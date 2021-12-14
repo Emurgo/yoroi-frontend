@@ -21,7 +21,7 @@ import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { environment } from '../../../environment';
 import CheckboxLabel from '../../../components/common/CheckboxLabel';
-import { WalletChecksum } from '@emurgo/cip4-js';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
@@ -50,7 +50,6 @@ type Props = {|
   +message: ?ConnectingMessage,
   +onToggleCheckbox: (PublicDeriver<>, ?WalletChecksum) => void,
   +onCancel: () => void,
-  +onConnect: number => Promise<void>,
   +handleSubmit: () => void,
   +selected: number,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,

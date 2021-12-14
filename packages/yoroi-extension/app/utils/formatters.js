@@ -20,8 +20,6 @@ export function splitAmount(
   return [beforeDecimal, afterDecimal]
 }
 
-export const amountWithoutZeros: (string => string) = (amount: string): string => amount.replace(/0+$/, '').replace(/\.$/, '')
-
 export const maxNameLengthBeforeTruncation = 15;
 export const truncateLongName: string => string = (walletName) => {
   return walletName.length > maxNameLengthBeforeTruncation
@@ -100,8 +98,9 @@ export function truncateAddress(addr: string): string {
  * Avoid using this when possible
  * Since the length is too small for some bech32 prefixes
  */
-export function truncateAddressShort(addr: string): string {
-  return truncateFormatter(addr, 20);
+export function truncateAddressShort(addr: string, by: ?number): string {
+  if (!by) by = 20
+  return truncateFormatter(addr, by);
 }
 
 /**

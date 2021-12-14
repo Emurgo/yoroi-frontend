@@ -34,22 +34,6 @@ const messages = defineMessages({
     id: 'wallet.topbar.dialog.tokenTypes',
     defaultMessage: '!!!Token types',
   },
-  standardWallet: {
-    id: 'wallet.nav.type.standard',
-    defaultMessage: '!!!Standard wallet',
-  },
-  paperWallet: {
-    id: 'wallet.nav.type.paper',
-    defaultMessage: '!!!Paper wallet',
-  },
-  trezorWallet: {
-    id: 'wallet.nav.type.trezor',
-    defaultMessage: '!!!Trezor wallet',
-  },
-  ledgerWallet: {
-    id: 'wallet.nav.type.ledger',
-    defaultMessage: '!!!Ledger wallet',
-  },
 });
 
 type Props = {|
@@ -117,12 +101,12 @@ export default class WalletCard extends Component<Props, State> {
 
   getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
     if (isLedgerNanoWallet(wallet)) {
-      return messages.ledgerWallet;
+      return globalMessages.ledgerWallet;
     }
     if (isTrezorTWallet(wallet)) {
-      return messages.trezorWallet;
+      return globalMessages.trezorWallet;
     }
-    return messages.standardWallet;
+    return globalMessages.standardWallet;
   };
 
   getIcon: ConceptualWallet => string = wallet => {

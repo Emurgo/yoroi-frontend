@@ -15,9 +15,9 @@ import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { WalletChecksum } from '@emurgo/cip4-js';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import ConnectorStore from '../stores/ConnectorStore';
+import { createAuthEntry } from '../api';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -49,7 +49,8 @@ export default class ConnectContainer extends Component<
     });
   };
 
-  componentDidMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
@@ -79,8 +80,7 @@ export default class ConnectContainer extends Component<
     const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
 
-    const authEntry = await ConnectorStore
-      .createAuthEntry({ appAuthID, deriver, checksum });
+    const authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
@@ -95,6 +95,7 @@ export default class ConnectContainer extends Component<
       publicDeriverId,
       appAuthID,
       auth: authEntry,
+      image: chromeMessage.imgBase64Url,
     });
     await connector.updateConnectorWhitelist.trigger({ whitelist });
 
@@ -124,7 +125,7 @@ export default class ConnectContainer extends Component<
     const wallets = this.generated.stores.connector.wallets;
     if (wallets) {
       const { selected, deriver, checksum } = this.state;
-      if (selected >= 0) {
+      if (selected >= 0 && deriver) {
         this.onConnect(deriver, checksum);
       }
     }
@@ -154,7 +155,6 @@ export default class ConnectContainer extends Component<
         error={error}
         message={responseMessage}
         publicDerivers={wallets}
-        onConnect={this.onConnect}
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}

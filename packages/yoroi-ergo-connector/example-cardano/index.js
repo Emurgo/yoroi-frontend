@@ -111,6 +111,7 @@ cardanoAccessBtn.addEventListener('click', () => {
           onApiConnectied(api);
       },
       function (err) {
+        toggleSpinner('hide');
         alertError(`Error: ${err}`);
       },
     );
@@ -402,7 +403,7 @@ window.onload = function() {
     alertError("Cardano API not found");
   } else {
     console.log("Cardano API detected, checking connection status");
-    cardano.yoroi.enable({ requestIdentification: true, onlySilent: true }).then(
+    cardano.yoroi.enable({ onlySilent: true }).then(
       api => {
         console.log('successful silent reconnection')
         onApiConnectied(api);

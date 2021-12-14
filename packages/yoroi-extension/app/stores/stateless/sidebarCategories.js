@@ -1,15 +1,16 @@
 // @flow
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import walletsIcon from '../../assets/images/sidebar/my_wallets.inline.svg';
 import transferIcon from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import settingsIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import goBackIcon from '../../assets/images/top-bar/back-arrow-white.inline.svg';
+import dappConnectorIcon from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import noticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { matchRoute } from '../../utils/routing';
 import environment from '../../environment';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 import walletIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import stakingIcon from '../../assets/images/sidebar/revamp/staking.inline.svg';
@@ -18,6 +19,8 @@ import votingIcon from '../../assets/images/sidebar/revamp/voting.inline.svg';
 // import swapIcon from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import settingIcon from '../../assets/images/sidebar/revamp/setting.inline.svg';
 import faqIcon from '../../assets/images/sidebar/revamp/faq.inline.svg';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+
 // import newUpdatesIcon from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
 // import feedbackIcon from '../../assets/images/sidebar/revamp/feedback.inline.svg';
 
@@ -92,6 +95,18 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   isVisible: _request => true,
 });
 
+
+export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
+  className: 'dapp-connector',
+  route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+  icon: dappConnectorIcon,
+  // the name `Dapp Connector` name should not be translated
+  // We only added it as all these labels of the sidebar are passed
+  // to intl.formatMessage(...) -> we have to pass valid label.
+  label: connectorMessages.dappConnector,
+  isVisible: _request =>  !environment.isLight
+});
+
 export const NOTICE_BOARD: SidebarCategory = registerCategory({
   className: 'notice-board',
   route: ROUTES.NOTICE_BOARD.ROOT,
@@ -120,24 +135,25 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'staking',
-    route: '/staking',
+    route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: _request => true,
+    isVisible: _request => _request.selected !== null,
   },
   {
     className: 'assets',
-    route: '/assets',
+    route: ROUTES.ASSETS.ROOT,
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
-    isVisible: _request => true,
+    isVisible: _request => _request.selected !== null,
   },
   {
     className: 'voting',
-    route: '/voting',
+    route: ROUTES.WALLETS.CATALYST_VOTING,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
-    isVisible: _request => true,
+    // $FlowFixMe[prop-missing]
+    isVisible: request => asGetStakingKey(request.selected) != null,
   },
   // {
   //   className: 'swap',

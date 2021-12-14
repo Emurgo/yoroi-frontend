@@ -8,6 +8,22 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  standardWallet: {
+    id: 'wallet.nav.type.standard',
+    defaultMessage: '!!!Standard wallet',
+  },
+  paperWallet: {
+    id: 'wallet.nav.type.paper',
+    defaultMessage: '!!!Paper wallet',
+  },
+  trezorWallet: {
+    id: 'wallet.nav.type.trezor',
+    defaultMessage: '!!!Trezor wallet',
+  },
+  ledgerWallet: {
+    id: 'wallet.nav.type.ledger',
+    defaultMessage: '!!!Ledger wallet',
+  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',
@@ -195,6 +211,10 @@ const globalMessages: * = defineMessages({
   addWalletLabel: {
     id: 'wallet.nav.addButton',
     defaultMessage: '!!!Add new wallet',
+  },
+  allWalletsLabel: {
+    id: 'wallet.nav.allWalletsLabel',
+    defaultMessage: '!!!All wallets',
   },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
@@ -578,6 +598,10 @@ const globalMessages: * = defineMessages({
     defaultMessage: '!!!Claim or transfer wallet',
   },
   // Revamp labels for sidebar
+  stakingDashboard: {
+    id: 'sidebar.stakingDashboard',
+    defaultMessage: '!!!Staking Dashboard',
+  },
   sidebarStaking: {
     id: 'sidebar.staking',
     defaultMessage: '!!!Staking',
@@ -617,6 +641,36 @@ const globalMessages: * = defineMessages({
   undelegateLabel: {
     id: 'global.labael.undelegate',
     defaultMessage: '!!!Undelegate',
+  },
+  roa30d: {
+    id: 'wallet.staking.banner.roa30d',
+    defaultMessage:
+      '!!!ROA 30d',
+  },
+  roaHelperMessage: {
+    id: 'wallet.staking.banner.roaHelperMessage',
+    defaultMessage:
+      '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
+  },
+  stakePoolDelegated: {
+    id: 'wallet.dashboard.upcomingRewards.stakePoolDelegated',
+    defaultMessage: '!!!Stake Pool Delegated',
+  },
+  totalDelegated: {
+    id: 'wallet.dashboard.summary.totalDelegated',
+    defaultMessage: '!!!Total Delegated',
+  },
+  overview: {
+    id: 'wallet.staking.overview',
+    defaultMessage: '!!!Overview',
+  },
+  tokens: {
+    id: 'wallet.assets.tokens',
+    defaultMessage: '!!!Tokens',
+  },
+  fingerprint: {
+    id: 'wallet.assets.fingerprint',
+    defaultMessage: '!!!Fingerprint',
   },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
@@ -852,6 +906,10 @@ export const connectorMessages: * = defineMessages({
     id: 'connector.settings.about',
     defaultMessage: '!!!About',
   },
+  dappConnector: {
+    id: 'connector.appName',
+    defaultMessage: 'Dapp Connector',
+  }
 });
 
 
