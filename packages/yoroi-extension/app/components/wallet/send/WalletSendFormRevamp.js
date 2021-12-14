@@ -88,11 +88,11 @@ const messages = defineMessages({
   },
   transactionFee: {
     id: 'wallet.send.form.revamp.transactionFee',
-    defaultMessage: 'Transaction fee',
+    defaultMessage: '!!!Transaction fee',
   },
   total: {
     id: 'wallet.send.confirmationDialog.totalLabel',
-    defaultMessage: 'Total',
+    defaultMessage: '!!!Total',
   },
   nAssets: {
     id: 'wallet.send.form.revamp.nAssets',

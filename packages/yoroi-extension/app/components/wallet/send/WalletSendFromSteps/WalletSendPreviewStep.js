@@ -5,7 +5,6 @@
 import type { Node } from 'react';
 import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import TextField from '../../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
@@ -253,7 +252,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
     const { intl } = this.context;
     const walletPasswordField = form.$('walletPassword');
     const {
-      onCancel,
       amount,
       receivers,
       isSubmitting,
@@ -267,11 +265,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
         </WarningBox>
       </div>
     );
-
-    const confirmButtonClasses = classnames([
-      'confirmButton',
-      isSubmitting ? styles.submitButtonSpinning : null,
-    ]);
 
     return (
       <div className={styles.component}>
