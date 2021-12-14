@@ -376,7 +376,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
           disabled={!walletPasswordField.isValid || isSubmitting}
           sx={{ display: 'block', padding: '0px' }}
         >
-          {true ?
+          {isSubmitting ?
             <LoadingSpinner light /> :
             intl.formatMessage(globalMessages.sendButtonLabel)}
         </Button>
