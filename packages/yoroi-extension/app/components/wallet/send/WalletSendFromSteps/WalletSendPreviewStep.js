@@ -55,8 +55,8 @@ type Props = {|
 
 const messages = defineMessages({
   nAssets: {
-    id: 'wallet.send.form.revamp.nAssets',
-    defaultMessage: '!!!{number} assets',
+    id: 'wallet.send.form.preview.nAssets',
+    defaultMessage: '!!!{number} Assets',
   }
 });
 

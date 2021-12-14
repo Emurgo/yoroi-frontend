@@ -96,8 +96,12 @@ const messages = defineMessages({
     defaultMessage: '!!!Total',
   },
   nAssets: {
-    id: 'wallet.send.form.revamp.nAssets',
+    id: 'wallet.send.form.nAssets',
     defaultMessage: '!!!{number} assets',
+  },
+  max: {
+    id: 'wallet.send.form.max',
+    defaultMessage: '!!!MAX',
   }
 });
 
