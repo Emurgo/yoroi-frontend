@@ -33,6 +33,7 @@ import type {
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
+import { Button } from '@mui/material';
 
 type Props = {|
   +staleTx: boolean,
@@ -387,6 +388,15 @@ export default class WalletSendPreviewStep extends Component<Props> {
           )
           : null
         }
+
+        <Button
+          variant="primary"
+          onClick={this.submit.bind(this)}
+          disabled={!walletPasswordField.isValid}
+          sx={{ display: 'block' }}
+        >
+          {intl.formatMessage(globalMessages.sendButtonLabel)}
+        </Button>
 
       </div>
     );
