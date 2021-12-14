@@ -2,6 +2,8 @@
 import { Component } from 'react';
 import styles from './AssetsDropdown.scss'
 import DefaultAssetIcon from '../../../../assets/images/assets-page/asset-no.inline.svg'
+import ArrowUpIcon from '../../../../assets/images/arrow-up.inline.svg'
+import ArrowDownIcon from '../../../../assets/images/arrow-down.inline.svg'
 
 type Props = {|
     +assetsList: Asset[],
@@ -29,7 +31,12 @@ export default class AssetsDropdown extends Component<Props, State> {
           <div className={styles.component}>
             <button type='button' onClick={() => this.toggleDropdown()} className={styles.header}>
               <p className={styles.title}>Assets</p>
-              <p className={styles.count}>{assets.length}</p>
+              <div className={styles.headerRight}>
+                <p className={styles.count}>{assets.length}</p>
+                {
+                  isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />
+                }
+              </div>
             </button>
 
             {isOpen &&

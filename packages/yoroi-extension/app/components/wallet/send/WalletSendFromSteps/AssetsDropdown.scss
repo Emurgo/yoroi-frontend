@@ -16,8 +16,14 @@
             color: #6B7384;
         }
 
-        .count {
-            color: #242838;
+        .headerRight {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .count {
+                color: #242838;
+                margin-right: 8px;
+            }
         }
     }
 
