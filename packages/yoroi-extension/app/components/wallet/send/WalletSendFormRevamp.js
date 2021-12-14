@@ -636,7 +636,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
   _nextStepButton(
     disabledCondition: boolean,
-    nextStep: number
+    nextStep: () => void
   ): Node {
     const { intl } = this.context;
 

@@ -34,6 +34,7 @@ import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentif
 import AssetsDropdown from './AssetsDropdown';
 import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import type { Asset } from '../../assets/AssetsList'
 
 type Props = {|
   +staleTx: boolean,
@@ -236,7 +237,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
     );
   }
 
-  getAssetsList = () => {
+  getAssetsList: (() => Asset[]) = () => {
     const { getTokenInfo } = this.props
     return this.props.amount.nonDefaultEntries().map(entry => ({
       entry,
@@ -375,7 +376,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
           disabled={!walletPasswordField.isValid || isSubmitting}
           sx={{ display: 'block', padding: '0px' }}
         >
-          {isSubmitting ?
+          {true ?
             <LoadingSpinner light /> :
             intl.formatMessage(globalMessages.sendButtonLabel)}
         </Button>

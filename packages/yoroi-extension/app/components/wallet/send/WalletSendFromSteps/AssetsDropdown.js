@@ -1,12 +1,14 @@
 // @flow
 import { Component } from 'react';
+import type { Node } from 'react'
 import styles from './AssetsDropdown.scss'
 import DefaultAssetIcon from '../../../../assets/images/assets-page/asset-no.inline.svg'
 import ArrowUpIcon from '../../../../assets/images/arrow-up.inline.svg'
 import ArrowDownIcon from '../../../../assets/images/arrow-down.inline.svg'
+import type { Asset } from '../../assets/AssetsList'
 
 type Props = {|
-    +assetsList: Asset[],
+    +assets: Asset[],
 |}
 
 type State = {|
@@ -24,7 +26,7 @@ export default class AssetsDropdown extends Component<Props, State> {
       this.setState({ isOpen: !isOpen })
     }
 
-    render() {
+    render(): Node {
         const { assets } = this.props
         const { isOpen } = this.state
         return (

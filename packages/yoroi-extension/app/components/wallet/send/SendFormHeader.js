@@ -32,7 +32,9 @@ const TABS = [
  */
 export default class SendFromHeader extends Component<Props> {
 
-    getBarClassnames = (tabStep: number, currentStep: number): string => {
+    getBarClassnames: (tabStep: number, currentStep: number) => string = (
+      tabStep, currentStep
+      ) => {
       /**
        * @Note
        * `eslint` doesn't allow ternary expressions

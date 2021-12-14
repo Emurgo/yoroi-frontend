@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, computed, observable, runInAction } from 'mobx';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
@@ -40,6 +40,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';

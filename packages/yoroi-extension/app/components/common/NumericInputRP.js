@@ -414,6 +414,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       value,
       error,
       amountFieldRevamp,
+      disabled,
       ...rest
     } = this.props;
 
@@ -429,7 +430,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
           onBlur={this.onBlur}
           value={inputValue}
           placeholder='0'
-          disabled={rest.disabled}
+          disabled={disabled}
         />
       )
     }
