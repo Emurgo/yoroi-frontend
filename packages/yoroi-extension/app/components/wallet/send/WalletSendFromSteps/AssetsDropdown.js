@@ -18,7 +18,8 @@ export default class AssetsDropdown extends Component<Props, State> {
     }
 
     toggleDropdown(): void {
-        this.setState({ isOpen: !this.state.isOpen })
+      const { isOpen } = this.state
+      this.setState({ isOpen: !isOpen })
     }
 
     render() {
