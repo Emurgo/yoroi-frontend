@@ -45,6 +45,7 @@ import TransactionSuccessDialog from '../../components/wallet/send/TransactionSu
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
+import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFromSteps/WalletSendPreviewStepContainer';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -192,7 +193,7 @@ class WalletSendPage extends Component<AllProps> {
             spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
             onAddToken={txBuilderActions.updateToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
-            previewStepsProps={this.generated.WalletSendConfirmationDialogContainerProps}
+            previewStep={this.renderTxPreviewStep}
           />
           {this.renderDialog()}
         </>
@@ -270,9 +271,6 @@ class WalletSendPage extends Component<AllProps> {
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
 
     const { transactionBuilderStore } = this.generated.stores;
-    console.log({
-      classicYoroi: transactionBuilderStore.tentativeTx
-    })
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
     }
@@ -286,6 +284,26 @@ class WalletSendPage extends Component<AllProps> {
       openTransactionSuccessDialog={this.openTransactionSuccessDialog}
     />);
   };
+
+  renderTxPreviewStep: (() => Node) = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    if (!transactionBuilderStore.tentativeTx) {
+      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
+    }
+    const signRequest = transactionBuilderStore.tentativeTx;
+
+    return (<WalletSendPreviewStepContainer
+      {...this.generated.WalletSendConfirmationDialogContainerProps}
+      signRequest={signRequest}
+      staleTx={transactionBuilderStore.txMismatch}
+      unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+      openTransactionSuccessDialog={this.openTransactionSuccessDialog}
+    />);
+  };
+
 
   /** Hardware Wallet (Trezor or Ledger) Confirmation dialog
     * Callback that creates a component to avoid the component knowing about actions/stores

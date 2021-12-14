@@ -39,7 +39,6 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import WalletSendPreviewStepContainer from './WalletSendFromSteps/WalletSendPreviewStepContainer';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
@@ -133,6 +132,7 @@ type Props = {|
   +onAddToken: (void | $ReadOnly<TokenRow>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
+  +previewStep: () => Node,
 |};
 
 type State = {|
@@ -264,9 +264,6 @@ export default class WalletSendForm extends Component<Props, State> {
             : null
         })(),
         validators: [async ({ field }) => {
-          console.log({
-            validation: true, field
-          })
           if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
             return true;
@@ -346,23 +343,6 @@ export default class WalletSendForm extends Component<Props, State> {
       networkId: this.props.defaultToken.NetworkId,
     });
     return info.Metadata.numberOfDecimals;
-  }
-
-  renderPreviewStep(): Node {
-    const publicDeriver = this.props.previewStepsProps.stores.wallets.selected
-    if (!publicDeriver) throw new Error(`Active wallet is required.`);
-    const { transactionBuilderStore } =  this.props.previewStepsProps.stores;
-    if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
-    }
-    const signRequest = transactionBuilderStore.tentativeTx;
-    return (
-      <WalletSendPreviewStepContainer
-        {...this.props.previewStepsProps}
-        signRequest={signRequest}
-        staleTx={transactionBuilderStore.txMismatch}
-        unitOfAccountSetting={this.props.previewStepsProps.stores.profile.unitOfAccount}
-      />)
   }
 
   renderCurrentStep(step: number): Node {
@@ -515,7 +495,7 @@ export default class WalletSendForm extends Component<Props, State> {
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
-            return this.renderPreviewStep()
+            return this.props.previewStep()
         default:
           throw Error(`${step} is not a valid step number`)
     }
