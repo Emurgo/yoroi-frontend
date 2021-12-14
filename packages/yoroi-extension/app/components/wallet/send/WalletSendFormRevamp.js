@@ -3,15 +3,13 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import { Button, MenuItem, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import TextField from '../../common/TextField'
 import { defineMessages, intlShape } from 'react-intl';
-import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
+import { isValidMemoOptional, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import { AmountInput, AmountInputRevamp } from '../../common/NumericInputRP';
-import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
-import BorderedBox from '../../widgets/BorderedBox';
+import { AmountInputRevamp } from '../../common/NumericInputRP';
 import styles from './WalletSendFormRevamp.scss';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { UriParams } from '../../../utils/URIHandling';
@@ -25,9 +23,11 @@ import {
 } from '../../../utils/formatters';
 import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
-import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName, genFormatTokenAmount,
+  // getTokenStrictName, getTokenIdentifierIfExists,
+} from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
@@ -522,102 +522,106 @@ export default class WalletSendForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { form } = this;
-    const { intl } = this.context;
     const { currentStep } = this.state
-    const {
-      hasAnyPending,
-      showMemo,
-      onAddMemo
-    } = this.props;
+    /**
+     * @note
+     * Need this commened code for reference.
+     */
+    // const { form } = this;
+    // const { intl } = this.context;
+    // const {
+    //   hasAnyPending,
+    //   showMemo,
+    //   onAddMemo
+    // } = this.props;
 
-    const amountField = form.$('amount');
-    const receiverField = form.$('receiver');
-    const memoField = form.$('memo');
-    const amountFieldProps = amountField.bind();
+    // const amountField = form.$('amount');
+    // const receiverField = form.$('receiver');
+    // const memoField = form.$('memo');
+    // const amountFieldProps = amountField.bind();
 
-    const transactionFee = this.props.fee ?? new MultiToken([], {
-      defaultIdentifier: this.props.defaultToken.Identifier,
-      defaultNetworkId: this.props.defaultToken.NetworkId,
-    });
+    // const transactionFee = this.props.fee ?? new MultiToken([], {
+    //   defaultIdentifier: this.props.defaultToken.Identifier,
+    //   defaultNetworkId: this.props.defaultToken.NetworkId,
+    // });
 
-    const totalAmount = this.props.totalInput ?? new MultiToken([{
-      identifier: (this.props.selectedToken ?? this.props.defaultToken).Identifier,
-      networkId: (this.props.selectedToken ?? this.props.defaultToken).NetworkId,
-      amount: formattedAmountToBigNumber(amountFieldProps.value)
-        .shiftedBy((this.props.selectedToken ?? this.props.defaultToken).Metadata.numberOfDecimals),
-    }], {
-      defaultIdentifier: this.props.defaultToken.Identifier,
-      defaultNetworkId: this.props.defaultToken.NetworkId,
-    });
+    // const totalAmount = this.props.totalInput ?? new MultiToken([{
+    //   identifier: (this.props.selectedToken ?? this.props.defaultToken).Identifier,
+    //   networkId: (this.props.selectedToken ?? this.props.defaultToken).NetworkId,
+    //   amount: formattedAmountToBigNumber(amountFieldProps.value)
+    //     .shiftedBy((this.props.selectedToken ?? this.props.defaultToken).Metadata.numberOfDecimals),
+    // }], {
+    //   defaultIdentifier: this.props.defaultToken.Identifier,
+    //   defaultNetworkId: this.props.defaultToken.NetworkId,
+    // });
 
-    const pendingTxWarningComponent = (
-      <div className={styles.warningBox}>
-        <WarningBox>
-          {intl.formatMessage(globalMessages.sendingIsDisabled)}
-        </WarningBox>
-      </div>
-    );
+    // const pendingTxWarningComponent = (
+    //   <div className={styles.warningBox}>
+    //     <WarningBox>
+    //       {intl.formatMessage(globalMessages.sendingIsDisabled)}
+    //     </WarningBox>
+    //   </div>
+    // );
 
-    let transactionFeeError = null;
-    if (this.props.isCalculatingFee) {
-      transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
-    }
-    if (this.props.error) {
-      transactionFeeError = this.context.intl.formatMessage(
-        this.props.error,
-        this.props.error.values
-      );
-    }
+    // let transactionFeeError = null;
+    // if (this.props.isCalculatingFee) {
+    //   transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
+    // }
+    // if (this.props.error) {
+    //   transactionFeeError = this.context.intl.formatMessage(
+    //     this.props.error,
+    //     this.props.error.values
+    //   );
+    // }
 
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    const tokenOptions = (() => {
-      if (this.props.spendableBalance == null) return [];
-      const { spendableBalance } = this.props;
-      return [
-        // make sure default token is always first in the list
-        spendableBalance.getDefaultEntry(),
-        ...spendableBalance.nonDefaultEntries(),
-      ].map(entry => ({
-        entry,
-        info: this.props.getTokenInfo(entry),
-      })).map(token => {
-        const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
-        return {
-          value: token.info.TokenId,
-          info: token.info,
-          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount,
-        }
-      });
-    })();
+    // const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    // const tokenOptions = (() => {
+    //   if (this.props.spendableBalance == null) return [];
+    //   const { spendableBalance } = this.props;
+    //   return [
+    //     // make sure default token is always first in the list
+    //     spendableBalance.getDefaultEntry(),
+    //     ...spendableBalance.nonDefaultEntries(),
+    //   ].map(entry => ({
+    //     entry,
+    //     info: this.props.getTokenInfo(entry),
+    //   })).map(token => {
+    //     const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+    //     return {
+    //       value: token.info.TokenId,
+    //       info: token.info,
+    //       label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+    //       id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+    //       amount,
+    //     }
+    //   });
+    // })();
 
 
-    const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-      identifier: this.props.defaultToken.Identifier,
-      networkId: this.props.defaultToken.NetworkId,
-    }).TokenId
+    // const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+    //   identifier: this.props.defaultToken.Identifier,
+    //   networkId: this.props.defaultToken.NetworkId,
+    // }).TokenId
 
-    const sendAmountOptions = (() => {
-      return [
-        { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
-        ...tokenOptions.filter(t => t.value === tokenId).map(token => {
-          let label = intl.formatMessage(messages.dropdownAmountLabel, {
-            currency: truncateToken(token.label)
-          })
-          const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
-          if(token.label === defaultTokenName){
-            label += intl.formatMessage(messages.allTokens)
-          }
-          return {
-            label,
-            value: token.value,
-            id: token.id
-          }
-        })
-      ]
-    })()
+    // const sendAmountOptions = (() => {
+    //   return [
+    //     { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
+    //     ...tokenOptions.filter(t => t.value === tokenId).map(token => {
+    //       let label = intl.formatMessage(messages.dropdownAmountLabel, {
+    //         currency: truncateToken(token.label)
+    //       })
+    //       const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
+    //       if(token.label === defaultTokenName){
+    //         label += intl.formatMessage(messages.allTokens)
+    //       }
+    //       return {
+    //         label,
+    //         value: token.value,
+    //         id: token.id
+    //       }
+    //     })
+    //   ]
+    // })()
 
     return (
       <div className={styles.component}>

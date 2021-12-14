@@ -33,6 +33,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
 import { Button } from '@mui/material';
+import LoadingSpinner from '../../../widgets/LoadingSpinner';
 
 type Props = {|
   +staleTx: boolean,
@@ -268,8 +269,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {this.props.staleTx && staleTxWarning}
-        <div>
+        <div className={styles.staleTxWarning}>
+          {this.props.staleTx && staleTxWarning}
+        </div>
+        <div className={styles.wrapper}>
           <div>
             <div className={styles.addressToLabel}>
               {intl.formatMessage(globalMessages.receiverLabel)}
@@ -369,10 +372,12 @@ export default class WalletSendPreviewStep extends Component<Props> {
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid}
-          sx={{ display: 'block' }}
+          disabled={!walletPasswordField.isValid || isSubmitting}
+          sx={{ display: 'block', padding: '0px' }}
         >
-          {intl.formatMessage(globalMessages.sendButtonLabel)}
+          {isSubmitting ?
+            <LoadingSpinner light /> :
+            intl.formatMessage(globalMessages.sendButtonLabel)}
         </Button>
 
       </div>

@@ -1,8 +1,14 @@
 .component {
-    width: 65%;
     padding-top: 15px;
     overflow-y: scroll;
-    height: 100%;
+    .wrapper {
+        width: 65%;
+        height: 100%;
+
+        .staleTxWarning {
+            margin-bottom: 20px;
+        }
+    }
 
     .addressToLabel {
         font-size: 16px;
