@@ -402,9 +402,7 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     const amountInputError = transactionFeeError || amountField.error
-
-
-
+    console.log({error: amountInputError})
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
@@ -490,7 +488,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     type='button'
                     onClick={() => this.props.updateSendAllStatus(!shouldSendAll)}
                   >
-                    MAX
+                    {intl.formatMessage(messages.max)}
                   </button>
                 </div>
 
@@ -499,7 +497,11 @@ export default class WalletSendForm extends Component<Props, State> {
                 </div>
               </div>
 
-              <p className={styles.amountError}>
+              <p
+                className={classnames(
+                  [!amountInputError ? styles.emptyError: styles.amountError ]
+                )}
+              >
                 {amountInputError}
               </p>
 
