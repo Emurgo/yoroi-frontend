@@ -40,6 +40,7 @@ import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import WalletSendPreviewStepContainer from './WalletSendFromSteps/WalletSendPreviewStepContainer';
+import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -477,7 +478,9 @@ export default class WalletSendForm extends Component<Props, State> {
                     allowSigns={false}
                     amountFieldRevamp
                   />
-                  <p className={styles.ada}>ADA</p>
+                  <p className={styles.defaultCoin}>
+                    {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
+                  </p>
                   <button
                     className={styles.max}
                     type='button'
@@ -609,14 +612,6 @@ export default class WalletSendForm extends Component<Props, State> {
         })
       ]
     })()
-
-    const tokenListClasses = classnames([
-      styles.tokenList,
-      {
-        [styles.show]: this.props.shouldSendAll &&
-           this.form.$('selectedToken').value === tokenId
-      }
-    ])
 
     return (
       <div className={styles.component}>

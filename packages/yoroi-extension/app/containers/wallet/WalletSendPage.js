@@ -8,7 +8,7 @@ import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 import WalletSendFormClassic from '../../components/wallet/send/WalletSendForm';
-import WalletSentFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
+import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
 
 // Web Wallet Confirmation
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
@@ -156,7 +156,7 @@ class WalletSendPage extends Component<AllProps> {
     if (this.props.selectedLayout === 'REVAMP') {
       return (
         <>
-          <WalletSentFormRevamp
+          <WalletSendFormRevamp
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
             validateAmount={(amount) => validateAmount(
               amount,
