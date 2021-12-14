@@ -273,22 +273,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
       isSubmitting ? styles.submitButtonSpinning : null,
     ]);
 
-    const actions = [
-      {
-        label: intl.formatMessage(globalMessages.backButtonLabel),
-        disabled: isSubmitting,
-        onClick: onCancel,
-      },
-      {
-        label: intl.formatMessage(globalMessages.sendButtonLabel),
-        onClick: this.submit.bind(this),
-        primary: true,
-        className: confirmButtonClasses,
-        isSubmitting,
-        disabled: !walletPasswordField.isValid,
-      },
-    ];
-
     return (
       <div className={styles.component}>
         {this.props.staleTx && staleTxWarning}
