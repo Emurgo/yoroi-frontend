@@ -133,6 +133,7 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
+  +openAddTokenDialog: void => void,
 |};
 
 type State = {|
@@ -484,6 +485,8 @@ export default class WalletSendForm extends Component<Props, State> {
               >
                 {amountInputError}
               </p>
+
+              <button type='button' onClick={this.props.openAddTokenDialog}> + Add Token</button>
 
               {this._nextStepButton(
                !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),

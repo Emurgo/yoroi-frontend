@@ -47,6 +47,7 @@ import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirm
 import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFromSteps/WalletSendPreviewStepContainer';
+import AddTokenDialog from '../../components/wallet/send/WalletSendFromSteps/AddTokenDialog'
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -110,6 +111,13 @@ class WalletSendPage extends Component<AllProps> {
     this.showMemo = !this.showMemo;
     this.generated.actions.memos.closeMemoDialog.trigger();
   };
+
+  openAddTokenDialog: void => void = () => {
+    this.generated.actions.closeActiveDialog.trigger()
+    this.generated.actions.dialogs.push.trigger({
+      dialog: AddTokenDialog
+    });
+  }
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -195,6 +203,7 @@ class WalletSendPage extends Component<AllProps> {
             onAddToken={txBuilderActions.updateToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
+            openAddTokenDialog={this.openAddTokenDialog}
           />
           {this.renderDialog()}
         </>
@@ -261,6 +270,12 @@ class WalletSendPage extends Component<AllProps> {
         onClose={this.closeTransactionSuccessDialog}
         classicTheme={this.generated.stores.profile.isClassicTheme}
       />)
+    }
+
+    if (uiDialogs.isOpen(AddTokenDialog)) {
+      return (
+        <AddTokenDialog />
+      )
     }
     return '';
   }
