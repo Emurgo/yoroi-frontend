@@ -1,5 +1,7 @@
 .component {
-    width: 670px;
+    min-height: 600px;
+    width: 100%;
+    height: 100%;
     .tokensList {
         .tokenRow {
             display: grid;
@@ -7,3 +9,8 @@
         }
     }
 }
+
+.dialog {
+    min-width: 670px;
+}
+  

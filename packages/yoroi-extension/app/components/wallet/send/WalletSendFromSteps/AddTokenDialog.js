@@ -80,7 +80,7 @@ export default class AddTokenDialog extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    const tokenOptions = (() => {
+    const tokensList = (() => {
       if (this.props.spendableBalance == null) return [];
       const { spendableBalance } = this.props;
       return [
@@ -104,13 +104,14 @@ export default class AddTokenDialog extends Component<Props> {
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         closeOnOverlayClick={false}
+        className={styles.dialog}
         onClose={onClose}
         closeButton={<DialogCloseButton />}
       >
         <div className={styles.component}>
           <div className={styles.tokensList}>
             {
-              tokenOptions.map(option => (
+              tokensList.map(option => (
                 <div className={styles.tokenRow}>
                   <p>{option.label}</p>
                   <p>{option.id}</p>
