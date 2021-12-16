@@ -212,6 +212,6 @@ const Label = styled(Typography)({
 export const columnTXStyles = {
   transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left' },
   status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left' },
-  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'center' },
+  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right' },
   amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right' },
 };
