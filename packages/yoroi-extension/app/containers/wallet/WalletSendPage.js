@@ -273,11 +273,7 @@ class WalletSendPage extends Component<AllProps> {
     }
 
     if (uiDialogs.isOpen(AddTokenDialog)) {
-      return (
-        <AddTokenDialog
-          onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
-        />
-      )
+      return this.renderAddTokenDialog()
     }
     return '';
   }
@@ -463,6 +459,16 @@ class WalletSendPage extends Component<AllProps> {
         this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
       }}
     />);
+  }
+
+  renderAddTokenDialog: void => void = () => {
+    return (
+      <AddTokenDialog
+        onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+      />
+    )
   }
 
   @computed get generated(): {|

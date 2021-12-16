@@ -14,7 +14,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import styles from '../WalletSendConfirmationDialog.scss';
+import styles from './AddTokenDialog.scss';
 import config from '../../../../config';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
@@ -33,10 +33,11 @@ import type {
   TokenLookupKey, TokenEntry,
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
+import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   +onClose: void => void,
+  +spendableBalance: ?MultiToken,
 |};
 
 @observer
@@ -78,17 +79,47 @@ export default class AddTokenDialog extends Component<Props> {
     const { onClose } = this.props
     const walletPasswordField = form.$('walletPassword');
 
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    const tokenOptions = (() => {
+      if (this.props.spendableBalance == null) return [];
+      const { spendableBalance } = this.props;
+      return [
+        ...spendableBalance.nonDefaultEntries(),
+      ].map(entry => ({
+        entry,
+        info: this.props.getTokenInfo(entry),
+      })).map(token => {
+        const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+        return {
+          value: token.info.TokenId,
+          info: token.info,
+          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+          amount,
+        }
+      });
+    })();
+
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         closeOnOverlayClick={false}
         onClose={onClose}
-        className={styles.dialog}
         closeButton={<DialogCloseButton />}
       >
-
-       <h1>Hello, Dialog</h1>
-
+        <div className={styles.component}>
+          <div className={styles.tokensList}>
+            {
+              tokenOptions.map(option => (
+                <div className={styles.tokenRow}>
+                  <p>{option.label}</p>
+                  <p>{option.id}</p>
+                  <p>{option.amount}</p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
       </Dialog>
     );
   }
