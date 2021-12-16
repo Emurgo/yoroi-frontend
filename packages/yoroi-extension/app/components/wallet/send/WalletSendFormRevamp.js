@@ -40,6 +40,7 @@ import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import PlusIcon from '../../../assets/images/plus.inline.svg'
 
 const messages = defineMessages({
   receiverLabel: {
@@ -101,7 +102,7 @@ const messages = defineMessages({
   max: {
     id: 'wallet.send.form.max',
     defaultMessage: '!!!MAX',
-  }
+  },
 });
 
 type Props = {|
@@ -486,7 +487,16 @@ export default class WalletSendForm extends Component<Props, State> {
                 {amountInputError}
               </p>
 
-              <button type='button' onClick={this.props.openAddTokenDialog}> + Add Token</button>
+              <div className={styles.buttonsWrappers}>
+                <button type='button' onClick={this.props.openAddTokenDialog}>
+                  <PlusIcon />
+                  <p>{intl.formatMessage(globalMessages.token)}</p>
+                </button>
+                <button type='button' onClick={this.props.openAddTokenDialog}>
+                  <PlusIcon />
+                  <p>{intl.formatMessage(globalMessages.nft)}</p>
+                </button>
+              </div>
 
               {this._nextStepButton(
                !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),

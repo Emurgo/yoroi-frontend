@@ -113,7 +113,7 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   openAddTokenDialog: void => void = () => {
-    this.generated.actions.closeActiveDialog.trigger()
+    this.generated.actions.dialogs.closeActiveDialog.trigger()
     this.generated.actions.dialogs.push.trigger({
       dialog: AddTokenDialog
     });
@@ -274,7 +274,9 @@ class WalletSendPage extends Component<AllProps> {
 
     if (uiDialogs.isOpen(AddTokenDialog)) {
       return (
-        <AddTokenDialog />
+        <AddTokenDialog
+          onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        />
       )
     }
     return '';

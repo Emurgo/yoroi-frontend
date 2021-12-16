@@ -36,6 +36,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
+  +onClose: void => void,
 |};
 
 @observer
@@ -74,12 +75,14 @@ export default class AddTokenDialog extends Component<Props> {
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
+    const { onClose } = this.props
     const walletPasswordField = form.$('walletPassword');
 
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         closeOnOverlayClick={false}
+        onClose={onClose}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
       >
