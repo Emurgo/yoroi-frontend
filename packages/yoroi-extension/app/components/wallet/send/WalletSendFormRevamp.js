@@ -498,13 +498,15 @@ export default class WalletSendForm extends Component<Props, State> {
                 </button>
               </div>
 
-              {this._nextStepButton(
-               !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),
-               () => {
-                this.props.onSubmit()
-                this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
-               }
-              )}
+              <div className={styles.next}>
+                {this._nextStepButton(
+                  !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),
+                  () => {
+                    this.props.onSubmit()
+                    this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
+                  }
+                )}
+              </div>
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
