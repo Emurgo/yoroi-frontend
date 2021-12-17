@@ -59,7 +59,7 @@ const SORTING_DIRECTIONS = {
 }
 
 const SORTING_COLUMNS = {
-  NAME: 'name',
+  LABEL: 'label',
   AMOUNT: 'amount'
 }
 
@@ -140,9 +140,9 @@ export default class AddTokenDialog extends Component<Props, State> {
       this.setState({ tokensList: this.genTokensList() })
       if(!keyword) return
       const regExp = new RegExp(keyword, 'gi')
-      const assetsListCopy = [...this.genTokensList()]
-      const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp))
-      this.setState({ tokensList: filteredAssetsList })
+      const tokensListCopy = [...this.genTokensList()]
+      const filteredTokensList = tokensListCopy.filter(a => a.label.match(regExp))
+      this.setState({ tokensList: filteredTokensList })
     };
 
   compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
@@ -164,10 +164,10 @@ export default class AddTokenDialog extends Component<Props, State> {
     return 0;
   }
 
-  sortAssets: ((field: string) => void) = (field: string) => {
-    const assetsListCopy = [...this.state.assetsList]
-    const sortedAssets = assetsListCopy.sort((a,b) => this.compare(a,b, field))
-    this.setState({ assetsList: sortedAssets, sortingColumn: field });
+  sortTokens: ((field: string) => void) = (field: string) => {
+    const tokensListCopy = [...this.state.tokensList]
+    const sortedTokens = tokensListCopy.sort((a,b) => this.compare(a,b, field))
+    this.setState({ tokensList: sortedTokens, sortingColumn: field });
   };
 
   displayColumnLogo: ((column: string) => Node) = (column: string) => {
@@ -226,7 +226,7 @@ export default class AddTokenDialog extends Component<Props, State> {
         <div className={styles.component}>
           <div className={styles.search}>
             <SearchIcon />
-            <input className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
+            <input onChange={this.search} className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
           </div>
           <div className={styles.minAda}>
             <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
@@ -240,11 +240,11 @@ export default class AddTokenDialog extends Component<Props, State> {
             <>
               <ul className={styles.columns}>
                 <li className={styles.name}>
-                  <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
+                  <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
                     <p className={styles.headerText}>
                       {intl.formatMessage(messages.nameAndTicker)}
                     </p>
-                    {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
+                    {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
                   </button>
                 </li>
                 <li className={styles.identifier}>
@@ -253,7 +253,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                   </p>
                 </li>
                 <li className={styles.quantity}>
-                  <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                  <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
                     <p className={styles.headerText}>
                       {intl.formatMessage(messages.quantity)}
                     </p>
