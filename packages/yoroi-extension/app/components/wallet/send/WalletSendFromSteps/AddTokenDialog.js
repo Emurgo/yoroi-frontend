@@ -7,7 +7,7 @@ import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../../../common/TextField';
-import { intlShape } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../../widgets/Dialog';
@@ -34,11 +34,40 @@ import type {
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../../stores/stateless/tokenHelpers';
+import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
+
 
 type Props = {|
   +onClose: void => void,
   +spendableBalance: ?MultiToken,
 |};
+
+export const messages: Object = defineMessages({
+  assets: {
+    id: 'wallet.assets.assets',
+    defaultMessage: '!!!Assets ({number})',
+  },
+  nameAndTicker: {
+    id: 'wallet.assets.nameAndTicker',
+    defaultMessage: '!!!Name and ticker',
+  },
+  quantity: {
+    id: 'wallet.assets.quantity',
+    defaultMessage: '!!!Quantity',
+  },
+  identifier: {
+    id: 'wallet.assets.id',
+    defaultMessage: '!!!ID',
+  },
+  search: {
+    id: 'wallet.assets.search',
+    defaultMessage: '!!!Search',
+  },
+  noAssetFound: {
+    id: 'wallet.assets.noAssetFound',
+    defaultMessage: '!!!No Asset Found',
+  },
+});
 
 @observer
 export default class AddTokenDialog extends Component<Props> {
@@ -88,7 +117,7 @@ export default class AddTokenDialog extends Component<Props> {
       ].map(entry => ({
         entry,
         info: this.props.getTokenInfo(entry),
-      })).map(token => {
+      })).filter(token => !token.info.IsNFT).map(token => {
         const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
         return {
           value: token.info.TokenId,
@@ -100,8 +129,6 @@ export default class AddTokenDialog extends Component<Props> {
       });
     })();
 
-    console.log({tokens: tokensList})
-
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.nTokens, { number: tokensList.length })}
@@ -111,13 +138,17 @@ export default class AddTokenDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
       >
         <div className={styles.component}>
+          <div className={styles.search}>
+            <SearchIcon />
+            <input className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
+          </div>
           <div className={styles.tokensList}>
             {
-              tokensList.map(option => (
-                <div className={styles.tokenRow}>
-                  <p>{option.label}</p>
-                  <p>{option.id}</p>
-                  <p>{option.amount}</p>
+              tokensList.map(token => (
+                <div key={token.id} className={styles.tokenRow}>
+                  <p>{token.label}</p>
+                  <p>{token.id}</p>
+                  <p>{token.amount}</p>
                 </div>
               ))
             }
