@@ -67,6 +67,10 @@ export const messages: Object = defineMessages({
     id: 'wallet.assets.noAssetFound',
     defaultMessage: '!!!No Asset Found',
   },
+  minAda: {
+    id: 'wallet.send.form.dialog',
+    defaultMessage: '!!!min-ada'
+  }
 });
 
 @observer
@@ -141,6 +145,9 @@ export default class AddTokenDialog extends Component<Props> {
           <div className={styles.search}>
             <SearchIcon />
             <input className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
+          </div>
+          <div className={styles.minAda}>
+            <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
           </div>
           <div className={styles.tokensList}>
             {
