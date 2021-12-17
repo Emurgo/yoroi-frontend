@@ -177,6 +177,14 @@ function toLedgerTokenBundle(
   return assetGroup;
 }
 
+/*
+ Compare two hex string keys according to the key order specified by RFC 7049:
+  *  If two keys have different lengths, the shorter one sorts
+     earlier;
+
+  *  If two keys have the same length, the one with the lower value
+     in (byte-wise) lexical order sorts earlier.
+*/
 function compareCborKey(hex1: string, hex2: string): number {
   if (hex1.length < hex2.length) {
     return -1;
@@ -184,15 +192,11 @@ function compareCborKey(hex1: string, hex2: string): number {
   if (hex2.length < hex1.length) {
     return 1;
   }
-  const bytes1 = [...Buffer.from(hex1, 'hex')];
-  const bytes2 = [...Buffer.from(hex2, 'hex')];
-  for (let i = 0; i < bytes1.length; i++) {
-    if (bytes1[i] < bytes2[i]) {
-      return -1;
-    }
-    if (bytes2[i] < bytes1[i]) {
-      return 1;
-    }
+  if (hex1 < hex2) {
+    return -1;
+  }
+  if (hex2 < hex1) {
+    return 1;
   }
   return 0;
 }
