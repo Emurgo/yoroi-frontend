@@ -189,13 +189,13 @@ function compareCborKey(hex1: string, hex2: string): number {
   if (hex1.length < hex2.length) {
     return -1;
   }
-  if (hex2.length < hex1.length) {
+  if (hex1.length > hex2.length) {
     return 1;
   }
   if (hex1 < hex2) {
     return -1;
   }
-  if (hex2 < hex1) {
+  if (hex1 > hex2) {
     return 1;
   }
   return 0;
