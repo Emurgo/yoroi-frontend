@@ -718,6 +718,7 @@
   "wallet.send.preview.transactionFee": "Transaction fee",
   "wallet.send.form.nAssets": "{number} assets",
   "wallet.send.form.token": "Token",
+  "wallet.send.form.nTokens": "Tokens ({number})",
   "wallet.send.form.nft": "NFT",
   "wallet.send.form.preview.nAssets": "{number} Assets",
   "wallet.send.ledger.confirmationDialog.info.line.1": "After connecting your Ledger device to your computer's USB port, press the Send using Ledger button.",

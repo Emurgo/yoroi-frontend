@@ -100,9 +100,11 @@ export default class AddTokenDialog extends Component<Props> {
       });
     })();
 
+    console.log({tokens: tokensList})
+
     return (
       <Dialog
-        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+        title={intl.formatMessage(globalMessages.nTokens, { number: tokensList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}

@@ -680,6 +680,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.assets.tokens',
     defaultMessage: '!!!Tokens',
   },
+  nTokens: {
+    id: 'wallet.send.form.nTokens',
+    defaultMessage: '!!!Tokens ({number})',
+  },
   token: {
     id: 'wallet.send.form.token',
     defaultMessage: '!!!Token',
