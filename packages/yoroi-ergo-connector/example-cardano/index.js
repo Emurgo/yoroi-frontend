@@ -194,6 +194,23 @@ getUtxos.addEventListener('click', () => {
         } else {
             utxos = utxosResponse
             alertSuccess(`Check the console`)
+            let adaAmount = 0n
+            const assetAmount = {} // asset id to amount mapping
+
+            for (const utxo of utxosResponse) {
+              adaAmount += BigInt(utxo.amount)
+              for (const asset of utxo.assets) {
+                if (assetAmount[asset.assetId]) {
+                  assetAmount[asset.assetId] += BigInt(asset.amount)
+                } else {
+                  assetAmount[asset.assetId] = BigInt(asset.amount)
+                }
+              }
+            }
+            // `adaAmount` is the same as the return value `getBalance()`
+            console.log('Ada balance:', adaAmount);
+            console.log('Assets:\n' + Object.keys(assetAmount).map(assetId=>`${assetId}: ${assetAmount[assetId]}`).join('\n'));
+
             alertEl.innerHTML = '<pre>' + JSON.stringify(utxosResponse, undefined, 2) + '</pre>'
         }
     })
