@@ -161,12 +161,40 @@ function toLedgerTokenBundle(
         assetNameHex: Buffer.from(assetName.name()).toString('hex'),
       });
     }
+    // sort by asset name to the order specified by rfc7049
+    tokens.sort(
+      (token1, token2) => compareCborKey(token1.assetNameHex, token2.assetNameHex)
+    );
     assetGroup.push({
       policyIdHex: Buffer.from(policyId.to_bytes()).toString('hex'),
       tokens,
     });
   }
+  // sort by policy id to the order specified by rfc7049
+  assetGroup.sort(
+    (asset1, asset2) => compareCborKey(asset1.policyIdHex, asset2.policyIdHex)
+  );
   return assetGroup;
+}
+
+function compareCborKey(hex1: string, hex2: string): number {
+  if (hex1.length < hex2.length) {
+    return -1;
+  }
+  if (hex2.length < hex1.length) {
+    return 1;
+  }
+  const bytes1 = [...Buffer.from(hex1, 'hex')];
+  const bytes2 = [...Buffer.from(hex2, 'hex')];
+  for (let i = 0; i < bytes1.length; i++) {
+    if (bytes1[i] < bytes2[i]) {
+      return -1;
+    }
+    if (bytes2[i] < bytes1[i]) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 function _transformToLedgerOutputs(request: {|
