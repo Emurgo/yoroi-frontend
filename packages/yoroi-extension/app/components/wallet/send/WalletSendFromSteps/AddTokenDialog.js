@@ -87,8 +87,12 @@ export const messages: Object = defineMessages({
     defaultMessage: '!!!No Asset Found',
   },
   minAda: {
-    id: 'wallet.send.form.dialog',
+    id: 'wallet.send.form.dialog.minAda',
     defaultMessage: '!!!min-ada'
+  },
+  add: {
+    id: 'wallet.send.form.dialog.add',
+    defaultMessage: '!!!add'
   }
 });
 
@@ -233,43 +237,45 @@ export default class AddTokenDialog extends Component<Props, State> {
             <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
           </div>
           {
-          tokensList.length === 0 ? (
-            <div className={styles.noAssetFound}>
-              <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
-            </div>
-          ): (
-            <>
-              <ul className={styles.columns}>
-                <li className={styles.name}>
-                  <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
+            tokensList.length === 0 ? (
+              <div className={styles.noAssetFound}>
+                <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
+              </div>
+            ): (
+              <>
+                <ul className={styles.columns}>
+                  <li className={styles.name}>
+                    <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
+                      <p className={styles.headerText}>
+                        {intl.formatMessage(messages.nameAndTicker)}
+                      </p>
+                      {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
+                    </button>
+                  </li>
+                  <li className={styles.identifier}>
                     <p className={styles.headerText}>
-                      {intl.formatMessage(messages.nameAndTicker)}
+                      {intl.formatMessage(messages.identifier)}
                     </p>
-                    {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
-                  </button>
-                </li>
-                <li className={styles.identifier}>
-                  <p className={styles.headerText}>
-                    {intl.formatMessage(messages.identifier)}
-                  </p>
-                  <InfoIcon />
-                </li>
-                <li className={styles.quantity}>
-                  <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                    <p className={styles.headerText}>
-                      {intl.formatMessage(messages.quantity)}
-                    </p>
-                    {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                  </button>
-                </li>
-              </ul>
+                    <InfoIcon />
+                  </li>
+                  <li className={styles.quantity}>
+                    <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
+                      <p className={styles.headerText}>
+                        {intl.formatMessage(messages.quantity)}
+                      </p>
+                      {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                    </button>
+                  </li>
+                </ul>
 
-              {
-                tokensList.map(token => <SingleTokenRow key={token.id} token={token} />)
-              }
-            </>
-          )
-        }
+                {
+                  tokensList.map(token => <SingleTokenRow key={token.id} token={token} />)
+                }
+              </>
+            )
+          }
+
+          <button type='button' className={styles.add}>{intl.formatMessage(messages.add)}</button>
         </div>
       </Dialog>
     );
