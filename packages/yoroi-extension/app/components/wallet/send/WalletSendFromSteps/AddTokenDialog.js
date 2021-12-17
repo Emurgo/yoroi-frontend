@@ -74,8 +74,8 @@ export const messages: Object = defineMessages({
     defaultMessage: '!!!Quantity',
   },
   identifier: {
-    id: 'wallet.assets.id',
-    defaultMessage: '!!!ID',
+    id: 'wallet.assets.fingerprint',
+    defaultMessage: '!!!Fingerprint',
   },
   search: {
     id: 'wallet.assets.search',
@@ -231,14 +231,43 @@ export default class AddTokenDialog extends Component<Props, State> {
           <div className={styles.minAda}>
             <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
           </div>
-          <div className={styles.tableHeader}>
-             Header
-          </div>
-          <div className={styles.tokensList}>
-            {
-              tokensList.map(token => <SingleTokenRow key={token.id} token={token} />)
-            }
-          </div>
+          {
+          tokensList.length === 0 ? (
+            <div className={styles.noAssetFound}>
+              <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
+            </div>
+          ): (
+            <>
+              <ul className={styles.columns}>
+                <li className={styles.name}>
+                  <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
+                    <p className={styles.headerText}>
+                      {intl.formatMessage(messages.nameAndTicker)}
+                    </p>
+                    {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
+                  </button>
+                </li>
+                <li className={styles.identifier}>
+                  <p className={styles.headerText}>
+                    {intl.formatMessage(messages.identifier)}
+                  </p>
+                </li>
+                <li className={styles.quantity}>
+                  <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                    <p className={styles.headerText}>
+                      {intl.formatMessage(messages.quantity)}
+                    </p>
+                    {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                  </button>
+                </li>
+              </ul>
+
+              {
+                tokensList.map(token => <SingleTokenRow key={token.id} token={token} />)
+              }
+            </>
+          )
+        }
         </div>
       </Dialog>
     );

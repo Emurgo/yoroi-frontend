@@ -43,10 +43,55 @@
         margin: 20px 0px;
     }
 
-    .tokensList {
-        .tokenRow {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+    .headerText {
+        color: #A7AFC0;
+        font-family: Rubik;
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 22px;
+    }
+
+    .columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        margin: 16px 0px 32px 0px;
+
+        .name {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            button {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+
+                p {
+                    margin-right: 4px;
+                }
+            }
+        }
+
+        .identifier {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            button {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+
+                p {
+                    margin-right: 4px;
+                }
+            }
         }
     }
 }
