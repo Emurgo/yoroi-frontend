@@ -35,6 +35,10 @@ import type {
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../../stores/stateless/tokenHelpers';
 import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
+import ArrowsListFromBottom from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
+import ArrowsListFromTop from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline.svg';
+import SingleTokenRow from './SingleTokenRow';
 
 
 type Props = {|
@@ -151,13 +155,7 @@ export default class AddTokenDialog extends Component<Props> {
           </div>
           <div className={styles.tokensList}>
             {
-              tokensList.map(token => (
-                <div key={token.id} className={styles.tokenRow}>
-                  <p>{token.label}</p>
-                  <p>{token.id}</p>
-                  <p>{token.amount}</p>
-                </div>
-              ))
+              tokensList.map(token => <SingleTokenRow key={token.id} token={token} />)
             }
           </div>
         </div>

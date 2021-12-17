@@ -1,0 +1,36 @@
+.component {
+    .token {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+        padding: 4px 0px;
+        margin-bottom: 32px;
+
+        .name {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            .logo {
+                overflow: hidden;
+                width: 32px;
+                height: 32px;
+                margin-right: 16px;
+            }
+
+            .label {
+                color: #3154CB;
+            }
+        }
+
+        .id {
+            color: #242838;
+            text-align: center;
+        }
+
+        .amount {
+            text-align: right;
+            color: #242838;
+        }
+    }
+}
