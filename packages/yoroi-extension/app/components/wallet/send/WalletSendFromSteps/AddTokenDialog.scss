@@ -76,6 +76,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+
+            .headerText {
+                margin-right: 4px;
+            }
         }
         
         .quantity {

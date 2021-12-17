@@ -37,6 +37,7 @@ import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentif
 import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
 import ArrowsListFromBottom from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import ArrowsListFromTop from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import InfoIcon from '../../../../assets/images/assets-page/info.inline.svg';
 import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import SingleTokenRow from './SingleTokenRow';
 
@@ -251,6 +252,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                   <p className={styles.headerText}>
                     {intl.formatMessage(messages.identifier)}
                   </p>
+                  <InfoIcon />
                 </li>
                 <li className={styles.quantity}>
                   <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
