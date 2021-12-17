@@ -155,6 +155,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     // $FlowFixMe[prop-missing]
     isVisible: request => asGetStakingKey(request.selected) != null,
   },
+  {
+    className: 'dapp-connector',
+    route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+    icon: dappConnectorIcon,
+    label: connectorMessages.dappConnector,
+    isVisible: _request =>  !environment.isLight
+  },
   // {
   //   className: 'swap',
   //   route: '/swap',

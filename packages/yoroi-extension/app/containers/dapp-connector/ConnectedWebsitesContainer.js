@@ -1,44 +1,49 @@
 // @flow
-import type { Node, ComponentType } from 'react'
-import { Component } from 'react'
-import { computed } from 'mobx'
-import { observer } from 'mobx-react'
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl'
-import { intlShape, } from 'react-intl'
-import type { InjectedOrGenerated } from '../../types/injectedPropsType'
-import TopBarLayout from '../../components/layout/TopBarLayout'
-import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
-import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer'
-import BannerContainer from '../banners/BannerContainer'
+import type { Node, ComponentType } from 'react';
+import { Component } from 'react';
+import { computed } from 'mobx';
+import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
-import { withLayout } from '../../styles/context/layout'
-import type { LayoutComponentMap } from '../../styles/context/layout'
-import SidebarContainer from '../SidebarContainer'
-import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage'
-import DappConnectorNavbar from '../../components/dapp-connector/Layout/DappConnectorNavbar'
-import { genLookupOrFail } from '../../stores/stateless/tokenHelpers'
-import LoadingSpinner from '../../components/widgets/LoadingSpinner'
-import { LoadingWalletStates } from '../../ergo-connector/types'
-import FullscreenLayout from '../../components/layout/FullscreenLayout'
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
+import SidebarContainer from '../SidebarContainer';
+import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage';
+import DappConnectorNavbar from '../../components/dapp-connector/Layout/DappConnectorNavbar';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import { LoadingWalletStates } from '../../ergo-connector/types';
+import FullscreenLayout from '../../components/layout/FullscreenLayout';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
-import environment from '../../environment'
-import { ROUTES } from '../../routes-config'
+import type {
+  WhitelistEntry,
+  PublicDeriverCache,
+} from '../../../chrome/extension/ergo-connector/types';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import environment from '../../environment';
+import { ROUTES } from '../../routes-config';
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import DappConnectorNavbarRevamp from '../../components/dapp-connector/Layout/DappConnectorNavbarRevamp';
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
-type Props = InjectedOrGenerated<GeneratedData>
+type Props = InjectedOrGenerated<GeneratedData>;
 
 type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
 class ConnectedWebsitesPageContainer extends Component<AllProps> {
-
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -74,9 +79,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     return settingsCache
   }
 
-  render (): Node {
+  render(): Node {
     const { stores } = this.generated;
-    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
     const wallets = stores.connector.allWallets;
     const loadingWallets = stores.connector.loadingWallets;
     const error = stores.connector.errorWallets;
@@ -88,7 +93,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
 
     let componentToRender;
     if (isLoading) {
-      componentToRender =  (
+      componentToRender = (
         <FullscreenLayout bottomPadding={0}>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -97,10 +102,10 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       );
     }
     if (isError) {
-      componentToRender = <p>{error}</p>
+      componentToRender = <p>{error}</p>;
     }
     if (isSuccess) {
-      componentToRender =  (
+      const connectedWebsitesPageClassic = (
         <ConnectedWebsitesPage
           whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
           wallets={wallets}
@@ -109,25 +114,64 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           getConceptualWallet={this.getConceptualWallet.bind(this)}
-        />)
+        />
+      );
+
+      const connectedWebsitesPageRevamp = (
+        <Box position="relative">
+          <ConnectedWebsitesPage
+            whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+            wallets={wallets}
+            onRemoveWallet={this.onRemoveWallet}
+            activeSites={this.generated.stores.connector.activeSites.sites}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+            getConceptualWallet={this.getConceptualWallet.bind(this)}
+          />
+          <Typography
+            as="a"
+            // TODO: add link
+            href="#"
+            target="_blank"
+            color="primary"
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              textDecoration: 'none',
+            }}
+          >
+            How it works?
+          </Typography>
+        </Box>
+      );
+
+      componentToRender = this.props.renderLayoutComponent({
+        CLASSIC: connectedWebsitesPageClassic,
+        REVAMP: connectedWebsitesPageRevamp,
+      });
     }
+
+    const navbarClassic = <DappConnectorNavbar />;
+    const navbarRevamp = <DappConnectorNavbarRevamp isSwitchOn={false} />;
 
     return (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
-        navbar={<DappConnectorNavbar />}
+        navbar={this.props.renderLayoutComponent({
+          CLASSIC: navbarClassic,
+          REVAMP: navbarRevamp,
+        })}
       >
         {/* {componentToRender} */}
-        <FullscreenLayout bottomPadding={0}>
-          {componentToRender}
-        </FullscreenLayout>
+        <FullscreenLayout bottomPadding={0}>{componentToRender}</FullscreenLayout>
       </TopBarLayout>
     );
   }
 
-
-  @computed get generated (): {|
+  @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
@@ -167,17 +211,17 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         activeSites: {| sites: Array<string> |},
       |},
       walletSettings: {|
-        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
       wallets: {|
         publicDerivers: Array<PublicDeriver<>>,
-      |}
+      |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
-    |} {
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -193,8 +237,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         walletSettings: {
-          getConceptualWalletSettingsCache: stores.walletSettings
-            .getConceptualWalletSettingsCache,
+          getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
@@ -223,9 +266,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
         },
       },
-      SidebarContainerProps: (
-        { actions, stores }: InjectedOrGenerated<SidebarContainerData>
-      ),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
