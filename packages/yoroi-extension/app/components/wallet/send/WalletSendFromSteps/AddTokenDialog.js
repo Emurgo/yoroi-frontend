@@ -207,7 +207,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           info: token.info,
           label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount,
+          amount: Number(amount),
         }
       });
   }

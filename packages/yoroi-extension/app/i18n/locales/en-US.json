@@ -712,7 +712,7 @@
   "wallet.send.form.sendAll.dropdownAmountLabel": "Send all {currency}",
   "wallet.send.form.sendAll.selectedAmountLable": "Amount Options",
   "wallet.send.form.dialog.minAda": "min-ada",
-  "wallet.send.form.dialog.add": "NFT",
+  "wallet.send.form.dialog.add": "add",
   "wallet.send.form.sendingIsDisabled": "Cannot send a new transaction while an existing one is still pending.",
   "wallet.send.form.transactionFeeError": "Not enough Ada for fees. Try sending a smaller amount.",
   "wallet.send.form.willSendAll": "Will Send All Tokens!",

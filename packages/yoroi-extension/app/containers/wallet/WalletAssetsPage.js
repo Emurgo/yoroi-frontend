@@ -36,11 +36,14 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         ].map(entry => ({
           entry,
           info: getTokenInfo(entry),
-        })).map(token => ({
-          name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-        }));
+        })).map(token => {
+          const amount =  genFormatTokenAmount(getTokenInfo)(token.entry)
+          return {
+            name: truncateToken(getTokenStrictName(token.info) ?? '-'),
+            id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+            amount: Number(amount),
+          }
+        });
       })();
 
     const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
