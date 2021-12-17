@@ -46,11 +46,25 @@ type Props = {|
   +spendableBalance: ?MultiToken,
 |};
 
+type State = {|
+  tokensList: Asset[],
+  sortingDirection: null | 'UP' | 'DOWN',
+  sortingColumn: string
+|}
+
+
+const SORTING_DIRECTIONS = {
+  UP: 'UP',
+  DOWN: 'DOWN'
+}
+
+const SORTING_COLUMNS = {
+  NAME: 'name',
+  AMOUNT: 'amount'
+}
+
+
 export const messages: Object = defineMessages({
-  assets: {
-    id: 'wallet.assets.assets',
-    defaultMessage: '!!!Assets ({number})',
-  },
   nameAndTicker: {
     id: 'wallet.assets.nameAndTicker',
     defaultMessage: '!!!Name and ticker',
@@ -78,11 +92,15 @@ export const messages: Object = defineMessages({
 });
 
 @observer
-export default class AddTokenDialog extends Component<Props> {
+export default class AddTokenDialog extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  componentDidMount(): void {
+    this.setState({ tokensList: this.genTokensList() })
+  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -110,14 +128,66 @@ export default class AddTokenDialog extends Component<Props> {
     },
   });
 
-  render(): Node {
-    const { form } = this;
-    const { intl } = this.context;
-    const { onClose } = this.props
-    const walletPasswordField = form.$('walletPassword');
+  state: State = {
+    tokensList: [],
+    sortingDirection: null,
+    sortingColumn: '',
+  };
 
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    const tokensList = (() => {
+  search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
+    (event: SyntheticEvent<HTMLInputElement>) => {
+      const keyword = event.currentTarget.value
+      this.setState({ tokensList: this.genTokensList() })
+      if(!keyword) return
+      const regExp = new RegExp(keyword, 'gi')
+      const assetsListCopy = [...this.genTokensList()]
+      const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp))
+      this.setState({ tokensList: filteredAssetsList })
+    };
+
+  compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
+    let newSortDirection = SORTING_DIRECTIONS.UP
+    if (!this.state.sortingDirection) {
+      newSortDirection = SORTING_DIRECTIONS.UP
+    } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
+      newSortDirection = SORTING_DIRECTIONS.DOWN
+    }
+
+    this.setState({ sortingDirection: newSortDirection })
+
+    if ( a[field] < b[field] ){
+      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+    }
+    if ( a[field] > b[field] ){
+      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
+    }
+    return 0;
+  }
+
+  sortAssets: ((field: string) => void) = (field: string) => {
+    const assetsListCopy = [...this.state.assetsList]
+    const sortedAssets = assetsListCopy.sort((a,b) => this.compare(a,b, field))
+    this.setState({ assetsList: sortedAssets, sortingColumn: field });
+  };
+
+  displayColumnLogo: ((column: string) => Node) = (column: string) => {
+    const {
+        sortingColumn,
+        sortingDirection
+    } = this.state;
+    if (!sortingDirection || sortingColumn !== column) {
+      return <ArrowsList />
+    }
+    if (sortingDirection === SORTING_DIRECTIONS.UP && sortingColumn === column) {
+      return <ArrowsListFromTop />
+    }
+    if (sortingDirection === SORTING_DIRECTIONS.DOWN && sortingColumn === column) {
+      return <ArrowsListFromBottom />
+    }
+    return <ArrowsList />;
+  }
+
+  genTokensList: void => void = () => {
       if (this.props.spendableBalance == null) return [];
       const { spendableBalance } = this.props;
       return [
@@ -135,7 +205,15 @@ export default class AddTokenDialog extends Component<Props> {
           amount,
         }
       });
-    })();
+  }
+
+  render(): Node {
+    const { form } = this;
+    const { intl } = this.context;
+    const { onClose } = this.props
+    const { tokensList } = this.state
+    const walletPasswordField = form.$('walletPassword');
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
     return (
       <Dialog
@@ -152,6 +230,9 @@ export default class AddTokenDialog extends Component<Props> {
           </div>
           <div className={styles.minAda}>
             <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
+          </div>
+          <div className={styles.tableHeader}>
+             Header
           </div>
           <div className={styles.tokensList}>
             {
