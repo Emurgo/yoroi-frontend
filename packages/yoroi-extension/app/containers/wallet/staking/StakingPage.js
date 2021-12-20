@@ -184,13 +184,14 @@ class StakingPage extends Component<AllProps> {
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return undefined;
     const currentEpoch = currTimeRequests.currentEpoch;
+    const epochLength = getEpochLength();
 
     const endEpochTime = toRealTime({
       absoluteSlotNum: toAbsoluteSlot({
         epoch: currentEpoch,
         // in Jormungandr, rewards were distributed at the start of the epoch
         // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
-        slot: isJormungandr(publicDeriver.getParent().getNetworkInfo()) ? 0 : getEpochLength(),
+        slot: isJormungandr(publicDeriver.getParent().getNetworkInfo()) ? 0 : epochLength,
       }),
       timeSinceGenesisFunc: timeSinceGenesis,
     });
@@ -241,10 +242,14 @@ class StakingPage extends Component<AllProps> {
     //   tw: '',
     // },
     // };
-
+  console.log(currTimeRequests, epochLength)
     return (
       <StakingTabs
-        epochProgress={{ currentEpoch, endEpochDate }}
+        epochProgress={{
+          currentEpoch,
+          endEpochDate,
+          percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
+        }}
         delegatedPool={delegatedPool}
         undelegate={
           // don't support undelegation for ratio stake since it's a less intuitive UX

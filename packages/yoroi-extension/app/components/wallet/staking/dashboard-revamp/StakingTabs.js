@@ -21,6 +21,7 @@ type Props = {|
   epochProgress: {|
     currentEpoch: number,
     endEpochDate: string,
+    percentage: number,
   |},
   +undelegate: void | (void => Promise<void>),
   +epochLength: ?number,
@@ -109,7 +110,7 @@ function StakingTabs({
       component: (
         <EpochProgressCard
           // TODO: Remove placeholders
-          percentage={55}
+          percentage={epochProgress.percentage}
           days="2.5"
           currentEpoch={epochProgress.currentEpoch}
           startEpochDate="-"
