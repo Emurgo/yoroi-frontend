@@ -40,6 +40,8 @@ import ArrowsListFromTop from '../../../../assets/images/assets-page/arrows-list
 import InfoIcon from '../../../../assets/images/assets-page/info.inline.svg';
 import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import SingleTokenRow from './SingleTokenRow';
+import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
+
 
 
 type Props = {|
@@ -210,7 +212,8 @@ export default class AddTokenDialog extends Component<Props, State> {
           {
             tokensList.length === 0 ? (
               <div className={styles.noAssetFound}>
-                <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
+                <NoItemsFoundImg />
+                <h1 className={styles.text}>{intl.formatMessage(messages.noAssetFound)}</h1>
               </div>
             ): (
               <>
