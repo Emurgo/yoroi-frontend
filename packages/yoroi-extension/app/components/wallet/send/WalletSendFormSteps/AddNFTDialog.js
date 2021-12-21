@@ -175,7 +175,7 @@ export default class AddNFTDialog extends Component<Props, State> {
       ].map(entry => ({
         entry,
         info: this.props.getTokenInfo(entry),
-      })).filter(token => !token.info.IsNFT).map(token => {
+      })).filter(token => token.info.IsNFT).map(token => {
         const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
         return {
           value: token.info.TokenId,
@@ -194,7 +194,7 @@ export default class AddNFTDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={"intl.formatMessage(globalMessages.nTokens, { number: tokensList.length })"}
+        title={intl.formatMessage(globalMessages.nNft, { number: tokensList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}

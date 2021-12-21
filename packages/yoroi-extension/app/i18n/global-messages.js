@@ -692,6 +692,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.send.form.nft',
     defaultMessage: '!!!NFT',
   },
+  nNft: {
+    id: 'wallet.send.form.nNft',
+    defaultMessage: '!!!NFT ({number})',
+  },
   fingerprint: {
     id: 'wallet.assets.fingerprint',
     defaultMessage: '!!!Fingerprint',
