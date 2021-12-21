@@ -713,24 +713,13 @@ function handleInjectorConnect(port) {
         });
       }
     }
-    if (message.type === 'yoroi_connect_request/ergo') {
+    if (message.type.startsWith('yoroi_connect_request')) {
       await withDb(
         async (_db, localStorageApi) => {
           const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
           const accepted = publicDeriverId !== null;
           port.postMessage({
-            type: 'yoroi_connect_response/ergo',
-            success: accepted
-          });
-        }
-      );
-    } else if (message.type === 'yoroi_connect_request/cardano') {
-      await withDb(
-        async (_db, localStorageApi) => {
-          const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-          const accepted = publicDeriverId !== null;
-          port.postMessage({
-            type: 'yoroi_connect_response/cardano',
+            type: `yoroi_connect_response/${message.type.split('/')[1]}`,
             success: accepted
           });
         }
