@@ -269,7 +269,14 @@ export default class AddTokenDialog extends Component<Props, State> {
                 </ul>
 
                 {
-                  tokensList.map(token => <SingleTokenRow key={token.id} token={token} />)
+                  tokensList.map(token => (
+                    <SingleTokenRow
+                      key={token.id}
+                      token={token}
+                      classicTheme={this.props.classicTheme}
+                      updateAmount={this.props.updateAmount}
+                    />
+                  ))
                 }
               </>
             )

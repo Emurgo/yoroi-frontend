@@ -144,8 +144,6 @@ type State = {|
   currentStep: number,
 |}
 
-const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
-
 @observer
 export default class WalletSendForm extends Component<Props, State> {
 

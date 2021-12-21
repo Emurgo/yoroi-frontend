@@ -46,8 +46,8 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
-import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFromSteps/WalletSendPreviewStepContainer';
-import AddTokenDialog from '../../components/wallet/send/WalletSendFromSteps/AddTokenDialog'
+import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
+import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog'
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -462,11 +462,14 @@ class WalletSendPage extends Component<AllProps> {
   }
 
   renderAddTokenDialog: void => void = () => {
+    const { txBuilderActions } = this.generated.actions;
     return (
       <AddTokenDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
         spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
       />
     )
   }
