@@ -149,7 +149,7 @@ export default class SingleTokenRow extends Component<Props> {
               ? null
               : formattedAmountToBigNumber(amountFieldProps.value)
               }
-              className="amount"
+              className="tokenAmount"
               label={intl.formatMessage(globalMessages.amountLabel)}
               decimalPlaces={this.getNumDecimals()}
               error={amountInputError}

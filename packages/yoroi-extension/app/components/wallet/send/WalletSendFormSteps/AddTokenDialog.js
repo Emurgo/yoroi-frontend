@@ -213,12 +213,9 @@ export default class AddTokenDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { form } = this;
     const { intl } = this.context;
     const { onClose } = this.props
     const { tokensList } = this.state
-    const walletPasswordField = form.$('walletPassword');
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
     return (
       <Dialog
