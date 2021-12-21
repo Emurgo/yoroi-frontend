@@ -107,31 +107,6 @@ export default class AddNFTDialog extends Component<Props, State> {
     this.setState({ tokensList: this.genTokensList() })
   }
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      walletPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder) : '',
-        value: '',
-        validators: [({ field }) => {
-          if (field.value === '') {
-            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-          }
-          return [true];
-        }],
-      },
-    }
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
 
   state: State = {
     tokensList: [],
@@ -219,7 +194,7 @@ export default class AddNFTDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(globalMessages.nTokens, { number: tokensList.length })}
+        title={"intl.formatMessage(globalMessages.nTokens, { number: tokensList.length })"}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
