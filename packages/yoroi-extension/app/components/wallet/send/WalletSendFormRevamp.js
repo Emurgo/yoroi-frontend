@@ -291,21 +291,6 @@ export default class WalletSendForm extends Component<Props, State> {
           return isValidAmount;
         }],
       },
-      selectedToken: {
-        label: this.context.intl.formatMessage(globalMessages.assetSelect),
-        value: this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-          identifier: this.props.defaultToken.Identifier,
-          networkId: this.props.defaultToken.NetworkId,
-        }).TokenId,
-      },
-      selectedAmount: {
-        label: this.context.intl.formatMessage(messages.selectedAmountLable),
-        value: this.props.shouldSendAll ?
-          this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-          identifier: this.props.defaultToken.Identifier,
-          networkId: this.props.defaultToken.NetworkId,
-        }).TokenId : CUSTOM_AMOUNT
-      },
       memo: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
         placeholder: this.context.intl.formatMessage(memoMessages.optionalMemo),

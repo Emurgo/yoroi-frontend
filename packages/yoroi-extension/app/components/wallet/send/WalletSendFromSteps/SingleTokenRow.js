@@ -20,6 +20,7 @@ export default class SingleTokenRow extends Component<Props> {
               </div>
               <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
               <p className={styles.amount}>{token.amount}</p>
+              <input type="text" />
             </div>
           </div>
         )
