@@ -463,10 +463,10 @@ class WalletSendPage extends Component<AllProps> {
 
   renderAddTokenDialog: void => void = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
-    const { transactionBuilderStore, txBuilderActions } = this.generated.stores;
-    if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
-    }
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    const { txBuilderActions } = this.generated.actions;
 
     const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId

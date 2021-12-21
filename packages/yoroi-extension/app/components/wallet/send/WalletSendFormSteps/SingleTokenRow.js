@@ -2,14 +2,18 @@
 import { Component } from 'react';
 import styles from './SingleTokenRow.scss'
 import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.svg';
-import { formattedAmountToNaturalUnits, truncateAddressShort } from '../../../../utils/formatters';
+import { formattedAmountToBigNumber, formattedAmountToNaturalUnits, truncateAddressShort, truncateToken } from '../../../../utils/formatters';
 import globalMessages from '../../../../i18n/global-messages';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
+import { genFormatTokenAmount, getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import config from '../../../../config';
 import BigNumber from 'bignumber.js';
 import { intlShape } from 'react-intl';
+import { AmountInputRevamp } from '../../../common/NumericInputRP';
+import {
+  MultiToken,
+} from '../../../../api/common/lib/MultiToken';
 
 type Props = {|
     token: string, // @todo update the type
@@ -20,7 +24,23 @@ export default class SingleTokenRow extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
-  // FORM VALIDATION
+
+  getNumDecimals(): number {
+    const info = this.props.selectedToken ?? this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    });
+    return info.Metadata.numberOfDecimals;
+  }
+
+  getTokenEntry: MultiToken => TokenEntry = (tokens) => {
+    return this.props.selectedToken == null
+      ? tokens.getDefaultEntry()
+      : tokens.values.find(
+        entry => entry.identifier === this.props.selectedToken?.Identifier
+      ) ?? tokens.getDefaultEntry();
+  }
+
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       amount: {
@@ -72,19 +92,77 @@ export default class SingleTokenRow extends Component<Props> {
   });
 
   render() {
-      const { token } = this.props
-      return (
-        <div className={styles.component}>
-          <div className={styles.token}>
-            <div className={styles.name}>
-              <div className={styles.logo}><NoAssetLogo /></div>
-              <p className={styles.label}>{token.label}</p>
-            </div>
-            <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
-            <p className={styles.amount}>{token.amount}</p>
-            <input type="text" />
+    const { form } = this
+    const { intl } = this.context;
+    const { token } = this.props
+    const amountField = form.$('amount');
+    const amountFieldProps = amountField.bind();
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+
+    let transactionFeeError = null;
+    if (this.props.isCalculatingFee) {
+      transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
+    }
+    if (this.props.error) {
+      transactionFeeError = this.context.intl.formatMessage(
+        this.props.error,
+        this.props.error.values
+      );
+    }
+
+    const transactionFee = this.props.fee ?? new MultiToken([], {
+      defaultIdentifier: this.props.defaultToken.Identifier,
+      defaultNetworkId: this.props.defaultToken.NetworkId,
+    });
+
+    const totalAmount = this.props.totalInput ?? new MultiToken([{
+      identifier: (this.props.selectedToken ?? this.props.defaultToken).Identifier,
+      networkId: (this.props.selectedToken ?? this.props.defaultToken).NetworkId,
+      amount: formattedAmountToBigNumber(amountFieldProps.value)
+        .shiftedBy((this.props.selectedToken ?? this.props.defaultToken).Metadata.numberOfDecimals),
+    }], {
+      defaultIdentifier: this.props.defaultToken.Identifier,
+      defaultNetworkId: this.props.defaultToken.NetworkId,
+    });
+
+    const amountInputError = transactionFeeError || amountField.error
+    return (
+      <div className={styles.component}>
+        <div className={styles.token}>
+          <div className={styles.name}>
+            <div className={styles.logo}><NoAssetLogo /></div>
+            <p className={styles.label}>{token.label}</p>
+          </div>
+          <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
+          <p className={styles.amount}>{token.amount}</p>
+        </div>
+        <div className={styles.amountWrapper}>
+          <div className={styles.amountTokenName}>
+            <div className={styles.logo}><NoAssetLogo /></div>
+            <p className={styles.label}>{token.label}</p>
+          </div>
+          <div className={styles.amountInput}>
+            <AmountInputRevamp
+              {...amountFieldProps}
+              value={amountFieldProps.value === ''
+              ? null
+              : formattedAmountToBigNumber(amountFieldProps.value)
+              }
+              className="amount"
+              label={intl.formatMessage(globalMessages.amountLabel)}
+              decimalPlaces={this.getNumDecimals()}
+              error={amountInputError}
+              currency={truncateToken(
+              getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+              )}
+              fees={formatValue(transactionFee.getDefaultEntry())}
+              total={formatValue(this.getTokenEntry(totalAmount))}
+              allowSigns={false}
+              amountFieldRevamp
+            />
           </div>
         </div>
-      )
+      </div>
+    )
   }
 }

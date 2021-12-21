@@ -1,10 +1,10 @@
 .component {
+    margin-bottom: 32px;
     .token {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         align-items: center;
         padding: 4px 0px;
-        margin-bottom: 32px;
 
         .name {
             display: flex;
@@ -31,6 +31,20 @@
         .amount {
             text-align: right;
             color: #242838;
+        }
+
+    }
+    .amountWrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #A7AFC0;
+        border-radius: 8px;
+        padding: 12px 16px;
+
+        input {
+            text-align: right; 
         }
     }
 }
