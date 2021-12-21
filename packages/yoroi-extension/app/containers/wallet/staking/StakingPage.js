@@ -243,7 +243,6 @@ class StakingPage extends Component<AllProps> {
     //   tw: '',
     // },
     // };
-  console.log(currTimeRequests, epochLength)
     return (
       <StakingTabs
         epochProgress={{
