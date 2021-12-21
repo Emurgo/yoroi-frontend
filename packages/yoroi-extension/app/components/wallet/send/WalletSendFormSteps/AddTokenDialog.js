@@ -88,6 +88,10 @@ export const messages: Object = defineMessages({
     id: 'wallet.assets.noAssetFound',
     defaultMessage: '!!!No Asset Found',
   },
+  noTokensYet: {
+    id: 'wallet.send.form.dialog.noTokensYet',
+    defaultMessage: '!!!There are no tokens in your wallet yet'
+  },
   minAda: {
     id: 'wallet.send.form.dialog.minAda',
     defaultMessage: '!!!min-ada'
@@ -213,7 +217,11 @@ export default class AddTokenDialog extends Component<Props, State> {
             tokensList.length === 0 ? (
               <div className={styles.noAssetFound}>
                 <NoItemsFoundImg />
-                <h1 className={styles.text}>{intl.formatMessage(messages.noAssetFound)}</h1>
+                <h1 className={styles.text}>
+                  {intl.formatMessage(
+                    this.genTokensList().length === 0 ? messages.noTokensYet : messages.noAssetFound
+                  )}
+                </h1>
               </div>
             ): (
               <>

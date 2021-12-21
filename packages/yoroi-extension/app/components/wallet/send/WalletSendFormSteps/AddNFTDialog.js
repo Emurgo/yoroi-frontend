@@ -39,6 +39,7 @@ import ArrowsListFromBottom from '../../../../assets/images/assets-page/arrows-l
 import ArrowsListFromTop from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import InfoIcon from '../../../../assets/images/assets-page/info.inline.svg';
 import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline.svg';
+import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import SingleTokenRow from './SingleTokenRow';
 
 
@@ -85,6 +86,10 @@ export const messages: Object = defineMessages({
   noAssetFound: {
     id: 'wallet.assets.noAssetFound',
     defaultMessage: '!!!No Asset Found',
+  },
+  noTokensYet: {
+    id: 'wallet.send.form.dialog.noTokensYet',
+    defaultMessage: '!!!There are no tokens in your wallet yet'
   },
   minAda: {
     id: 'wallet.send.form.dialog.minAda',
@@ -211,7 +216,12 @@ export default class AddNFTDialog extends Component<Props, State> {
           {
             tokensList.length === 0 ? (
               <div className={styles.noAssetFound}>
-                <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
+                <NoItemsFoundImg />
+                <h1 className={styles.text}>
+                  {intl.formatMessage(
+                    this.genTokensList().length === 0 ? messages.noTokensYet : messages.noAssetFound
+                  )}
+                </h1>
               </div>
             ): (
               <>
