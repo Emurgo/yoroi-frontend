@@ -275,6 +275,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                       token={token}
                       classicTheme={this.props.classicTheme}
                       updateAmount={this.props.updateAmount}
+                      uriParams={this.props.uriParams}
                     />
                   ))
                 }

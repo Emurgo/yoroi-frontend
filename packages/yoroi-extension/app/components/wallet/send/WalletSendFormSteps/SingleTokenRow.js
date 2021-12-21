@@ -36,10 +36,6 @@ export default class SingleTokenRow extends Component<Props> {
             : null
         })(),
         validators: [async ({ field }) => {
-          if (this.props.shouldSendAll) {
-            // sendall doesn't depend on the amount so always succeed
-            return true;
-          }
           const amountValue: string = field.value;
           if (amountValue === '') {
             this.props.updateAmount();

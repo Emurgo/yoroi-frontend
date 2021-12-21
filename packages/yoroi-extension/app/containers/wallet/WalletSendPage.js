@@ -462,7 +462,16 @@ class WalletSendPage extends Component<AllProps> {
   }
 
   renderAddTokenDialog: void => void = () => {
-    const { txBuilderActions } = this.generated.actions;
+    const publicDeriver = this.generated.stores.wallets.selected;
+    const { transactionBuilderStore, txBuilderActions } = this.generated.stores;
+    if (!transactionBuilderStore.tentativeTx) {
+      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
+    }
+
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+
     return (
       <AddTokenDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
@@ -470,6 +479,18 @@ class WalletSendPage extends Component<AllProps> {
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         classicTheme={this.generated.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+        uriParams={this.generated.stores.loading.uriParams}
+        selectedToken={transactionBuilderStore.selectedToken}
+        validateAmount={(amount) => validateAmount(
+          amount,
+          transactionBuilderStore.selectedToken ?? defaultToken,
+          getMinimumValue(
+            publicDeriver.getParent().getNetworkInfo(),
+            transactionBuilderStore.selectedToken?.IsDefault ?? true
+          ),
+          this.context.intl,
+        )}
+        defaultToken={defaultToken}
       />
     )
   }
