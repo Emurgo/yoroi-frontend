@@ -14,6 +14,7 @@ import { AmountInputRevamp } from '../../../common/NumericInputRP';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
+import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
 
 type Props = {|
     token: string, // @todo update the type
@@ -161,6 +162,7 @@ export default class SingleTokenRow extends Component<Props> {
               amountFieldRevamp
             />
           </div>
+          <button type='button' className={styles.close}> <CloseIcon /> </button>
         </div>
       </div>
     )
