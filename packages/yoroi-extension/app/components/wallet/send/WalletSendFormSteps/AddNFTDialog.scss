@@ -44,6 +44,32 @@
         margin: 20px 0px;
     }
 
+    .noAssetFound {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-top: 30px;
+        padding-bottom: 30px;
+
+        img {
+            display: inline-block;
+            width: 130px;
+            height: 100px;
+            margin-bottom: 24px;
+        }
+
+        .text {
+            color: #242838;
+            font-family: Rubik;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0;
+            line-height: 26px;
+            text-align: center;
+        }
+
+    }
 
     .nftsGrid {
         display: grid;
