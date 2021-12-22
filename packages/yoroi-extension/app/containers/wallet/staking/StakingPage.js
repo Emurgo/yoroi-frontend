@@ -56,6 +56,7 @@ import type {
   TimeCalcRequests,
 } from '../../../stores/base/BaseCardanoTimeStore';
 import moment from 'moment';
+import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -172,8 +173,10 @@ class StakingPage extends Component<AllProps> {
     return undefined;
   };
 
-  getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
-    const timeStore = this.generated.stores.time;
+  getStakePools: (PublicDeriver<>, Array<Object>) => Node | void = (publicDeriver, rewardHistory) => {
+    const { actions, stores } = this.generated;
+    const timeStore = stores.time;
+
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
@@ -245,6 +248,13 @@ class StakingPage extends Component<AllProps> {
     // };
     return (
       <StakingTabs
+        rewardHistory={{
+          list: rewardHistory,
+          onOpenRewardList: () =>
+            actions.dialogs.open.trigger({
+              dialog: RewardHistoryDialog,
+            }),
+        }}
         epochProgress={{
           currentEpoch,
           endEpochDate,
@@ -295,8 +305,75 @@ class StakingPage extends Component<AllProps> {
     const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
     const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
 
+    const rewardHistory = [
+      {
+        poolTicker: '[Emurgo 12121]',
+        poolId: 'a4138092ab0c28ff451b1f5f9d2f6a6a1639bdf520eb1f0379bd6b04',
+        poolAvatar: null,
+        history: [
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+        ],
+      },
+      {
+        poolTicker: '[Pool Unknown]',
+        poolId: 'a4138092ab0c28ff451b1f5f9d2f6a6a1639bdf520eb1f0379bd6b04',
+        poolAvatar: null,
+        history: [
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+          {
+            type: 'Received',
+            date: '23 Jul, 11:30 PM',
+            balance: '+1.292335 ADA',
+          },
+        ],
+      },
+    ];
+
     const showStakePoolTabs =
-      errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
+      errorIfPresent == null ? this.getStakePools(publicDeriver, rewardHistory) : errorIfPresent;
 
     return (
       <TopBarLayout
@@ -411,6 +488,9 @@ class StakingPage extends Component<AllProps> {
                 this.generated.actions.dialogs.closeActiveDialog.trigger();
               }}
             />
+          ) : null}
+          {uiDialogs.isOpen(RewardHistoryDialog) ? (
+            <RewardHistoryDialog onClose={this.onClose} list={rewardHistory} />
           ) : null}
         </Box>
       </TopBarLayout>

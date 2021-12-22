@@ -672,6 +672,18 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.overview',
     defaultMessage: '!!!Overview',
   },
+  rewardHistory: {
+    id: 'wallet.staking.rewards.rewardHistory',
+    defaultMessage: '!!!Reward History',
+  },
+  openRewardHistory: {
+    id: 'wallet.staking.rewards.openRewardHistory',
+    defaultMessage: '!!!Open Reward History',
+  },
+  epochProgress: {
+    id: 'wallet.staking.epochProgress',
+    defaultMessage: '!!!Epoch Progress',
+  },
   tokens: {
     id: 'wallet.assets.tokens',
     defaultMessage: '!!!Tokens',

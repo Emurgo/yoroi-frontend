@@ -17,6 +17,10 @@ import RewardHistoryTab from './RewardHistoryTab';
 
 type Props = {|
   delegatedPool: PoolData,
+  rewardHistory: {|
+    list: Array<Object>,
+    onOpenRewardList: () => void,
+  |},
   epochProgress: {|
     currentEpoch: number,
     endEpochDate: string,
@@ -36,7 +40,13 @@ const messages = defineMessages({
   },
 });
 
-function StakingTabs({ delegatedPool, undelegate, epochProgress, intl }: Props & Intl): Node {
+function StakingTabs({
+  delegatedPool,
+  undelegate,
+  epochProgress,
+  rewardHistory,
+  intl,
+}: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -58,12 +68,17 @@ function StakingTabs({ delegatedPool, undelegate, epochProgress, intl }: Props &
     },
     {
       id: 1,
-      label: 'Reward History',
-      component: <RewardHistoryTab />,
+      label: intl.formatMessage(globalMessages.rewardHistory),
+      component: (
+        <RewardHistoryTab
+          list={rewardHistory.list}
+          onOpenRewardList={rewardHistory.onOpenRewardList}
+        />
+      ),
     },
     {
       id: 2,
-      label: 'Epoch progress',
+      label: intl.formatMessage(globalMessages.epochProgress),
       component: (
         <EpochProgressCard
           // TODO: Remove placeholders

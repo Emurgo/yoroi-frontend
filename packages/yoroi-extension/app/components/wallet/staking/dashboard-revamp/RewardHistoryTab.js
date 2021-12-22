@@ -1,52 +1,111 @@
 // @flow
-import type { Node } from 'react';
-import { Box } from '@mui/system';
+import type { ComponentType, Node } from 'react';
+import { Box, styled } from '@mui/system';
 import { Stack, Typography } from '@mui/material';
+import { injectIntl } from 'react-intl';
+import globalMessages from '../../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { getAvatarFromPoolId } from '../utils';
 
-type Props = {||};
+type RewardHistoryItemProps = {|
+  poolId: string,
+  poolTicker: string,
+  poolAvatar: string,
+  historyList: Array<{|
+    type: string,
+    date: string,
+    balance: string,
+  |}>,
+|};
+type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
-function HistoryRow() {
+export const RewardHistoryItem = ({
+  poolId,
+  poolTicker,
+  poolAvatar,
+  historyList,
+}: RewardHistoryItemProps): Node => {
+  const avatarGenerated = getAvatarFromPoolId(poolId);
+
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center">
-      <Box>
-        <Typography color="var(--yoroi-palette-gray-900)">Received</Typography>
-        <Typography variant="body3" color="var(--yoroi-palette-gray-600)">
-          23 Jul, 11:30pm
-        </Typography>
+    <Box
+      paddingTop="20px"
+      paddingBottom="26px"
+      borderBottom="1px solid var(--yoroi-palette-gray-50)"
+    >
+      <Box marginBottom="20px">
+        <Typography color="var(--yoroi-palette-gray-600)">Stake Pool</Typography>
+        <Box display="flex">
+          <AvatarWrapper>
+            {poolAvatar != null ? (
+              <AvatarImg src={poolAvatar} alt="stake pool logo" />
+            ) : (
+              <AvatarImg src={avatarGenerated} alt="stake pool logo" />
+            )}
+          </AvatarWrapper>
+          <Typography>{poolTicker}</Typography>
+        </Box>
       </Box>
-      <Typography color="var(--yoroi-palette-gray-900)">+ 100101010.212 ADA</Typography>
+      <Stack spacing="22px">
+        {historyList.map(({ type, date, balance }) => (
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box>
+              <Typography color="var(--yoroi-palette-gray-900)">{type}</Typography>
+              <Typography variant="body3" color="var(--yoroi-palette-gray-600)">
+                {date}
+              </Typography>
+            </Box>
+            <Typography color="var(--yoroi-palette-gray-900)">{balance}</Typography>
+          </Box>
+        ))}
+      </Stack>
     </Box>
   );
-}
+};
 
-function RewardHistoryTab(props: Props): Node {
+type RewardHistoryTabProps = {|
+  list: Array<Object>,
+  onOpenRewardList: () => void,
+|};
+
+function RewardHistoryTab({ list, onOpenRewardList, intl }: RewardHistoryTabProps & Intl): Node {
   return (
-    <Box >
+    <Box>
       <Typography
         as="button"
         variant="body2"
         color="var(--yoroi-palette-gray-600)"
         display="block"
         marginLeft="auto"
-        marginBottom="20px"
+        onClick={onOpenRewardList}
       >
-        Open reward list
+        {intl.formatMessage(globalMessages.openRewardHistory)}
       </Typography>
-      <Box>
-        <Box marginBottom="20px">
-          <Typography color="var(--yoroi-palette-gray-600)">Stake Pool</Typography>
-          <Typography>Avatar - Emurgo [Emrugo]</Typography>
-        </Box>
-        <Stack spacing="22px">
-          <HistoryRow />
-          <HistoryRow />
-          <HistoryRow />
-          <HistoryRow />
-          <HistoryRow />
-          <HistoryRow />
-        </Stack>
-      </Box>
+      {list.map(item => (
+        <RewardHistoryItem
+          key={item.poolId}
+          poolId={item.poolId}
+          poolTicker={item.poolTicker}
+          poolAvatar={item.poolAvatar}
+          historyList={item.history}
+        />
+      ))}
     </Box>
   );
 }
-export default RewardHistoryTab;
+export default (injectIntl(RewardHistoryTab): ComponentType<RewardHistoryTabProps>);
+
+const AvatarWrapper: any = styled(Box)({
+  width: '24px',
+  height: '24px',
+  minWidth: '24px',
+  marginRight: '12px',
+  borderRadius: '20px',
+  overflow: 'hidden',
+});
+
+const AvatarImg: any = styled('img')({
+  width: '100%',
+  background: 'white',
+  objectFit: 'scale-down',
+});
