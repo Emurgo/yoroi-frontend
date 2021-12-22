@@ -224,7 +224,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                 </h1>
               </div>
             ): (
-              <>
+              <div className={styles.columnsContainer}>
                 <ul className={styles.columns}>
                   <li className={styles.name}>
                     <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
@@ -265,7 +265,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                     />
                   ))
                 }
-              </>
+              </div>
             )
           }
 
