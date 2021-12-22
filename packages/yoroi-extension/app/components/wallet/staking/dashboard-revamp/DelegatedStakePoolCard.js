@@ -2,13 +2,13 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, Typography } from '@mui/material';
-import { toSvg } from 'jdenticon';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { HelperTooltip, SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
+import { getAvatarFromPoolId } from '../utils';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -21,8 +21,7 @@ type Intl = {|
 
 function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Intl): Node {
   const { id, name, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
-  const avatarSource = toSvg(id, 36, { padding: 0 });
-  const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+  const avatarGenerated = getAvatarFromPoolId(id);
 
   return (
     <Wrapper>
