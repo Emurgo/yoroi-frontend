@@ -14,7 +14,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import styles from './AddTokenDialog.scss';
+import styles from './AddNFTDialog.scss';
 import config from '../../../../config';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
@@ -41,6 +41,7 @@ import InfoIcon from '../../../../assets/images/assets-page/info.inline.svg';
 import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import SingleTokenRow from './SingleTokenRow';
+import { NftCardImage } from '../../assets/NFTsList';
 
 
 type Props = {|
@@ -49,21 +50,9 @@ type Props = {|
 |};
 
 type State = {|
-  tokensList: Asset[],
-  sortingDirection: null | 'UP' | 'DOWN',
-  sortingColumn: string
+  nftsList: Asset[],
 |}
 
-
-const SORTING_DIRECTIONS = {
-  UP: 'UP',
-  DOWN: 'DOWN'
-}
-
-const SORTING_COLUMNS = {
-  LABEL: 'label',
-  AMOUNT: 'amount'
-}
 
 
 export const messages: Object = defineMessages({
@@ -109,70 +98,26 @@ export default class AddNFTDialog extends Component<Props, State> {
   };
 
   componentDidMount(): void {
-    this.setState({ tokensList: this.genTokensList() })
+    this.setState({ nftsList: this.genNftsList() })
   }
 
 
   state: State = {
-    tokensList: [],
-    sortingDirection: null,
-    sortingColumn: '',
+    nftsList: [],
   };
 
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
     (event: SyntheticEvent<HTMLInputElement>) => {
       const keyword = event.currentTarget.value
-      this.setState({ tokensList: this.genTokensList() })
+      this.setState({ nftsList: this.genNftsList() })
       if(!keyword) return
       const regExp = new RegExp(keyword, 'gi')
-      const tokensListCopy = [...this.genTokensList()]
-      const filteredTokensList = tokensListCopy.filter(a => a.label.match(regExp))
-      this.setState({ tokensList: filteredTokensList })
+      const nftsListCopy = [...this.genNftsList()]
+      const filteredNftsList = nftsListCopy.filter(a => a.name.match(regExp))
+      this.setState({ nftsList: filteredNftsList })
     };
 
-  compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
-    let newSortDirection = SORTING_DIRECTIONS.UP
-    if (!this.state.sortingDirection) {
-      newSortDirection = SORTING_DIRECTIONS.UP
-    } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
-      newSortDirection = SORTING_DIRECTIONS.DOWN
-    }
-
-    this.setState({ sortingDirection: newSortDirection })
-
-    if ( a[field] < b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
-    }
-    if ( a[field] > b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-    }
-    return 0;
-  }
-
-  sortTokens: ((field: string) => void) = (field: string) => {
-    const tokensListCopy = [...this.state.tokensList]
-    const sortedTokens = tokensListCopy.sort((a,b) => this.compare(a,b, field))
-    this.setState({ tokensList: sortedTokens, sortingColumn: field });
-  };
-
-  displayColumnLogo: ((column: string) => Node) = (column: string) => {
-    const {
-        sortingColumn,
-        sortingDirection
-    } = this.state;
-    if (!sortingDirection || sortingColumn !== column) {
-      return <ArrowsList />
-    }
-    if (sortingDirection === SORTING_DIRECTIONS.UP && sortingColumn === column) {
-      return <ArrowsListFromTop />
-    }
-    if (sortingDirection === SORTING_DIRECTIONS.DOWN && sortingColumn === column) {
-      return <ArrowsListFromBottom />
-    }
-    return <ArrowsList />;
-  }
-
-  genTokensList: void => void = () => {
+  genNftsList: void => void = () => {
       if (this.props.spendableBalance == null) return [];
       const { spendableBalance } = this.props;
       return [
@@ -181,25 +126,31 @@ export default class AddNFTDialog extends Component<Props, State> {
         entry,
         info: this.props.getTokenInfo(entry),
       })).filter(token => token.info.IsNFT).map(token => {
-        const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+        const policyId = token.entry.identifier.split('.')[0];
+        const name = truncateToken(getTokenStrictName(token.info) ?? '-');
         return {
-          value: token.info.TokenId,
-          info: token.info,
-          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: Number(amount),
-        }
-      });
+          name,
+          id: getTokenIdentifierIfExists(token.info) ?? '-',
+          amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
+          policyId,
+          // $FlowFixMe[prop-missing]
+          nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+        };
+      })
+      .map(item => ({
+        name: item.name,
+        image: item.nftMetadata?.image,
+      }));
   }
 
   render(): Node {
     const { intl } = this.context;
     const { onClose } = this.props
-    const { tokensList } = this.state
+    const { nftsList } = this.state
 
     return (
       <Dialog
-        title={intl.formatMessage(globalMessages.nNft, { number: tokensList.length })}
+        title={intl.formatMessage(globalMessages.nNft, { number: nftsList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
@@ -214,57 +165,31 @@ export default class AddNFTDialog extends Component<Props, State> {
             <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
           </div>
           {
-            tokensList.length === 0 ? (
+            nftsList.length === 0 ? (
               <div className={styles.noAssetFound}>
                 <NoItemsFoundImg />
                 <h1 className={styles.text}>
                   {intl.formatMessage(
-                    this.genTokensList().length === 0 ? messages.noTokensYet : messages.noAssetFound
+                    this.genNftsList().length === 0 ? messages.noTokensYet : messages.noAssetFound
                   )}
                 </h1>
               </div>
             ): (
               <>
-                <ul className={styles.columns}>
-                  <li className={styles.name}>
-                    <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
-                      <p className={styles.headerText}>
-                        {intl.formatMessage(messages.nameAndTicker)}
-                      </p>
-                      {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
-                    </button>
-                  </li>
-                  <li className={styles.identifier}>
-                    <p className={styles.headerText}>
-                      {intl.formatMessage(messages.identifier)}
-                    </p>
-                    <InfoIcon />
-                  </li>
-                  <li className={styles.quantity}>
-                    <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                      <p className={styles.headerText}>
-                        {intl.formatMessage(messages.quantity)}
-                      </p>
-                      {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                    </button>
-                  </li>
-                </ul>
+                <div className={styles.nftsGrid}>
+                  {
+                    nftsList.map(nft => {
+                      const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
 
-                {
-                  tokensList.map(token => (
-                    <SingleTokenRow
-                      key={token.id}
-                      token={token}
-                      classicTheme={this.props.classicTheme}
-                      updateAmount={this.props.updateAmount}
-                      uriParams={this.props.uriParams}
-                      selectedToken={this.props.selectedToken}
-                      validateAmount={this.props.validateAmount}
-                      defaultToken={this.props.defaultToken}
-                      getTokenInfo={this.props.getTokenInfo}
-                    />
-                  ))
-                }
+                      return (
+                        <div className={styles.nftCard}>
+                          <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" />
+                          <p className={styles.nftName}>{nft.name }</p>
+                        </div>
+                      )
+                    })
+                  }
+                </div>
               </>
             )
           }

@@ -108,7 +108,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
-function NftCardImage({ ipfsUrl, name }) {
+export function NftCardImage({ ipfsUrl, name }) {
   const ipfsHash = ipfsUrl != null ? ipfsUrl.replace('ipfs://', '') : '';
 
   return (
@@ -131,7 +131,7 @@ const SearchInput = styled(Input)({
 const SLink = styled(Link)({
   textDecoration: 'none',
 });
-const ImageItem = styled(ImageListItem)({
+export const ImageItem = styled(ImageListItem)({
   padding: '16px',
   paddingBottom: '12px',
   backgroundColor: 'var(--yoroi-palette-common-white)',
