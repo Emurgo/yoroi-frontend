@@ -633,4 +633,5 @@ const WrapperCards = styled(Box)({
   display: 'flex',
   justifyContent: 'space-between',
   marginBottom: '40px',
+  height: '412px',
 });

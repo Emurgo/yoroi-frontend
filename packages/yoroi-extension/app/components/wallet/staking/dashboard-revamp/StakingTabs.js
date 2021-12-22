@@ -2,7 +2,7 @@
 import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import { Box, styled } from '@mui/system';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { TabContext, TabList, TabPanel as TabPanelBase } from '@mui/lab';
 import { IconButton, Tab, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import InfoIconSVG from '../../../../assets/images/info-icon.inline.svg';
@@ -13,6 +13,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { EpochProgressCard } from './EpochProgressCard';
+import RewardHistoryTab from './RewardHistoryTab';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -46,7 +47,6 @@ function StakingTabs({ delegatedPool, undelegate, epochProgress, intl }: Props &
     {
       id: 0,
       label: intl.formatMessage(globalMessages.stakePoolDelegated),
-      disabled: false,
       component: (
         <Box>
           <StakePoolAlert message={intl.formatMessage(messages.alertInfo)} />
@@ -59,13 +59,11 @@ function StakingTabs({ delegatedPool, undelegate, epochProgress, intl }: Props &
     {
       id: 1,
       label: 'Reward History',
-      disabled: true,
-      component: <Box>TODO: Reward History!</Box>,
+      component: <RewardHistoryTab />,
     },
     {
       id: 2,
       label: 'Epoch progress',
-      disabled: false,
       component: (
         <EpochProgressCard
           // TODO: Remove placeholders
@@ -84,8 +82,8 @@ function StakingTabs({ delegatedPool, undelegate, epochProgress, intl }: Props &
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: 'var(--yoroi-palette-gray-200)' }}>
           <TabList onChange={handleChange} aria-label="Staking tabs">
-            {tabs.map(({ label, id, disabled }) => (
-              <StyledTab disabled={disabled} label={label} value={id} />
+            {tabs.map(({ label, id }) => (
+              <StyledTab label={label} value={id} />
             ))}
           </TabList>
         </Box>
@@ -104,6 +102,9 @@ const Card = styled(Box)({
   borderRadius: '8px',
   flex: '1 1 48.5%',
   maxWidth: '48.5%',
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
 });
 
 const StyledTab = styled(Tab)({
@@ -130,6 +131,10 @@ function StakePoolAlert({ message }: {| message: string |}): Node {
     </StyledBox>
   );
 }
+const TabPanel = styled(TabPanelBase)({
+  flex: 'auto',
+  overflow: 'auto',
+});
 const StyledBox = styled(Box)({
   display: 'flex',
   background: 'var(--yoroi-palette-gray-50)',

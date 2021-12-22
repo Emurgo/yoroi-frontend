@@ -22,7 +22,7 @@ export function EpochProgressCard({
   return (
     <Box>
       <Graph value={percentage} days={days} />
-      <Stack direction="row" spacing={4} mt="32px">
+      <Stack direction="row" spacing={4} mt="26px">
         <LabelWithValue label="Current Epoch" value={currentEpoch} />
         <LabelWithValue label="Epoch started at" value={startEpochDate} />
         <LabelWithValue label="Epoch end at" value={endEpochDate} />
