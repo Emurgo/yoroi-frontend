@@ -43,6 +43,7 @@ import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networ
 import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
+import TokensAmountPreview from './WalletSendFormSteps/TokensAmountPreview';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -471,6 +472,8 @@ export default class WalletSendForm extends Component<Props, State> {
               >
                 {amountInputError}
               </p>
+
+              <TokensAmountPreview spendableBalance={this.props.spendableBalance} />
 
               <div className={styles.buttonsWrappers}>
                 <button type='button' onClick={() => this.props.openDialog(AddTokenDialog)}>
