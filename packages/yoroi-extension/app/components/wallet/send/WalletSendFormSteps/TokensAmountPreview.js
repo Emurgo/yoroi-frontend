@@ -21,9 +21,9 @@ export default class TokensAmountPreview extends Component {
         if (spendableBalance == null) return [];
         return spendableBalance.nonDefaultEntries().map(entry => ({
             entry,
-            info: getTokenInfo(entry),
+            info: this.props.getTokenInfo(entry),
         })).filter(token => !token.info.IsNFT).map(token => {
-            const amount = genFormatTokenAmount(getTokenInfo)(token.entry)
+            const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
             return {
                 value: token.info.TokenId,
                 info: token.info,
@@ -37,7 +37,7 @@ export default class TokensAmountPreview extends Component {
     genNftsList() {
         const { spendableBalance } = this.props
         if (spendableBalance == null) return [];
-        return this.props.nonDefaultEntries().map(entry => ({
+        return spendableBalance.nonDefaultEntries().map(entry => ({
           entry,
           info: this.props.getTokenInfo(entry),
         })).filter(token => token.info.IsNFT).map(token => {
@@ -81,14 +81,18 @@ export default class TokensAmountPreview extends Component {
             </div>
             <div>
               {nfts.length > 0 && (
-                <div>
-                  <h6 className={styles.title}>{intl.formatMessage(globalMessages.tokens)}</h6>
-                    {nfts.map(({ name, image }) => (
-                      <div key={name} className={styles.tokenRow}>
-                        <div className={styles.logo}><NoAssetLogo /></div>
-                        <p className={styles.label}>{name}</p>
-                      </div>
-                    ))}
+                <div className={styles.nfts}>
+                  <h6 className={styles.title}>{intl.formatMessage(globalMessages.nfts)}</h6>
+                    {nfts.map(({ name, image }) => {
+                        const ipfs = image != null ? image.replace('ipfs://', '') : '';
+
+                        return (
+                          <div key={name} className={styles.nftRow}>
+                            <img className={styles.nftImage} src={`https://ipfs.io/ipfs/${ipfs}`} alt={name} loading="lazy" />
+                            <p className={styles.label}>{name}</p>
+                          </div>
+                        )
+                    })}
                 </div>
                 )}
             </div>
