@@ -57,7 +57,7 @@ export default class LocalStorageApi {
   );
 
   setConnectorStatus: ConnectorStatus => Promise<void> = (status) => setLocalItem(
-    storageKeys.CONNECTOR_STATUS, status
+    storageKeys.CONNECTOR_STATUS, JSON.stringify(status)
   )
   // ========== Locale ========== //
 

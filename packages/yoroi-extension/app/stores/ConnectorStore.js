@@ -151,7 +151,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable errorWallets: string = '';
   /**
    * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
-   *   it will be displyed fo the user at the `connect` screen for the user to choose 
+   *   it will be displyed fo the user at the `connect` screen for the user to choose
    *   which wallet to connect
    * - `allWallets`: list of all wallets the user have in yoroi
    *    We need it to display walelts-websits on the `connected webists screen`
@@ -246,7 +246,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @action
   _getConnectorStatus: () => Promise<ConnectorStatus> = async () => {
     let connectorStatus = await this.getConnectorStatus.execute();
-
     /**
      * When running this for the first time `connectorStatus` will be null
      * but the dapp connector will be active by default so will mark the status as active
@@ -255,20 +254,21 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       connectorStatus = {
         isActive: true
       }
+    } else {
+      connectorStatus = JSON.parse(connectorStatus)
     }
 
     runInAction(() => {
-      this.connectorStatus = connectorStatus
+      this.connectorStatus = connectorStatus;
     })
   }
   @action
   _toggleDappConnector: void => Promise<void> = async () => {
     const currentStatus = this.connectorStatus.isActive
     await this.setConnectorStatus.execute(
-      {status: { ...this.connectorStatus, isActive: !currentStatus }}
+      { status: { isActive: !currentStatus } }
     )
     await this._getConnectorStatus()
-    // console.log({currentStatus, newStatus: this.connectorStatus.isActive })
   }
 
   @action
