@@ -54,8 +54,8 @@ export default class DappConnectorNavbar extends Component<Props, State> {
     return (
       <div className={styles.component}>
         <h1 className={styles.header}>Dapp connector</h1>
-        <div>
-          <p>
+        <div className={styles.dappSwitcher}>
+          <p className={styles.label}>
             <span>{intl.formatMessage(
               isChecked ? messages.switcherLabelOn : messages.switcherLabelOff
               )}

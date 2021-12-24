@@ -15,11 +15,26 @@
         line-height: 28px;
     }
 
+    .dappSwitcher {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .label {
+            margin-right: 13px;
+            color: #6B7384;
+            font-family: Rubik;
+            font-size: 14px;
+            letter-spacing: 0;
+            line-height: 22px;
+        }
+    }
+
     .switch {
         position: relative;
         display: inline-block;
-        width: 60px;
-        height: 34px;
+        width: 32px;
+        height: 20px;
 
         input {
             opacity: 0;
@@ -34,7 +49,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #DCE0E9;
             -webkit-transition: .4s;
             transition: .4s;
             border-radius: 34px;
@@ -42,10 +57,13 @@
             &:before {
                 position: absolute;
                 content: "";
-                height: 26px;
-                width: 26px;
-                left: 4px;
-                bottom: 4px;
+                height: 16px;
+                width: 16px;
+                border-radius: 14px;
+                background-color: #FFFFFF;
+                box-shadow: 0 1px 4px 0 rgba(28,28,36,0.08);
+                left: 2px;
+                bottom: 2px;
                 background-color: white;
                 -webkit-transition: .4s;
                 transition: .4s;
@@ -58,12 +76,12 @@
         }
 
         .sliderChecked {
-            background-color:#2196F3;
+            background-color: #17D1AA;
             
             &:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
+                -webkit-transform: translateX(12.5px);
+                -ms-transform: translateX(12.5px);
+                transform: translateX(12.5px);
             }
         }
     }
