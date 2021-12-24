@@ -199,8 +199,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
-    this.action.connector.getConnectorStatus.listen(this._getConnectorStatus)
-    this.action.connector.updateConnectorStatus.listen(this._updateConnectorStatus)
+    this.action.connector.getConnectorStatus.listen(this._getConnectorStatus);
+    this.action.connector.toggleDappConnector.listen(this._toggleDappConnector);
     this._getConnectorWhitelist();
     this._getConnectorStatus()
     this._getConnectingMsg();
@@ -245,7 +245,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @action
   _getConnectorStatus: () => Promise<ConnectorStatus> = async () => {
-    let connectorStatus = this.getConnectorStatus.execute();
+    let connectorStatus = await this.getConnectorStatus.execute();
+
     /**
      * When running this for the first time `connectorStatus` will be null
      * but the dapp connector will be active by default so will mark the status as active
@@ -259,6 +260,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.connectorStatus = connectorStatus
     })
+  }
+  @action
+  _toggleDappConnector: void => void = async () => {
+    const currentStatus = this.connectorStatus.isActive
+    this.setConnectorStatus.execute({ ...this.connectorStatus, isActive: !currentStatus })
+    this.getConnectorStatus.execute()
   }
 
   @action

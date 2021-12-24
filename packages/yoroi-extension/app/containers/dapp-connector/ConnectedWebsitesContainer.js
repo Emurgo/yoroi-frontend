@@ -28,6 +28,7 @@ import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extens
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
 import environment from '../../environment'
 import { ROUTES } from '../../routes-config'
+import type { ConnectorStatus } from '../../api/localStorage'
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
@@ -116,7 +117,11 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
-        navbar={<DappConnectorNavbar />}
+        navbar={(
+          <DappConnectorNavbar
+            connectorStatus={this.generated.stores.connector.connectorStatus}
+          />
+        )}
       >
         <FullscreenLayout bottomPadding={0}>
           {componentToRender}
@@ -143,6 +148,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
         |},
+        toggleDappConnector: {|
+          trigger: (params: void) => Promise<void>
+        |}
       |},
       router: {|
         goToRoute: {|
@@ -164,6 +172,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
         activeSites: {| sites: Array<string> |},
+        connectorStatus: ConnectorStatus,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
@@ -204,6 +213,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           loadingWallets: stores.connector.loadingWallets,
           errorWallets: stores.connector.errorWallets,
           activeSites: stores.connector.activeSites,
+          connectorStatus: stores.connector.connectorStatus,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -220,6 +230,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
             trigger: actions.connector.removeWalletFromWhitelist.trigger,
           },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
+          toggleDappConnector: { trigger: actions.connector.toggleDappConnector.trigger },
         },
       },
       SidebarContainerProps: (

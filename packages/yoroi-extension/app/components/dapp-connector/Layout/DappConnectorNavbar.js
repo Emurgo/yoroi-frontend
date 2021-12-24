@@ -6,12 +6,11 @@ import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames'
+import type { ConnectorStatus } from '../../../api/localStorage'
 
 
-type Props = {||}
-type State = {|
-  isChecked: boolean,
-  isFocused: boolean,
+type Props = {|
+  connectorStatus: ConnectorStatus
 |}
 
 const messages = defineMessages({
@@ -27,29 +26,19 @@ const messages = defineMessages({
 
 
 @observer
-export default class DappConnectorNavbar extends Component<Props, State> {
+export default class DappConnectorNavbar extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state: State = {
-    isFocused: false,
-    isChecked: false,
-  }
-
-  onFocus: void => void = () => {
-    this.setState({ isFocused: true })
-  }
-
   onChange: void => void = () => {
-    const { isChecked } = this.state
-    this.setState({ isChecked: !isChecked })
+    // update the s
   }
 
   render(): Node {
     const { intl } = this.context;
-    const { isFocused, isChecked } = this.state
+    const { connectorStatus: { isActive } } = this.props
 
     return (
       <div className={styles.component}>
@@ -57,7 +46,7 @@ export default class DappConnectorNavbar extends Component<Props, State> {
         <div className={styles.dappSwitcher}>
           <p className={styles.label}>
             <span>{intl.formatMessage(
-              isChecked ? messages.switcherLabelOn : messages.switcherLabelOff
+              isActive ? messages.switcherLabelOn : messages.switcherLabelOff
               )}
             </span>
           </p>
@@ -67,7 +56,7 @@ export default class DappConnectorNavbar extends Component<Props, State> {
           >
             <input onChange={this.onChange} type="checkbox" id='switcher' />
             <span className={classnames([
-              styles.slider, isFocused && styles.sliderFocus, isChecked && styles.sliderChecked
+              styles.slider, isActive && styles.sliderChecked
             ])}
             />
           </label>

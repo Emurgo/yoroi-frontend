@@ -18,7 +18,5 @@ export default class ConnectorActions {
   confirmSignInTx: Action<string> = new Action();
   cancelSignInTx: Action<void> = new Action();
   getConnectorStatus: AsyncAction<void> = new AsyncAction();
-  updateConnectorStatus: AsyncAction<{|
-    status: ConnectorStatus
-  |}> = new AsyncAction();
+  toggleDappConnector: AsyncAction<void> = new AsyncAction();
 }
