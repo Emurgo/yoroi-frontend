@@ -120,6 +120,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         navbar={(
           <DappConnectorNavbar
             connectorStatus={this.generated.stores.connector.connectorStatus}
+            toggleDappConnector={this.generated.actions.connector.toggleDappConnector.trigger}
           />
         )}
       >

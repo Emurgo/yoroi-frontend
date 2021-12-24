@@ -38,7 +38,7 @@ export default class DappConnectorNavbar extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { connectorStatus: { isActive } } = this.props
+    const { connectorStatus: { isActive }, toggleDappConnector } = this.props
 
     return (
       <div className={styles.component}>
@@ -54,7 +54,7 @@ export default class DappConnectorNavbar extends Component<Props> {
             htmlFor='switcher'
             className={styles.switch}
           >
-            <input onChange={this.onChange} type="checkbox" id='switcher' />
+            <input onChange={toggleDappConnector} type="checkbox" id='switcher' />
             <span className={classnames([
               styles.slider, isActive && styles.sliderChecked
             ])}

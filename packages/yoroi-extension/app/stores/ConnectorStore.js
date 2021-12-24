@@ -199,8 +199,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
-    this.action.connector.getConnectorStatus.listen(this._getConnectorStatus);
-    this.action.connector.toggleDappConnector.listen(this._toggleDappConnector);
+    this.actions.connector.getConnectorStatus.listen(this._getConnectorStatus);
+    this.actions.connector.toggleDappConnector.listen(this._toggleDappConnector);
     this._getConnectorWhitelist();
     this._getConnectorStatus()
     this._getConnectingMsg();
