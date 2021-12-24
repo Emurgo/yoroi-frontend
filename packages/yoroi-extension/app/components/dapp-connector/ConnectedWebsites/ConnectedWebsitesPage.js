@@ -35,6 +35,14 @@ const messages = defineMessages({
       id: 'connector.connect.noWebsitesConnected',
       defaultMessage: `!!!You don't have any websites connected yet`,
     },
+    wallets: {
+      id: 'connector.connect.wallets',
+      defaultMessage: `!!!Wallets`,
+    },
+    dapps: {
+      id: 'connector.connect.dapps',
+      defaultMessage: `!!!Dapps`,
+    },
 });
 
 function walletExistInWebsitsList(
@@ -109,8 +117,8 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           <div className={styles.component}>
             <div className={styles.container}>
               <div className={styles.header}>
-                <p>Wallets</p>
-                <p>Dapps</p>
+                <p>{intl.formatMessage(messages.wallets)} </p>
+                <p>{intl.formatMessage(messages.dapps)} </p>
               </div>
               <div>
                 {isCardanoExist &&

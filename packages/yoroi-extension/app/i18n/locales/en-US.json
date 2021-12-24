@@ -59,6 +59,8 @@
   "connector.connect.connectedWallets": "Connected Wallets",
   "connector.connect.connectedWallets.active": "Active",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
+  "connector.connect.wallets": "Wallets",
+  "connector.connect.dapps": "Dapps",
   "connector.signin.title": "Sign transaction",
   "connector.signin.txDetails": "Transaction Details",
   "connector.signin.receiver": "Receiver",
