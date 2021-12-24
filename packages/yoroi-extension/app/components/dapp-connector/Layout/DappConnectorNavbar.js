@@ -9,18 +9,14 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 type Props = {||}
 
 const messages = defineMessages({
-  switcherLable: {
-    id: 'connectedWebsites.navbar.switcher.label',
-    defaultMessage: '!!!Dapp Connector is',
-  },
-  on: {
+  switcherLabelOn: {
     id: 'connectedWebsites.navbar.switcher.on',
-    defaultMessage: '!!!on',
+    defaultMessage: '!!!Dapp Connector is on',
   },
-  off: {
+  switcherLabelOff: {
     id: 'connectedWebsites.navbar.switcher.off',
-    defaultMessage: '!!!off',
-  }
+    defaultMessage: '!!!Dapp Connector is off',
+  },
 });
 
 
@@ -33,12 +29,16 @@ export default class DappConnectorNavbar extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
+    const isDappConnectorActive = false
     return (
       <div className={styles.component}>
         <h1 className={styles.header}>Dapp connector</h1>
         <div>
           <p>
-            <span>{intl.formatMessage(messages.switcherLable)}</span>
+            <span>{intl.formatMessage(
+              isDappConnectorActive ? messages.switcherLabelOn : messages.switcherLabelOff
+              )}
+            </span>
           </p>
         </div>
       </div>
