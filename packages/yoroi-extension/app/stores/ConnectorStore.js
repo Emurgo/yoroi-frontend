@@ -36,6 +36,7 @@ import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ConnectorStatus } from '../api/localStorage'
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -133,6 +134,10 @@ async function parseWalletsList(
   return result
 }
 
+type GetConnectorStatusFunc = void => Promise<?ConnectorStatus>;
+type SetConnectorStatusFunc = {|
+  status: ConnectorStatus,
+|} => Promise<void>
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
@@ -153,6 +158,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
    */
   @observable filteredWallets: Array<PublicDeriverCache> = [];
   @observable allWallets: Array<PublicDeriverCache> = [];
+
+  @observable getConnectorStatus: Request<
+  GetConnectorStatusFunc
+  > = new Request<GetConnectorStatusFunc>(
+    this.api.localStorage.getConnectorStatus
+  )
+  @observable setConnectorStatus: Request<SetConnectorStatusFunc> = new Request<
+  SetConnectorStatusFunc
+  >(({ status }) => this.api.localStorage.setConnectorStatus(status));
+  @observable connectorStatus: ?ConnectorStatus;
 
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
@@ -184,7 +199,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
+    this.action.connector.getConnectorStatus.listen(this._getConnectorStatus)
+    this.action.connector.updateConnectorStatus.listen(this._updateConnectorStatus)
     this._getConnectorWhitelist();
+    this._getConnectorStatus()
     this._getConnectingMsg();
     this._getSigningMsg();
     this.currentConnectorWhitelist;
@@ -224,6 +242,24 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
+
+  @action
+  _getConnectorStatus: () => Promise<ConnectorStatus> = async () => {
+    let connectorStatus = this.getConnectorStatus.execute();
+    /**
+     * When running this for the first time `connectorStatus` will be null
+     * but the dapp connector will be active by default so will mark the status as active
+     */
+    if (!connectorStatus) {
+      connectorStatus = {
+        isActive: true
+      }
+    }
+
+    runInAction(() => {
+      this.connectorStatus = connectorStatus
+    })
+  }
 
   @action
   _confirmSignInTx: string => void = password => {

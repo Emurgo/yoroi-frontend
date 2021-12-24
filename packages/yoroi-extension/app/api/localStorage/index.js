@@ -33,11 +33,17 @@ const storageKeys = {
   SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
+  CONNECTOR_STATUS: 'connector_status',
+
 };
 
 export type SetCustomUserThemeRequest = {|
   cssCustomPropObject: Object,
 |};
+
+export type ConnectorStatus = {|
+  isActive: boolean,
+|}
 
 /**
  * This api layer provides access to the electron local storage
@@ -45,7 +51,14 @@ export type SetCustomUserThemeRequest = {|
  */
 
 export default class LocalStorageApi {
+  // ========== CONNECTOR ========== //
+  getConnectorStatus: void => Promise<?ConnectorStatus> = () => getLocalItem(
+    storageKeys.CONNECTOR_STATUS
+  );
 
+  setConnectorStatus: ConnectorStatus => Promise<void> = (status) => setLocalItem(
+    storageKeys.CONNECTOR_STATUS, status
+  )
   // ========== Locale ========== //
 
   getUserLocale: void => Promise<?string> = () => getLocalItem(storageKeys.USER_LOCALE);

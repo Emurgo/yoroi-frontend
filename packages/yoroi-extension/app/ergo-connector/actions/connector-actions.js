@@ -1,6 +1,7 @@
 // @flow
 import { AsyncAction, Action } from '../../actions/lib/Action';
 import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { ConnectorStatus } from '../../api/localStorage'
 // ======= CONNECTOR ACTIONS =======
 
 export default class ConnectorActions {
@@ -16,4 +17,8 @@ export default class ConnectorActions {
   removeWalletFromWhitelist: AsyncAction<string> = new AsyncAction();
   confirmSignInTx: Action<string> = new Action();
   cancelSignInTx: Action<void> = new Action();
+  getConnectorStatus: AsyncAction<void> = new AsyncAction();
+  updateConnectorStatus: AsyncAction<{|
+    status: ConnectorStatus
+  |}> = new AsyncAction();
 }
