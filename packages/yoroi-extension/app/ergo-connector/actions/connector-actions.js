@@ -1,7 +1,6 @@
 // @flow
 import { AsyncAction, Action } from '../../actions/lib/Action';
 import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
-import type { ConnectorStatus } from '../../api/localStorage'
 // ======= CONNECTOR ACTIONS =======
 
 export default class ConnectorActions {

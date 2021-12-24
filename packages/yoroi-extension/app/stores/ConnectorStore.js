@@ -262,10 +262,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     })
   }
   @action
-  _toggleDappConnector: void => void = async () => {
+  _toggleDappConnector: void => Promise<void> = async () => {
     const currentStatus = this.connectorStatus.isActive
-    this.setConnectorStatus.execute({ ...this.connectorStatus, isActive: !currentStatus })
-    this.getConnectorStatus.execute()
+    await this.setConnectorStatus.execute(
+      {status: { ...this.connectorStatus, isActive: !currentStatus }}
+    )
+    await this._getConnectorStatus()
+    // console.log({currentStatus, newStatus: this.connectorStatus.isActive })
   }
 
   @action
