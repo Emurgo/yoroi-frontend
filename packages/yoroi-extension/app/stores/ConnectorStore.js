@@ -167,7 +167,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable setConnectorStatus: Request<SetConnectorStatusFunc> = new Request<
   SetConnectorStatusFunc
   >(({ status }) => this.api.localStorage.setConnectorStatus(status));
-  @observable connectorStatus: ?ConnectorStatus;
+  @observable connectorStatus: ConnectorStatus;
 
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
@@ -244,7 +244,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action
-  _getConnectorStatus: () => Promise<ConnectorStatus> = async () => {
+  _getConnectorStatus: () => Promise<void> = async () => {
     let connectorStatus = await this.getConnectorStatus.execute();
     /**
      * When running this for the first time `connectorStatus` will be null
@@ -254,8 +254,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       connectorStatus = {
         isActive: true
       }
-    } else {
-      connectorStatus = JSON.parse(connectorStatus)
     }
 
     runInAction(() => {

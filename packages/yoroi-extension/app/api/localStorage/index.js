@@ -52,9 +52,11 @@ export type ConnectorStatus = {|
 
 export default class LocalStorageApi {
   // ========== CONNECTOR ========== //
-  getConnectorStatus: void => Promise<?ConnectorStatus> = () => getLocalItem(
-    storageKeys.CONNECTOR_STATUS
-  );
+  getConnectorStatus: void => Promise<?ConnectorStatus> = async () => {
+    const result = await getLocalItem(storageKeys.CONNECTOR_STATUS);
+    if (result === undefined || result === null) return undefined;
+    return JSON.parse(result);
+  }
 
   setConnectorStatus: ConnectorStatus => Promise<void> = (status) => setLocalItem(
     storageKeys.CONNECTOR_STATUS, JSON.stringify(status)

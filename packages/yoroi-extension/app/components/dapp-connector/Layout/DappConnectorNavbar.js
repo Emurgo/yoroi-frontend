@@ -10,7 +10,8 @@ import type { ConnectorStatus } from '../../../api/localStorage'
 
 
 type Props = {|
-  connectorStatus: ConnectorStatus
+  +connectorStatus: ConnectorStatus,
+  +toggleDappConnector: void => void,
 |}
 
 const messages = defineMessages({
@@ -32,9 +33,6 @@ export default class DappConnectorNavbar extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  onChange: void => void = () => {
-    // update the s
-  }
 
   render(): Node {
     const { intl } = this.context;
