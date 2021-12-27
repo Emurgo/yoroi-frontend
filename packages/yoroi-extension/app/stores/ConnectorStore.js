@@ -257,9 +257,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     runInAction(() => {
+      // $FlowFixMe
       this.connectorStatus = connectorStatus;
     })
   }
+
   @action
   _toggleDappConnector: void => Promise<void> = async () => {
     const currentStatus = this.connectorStatus.isActive

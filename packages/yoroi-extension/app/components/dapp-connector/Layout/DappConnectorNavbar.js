@@ -11,7 +11,7 @@ import type { ConnectorStatus } from '../../../api/localStorage'
 
 type Props = {|
   +connectorStatus: ConnectorStatus,
-  +toggleDappConnector: void => void,
+  +toggleDappConnector: void => Promise<void>,
 |}
 
 const messages = defineMessages({
