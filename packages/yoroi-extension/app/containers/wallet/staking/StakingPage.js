@@ -1,24 +1,24 @@
 // @flow
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import BannerContainer from '../../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer';
+import BannerContainer from '../../banners/BannerContainer';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer';
+import SidebarContainer from '../../SidebarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
+import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 
 import TopBarLayout from '../../../components/layout/TopBarLayout';
-import SidebarContainer from '../../SidebarContainer';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
-import NavBarContainerRevamp from '../../NavBarContainerRevamp';
+import { withLayout } from '../../../styles/context/layout';
 import WalletEmptyBanner from '../WalletEmptyBanner';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
 import CardanoStakingPage from './CardanoStakingPage';
@@ -31,32 +31,34 @@ import OverviewModal from '../../../components/wallet/staking/dashboard-revamp/O
 import type { DelegationRequests, PoolMeta } from '../../../stores/toplevel/DelegationStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
-import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
+import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
+import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
-  isCardanoHaskell,
-  isJormungandr,
+  getCardanoHaskellBaseConfig, isCardanoHaskell, isJormungandr,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
-import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
-import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
-import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
+import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import type {
-  CurrentTimeRequests,
-  TimeCalcRequests,
+  CurrentTimeRequests, TimeCalcRequests,
 } from '../../../stores/base/BaseCardanoTimeStore';
 import moment from 'moment';
-import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import type { GraphRewardData } from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import RewardHistoryDialog
+  from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
+import { hiddenAmount } from '../../../utils/strings';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -154,6 +156,147 @@ class StakingPage extends Component<AllProps> {
     );
   };
 
+  /* Reward History */
+  _generateRewardGraphData: ({|
+    delegationRequests: DelegationRequests,
+    currentEpoch: number,
+    publicDeriver: PublicDeriver<>,
+  |}) => any = request => {
+    const history = request.delegationRequests.rewardHistory.result;
+    if (history == null) {
+      return null;
+    }
+    if (!request.delegationRequests.getCurrentDelegation.wasExecuted) {
+      return null;
+    }
+    let historyIterator = 0;
+    const perEpochRewards: Array<any> = [];
+
+    const startEpoch = (() => {
+      if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+        const shelleyConfig = getCardanoHaskellBaseConfig(
+          request.publicDeriver.getParent().getNetworkInfo()
+        )[1];
+        return shelleyConfig.StartAt;
+      }
+      return 0;
+    })();
+    const endEpoch = (() => {
+      if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+        // TODO: -1 since cardano-db-sync doesn't expose this information for some reason
+        return request.currentEpoch - 1;
+      }
+      if (isJormungandr(request.publicDeriver.getParent().getNetworkInfo())) {
+        // note: reward history includes the current epoch
+        // since it tells you the reward you got at slot 0 of the new epoch
+        return request.currentEpoch + 1;
+      }
+      throw new Error(
+        `${nameof(this._generateRewardGraphData)} can't compute endEpoch for rewards`
+      );
+    })();
+
+    const getMiniPoolInfo = (poolHash: string) => {
+      const meta = this.generated.stores.delegation.getLocalPoolInfo(
+        request.publicDeriver.getParent().getNetworkInfo(),
+        poolHash
+      );
+      if (meta == null || meta.info == null || meta.info.ticker == null || meta.info.name == null) {
+        return truncateAddressShort(poolHash.toString());
+      }
+      return `[${meta.info.ticker}] ${meta.info.name}`;
+    };
+
+    const getDateFromEpoch = epoch => {
+      const timeStore = this.generated.stores.time;
+      const timeCalcRequests = timeStore.getTimeCalcRequests(request.publicDeriver);
+      const toRealTime = timeCalcRequests.requests.toRealTime.result;
+      if (toRealTime == null) return undefined;
+      const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
+      if (toAbsoluteSlot == null) return undefined;
+      const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
+      if (timeSinceGenesis == null) return undefined;
+      const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
+      if (getEpochLength == null) return undefined;
+
+      const endEpochTime = toRealTime({
+        absoluteSlotNum: toAbsoluteSlot({
+          epoch,
+          // in Jormungandr, rewards were distributed at the start of the epoch
+          // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
+          slot: isJormungandr(request.publicDeriver.getParent().getNetworkInfo())
+            ? 0
+            : getEpochLength(),
+        }),
+        timeSinceGenesisFunc: timeSinceGenesis,
+      });
+      const endEpochMoment = moment(endEpochTime).format('lll');
+      return endEpochMoment;
+    };
+
+    const getNormalized = tokenEntry => {
+      const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
+        .get(tokenEntry.networkId.toString())
+        ?.get(tokenEntry.identifier);
+      if (tokenRow == null)
+        throw new Error(`${nameof(StakingPage)} no token info for ${JSON.stringify(tokenEntry)}`);
+      const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
+      const tokenInfo = getTokenInfo(tokenEntry);
+      const shiftedAmount = tokenEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals
+      );
+      return this.generated.stores.profile.shouldHideBalance ?
+        hiddenAmount :
+        `${beforeDecimalRewards}${afterDecimalRewards} ${truncateToken(getTokenName(tokenInfo))}`;
+    };
+    for (let i = startEpoch; i < endEpoch; i++) {
+      if (historyIterator < history.length && i === history[historyIterator][0]) {
+        // exists a reward for this epoch
+        const poolHash = history[historyIterator][2];
+        const nextReward = history[historyIterator][1];
+
+        perEpochRewards.push({
+          name: i,
+          primary: getNormalized(nextReward.getDefaultEntry()),
+          poolName: getMiniPoolInfo(poolHash),
+          poolId: poolHash,
+          date: getDateFromEpoch(i),
+        });
+        historyIterator++;
+      } else {
+        perEpochRewards.push({
+          name: i,
+          primary: 0,
+          poolName: '',
+          poolId: '',
+          date: '',
+        });
+      }
+    }
+
+    return perEpochRewards.filter(item => item.poolName);
+  };
+
+  _generateGraphData: ({|
+    delegationRequests: DelegationRequests,
+    publicDeriver: PublicDeriver<>,
+  |}) => GraphRewardData = request => {
+    const timeStore = this.generated.stores.time;
+    const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
+
+    return {
+      error: request.delegationRequests.rewardHistory.error,
+      items: this._generateRewardGraphData({
+        delegationRequests: request.delegationRequests,
+        currentEpoch: currTimeRequests.currentEpoch,
+        publicDeriver: request.publicDeriver,
+      }),
+    };
+  };
+
   getErrorInFetch: (PublicDeriver<>) => void | {| error: LocalizableError |} = publicDeriver => {
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -173,7 +316,10 @@ class StakingPage extends Component<AllProps> {
     return undefined;
   };
 
-  getStakePools: (PublicDeriver<>, Array<Object>) => Node | void = (publicDeriver, rewardHistory) => {
+  getStakePools: (PublicDeriver<>, GraphRewardData) => Node | void = (
+    publicDeriver,
+    rewardsGraphData
+  ) => {
     const { actions, stores } = this.generated;
     const timeStore = stores.time;
 
@@ -218,7 +364,6 @@ class StakingPage extends Component<AllProps> {
       return null;
     }
     const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-    const { intl } = this.context;
     const currentPage = this.generated.stores.delegation.selectedPage;
 
     const currentPool = currentPools[0][currentPage];
@@ -230,7 +375,7 @@ class StakingPage extends Component<AllProps> {
       // server hasn't returned information about the stake pool yet
       return undefined;
     }
-    const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+    const name = meta.info?.name ?? truncateAddressShort(currentPool.toString());
     const delegatedPool = {
       id: String(currentPool),
       name,
@@ -248,8 +393,24 @@ class StakingPage extends Component<AllProps> {
     // };
     return (
       <StakingTabs
+        delegatedPool={{
+          pool: delegatedPool,
+          undelegate:
+            // don't support undelegation for ratio stake since it's a less intuitive UX
+            currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
+              ? async () => {
+                  this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
+                  await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
+                    {
+                      publicDeriver,
+                      poolRequest: undefined,
+                    }
+                  );
+                }
+              : undefined,
+        }}
         rewardHistory={{
-          list: rewardHistory,
+          graphData: rewardsGraphData,
           onOpenRewardList: () =>
             actions.dialogs.open.trigger({
               dialog: RewardHistoryDialog,
@@ -260,21 +421,6 @@ class StakingPage extends Component<AllProps> {
           endEpochDate,
           percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
         }}
-        delegatedPool={delegatedPool}
-        undelegate={
-          // don't support undelegation for ratio stake since it's a less intuitive UX
-          currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
-            ? async () => {
-                this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
-                  {
-                    publicDeriver,
-                    poolRequest: undefined,
-                  }
-                );
-              }
-            : undefined
-        }
       />
     );
   };
@@ -305,75 +451,13 @@ class StakingPage extends Component<AllProps> {
     const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
     const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
 
-    const rewardHistory = [
-      {
-        poolTicker: '[Emurgo 12121]',
-        poolId: 'a4138092ab0c28ff451b1f5f9d2f6a6a1639bdf520eb1f0379bd6b04',
-        poolAvatar: null,
-        history: [
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-        ],
-      },
-      {
-        poolTicker: '[Pool Unknown]',
-        poolId: 'a4138092ab0c28ff451b1f5f9d2f6a6a1639bdf520eb1f0379bd6b04',
-        poolAvatar: null,
-        history: [
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-          {
-            type: 'Received',
-            date: '23 Jul, 11:30 PM',
-            balance: '+1.292335 ADA',
-          },
-        ],
-      },
-    ];
+    const rewardsGraphData = this._generateGraphData({
+      delegationRequests,
+      publicDeriver,
+    });
 
     const showStakePoolTabs =
-      errorIfPresent == null ? this.getStakePools(publicDeriver, rewardHistory) : errorIfPresent;
+      errorIfPresent == null ? this.getStakePools(publicDeriver, rewardsGraphData) : errorIfPresent;
 
     return (
       <TopBarLayout
@@ -490,7 +574,7 @@ class StakingPage extends Component<AllProps> {
             />
           ) : null}
           {uiDialogs.isOpen(RewardHistoryDialog) ? (
-            <RewardHistoryDialog onClose={this.onClose} list={rewardHistory} />
+            <RewardHistoryDialog onClose={this.onClose} graphData={rewardsGraphData} />
           ) : null}
         </Box>
       </TopBarLayout>

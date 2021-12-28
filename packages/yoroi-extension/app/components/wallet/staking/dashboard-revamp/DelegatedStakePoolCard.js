@@ -32,7 +32,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           <AvatarImg src={avatarGenerated} alt="stake pool logo" />
         )}
       </AvatarWrapper>
-      <Box width="180px" overflow="hidden" paddingLeft="4px">
+      <Box paddingLeft="4px">
         <Typography color="var(--yoroi-palette-gray-900)" variant="body1" mb="3px">
           {name}
         </Typography>
@@ -42,15 +42,17 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           socialLinks={socialLinks}
         />
       </Box>
-      <Box display="flex" alignItems="center" flex="1">
-        <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
-          {intl.formatMessage(globalMessages.roa30d)}
-          <Typography ml="8px" as="span" color="var(--yoroi-palette-gray-900)">
-            {roa}
+      {roa != null ? (
+        <Box display="flex" alignItems="center" flex="1">
+          <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
+            {intl.formatMessage(globalMessages.roa30d)}
+            <Typography ml="8px" as="span" color="var(--yoroi-palette-gray-900)">
+              {roa}
+            </Typography>
           </Typography>
-        </Typography>
-        <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
-      </Box>
+          <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
+        </Box>
+      ) : null}
       <UndelegateButton color="secondary" onClick={undelegate}>
         {intl.formatMessage(globalMessages.undelegateLabel)}
       </UndelegateButton>

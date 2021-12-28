@@ -3,22 +3,24 @@ import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel as TabPanelBase } from '@mui/lab';
-import { IconButton, Tab, Typography } from '@mui/material';
+import { Tab } from '@mui/material';
 import { observer } from 'mobx-react';
-import InfoIconSVG from '../../../../assets/images/info-icon.inline.svg';
-import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
-import DelegatedStakePoolCard from './DelegatedStakePoolCard';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { EpochProgressCard } from './EpochProgressCard';
 import RewardHistoryTab from './RewardHistoryTab';
+import type { GraphRewardData } from './RewardHistoryDialog';
+import { StakePoolDelegatedTab } from './StakePoolDelegatedTab';
 
 type Props = {|
-  delegatedPool: PoolData,
+  delegatedPool: {|
+    pool: PoolData,
+    undelegate: void | (void => Promise<void>),
+  |},
   rewardHistory: {|
-    list: Array<Object>,
+    graphData: GraphRewardData,
     onOpenRewardList: () => void,
   |},
   epochProgress: {|
@@ -26,8 +28,8 @@ type Props = {|
     endEpochDate: string,
     percentage: number,
   |},
-  +undelegate: void | (void => Promise<void>),
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -40,13 +42,7 @@ const messages = defineMessages({
   },
 });
 
-function StakingTabs({
-  delegatedPool,
-  undelegate,
-  epochProgress,
-  rewardHistory,
-  intl,
-}: Props & Intl): Node {
+function StakingTabs({ delegatedPool, epochProgress, rewardHistory, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -58,12 +54,11 @@ function StakingTabs({
       id: 0,
       label: intl.formatMessage(globalMessages.stakePoolDelegated),
       component: (
-        <Box>
-          <StakePoolAlert message={intl.formatMessage(messages.alertInfo)} />
-          <Box py="10px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
-            <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />
-          </Box>
-        </Box>
+        <StakePoolDelegatedTab
+          alertMessage={intl.formatMessage(messages.alertInfo)}
+          delegatedPool={delegatedPool.pool}
+          undelegate={delegatedPool.undelegate}
+        />
       ),
     },
     {
@@ -71,7 +66,7 @@ function StakingTabs({
       label: intl.formatMessage(globalMessages.rewardHistory),
       component: (
         <RewardHistoryTab
-          list={rewardHistory.list}
+          graphData={rewardHistory.graphData}
           onOpenRewardList={rewardHistory.onOpenRewardList}
         />
       ),
@@ -133,31 +128,7 @@ const StyledTab = styled(Tab)({
   },
 });
 
-function StakePoolAlert({ message }: {| message: string |}): Node {
-  return (
-    <StyledBox>
-      <InfoIconSVG />
-      <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
-        {message}
-      </Typography>
-      <IconButton>
-        <CloseIcon />
-      </IconButton>
-    </StyledBox>
-  );
-}
 const TabPanel = styled(TabPanelBase)({
   flex: 'auto',
   overflow: 'auto',
-});
-const StyledBox = styled(Box)({
-  display: 'flex',
-  background: 'var(--yoroi-palette-gray-50)',
-  padding: '12px 16px',
-  alignItems: 'center',
-  marginBottom: '6px',
-  borderRadius: '8px',
-  '& > svg:first-child': {
-    minWidth: '24px',
-  },
 });

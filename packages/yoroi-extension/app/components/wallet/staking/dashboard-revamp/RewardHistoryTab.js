@@ -5,11 +5,17 @@ import { Stack, Typography } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { getAvatarFromPoolId } from '../utils';
+import { getAvatarFromPoolId, groupByPoolName } from '../utils';
+import { useMemo } from 'react';
+import type { GraphRewardData } from './RewardHistoryDialog';
+import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import ErrorBlock from '../../../widgets/ErrorBlock';
+import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
+import LoadingSpinner from '../../../widgets/LoadingSpinner';
 
 type RewardHistoryItemProps = {|
   poolId: string,
-  poolTicker: string,
+  poolName: string,
   poolAvatar: string,
   historyList: Array<{|
     type: string,
@@ -21,7 +27,7 @@ type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
 export const RewardHistoryItem = ({
   poolId,
-  poolTicker,
+  poolName,
   poolAvatar,
   historyList,
 }: RewardHistoryItemProps): Node => {
@@ -43,12 +49,13 @@ export const RewardHistoryItem = ({
               <AvatarImg src={avatarGenerated} alt="stake pool logo" />
             )}
           </AvatarWrapper>
-          <Typography>{poolTicker}</Typography>
+          <Typography>{poolName}</Typography>
         </Box>
       </Box>
       <Stack spacing="22px">
-        {historyList.map(({ type, date, balance }) => (
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+        {historyList.map(({ type, date, balance }, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Box key={idx} display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography color="var(--yoroi-palette-gray-900)">{type}</Typography>
               <Typography variant="body3" color="var(--yoroi-palette-gray-600)">
@@ -64,11 +71,17 @@ export const RewardHistoryItem = ({
 };
 
 type RewardHistoryTabProps = {|
-  list: Array<Object>,
+  graphData: GraphRewardData,
   onOpenRewardList: () => void,
 |};
 
-function RewardHistoryTab({ list, onOpenRewardList, intl }: RewardHistoryTabProps & Intl): Node {
+function RewardHistoryTab({
+  graphData,
+  onOpenRewardList,
+  intl,
+}: RewardHistoryTabProps & Intl): Node {
+  const rewardList = graphData.items;
+  const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
   return (
     <Box>
       <Typography
@@ -81,15 +94,37 @@ function RewardHistoryTab({ list, onOpenRewardList, intl }: RewardHistoryTabProp
       >
         {intl.formatMessage(globalMessages.openRewardHistory)}
       </Typography>
-      {list.map(item => (
-        <RewardHistoryItem
-          key={item.poolId}
-          poolId={item.poolId}
-          poolTicker={item.poolTicker}
-          poolAvatar={item.poolAvatar}
-          historyList={item.history}
-        />
-      ))}
+      {graphData.error && (
+        <div>
+          <center>
+            <InvalidURIImg />
+          </center>
+          <ErrorBlock error={graphData.error} />
+        </div>
+      )}
+      {rewardList == null ? (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      ) : (
+        Object.entries(rewardsByPoolName ?? {}).map(([poolName, data]) => (
+          <RewardHistoryItem
+            key={poolName}
+            // $FlowFixMe[incompatible-use]: Object entries flow type
+            poolId={data.poolId}
+            poolName={poolName}
+            // $FlowFixMe[incompatible-use]: Object entries flow type
+            poolAvatar={data.poolAvatar}
+            // $FlowFixMe[incompatible-use]: Object entries flow type
+            historyList={data.map(item => ({
+              // TODO: Make sure it's "received" in all use cases
+              type: 'Received',
+              date: item.date,
+              balance: item.primary,
+            }))}
+          />
+        ))
+      )}
     </Box>
   );
 }
