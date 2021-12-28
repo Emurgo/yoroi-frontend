@@ -5,7 +5,7 @@ import type { Node } from 'react';
 import DropdownCard from './DropdownCard';
 import styles from './ConnectWebsitesPage.scss';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
@@ -24,16 +24,6 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
 |};
-const messages = defineMessages({
-  connectedWallets: {
-    id: 'connector.connect.connectedWallets',
-    defaultMessage: '!!!Connected Wallets',
-  },
-  noWebsitesConnected: {
-    id: 'connector.connect.noWebsitesConnected',
-    defaultMessage: `!!!You don't have any websites connected yet`,
-  },
-});
 
 @observer
 export default class ConnectWebsitesPage extends Component<Props> {
@@ -46,7 +36,7 @@ export default class ConnectWebsitesPage extends Component<Props> {
     const genNoResult = () => (
       <div className={styles.noItems}>
         <NoItemsFoundImg />
-        <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
+        <h3>{intl.formatMessage(connectorMessages.noWebsitesConnected)} </h3>
         <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
       </div>
     );
@@ -72,7 +62,7 @@ export default class ConnectWebsitesPage extends Component<Props> {
             if (wallet == null) return null;
             return (
               <DropdownCard
-                label={intl.formatMessage(messages.connectedWallets)}
+                label={intl.formatMessage(connectorMessages.connectedWallets)}
                 infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
                 key={url}
                 url={url}

@@ -3,12 +3,12 @@
 // eslint-disable-next-line no-unused-vars
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from '@mui/material';
 import TextField from '../../../components/common/TextField';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -49,25 +49,6 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
-
-const messages = defineMessages({
-  title: {
-    id: 'connector.signin.title',
-    defaultMessage: '!!!Sign transaction',
-  },
-  txDetails: {
-    id: 'connector.signin.txDetails',
-    defaultMessage: '!!!Transaction Details',
-  },
-  receiver: {
-    id: 'connector.signin.receiver',
-    defaultMessage: '!!!Receiver',
-  },
-  more: {
-    id: 'connector.signin.more',
-    defaultMessage: '!!!more'
-  }
-});
 
 type State = {|
   showUtxoDetails: boolean,
@@ -229,7 +210,7 @@ class SignTxPage extends Component<Props, State> {
         {addresses.map((address, idx) => {
           if (idx >= 1) return (
             <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
-              {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
+              {addresses.length - 1} <span>{this.context.intl.formatMessage(connectorMessages.more)}</span>
             </button>
           )
           return <p>{address}</p>
@@ -261,15 +242,15 @@ class SignTxPage extends Component<Props, State> {
            <div>
              <div className={styles.component}>
                <div>
-                 <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
+                 <h1 className={styles.title}>{intl.formatMessage(connectorMessages.title)}</h1>
                </div>
                <div className={styles.transactionWrapper}>
                  <p className={styles.transactionId}>
-                   {intl.formatMessage(messages.receiver)}
+                   {intl.formatMessage(connectorMessages.receiver)}
                  </p>
                  <p className={styles.hash}>{this.renderAddresses()}</p>
                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
-                   <p>{intl.formatMessage(messages.txDetails)}</p>
+                   <p>{intl.formatMessage(connectorMessages.txDetails)}</p>
                    <ArrowRight />
                  </button>
                </div>

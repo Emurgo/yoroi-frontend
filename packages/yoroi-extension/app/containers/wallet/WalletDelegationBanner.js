@@ -31,10 +31,6 @@ type Intl = {|
 |};
 
 const messages = defineMessages({
-  noDelegated: {
-    id: 'wallet.transaction.empty',
-    defaultMessage: '!!!Your wallet is empty',
-  },
   delegateNow: {
     id: 'wallet.staking.banner.delegateNow',
     defaultMessage: '!!!Delegate now with our stake pool and start earning rewards',

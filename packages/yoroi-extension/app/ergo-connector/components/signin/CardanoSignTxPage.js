@@ -2,12 +2,12 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from '@mui/material';
 import TextField from '../../../components/common/TextField';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import config from '../../../config';
@@ -56,25 +56,6 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
-
-const messages = defineMessages({
-  title: {
-    id: 'connector.signin.title',
-    defaultMessage: '!!!Sign transaction',
-  },
-  txDetails: {
-    id: 'connector.signin.txDetails',
-    defaultMessage: '!!!Transaction Details',
-  },
-  receiver: {
-    id: 'connector.signin.receiver',
-    defaultMessage: '!!!Receiver',
-  },
-  more: {
-    id: 'connector.signin.more',
-    defaultMessage: '!!!more'
-  }
-});
 
 @observer
 class SignTxPage extends Component<Props> {
@@ -297,7 +278,7 @@ class SignTxPage extends Component<Props> {
                 key={address}
               >
                 {addresses.length - 1}&nbsp;
-                <span>{this.context.intl.formatMessage(messages.more)}</span>
+                <span>{this.context.intl.formatMessage(connectorMessages.more)}</span>
               </button>
             );
           }
@@ -323,11 +304,11 @@ class SignTxPage extends Component<Props> {
             !showUtxoDetails ?(
               <div>
                 <div>
-                  <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
+                  <h1 className={styles.title}>{intl.formatMessage(connectorMessages.title)}</h1>
                 </div>
                 <div className={styles.transactionWrapper}>
                   <p className={styles.transactionId}>
-                    {intl.formatMessage(messages.receiver)}
+                    {intl.formatMessage(connectorMessages.receiver)}
                   </p>
                   <div className={styles.hash}>{this.renderAddresses()}</div>
                   <button
@@ -335,7 +316,7 @@ class SignTxPage extends Component<Props> {
                     type='button'
                     className={styles.utxo}
                   >
-                    <p>{intl.formatMessage(messages.txDetails)}</p>
+                    <p>{intl.formatMessage(connectorMessages.txDetails)}</p>
                     <ArrowRight />
                   </button>
                 </div>

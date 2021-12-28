@@ -917,7 +917,31 @@ export const connectorMessages: * = defineMessages({
   dappConnector: {
     id: 'connector.appName',
     defaultMessage: '!!!Dapp Connector',
-  }
+  },
+  title: {
+    id: 'connector.signin.title',
+    defaultMessage: '!!!Sign transaction',
+  },
+  txDetails: {
+    id: 'connector.signin.txDetails',
+    defaultMessage: '!!!Transaction Details',
+  },
+  receiver: {
+    id: 'connector.signin.receiver',
+    defaultMessage: '!!!Receiver',
+  },
+  more: {
+    id: 'connector.signin.more',
+    defaultMessage: '!!!more'
+  },
+  connectedWallets: {
+    id: 'connector.connect.connectedWallets',
+    defaultMessage: '!!!Connected Wallets',
+  },
+  noWebsitesConnected: {
+    id: 'connector.connect.noWebsitesConnected',
+    defaultMessage: `!!!You don't have any websites connected yet`,
+  },
 });
 
 

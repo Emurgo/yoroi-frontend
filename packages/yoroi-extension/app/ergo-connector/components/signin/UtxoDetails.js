@@ -2,10 +2,10 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './UtxoDetails.scss';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
@@ -44,13 +44,6 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?number,
   +toggleUtxoDetails: (newState: boolean) => void
 |};
-
-const messages = defineMessages({
-  utxoDetails: {
-    id: 'connector.signin.txDetails',
-    defaultMessage: '!!!Transaction Details',
-  }
-});
 
 @observer
 class UtxoDetails extends Component<Props> {
@@ -229,7 +222,7 @@ class UtxoDetails extends Component<Props> {
           <div>
             <button onClick={() => this.props.toggleUtxoDetails(false)} className={styles.back} type='button'>
               <ArrowLeft />
-              <p>{intl.formatMessage(messages.utxoDetails)}</p>
+              <p>{intl.formatMessage(connectorMessages.txDetails)}</p>
             </button>
           </div>
           <div>

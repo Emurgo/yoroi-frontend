@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import type { WhitelistEntry, PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types'
 import styles from './ConnectedWebsitesPage.scss'
 import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -25,17 +25,6 @@ type Props = {|
     +shouldHideBalance: boolean,
     +getConceptualWallet: number => ConceptualWalletSettingsCache | null
 |};
-
-const messages = defineMessages({
-    connectedWallets: {
-      id: 'connector.connect.connectedWallets',
-      defaultMessage: '!!!Connected Wallets',
-    },
-    noWebsitesConnected: {
-      id: 'connector.connect.noWebsitesConnected',
-      defaultMessage: `!!!You don't have any websites connected yet`,
-    },
-});
 
 function walletExistInWebsitsList(
   whitelistEntries: Array<WhitelistEntry>,
@@ -91,7 +80,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           <div className={styles.component}>
             <div className={styles.noItems}>
               <NoItemsFoundImg />
-              <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
+              <h3>{intl.formatMessage(connectorMessages.noWebsitesConnected)} </h3>
               <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
             </div>
           </div>
