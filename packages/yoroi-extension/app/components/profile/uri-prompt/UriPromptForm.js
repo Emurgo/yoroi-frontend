@@ -13,7 +13,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   uriHeading: {
     id: 'profile.uriPrompt.form.heading',
-    defaultMessage: 'Allow Cardano Payment URLs'
+    defaultMessage: '!!!Allow Cardano Payment URLs'
   },
   uriExplanation: {
     id: 'profile.uriPrompt.form.explanation',

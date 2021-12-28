@@ -66,11 +66,11 @@ const messages: * = defineMessages({
   },
   betweenVotingSubtitle: {
     id: 'wallet.registrationOver.betweenVotingSubtitle',
-    defaultMessage: '!!!"Registration has ended.  Voting ends at  {votingEnd}'
+    defaultMessage: '!!!Registration has ended.  Voting ends at  {votingEnd}'
   },
   nextFundRegistration: {
     id: 'wallet.registrationOver.nextFundRegistration',
-    defaultMessage: 'Round {roundNumber} starts at {registrationStart}'
+    defaultMessage: '!!!Round {roundNumber} starts at {registrationStart}'
   }
 });
 

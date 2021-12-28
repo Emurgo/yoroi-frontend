@@ -367,7 +367,7 @@ const globalMessages: * = defineMessages({
   translationContributors: {
     id: 'settings.general.translation.contributors',
     // empty string can't be translated in CrowdIn so we use underscore instead
-    defaultMessage: '_',
+    defaultMessage: '!!!_',
   },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',
@@ -916,7 +916,7 @@ export const connectorMessages: * = defineMessages({
   },
   dappConnector: {
     id: 'connector.appName',
-    defaultMessage: 'Dapp Connector',
+    defaultMessage: '!!!Dapp Connector',
   }
 });
 
