@@ -13,7 +13,7 @@ import type {
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -22,23 +22,10 @@ import { createAuthEntry } from '../api';
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
 
-type State = {|
-  selected: number,
-  deriver: ?PublicDeriver<>,
-  checksum: ?WalletChecksum,
-|};
-
 @observer
 export default class ConnectContainer extends Component<
-  InjectedOrGeneratedConnector<GeneratedData>,
-  State
+  InjectedOrGeneratedConnector<GeneratedData>
 > {
-  state: State = {
-    selected: -1,
-    deriver: null,
-    checksum: null,
-  };
-
   onUnload: (SyntheticEvent<>) => void = ev => {
     ev.preventDefault();
     const chromeMessage = this.generated.stores.connector.connectingMessage;
@@ -60,18 +47,12 @@ export default class ConnectContainer extends Component<
     window.removeEventListener('unload', this.onUnload);
   }
 
-  onToggleCheckbox: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
-    const index = deriver.getPublicDeriverId();
-    this.setState((prevState) => prevState.selected === index
-      ? { selected: -1, deriver: null, checksum: null }
-      : { selected: index, deriver, checksum }
-    );
-  };
-
   async onConnect(deriver: PublicDeriver<>, checksum: ?WalletChecksum) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
-    if(chromeMessage == null) {
-      throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
+    if (chromeMessage == null) {
+      throw new Error(
+        `${nameof(chromeMessage)} connecting to a wallet but no connect message found`
+      );
     }
 
     const connector = this.generated.actions.connector;
@@ -110,6 +91,19 @@ export default class ConnectContainer extends Component<
     connector.closeWindow.trigger();
   }
 
+  onSelectWallet: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (
+    deriver,
+    checksum
+  ) => {
+    const wallets = this.generated.stores.connector.wallets;
+    if (wallets) {
+      const index = deriver.getPublicDeriverId();
+      if (index >= 0 && deriver) {
+        this.onConnect(deriver, checksum);
+      }
+    }
+  };
+
   onCancel: void => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     chrome.runtime.sendMessage(({
@@ -121,32 +115,21 @@ export default class ConnectContainer extends Component<
     this.generated.actions.connector.closeWindow.trigger();
   };
 
-  handleSubmit: () => void = () => {
-    const wallets = this.generated.stores.connector.wallets;
-    if (wallets) {
-      const { selected, deriver, checksum } = this.state;
-      if (selected >= 0 && deriver) {
-        this.onConnect(deriver, checksum);
-      }
-    }
-  };
-
   render(): Node {
-    const { selected } = this.state;
     const responseMessage = this.generated.stores.connector.connectingMessage;
     const wallets = this.generated.stores.connector.wallets;
     const error = this.generated.stores.connector.errorWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const protocol = this.generated.stores.connector.protocol;
-    let network = ''
+    let network = '';
     if (protocol === 'ergo') {
-      network = networks.ErgoMainnet.NetworkName
+      network = networks.ErgoMainnet.NetworkName;
     } else if (protocol === 'cardano') {
       /**
        * For Cardano we are displaying all type of wallet main and test net wallets
        * So will name the network "Cardano" for now until we apply the filter.
        */
-      network = 'Cardano'
+      network = 'Cardano';
     }
 
     return (
@@ -155,10 +138,7 @@ export default class ConnectContainer extends Component<
         error={error}
         message={responseMessage}
         publicDerivers={wallets}
-        onToggleCheckbox={this.onToggleCheckbox}
-        onCancel={this.onCancel}
-        handleSubmit={this.handleSubmit}
-        selected={selected}
+        onSelectWallet={this.onSelectWallet}
         network={network}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
@@ -215,7 +195,7 @@ export default class ConnectContainer extends Component<
     return Object.freeze({
       stores: {
         profile: {
-          shouldHideBalance: stores.profile.shouldHideBalance
+          shouldHideBalance: stores.profile.shouldHideBalance,
         },
         connector: {
           connectingMessage: stores.connector.connectingMessage,
