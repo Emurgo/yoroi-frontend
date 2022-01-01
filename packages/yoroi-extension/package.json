@@ -192,7 +192,7 @@
     "ergo-lib-wasm-browser": "^0.14.0",
     "es6-error": "4.1.1",
     "file-saver": "2.0.5",
-    "jdenticon": "3.1.0",
+    "jdenticon": "3.1.1",
     "json-bigint": "1.0.0",
     "jspdf": "1.5.3",
     "lodash": "4.17.20",
