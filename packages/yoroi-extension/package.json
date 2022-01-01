@@ -169,7 +169,7 @@
     "@emurgo/js-chain-libs": "0.7.1",
     "@emurgo/ledger-connect-handler": "6.0.0",
     "@mui/lab": "^5.0.0-alpha.51",
-    "@mui/material": "^5.0.4",
+    "@mui/material": "^5.2.6",
     "@svgr/webpack": "5.5.0",
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",
