@@ -174,7 +174,7 @@
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",
     "bech32": "2.0.0",
-    "bignumber.js": "9.0.1",
+    "bignumber.js": "9.0.2",
     "bip32": "2.0.6",
     "bip39": "3.0.3",
     "blake2b": "2.1.3",
