@@ -161,7 +161,7 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "4.0.0",
     "@download/blockies": "1.0.3",
-    "@emotion/react": "^11.4.1",
+    "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.3.0",
     "@emurgo/cardano-serialization-lib-browser": "9.1.0",
     "@emurgo/cip14-js": "2.0.0",
