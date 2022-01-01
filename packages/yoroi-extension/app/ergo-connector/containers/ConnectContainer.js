@@ -22,10 +22,28 @@ import { createAuthEntry } from '../api';
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
 
+type State = {|
+  isAppAuth: boolean,
+  selectedWallet: {|
+    index: number,
+    deriver: ?PublicDeriver<>,
+    checksum: ?WalletChecksum,
+  |},
+|};
+
 @observer
 export default class ConnectContainer extends Component<
-  InjectedOrGeneratedConnector<GeneratedData>
+  InjectedOrGeneratedConnector<GeneratedData>,
+  State
 > {
+  state: State = {
+    isAppAuth: true,
+    selectedWallet: {
+      index: -1,
+      deriver: null,
+      checksum: null,
+    },
+  };
   onUnload: (SyntheticEvent<>) => void = ev => {
     ev.preventDefault();
     const chromeMessage = this.generated.stores.connector.connectingMessage;
@@ -47,28 +65,39 @@ export default class ConnectContainer extends Component<
     window.removeEventListener('unload', this.onUnload);
   }
 
-  async onConnect(deriver: PublicDeriver<>, checksum: ?WalletChecksum) {
+  onConnect = async (deriver: PublicDeriver<>, checksum: ?WalletChecksum, password: ?string) => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if (chromeMessage == null) {
       throw new Error(
         `${nameof(chromeMessage)} connecting to a wallet but no connect message found`
       );
     }
-
     const connector = this.generated.actions.connector;
 
     const url = chromeMessage.url;
     const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
 
-    const authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
+    if (appAuthID == null && password == null) {
+      this.setState({ isAppAuth: false });
+      return;
+    }
+
+    let authEntry;
+    if (password != null) {
+      // $FlowFixMe: TODO: Add password in createAuthEntry
+      authEntry = await createAuthEntry({ appAuthID, deriver, checksum, password });
+    } else {
+      authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
+    }
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
 
     // Removing any previous whitelisted connections for the same url
-    const whitelist = (result.length ? [...result] : [])
-      .filter(e => (e.protocol !== protocol) || (e.url !== url));
+    const whitelist = (result.length ? [...result] : []).filter(
+      e => e.protocol !== protocol || e.url !== url
+    );
 
     whitelist.push({
       url,
@@ -80,16 +109,18 @@ export default class ConnectContainer extends Component<
     });
     await connector.updateConnectorWhitelist.trigger({ whitelist });
 
-    chrome.runtime.sendMessage(({
-      type: 'connect_response',
-      accepted: true,
-      publicDeriverId,
-      auth: authEntry,
-      tabId: chromeMessage.tabId,
-    }: ConnectResponseData));
+    chrome.runtime.sendMessage(
+      ({
+        type: 'connect_response',
+        accepted: true,
+        publicDeriverId,
+        auth: authEntry,
+        tabId: chromeMessage.tabId,
+      }: ConnectResponseData)
+    );
 
     connector.closeWindow.trigger();
-  }
+  };
 
   onSelectWallet: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (
     deriver,
@@ -98,6 +129,14 @@ export default class ConnectContainer extends Component<
     const wallets = this.generated.stores.connector.wallets;
     if (wallets) {
       const index = deriver.getPublicDeriverId();
+      this.setState(prevState => ({
+        ...prevState,
+        selectedWallet: {
+          index,
+          deriver,
+          checksum,
+        },
+      }));
       if (index >= 0 && deriver) {
         this.onConnect(deriver, checksum);
       }
@@ -106,11 +145,13 @@ export default class ConnectContainer extends Component<
 
   onCancel: void => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage(({
-      type: 'connect_response',
-      accepted: false,
-      tabId: chromeMessage?.tabId,
-    }: ConnectResponseData));
+    chrome.runtime.sendMessage(
+      ({
+        type: 'connect_response',
+        accepted: false,
+        tabId: chromeMessage?.tabId,
+      }: ConnectResponseData)
+    );
 
     this.generated.actions.connector.closeWindow.trigger();
   };
@@ -134,6 +175,10 @@ export default class ConnectContainer extends Component<
 
     return (
       <ConnectPage
+        selectedWallet={this.state.selectedWallet}
+        onConnect={this.onConnect}
+        onCancel={this.onCancel}
+        isAppAuth={this.state.isAppAuth}
         loading={loadingWallets}
         error={error}
         message={responseMessage}
