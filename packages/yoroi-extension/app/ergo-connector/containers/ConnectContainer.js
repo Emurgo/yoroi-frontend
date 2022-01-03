@@ -65,7 +65,11 @@ export default class ConnectContainer extends Component<
     window.removeEventListener('unload', this.onUnload);
   }
 
-  onConnect = async (deriver: PublicDeriver<>, checksum: ?WalletChecksum, password: ?string) => {
+  onConnect: (
+    deriver: PublicDeriver<>,
+    checksum: ?WalletChecksum,
+    password: ?string
+  ) => Promise<void> = async (deriver, checksum, password) => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if (chromeMessage == null) {
       throw new Error(
