@@ -41,7 +41,13 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
     <Background>
       <TabContext value={value}>
         <Box>
-          <TabList onChange={handleChange} aria-label="Staking tabs">
+          <TabList
+            sx={{
+              '& .MuiTabs-indicator': { height: '4px' },
+            }}
+            onChange={handleChange}
+            aria-label="Staking tabs"
+          >
             {tabs.map(({ label, id }) => (
               <StyledTab label={label} value={id} />
             ))}
@@ -68,12 +74,14 @@ const StyledTab = styled(Tab)({
     boxShadow:
       '0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74)',
   },
+  '&.Mui-selected': {
+    fontWeight: 700,
+  },
   '&.MuiTab-root': {
     paddingLeft: 0,
     paddingRight: 0,
     paddingTop: '24px',
-    paddingBottom: '20px',
+    paddingBottom: '8px',
     marginLeft: '35px',
-    fontWeight: 500,
   },
 });
