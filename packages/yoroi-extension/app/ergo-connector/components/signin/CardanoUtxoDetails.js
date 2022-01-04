@@ -10,35 +10,27 @@ import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import ProgressBar from '../ProgressBar';
-import type {
-  TokenLookupKey,
-  TokenEntry,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
-import ArrowLeft from '../../../assets/images/arrow-left.inline.svg'
 import type { CardanoConnectorSignRequest } from '../../types';
 
 type Props = {|
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?number,
-  +toggleUtxoDetails: (newState: boolean) => void
 |};
 
 const messages = defineMessages({
@@ -204,7 +196,7 @@ class CardanoUtxoDetails extends Component<Props> {
         ))}
       </div>
     );
-  }
+  };
 
   render(): Node {
     const { intl } = this.context;
@@ -212,13 +204,9 @@ class CardanoUtxoDetails extends Component<Props> {
 
     return (
       <>
-        <ProgressBar step={2} />
         <div className={styles.component}>
           <div>
-            <button onClick={() => this.props.toggleUtxoDetails(false)} className={styles.back} type='button'>
-              <ArrowLeft />
-              <p>{intl.formatMessage(messages.utxoDetails)}</p>
-            </button>
+            <p>{intl.formatMessage(messages.utxoDetails)}</p>
           </div>
           <div>
             <div className={styles.addressHeader}>
@@ -229,9 +217,7 @@ class CardanoUtxoDetails extends Component<Props> {
                 </p>
               </div>
               <div className={styles.addressFrom}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.amount)}
-                </p>
+                <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
               </div>
             </div>
             <div className={styles.addressFromList}>
@@ -252,9 +238,7 @@ class CardanoUtxoDetails extends Component<Props> {
                 </p>
               </div>
               <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.amount)}
-                </p>
+                <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
               </div>
             </div>
             <div className={styles.addressToList}>

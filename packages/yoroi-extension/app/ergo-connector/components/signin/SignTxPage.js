@@ -27,7 +27,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
-import type { PublicDeriverCache, Tx } from '../../../../chrome/extension/ergo-connector/types';
+import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
@@ -50,10 +50,10 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?number,
   +shouldHideBalance: boolean,
   +selectedWallet: PublicDeriverCache,
-  +connectedWebsite: any,
+  +connectedWebsite: ?WhitelistEntry,
 |};
 
-const messages = defineMessages({
+export const signTxMessages: Object = defineMessages({
   title: {
     id: 'connector.signin.title',
     defaultMessage: '!!!Sign transaction',
@@ -194,10 +194,7 @@ class SignTxPage extends Component<Props> {
       if (price != null) {
         return (
           <>
-            <span>
-              {calculateAndFormatValue(shiftedAmount, price)}
-            </span>{' '}
-            {currency}
+            <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
             <div>
               {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
             </div>
@@ -238,164 +235,163 @@ class SignTxPage extends Component<Props> {
     const amount = totalInput.joinSubtractCopy(fee);
 
     const url = connectedWebsite?.url ?? '';
-    const faviconUrl = connectedWebsite?.image;
+    const faviconUrl = connectedWebsite?.image ?? '';
 
     return (
-      <>
-        <SignTxTabs
-          overviewContent={
-            <Box paddingTop="8px" overflowWrap="break-word">
-              <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-                {intl.formatMessage(messages.connectedTo)}
-              </Typography>
-              <Box
-                display="flex"
-                alignItems="center"
-                px="28px"
-                py="20px"
-                border="1px solid var(--yoroi-palette-gray-100)"
-                borderRadius="6px"
-                minHeight="88px"
-                mb="8px"
-              >
-                {faviconUrl != null && faviconUrl !== '' ? (
-                  <Box
-                    sx={{
-                      marginRight: '12px',
-                      width: '32px',
-                      height: '32px',
-                      border: '1px solid #a7afc0',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: '#f8f8f8',
-                      img: {
-                        width: '20px',
-                      },
-                    }}
-                  >
-                    <img src={faviconUrl} alt={`${url} favicon`} />
-                  </Box>
-                ) : null}
-                <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
-                  {url}
-                </Typography>
-              </Box>
-              <Box
-                display="flex"
-                alignItems="center"
-                px="28px"
-                py="20px"
-                border="1px solid var(--yoroi-palette-gray-100)"
-                borderRadius="6px"
-                minHeight="88px"
-              >
-                <WalletCard
-                  shouldHideBalance={this.props.shouldHideBalance}
-                  publicDeriver={this.props.selectedWallet}
-                  getTokenInfo={this.props.getTokenInfo}
-                />
-              </Box>
-              <Box pt="32px">
-                <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-                  {intl.formatMessage(messages.totals)}
-                </Typography>
-                <Box
-                  width="100%"
-                  px="12px"
-                  py="20px"
-                  pb="12px"
-                  border="1px solid var(--yoroi-palette-gray-100)"
-                  borderRadius="6px"
-                >
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    color="var(--yoroi-palette-gray-600)"
-                    py="6px"
-                    px="10px"
-                  >
-                    <Typography>{intl.formatMessage(messages.transactionFee)}</Typography>
-                    <Typography>
-                      {this.renderAmountDisplay({
-                        entry: {
-                          ...txData.fee().getDefaultEntry(),
-                          amount: txData.fee().getDefaultEntry().amount.abs().negated(),
-                        },
-                      })}
-                    </Typography>
-                  </Box>
-                  <Box
-                    px="12px"
-                    py="23px"
-                    mt="10px"
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    borderRadius="6px"
-                    backgroundColor="var(--yoroi-palette-primary-300)"
-                    color="var(--yoroi-palette-common-white)"
-                  >
-                    <Typography>{intl.formatMessage(messages.totalAmount)}</Typography>
-                    <Typography variant="h3">
-                      {this.renderAmountDisplay({
-                        entry: {
-                          ...amount.getDefaultEntry(),
-                          amount: amount.getDefaultEntry().amount.abs().negated(),
-                        },
-                      })}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box mt="46px">
-                <TextField
-                  type="password"
-                  {...walletPasswordField.bind()}
-                  error={walletPasswordField.error}
-                />
+      <SignTxTabs
+        overviewContent={
+          <Box paddingTop="8px" overflowWrap="break-word">
+            <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+              {intl.formatMessage(signTxMessages.connectedTo)}
+            </Typography>
+            <Box
+              display="flex"
+              alignItems="center"
+              px="28px"
+              py="20px"
+              border="1px solid var(--yoroi-palette-gray-100)"
+              borderRadius="6px"
+              minHeight="88px"
+              mb="8px"
+            >
+              {faviconUrl != null && faviconUrl !== '' ? (
                 <Box
                   sx={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gridGap: '5px',
+                    marginRight: '12px',
+                    width: '32px',
+                    height: '32px',
+                    border: '1px solid #a7afc0',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#f8f8f8',
+                    img: {
+                      width: '20px',
+                    },
                   }}
                 >
-                  <Button fullWidth variant="secondary" onClick={onCancel}>
-                    {intl.formatMessage(globalMessages.cancel)}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    fullWidth
-                    disabled={!walletPasswordField.isValid}
-                    onClick={this.submit.bind(this)}
-                  >
-                    {intl.formatMessage(globalMessages.confirm)}
-                  </Button>
+                  <img src={faviconUrl} alt={`${url} favicon`} />
+                </Box>
+              ) : null}
+              <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
+                {url}
+              </Typography>
+            </Box>
+            <Box
+              display="flex"
+              alignItems="center"
+              px="28px"
+              py="20px"
+              border="1px solid var(--yoroi-palette-gray-100)"
+              borderRadius="6px"
+              minHeight="88px"
+            >
+              <WalletCard
+                shouldHideBalance={this.props.shouldHideBalance}
+                publicDeriver={this.props.selectedWallet}
+                getTokenInfo={this.props.getTokenInfo}
+              />
+            </Box>
+            <Box pt="32px">
+              <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+                {intl.formatMessage(signTxMessages.totals)}
+              </Typography>
+              <Box
+                width="100%"
+                px="12px"
+                py="20px"
+                pb="12px"
+                border="1px solid var(--yoroi-palette-gray-100)"
+                borderRadius="6px"
+              >
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  color="var(--yoroi-palette-gray-600)"
+                  py="6px"
+                  px="10px"
+                >
+                  <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
+                  <Typography>
+                    {this.renderAmountDisplay({
+                      entry: {
+                        ...txData.fee().getDefaultEntry(),
+                        amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                      },
+                    })}
+                  </Typography>
+                </Box>
+                <Box
+                  px="12px"
+                  py="23px"
+                  mt="10px"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  borderRadius="6px"
+                  backgroundColor="var(--yoroi-palette-primary-300)"
+                  color="var(--yoroi-palette-common-white)"
+                >
+                  <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
+                  <Typography variant="h3">
+                    {this.renderAmountDisplay({
+                      entry: {
+                        ...amount.getDefaultEntry(),
+                        amount: amount.getDefaultEntry().amount.abs().negated(),
+                      },
+                    })}
+                  </Typography>
                 </Box>
               </Box>
             </Box>
-          }
-          utxoAddressContent={
-            <Box>
-              <UtxoDetails
-                txData={txData}
-                onCopyAddressTooltip={this.props.onCopyAddressTooltip}
-                addressToDisplayString={this.props.addressToDisplayString}
-                getCurrentPrice={this.props.getCurrentPrice}
-                getTokenInfo={this.props.getTokenInfo}
-                notification={this.props.notification}
-                selectedExplorer={this.props.selectedExplorer}
-                tx={this.props.tx}
-                unitOfAccountSetting={this.props.unitOfAccountSetting}
+
+            <Box mt="46px">
+              <TextField
+                type="password"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
               />
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gridGap: '15px',
+                }}
+              >
+                <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
+                  {intl.formatMessage(globalMessages.cancel)}
+                </Button>
+                <Button
+                  variant="primary"
+                  fullWidth
+                  sx={{ minWidth: 'auto' }}
+                  disabled={!walletPasswordField.isValid}
+                  onClick={this.submit.bind(this)}
+                >
+                  {intl.formatMessage(globalMessages.confirm)}
+                </Button>
+              </Box>
             </Box>
-          }
-        />
-      </>
+          </Box>
+        }
+        utxoAddressContent={
+          <Box>
+            <UtxoDetails
+              txData={txData}
+              onCopyAddressTooltip={this.props.onCopyAddressTooltip}
+              addressToDisplayString={this.props.addressToDisplayString}
+              getCurrentPrice={this.props.getCurrentPrice}
+              getTokenInfo={this.props.getTokenInfo}
+              notification={this.props.notification}
+              selectedExplorer={this.props.selectedExplorer}
+              tx={this.props.tx}
+              unitOfAccountSetting={this.props.unitOfAccountSetting}
+            />
+          </Box>
+        }
+      />
     );
   }
 }

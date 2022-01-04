@@ -148,6 +148,9 @@ export default class SignTxContainer extends Component<
         if (txData == null) return this.renderLoading();
         component = (
           <CardanoSignTxPage
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+            connectedWebsite={connectedWebsite}
+            selectedWallet={selectedWallet}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {

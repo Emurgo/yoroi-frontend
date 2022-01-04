@@ -2,6 +2,7 @@
   height: calc(100vh - 92px);
   display: flex;
   flex-direction: column;
+  overflow: overlay;
   &.isNightly {
     height: calc(100vh - 138px);
   }
