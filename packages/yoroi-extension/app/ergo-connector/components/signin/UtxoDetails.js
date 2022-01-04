@@ -10,7 +10,6 @@ import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import ProgressBar from '../ProgressBar';
 import type {
   TokenLookupKey,
   TokenEntry,
@@ -30,7 +29,6 @@ import classnames from 'classnames';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
-import ArrowLeft from '../../../assets/images/arrow-left.inline.svg'
 
 type Props = {|
   +tx: Tx,
@@ -42,7 +40,6 @@ type Props = {|
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?number,
-  +toggleUtxoDetails: (newState: boolean) => void
 |};
 
 const messages = defineMessages({
@@ -224,13 +221,9 @@ class UtxoDetails extends Component<Props> {
 
     return (
       <>
-        <ProgressBar step={2} />
         <div className={styles.component}>
           <div>
-            <button onClick={() => this.props.toggleUtxoDetails(false)} className={styles.back} type='button'>
-              <ArrowLeft />
-              <p>{intl.formatMessage(messages.utxoDetails)}</p>
-            </button>
+           <p>{intl.formatMessage(messages.utxoDetails)}</p>
           </div>
           <div>
             <div className={styles.addressHeader}>

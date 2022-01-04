@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import styles from './SignTxPage.scss';
+import styles from './CardanoSignTxPage.scss';
 import { Button } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
