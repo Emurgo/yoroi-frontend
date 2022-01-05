@@ -80,22 +80,16 @@ export default class TokenInfoStore<
 
     const { requests } = this.stores.transactions.getTxRequests(wallet);
 
-    await requests.getBalanceRequest;
-    const balance = requests.getBalanceRequest.result;
-    if (!balance || !balance.size) {
-      return;
-    }
-    // expect all tokens to have an identical network id
-    const networkId = balance.values[0].networkId;
-    const tokenIds = balance.values
-      .filter(token => token.networkId === networkId)
-      .map(token => token.identifier);
+    await requests.allRequest;
+
+    const tokenIds = Array.from(requests.allRequest.result.assetIds);
 
     const db = this.stores.loading.getDatabase();
     if (!db) {
       return;
     }
 
+    const networkId = wallet.getParent().networkInfo.NetworkId;
     const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
       ({ NetworkId }) => NetworkId === networkId
     );
