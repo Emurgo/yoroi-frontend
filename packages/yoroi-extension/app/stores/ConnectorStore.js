@@ -245,17 +245,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @action
   _getConnectorStatus: () => Promise<void> = async () => {
-    let connectorStatus = await this.getConnectorStatus.execute();
-    /**
-     * When running this for the first time `connectorStatus` will be null
-     * but the dapp connector will be active by default so will mark the status as active
-     */
-    if (!connectorStatus) {
-      connectorStatus = {
-        isActive: true
-      }
-    }
-
+    const connectorStatus = await this.getConnectorStatus.execute();
     runInAction(() => {
       // $FlowFixMe
       this.connectorStatus = connectorStatus;

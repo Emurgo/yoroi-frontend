@@ -717,9 +717,6 @@ function handleInjectorConnect(port) {
       await withDb(
         async (_db, localStorageApi) => {
           const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-          console.log({
-            publicDeriverId
-          })
           const accepted = publicDeriverId !== null;
           port.postMessage({
             type: 'yoroi_connect_response/ergo',
