@@ -134,7 +134,7 @@ async function parseWalletsList(
   return result
 }
 
-type GetConnectorStatusFunc = void => Promise<?ConnectorStatus>;
+type GetConnectorStatusFunc = void => Promise<ConnectorStatus>;
 type SetConnectorStatusFunc = {|
   status: ConnectorStatus,
 |} => Promise<void>

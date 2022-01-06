@@ -298,7 +298,14 @@ signTx.addEventListener('click', async (e) => {
 })
 
 if (typeof ergo_request_read_access === "undefined") {
-    alertError("Ergo not found");
+    alertError(`
+    <strong>Ergo not Found</strong>
+     <h3>Debugging:</h3>
+     <ul>
+       <li>Dapp Connector is deactivated by the user.<br> Got to the connected-webistes page an toggle it on</li>
+       <li>Problem with Yoroi <br> Try to reload the extention!</li>
+     </ul>
+   `);
 } else {
     console.log("Ergo found");
     window.addEventListener("ergo_wallet_disconnected", function(event) {

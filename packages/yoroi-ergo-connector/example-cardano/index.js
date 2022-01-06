@@ -273,7 +273,14 @@ createTx.addEventListener('click', () => {
 })
 
 if (typeof cardano === "undefined") {
-    alert("Cardano not found");
+    alertError(`
+     <strong>Cardano not Found</strong>
+      <h3>Debugging:</h3>
+      <ul>
+        <li>Dapp Connector is deactivated by the user.<br> Got to the connected-webistes page an toggle it on</li>
+        <li>Problem with Yoroi <br> Try to reload the extention!</li>
+      </ul>
+    `);
 } else {
     console.log("Cardano found");
     window.addEventListener("cardano_wallet_disconnected", function(event) {
