@@ -54,6 +54,7 @@ export default class LocalStorageApi {
   // ========== CONNECTOR ========== //
   getConnectorStatus: void => Promise<?ConnectorStatus> = async () => {
     const result = await getLocalItem(storageKeys.CONNECTOR_STATUS);
+    // Default state for the dapp connector is `on`
     if (result === undefined || result === null) return { isActive: true };
     return JSON.parse(result);
   }

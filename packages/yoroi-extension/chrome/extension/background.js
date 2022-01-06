@@ -735,13 +735,12 @@ function handleInjectorConnect(port) {
           });
         }
       );
-    } else if (message.type === 'should_inject_api_request') {
+    } else if (message.type === 'request/should_inject_api') {
       await withDb(
         async (_db, localStorageApi) => {
-          // Default state for the dapp connecto that is `on`
-          const connectorStatus = await localStorageApi.getConnectorStatus() ?? { isActive: true }
+          const connectorStatus = await localStorageApi.getConnectorStatus()
           port.postMessage({
-            type: 'should_inject_api_response',
+            type: 'response/should_inject_api',
             shouldInject: connectorStatus.isActive
           })
         }

@@ -291,7 +291,7 @@ function createYoroiPort() {
     }
     // Ping yoroi to check Dapp-Connector status 
     yoroiPort.postMessage({
-      type: `should_inject_api_request`,
+      type: `request/should_inject_api`,
     })
 
     yoroiPort.onMessage.addListener(message => {
@@ -328,7 +328,7 @@ function createYoroiPort() {
                 type: "connector_connected",
                 success: message.success
             }, location.origin);
-        } else if (message.type === 'should_inject_api_response') {
+        } else if (message.type === 'response/should_inject_api') {
           if (message.shouldInject) {
             injectIntoPage(initialInject)
           } else {
