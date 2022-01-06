@@ -54,7 +54,7 @@ export default class LocalStorageApi {
   // ========== CONNECTOR ========== //
   getConnectorStatus: void => Promise<?ConnectorStatus> = async () => {
     const result = await getLocalItem(storageKeys.CONNECTOR_STATUS);
-    if (result === undefined || result === null) return undefined;
+    if (result === undefined || result === null) return { isActive: true };
     return JSON.parse(result);
   }
 
