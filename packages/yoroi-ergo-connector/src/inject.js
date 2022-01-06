@@ -289,6 +289,11 @@ function createYoroiPort() {
       // this is the seperate connector extension
       yoroiPort = chrome.runtime.connect(extensionId);
     }
+    // Ping yoroi to check Dapp-Connector status 
+    yoroiPort.postMessage({
+      type: `should_inject_api_request`,
+    })
+
     yoroiPort.onMessage.addListener(message => {
         // alert("content script message: " + JSON.stringify(message));
         if (message.type === "connector_rpc_response") {
@@ -323,6 +328,19 @@ function createYoroiPort() {
                 type: "connector_connected",
                 success: message.success
             }, location.origin);
+        } else if (message.type === 'should_inject_api_response') {
+          if (message.shouldInject) {
+            injectIntoPage(initialInject)
+          } else {
+            console.error()
+            window.postMessage({
+                type: "connector_connected",
+                err: {
+                    code: API_INTERNAL_ERROR,
+                    info: "Dapp Connector is deactivated by the user."
+                }
+            }, location.origin);
+          }
         }
     });
 
@@ -333,7 +351,9 @@ function createYoroiPort() {
 
 if (shouldInject()) {
     console.log(`content script injected into ${location.hostname}`);
-    injectIntoPage(initialInject);
+    if (yoroiPort == null) {
+      createYoroiPort();
+    }
 
     // events from page (injected code)
     window.addEventListener("message", function(event) {
@@ -378,9 +398,9 @@ if (shouldInject()) {
                     success: true
                 }, location.origin);
             } else {
-                if (yoroiPort == null) {
-                    createYoroiPort();
-                }
+                // if (yoroiPort == null) {
+                //     createYoroiPort();
+                // }
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
                 const protocol = dataType.split('/')[1];

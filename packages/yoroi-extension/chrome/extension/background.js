@@ -717,6 +717,9 @@ function handleInjectorConnect(port) {
       await withDb(
         async (_db, localStorageApi) => {
           const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+          console.log({
+            publicDeriverId
+          })
           const accepted = publicDeriverId !== null;
           port.postMessage({
             type: 'yoroi_connect_response/ergo',
@@ -735,6 +738,17 @@ function handleInjectorConnect(port) {
           });
         }
       );
+    } else if (message.type === 'should_inject_api_request') {
+      await withDb(
+        async (_db, localStorageApi) => {
+          // Default state for the dapp connecto that is `on`
+          const connectorStatus = await localStorageApi.getConnectorStatus() ?? { isActive: true }
+          port.postMessage({
+            type: 'should_inject_api_response',
+            shouldInject: connectorStatus.isActive
+          })
+        }
+      )
     } else if (message.type === 'connector_rpc_request') {
       switch (message.function) {
           case 'sign_tx':
