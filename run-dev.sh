@@ -1,0 +1,1 @@
+. install-all.sh && npm run dev:stable --prefix packages/yoroi-extension
