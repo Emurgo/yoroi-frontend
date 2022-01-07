@@ -154,7 +154,10 @@ export type GetTransactionsDataResponse = {|
 |};
 
 export type GetTransactionsDataFunc = (
-  request: BaseGetTransactionsRequest
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+    isLocalRequest: boolean,
+  |}
 ) => Promise<GetTransactionsDataResponse>;
 
 export type ExportTransactionsRequest = {|
