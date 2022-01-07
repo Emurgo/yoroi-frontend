@@ -64,6 +64,7 @@ function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
     unconfirmedAmount: null,
     remoteTransactionIds: new Set(),
     timestamps: [],
+    assetIds: [],
   }));
   const getBalanceRequest = new CachedRequest(request => request.getBalance());
   const getAssetDepositRequest = new CachedRequest(request => request.getBalance());

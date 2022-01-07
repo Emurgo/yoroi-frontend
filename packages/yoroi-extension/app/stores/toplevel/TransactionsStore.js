@@ -558,7 +558,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           defaultTokenInfo,
         ),
         new RemoteTransactionIdsReducer(),
-        new TimestampsReducer()
+        new TimestampsReducer(),
+        new AssetIdsReducer(),
       ];
 
       for (;;) {
@@ -588,6 +589,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         unconfirmedAmount: reducers[2].result,
         remoteTransactionIds: reducers[3].result,
         timestamps: reducers[4].result,
+        assetIds: [...reducers[5].result],
       };
     };
   }
@@ -963,5 +965,27 @@ class TimestampsReducer {
   }
   get result(): Array<number> {
     return Array.from(this.timestamps);
+  }
+}
+
+// Collect all asset IDs that appear in the transaction list
+class AssetIdsReducer {
+  assetIds: Set<string> = new Set();
+  reduce(transactions: Array<WalletTransaction>): void {
+    for (const tx of transactions) {
+      for (const io of tx.addresses.from) {
+        for (const tokenEntry of io.value.values) {
+          this.assetIds.add(tokenEntry.identifier);
+        }
+      }
+      for (const io of tx.addresses.to) {
+        for (const tokenEntry of io.value.values) {
+          this.assetIds.add(tokenEntry.identifier);
+        }
+      }
+    }
+  }
+  get result(): Set<string> {
+    return this.assetIds;
   }
 }
