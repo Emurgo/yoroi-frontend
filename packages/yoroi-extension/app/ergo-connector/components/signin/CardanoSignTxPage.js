@@ -296,9 +296,10 @@ class SignTxPage extends Component<Props> {
     return (
       <div className={styles.toAddresses}>
         <p className={styles.address}>{addresses[0]}</p>
+        { addresses.length >= 2 &&  (
         <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
           {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
-        </button>
+        </button>)}
       </div>
     )
   }
