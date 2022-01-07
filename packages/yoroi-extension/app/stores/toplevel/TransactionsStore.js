@@ -589,7 +589,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         unconfirmedAmount: reducers[2].result,
         remoteTransactionIds: reducers[3].result,
         timestamps: reducers[4].result,
-        assetIds: reducers[5].result,
+        assetIds: [...reducers[5].result],
       };
     };
   }

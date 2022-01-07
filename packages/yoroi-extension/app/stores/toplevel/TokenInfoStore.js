@@ -82,7 +82,7 @@ export default class TokenInfoStore<
 
     await requests.allRequest;
 
-    const tokenIds = Array.from(requests.allRequest.result.assetIds);
+    const tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
 
     const db = this.stores.loading.getDatabase();
     if (!db) {
