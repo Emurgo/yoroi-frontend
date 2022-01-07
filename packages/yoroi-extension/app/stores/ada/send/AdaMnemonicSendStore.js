@@ -110,12 +110,19 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
         }
       }
 
-      return await this.api.ada.signAndBroadcast({
+      const { txId } = await this.api.ada.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.password,
         signRequest: request.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       });
+
+      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
+        request.publicDeriver,
+        request.signRequest,
+        txId,
+      );
+      return { txId };
     } catch (error) {
       Logger.error(`${nameof(AdaMnemonicSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw error;

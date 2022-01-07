@@ -61,4 +61,7 @@ export const ROUTES = {
     NFTS: '/assets/nfts',
     NFT_DETAILS: '/assets/nfts/:nftId'
   },
+  DAPP_CONNECTOR: {
+    CONNECTED_WEBSITES: '/connector/connected-websites'
+  }
 };

@@ -65,7 +65,11 @@ export default class ConnectContainer extends Component<
     }
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length ? [...result] : [];
-    whitelist.push({ url: chromeMessage.url, publicDeriverId });
+    whitelist.push({
+      url: chromeMessage.url,
+      publicDeriverId,
+      image: chromeMessage.imgBase64Url
+    });
     await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage(({
@@ -90,7 +94,7 @@ export default class ConnectContainer extends Component<
   };
 
   handleSubmit: () => void = () => {
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.filteredWallets;
     if (wallets) {
       const { selected } = this.state;
       if (selected >= 0) {
@@ -102,7 +106,7 @@ export default class ConnectContainer extends Component<
   render(): Node {
     const { selected } = this.state;
     const responseMessage = this.generated.stores.connector.connectingMessage;
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.filteredWallets;
     const error = this.generated.stores.connector.errorWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const protocol = this.generated.stores.connector.protocol;
@@ -163,7 +167,7 @@ export default class ConnectContainer extends Component<
       |},
       connector: {|
         connectingMessage: ?ConnectingMessage,
-        wallets: Array<PublicDeriverCache>,
+        filteredWallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
@@ -189,7 +193,7 @@ export default class ConnectContainer extends Component<
         connector: {
           connectingMessage: stores.connector.connectingMessage,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
-          wallets: stores.connector.wallets,
+          filteredWallets: stores.connector.filteredWallets,
           errorWallets: stores.connector.errorWallets,
           loadingWallets: stores.connector.loadingWallets,
           protocol: stores.connector.protocol,

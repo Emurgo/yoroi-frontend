@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 // @flow
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed } from 'mobx';
+import { observable, action, runInAction, computed, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
@@ -98,7 +98,7 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
   });
 }
 
-function getProtocol(): Promise<Protocol> {
+export function getProtocol(): Promise<Protocol> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
         ({ type: 'get_protocol' }),
@@ -114,7 +114,7 @@ function getProtocol(): Promise<Protocol> {
   });
 }
 
-function getConnectedSites(): Promise<ConnectedSites> {
+export function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
       window.chrome.runtime.sendMessage(
@@ -131,6 +131,29 @@ function getConnectedSites(): Promise<ConnectedSites> {
   });
 }
 
+export async function parseWalletsList(
+  wallets: Array<PublicDeriver<>>
+  ): Promise<Array<PublicDeriverCache>> {
+  const result = [];
+  for (const currentWallet of wallets) {
+    const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
+    const withPubKey = asGetPublicKey(currentWallet);
+
+    const canGetBalance = asGetBalance(currentWallet);
+    const balance = canGetBalance == null
+      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+      : await canGetBalance.getBalance();
+    result.push({
+      publicDeriver: currentWallet,
+      name: conceptualInfo.Name,
+      balance,
+      checksum: await getWalletChecksum(withPubKey)
+    });
+  }
+
+  return result
+}
+
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
@@ -143,6 +166,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<PublicDeriverCache> = [];
+  /**
+   * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
+   *   it will be displyed to the user at the `connect` screen for the user to choose
+   *   which wallet to connect
+   * - `allWallets`: list of all wallets the user have in yoroi
+   *    Will be displayed in the on the `connected webists screen` as we need all wallets
+   *    not only ergo or cardano ones
+   */
+  @observable filteredWallets: Array<PublicDeriverCache> = [];
+  @observable allWallets: Array<PublicDeriverCache> = [];
   @observable protocol: string = ''
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
@@ -242,7 +275,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const sendData: ConfirmedSignData = {
       type: 'sign_confirmed',
-      tx: signingMessage.sign.tx,
+      tx: toJS(signingMessage.sign.tx),
       uid: signingMessage.sign.uid,
       tabId: signingMessage.tabId,
       pw: password,
@@ -299,28 +332,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         await this._getTxAssets(filteredWallets);
       }
 
-      const result = [];
-      for (const currentWallet of filteredWallets) {
-        const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
-        const withPubKey = asGetPublicKey(currentWallet);
-
-        const canGetBalance = asGetBalance(currentWallet);
-        const balance = canGetBalance == null
-          ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-          : await canGetBalance.getBalance();
-        result.push({
-          publicDeriver: currentWallet,
-          name: conceptualInfo.Name,
-          balance,
-          checksum: await getWalletChecksum(withPubKey)
-        });
-      }
+      const filteredWalletsResult = await parseWalletsList(filteredWallets)
+      const allWallets = await parseWalletsList(wallets)
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
 
         // note: "replace" is a mobx-specific function
-        (this.wallets: any).replace(result);
+        (this.wallets: any).replace(filteredWalletsResult);
+        (this.filteredWallets: any).replace(filteredWalletsResult);
+        (this.allWallets: any).replace(allWallets)
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
         this.createAdaTransaction();

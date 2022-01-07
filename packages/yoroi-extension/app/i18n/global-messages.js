@@ -8,6 +8,22 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  standardWallet: {
+    id: 'wallet.nav.type.standard',
+    defaultMessage: '!!!Standard wallet',
+  },
+  paperWallet: {
+    id: 'wallet.nav.type.paper',
+    defaultMessage: '!!!Paper wallet',
+  },
+  trezorWallet: {
+    id: 'wallet.nav.type.trezor',
+    defaultMessage: '!!!Trezor wallet',
+  },
+  ledgerWallet: {
+    id: 'wallet.nav.type.ledger',
+    defaultMessage: '!!!Ledger wallet',
+  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',
@@ -183,6 +199,14 @@ const globalMessages: * = defineMessages({
   languageItalian: {
     id: 'global.language.italian',
     defaultMessage: '!!!Italiano',
+  },
+  languageCzech: {
+    id: 'global.language.czech',
+    defaultMessage: '!!!Czech',
+  },
+  languageSlovak: {
+    id: 'global.language.slovak',
+    defaultMessage: '!!!Slovak',
   },
   addressLabel: {
     id: 'wallet.receive.confirmationDialog.addressLabel',
@@ -890,6 +914,10 @@ export const connectorMessages: * = defineMessages({
     id: 'connector.settings.about',
     defaultMessage: '!!!About',
   },
+  dappConnector: {
+    id: 'connector.appName',
+    defaultMessage: 'Dapp Connector',
+  }
 });
 
 
