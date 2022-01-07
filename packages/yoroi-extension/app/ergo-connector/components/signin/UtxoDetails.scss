@@ -2,7 +2,11 @@
   padding-right: 32px;
   padding-left: 32px;
   padding-top: 30px;
-  overflow-wrap: break-word;
+  padding-bottom: 30px;
+  overflow-y: scroll;
+  width: 100%;
+  height: 100%;
+  padding-bottom: 100px;
 }
 
 .rowData {
