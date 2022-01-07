@@ -259,17 +259,14 @@ function shouldInject() {
  * which we don't use in the connector
  * So instead, we use this heuristic
  */
-function getFavicon(url) {
-    let faviconURL = '';
+function getFavicons(url) {
+    const defaultFavicon = `${url}/favicon.ico`;
     // sometimes the favicon is specified at the top of the HTML
-    const favicon = document.querySelector("link[rel~='icon']");
-    if(favicon) {
-        faviconURL = favicon.href;
-    } else {
-        // if not in the HTML, check the domain root
-        faviconURL = `${url}/favicon.ico`;
+    const optionalFavicon = document.querySelector("link[rel~='icon']");
+    if(optionalFavicon) {
+        return [defaultFavicon, optionalFavicon.href]
     }
-    return faviconURL;
+    return [defaultFavicon];
 }
 let yoroiPort = null;
 let ergoApiInjected = false;
@@ -384,7 +381,7 @@ if (shouldInject()) {
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
                 const protocol = dataType.split('/')[1];
-                convertImgToBase64(getFavicon(location.origin))
+                convertImgToBase64(location.origin, getFavicons(location.origin))
                     .then(imgBase64Url => {
                         const message = {
                             imgBase64Url,
@@ -403,11 +400,26 @@ if (shouldInject()) {
  * Returns a PNG base64 encoding of the favicon
  * but returns empty string if no favicon is set for the page
  */
-async function convertImgToBase64(url, outputFormat) {
-    // as a safety precaution, we only load the favicon if it's the same origin as the website
-    // if we don't do this, we might get a CORS error anyway
-    // I don't know if any websites set their favicon to external websites, so it should not be a problem
-    const response = await fetch(url, {mode: 'same-origin'});
+async function convertImgToBase64(origin, urls) {
+    let response;
+    for (url of urls) {
+        try {
+            const mode = url.includes(origin) ? 'same-origin' : 'no-cors';
+            response = await fetch(url, { mode });
+            break;
+        } catch (e) {
+            if (String(e).includes('Failed to fetch')) {
+                console.warn(`[yoroi-connector] Failed to fetch favicon at '${url}'`);
+                continue;
+            }
+            console.error(`[yoroi-connector] Failed to fetch favicon at '${url}'`, e);
+            throw e;
+        }
+    }
+    if (!response) {
+        console.warn(`[yoroi-connector] No downloadable favicon found `);
+        return '';
+    }
     const blob = await response.blob();
 
     const reader = new FileReader();
