@@ -37,7 +37,7 @@ export default class ConnectWebsitesContainer extends Component<
   };
 
   render(): Node {
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.allWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const error = this.generated.stores.connector.errorWallets;
     const isLoading = (
@@ -95,7 +95,7 @@ export default class ConnectWebsitesContainer extends Component<
         shouldHideBalance: boolean,
       |},
       connector: {|
-        wallets: ?Array<PublicDeriverCache>,
+        allWallets: ?Array<PublicDeriverCache>,
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
         loadingWallets: $Values<typeof LoadingWalletStates>,
         errorWallets: string,
@@ -119,7 +119,7 @@ export default class ConnectWebsitesContainer extends Component<
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         connector: {
-          wallets: stores.connector.wallets,
+          allWallets: stores.connector.allWallets,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
           loadingWallets: stores.connector.loadingWallets,
           errorWallets: stores.connector.errorWallets,

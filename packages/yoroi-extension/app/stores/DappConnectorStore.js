@@ -5,17 +5,11 @@ import Request from './lib/LocalizedRequest';
 import Store from './base/Store';
 import type {
   PublicDeriverCache,
-  ConfirmedSignData,
   ConnectingMessage,
-  FailedSignData,
-  SigningMessage,
   WhitelistEntry,
   ConnectedSites,
   ConnectRetrieveData,
-  TxSignWindowRetrieveData,
   RemoveWalletFromWhitelistData,
-  GetConnectedSitesData,
-  Protocol,
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -24,18 +18,9 @@ import {
   getWallets
 } from '../api/common/index';
 import {
-  isCardanoHaskell,
   isErgo,
 } from '../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  asGetBalance,
-  asGetPublicKey,
-} from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import { MultiToken } from '../api/common/lib/MultiToken';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
+import { getConnectedSites, getProtocol, parseWalletsList } from '../ergo-connector/stores/ConnectorStore';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -57,81 +42,22 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
   });
 }
 
-// Need to run only once - Sign Tx Confirmation
-let initedSigning = false;
-function sendMsgSigningTx(): Promise<SigningMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'tx_sign_window_retrieve_data' }: TxSignWindowRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
+// function getConnectedSites(): Promise<ConnectedSites> {
+//   return new Promise((resolve, reject) => {
+//     window.chrome.runtime.sendMessage(
+//       ({ type: 'get_connected_sites' }: GetConnectedSitesData),
+//       response => {
+//         if (window.chrome.runtime.lastError) {
+//           // eslint-disable-next-line prefer-promise-reject-errors
+//           reject('Could not establish connection: get_connected_sites ');
+//         }
 
-          resolve(response);
-          initedSigning = true;
-        }
-      );
-  });
-}
+//         resolve(response);
+//       }
+//     );
+//   });
+// }
 
-function getProtocol(): Promise<Protocol> {
-  return new Promise((resolve, reject) => {
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_protocol' }),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_protocol ');
-          }
-
-          resolve(response);
-        }
-      );
-  });
-}
-
-function getConnectedSites(): Promise<ConnectedSites> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_connected_sites ');
-          }
-
-          resolve(response);
-        }
-      );
-  });
-}
-
-async function parseWalletsList(
-  wallets: Array<PublicDeriver<>>
-  ): Promise<Array<PublicDeriverCache>> {
-  const result = [];
-  for (const currentWallet of wallets) {
-    const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
-    const withPubKey = asGetPublicKey(currentWallet);
-
-    const canGetBalance = asGetBalance(currentWallet);
-    const balance = canGetBalance == null
-      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-      : await canGetBalance.getBalance();
-    result.push({
-      publicDeriver: currentWallet,
-      name: conceptualInfo.Name,
-      balance,
-      checksum: await getChecksum(withPubKey)
-    });
-  }
-
-  return result
-}
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -146,10 +72,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable errorWallets: string = '';
   /**
    * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
-   *   it will be displyed fo the user at the `connect` screen for the user to choose 
+   *   it will be displyed to the user at the `connect` screen for the user to choose
    *   which wallet to connect
    * - `allWallets`: list of all wallets the user have in yoroi
-   *    We need it to display walelts-websits on the `connected webists screen`
+   *    Will be displayed in the on the `connected webists screen` as we need all wallets
+   *    not only ergo or cardano ones
    */
   @observable filteredWallets: Array<PublicDeriverCache> = [];
   @observable allWallets: Array<PublicDeriverCache> = [];
@@ -169,35 +96,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     getConnectedSites
   );
 
-  @observable signingMessage: ?SigningMessage = null;
-
 
   setup(): void {
     super.setup();
-    this.actions.connector.getResponse.listen(this._getConnectingMsg);
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
-    this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
-    this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
-    this.actions.connector.closeWindow.listen(this._closeWindow);
     this._getConnectorWhitelist();
-    this._getConnectingMsg();
-    this._getSigningMsg();
     this.currentConnectorWhitelist;
   }
 
   teardown(): void {
     super.teardown();
-  }
-
-  // ========== general ========== //
-  @action
-  _closeWindow(): void {
-    window.close();
   }
 
   // ========== connecting wallets ========== //
@@ -211,52 +123,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       })
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
-  };
-
-  @action
-  _getSigningMsg: () => Promise<void> = async () => {
-    await sendMsgSigningTx()
-      .then(response => {
-        runInAction(() => {
-          this.signingMessage = response;
-        });
-      })
-      // eslint-disable-next-line no-console
-      .catch(err => console.error(err));
-  };
-
-  @action
-  _confirmSignInTx: string => void = password => {
-    if (this.signingMessage == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
-    }
-    const { signingMessage } = this;
-    if (signingMessage.sign.tx == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
-    }
-    const sendData: ConfirmedSignData = {
-      type: 'sign_confirmed',
-      tx: signingMessage.sign.tx,
-      uid: signingMessage.sign.uid,
-      tabId: signingMessage.tabId,
-      pw: password,
-    };
-    window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
-  };
-  @action
-  _cancelSignInTx: void => void = () => {
-    if (this.signingMessage == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
-    }
-    const { signingMessage } = this;
-    const sendData: FailedSignData = {
-      type: 'sign_rejected',
-      uid: signingMessage.sign.uid,
-      tabId: signingMessage.tabId,
-    };
-    window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
   };
 
   // ========== wallets info ========== //
@@ -345,22 +211,4 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? { sites: [] };
   }
-}
-
-// TODO: do something better than duplicating the logic here
-async function getChecksum(
-  publicDeriver: ReturnType<typeof asGetPublicKey>,
-): Promise<void | WalletChecksum> {
-  if (publicDeriver == null) return undefined;
-
-  const hash = (await publicDeriver.getPublicKey()).Hash;
-
-  const isLegacyWallet =
-    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-    publicDeriver.getParent() instanceof Bip44Wallet;
-  const checksum = isLegacyWallet
-    ? legacyWalletChecksum(hash)
-    : walletChecksum(hash);
-
-  return checksum;
 }
