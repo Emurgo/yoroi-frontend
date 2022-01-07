@@ -151,6 +151,7 @@ export type GetTransactionsDataResponse = {|
   unconfirmedAmount: ?UnconfirmedAmount,
   remoteTransactionIds: Set<string>,
   timestamps: Array<number>,
+  assetIds: Array<string>,
 |};
 
 export type GetTransactionsDataFunc = (

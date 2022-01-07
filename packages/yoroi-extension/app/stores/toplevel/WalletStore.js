@@ -201,7 +201,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const selectedPublicDeriverId = this.selected?.publicDeriverId;
     if (selectedPublicDeriverId != null) {
       const selectedCache: ?PublicKeyCache = this.publicKeyCache
-        // $FlowFixMe
+        // $FlowFixMe[prop-missing]
         .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
       return selectedCache == null ? null : selectedCache.plate;
     }
