@@ -13,11 +13,12 @@ export default class CoinPriceStore extends BaseCoinPriceStore<StoresMap, Action
       await this.refreshCurrentCoinPrice(selected.getParent().getNetworkInfo());
       const { allRequest } = this.stores.transactions
         .getTxRequests(selected).requests;
-      const transactions = allRequest.result?.transactions;
-      if (allRequest.wasExecuted && transactions != null) {
+
+      const timestamps = allRequest.result?.timestamps;
+      if (allRequest.wasExecuted && timestamps) {
         await this.stores.coinPriceStore.updateTransactionPriceData({
           db: selected.getDb(),
-          transactions,
+          timestamps,
         });
       }
     }
