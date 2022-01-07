@@ -1,6 +1,6 @@
 // @flow
 
-import { isEqual } from 'lodash';
+import { isEqual, chunk } from 'lodash';
 import type {
   lf$Database, lf$Transaction,
 } from 'lovefield';
@@ -116,6 +116,11 @@ import { getErgoBaseConfig, } from '../../../../ada/lib/storage/database/prepack
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
+import type { ConfigType } from '../../../../../../config/config-types';
+
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
+const addressesLimit = CONFIG.app.addressRequestSize;
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -160,6 +165,56 @@ async function rawGetAllTxIds(
       utxoAddresses,
     },
   };
+}
+
+async function rawGetAllTxIdsChunked(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+  |},
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
+  derivationTables: Map<number, string>,
+): Promise<Array<{|
+  txIds: Array<number>,
+  addresses: {|
+    utxoAddresses: Array<$ReadOnly<AddressRow>>,
+  |}
+|}>> {
+  const {
+    utxoAddresses,
+  } = await rawGetAddressRowsForWallet(
+    dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    request,
+    derivationTables,
+  );
+
+  const chunkedUtxoAddress = chunk(utxoAddresses, addressesLimit);
+  const chunks = [];
+
+  for(const addresses of chunkedUtxoAddress) {
+    const utxoAddressIds = addresses.map(row => row.AddressId);
+    chunks.push({
+      txIds: Array.from(new Set([
+        ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+          db, dbTx, { addressIds: utxoAddressIds },
+        ))]
+      )),
+      addresses: {
+        utxoAddresses: addresses
+      }
+    });
+  }
+
+  return chunks;
 }
 
 export async function rawGetTransactions(
@@ -1049,7 +1104,7 @@ async function rawUpdateTransactions(
     // 3) get new txs from fetcher
 
     // important: get addresses for our wallet AFTER scanning for new addresses
-    const { txIds, addresses } = await rawGetAllTxIds(
+    const chunks = await rawGetAllTxIdsChunked(
       db, dbTx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -1060,70 +1115,75 @@ async function rawUpdateTransactions(
       { publicDeriver },
       derivationTables,
     );
-    const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
-      db, dbTx,
-      {
-        txIds,
-        height: Number.MAX_SAFE_INTEGER,
-      }
-    );
 
-    const requestKind = bestInStorage == null
-      ? undefined
-      : {
-        after: {
-          block: bestInStorage.Block.Hash,
-          tx: bestInStorage.Transaction.Hash,
+    for (const c of chunks){
+      const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
+        db, dbTx,
+        {
+          txIds: c.txIds,
+          height: Number.MAX_SAFE_INTEGER,
         }
-      };
-    const txsFromNetwork = await getTransactionsHistoryForAddresses({
-      ...requestKind,
-      network,
-      addresses: [
-        ...addresses.utxoAddresses.map(address => address.Hash)
-      ],
-      untilBlock,
-    });
+      );
 
-    const ourIds = new Set(
-      Object.keys(addresses)
-        .flatMap(key => addresses[key])
-        .map(addrRow => addrRow.AddressId)
-    );
-    // 4) save data to local DB
-    // WARNING: this can also modify the address set
-    // ex: a new group address is found
-    await updateTransactionBatch(
-      db,
-      dbTx,
-      {
-        MarkUtxo: deps.MarkUtxo,
-        ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
-        GetEncryptionMeta: deps.GetEncryptionMeta,
-        GetTransaction: deps.GetTransaction,
-        GetUtxoInputs: deps.GetUtxoInputs,
-        ModifyTransaction: deps.ModifyTransaction,
-        ModifyErgoTx: deps.ModifyErgoTx,
-        ModifyToken: deps.ModifyToken,
-        GetToken: deps.GetToken,
-        AssociateToken: deps.AssociateToken,
-      },
-      {
-        network: publicDeriver.getParent().getNetworkInfo(),
-        txIds,
-        txsFromNetwork,
-        hashToIds: rawGenHashToIdsFunc(
-          ourIds,
-          publicDeriver.getParent().getNetworkInfo()
-        ),
-        defaultToken: publicDeriver.getParent().getDefaultToken(),
-        findOwnAddress: rawGenFindOwnAddress(
-          ourIds
-        ),
-        derivationTables,
-        getAssetInfo,
-      }
-    );
+      const requestKind = bestInStorage == null
+        ? undefined
+        : {
+          after: {
+            block: bestInStorage.Block.Hash,
+            tx: bestInStorage.Transaction.Hash,
+          }
+        };
+      const txsFromNetwork = await getTransactionsHistoryForAddresses({
+        ...requestKind,
+        network,
+        addresses: [
+          ...c.addresses.utxoAddresses.map(address => address.Hash)
+        ],
+        untilBlock,
+      });
+
+      const addresses = c.addresses;
+      const ourIds = new Set(
+        Object.keys(addresses)
+          .flatMap(key => addresses[key])
+          .map(addrRow => addrRow.AddressId)
+      );
+
+      // 4) save data to local DB
+      // WARNING: this can also modify the address set
+      // ex: a new group address is found
+      await updateTransactionBatch(
+        db,
+        dbTx,
+        {
+          MarkUtxo: deps.MarkUtxo,
+          ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
+          GetEncryptionMeta: deps.GetEncryptionMeta,
+          GetTransaction: deps.GetTransaction,
+          GetUtxoInputs: deps.GetUtxoInputs,
+          ModifyTransaction: deps.ModifyTransaction,
+          ModifyErgoTx: deps.ModifyErgoTx,
+          ModifyToken: deps.ModifyToken,
+          GetToken: deps.GetToken,
+          AssociateToken: deps.AssociateToken,
+        },
+        {
+          network: publicDeriver.getParent().getNetworkInfo(),
+          txIds: c.txIds,
+          txsFromNetwork,
+          hashToIds: rawGenHashToIdsFunc(
+            ourIds,
+            publicDeriver.getParent().getNetworkInfo()
+          ),
+          defaultToken: publicDeriver.getParent().getDefaultToken(),
+          findOwnAddress: rawGenFindOwnAddress(
+            ourIds
+          ),
+          derivationTables,
+          getAssetInfo,
+        }
+      );
+    }
   }
 
   // 5) update last sync
