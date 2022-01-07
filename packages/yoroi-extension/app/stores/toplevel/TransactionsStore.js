@@ -51,6 +51,8 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
+import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
+import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -107,6 +109,7 @@ function newMultiToken(
 }
 
 const SUBMITTED_TRANSACTIONS_KEY = 'submittedTransactions';
+const TRANSACTION_LIST_COMPUTATION_BATCH_SIZE = 60;
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
@@ -514,8 +517,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   genComputeOnAllTransactions: string => GetTransactionsDataFunc = (apiType) => {
-    return async (...args) => {
-      const publicDeriver = args[0].publicDeriver;
+    return async (request) => {
+      const publicDeriver = request.publicDeriver;
       const NetworkId = publicDeriver.getParent().getNetworkInfo().NetworkId
 
       const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(NetworkId);
@@ -543,27 +546,50 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
                timestamp
              )));
 
-      const result = await this.stores.substores[apiType].transactions.refreshTransactions(...args);
-      const hash = hashTransactions(result.transactions);
+      let cursor = 0;
 
-      const unconfirmedAmount = calculateUnconfirmedAmount(
-        result.transactions,
-        txRequests.lastSyncInfo.Height,
-        assuranceMode,
-        getUnitOfAccount,
-        defaultTokenInfo,
-      );
+      const reducers = [
+        new HashReducer(),
+        new TotalAvailableReducer(),
+        new UnconfirmedAmountReducer(
+          txRequests.lastSyncInfo.Height,
+          assuranceMode,
+          getUnitOfAccount,
+          defaultTokenInfo,
+        ),
+        new RemoteTransactionIdsReducer(),
+        new TimestampsReducer()
+      ];
+
+      for (;;) {
+        const batchRequest = {
+          ...request,
+          skip: cursor,
+          limit: TRANSACTION_LIST_COMPUTATION_BATCH_SIZE,
+        };
+
+        const batchResult =
+          await this.stores.substores[apiType].transactions.refreshTransactions(
+            batchRequest
+          );
+        if (batchResult.transactions.length === 0) {
+          break;
+        }
+        cursor += TRANSACTION_LIST_COMPUTATION_BATCH_SIZE;
+
+        for (const reducer of reducers) {
+          reducer.reduce(batchResult.transactions);
+        }
+      }
 
       return {
-        hash,
-        totalAvailable: result.transactions.length,
-        unconfirmedAmount,
-        remoteTransactionIds: new Set(
-          result.transactions.map(tx => tx.txid)
-        ),
-        timestamps: Array.from(new Set(result.transactions.map(tx => tx.date.valueOf())))
+        hash: reducers[0].result,
+        totalAvailable: reducers[1].result,
+        unconfirmedAmount: reducers[2].result,
+        remoteTransactionIds: reducers[3].result,
+        timestamps: reducers[4].result,
       };
-    }
+    };
   }
 
   getTxRequests: (
@@ -830,13 +856,112 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 }
 
-function hashTransactions(transactions: ?Array<WalletTransaction>): number {
-  let hash = 0;
-  if (transactions == null) return hash;
-
-  const seed = 858499202; // random seed
-  for (const tx of transactions) {
-    hash = digestForHash(hash.toString(16) + tx.uniqueKey, seed);
+class HashReducer {
+  hash: number = 0;
+  reduce(transactions: Array<WalletTransaction>): void {
+    const seed = 858499202; // random seed
+    for (const tx of transactions) {
+      this.hash = digestForHash(this.hash.toString(16) + tx.uniqueKey, seed);
+    }
   }
-  return hash;
+  get result(): number {
+    return this.hash;
+  }
+}
+
+class TotalAvailableReducer {
+  length: number = 0;
+  reduce(transactions: Array<WalletTransaction>): void {
+    this.length += transactions.length;
+  }
+  get result(): number {
+    return this.length;
+  }
+}
+
+class UnconfirmedAmountReducer {
+  amount: UnconfirmedAmount;
+  lastSyncHeight: number;
+  assuranceMode: AssuranceMode;
+  getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>);
+  defaultTokenInfo: DefaultTokenEntry;
+
+  constructor(
+    lastSyncHeight: number,
+    assuranceMode: AssuranceMode,
+    getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
+    defaultTokenInfo: DefaultTokenEntry
+  ) {
+    this.amount = {
+      total: new MultiToken([], defaultTokenInfo),
+      incoming: new MultiToken([], defaultTokenInfo),
+      outgoing: new MultiToken([], defaultTokenInfo),
+      incomingInSelectedCurrency: new BigNumber(0),
+      outgoingInSelectedCurrency: new BigNumber(0),
+    };
+
+    this.lastSyncHeight = lastSyncHeight;
+    this.assuranceMode = assuranceMode;
+    this.getUnitOfAccount = getUnitOfAccount;
+    this.defaultTokenInfo = defaultTokenInfo;
+  }
+
+  reduce(transactions: Array<WalletTransaction>): void {
+    const batchAmount = calculateUnconfirmedAmount(
+      transactions,
+      this.lastSyncHeight,
+      this.assuranceMode,
+      this.getUnitOfAccount,
+      this.defaultTokenInfo,
+    );
+
+    this.amount.total.joinAddMutable(batchAmount.total);
+    this.amount.incoming.joinAddMutable(batchAmount.incoming);
+    this.amount.outgoing.joinAddMutable(batchAmount.outgoing);
+    if (
+      this.amount.incomingInSelectedCurrency &&
+        batchAmount.incomingInSelectedCurrency
+    ) {
+      this.amount.incomingInSelectedCurrency =
+        this.amount.incomingInSelectedCurrency.plus(
+          batchAmount.incomingInSelectedCurrency
+        );
+    }
+    if (
+      this.amount.outgoingInSelectedCurrency &&
+        batchAmount.outgoingInSelectedCurrency
+    ) {
+      this.amount.outgoingInSelectedCurrency =
+        this.amount.outgoingInSelectedCurrency.plus(
+          batchAmount.outgoingInSelectedCurrency
+        );
+    }
+  }
+  get result(): UnconfirmedAmount {
+    return this.amount;
+  }
+}
+
+class RemoteTransactionIdsReducer {
+  ids: Set<string> = new Set();
+  reduce(transactions: Array<WalletTransaction>): void {
+    for (const { txid } of transactions) {
+      this.ids.add(txid);
+    }
+  }
+  get result(): Set<string> {
+    return this.ids;
+  }
+}
+
+class TimestampsReducer {
+  timestamps: Set<number> = new Set();
+  reduce(transactions: Array<WalletTransaction>): void {
+    for (const { date } of transactions) {
+      this.timestamps.add(date.valueOf());
+    }
+  }
+  get result(): Array<number> {
+    return Array.from(this.timestamps);
+  }
 }
