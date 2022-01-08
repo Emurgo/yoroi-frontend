@@ -75,6 +75,8 @@ import type CardanoTxRequest from '../../app/api/ada';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 
 
+import JSONBigInt from 'json-bigint';
+
 /*::
 declare var chrome;
 */
@@ -520,7 +522,7 @@ const yoroiMessageHandler = async (
       connection.pendingSigns.delete(request.uid);
     } else {
       // eslint-disable-next-line no-console
-      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+      console.error(`couldn't find tabId: ${request.tabId} in ${JSONBigInt.stringify(connectedSites.entries())}`);
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
@@ -646,7 +648,7 @@ async function confirmConnect(
   const whitelist = await localStorageApi.getWhitelist() ?? [];
   return new Promise((resolve, reject) => {
     try {
-      Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
+      Logger.info(`whitelist: ${JSONBigInt.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find((entry: WhitelistEntry) => {
         // Whitelist is only matching if same auth or auth is not requested
         const matchingUrl = entry.url === url;
@@ -763,7 +765,7 @@ function handleInjectorConnect(port) {
           });
         } else {
           const func = message.function;
-          const args = message.params.map(JSON.stringify).join(', ');
+          const args = message.params.map(JSONBigInt.stringify).join(', ');
           if (e?.stack != null) {
             Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
           } else {

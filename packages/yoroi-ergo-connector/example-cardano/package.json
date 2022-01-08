@@ -1,6 +1,6 @@
 {
   "name": "test-ergo-dapp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "test dApp to interact with the Yoroi Ergo dApp Connector",
   "main": "index.js",
   "bin": {

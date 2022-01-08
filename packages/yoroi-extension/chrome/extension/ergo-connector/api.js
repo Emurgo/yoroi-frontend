@@ -335,6 +335,11 @@ function createMockHeader(bestBlock) {
     nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
     height: bestBlock.height + 1,
     votes: '040000', // TODO: where to get votes? (does this impact signing?)
+    id: '4caa17e62fe66ba7bd69597afdc996ae35b1ff12e0ba90c22ff288a4de10e91b',
+    stateRoot: '8ad868627ea4f7de6e2a2fe3f98fafe57f914e0f2ef3331c006def36c697f92713',
+    adProofsRoot: 'd882aaf42e0a95eb95fcce5c3705adf758e591532f733efe790ac3c404730c39',
+    transactionsRoot: '63eaa9aff76a1de3d71c81e4b2d92e8d97ae572a8e9ab9e66599ed0912dd2f8b',
+    extensionHash: '3f91f3c680beb26615fdec251aee3f81aaf5a02740806c167c0f3c929471df44',
   });
 }
 
