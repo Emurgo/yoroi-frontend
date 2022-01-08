@@ -117,10 +117,48 @@ const initialInject = `
 `
 
 const cardanoApiInject = `
+class CardanoAuth {
+    constructor(auth, rpc) {
+      this._auth = auth;
+      this._cardano_rpc_call = rpc;
+    }
+    
+    isEnabled() {
+      return this._auth != null;
+    }
+    
+    getWalletId() {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._auth.walletId;
+    }
+    
+    getWalletPubkey() {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._auth.pubkey;
+    }
+    
+    signHexPayload(payload_hex_string) {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._cardano_rpc_call("auth_sign_hex_payload/cardano", [payload_hex_string]);
+    }
+    
+    checkHexPayload(payload_hex_string, signature_hex_string) {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._cardano_rpc_call("auth_check_hex_payload/cardano", [payload_hex_string, signature_hex_string]);
+    }
+}
 class CardanoAPI {
   
     constructor(auth, rpc) {
-      this._auth = auth;
+      this._auth = new CardanoAuth(auth, rpc);
       this._cardano_rpc_call = rpc;
       this._disconnection = [false];
       const self = this;
@@ -137,36 +175,8 @@ class CardanoAPI {
       throw new Error('Not implemented yet');
     }
     
-    isAuthEnabled() {
-      return this._auth != null;
-    }
-    
-    authGetWalletId() {
-      if (!this._auth) {
-        throw new Error('This connection does not have auth enabled!');
-      }
-      return this._auth.walletId;
-    }
-    
-    authGetWalletPubkey() {
-      if (!this._auth) {
-        throw new Error('This connection does not have auth enabled!');
-      }
-      return this._auth.pubkey;
-    }
-    
-    authSignHexPayload(payload_hex_string) {
-      if (!this._auth) {
-        throw new Error('This connection does not have auth enabled!');
-      }
-      return this._cardano_rpc_call("auth_sign_hex_payload/cardano", [payload_hex_string]);
-    }
-    
-    authCheckHexPayload(payload_hex_string, signature_hex_string) {
-      if (!this._auth) {
-        throw new Error('This connection does not have auth enabled!');
-      }
-      return this._cardano_rpc_call("auth_check_hex_payload/cardano", [payload_hex_string, signature_hex_string]);
+    auth() {
+      return this._auth;
     }
     
     getBalance(token_id = 'ADA') {

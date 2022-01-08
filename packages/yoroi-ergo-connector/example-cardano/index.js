@@ -54,10 +54,12 @@ function onApiConnectied(api) {
   toggleSpinner('hide');
   let walletDisplay = 'an anonymous Yoroi Wallet';
 
-  const authEnabled = api.isAuthEnabled();
+  const auth = api.auth && api.auth();
+  const authEnabled = auth && auth.isEnabled();
+
   if (authEnabled) {
-    const walletId = api.authGetWalletId();
-    const pubkey = api.authGetWalletPubkey();
+    const walletId = auth.getWalletId();
+    const pubkey = auth.getWalletPubkey();
     console.log('Auth acquired successfully: ',
       JSON.stringify({ walletId, pubkey }));
     const walletPlate = textPartFromWalletChecksumImagePart(walletId);
@@ -89,10 +91,10 @@ function onApiConnectied(api) {
       messageJson,
       messageHex,
     }))
-    api.authSignHexPayload(messageHex).then(sig => {
+    auth.signHexPayload(messageHex).then(sig => {
       console.log('Signature received: ', sig);
       console.log('Verifying signature against the message');
-      api.authCheckHexPayload(messageHex, sig).then(r => {
+      auth.checkHexPayload(messageHex, sig).then(r => {
         console.log('Signature matches message: ', r);
       }, e => {
         console.error('Sig check failed', e);
