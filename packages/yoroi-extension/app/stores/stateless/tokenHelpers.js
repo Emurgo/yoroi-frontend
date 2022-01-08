@@ -12,6 +12,7 @@ export function getTokenName(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
+    IsNFT?: boolean,
     Metadata: TokenMetadata,
     ...,
   }>,
@@ -21,6 +22,23 @@ export function getTokenName(
   const identifier = getTokenIdentifierIfExists(tokenRow);
   if (identifier != null) return identifier;
   return '-';
+}
+
+const ASCII_ASSET_NAME_BLACKLIST =
+  new Set<void | string>(['ADA']);
+
+function hexToValidAsciiOrNothing(hexString: string): void | string {
+  const bytes = [...Buffer.from(hexString, 'hex')];
+  const isAscii = bytes.every(b => b > 32 && b < 127);
+  return isAscii ? String.fromCharCode(...bytes) : undefined;
+}
+
+function decodeAssetNameIfASCII(assetName: ?string): void | string {
+  if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
+    return undefined;
+  }
+  const asciiName = hexToValidAsciiOrNothing(assetName);
+  return ASCII_ASSET_NAME_BLACKLIST.has(asciiName) ? undefined : asciiName;
 }
 
 export function getTokenStrictName(
@@ -37,17 +55,7 @@ export function getTokenStrictName(
     return tokenRow.Metadata.longName;
   }
   if (tokenRow.Metadata.type === 'Cardano') {
-    if (tokenRow.Metadata.assetName.length > 0 && isHexadecimal(tokenRow.Metadata.assetName)) {
-      const bytes = [...Buffer.from(tokenRow.Metadata.assetName, 'hex')];
-      // check this is a valid ASCII string
-      // https://github.com/trezor/trezor-firmware/blob/d4dcd7bff9aaa87d2ba3f02b3ec4aa39dfc30eaa/core/src/apps/cardano/layout.py#L68
-      if (bytes.filter(byte => byte <= 32 || byte >= 127).length === 0) {
-        const asciiName = String.fromCharCode(...bytes);
-        if (asciiName !== 'ADA') { // overly simple blocklist for names
-          return asciiName;
-        }
-      }
-    }
+    return decodeAssetNameIfASCII(tokenRow.Metadata.assetName);
   }
   return undefined;
 }
@@ -56,6 +64,7 @@ export function getTokenIdentifierIfExists(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
+    IsNFT?: boolean,
     Metadata: TokenMetadata,
     ...,
   }>
@@ -85,6 +94,17 @@ export function genLookupOrFail(
   };
 }
 
+export function genLookupOrNull(
+  map: TokenInfoMap,
+): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null) {
+  return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> | null => {
+    const tokenRow = map
+      .get(lookup.networkId.toString())
+      ?.get(lookup.identifier);
+    if (tokenRow == null) return null
+    return tokenRow;
+  };
+}
 export function genFormatTokenAmount(
   getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
 ): (TokenEntry => string) {
@@ -93,6 +113,7 @@ export function genFormatTokenAmount(
 
     return tokenEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-      .toFormat(tokenInfo.Metadata.numberOfDecimals);
+      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
+      .toString();
   };
 }

@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
@@ -128,7 +128,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
             websiteName="Github"
             url={baseGithubUrl + 'releases/'}
             light={false}
-            arrowRelativeToTip={false /* branch name may be too small otherwise */}
+            placementTooltip="bottom"
             onExternalLinkClick={handleExternalLinkClick}
           >
             <RawHash light={false}>
@@ -142,6 +142,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
             websiteName="Github"
             url={baseGithubUrl + 'commit/' + environment.commit}
             light={false}
+            placementTooltip="bottom-start"
             onExternalLinkClick={handleExternalLinkClick}
           >
             <RawHash light={false}>
@@ -156,7 +157,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
               websiteName="Github"
               url={baseGithubUrl + 'tree/' + environment.branch}
               light={false}
-              arrowRelativeToTip={false /* branch name may be too small otherwise */}
+              placementTooltip="bottom-start"
               onExternalLinkClick={handleExternalLinkClick}
             >
               <RawHash light={false}>

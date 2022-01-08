@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import YoroiLogo from '../../assets/images/yoroi_logo.inline.svg';
 import MenuIcon from '../../assets/images/menu_icon.inline.svg';
@@ -19,10 +19,6 @@ const messages = defineMessages({
   yoroiDappConnector: {
     id: 'global.connector.yoroiDappConnector',
     defaultMessage: '!!!Yoroi Dapp Connector',
-  },
-  poweredBy: {
-    id: 'global.connector.poweredByErgo',
-    defaultMessage: '!!!Powered by Ergo',
   },
 });
 @observer
@@ -45,7 +41,6 @@ export default class Layout extends Component<Props> {
             <YoroiLogo />
             <div className={styles.logo}>
               <h3>{intl.formatMessage(messages.yoroiDappConnector)}</h3>
-              <p className={styles.poweredBy}>{intl.formatMessage(messages.poweredBy)}</p>
             </div>
           </div>
         </div>

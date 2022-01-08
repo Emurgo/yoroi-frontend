@@ -2,7 +2,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import BigNumber from 'bignumber.js';
 
 import { select, boolean, } from '@storybook/addon-knobs';
@@ -22,7 +21,7 @@ import {
   getValidationMnemonicCases,
   mockLedgerMeta,
 } from '../../../stories/helpers/StoryWrapper';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import AdaApi from '../../api/ada/index';
 import { NoInputsError, GenericApiError, } from '../../api/common/errors';
 import { withScreenshot } from 'storycap';
@@ -61,6 +60,7 @@ import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
 import { mockDefaultToken, mockFromDefaults } from '../../stores/toplevel/TokenInfoStore';
+import { walletLookup } from '../../../stories/helpers/WalletCache'
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -468,6 +468,7 @@ export const CreateWalletFinalConfirm = (): Node => {
 const restoreWalletProps: {|
   step: *,
   selectedNetwork: *,
+  lookup:*,
   walletRestoreMeta?: *,
   recoveryResult?: *,
   restoreRequest?: *,
@@ -482,6 +483,13 @@ const restoreWalletProps: {|
       selectedNetwork: request.selectedNetwork,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       unitOfAccount: genUnitOfAccount(),
+      shouldHideBalance: false,
+    },
+    delegation: {
+      getDelegationRequests: () => {},
+    },
+    walletSettings: {
+      getConceptualWalletSettingsCache: request.lookup.getConceptualWalletSettingsCache,
     },
     uiNotifications: {
       isOpen: () => false,
@@ -493,6 +501,7 @@ const restoreWalletProps: {|
           ? boolean('isExecuting', false)
           : false,
       },
+      getPublicKeyCache: request.lookup.getPublicKeyCache,
       restoreRequest: request.restoreRequest || {
         isExecuting: false,
         error: undefined,
@@ -519,6 +528,10 @@ const restoreWalletProps: {|
         }
         return AdaApi.isValidMnemonic({ mnemonic, numberOfWords: mode.length  });
       },
+      duplicatedWallet: null
+    },
+    transactions: {
+      getTxRequests: request.lookup.getTransactions
     },
     yoroiTransfer: {
       status: request.yoroiTransferStep || TransferStatus.UNINITIALIZED,
@@ -561,6 +574,15 @@ const restoreWalletProps: {|
         trigger: action('open'),
       },
     },
+    wallets: {
+      setActiveWallet: { trigger: action('setActiveWallet') },
+    },
+    router: {
+      goToRoute: { trigger: action('goToRoute') },
+    },
+    profile: {
+      updateHideBalance: { trigger: async (req) => action('updateHideBalance')(req) },
+    },
     walletRestore: {
       reset: {
         trigger: action('reset'),
@@ -581,7 +603,7 @@ const restoreWalletProps: {|
         trigger: async (req) => action('startCheck')(req),
       },
       submitFields: {
-        trigger: action('submitFields'),
+        trigger: async (req) => action('submitFields')(req),
       },
     },
     ada: {
@@ -642,6 +664,7 @@ export const RestoreWalletStart = (): Node => {
   const paperPassword = getPasswordValidationCases('paper_password');
 
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -651,6 +674,7 @@ export const RestoreWalletStart = (): Node => {
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
+            lookup,
             step: RestoreSteps.START,
             walletRestoreMeta: {
               recoveryPhrase: (() => {
@@ -698,6 +722,8 @@ export const RestoreVerify = (): Node => {
     getRestoreMode(),
     selectedNetwork,
   );
+  const lookup = walletLookup([]);
+
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -717,6 +743,7 @@ export const RestoreVerify = (): Node => {
               phrase: recoveryPhrase,
               plates,
             },
+            lookup,
           })
         },
       }))}
@@ -726,6 +753,7 @@ export const RestoreVerify = (): Node => {
 
 export const RestoreLegacyExplanation = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -737,6 +765,7 @@ export const RestoreLegacyExplanation = (): Node => {
           generated: restoreWalletProps({
             selectedNetwork,
             step: RestoreSteps.LEGACY_EXPLANATION,
+            lookup,
             restoreRequest: {
               isExecuting: boolean('isExecuting', false),
               error: undefined,
@@ -751,6 +780,7 @@ export const RestoreLegacyExplanation = (): Node => {
 
 export const RestoreUpgradeRestoringAddresses = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -763,6 +793,7 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
             selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.RESTORING_ADDRESSES,
+            lookup,
           })
         },
       }))}
@@ -772,6 +803,7 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
 
 export const RestoreUpgradeCheckingAddresses = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -784,6 +816,7 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
             selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.CHECKING_ADDRESSES,
+            lookup,
           })
         },
       }))}
@@ -793,6 +826,7 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
 
 export const RestoreUpgradeGeneratingTx = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -805,6 +839,7 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
             selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.GENERATING_TX,
+            lookup,
           })
         },
       }))}
@@ -814,6 +849,7 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
 
 export const RestoreUpgradeReadyToTransfer = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -826,6 +862,7 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
             selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.READY_TO_TRANSFER,
+            lookup,
           })
         },
       }))}
@@ -835,6 +872,8 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
 
 export const RestoreUpgradeError = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
+
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -848,6 +887,7 @@ export const RestoreUpgradeError = (): Node => {
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferError: new GenericApiError(),
             yoroiTransferStep: TransferStatus.ERROR,
+            lookup,
           })
         },
       }))}
@@ -857,6 +897,7 @@ export const RestoreUpgradeError = (): Node => {
 
 export const RestoreUpgradeNoNeed = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
+  const lookup = walletLookup([]);
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -870,6 +911,7 @@ export const RestoreUpgradeNoNeed = (): Node => {
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferError: new NoInputsError(),
             yoroiTransferStep: TransferStatus.ERROR,
+            lookup,
           })
         },
       }))}

@@ -24,6 +24,9 @@ import type {
   ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
   GetConnectedSitesData,
+  Tx,
+  CardanoTx,
+  GetConnectionProtocolData,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -37,11 +40,15 @@ import {
 import {
   connectorGetBalance,
   connectorGetChangeAddress,
-  connectorGetUtxos,
+  connectorGetUtxosErgo,
   connectorSendTx,
+  connectorSendTxCardano,
   connectorSignTx,
+  connectorSignCardanoTx,
+  connectorCreateCardanoTx,
   connectorGetUsedAddresses,
-  connectorGetUnusedAddresses
+  connectorGetUnusedAddresses,
+  connectorGetUtxosCardano
 } from './ergo-connector/api';
 import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
@@ -61,6 +68,9 @@ import {
 } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
+import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import type CardanoTxRequest from '../../app/api/ada';
+
 
 /*::
 declare var chrome;
@@ -100,6 +110,7 @@ type PendingSign = {|
 |}
 
 let imgBase64Url: string = '';
+let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
@@ -310,21 +321,22 @@ async function withSelectedWallet<T>(
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (
+const yoroiMessageHandler = async (
   request: (
-    ConnectResponseData |
-    ConfirmedSignData |
-    FailedSignData |
-    TxSignWindowRetrieveData |
-    ConnectRetrieveData |
-    RemoveWalletFromWhitelistData |
-    GetConnectedSitesData
+    ConnectResponseData
+    | ConfirmedSignData
+    | FailedSignData
+    | TxSignWindowRetrieveData
+    | ConnectRetrieveData
+    | RemoveWalletFromWhitelistData
+    | GetConnectedSitesData
+    | GetConnectionProtocolData
   ),
   sender,
   sendResponse
 ) => {
   async function signTxInputs(
-    tx,
+    tx: Tx,
     indices: number[],
     password: string,
     tabId: number
@@ -337,10 +349,12 @@ chrome.runtime.onMessage.addListener(async (
           if (canGetAllUtxos == null) {
             throw new Error('could not get all utxos');
           }
-          const utxos = await canGetAllUtxos.getAllUtxos();
-          const stateFetcher = await getStateFetcher(localStorageApi);
-          const bestBlock = await stateFetcher
-            .getBestBlock({ network: wallet.getParent().getNetworkInfo() });
+          const network = wallet.getParent().getNetworkInfo();
+          const [utxos, bestBlock] = await Promise.all([
+            canGetAllUtxos.getAllUtxos(),
+            getStateFetcher(localStorageApi)
+              .then(f => f.getBestBlock({ network })),
+          ])
           return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
         db,
@@ -348,6 +362,47 @@ chrome.runtime.onMessage.addListener(async (
       );
     });
   }
+  async function signCardanoTx(
+    tx: CardanoTx,
+    password: string,
+    tabId: number
+  ): Promise<string> {
+    return await withDb(async (db, localStorageApi) => {
+      return await withSelectedWallet(
+        tabId,
+        async (wallet) => {
+          return await connectorSignCardanoTx(
+            wallet,
+            password,
+            tx,
+          );
+        },
+        db,
+        localStorageApi
+      );
+    });
+  }
+  async function createCardanoTx(
+    tx: CardanoTxRequest,
+    password: string,
+    tabId: number
+  ): Promise<string> {
+    return await withDb(async (db, localStorageApi) => {
+      return await withSelectedWallet(
+        tabId,
+        async (wallet) => {
+          return await connectorCreateCardanoTx(
+            wallet,
+            password,
+            tx,
+          );
+        },
+        db,
+        localStorageApi
+      );
+    });
+  }
+
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     if (request.tabId == null) return;
@@ -372,7 +427,8 @@ chrome.runtime.onMessage.addListener(async (
       switch (responseData.request.type) {
         case 'tx':
           {
-            const txToSign = request.tx;
+            // We know `tx` is a `Tx` here
+            const txToSign: Tx = (request.tx: any);
             const allIndices = [];
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
@@ -384,7 +440,7 @@ chrome.runtime.onMessage.addListener(async (
         case 'tx_input':
           {
             const data = responseData.request;
-            const txToSign = request.tx;
+            const txToSign: Tx = (request.tx: any);
             const signedTx = await signTxInputs(
               txToSign,
               [data.index],
@@ -394,6 +450,28 @@ chrome.runtime.onMessage.addListener(async (
             responseData.resolve({ ok: signedTx.inputs[data.index] });
           }
           break;
+        case 'tx/cardano':
+          {
+            const signedTx = await signCardanoTx(
+              // $FlowFixMe[prop-missing]
+              // $FlowFixMe[incompatible-cast]
+              (request.tx.tx: CardanoTx),
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx });
+          }
+        break;
+        case 'tx-create-req/cardano':
+          {
+            const signedTx = await createCardanoTx(
+              (request.tx: any),
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx });
+          }
+        break;
         case 'data':
           // mocked data sign
           responseData.resolve({ err: 'Generic data signing is not implemented yet' });
@@ -471,8 +549,19 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
+  } else if (request.type === 'get_protocol') {
+    sendResponse({ type: connectionProtocol })
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(
+  // Returning `true` is required by Firefox, see:
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+  (message, sender, sendResponse) => {
+    yoroiMessageHandler(message, sender, sendResponse);
+    return true;
+  }
+);
 
 async function removeWallet(
   tabId: number,
@@ -571,68 +660,72 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
-    const tabId = port.sender.tab.id;
-    ports.set(tabId, port);
-    port.onMessage.addListener(async message => {
-      imgBase64Url = message.imgBase64Url;
-      function rpcResponse(response) {
-        port.postMessage({
-          type: 'connector_rpc_response',
-          protocol: message.protocol,
-          uid: message.uid,
-          return: response
+    handleInjectorConnect(port);
+  } else {
+    // disconnect?
+  }
+});
+
+// per-page connection to injected code by Yoroi with connector
+chrome.runtime.onConnect.addListener(port => {
+  handleInjectorConnect(port);
+});
+
+function handleInjectorConnect(port) {
+  const tabId = port.sender.tab.id;
+  ports.set(tabId, port);
+  port.onMessage.addListener(async message => {
+
+    connectionProtocol = message.protocol;
+    imgBase64Url = message.imgBase64Url;
+    function rpcResponse(response) {
+      port.postMessage({
+        type: 'connector_rpc_response',
+        protocol: message.protocol,
+        uid: message.uid,
+        return: response
+      });
+    }
+    function checkParamCount(expected: number) {
+      const found = message?.params?.length;
+      if (found !== expected) {
+        throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
+      }
+    }
+    function handleError(e: any) {
+      if (e instanceof ConnectorError) {
+        rpcResponse({
+          err: e.toAPIError()
+        });
+      } else {
+        const func = message.function;
+        const args = message.params.map(JSON.stringify).join(', ');
+        if (e?.stack != null) {
+          Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
+        } else {
+          Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
+        }
+        rpcResponse({
+          err: {
+            code: APIErrorCodes.API_INTERNAL_ERROR,
+            info: 'Yoroi has encountered an internal error - please see logs'
+          }
         });
       }
-      function checkParamCount(expected: number) {
-        const found = message?.params?.length;
-        if (found !== expected) {
-          throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
-        }
-      }
-      function handleError(e: any) {
-        if (e instanceof ConnectorError) {
-          rpcResponse({
-            err: e.toAPIError()
-          });
-        } else {
-          const func = message.function;
-          const args = message.params.map(JSON.stringify).join(', ');
-          if (e?.stack != null) {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
-          } else {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
-          }
-          rpcResponse({
-            err: {
-              code: APIErrorCodes.API_INTERNAL_ERROR,
-              info: 'Yoroi has encountered an internal error - please see logs'
-            }
+    }
+    if (message.type.startsWith('yoroi_connect_request')) {
+      await withDb(
+        async (_db, localStorageApi) => {
+          const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+          const accepted = publicDeriverId !== null;
+          port.postMessage({
+            type: `yoroi_connect_response/${message.type.split('/')[1]}`,
+            success: accepted
           });
         }
-      }
-      if (message.type === 'yoroi_connect_request/ergo') {
-        await withDb(
-          async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
-            port.postMessage({
-              type: 'yoroi_connect_response/ergo',
-              success: accepted
-            });
-          }
-        );
-      } else if (message.type === 'yoroi_connect_request/cardano') {
-        await withDb(
-          async (_db, localStorageApi) => {
-            const connextionConfirmed = await confirmConnect(tabId, message.url, localStorageApi);
-            port.postMessage({
-              type: 'yoroi_connect_response/cardano',
-              success: connextionConfirmed !== null
-            });
-          }
-        );
-      } else if (message.type === 'connector_rpc_request') {
-        switch (message.function) {
+      );
+    } else if (message.type === 'connector_rpc_request') {
+      switch (message.function) {
           case 'sign_tx':
             try {
               checkParamCount(1);
@@ -656,7 +749,33 @@ chrome.runtime.onConnectExternal.addListener(port => {
             } catch (e) {
               handleError(e);
             }
-            break;
+          break;
+          case 'sign_tx/cardano':
+            try {
+              checkParamCount(1);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx/cardano',
+                    tx: {
+                      tx: message.params[0],
+                      partialSign: message.params[1],
+                    },
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           case 'sign_tx_input':
             try {
               checkParamCount(2);
@@ -723,18 +842,29 @@ chrome.runtime.onConnectExternal.addListener(port => {
               const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
               const tokenId = asTokenId(message.params[1]);
               const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
-
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const utxos = await connectorGetUtxos(
-                      wallet,
-                      pendingTxs,
-                      valueExpected,
-                      tokenId,
-                      paginate
-                    );
+                    const walletType = wallet.parent.defaultToken.Metadata.type
+                    let utxos;
+                    if(walletType === 'Cardano') {
+                      utxos = await connectorGetUtxosCardano(
+                        wallet,
+                        pendingTxs,
+                        valueExpected,
+                        tokenId,
+                        paginate
+                      );
+                    } else {
+                      utxos = await connectorGetUtxosErgo(
+                        wallet,
+                        pendingTxs,
+                        valueExpected,
+                        tokenId,
+                        paginate
+                        );
+                    }
                     rpcResponse({
                       ok: utxos
                     });
@@ -809,12 +939,27 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'submit_tx':
             try {
               await RustModule.load();
-              const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                    let id;
+                    if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+                      const tx = RustModule.WalletV4.Transaction.from_bytes(
+                        Buffer.from(message.params[0], 'hex'),
+                      );
+                      await connectorSendTxCardano(
+                        wallet,
+                        tx.to_bytes(),
+                        localStorageApi,
+                      );
+                      id = Buffer.from(
+                        RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
+                      ).toString('hex');
+                    } else { // is Ergo
+                      const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
+                      id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                    }
                     rpcResponse({
                       ok: id
                     });
@@ -832,6 +977,29 @@ chrome.runtime.onConnectExternal.addListener(port => {
               ok: true,
             });
             break;
+          case 'create_tx/cardano':
+            try {
+              checkParamCount(1);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx-create-req/cardano',
+                    tx: message.params[0],
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           default:
             rpcResponse({
               err: {
@@ -840,10 +1008,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
               }
             })
             break;
-        }
       }
-    });
-  } else {
-    // disconnect?
-  }
-});
+    }
+  });
+}

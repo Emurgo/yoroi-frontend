@@ -158,6 +158,45 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  AlonzoTestnet: ({
+    NetworkId: 4_00,
+    NetworkName: 'Alonzo Testnet',
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://alonzo-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000'
+        : 'wss://alonzo-backend.yoroiwallet.com:443',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
+    },
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 1097911063,
+        GenesisDate: '1563999616000',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 0,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
+  }: NetworkRow),
 });
 
 export function isTestnet(
@@ -225,6 +264,7 @@ export const defaultAssets: Array<
         NetworkId: network.NetworkId,
         Identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
         IsDefault: true,
+        IsNFT: false,
         Metadata: {
           type: 'Cardano',
           policyId: PRIMARY_ASSET_CONSTANTS.Jormungandr,
@@ -240,13 +280,15 @@ export const defaultAssets: Array<
         NetworkId: network.NetworkId,
         Identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         IsDefault: true,
+        IsNFT: false,
         Metadata: {
           type: 'Cardano',
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
           assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
-          ticker: network === networks.CardanoTestnet
-            ? 'TADA'
-            : 'ADA',
+          ticker:
+            (network === networks.CardanoTestnet || network === networks.AlonzoTestnet)
+              ? 'TADA'
+              : 'ADA',
           longName: null,
           numberOfDecimals: 6,
         }
@@ -257,6 +299,7 @@ export const defaultAssets: Array<
         NetworkId: network.NetworkId,
         Identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
         IsDefault: true,
+        IsNFT: false,
         Metadata: {
           type: 'Ergo',
           height: 0,

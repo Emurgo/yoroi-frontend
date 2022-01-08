@@ -14,24 +14,18 @@
 
     .groupDate {
       padding-left: 24px;
-      font-family: var(--font-regular);
       font-size: 14px;
       line-height: 1.38;
-      color: var(--theme-navbar-color);
+      color: var(--yoroi-palette-gray-600);
     }
   }
 
   .list {
     margin-bottom: 20px;
-  
+
     &:last-child {
       margin: 0;
     }
-  }
-
-  .showMoreTransactionsButton {
-    display: block !important;
-    margin: 30px auto;
   }
 }
 

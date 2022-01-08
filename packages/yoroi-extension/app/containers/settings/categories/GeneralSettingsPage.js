@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -10,16 +10,31 @@ import ThemeSettingsBlock from '../../../components/settings/categories/general-
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
-import type { Theme } from '../../../themes';
+import type { Theme } from '../../../styles/utils';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 
 type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
+  switchWallet: (PublicDeriver<>) => void = publicDeriver => {
+    this.generated.actions.router.goToRoute.trigger({
+      route: this.generated.stores.app.currentRoute,
+      publicDeriver,
+    });
+  };
+
+  handleSwitchToFirstWallet: void => void = () => {
+    const selectedWallet = this.generated.stores.wallets.selected;
+    if (selectedWallet == null) {
+      const wallets = this.generated.stores.wallets.publicDerivers;
+      const firstWallet = wallets[0];
+      this.switchWallet(firstWallet);
+    }
+  };
 
   render(): Node {
     const profileStore = this.generated.stores.profile;
-
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const { currentTheme } = profileStore;
 
@@ -34,8 +49,8 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         />
         <ThemeSettingsBlock
           currentTheme={currentTheme}
+          switchToFirstWallet={this.handleSwitchToFirstWallet}
           selectTheme={this.generated.actions.profile.updateTheme.trigger}
-          getThemeVars={this.generated.stores.profile.getThemeVars}
           exportTheme={this.generated.actions.profile.exportTheme.trigger}
           hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
           onExternalLinkClick={handleExternalLinkClick}
@@ -49,37 +64,47 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     actions: {|
       profile: {|
         exportTheme: {|
-          trigger: (params: void) => Promise<void>
+          trigger: (params: void) => Promise<void>,
         |},
         updateLocale: {|
           trigger: (params: {|
-            locale: string
-          |}) => Promise<void>
+            locale: string,
+          |}) => Promise<void>,
         |},
         updateTheme: {|
           trigger: (params: {|
-            theme: string
-          |}) => Promise<void>
-        |}
-      |}
+            theme: string,
+          |}) => Promise<void>,
+        |},
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
+      app: {| currentRoute: string |},
       profile: {|
         LANGUAGE_OPTIONS: Array<LanguageType>,
         currentLocale: string,
         currentTheme: Theme,
-        getThemeVars: ({| theme: string |}) => {
-          [key: string]: string,
-          ...
-        },
         hasCustomTheme: void => boolean,
         setProfileLocaleRequest: {|
           error: ?LocalizableError,
-          isExecuting: boolean
-        |}
-      |}
-    |}
-    |} {
+          isExecuting: boolean,
+        |},
+      |},
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        publicDerivers: Array<PublicDeriver<>>,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -90,6 +115,9 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     const profileStore = stores.profile;
     return Object.freeze({
       stores: {
+        app: {
+          currentRoute: stores.app.currentRoute,
+        },
         profile: {
           setProfileLocaleRequest: {
             isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
@@ -98,8 +126,11 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           currentLocale: profileStore.currentLocale,
           currentTheme: profileStore.currentTheme,
-          getThemeVars: profileStore.getThemeVars,
           hasCustomTheme: profileStore.hasCustomTheme,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          publicDerivers: stores.wallets.publicDerivers,
         },
       },
       actions: {
@@ -107,6 +138,9 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           updateLocale: { trigger: actions.profile.updateLocale.trigger },
           updateTheme: { trigger: actions.profile.updateTheme.trigger },
           exportTheme: { trigger: actions.profile.exportTheme.trigger },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
     });

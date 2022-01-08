@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Element, Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -8,23 +8,29 @@ import styles from './WalletRecoveryPhraseMnemonic.scss';
 type Props = {|
   +phrase: string | Element<any>,
   +classicTheme: boolean,
-  +filled?: boolean
+  +filled?: boolean,
+  +phraseDoesNotMatch?: string,
 |};
 
 @observer
 export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
-  static defaultProps: {|filled: void|} = {
-    filled: undefined
+  static defaultProps: {|filled: void, phraseDoesNotMatch: string |} = {
+    filled: undefined,
+    phraseDoesNotMatch: ''
   }
 
   render(): Node {
-    const { phrase, filled } = this.props;
+    const { phrase, filled, phraseDoesNotMatch } = this.props;
     const componentClasses = classnames([
       styles.component,
-      filled === true ? styles.filled : ''
+      filled === true ? styles.filled : '',
+      phraseDoesNotMatch ? styles.phraseDoesNotMatch : '',
     ]);
     return (
-      <div className={componentClasses}>{phrase}</div>
+      <div>
+        <div className={componentClasses}>{phrase}</div>
+        <p className={styles.errorText}>{phraseDoesNotMatch}</p>
+      </div>
     );
   }
 

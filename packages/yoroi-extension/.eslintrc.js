@@ -47,6 +47,8 @@ module.exports = {
     'promise/always-return': 2,
     'promise/catch-or-return': 2,
     'promise/no-native': 0,
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
     'react/button-has-type': 1,
     'react/destructuring-assignment': 0,
     'react/no-array-index-key': 1,

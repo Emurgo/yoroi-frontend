@@ -1,7 +1,11 @@
 .infoBlock {
-  font-family: var(--font-regular);
+  font-weight: 400;
   font-size: 15px;
   opacity: 0.7;
   text-align: center;
   padding: 10px 0 0 0;
+}
+
+.includeTxIds {
+  margin-top: 20px;
 }

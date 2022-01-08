@@ -1,12 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import Card from './Card';
 import styles from './UserSummary.scss';
 import IconAda from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
@@ -31,10 +30,6 @@ const messages = defineMessages({
   title: {
     id: 'wallet.dashboard.summary.title',
     defaultMessage: '!!!Your Summary',
-  },
-  delegatedLabel: {
-    id: 'wallet.dashboard.summary.delegatedTitle',
-    defaultMessage: '!!!Total Delegated',
   },
   note: {
     id: 'wallet.dashboard.summary.note',
@@ -150,11 +145,13 @@ export default class UserSummary extends Component<Props, State> {
           <div className={styles.footer}>
             {this.props.withdrawRewards != null && (
               <Button
-                className={classnames(styles.actionButton, 'secondary', 'withdrawButton')}
-                label={intl.formatMessage(globalMessages.withdrawLabel)}
+                className="withdrawButton"
+                variant="secondary"
                 onClick={this.props.withdrawRewards}
-                skin={ButtonSkin}
-              />
+                sx={{ height: '46px', width: '144px' }}
+              >
+                {intl.formatMessage(globalMessages.withdrawLabel)}
+              </Button>
             )}
             <div
               className={styles.note}
@@ -255,7 +252,7 @@ export default class UserSummary extends Component<Props, State> {
           <div className={styles.cardContent}>
             <div>
               <div className={styles.delegatedHeader}>
-                <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+                <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalDelegated)}:</h3>
                 <div className={styles.mangledSection}>
                   {mangledWarningIcon}
                 </div>
@@ -327,17 +324,17 @@ export default class UserSummary extends Component<Props, State> {
 
   formatTokenEntry: TokenEntry => Node = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    const splitAmount = tokenEntry.amount
+    const tokenAmount = tokenEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-      .toFormat(tokenInfo.Metadata.numberOfDecimals)
-      .split('.');
-
+      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
+      .toString();
+    const splitAmount = tokenAmount.split('.');
     const amountNode = this.props.shouldHideBalance
       ? <>{hiddenAmount}</>
       : (
         <>
           {splitAmount[0]}
-          <span className={styles.decimal}>.{splitAmount[1]} </span>
+          <span className={styles.decimal}>{splitAmount[1] ? '.' + splitAmount[1] : null} </span>
         </>
       );
     return (

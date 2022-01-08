@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -37,6 +37,7 @@ type Props = {|
   +onCardano: void => void,
   +onCardanoTestnet: void => void,
   +onErgo: void | (void => void),
+  +onAlonzoTestnet: void => void,
   +onExternalLinkClick: MouseEvent => void,
 |};
 
@@ -81,6 +82,24 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 type="cardanoTestnet"
                 title="Cardano Testnet"
                 onSubmit={this.props.onCardanoTestnet}
+                learnMoreText={
+                  <>
+                    {intl.formatMessage(messages.testnetDescription)}<br />
+                    <a
+                      href="https://testnets.cardano.org/"
+                      onClick={event => this.props.onExternalLinkClick(event)}
+                    >
+                      {intl.formatMessage(globalMessages.learnMore)}
+                    </a>
+                  </>}
+              />
+            }
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+              <OptionBlock
+                parentName="PickCurrencyOptionDialog"
+                type="alonzoWhiteTestnet"
+                title="Alonzo White Testnet"
+                onSubmit={this.props.onAlonzoTestnet}
                 learnMoreText={
                   <>
                     {intl.formatMessage(messages.testnetDescription)}<br />

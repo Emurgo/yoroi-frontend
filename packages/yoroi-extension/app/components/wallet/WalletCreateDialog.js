@@ -1,9 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
+import TextField from '../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -13,7 +13,6 @@ import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from 
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
-import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -68,7 +67,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   }
 
   // $FlowFixMe[value-as-type]
-  walletNameInput: Input;
+  walletNameInput: TextField;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -194,35 +193,33 @@ export default class WalletCreateDialog extends Component<Props, State> {
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
       >
-        <Input
+        <TextField
           className="walletName"
           onKeyPress={this.checkForEnterKey.bind(this)}
-          inputRef={(input) => { this.walletNameInput = input; }}
+          inputRef={input => {
+            this.walletNameInput = input;
+          }}
           {...walletNameField.bind()}
           done={walletNameField.isValid}
           error={walletNameField.error}
-          skin={InputOwnSkin}
         />
 
         <div className={styles.walletPassword}>
           <div className={walletPasswordFieldsClasses}>
-            <Input
+            <TextField
               className="walletPassword"
               {...walletPasswordField.bind()}
               done={walletPasswordField.isValid}
               error={walletPasswordField.error}
-              skin={InputOwnSkin}
             />
-            <Input
+            <TextField
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
               done={repeatPassword && repeatedPasswordField.isValid}
               error={repeatedPasswordField.error}
-              skin={InputOwnSkin}
             />
           </div>
         </div>
-
       </Dialog>
     );
   }

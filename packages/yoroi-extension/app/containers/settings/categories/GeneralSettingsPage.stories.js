@@ -1,16 +1,14 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 
 import { boolean } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { LANGUAGES } from '../../../i18n/translations';
 import GeneralSettingsPage from './GeneralSettingsPage';
 import { withScreenshot } from 'storycap';
-import { globalKnobs, } from '../../../../stories/helpers/StoryWrapper';
+import { globalKnobs } from '../../../../stories/helpers/StoryWrapper';
 import { walletLookup } from '../../../../stories/helpers/WalletCache';
-import { getVarsForTheme } from '../../../stores/base/BaseProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
@@ -30,7 +28,8 @@ export const Generic = (): Node => {
       selected: null,
       ...lookup,
     }),
-    (<GeneralSettingsPage
+    // $FlowFixMe[incompatible-type]: extra props added for revamp
+    <GeneralSettingsPage
       generated={{
         stores: {
           profile: {
@@ -41,19 +40,18 @@ export const Generic = (): Node => {
             LANGUAGE_OPTIONS: LANGUAGES,
             currentLocale: globalKnobs.locale(),
             currentTheme: globalKnobs.currentTheme(),
-            getThemeVars: getVarsForTheme,
             hasCustomTheme: () => boolean('hasCustomTheme', false),
           },
         },
         actions: {
           profile: {
-            updateLocale: { trigger: async (req) => action('updateLocale')(req) },
-            updateTheme: { trigger: async (req) => action('updateTheme')(req) },
-            exportTheme: { trigger: async (req) => action('exportTheme')(req) },
+            updateLocale: { trigger: async req => action('updateLocale')(req) },
+            updateTheme: { trigger: async req => action('updateTheme')(req) },
+            exportTheme: { trigger: async req => action('exportTheme')(req) },
           },
         },
       }}
-    />)
+    />
   );
 };
 

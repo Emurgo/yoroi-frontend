@@ -16,6 +16,7 @@ export const ROUTES = {
     ADD: '/wallets/add',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',
+    ASSETS: '/wallets/assets',
     RECEIVE: {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',
@@ -23,7 +24,7 @@ export const ROUTES = {
     DELEGATION_DASHBOARD: '/wallets/delegation-dashboard',
     ADAPOOL_DELEGATION_SIMPLE: '/wallets/delegation-simple',
     CARDANO_DELEGATION: '/wallets/cardano-delegation',
-    CATALYST_VOTING: '/wallets/voting'
+    CATALYST_VOTING: '/wallets/voting',
   },
   SETTINGS: {
     ROOT: '/settings',
@@ -44,9 +45,6 @@ export const ROUTES = {
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
   },
-  STAKING: {
-    ROOT: '/staking'
-  },
   OAUTH_FROM_EXTERNAL: {
     DROPBOX: '/foo', // TODO: think about this. GET params don't work well with react-router I think
     // DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
@@ -54,4 +52,16 @@ export const ROUTES = {
   NOTICE_BOARD: {
     ROOT: '/notice-board',
   },
+  // revamp
+  STAKING: '/staking',
+  ASSETS: {
+    ROOT: '/assets',
+    TOKENS: '/assets/tokens',
+    TOKEN_DETAILS: '/assets/tokens/:tokenId',
+    NFTS: '/assets/nfts',
+    NFT_DETAILS: '/assets/nfts/:nftId'
+  },
+  DAPP_CONNECTOR: {
+    CONNECTED_WEBSITES: '/connector/connected-websites'
+  }
 };

@@ -1,13 +1,23 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
+
 export function splitAmount(
   amount: BigNumber,
   decimalPlaces: number,
 ): [string, string] {
+  if (decimalPlaces === 0) {
+    return [amount.toFormat(0), '']
+  }
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
-  return [valString.substring(0, startIndex), valString.substring(startIndex)];
+  let beforeDecimal = valString.substring(0, startIndex)
+  const afterDecimal = valString.substring(startIndex).replace(/0+$/, '')
+  // Remove the dots if no decimals
+  if (!afterDecimal) {
+    beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
+  }
+  return [beforeDecimal, afterDecimal]
 }
 
 export const maxNameLengthBeforeTruncation = 15;
@@ -88,8 +98,8 @@ export function truncateAddress(addr: string): string {
  * Avoid using this when possible
  * Since the length is too small for some bech32 prefixes
  */
-export function truncateAddressShort(addr: string): string {
-  return truncateFormatter(addr, 20);
+export function truncateAddressShort(addr: string, by: ?number): string {
+  return truncateFormatter(addr, by ?? 20);
 }
 
 /**

@@ -298,6 +298,7 @@ export function convertAdaTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
+        id: tx.transaction.Hash,
       });
     }
   }
@@ -371,6 +372,7 @@ export function asAddressedUtxo(
         tokens: [],
       }
     );
+
 
     const assets = tokenTypes.tokens.map(token => {
       const pieces = identifierToCardanoAsset(token.tokenId);

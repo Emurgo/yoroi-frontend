@@ -8,10 +8,11 @@ import type {
 import type {
   CardanoAddress,
   CardanoPublicKey,
-  CardanoSignedTx,
+  CardanoSignedTxData,
   CardanoGetPublicKey,
   CardanoAddressParameters,
   CardanoGetAddress,
+  CardanoSignedTxWitness,
 } from 'trezor-connect/lib/types/networks/cardano';
 import type { Success, } from 'trezor-connect/lib/types/params';
 import { ADDRESS_TYPE, CERTIFICATE_TYPE } from './lib/constants/cardano';
@@ -83,6 +84,9 @@ function deriveAddress(
   rootKey: RustModule.WalletV4.Bip32PrivateKey,
   request: CardanoGetAddress,
 ): RustModule.WalletV4.Address {
+  if (!request.addressParameters.path) {
+    throw new Error('unexpected address parameter');
+  }
   const spendingKey = derivePath(rootKey, toPath(request.addressParameters.path));
 
   if (request.addressParameters.addressType === ADDRESS_TYPE.Byron) {
@@ -189,10 +193,13 @@ class MockTrezorConnect {
       const selectedWallet = MockTrezorConnect.selectedWallet;
       const address = deriveAddress(selectedWallet.rootKey, request);
 
+      if (!request.addressParameters.path) {
+        throw new Error('unexpected address parameter');
+      }
       const arrayPath = toPath(request.addressParameters.path);
       const serializedPath = typeof request.addressParameters.path === 'string'
         ? request.addressParameters.path
-        : toDerivationPathString(request.addressParameters.path);
+        : toDerivationPathString(arrayPath);
 
       const serializedStakingPath = request.addressParameters.stakingPath != null
         ? toDerivationPathString(toPath(request.addressParameters.stakingPath))
@@ -278,15 +285,15 @@ class MockTrezorConnect {
     const witGens: Array<RustModule.WalletV4.TransactionHash => void> = [];
 
     const seenBootstrapKeys = new Set<string>();
-    const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
     const seenVkeyWits = new Set<string>();
-    const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
+    const witnessesToReturn: Array<CardanoSignedTxWitness> = [];
 
     const addWitness: (
       Array<number>,
       RustModule.WalletV4.Bip32PrivateKey,
       RustModule.WalletV4.TransactionHash
     ) => void = (path, key, hash) => {
+      const pubKey = Buffer.from(key.to_raw_key().to_public().as_bytes()).toString('hex');
       const vkey = RustModule.WalletV4.Vkey.new(key.to_raw_key().to_public());
       const sig = key.to_raw_key().sign(Buffer.from(hash.to_bytes()));
       if (path[0] === WalletTypePurpose.BIP44) {
@@ -305,7 +312,12 @@ class MockTrezorConnect {
           return;
         }
         seenBootstrapKeys.add(asString);
-        bootstrapWits.add(bootstrapWit);
+        witnessesToReturn.push({
+          type: 0,
+          pubKey,
+          signature: asString,
+          chainCode: Buffer.from(key.chaincode()).toString('hex'),
+        });
         return;
       }
       const witness = RustModule.WalletV4.Vkeywitness.new(
@@ -317,7 +329,11 @@ class MockTrezorConnect {
         return;
       }
       seenVkeyWits.add(witAsStr);
-      vkeyWits.add(witness);
+      witnessesToReturn.push({
+        type: 1,
+        pubKey,
+        signature: witAsStr,
+      });
     };
 
     const inputs = RustModule.WalletV4.TransactionInputs.new();
@@ -404,20 +420,27 @@ class MockTrezorConnect {
       body.set_certs(certs);
     }
 
-    const metadata = request.auxiliaryData?.blob != null
-      ? RustModule.WalletV4.TransactionMetadata.from_bytes(
-        Buffer.from(request.auxiliaryData.blob, 'hex')
-      )
-      : undefined;
-    if (metadata != null) {
-      body.set_metadata_hash(RustModule.WalletV4.hash_metadata(metadata));
+    const auxDataHash = request.auxiliaryData?.hash;
+    if (auxDataHash != null) {
+      body.set_auxiliary_data_hash(
+        RustModule.WalletV4.AuxiliaryDataHash.from_bytes(
+          Buffer.from(auxDataHash, 'hex')
+        )
+      );
+    }
+    if (request.auxiliaryData?.catalystRegistrationParameters) {
+      throw new Error('not implemented');
     }
     if (request.withdrawals != null && request.withdrawals.length > 0) {
       const withdrawalRequest = request.withdrawals;
       const withdrawals = RustModule.WalletV4.Withdrawals.new();
       for (const withdrawal of withdrawalRequest) {
-        const stakingKey = derivePath(selectedWallet.rootKey, toPath(withdrawal.path));
-        witGens.push((hash) => addWitness(toPath(withdrawal.path), stakingKey, hash));
+        if (!withdrawal.path) {
+          throw new Error('unexpected withdrawal parameter');
+        }
+        const arrayPath = toPath(withdrawal.path);
+        const stakingKey = derivePath(selectedWallet.rootKey, arrayPath);
+        witGens.push((hash) => addWitness(arrayPath, stakingKey, hash));
 
         const rewardAddress = RustModule.WalletV4.RewardAddress.new(
           request.networkId,
@@ -438,29 +461,16 @@ class MockTrezorConnect {
       witGen(txBodyHash);
     }
 
-    const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
-    if (bootstrapWits.len() > 0) {
-      witSet.set_bootstraps(bootstrapWits);
-    }
-    if (vkeyWits.len() > 0) {
-      witSet.set_vkeys(vkeyWits);
-    }
     // TODO: handle scripts
 
-    const fullTx = RustModule.WalletV4.Transaction.new(
-      body,
-      witSet,
-      metadata,
-    );
-    const result = ({
-      success: (true: true),
+    return ({
+      success: true,
       id: 0,
       payload: {
         hash: Buffer.from(txBodyHash.to_bytes()).toString('hex'),
-        serializedTx: Buffer.from(fullTx.to_bytes()).toString('hex'),
+        witnesses: witnessesToReturn,
       },
-    }: Success<CardanoSignedTx>);
-    return result;
+    }: Success<CardanoSignedTxData>) ;
   };
 
   static manifest: $PropertyType<API, 'manifest'> = (_data) => {

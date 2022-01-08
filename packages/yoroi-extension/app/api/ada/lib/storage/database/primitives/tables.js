@@ -319,6 +319,8 @@ export type CardanoShelleyTransactionInsert = {|
     Fee: string,
     Ttl?: string,
     Metadata: null | string,
+    // note if this field is not present, the tx is *valid*
+    IsValid?: boolean,
   |},
   ...TransactionInsertBase,
 |};
@@ -467,6 +469,19 @@ export const AddressMappingSchema: {|
   }
 };
 
+export type CardanoAssetMintMetadata = {|
+  // transaction_metadatum_label: 721 for NFTs
+  // See CIP 721
+  // https://github.com/cardano-foundation/CIPs/blob/8b1f2f0900d81d6233e9805442c2b42aa1779d2d/CIP-NFTMetadataStandard.md
+  ...{[key: string]: {|
+    // policy ID
+    ...{[key: string]: {|
+      // asset name
+      ...{[key: string]: any}
+    |}}
+  |}}
+|}
+
 export type CommonMetadata = {|
   numberOfDecimals: number,
   ticker: null | string,
@@ -497,6 +512,7 @@ export type TokenMetadata = {|
   // empty string for ADA
   +assetName: string,
   ...CommonMetadata,
+  +assetMintMetadata?: ?Array<CardanoAssetMintMetadata | any> | any
 |};
 
 export type TokenInsert = {|
@@ -511,6 +527,7 @@ export type TokenInsert = {|
    * As some blockchains have multiple primary tokens
   */
   Identifier: string,
+  IsNFT?: boolean,
   Metadata: TokenMetadata,
 |};
 export type TokenUpsertWithDigest = TokenInsert | {|
@@ -529,6 +546,7 @@ export const TokenSchema: {|
   name: 'Token',
   properties: {
     TokenId: 'TokenId',
+    IsNFT: 'IsNFT',
     IsDefault: 'IsDefault',
     NetworkId: 'NetworkId',
     Digest: 'Digest',
@@ -583,6 +601,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Network Table
   schemaBuilder.createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
+    .addColumn(NetworkSchema.properties.NetworkName, Type.STRING)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
     .addColumn(NetworkSchema.properties.Backend, Type.OBJECT)
     .addColumn(NetworkSchema.properties.BaseConfig, Type.OBJECT)
@@ -829,6 +848,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(TokenSchema.properties.IsDefault, Type.BOOLEAN)
+    .addColumn('IsNFT', Type.BOOLEAN)
     .addColumn(TokenSchema.properties.Identifier, Type.STRING)
     .addColumn(TokenSchema.properties.Digest, Type.NUMBER)
     .addColumn(TokenSchema.properties.Metadata, Type.OBJECT)

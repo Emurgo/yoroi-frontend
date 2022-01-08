@@ -10,31 +10,30 @@
   }
 
   .optionBlockWrapper {
-    font-family: var(--font-regular);
+    font-weight: 400;
     letter-spacing: 0;
-  
+
     // TITLE BLOCK
     .optionSubmitButton {
-      font-family: var(--font-regular);
+      font-weight: 400;
       display: flex;
       align-items: center;
       padding: 11px 30px;
-      background-color: var(--cmn-color-white);
+      background-color: var(--yoroi-palette-common-white);
       width: 100%;
       cursor: pointer;
       transition: 100ms;
       border-radius: 8px;
-  
+
       .optionTitle {
         font-size: 18px;
         line-height: 22px;
-        color: var(--theme-wallet-add-option-dialog-item-title-color);
+        color: var(--yoroi-wallet-add-option-dialog-item-title-color);
         text-align: left;
-        font-family: var(--font-medium);
-        font-weight: var(--font-semibold);
+        font-weight: 500;
         transition: 100ms;
       }
-  
+
       .optionImage {
         width: 70px;
         flex: 0 0 70px;
@@ -53,15 +52,15 @@
     // LEARN MORE TEXT BLOCK
     .learnMoreTextBlock {
       a {
-        @include underline(var(--theme-underline-dark-color));
-        color: var(--theme-wallet-add-option-dialog-item-title-color);
+        @include underline(var(--yoroi-palette-gray-800));
+        color: var(--yoroi-wallet-add-option-dialog-item-title-color);
       }
 
       overflow: hidden;
       max-height: 0;
       transition: 300ms linear;
       will-change: height;
-      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-block-bg-color);
+      background-color: var(--yoroi-palette-gray-50);
 
       .learnMoreTextWrapper {
         padding: 20px 40px 15px;
@@ -69,7 +68,7 @@
         .learnMoreText {
           font-size: 14px;
           line-height: 22px;
-        }        
+        }
       }
 
       &.showlearnMore {
@@ -80,8 +79,8 @@
 
     // LEARN MORE BUTTON
     .learnMoreButton {
-      color: var(--theme-wallet-add-option-dialog-item-learn-more-button-color);
-      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-button-bg-color);
+      color: var(--yoroi-palette-gray-400);
+      background-color: var(--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color);
       display: block;
       font-size: 14px;
       text-align: center;
@@ -93,17 +92,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-regular);
+      font-weight: 400;
       transition: 100ms;
-    
+
       &:hover {
-        box-shadow: 0 8px 10px 0px rgba(24,26,30, .06);
+        box-shadow: 0 8px 10px 0px rgba(24, 26, 30, 0.06);
       }
-    
+
       svg {
         transition: 300ms;
       }
-    
+
       &.arrowUp {
         svg {
           transform: rotate(180deg);
@@ -114,7 +113,7 @@
         margin-left: 5px;
         margin-top: 3px;
         line-height: normal;
-      }      
+      }
     }
   }
 }
@@ -125,10 +124,10 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--theme-default-main-color); 
+            color: var(--yoroi-palette-secondary-300);
           }
         }
-        
+
         .optionImage {
           &.cardano {
             background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
@@ -146,6 +145,9 @@
             background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
             background-position: center 15px !important;
             background-size: 50px;
+          }
+          &.alonzoWhiteTestnet {
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
@@ -191,7 +193,76 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--theme-default-color-blue); 
+            color: var(--yoroi-palette-primary-300);
+          }
+        }
+
+        .optionImage {
+          &.cardano {
+            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
+          }
+          &.cardanoTestnet {
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+          }
+          &.ergo {
+            background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
+          }
+          &.legacyDaedalus {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
+          }
+          &.masterKey {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
+            background-position: center 15px !important;
+            background-size: 50px;
+          }
+          &.alonzoWhiteTestnet {
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+          }
+          // CONNECT HARDWARE WALLET
+          &.connectLedger {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
+          }
+
+          &.connectTrezor {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
+          }
+
+          // CREATE WALLET
+          &.createWallet {
+            background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
+          }
+
+          // RESTORE WALLET
+          &.restoreNormalWallet {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
+          }
+          &.normal24WordWallet {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
+          }
+          &.restorePaperWallet {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
+          }
+          &.bgByronMainnet {
+            background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
+            background-position: center 20px !important;
+          }
+          &.bgShelleyMainnet {
+            background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
+            background-position: center 20px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+:global(.YoroiRevamp) {
+  .optionBlockListItem {
+    .optionBlockWrapper {
+      .optionSubmitButton {
+        &:hover {
+          .optionTitle {
+            color: var(--yoroi-palette-primary-300);
           }
         }
 
@@ -217,7 +288,7 @@
           &.connectLedger {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
           }
-      
+
           &.connectTrezor {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
           }
@@ -226,7 +297,7 @@
           &.createWallet {
             background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
           }
-        
+
           // RESTORE WALLET
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);

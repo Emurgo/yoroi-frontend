@@ -1,6 +1,6 @@
 // @flow
-import type { Node } from 'react'
-import React, { Component } from 'react'
+import type { Node, ComponentType } from 'react'
+import { Component } from 'react'
 import { computed } from 'mobx'
 import { observer } from 'mobx-react'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl'
@@ -10,7 +10,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType'
 import MyWallets from '../../components/wallet/my-wallets/MyWallets'
 import TopBarLayout from '../../components/layout/TopBarLayout'
 
-import WalletsList from '../../components/wallet/my-wallets/WalletsList'
 import WalletRow from '../../components/wallet/my-wallets/WalletRow'
 import WalletDetails from '../../components/wallet/my-wallets/WalletDetails'
 import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency'
@@ -45,13 +44,20 @@ import BuySellDialog from '../../components/buySell/BuySellDialog';
 import type { WalletInfo } from '../../components/buySell/BuySellDialog';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks'
+import NavBarRevamp from '../../components/topbar/NavBarRevamp'
+import { withLayout } from '../../styles/context/layout'
+import type { LayoutComponentMap } from '../../styles/context/layout'
+import { Box } from '@mui/system'
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
 type Props = InjectedOrGenerated<GeneratedData>
 
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class MyWalletsPage extends Component<Props> {
+class MyWalletsPage extends Component<AllProps> {
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
@@ -98,7 +104,7 @@ export default class MyWalletsPage extends Component<Props> {
     const { stores } = this.generated;
     const { uiDialogs } = stores;
 
-    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
 
     const wallets = this.generated.stores.wallets.publicDerivers;
 
@@ -106,27 +112,40 @@ export default class MyWalletsPage extends Component<Props> {
       <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />
     );
 
-    const navbarElement = (
+    const navbarElementClassic = (
       <NavBar
         title={navbarTitle}
-        button={<NavBarAddButton onClick={
-          () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
-        }
-        />}
-        buyButton={
-          <BuySellAdaButton onBuySellClick={() =>
-            (this.openDialogWrapper(BuySellDialog))
-          }
+        button={
+          <NavBarAddButton
+            onClick={() =>
+              this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+            }
           />
         }
-        walletDetails={undefined}
+        buyButton={
+          <BuySellAdaButton onBuySellClick={() => this.openDialogWrapper(BuySellDialog)} />
+        }
       />
     );
 
+    const navbarElementRevamp = (
+      <NavBarRevamp
+        title={navbarTitle}
+        buyButton={
+          <BuySellAdaButton onBuySellClick={() => this.openDialogWrapper(BuySellDialog)} />
+        }
+      />
+    );
+
+    const navbarElement = this.props.renderLayoutComponent({
+      CLASSIC: navbarElementClassic,
+      REVAMP: navbarElementRevamp,
+    });
+
     const walletsList = (
-      <WalletsList>
+      <Box flex={1}>
         {wallets.map(wallet => this.generateRow(wallet))}
-      </WalletsList>
+      </Box>
     );
 
     let activeDialog = null;
@@ -479,3 +498,4 @@ export default class MyWalletsPage extends Component<Props> {
     });
   }
 }
+export default (withLayout(MyWalletsPage): ComponentType<Props>);

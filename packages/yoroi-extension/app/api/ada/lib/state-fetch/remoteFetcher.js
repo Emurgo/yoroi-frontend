@@ -23,6 +23,10 @@ import type {
   TxBodiesResponse,
   UtxoSumRequest,
   UtxoSumResponse,
+  CatalystRoundInfoRequest,
+  CatalystRoundInfoResponse,
+  MultiAssetMintMetadataRequest,
+  MultiAssetMintMetadataResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -35,6 +39,7 @@ import {
   GetAccountStateApiError,
   GetBestBlockError,
   GetPoolInfoApiError,
+  GetCatalystRoundInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
@@ -378,33 +383,73 @@ export class RemoteFetcher implements IFetcher {
         method: 'get',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
       }
-    ).then(response => response.data)
+    ).then(response => ({ error: null, data: response.data }))
       .catch((error) => {
-        if (error.response.status) {
-          Logger.info(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} 404: no token meta found for subject: ` + id);
-        } else {
-          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
+        if (error.response?.status === 404) {
+          return { error: 'noMetadata', data: id };
         }
-        return null;
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
+        return { error: 'fail', data: null };
       }));
+    // return the mapping from query id/subject to token info
+    // if there is no info about a token (not an error), the value is null
+    // if there is an error querying a token, the key is not present
     return (await Promise.all(promises)).reduce((res, resp) => {
-      if (resp?.subject) {
+      if (resp.error === 'noMetadata') {
+        res[resp.data] = null;
+      } else if (!resp.error && resp.data.subject) {
         const v = {};
-        if (resp.name?.value) {
-          v.name = resp.name.value;
+        if (resp.data.name?.value) {
+          v.name = resp.data.name.value;
         }
-        if (resp.decimals?.value) {
-          v.decimals = resp.decimals.value;
+        if (resp.data.decimals?.value) {
+          v.decimals = resp.data.decimals.value;
         }
-        if (resp.ticker?.value) {
-          v.ticker = resp.ticker.value;
+        if (resp.data.ticker?.value) {
+          v.ticker = resp.data.ticker.value;
         }
         if (v.name || v.decimals || v.ticker) {
-          res[resp.subject] = v;
+          res[resp.data.subject] = v;
         }
 
       }
       return res;
     }, {});
+  }
+
+  getCatalystRoundInfo: CatalystRoundInfoRequest =>
+    Promise<CatalystRoundInfoResponse> = async (body) =>
+  {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
+    return await axios(
+      `${BackendService}/api/v0/catalyst/fundInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
+  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+    => Promise<MultiAssetMintMetadataResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
+      return await axios(
+        `${BackendService}/api/multiAsset/metadata`,
+        {
+          method: 'post',
+          data: {
+            assets: body.assets
+          }
+        }
+      ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
+        return {};
+      });
   }
 }

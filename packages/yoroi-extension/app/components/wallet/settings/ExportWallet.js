@@ -1,13 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
-import classNames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './ExportWallet.scss';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export const messages: * = defineMessages({
@@ -27,32 +25,27 @@ type Props = {|
 
 @observer
 export default class ExportWallet extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
 
-    const buttonClassNames = classNames([
-      'primary',
-      styles.submitButton,
-      'exportWallet' // classname for UI tests
-    ]);
     return (
       <div className={styles.component}>
         <h2>{intl.formatMessage(messages.titleLabel)}</h2>
 
-        <p>
-          {intl.formatMessage(messages.exportExplanation)}
-        </p>
+        <p>{intl.formatMessage(messages.exportExplanation)}</p>
 
         <Button
-          className={buttonClassNames}
-          label={`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
-          skin={ButtonSkin}
+          variant="primary"
+          className="exportWallet"
           onClick={this.props.openDialog}
-        />
+          sx={{ marginTop: '20px', width: '400px' }}
+        >
+          {`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
+        </Button>
       </div>
     );
   }

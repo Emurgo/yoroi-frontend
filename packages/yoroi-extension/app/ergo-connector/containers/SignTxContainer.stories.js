@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node, ComponentType } from 'react';
 import SignTxContainer from './SignTxContainer';
 import { withScreenshot } from 'storycap';
@@ -61,7 +60,7 @@ const message = (id: number) => ({
         creationHeight: 1,
         ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
           '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
-        ).to_ergo_tree().to_bytes()).toString('hex'),
+        ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
         assets: [],
         additionalRegisters: Object.freeze({}),
       }],
@@ -72,7 +71,7 @@ const message = (id: number) => ({
         value: '1234567',
         ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
           '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
-        ).to_ergo_tree().to_bytes()).toString('hex'),
+        ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
         assets: [{
           amount: '12340',
           tokenId: tokenInfo.tokenId,
@@ -94,6 +93,7 @@ const genBaseProps: {|
     NetworkId: request.wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
     Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
     IsDefault: false,
+    IsNFT: false,
     Metadata: {
       type: 'Ergo',
       height: 0,
@@ -114,7 +114,7 @@ const genBaseProps: {|
       connector: {
         signingRequest: tentativeTx,
         signingMessage: message(request.wallet.publicDeriver.getPublicDeriverId()),
-        wallets: request.isLoading
+        filteredWallets: request.isLoading
           ? []
           : [{
             publicDeriver: request.wallet.publicDeriver,
@@ -131,6 +131,7 @@ const genBaseProps: {|
               TextPart: 'XLBS-6706',
             }
           }],
+        adaTransaction: null,
       },
       coinPriceStore: {
         getCurrentPrice: (_from, _to) => 5,

@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node, ComponentType } from 'react';
 import ConnectWebsitesContainer from './ConnectWebsitesContainer';
 import { withScreenshot } from 'storycap';
@@ -84,7 +83,7 @@ const genBaseProps: {|
       },
       connector: {
         currentConnectorWhitelist: request.whitelist,
-        wallets,
+        allWallets: wallets,
         errorWallets,
         loadingWallets: walletsState,
         activeSites,
@@ -123,10 +122,12 @@ export const Whitelisted = (): Node => {
           {
             url: 'google.com',
             publicDeriverId: 0,
+            image: '',
           },
           {
             url: 'yoroi.com',
             publicDeriverId: 1,
+            image: '',
           },
         ],
         wallet,

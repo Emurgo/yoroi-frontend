@@ -1,6 +1,6 @@
 // @flow
-import React, { Component } from 'react';
-import type { Node } from 'react';
+import { Component } from 'react';
+import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -21,10 +21,14 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  CoinTypes,
-} from '../../config/numbersConfig';
+import { CoinTypes } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+import SubMenu from '../../components/topbar/SubMenu';
+import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -33,32 +37,60 @@ type Props = {|
   +children?: Node,
 |};
 
-@observer
-export default class Transfer extends Component<Props> {
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedProps |};
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+@observer
+class Transfer extends Component<AllProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps: {|children: void|} = {
+  static defaultProps: {| children: void |} = {
     children: undefined,
   };
 
   render(): Node {
-    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
 
-    const navbar = (
+    const menu = (
+      <SubMenu
+        options={allSubcategoriesRevamp.map(category => ({
+          className: category.className,
+          label: this.context.intl.formatMessage(category.label),
+          route: category.route,
+        }))}
+        onItemClick={route => this.generated.actions.router.goToRoute.trigger({ route })}
+        isActiveItem={route => this.generated.stores.app.currentRoute.startsWith(route)}
+      />
+    );
+    const navbarClassic = (
       <NavBarContainer
         {...this.generated.NavBarContainerProps}
-        title={<NavBarTitle
-          title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)}
-        />}
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
+        }
       />
     );
 
+    const navbarRevamp = (
+      <NavBarContainerRevamp
+        {...this.generated.NavBarContainerRevampProps}
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />
+        }
+        menu={menu}
+      />
+    );
+
+    const navbar = this.props.renderLayoutComponent({
+      CLASSIC: navbarClassic,
+      REVAMP: navbarRevamp,
+    });
+
     return (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         navbar={navbar}
         sidebar={sidebarContainer}
         showInContainer
@@ -93,6 +125,7 @@ export default class Transfer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     WalletTransferPageProps: InjectedOrGenerated<WalletTransferPageData>,
     actions: {|
@@ -138,6 +171,9 @@ export default class Transfer extends Component<Props> {
       NavBarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<NavBarContainerData>
       ),
+      NavBarContainerRevampProps: (
+        { actions, stores, }: InjectedOrGenerated<NavBarContainerRevampData>
+      ),
       WalletTransferPageProps: (
         { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
       ),
@@ -145,3 +181,4 @@ export default class Transfer extends Component<Props> {
     });
   }
 }
+export default (withLayout(Transfer): ComponentType<Props>)

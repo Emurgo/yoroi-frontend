@@ -2,7 +2,7 @@
 @import '../../../themes/mixins/error-message';
 
 .dialog {
-  font-family: var(--font-medium);
+  font-weight: 500;
 
   :global {
     .Dialog_title {
@@ -15,22 +15,23 @@
   }
 
   .submitButtonSpinning {
-    @include loading-spinner("../../../assets/images/spinner-light.svg");
-  }  
+    @include loading-spinner('../../../assets/images/spinner-light.svg');
+  }
 
   .currencySymbol {
-    font-family: var(--font-light);
+    font-weight: 300;
     text-transform: uppercase;
   }
 
   .addressToLabelWrapper,
+  .txSizeWrapper,
   .amountFeesWrapper {
     margin-bottom: 20px;
   }
 
   .addressToLabel {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.5px;
     line-height: 1.38;
     margin-left: 10px;
@@ -41,6 +42,13 @@
     font-size: 15px;
     line-height: 1.38;
     margin-top: 6px;
+  }
+
+  .txSize {
+    font-size: 13px;
+    line-height: 1.28;
+    margin-top: 6px;
+    color: #b0b0b0;
   }
 
   .amountFeesWrapper {
@@ -63,7 +71,7 @@
     .amountLabel,
     .feesLabel {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
       letter-spacing: 0.5px;
       line-height: 1.38;
       margin-left: 10px;
@@ -87,7 +95,7 @@
 
   .totalAmountLabel {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.5px;
     line-height: 1.38;
     margin-left: 10px;
@@ -95,7 +103,7 @@
   }
 
   .totalAmount {
-    color: var(--theme-send-confirmation-dialog-send-values-color);
+    color: var(--yoroi-send-confirmation-dialog-send-values-color);
     line-height: 1.38;
     margin-top: 6px;
     word-break: break-word;
@@ -120,7 +128,7 @@
   .amountFeesWrapper {
     .amount,
     .fees {
-      color: var(--theme-send-confirmation-dialog-send-values-color);
+      color: var(--yoroi-send-confirmation-dialog-send-values-color);
     }
 
     .fees {
@@ -130,12 +138,12 @@
 }
 
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);  
-  font-family: var(--font-regular);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
+  font-weight: 400;
 
   .currencySymbol {
-    font-family: var(--font-regular);
+    font-weight: 400;
   }
 
   .addressToLabelWrapper,
@@ -199,12 +207,12 @@
   }
 
   .totalAmount {
-    font-family: var(--font-medium);
+    font-weight: 500;
     line-height: 1.57;
     margin-top: 2px;
 
     .currencySymbol {
-      font-family: var(--font-medium);
+      font-weight: 500;
     }
   }
 }

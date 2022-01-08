@@ -1,0 +1,37 @@
+.component {
+  color: var(--yoroi-palette-gray-600);
+  display: block;
+  text-align: left;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  padding: 6px 0px;
+  text-transform: uppercase;
+  border-bottom: 3px solid transparent;
+  width: initial;
+
+  &.active {
+    border-bottom-color: var(--yoroi-palette-secondary-300);
+    color: var(--yoroi-palette-secondary-300);
+    font-weight: 500;
+
+    &:hover {
+      border-bottom-color: var(--yoroi-palette-secondary-300);
+    }
+  }
+
+  & + .component {
+    margin-left: 43px;
+  }
+}
+
+.enabled {
+  &:hover {
+    color: var(--yoroi-palette-gray-900);
+    cursor: pointer;
+  }
+}
+
+.disabled {
+  color: var(--yoroi-palette-gray-200);
+}

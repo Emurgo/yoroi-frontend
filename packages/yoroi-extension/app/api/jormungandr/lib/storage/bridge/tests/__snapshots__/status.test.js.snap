@@ -908,6 +908,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -923,6 +924,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -938,6 +940,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "boxId": "",
           "description": null,
@@ -954,6 +957,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -964,6 +968,22 @@ Array [
         },
         "NetworkId": 300,
         "TokenId": 4,
+      },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 400,
+        "TokenId": 5,
       },
     ],
   },
@@ -2341,6 +2361,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -2356,6 +2377,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -2371,6 +2393,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "boxId": "",
           "description": null,
@@ -2387,6 +2410,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -2397,6 +2421,22 @@ Array [
         },
         "NetworkId": 300,
         "TokenId": 4,
+      },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 400,
+        "TokenId": 5,
       },
     ],
   },
@@ -3498,6 +3538,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -3513,6 +3554,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -3528,6 +3570,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "boxId": "",
           "description": null,
@@ -3544,6 +3587,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -3554,6 +3598,22 @@ Array [
         },
         "NetworkId": 300,
         "TokenId": 4,
+      },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 400,
+        "TokenId": 5,
       },
     ],
   },
@@ -4931,6 +4991,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -4946,6 +5007,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -4961,6 +5023,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "boxId": "",
           "description": null,
@@ -4977,6 +5040,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -4987,6 +5051,22 @@ Array [
         },
         "NetworkId": 300,
         "TokenId": 4,
+      },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 400,
+        "TokenId": 5,
       },
     ],
   },

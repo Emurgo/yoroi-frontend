@@ -21,6 +21,7 @@ import {
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
+  genGetMultiAssetMetadata
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -218,6 +219,7 @@ async function syncingSimpleTransaction(
   );
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
+  const getMultiAssetMetadata = genGetMultiAssetMetadata();
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -240,6 +242,7 @@ async function syncingSimpleTransaction(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     {
@@ -290,6 +293,7 @@ async function syncingSimpleTransaction(
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 assetName: '',
@@ -351,6 +355,7 @@ async function syncingSimpleTransaction(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     {
@@ -392,6 +397,7 @@ async function syncingSimpleTransaction(
             TransactionId: 2,
             Extra: {
               Fee: '100000',
+              IsValid: true,
               Metadata: null,
             },
           },
@@ -411,6 +417,7 @@ async function syncingSimpleTransaction(
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 assetName: '',
@@ -455,6 +462,7 @@ async function syncingSimpleTransaction(
             TransactionId: 2,
             Extra: {
               Fee: '100000',
+              IsValid: true,
               Metadata: null,
             },
           },
@@ -474,6 +482,7 @@ async function syncingSimpleTransaction(
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 assetName: '',

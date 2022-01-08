@@ -930,13 +930,26 @@ declare export class ErgoStateContext {
     * Encode Ergo tree as serialized bytes
     * @returns {Uint8Array}
     */
-    to_bytes(): Uint8Array;
+    sigma_serialize_bytes(): Uint8Array;
 
     /**
      * Returns Base16-encoded serialized bytes
      * @returns {string}
      */
     to_base16_bytes(): string;
+
+    /**
+     * Returns number
+     * @returns {number}
+     */
+    constants_len(): number;
+
+    /**
+     * Returns the constant
+     * @param {number} idx
+     * @returns {Constant}
+     */
+    get_constant(idx: number): Constant;
   }
   /**
   * Wrapper for i64 for JS/TS

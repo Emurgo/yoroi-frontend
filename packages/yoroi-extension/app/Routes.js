@@ -1,5 +1,4 @@
 // @flow
-import React from 'react';
 import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
@@ -31,6 +30,7 @@ import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
+import WalletAssetsPage from './containers/wallet/WalletAssetsPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
@@ -46,6 +46,14 @@ import ComplexityLevelSettingsPage from './containers/settings/categories/Comple
 import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
 import WalletSwitch from './containers/WalletSwitch';
+import StakingPage from './containers/wallet/staking/StakingPage';
+import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import TokensPageRevamp from './containers/wallet/TokensPageRevamp';
+import TokensDetailPageRevamp from './containers/wallet/TokenDetailPageRevamp';
+import NFTsPageRevamp from './containers/wallet/NFTsPageRevamp';
+import NFTDetailPageRevamp from './containers/wallet/NFTDetailPageRevamp';
+import ConnectedWebsitesPage from './containers/dapp-connector/ConnectedWebsitesContainer';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -94,8 +102,27 @@ export const Routes = (
       />
       <Route
         exact
+        path={ROUTES.STAKING}
+        component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.ASSETS.ROOT}
+        component={(props) => (
+          wrapAssets(
+            { ...props, stores, actions },
+            AssetsSubpages(stores, actions)
+          )
+        )}
+      />
+      <Route
+        exact
         path={ROUTES.WALLETS.ADD}
         component={(props) => <WalletAddPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
+        component={(props) => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         path={ROUTES.WALLETS.ROOT}
@@ -155,6 +182,10 @@ const WalletsSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.SEND}
       component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.WALLETS.ASSETS}
+      component={(props) => <WalletAssetsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
@@ -229,6 +260,31 @@ const SettingsSubpages = (stores, actions) => (
   </Switch>
 );
 
+const AssetsSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.ASSETS.TOKENS}
+      component={(props) => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.TOKEN_DETAILS}
+      component={(props) => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.NFTS}
+      component={(props) => <NFTsPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.NFT_DETAILS}
+      component={(props) => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.ASSETS.TOKENS} />
+  </Switch>
+);
 /* eslint-enable max-len */
 
 export function wrapSettings(
@@ -241,6 +297,19 @@ export function wrapSettings(
     >
       {children}
     </Settings>
+  );
+}
+
+export function wrapAssets(
+  assetsProps: InjectedOrGenerated<AssetsData>,
+  children: Node,
+): Node {
+  return (
+    <AssetsWrapper
+      {...assetsProps}
+    >
+      {children}
+    </AssetsWrapper>
   );
 }
 

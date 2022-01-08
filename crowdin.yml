@@ -15,6 +15,8 @@ files:
         id: id-ID
         es: es-ES
         it: it-IT
+        sk: sk-SK
+        cs: cs-CZ
   - source: /packages/yoroi-extension/app/i18n/locales/**/en-US.md
     translation: /packages/yoroi-extension/app/i18n/locales/**/%locale%.md
     languages_mapping:
@@ -30,4 +32,6 @@ files:
         id: id-ID
         es: es-ES
         it: it-IT
+        sk: sk-SK
+        cs: cs-CZ
     content_segmentation: 0
