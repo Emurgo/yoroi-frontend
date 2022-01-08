@@ -112,6 +112,7 @@ function Autocomplete({
             setInputValue('');
             addSelectedItem(selectedItem);
             closeMenu();
+            inputRef.current?.focus();
           }
           break;
         default:
