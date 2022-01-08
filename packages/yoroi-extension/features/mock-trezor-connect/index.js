@@ -84,6 +84,9 @@ function deriveAddress(
   rootKey: RustModule.WalletV4.Bip32PrivateKey,
   request: CardanoGetAddress,
 ): RustModule.WalletV4.Address {
+  if (!request.addressParameters.path) {
+    throw new Error('unexpected address parameter');
+  }
   const spendingKey = derivePath(rootKey, toPath(request.addressParameters.path));
 
   if (request.addressParameters.addressType === ADDRESS_TYPE.Byron) {
@@ -190,10 +193,13 @@ class MockTrezorConnect {
       const selectedWallet = MockTrezorConnect.selectedWallet;
       const address = deriveAddress(selectedWallet.rootKey, request);
 
+      if (!request.addressParameters.path) {
+        throw new Error('unexpected address parameter');
+      }
       const arrayPath = toPath(request.addressParameters.path);
       const serializedPath = typeof request.addressParameters.path === 'string'
         ? request.addressParameters.path
-        : toDerivationPathString(request.addressParameters.path);
+        : toDerivationPathString(arrayPath);
 
       const serializedStakingPath = request.addressParameters.stakingPath != null
         ? toDerivationPathString(toPath(request.addressParameters.stakingPath))
@@ -429,8 +435,12 @@ class MockTrezorConnect {
       const withdrawalRequest = request.withdrawals;
       const withdrawals = RustModule.WalletV4.Withdrawals.new();
       for (const withdrawal of withdrawalRequest) {
-        const stakingKey = derivePath(selectedWallet.rootKey, toPath(withdrawal.path));
-        witGens.push((hash) => addWitness(toPath(withdrawal.path), stakingKey, hash));
+        if (!withdrawal.path) {
+          throw new Error('unexpected withdrawal parameter');
+        }
+        const arrayPath = toPath(withdrawal.path);
+        const stakingKey = derivePath(selectedWallet.rootKey, arrayPath);
+        witGens.push((hash) => addWitness(arrayPath, stakingKey, hash));
 
         const rewardAddress = RustModule.WalletV4.RewardAddress.new(
           request.networkId,
