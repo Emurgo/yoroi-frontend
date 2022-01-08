@@ -18,6 +18,7 @@ type Props = {|
   delegatedPool: PoolData,
   epochProgress: {|
     currentEpoch: number,
+    startEpochDate: string,
     endEpochDate: string,
     percentage: number,
   |},
@@ -72,7 +73,7 @@ function StakingTabs({ delegatedPool, undelegate, epochProgress, intl }: Props &
           percentage={epochProgress.percentage}
           days="2.5"
           currentEpoch={epochProgress.currentEpoch}
-          startEpochDate="-"
+          startEpochDate={epochProgress.startEpochDate}
           endEpochDate={epochProgress.endEpochDate}
         />
       ),
