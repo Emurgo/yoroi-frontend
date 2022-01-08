@@ -214,7 +214,7 @@
     "react-copy-to-clipboard": "5.0.3",
     "react-dom": "17.0.2",
     "react-intl": "2.9.0",
-    "react-markdown": "5.0.3",
+    "react-markdown": "7.1.2",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
     "recharts": "1.8.5",
