@@ -161,8 +161,8 @@ function TopBarLayout({
             width: '100%',
             height: '100%',
             overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
+            display: 'grid',
+            gridTemplateRows: 'auto 1fr',
             position: 'relative',
             background: showInContainer === true && 'var(--yoroi-palette-gray-50)',
           }}
