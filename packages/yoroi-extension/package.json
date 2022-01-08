@@ -164,7 +164,7 @@
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@emurgo/cardano-serialization-lib-browser": "9.1.0",
-    "@emurgo/cip14-js": "2.0.0",
+    "@emurgo/cip14-js": "3.0.1",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
     "@emurgo/ledger-connect-handler": "6.0.0",
