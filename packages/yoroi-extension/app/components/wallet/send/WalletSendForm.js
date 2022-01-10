@@ -553,7 +553,7 @@ export default class WalletSendForm extends Component<Props> {
           </div>
 
           {showMemo ? (
-            <div className={styles.memoInput}>
+            <div>
               <TextField
                 className="memo"
                 {...memoField.bind()}
