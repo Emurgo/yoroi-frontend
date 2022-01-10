@@ -74,7 +74,7 @@ export default class SignTxContainer extends Component<
     const { signingMessage } = this.generated.stores.connector;
     if (signingMessage == null) return this.renderLoading();
 
-    const selectedWallet = this.generated.stores.connector.wallets.find(
+    const selectedWallet = this.generated.stores.connector.filteredWallets.find(
       wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
     );
     if (selectedWallet == null) return this.renderLoading();
@@ -208,7 +208,7 @@ export default class SignTxContainer extends Component<
       |},
       connector: {|
         signingMessage: ?SigningMessage,
-        wallets: Array<PublicDeriverCache>,
+        filteredWallets: Array<PublicDeriverCache>,
         signingRequest: ?ISignRequest<any>,
         adaTransaction: ?CardanoConnectorSignRequest,
       |},
@@ -242,7 +242,7 @@ export default class SignTxContainer extends Component<
         },
         connector: {
           signingMessage: stores.connector.signingMessage,
-          wallets: stores.connector.wallets,
+          filteredWallets: stores.connector.filteredWallets,
           signingRequest: stores.connector.signingRequest,
           adaTransaction: stores.connector.adaTransaction,
         },

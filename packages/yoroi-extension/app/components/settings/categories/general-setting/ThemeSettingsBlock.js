@@ -63,6 +63,7 @@ type Props = {|
   +exportTheme: void => PossiblyAsync<void>,
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
+  +switchToFirstWallet: void => void,
 |};
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
@@ -205,6 +206,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
               }}
               onClick={() => {
                 selectTheme({ theme: THEMES.YOROI_REVAMP });
+                this.props.switchToFirstWallet();
               }}
             >
               {intl.formatMessage(messages.tryYoroiRevamp)}
