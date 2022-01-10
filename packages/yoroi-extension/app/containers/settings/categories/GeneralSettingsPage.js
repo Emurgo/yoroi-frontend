@@ -55,7 +55,9 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
           onExternalLinkClick={handleExternalLinkClick}
         />
-        <AboutYoroiSettingsBlock />
+        <AboutYoroiSettingsBlock
+          wallet={this.generated.stores.wallets.selected}
+        />
       </>
     );
   }
