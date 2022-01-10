@@ -46,6 +46,7 @@ import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums
 import { getAllTokenInfo } from './lib/tokens/utils';
 import { MultiToken } from './lib/MultiToken';
 import type { DefaultTokenEntry } from './lib/MultiToken';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 
 // getTokenInfo
 
@@ -143,6 +144,22 @@ export type GetTransactionsResponse = {
 export type GetTransactionsFunc = (
   request: BaseGetTransactionsRequest
 ) => Promise<GetTransactionsResponse>;
+
+export type GetTransactionsDataResponse = {|
+  hash: number,
+  totalAvailable: number,
+  unconfirmedAmount: ?UnconfirmedAmount,
+  remoteTransactionIds: Set<string>,
+  timestamps: Array<number>,
+  assetIds: Array<string>,
+|};
+
+export type GetTransactionsDataFunc = (
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+    isLocalRequest: boolean,
+  |}
+) => Promise<GetTransactionsDataResponse>;
 
 export type ExportTransactionsRequest = {|
   ticker: string,

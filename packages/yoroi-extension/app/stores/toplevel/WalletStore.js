@@ -201,7 +201,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const selectedPublicDeriverId = this.selected?.publicDeriverId;
     if (selectedPublicDeriverId != null) {
       const selectedCache: ?PublicKeyCache = this.publicKeyCache
-        // $FlowFixMe
+        // $FlowFixMe[prop-missing]
         .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
       return selectedCache == null ? null : selectedCache.plate;
     }
@@ -267,7 +267,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       const { result } = txRequests.requests.allRequest;
       if (result == null)
         throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
-      if (result.transactions.length === 0) {
+      if (result.totalAvailable === 0) {
         for (const txRequest of Object.keys(txRequests.requests)) {
           txRequests.requests[txRequest].reset();
         }

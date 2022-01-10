@@ -11,9 +11,10 @@
       overflow-y: scroll;
       background-color: white;
       margin-top: 40px;
+      margin-bottom: 40px; 
       border-radius: 8px;
       -ms-overflow-style: none;
-      scrollbar-width: none;  
+      scrollbar-width: none; 
     }
 
     .container::-webkit-scrollbar {
