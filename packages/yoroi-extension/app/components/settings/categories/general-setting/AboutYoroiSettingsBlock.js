@@ -20,6 +20,7 @@ import { isTestnet } from '../../../../api/ada/lib/storage/database/prepackaged/
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
+import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -114,8 +115,12 @@ const socialMediaLinks = [{
 
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
+type Props = {|
+  wallet: null | PublicDeriver<>
+|}
+
 @observer
-export default class AboutYoroiSettingsBlock extends Component<{||}> {
+export default class AboutYoroiSettingsBlock extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
