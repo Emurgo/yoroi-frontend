@@ -3,17 +3,22 @@ updates:
 - package-ecosystem: npm
   directory: "/packages/yoroi-extension"
   schedule:
-    interval: monthly
-    timezone: PST8PDT
-  open-pull-requests-limit: 5
+    interval: weekly
+    day: monday
+    time: 03:00
+    timezone: UTC
+  open-pull-requests-limit: 10
   allow:
-  - dependency-name: "@cardano-foundation/ledgerjs-hw-app-cardano"
-  - dependency-name: "@emurgo/*"
-  - dependency-name: "cardano-*"
-  - dependency-name: "ergo-*"
-  - dependency-name: "lodash"
-  - dependency-name: "mobx*"
-  - dependency-name: "react*"
-  - dependency-name: "trezor-connect"
-  - dependency-name: "chromedriver"
+    - dependency-name: "@cardano-foundation/ledgerjs-hw-app-cardano"
+    - dependency-name: "@emurgo/*"
+    - dependency-name: "cardano-*"
+    - dependency-name: "ergo-*"
+    - dependency-name: "lodash"
+    - dependency-name: "mobx*"
+    - dependency-name: "react*"
+    - dependency-name: "trezor-connect"
+    - dependency-name: "chromedriver"
+  assignees:
+    - "vsubhuman"
+    - "javimaravillas"
   rebase-strategy: disabled
