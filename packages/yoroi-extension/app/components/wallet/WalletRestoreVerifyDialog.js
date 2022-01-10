@@ -71,6 +71,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     title: string,
     plate: WalletChecksum,
   ): Node {
+    console.log({title})
     return (
       <div key={title}>
         <h2 className={styles.addressLabel}>
