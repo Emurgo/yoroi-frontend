@@ -259,6 +259,8 @@
   "settings.general.aboutYoroi.label": "About Yoroi",
   "settings.general.aboutYoroi.medium": "EMURGO Medium",
   "settings.general.aboutYoroi.networkLabel": "Network:",
+  "settings.general.aboutYoroi.network.mainnet": "mainnet",
+  "settings.general.aboutYoroi.network.testnet": "testnet",
   "settings.general.aboutYoroi.telegram": "EMURGO Telegram",
   "settings.general.aboutYoroi.twitter": "Yoroi Twitter",
   "settings.general.aboutYoroi.versionLabel": "Current version:",
