@@ -93,8 +93,7 @@ export default ({
   };
 
   if (shouldInjectConnector) {
-    base.content_scripts.push(
-      {
+    base.content_scripts.push({
         matches: [
           'file://*/*',
           'http://*/*',
@@ -105,8 +104,9 @@ export default ({
         ],
         run_at: 'document_start',
         all_frames: true,
-      }
-    );
+    });
+    base.permissions
+      .push('activeTab');
   }
 
   const verName /*: {| version_name?: string |} */ = versionName != null
