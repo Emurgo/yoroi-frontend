@@ -29,11 +29,13 @@ export default class ConnectWebsitesContainer extends Component<
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
-  onRemoveWallet: ?string => void = url => {
+  onRemoveWallet: (url: string, protocol: string) => void = (url, protocol) => {
     if (url == null) {
       throw new Error(`Removing a wallet from whitelist but there's no url`);
     }
-    this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
+    this.generated.actions.connector.removeWalletFromWhitelist.trigger({
+      url, protocol
+    });
   };
 
   render(): Node {
@@ -83,7 +85,7 @@ export default class ConnectWebsitesContainer extends Component<
           trigger: (params: void) => Promise<void>,
         |},
         removeWalletFromWhitelist: {|
-          trigger: (params: string) => Promise<void>,
+          trigger: (params: {| url: string, protocol: string |}) => Promise<void>,
         |},
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
