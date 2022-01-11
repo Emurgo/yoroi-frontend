@@ -473,7 +473,8 @@ if (shouldInject()) {
                 }, location.origin);
             }
         } else if (dataType === "connector_connect_request/ergo" || dataType === 'connector_connect_request/cardano') {
-            if ((ergoApiInjected || cardanoApiInjected) && yoroiPort) {
+            const requestIdentification = event.data.requestIdentification;
+            if ((ergoApiInjected || (cardanoApiInjected && !requestIdentification)) && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 console.log('you are already connected')
                 window.postMessage({
@@ -494,7 +495,7 @@ if (shouldInject()) {
                             type: `yoroi_connect_request/${protocol}`,
                             connectParameters: {
                                 url: location.hostname,
-                                requestIdentification: event.data.requestIdentification,
+                                requestIdentification,
                                 onlySilent: event.data.onlySilent,
                             },
                             protocol,
