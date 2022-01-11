@@ -674,7 +674,7 @@ async function confirmConnect(
         });
         return;
       }
-      if (Boolean(onlySilent)) {
+      if (onlySilent) {
         reject(new Error('[onlySilent:fail] No active connection'));
         return;
       }
