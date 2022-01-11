@@ -124,7 +124,7 @@ export const Whitelisted = (): Node => {
             publicDeriverId: 0,
             appAuthID: '1',
             auth: null,
-            protocol: 'ergo'
+            protocol: 'ergo',
             image: '',
           },
           {
@@ -132,7 +132,7 @@ export const Whitelisted = (): Node => {
             publicDeriverId: 1,
             appAuthID: '2',
             auth: null,
-            protocol: 'cardano'
+            protocol: 'cardano',
             image: '',
           },
         ],

@@ -329,7 +329,7 @@ async function withSelectedWallet<T>(
     );
     if (selectedWallet == null) {
       connectedSites.delete(tabId);
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-call]
       await removeWallet(tabId, publicDeriverId, localStorageApi);
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }

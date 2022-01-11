@@ -19,7 +19,7 @@ export const createAuthEntry: ({|
     throw new Error(`[createAuthEntry] app auth is requested but wallet-checksum does not exist`)
   }
   // <TODO:AUTH> this is a temporary insecure dev stub using the deriver public key
-  // $FlowFixMe
+  // $FlowFixMe[prop-missing]
   const walletPubKey = (await deriver.getPublicKey()).Hash;
   const appPubKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
     Buffer.from(walletPubKey, 'hex'),
@@ -43,7 +43,7 @@ export const authSignHexPayload: ({|
   if (appAuthID == null) {
     throw new Error(`[authSignHexPayload] app auth sign is requested but no auth is present in connection`)
   }
-  // $FlowFixMe
+  // $FlowFixMe[prop-missing]
   const walletPubKey = (await deriver.getPublicKey()).Hash;
   const appPrivKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
     Buffer.from(walletPubKey, 'hex'),
