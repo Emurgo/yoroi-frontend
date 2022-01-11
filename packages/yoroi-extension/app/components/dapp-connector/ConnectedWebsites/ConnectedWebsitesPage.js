@@ -35,48 +35,6 @@ const messages = defineMessages({
     },
 });
 
-function walletExistInWebsitsList(
-  whitelistEntries: Array<WhitelistEntry>,
-  publicDeriverId: number) {
-  for(const website of whitelistEntries) {
-    if (website.publicDeriverId === publicDeriverId) return true
-  }
-  return false
-}
-
-function checkForNetworks(
-  wallets: Array<PublicDeriverCache>,
-  whitelistEntries: Array<WhitelistEntry>
-  ) {
-  /**
-   * Form a list of cached wallets. will look if the list has ergo wallets or cardano wallts
-   * or both.
-   */
-  let isErgoExist = false
-  let isCardanoExist = false
-
-  for (const wallet of wallets) {
-    if(!walletExistInWebsitsList(whitelistEntries, wallet.publicDeriver.getPublicDeriverId())) {
-      continue
-    }
-    if (isErgo(wallet.publicDeriver.getParent().getNetworkInfo())) {
-      isErgoExist = true
-    } else {
-      isCardanoExist = true
-    }
-    // if both networks exists in the set of wallet we don't need to continue searching
-    if (isErgoExist && isCardanoExist ) return {
-      isErgoExist,
-      isCardanoExist
-    }
-  }
-
-  return {
-    isErgoExist,
-    isCardanoExist
-  }
-}
-
 @observer
 export default class ConnectedWebsitesPage extends Component<Props> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -96,11 +54,17 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           );
 
         const { whitelistEntries, wallets } = this.props;
-        if (whitelistEntries == null || whitelistEntries.length === 0 || wallets == null || wallets.length === 0) {
+        if (whitelistEntries == null
+          || whitelistEntries.length === 0
+          || wallets == null
+          || wallets.length === 0
+        ) {
            return genNoResult();
         }
 
-        const { ergoNodes, cardanoNodes } = whitelistEntries.map(({ url, protocol, publicDeriverId, image }) => {
+        const { ergoNodes, cardanoNodes } = whitelistEntries.map((
+          { url, protocol, publicDeriverId, image }
+        ) => {
           const wallet = wallets.find( cacheEntry =>
             cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
           )
