@@ -329,6 +329,10 @@ function injectIntoPage(code) {
 }
 
 function shouldInject() {
+    if (true) {
+        // <TODO:CONNECTOR_202201>
+        return false;
+    }
     const documentElement = document.documentElement.nodeName
     const docElemCheck = documentElement ? documentElement.toLowerCase() === 'html' : true;
     const { docType } = window.document;
