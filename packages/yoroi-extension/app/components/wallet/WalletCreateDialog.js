@@ -108,7 +108,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
-          if (walletPassword.length === 0) return [true];
           return [
             isValidRepeatPassword(walletPassword, field.value),
             this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
