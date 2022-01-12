@@ -5,36 +5,35 @@ import { observable, action, runInAction, computed, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
-  PublicDeriverCache,
   ConfirmedSignData,
-  ConnectingMessage,
-  FailedSignData,
-  SigningMessage,
-  WhitelistEntry,
   ConnectedSites,
+  ConnectingMessage,
   ConnectRetrieveData,
-  TxSignWindowRetrieveData,
-  RemoveWalletFromWhitelistData,
+  FailedSignData,
   GetConnectedSitesData,
   Protocol,
+  PublicDeriverCache,
+  RemoveWalletFromWhitelistData,
+  SigningMessage,
   Tx,
+  TxSignWindowRetrieveData,
+  WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
+import type { CardanoConnectorSignRequest } from '../types';
 import { LoadingWalletStates } from '../types';
+import { getWallets } from '../../api/common/index';
 import {
-  getWallets
-} from '../../api/common/index';
-import {
+  getCardanoHaskellBaseConfig,
+  getErgoBaseConfig,
   isCardanoHaskell,
   isErgo,
-  getErgoBaseConfig,
-  getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
+  asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asGetAllUtxos,
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -46,10 +45,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 import { Logger } from '../../utils/logging';
-import type { CardanoConnectorSignRequest } from '../types';
-import {
-  asAddressedUtxo,
-} from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, } from '../../api/ada/transactions/utils';
 import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   connectorGetUsedAddresses,
@@ -253,11 +249,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         runInAction(() => {
           this.signingMessage = response;
         });
-        if (response && response.sign.type === 'tx/cardano') {
-          this.createAdaTransaction();
-        }
-        if (response.sign.type === 'tx-create-req/cardano') {
-          this.generateAdaTransaction();
+        if (response) {
+          if (response.sign.type === 'tx/cardano') {
+            this.createAdaTransaction();
+          }
+          if (response.sign.type === 'tx-create-req/cardano') {
+            this.generateAdaTransaction();
+          }
         }
       })
       // eslint-disable-next-line no-console
@@ -685,15 +683,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.setConnectorWhitelist.execute({ whitelist });
     await this.getConnectorWhitelist.execute();
   };
-  _removeWalletFromWhitelist: (url: string) => Promise<void> = async url => {
-    const filter = this.currentConnectorWhitelist.filter(e => e.url !== url);
+  _removeWalletFromWhitelist: (
+    request: {| url: string, protocol: string |}
+    ) => Promise<void> = async (request) => {
+    const filter = this.currentConnectorWhitelist.filter(
+      e => !(e.url === request.url && e.protocol === request.protocol)
+    );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
     window.chrome.runtime.sendMessage(({
       type: 'remove_wallet_from_whitelist',
-      url,
+      url: request.url,
     }: RemoveWalletFromWhitelistData));
   };
 

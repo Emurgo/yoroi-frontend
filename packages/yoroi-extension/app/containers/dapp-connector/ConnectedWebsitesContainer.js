@@ -55,11 +55,14 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
-  onRemoveWallet: ?string => void = url => {
-    if (url == null) {
-      throw new Error(`Removing a wallet from whitelist but there's no url`);
+  onRemoveWallet: {| url: ?string, protocol: ?string |} => void = ({ url, protocol }) => {
+    if (url == null || protocol == null) {
+      throw new Error(`Removing a wallet from whitelist but there's no url or protocol`);
     }
-    this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
+    this.generated.actions.connector.removeWalletFromWhitelist.trigger({
+      url,
+      protocol,
+    });
   };
   getConceptualWallet(publicDeriverId: number): ConceptualWalletSettingsCache | null {
     const wallets = this.generated.stores.wallets.publicDerivers;
@@ -139,7 +142,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           trigger: (params: void) => Promise<void>,
         |},
         removeWalletFromWhitelist: {|
-          trigger: (params: string) => Promise<void>,
+          trigger: (params: {| url: string, protocol: string |}) => Promise<void>,
         |},
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
