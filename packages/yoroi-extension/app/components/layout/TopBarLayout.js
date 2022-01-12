@@ -44,6 +44,7 @@ function TopBarLayout({
           sx={{
             position: 'relative',
             overflow: 'auto',
+            height: '100%',
             '&::-webkit-scrollbar-button': {
               height: '7px',
               display: 'block',
@@ -161,8 +162,8 @@ function TopBarLayout({
             width: '100%',
             height: '100%',
             overflow: 'hidden',
-            display: 'grid',
-            gridTemplateRows: 'auto 1fr',
+            display: 'flex',
+            flexDirection: 'column',
             position: 'relative',
             background: showInContainer === true && 'var(--yoroi-palette-gray-50)',
           }}
