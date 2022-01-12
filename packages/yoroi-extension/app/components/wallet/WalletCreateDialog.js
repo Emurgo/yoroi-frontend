@@ -18,7 +18,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.create.dialog.title',
-    defaultMessage: '!!!Create a new wallet',
+    defaultMessage: '!!!Create wallet',
   },
   walletName: {
     id: 'wallet.create.dialog.name.label',
