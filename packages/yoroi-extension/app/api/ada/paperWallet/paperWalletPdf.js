@@ -106,7 +106,7 @@ export const generateAdaPaperPdf = async (
 
       // Print account plate ID under the plate icon on backside
       doc.setFontSize(12);
-      textCenter(doc, 130, plate.TextPart, null, 180, true);
+      textCenter(doc, 130, plate.TextPart);
     }
 
     await addImage(doc, paperWalletPage2Path, pageSize);
@@ -162,7 +162,7 @@ function printAddresses(
   if (addresses.length === 1) {
     doc.setFontSize(9);
     const [address] = addresses;
-    textCenter(doc, pA.y + 7, address, null, 180, true);
+    textCenter(doc, pA.y + 7, address);
     // Generate QR image for wallet address
     const qrCodeImage = Buffer.from(qr.imageSync(address, {
       type: 'png',
@@ -220,7 +220,7 @@ function printMnemonics(doc: Pdf, words: Array<string>): void {
     const rowLetters = rowWords.reduce((a, s) => a + s.length, 0);
     const rowString = rowWords.join(' '.repeat((64 - rowLetters) / 7));
     const y = (pB.y - (lineHeight / 2)) - (lineHeight * r);
-    textCenter(doc, y, rowString, null, 180, true);
+    textCenter(doc, y, rowString);
   }
 }
 
