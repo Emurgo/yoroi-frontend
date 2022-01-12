@@ -68,7 +68,7 @@ export const Generic = (): Node => {
           },
           connector: {
             connectingMessage: undefined,
-            wallets,
+            filteredWallets: wallets,
             errorWallets,
             loadingWallets: walletsState,
             currentConnectorWhitelist: [],

@@ -29,15 +29,17 @@ export default class ConnectWebsitesContainer extends Component<
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
-  onRemoveWallet: ?string => void = url => {
+  onRemoveWallet: (url: string, protocol: string) => void = (url, protocol) => {
     if (url == null) {
       throw new Error(`Removing a wallet from whitelist but there's no url`);
     }
-    this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
+    this.generated.actions.connector.removeWalletFromWhitelist.trigger({
+      url, protocol
+    });
   };
 
   render(): Node {
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.allWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const error = this.generated.stores.connector.errorWallets;
     const isLoading = (
@@ -83,7 +85,7 @@ export default class ConnectWebsitesContainer extends Component<
           trigger: (params: void) => Promise<void>,
         |},
         removeWalletFromWhitelist: {|
-          trigger: (params: string) => Promise<void>,
+          trigger: (params: {| url: string, protocol: string |}) => Promise<void>,
         |},
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
@@ -95,7 +97,7 @@ export default class ConnectWebsitesContainer extends Component<
         shouldHideBalance: boolean,
       |},
       connector: {|
-        wallets: ?Array<PublicDeriverCache>,
+        allWallets: ?Array<PublicDeriverCache>,
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
         loadingWallets: $Values<typeof LoadingWalletStates>,
         errorWallets: string,
@@ -119,7 +121,7 @@ export default class ConnectWebsitesContainer extends Component<
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         connector: {
-          wallets: stores.connector.wallets,
+          allWallets: stores.connector.allWallets,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
           loadingWallets: stores.connector.loadingWallets,
           errorWallets: stores.connector.errorWallets,

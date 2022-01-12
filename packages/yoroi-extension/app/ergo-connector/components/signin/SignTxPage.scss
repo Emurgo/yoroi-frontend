@@ -1,8 +1,8 @@
 .component {
-  padding-right: 15px;
-  padding-left: 15px;
-  padding-top: 30px;
-  overflow-wrap: break-word;
+  padding: 30px 15px 50px 15px ;
+  overflow: scroll;
+  width: 100%;
+  height: 100%;
 
   .title {
     font-size: 24px;
@@ -39,6 +39,11 @@
       color: #6B7384;
       font-size: 14px;
       line-height: 22px;
+      .address {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
     .utxo {
       display: flex;

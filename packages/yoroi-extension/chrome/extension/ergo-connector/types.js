@@ -393,9 +393,27 @@ export type PublicDeriverCache = {|
   checksum: void | WalletChecksum,
 |}
 
-export type WhitelistEntry = {| url: string, publicDeriverId: number |};
+export type WalletAuthEntry = {|
+  walletId: string,
+  pubkey: string,
+|};
 
-export type ConnectingMessage = {| tabId: number, url: string, imgBase64Url: string |};
+export type WhitelistEntry = {|
+  url: string,
+  protocol: 'ergo' | 'cardano',
+  publicDeriverId: number,
+  appAuthID: ?string,
+  auth: ?WalletAuthEntry,
+  image: string,
+|};
+
+export type ConnectingMessage = {|
+  tabId: number,
+  url: string,
+  appAuthID?: string,
+  imgBase64Url: string,
+  protocol: 'ergo' | 'cardano',
+|};
 export type SigningMessage = {|
   publicDeriverId: number,
   sign: PendingSignData,
@@ -452,6 +470,7 @@ export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: true,
   publicDeriverId: number,
+  auth: ?WalletAuthEntry,
   tabId: ?number,
 |} | {|
   type: 'connect_response',
