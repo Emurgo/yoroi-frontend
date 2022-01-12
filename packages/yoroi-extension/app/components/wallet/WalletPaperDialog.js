@@ -30,7 +30,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCreatePaper: ({| numAddresses: number, printAccountPlate: boolean |}) => void,
+  +onCreatePaper: ({| numAddresses: number |}) => void,
   +onCancel: void => void,
   +paperWalletsIntroText: string,
   +error?: ?LocalizableError,
