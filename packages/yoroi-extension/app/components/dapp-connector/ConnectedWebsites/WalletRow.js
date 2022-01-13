@@ -13,6 +13,7 @@ import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
 import NoDappImage from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import WalletType from '../../widgets/WalletType';
+import NavPlate from '../../topbar/NavPlate'
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -80,7 +81,9 @@ export default class WalletRow extends Component<Props, State> {
       url,
       protocol,
       wallet,
+      plate,
       onRemoveWallet,
+      balance,
       shouldHideBalance,
       getTokenInfo,
       settingsCache,
@@ -89,11 +92,11 @@ export default class WalletRow extends Component<Props, State> {
       const { showDeleteIcon } = this.state
       const { intl } = this.context;
       // eslint-disable-next-line no-unused-vars
-      const [_, iconComponent] = wallet.checksum
-      ? constructPlate(wallet.checksum, 0, styles.icon)
-      : [];
+      // const [_, iconComponent] = wallet.checksum
+      // ? constructPlate(wallet.checksum, 0, styles.icon)
+      // : [];
 
-      const defaultEntry = wallet.balance.getDefaultEntry();
+      const defaultEntry = balance.getDefaultEntry();
       const tokenInfo = getTokenInfo(defaultEntry);
       const shiftedAmount = defaultEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
@@ -106,13 +109,15 @@ export default class WalletRow extends Component<Props, State> {
             className={styles.component}
           >
             <p className={styles.name}>
-              {wallet.name}
-              {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>}
+              {/* {wallet.name} */}
+              {/* {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>} */}
             </p>
             <div className={styles.rowWrapper}>
               <div>
                 <div className={styles.card}>
-                  <div className={styles.avatar}>{iconComponent}</div>
+                  <div className={styles.avatar}>
+                    <NavPlate plate={plate} wallet={settingsCache} />
+                  </div>
                   <p className={styles.balance}>
                     {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
                     <span>{getTokenName(tokenInfo)}</span>

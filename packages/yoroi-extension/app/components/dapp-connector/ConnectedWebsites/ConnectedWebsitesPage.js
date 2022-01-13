@@ -66,12 +66,14 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           { url, protocol, publicDeriverId, image }
         ) => {
           const wallet = wallets.find( cacheEntry =>
-            cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
+            cacheEntry.getPublicDeriverId() === publicDeriverId
           )
           if (wallet == null) {
             return [null, null]
           }
-          return [isErgo(wallet.publicDeriver.getParent().getNetworkInfo()), (
+
+          const { balance, plate } = this.props.getWalletInfo(wallet)
+          return [isErgo(wallet.getParent().getNetworkInfo()), (
             <WalletRow
               key={url}
               url={url}
@@ -80,9 +82,11 @@ export default class ConnectedWebsitesPage extends Component<Props> {
               websiteIcon={image}
               isActiveSite={this.props.activeSites.includes(url)}
               onRemoveWallet={this.props.onRemoveWallet}
+              balance={balance}
+              plate={plate}
               shouldHideBalance={this.props.shouldHideBalance}
               getTokenInfo={this.props.getTokenInfo}
-              settingsCache={this.props.getConceptualWallet(publicDeriverId)}
+              settingsCache={this.props.getConceptualWallet(wallet)}
             />
           )]
         }).reduce((acc, [isWalletErgo, node]) => {

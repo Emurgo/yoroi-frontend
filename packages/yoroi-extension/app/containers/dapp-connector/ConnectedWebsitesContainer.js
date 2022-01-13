@@ -26,6 +26,7 @@ import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/Wallet
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
+import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment'
 import { ROUTES } from '../../routes-config'
 
@@ -64,22 +65,35 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       protocol,
     });
   };
-  getConceptualWallet(publicDeriverId: number): ConceptualWalletSettingsCache | null {
-    const wallets = this.generated.stores.wallets.publicDerivers;
-    const wallet = wallets.find(
-      publicDeriver => publicDeriver.getPublicDeriverId() === publicDeriverId
-    )
 
-    if(!wallet) return null
+  getConceptualWallet(publicDeriver): ConceptualWalletSettingsCache | null {
     const settingsCache = this.generated.stores.walletSettings
-    .getConceptualWalletSettingsCache(wallet.getParent());
+    .getConceptualWalletSettingsCache(publicDeriver.getParent());
 
     return settingsCache
+  }
+
+  getWalletInfo(publicDeriver) {
+    const txRequests: TxRequests = this.generated.stores.transactions
+    .getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate = withPubKey == null
+      ? null
+      : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+    return {
+      balance,
+      plate
+    }
   }
 
   render (): Node {
     const { stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
+    const _wallets = this.generated.stores.wallets.publicDerivers;
+    console.log({_wallets})
     const wallets = stores.connector.allWallets;
     const loadingWallets = stores.connector.loadingWallets;
     const error = stores.connector.errorWallets;
@@ -106,12 +120,13 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       componentToRender =  (
         <ConnectedWebsitesPage
           whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-          wallets={wallets}
+          wallets={_wallets}
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           getConceptualWallet={this.getConceptualWallet.bind(this)}
+          getWalletInfo={this.getWalletInfo.bind(this)}
         />)
     }
 
@@ -175,8 +190,12 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         tokenInfo: TokenInfoMap,
       |},
       wallets: {|
-        publicDerivers: Array<PublicDeriver<>>,
-      |}
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+        publicDerivers: Array<PublicDeriver<>>
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests
+      |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
     |} {
@@ -200,6 +219,10 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
         },
         connector: {
           allWallets: stores.connector.allWallets,
