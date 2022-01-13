@@ -42,22 +42,6 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
   });
 }
 
-// function getConnectedSites(): Promise<ConnectedSites> {
-//   return new Promise((resolve, reject) => {
-//     window.chrome.runtime.sendMessage(
-//       ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-//       response => {
-//         if (window.chrome.runtime.lastError) {
-//           // eslint-disable-next-line prefer-promise-reject-errors
-//           reject('Could not establish connection: get_connected_sites ');
-//         }
-
-//         resolve(response);
-//       }
-//     );
-//   });
-// }
-
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
