@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { PublicDeriverCache, WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
+import type { WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
 import styles from './ConnectedWebsitesPage.scss'
 import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -14,8 +14,9 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import type { TokenLookupKey, MultiToken } from '../../../api/common/lib/MultiToken';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver'
 
-type WalletInfo = {| balance: null | MultiToken, plate: null | WalletChecksum |}
+type WalletInfo = {| balance: null | MultiToken, plate: WalletChecksum |}
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
     +activeSites: Array<string>,
@@ -23,7 +24,7 @@ type Props = {|
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
-    +getConceptualWallet: number => ConceptualWalletSettingsCache | null,
+    +getConceptualWallet: number => ConceptualWalletSettingsCache,
     +getWalletInfo: (PublicDeriver<>) => WalletInfo
 |};
 

@@ -72,7 +72,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     });
   };
 
-  getConceptualWallet(publicDeriver): ConceptualWalletSettingsCache {
+  getConceptualWallet(publicDeriver: PublicDeriver<>): ConceptualWalletSettingsCache {
     const settingsCache = this.generated.stores.walletSettings
     .getConceptualWalletSettingsCache(publicDeriver.getParent());
 

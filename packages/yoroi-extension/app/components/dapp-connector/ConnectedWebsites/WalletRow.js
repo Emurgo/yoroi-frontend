@@ -3,7 +3,7 @@
 import { Component } from 'react'
 import type { Node } from 'react';
 import styles from './WalletRow.scss'
-import { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
