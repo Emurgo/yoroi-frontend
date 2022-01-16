@@ -109,8 +109,8 @@ export default class WalletRow extends Component<Props, State> {
             className={styles.component}
           >
             <p className={styles.name}>
-              {/* {wallet.name} */}
-              {/* {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>} */}
+              {settingsCache.conceptualWalletName}
+              {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>}
             </p>
             <div className={styles.rowWrapper}>
               <div>
