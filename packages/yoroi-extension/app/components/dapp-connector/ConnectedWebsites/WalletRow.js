@@ -15,6 +15,7 @@ import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/Wal
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { splitAmount, truncateToken } from '../../../utils/formatters';
 
 const messages = defineMessages({
   active: {
@@ -58,6 +59,39 @@ export default class WalletRow extends Component<Props, State> {
     this.setState({ showDeleteIcon: false })
   }
 
+  renderAmountDisplay: {|
+    shouldHideBalance: boolean,
+    amount: ?MultiToken,
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return <div className={styles.isLoading} />;
+    }
+
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    let balanceDisplay;
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>{hiddenAmount}</span>);
+    } else {
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
+      );
+
+      balanceDisplay = (
+        <>
+          {beforeDecimalRewards}
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+      );
+    }
+
+    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
+  }
+
   render(): Node {
       const {
       isActiveSite,
@@ -67,16 +101,11 @@ export default class WalletRow extends Component<Props, State> {
       onRemoveWallet,
       balance,
       shouldHideBalance,
-      getTokenInfo,
       settingsCache,
       websiteIcon
       } = this.props;
       const { showDeleteIcon } = this.state
       const { intl } = this.context;
-      const defaultEntry = balance.getDefaultEntry();
-      const tokenInfo = getTokenInfo(defaultEntry);
-      const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
       return (
         <div>
@@ -96,8 +125,10 @@ export default class WalletRow extends Component<Props, State> {
                     <NavPlate plate={plate} wallet={settingsCache} />
                   </div>
                   <p className={styles.balance}>
-                    {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
-                    <span>{getTokenName(tokenInfo)}</span>
+                    {this.renderAmountDisplay({
+                      shouldHideBalance,
+                      amount: balance,
+                    })}
                   </p>
                 </div>
               </div>
