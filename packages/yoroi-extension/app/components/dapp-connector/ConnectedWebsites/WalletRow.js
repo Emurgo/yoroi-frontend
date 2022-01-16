@@ -29,7 +29,6 @@ type Props = {|
     +url: ?string,
     +protocol: ?string,
     +isActiveSite: boolean,
-    +wallet: PublicDeriverCache,
     +shouldHideBalance: boolean,
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
@@ -41,22 +40,6 @@ type State = {|
   showDeleteIcon: boolean,
 |}
 
-function constructPlate(
-    plate: WalletChecksum,
-    saturationFactor: number,
-    divClass: string
-  ): [string, React$Element<'div'>] {
-    return [
-      plate.TextPart,
-      <div className={divClass}>
-        <WalletAccountIcon
-          iconSeed={plate.ImagePart}
-          saturationFactor={saturationFactor}
-          scalePx={6}
-        />
-      </div>,
-    ];
-}
 
 export default class WalletRow extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -80,7 +63,6 @@ export default class WalletRow extends Component<Props, State> {
       isActiveSite,
       url,
       protocol,
-      wallet,
       plate,
       onRemoveWallet,
       balance,
@@ -91,11 +73,6 @@ export default class WalletRow extends Component<Props, State> {
       } = this.props;
       const { showDeleteIcon } = this.state
       const { intl } = this.context;
-      // eslint-disable-next-line no-unused-vars
-      // const [_, iconComponent] = wallet.checksum
-      // ? constructPlate(wallet.checksum, 0, styles.icon)
-      // : [];
-
       const defaultEntry = balance.getDefaultEntry();
       const tokenInfo = getTokenInfo(defaultEntry);
       const shiftedAmount = defaultEntry.amount

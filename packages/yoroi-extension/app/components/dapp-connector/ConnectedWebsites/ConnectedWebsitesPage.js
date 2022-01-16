@@ -17,7 +17,7 @@ import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/Wal
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
     +activeSites: Array<string>,
-    +wallets: ?Array<PublicDeriverCache>,
+    +wallets: ?Array<PublicDeriver<>>,
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
@@ -71,14 +71,12 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           if (wallet == null) {
             return [null, null]
           }
-
           const { balance, plate } = this.props.getWalletInfo(wallet)
           return [isErgo(wallet.getParent().getNetworkInfo()), (
             <WalletRow
               key={url}
               url={url}
               protocol={protocol}
-              wallet={wallet}
               websiteIcon={image}
               isActiveSite={this.props.activeSites.includes(url)}
               onRemoveWallet={this.props.onRemoveWallet}

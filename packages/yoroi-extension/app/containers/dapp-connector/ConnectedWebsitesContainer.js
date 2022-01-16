@@ -29,6 +29,11 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
 import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment'
 import { ROUTES } from '../../routes-config'
+import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
+import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
+import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+
+
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
@@ -92,9 +97,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   render (): Node {
     const { stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
-    const _wallets = this.generated.stores.wallets.publicDerivers;
-    console.log({_wallets})
-    const wallets = stores.connector.allWallets;
+    const wallets = this.generated.stores.wallets.publicDerivers;
     const loadingWallets = stores.connector.loadingWallets;
     const error = stores.connector.errorWallets;
     const isLoading = (
@@ -120,7 +123,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       componentToRender =  (
         <ConnectedWebsitesPage
           whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-          wallets={_wallets}
+          wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
