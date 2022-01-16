@@ -13,7 +13,9 @@ import WalletRow from './WalletRow';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TokenLookupKey, } from '../../../api/common/lib/MultiToken';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
+type WalletInfo = {| balance: null | MultiToken, plate: null | walletChecksum |}
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
     +activeSites: Array<string>,
@@ -21,7 +23,8 @@ type Props = {|
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
-    +getConceptualWallet: number => ConceptualWalletSettingsCache | null
+    +getConceptualWallet: number => ConceptualWalletSettingsCache | null,
+    +getWalletInfo: (PublicDeriver<>) => WalletInfo
 |};
 
 const messages = defineMessages({
