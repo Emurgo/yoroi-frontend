@@ -110,7 +110,8 @@ export default class WalletRow extends Component<Props, State> {
       return (
         <div>
           <div
-            onMouseEnter={this.showDeleteIcon}
+            onMouseOver={this.showDeleteIcon}
+            onFocus={this.showDeleteIcon}
             onMouseLeave={this.hideDeleteIcon}
             className={styles.component}
           >
