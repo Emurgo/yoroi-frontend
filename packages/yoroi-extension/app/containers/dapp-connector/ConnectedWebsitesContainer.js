@@ -110,31 +110,31 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     const isError = loadingWallets === LoadingWalletStates.REJECTED;
 
     let componentToRender;
-    if (isLoading) {
-      componentToRender =  (
-        <FullscreenLayout bottomPadding={0}>
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        </FullscreenLayout>
-      );
-    }
-    if (isError) {
-      componentToRender = <p>{error}</p>
-    }
-    if (isSuccess) {
-      componentToRender =  (
-        <ConnectedWebsitesPage
-          whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-          wallets={wallets}
-          onRemoveWallet={this.onRemoveWallet}
-          activeSites={this.generated.stores.connector.activeSites.sites}
-          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-          getConceptualWallet={this.getConceptualWallet.bind(this)}
-          getWalletInfo={this.getWalletInfo.bind(this)}
-        />)
-    }
+    // if (isLoading) {
+    //   componentToRender =  (
+    //     <FullscreenLayout bottomPadding={0}>
+    //       <VerticallyCenteredLayout>
+    //         <LoadingSpinner />
+    //       </VerticallyCenteredLayout>
+    //     </FullscreenLayout>
+    //   );
+    // }
+    // if (isError) {
+    //   componentToRender = <p>{error}</p>
+    // }
+    // if (isSuccess) {
+    componentToRender =  (
+      <ConnectedWebsitesPage
+        whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+        wallets={wallets}
+        onRemoveWallet={this.onRemoveWallet}
+        activeSites={this.generated.stores.connector.activeSites.sites}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        getConceptualWallet={this.getConceptualWallet.bind(this)}
+        getWalletInfo={this.getWalletInfo.bind(this)}
+      />)
+    // }
 
     return (
       <TopBarLayout

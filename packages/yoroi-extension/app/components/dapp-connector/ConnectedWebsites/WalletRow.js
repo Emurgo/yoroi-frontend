@@ -63,7 +63,7 @@ export default class WalletRow extends Component<Props, State> {
     shouldHideBalance: boolean,
     amount: ?MultiToken,
   |} => Node = (request) => {
-    if (request.amount == null) {
+    if (request.amount != null) {
       return <div className={styles.isLoading} />;
     }
 
