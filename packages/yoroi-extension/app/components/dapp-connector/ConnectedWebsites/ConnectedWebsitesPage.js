@@ -24,7 +24,7 @@ type Props = {|
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
-    +getConceptualWallet: number => ConceptualWalletSettingsCache,
+    +getConceptualWallet: PublicDeriver<> => ConceptualWalletSettingsCache,
     +getWalletInfo: (PublicDeriver<>) => WalletInfo
 |};
 

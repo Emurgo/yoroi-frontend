@@ -17,14 +17,11 @@ import SidebarContainer from '../SidebarContainer'
 import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage'
 import DappConnectorNavbar from '../../components/dapp-connector/Layout/DappConnectorNavbar'
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers'
-import LoadingSpinner from '../../components/widgets/LoadingSpinner'
-import { LoadingWalletStates } from '../../ergo-connector/types'
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
+import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
 import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment'
@@ -98,44 +95,8 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   }
 
   render (): Node {
-    const { stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
     const wallets = this.generated.stores.wallets.publicDerivers;
-    const loadingWallets = stores.connector.loadingWallets;
-    const error = stores.connector.errorWallets;
-    const isLoading = (
-      loadingWallets === LoadingWalletStates.IDLE || loadingWallets === LoadingWalletStates.PENDING
-    );
-    const isSuccess = loadingWallets === LoadingWalletStates.SUCCESS;
-    const isError = loadingWallets === LoadingWalletStates.REJECTED;
-
-    let componentToRender;
-    // if (isLoading) {
-    //   componentToRender =  (
-    //     <FullscreenLayout bottomPadding={0}>
-    //       <VerticallyCenteredLayout>
-    //         <LoadingSpinner />
-    //       </VerticallyCenteredLayout>
-    //     </FullscreenLayout>
-    //   );
-    // }
-    // if (isError) {
-    //   componentToRender = <p>{error}</p>
-    // }
-    // if (isSuccess) {
-    componentToRender =  (
-      <ConnectedWebsitesPage
-        whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-        wallets={wallets}
-        onRemoveWallet={this.onRemoveWallet}
-        activeSites={this.generated.stores.connector.activeSites.sites}
-        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-        getConceptualWallet={this.getConceptualWallet.bind(this)}
-        getWalletInfo={this.getWalletInfo.bind(this)}
-      />)
-    // }
-
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -143,7 +104,16 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         navbar={<DappConnectorNavbar />}
       >
         <FullscreenLayout bottomPadding={0}>
-          {componentToRender}
+          <ConnectedWebsitesPage
+            whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+            wallets={wallets}
+            onRemoveWallet={this.onRemoveWallet}
+            activeSites={this.generated.stores.connector.activeSites.sites}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+            getConceptualWallet={this.getConceptualWallet.bind(this)}
+            getWalletInfo={this.getWalletInfo.bind(this)}
+          />)
         </FullscreenLayout>
       </TopBarLayout>
     );
@@ -183,10 +153,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         shouldHideBalance: boolean,
       |},
       connector: {|
-        allWallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
-        errorWallets: string,
-        loadingWallets: $Values<typeof LoadingWalletStates>,
         activeSites: {| sites: Array<string> |},
       |},
       walletSettings: {|
@@ -231,10 +198,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           getTxRequests: stores.transactions.getTxRequests,
         },
         connector: {
-          allWallets: stores.connector.allWallets,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
-          loadingWallets: stores.connector.loadingWallets,
-          errorWallets: stores.connector.errorWallets,
           activeSites: stores.connector.activeSites,
         },
         tokenInfoStore: {
