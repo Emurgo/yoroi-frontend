@@ -88,6 +88,8 @@ class App extends Component<Props, State> {
       translations[locale]
     );
 
+    Logger.debug(`[yoroi] messages merged`);
+
     const themeVars = Object.assign(stores.profile.currentThemeVars, {
       // show wingdings on dev builds when no font is set to easily find
       // missing font bugs. However, on production, we use Times New Roman
@@ -99,6 +101,8 @@ class App extends Component<Props, State> {
     changeToplevelTheme(currentTheme);
 
     const muiTheme = MuiThemes[currentTheme];
+
+    Logger.debug(`[yoroi] themes changed`);
 
     return (
       <div style={{ height: '100%' }}>

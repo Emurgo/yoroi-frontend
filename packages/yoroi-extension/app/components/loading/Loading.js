@@ -51,28 +51,24 @@ export default class Loading extends Component<Props> {
       styles.yoroiLogo,
       hasLoadedCurrentTheme ? null : styles.hide,
     ]);
-    const renderError = error == null || !hasLoadedCurrentLocale
-      ? null
-      : (
-        <div className={styles.loading}>
-          <h1 className={styles.error}>
-            {intl.formatMessage(error)}<br /><br />
-            {this._getErrorMessageComponent()}
+    const renderError = error != null && hasLoadedCurrentLocale ? (
+      <div className={styles.loading}>
+        <h1 className={styles.error}>
+          {intl.formatMessage(error)}<br /><br />
+          {this._getErrorMessageComponent()}
+        </h1>
+      </div>
+    ) : null;
+    const renderContent = error == null && isLoadingDataForNextScreen ? (
+      <div className={styles.loading}>
+        {hasLoadedCurrentLocale && (
+          <h1 className={styles.headline}>
+            {intl.formatMessage(messages.loading)}
           </h1>
-        </div>
-      );
-    const renderContent = (error != null || !isLoadingDataForNextScreen)
-      ? null
-      : (
-        <div className={styles.loading}>
-          {hasLoadedCurrentLocale && (
-            <h1 className={styles.headline}>
-              {intl.formatMessage(messages.loading)}
-            </h1>
-          )}
-          <LoadingSpinner />
-        </div>
-      );
+        )}
+        <LoadingSpinner />
+      </div>
+    ) : null;
     return (
       <div className={componentStyles}>
         <div className={yoroiLogoStyles}>
