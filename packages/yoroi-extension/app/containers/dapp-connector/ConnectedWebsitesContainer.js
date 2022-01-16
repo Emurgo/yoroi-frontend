@@ -54,7 +54,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         route: ROUTES.MY_WALLETS,
       })
     }
-    this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.refreshActiveSites.trigger();
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
