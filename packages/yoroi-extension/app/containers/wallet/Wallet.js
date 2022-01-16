@@ -91,7 +91,7 @@ class Wallet extends Component<AllProps> {
     return undefined;
   }
 
-  navigateToWallets: string => void = destination => {
+  navigateToMyWallets: string => void = destination => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
 
@@ -100,7 +100,7 @@ class Wallet extends Component<AllProps> {
       return (
         <WalletSyncingOverlay
           classicTheme={this.generated.stores.profile.isClassicTheme}
-          onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)}
+          onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
       )
     }
@@ -162,7 +162,7 @@ class Wallet extends Component<AllProps> {
             title={
               <NavBarBack
                 route={ROUTES.MY_WALLETS}
-                onBackClick={this.navigateToWallets}
+                onBackClick={this.navigateToMyWallets}
                 title={intl.formatMessage(messages.backButton)}
               />
             }
