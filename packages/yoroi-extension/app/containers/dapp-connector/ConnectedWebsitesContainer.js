@@ -32,7 +32,8 @@ import { ROUTES } from '../../routes-config'
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { MultiToken } from '../../api/common/lib/MultiToken'
 
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
@@ -71,14 +72,16 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     });
   };
 
-  getConceptualWallet(publicDeriver): ConceptualWalletSettingsCache | null {
+  getConceptualWallet(publicDeriver): ConceptualWalletSettingsCache {
     const settingsCache = this.generated.stores.walletSettings
     .getConceptualWalletSettingsCache(publicDeriver.getParent());
 
     return settingsCache
   }
 
-  getWalletInfo(publicDeriver) {
+  getWalletInfo(
+    publicDeriver: PublicDeriver<>
+    ): {| balance: null | MultiToken, plate: null | WalletChecksum |} {
     const txRequests: TxRequests = this.generated.stores.transactions
     .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result ?? null;

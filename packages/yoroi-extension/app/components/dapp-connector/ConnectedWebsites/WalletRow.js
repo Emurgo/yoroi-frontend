@@ -3,10 +3,7 @@
 import { Component } from 'react'
 import type { Node } from 'react';
 import styles from './WalletRow.scss'
-import WalletAccountIcon from '../../topbar/WalletAccountIcon';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
-import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
@@ -17,6 +14,7 @@ import NavPlate from '../../topbar/NavPlate'
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 const messages = defineMessages({
   active: {
@@ -32,8 +30,10 @@ type Props = {|
     +shouldHideBalance: boolean,
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-    +settingsCache: ConceptualWalletSettingsCache | null,
+    +settingsCache: ConceptualWalletSettingsCache,
     +websiteIcon: string,
+    +balance: MultiToken | null,
+    +plate: WalletChecksum,
 |};
 
 type State = {|

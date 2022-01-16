@@ -11,11 +11,11 @@ import { connectorMessages } from '../../../i18n/global-messages';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WalletRow from './WalletRow';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { TokenLookupKey, } from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey, MultiToken } from '../../../api/common/lib/MultiToken';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 
-type WalletInfo = {| balance: null | MultiToken, plate: null | walletChecksum |}
+type WalletInfo = {| balance: null | MultiToken, plate: null | WalletChecksum |}
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
     +activeSites: Array<string>,
