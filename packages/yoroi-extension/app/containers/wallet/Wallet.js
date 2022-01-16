@@ -98,9 +98,9 @@ class Wallet extends Component<AllProps> {
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
     if (this.generated.stores.wallets.firstSync) {
       return (
-        <WalletSyncingOverlay 
-          classicTheme={this.generated.stores.profile.isClassicTheme} 
-          onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)} 
+        <WalletSyncingOverlay
+          classicTheme={this.generated.stores.profile.isClassicTheme}
+          onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)}
         />
       )
     }
@@ -250,8 +250,8 @@ class Wallet extends Component<AllProps> {
       walletSettings: {|
         getWalletWarnings: (PublicDeriver<>) => WarningList,
       |},
-      wallets: {| 
-        selected: null | PublicDeriver<>, 
+      wallets: {|
+        selected: null | PublicDeriver<>,
         firstSync: boolean,
       |},
       router: {| location: any |},
