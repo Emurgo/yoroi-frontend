@@ -1,7 +1,7 @@
 // @flow
 
 import { When, Then } from 'cucumber';
-import { By, WebElement } from 'selenium-webdriver';
+import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect, assert } from 'chai';
 
@@ -58,7 +58,6 @@ When(/^I accept the creation terms$/, async function () {
   const privacyDlg =   await this.driver.findElement(By.xpath('//div[contains(@class,"WalletBackupPrivacyWarningDialog_component")]')) ;
   const privacyChkbox = privacyDlg.findElement(By.xpath('//input[@type="checkbox"]'));
   privacyChkbox.click();
- // await this.click('.SimpleCheckbox_check');
   await this.click('//button[text()="Continue"]', By.xpath);
   });
 
@@ -78,16 +77,11 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
     await this.click(
       "(//button[contains(@class,'MnemonicWord_component') " + // any word
       ` and (text() = '${word}')])`, By.xpath // correct word
-     // ` and @label = '${word}'])[1]`, By.xpath // correct word
     );
    }
-  //const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
   const checkboxes = await this.driver.findElements(By.xpath("//input[contains(@class,'PrivateSwitchBase-input')]"));
-
   checkboxes.forEach((box) => box.click());
-  //await this.click('.WalletRecoveryPhraseEntryDialog .primary');
   await this.click('//button[text()="Confirm"]', By.xpath);
-  console.log("Clicked on Confirm ");
 });
 
 When(/^I enter random mnemonic phrase$/, async function () {
