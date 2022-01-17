@@ -127,9 +127,8 @@ class ThemeSettingsBlock extends Component<AllProps> {
       </>
     );
 
-    // <TODO:REVAMP_BUTTON> need to enable nightly
     const shouldDisplayRevampButton = environment.isDev()
-      // || environment.isNightly()
+      || environment.isNightly()
       || environment.isTest();
 
     const themeBlockClassicComponent = (

@@ -21,6 +21,8 @@ import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { environment } from '../../../environment';
 import CheckboxLabel from '../../../components/common/CheckboxLabel';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   subtitle: {
@@ -46,9 +48,8 @@ type Props = {|
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
   +message: ?ConnectingMessage,
-  +onToggleCheckbox: number => void,
+  +onToggleCheckbox: (PublicDeriver<>, ?WalletChecksum) => void,
   +onCancel: () => void,
-  +onConnect: number => Promise<void>,
   +handleSubmit: () => void,
   +selected: number,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
@@ -125,7 +126,10 @@ class ConnectPage extends Component<Props> {
                       getTokenInfo={this.props.getTokenInfo}
                     />
                   }
-                  onChange={() => onToggleCheckbox(item.publicDeriver.getPublicDeriverId())}
+                  onChange={() => onToggleCheckbox(
+                    item.publicDeriver,
+                    item.checksum,
+                  )}
                   checked={selected === item.publicDeriver.getPublicDeriverId()}
                 />
               </li>

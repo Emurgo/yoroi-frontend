@@ -15,12 +15,17 @@ import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { createAuthEntry } from '../api';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
 
 type State = {|
   selected: number,
+  deriver: ?PublicDeriver<>,
+  checksum: ?WalletChecksum,
 |};
 
 @observer
@@ -30,6 +35,8 @@ export default class ConnectContainer extends Component<
 > {
   state: State = {
     selected: -1,
+    deriver: null,
+    checksum: null,
   };
 
   onUnload: (SyntheticEvent<>) => void = ev => {
@@ -42,7 +49,8 @@ export default class ConnectContainer extends Component<
     });
   };
 
-  componentDidMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
@@ -51,35 +59,55 @@ export default class ConnectContainer extends Component<
   componentWillUnmount() {
     window.removeEventListener('unload', this.onUnload);
   }
-  onToggleCheckbox: (index: number) => void = index => {
+
+  onToggleCheckbox: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
+    const index = deriver.getPublicDeriverId();
     this.setState((prevState) => prevState.selected === index
-      ? { selected: -1 }
-      : { selected: index }
+      ? { selected: -1, deriver: null, checksum: null }
+      : { selected: index, deriver, checksum }
     );
   };
 
-  async onConnect(publicDeriverId: number) {
+  async onConnect(deriver: PublicDeriver<>, checksum: ?WalletChecksum) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if(chromeMessage == null) {
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
     }
+
+    const connector = this.generated.actions.connector;
+
+    const url = chromeMessage.url;
+    const protocol = chromeMessage.protocol;
+    const appAuthID = chromeMessage.appAuthID;
+
+    const authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
+
+    const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
-    const whitelist = result.length ? [...result] : [];
+
+    // Removing any previous whitelisted connections for the same url
+    const whitelist = (result.length ? [...result] : [])
+      .filter(e => (e.protocol !== protocol) || (e.url !== url));
+
     whitelist.push({
-      url: chromeMessage.url,
+      url,
+      protocol,
       publicDeriverId,
-      image: chromeMessage.imgBase64Url
+      appAuthID,
+      auth: authEntry,
+      image: chromeMessage.imgBase64Url,
     });
-    await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
+    await connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage(({
       type: 'connect_response',
       accepted: true,
       publicDeriverId,
+      auth: authEntry,
       tabId: chromeMessage.tabId,
     }: ConnectResponseData));
 
-    this.generated.actions.connector.closeWindow.trigger();
+    connector.closeWindow.trigger();
   }
 
   onCancel: void => void = () => {
@@ -96,9 +124,9 @@ export default class ConnectContainer extends Component<
   handleSubmit: () => void = () => {
     const wallets = this.generated.stores.connector.filteredWallets;
     if (wallets) {
-      const { selected } = this.state;
-      if (selected >= 0) {
-        this.onConnect(selected);
+      const { selected, deriver, checksum } = this.state;
+      if (selected >= 0 && deriver) {
+        this.onConnect(deriver, checksum);
       }
     }
   };
@@ -127,7 +155,6 @@ export default class ConnectContainer extends Component<
         error={error}
         message={responseMessage}
         publicDerivers={wallets}
-        onConnect={this.onConnect}
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
