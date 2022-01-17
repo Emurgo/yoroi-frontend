@@ -1,6 +1,6 @@
 // @flow
 
-import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
+import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout, Status,setWorldConstructor} from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By } from 'selenium-webdriver';
@@ -38,7 +38,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
-  setDefaultTimeout(60 * 1000);
+  setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
   ErgoServer.getMockServer({});
@@ -105,9 +105,29 @@ After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({});
 });
 
-After(async function () {
+const dir1 = './testScreenshots/';
+
+After( async function (scenario) {
+
+  console.log("Status :"+scenario.result.status);
+
+  const dirFailScr = './testScreenshots/';
+  if(scenario.result.status == 'failed'){ 
+    
+    takeScreenshot(this.driver, 'failedStep');
+  }
   await this.driver.quit();
+
 });
+
+
+async function attachScreenshot(){
+  var world = this;
+
+  driver.takeScreenshot().then(function (buffer) {
+    return world.attach(buffer, 'image/png');
+      }); 
+}
 
 const writeFile = promisify(fs.writeFile);
 
@@ -130,7 +150,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
+   if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
     }
 
@@ -141,14 +161,25 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
 
 async function takeScreenshot(driver, name) {
   // path logic
-  const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
+  const dir = `${screenshotsDir}/${testProgress.scenarioName}`; 
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
   const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}.png`;
 
-  const screenshot = await driver.takeScreenshot();
+  const screenshot = await driver.takeScreenshot(); 
   await writeFile(path, screenshot, 'base64');
+  
+}
+
+
+async function handleAlerts(driver, decider){
+  let alert = await driver.switchTo().alert();
+  let alertText = await alert.getText();
+  if(decider == "accept")
+    await alert.accept();
+  else
+    await alert.dismiss();
 }
 
 async function inputMnemonicForWallet(
@@ -245,13 +276,24 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
 Given(/^I have completed the basic setup$/, async function () {
   // language select page
   await this.waitForElement('.LanguageSelectionForm_component');
-  await this.click('.LanguageSelectionForm_submitButton');
+  await this.click('//button[text()="Continue"]', By.xpath);
+ // await this.click('.LanguageSelectionForm_submitButton');
 
   // ToS page
   await this.waitForElement('.TermsOfUseForm_component');
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.TermsOfUseForm_submitButton');
+  //await sleepTh(2000);
 
+  const TOS_class_element = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
+
+  const checkbox = await TOS_class_element.findElement(By.xpath('//input[@type="checkbox"]'));
+
+  await checkbox.click();
+  
+  
+ // this.click('//input[@type="checkbox"]', By.xpath);
+  //await this.click('.SimpleCheckbox_check');
+  await this.click('//button[text()="Continue"]', By.xpath);
+  //await this.click('.TermsOfUseForm_submitButton');
   // uri prompt page
   await acceptUriPrompt(this);
 
@@ -289,6 +331,7 @@ async function acceptUriPrompt(world: any) {
   if (world.getBrowser() !== 'firefox') {
     await world.waitForElement('.UriPromptForm_component');
     await world.click('.allowButton');
+    //await handleAlerts(world.driver,"accept");
     await world.waitForElement('.UriAccept_component');
     await world.click('.finishButton');
   }

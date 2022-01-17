@@ -1,0 +1,233 @@
+[
+  {
+    "keyword": "Feature",
+    "name": "Wallet creation",
+    "line": 1,
+    "id": "wallet-creation",
+    "tags": [],
+    "uri": "features/wallet-creation.feature",
+    "elements": [
+      {
+        "id": "wallet-creation;wallet-creation-(it-5)",
+        "keyword": "Scenario",
+        "line": 9,
+        "name": "Wallet creation (IT-5)",
+        "tags": [
+          {
+            "name": "@it-5",
+            "line": 8
+          }
+        ],
+        "type": "scenario",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "match": {
+              "location": "features/step_definitions/common-steps.js:52"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3000000
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "match": {
+              "location": "features/step_definitions/common-steps.js:61"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1839000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 4,
+            "name": "I have opened the extension",
+            "match": {
+              "location": "features/step_definitions/common-steps.js:340"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8809000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 5,
+            "name": "I have completed the basic setup",
+            "match": {
+              "location": "features/step_definitions/common-steps.js:276"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 7453000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 6,
+            "name": "There is no wallet stored",
+            "match": {
+              "location": "features/step_definitions/common-steps.js:359"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 127000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I click the create button",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 388000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "I select the currency cardano",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:16"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 119000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 12,
+            "name": "I select Create Wallet",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:21"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 491000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 13,
+            "name": "I enter the name \"Created Wallet\"",
+            "match": {
+              "location": "features/step_definitions/wallet-steps.js:7"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1060000000
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "password",
+                      "repeatedPassword"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "asdfasdfasdf",
+                      "asdfasdfasdf"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "And ",
+            "line": 14,
+            "name": "I enter the created wallet password:",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:30"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 956000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 17,
+            "name": "I click the \"Create personal wallet\" button",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:40"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 323000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "I accept the creation terms",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:57"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 152000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "I copy and enter the displayed mnemonic phrase",
+            "match": {
+              "location": "features/step_definitions/wallet-creation-steps.js:65"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1973000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 20,
+            "name": "I should see the opened wallet with name \"Created Wallet\"",
+            "match": {
+              "location": "features/step_definitions/wallet-steps.js:20"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1268000000
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "match": {
+              "location": "features/step_definitions/common-steps.js:110"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 55000000
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -36,6 +36,12 @@ npm run test:run:feature:chrome features/wallet-creation.feature
 npm run test:run:tag:chrome @it-10
 ```
 
+### Create Html Reports
+After executing the above commands to run tests, cucumber-html-reporter can be used to create html reports.
+````
+node reportGenerator.js
+````
+
 ### Storybook
 
 You can easily inspect the whole UI by running Storybook. It is useful for developing also because it supports hot-reload.
