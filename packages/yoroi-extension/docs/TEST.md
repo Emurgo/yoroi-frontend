@@ -38,7 +38,8 @@ npm run test:run:tag:chrome @it-10
 
 ### Create Html Reports
 After executing the above commands to run tests, cucumber-html-reporter can be used to create html reports.
-````
+````bash
+# How to create html reports after a test run
 node reportGenerator.js
 ````
 
