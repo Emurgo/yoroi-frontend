@@ -97,6 +97,7 @@ class Wallet extends Component<AllProps> {
 
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
     const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
 
     if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
@@ -254,7 +255,7 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
-        firstSync: boolean,
+        firstSync: ?number,
       |},
       router: {| location: any |},
       transactions: {|

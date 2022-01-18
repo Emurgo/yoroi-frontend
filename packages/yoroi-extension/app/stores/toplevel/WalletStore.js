@@ -93,7 +93,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable firstSync: null | number;
+  @observable firstSync: ?number;
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -239,7 +239,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
 
       await updateSyncedWallets(publicDeriver)
-       if (this.firstSync) {
+       if (typeof this.firstSync === 'number') {
         runInAction(() => {
           this.firstSync = null
         })
