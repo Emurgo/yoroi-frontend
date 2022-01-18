@@ -151,7 +151,7 @@ Since we need to query the price of 3 cryptos, for APIs that only support one pa
 |https://p.nomics.com/pricing|192 /day or 5952/month|Testing|$1 / 1000 calls| N/A ||
 |https://www.cryptonator.com/api/||N/A|Free|No rate limits||
 |https://developers.shrimpy.io/#pricing|96 /day or 2976/month|N/A|$1 / 100000 calls|N/A||
-|https://cryptoapis.io/pricing|288 /day or 8928 /month|Free|Free|1000 calls/day||
+|https://my.cryptoapis.io/account/subscriptions-and-plans|864 /day or 26784 /month|Standard|€99 / mo|3000 calls/day|
 
 Using 5 minutes refresh interval, the required frequency is 288 /day or 8928 /month and 26784 /month for 3 cryptos.
 
@@ -165,7 +165,7 @@ Using 5 minutes refresh interval, the required frequency is 288 /day or 8928 /mo
 |nomics|576 /day or 17856 /month|Testing|$1 / 1000 calls|N/A|
 |cryptonator||N/A|Free|No rate limits|
 |shrimpy|288 /day or 8928 /month|N/A|$1 / 100000 calls|N/A|
-|cryptoapis|864 /day or 26784 /month|Free|Free|1000 calls/day|
+|cryptoapis|864 /day or 26784 /month|Standard|€99 / mo|3000 calls/day|
 
 Using 1 minute refresh interval, the required frequency is 1,440 /day or 44,640 /month and 133,920 /month for 3 cryptos.
 
