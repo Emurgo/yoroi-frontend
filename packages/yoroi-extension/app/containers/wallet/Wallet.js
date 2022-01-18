@@ -96,7 +96,9 @@ class Wallet extends Component<AllProps> {
   };
 
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
-    if (this.generated.stores.wallets.firstSync) {
+    const publicDeriver = this.generated.stores.wallets.selected;
+
+    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
         <WalletSyncingOverlay
           classicTheme={this.generated.stores.profile.isClassicTheme}
