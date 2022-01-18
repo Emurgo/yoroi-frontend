@@ -224,7 +224,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
-      // await markExistingWalletsAsSynced(this.stores.wallets.publicDerivers)
+      await markExistingWalletsAsSynced(this.stores.wallets.publicDerivers)
       const wallet = await getCurrentWalletFromLS(publicDeriver);
       if (!wallet || !wallet.isSynced) {
         runInAction(() => {
