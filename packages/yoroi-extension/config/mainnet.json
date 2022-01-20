@@ -6,7 +6,7 @@
     "simpleTemplate": "https://adapools.yoroiwallet.com/?source=$$BROWSER$$"
   },
   "app": {
-    "walletRefreshInterval": 20000,
+    "walletRefreshInterval": 30000,
     "serverStatusRefreshInterval": 20000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
