@@ -91,16 +91,19 @@ class Wallet extends Component<AllProps> {
     return undefined;
   }
 
-  navigateToWallets: string => void = destination => {
+  navigateToMyWallets: string => void = destination => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
 
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
-    if (this.generated.stores.wallets.firstSync) {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
+
+    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
-        <WalletSyncingOverlay 
-          classicTheme={this.generated.stores.profile.isClassicTheme} 
-          onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)} 
+        <WalletSyncingOverlay
+          classicTheme={this.generated.stores.profile.isClassicTheme}
+          onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
       )
     }
@@ -162,7 +165,7 @@ class Wallet extends Component<AllProps> {
             title={
               <NavBarBack
                 route={ROUTES.MY_WALLETS}
-                onBackClick={this.navigateToWallets}
+                onBackClick={this.navigateToMyWallets}
                 title={intl.formatMessage(messages.backButton)}
               />
             }
@@ -250,9 +253,9 @@ class Wallet extends Component<AllProps> {
       walletSettings: {|
         getWalletWarnings: (PublicDeriver<>) => WarningList,
       |},
-      wallets: {| 
-        selected: null | PublicDeriver<>, 
-        firstSync: boolean,
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        firstSync: ?number,
       |},
       router: {| location: any |},
       transactions: {|
