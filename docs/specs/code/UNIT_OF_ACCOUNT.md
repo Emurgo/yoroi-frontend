@@ -133,9 +133,9 @@ Then endpoints provided by the backend:
 The backend queries conversion rate data from multiple (at least 3) API providers and use the median value to answer client requests.
 
 # APIs
-To support the design of 15 minute refresh interval, the required query frequency is:
+To support 15 minute refresh interval, the required query frequency is:
 60 minutes/hour / 15 minutes * 24 hours/day = 96 /day
-or maximal
+which is
 96 /day * 31 day/month = 2976 /month.
 
 Since we need to query the price of 3 cryptos, for APIs that only support one pair of rates per query, the numbers becomes:
@@ -143,43 +143,43 @@ Since we need to query the price of 3 cryptos, for APIs that only support one pa
 
 |API provider|Requirement|Minimal plan|Fee/month|Rate limit|Comments|
 |-|-|-|-|-|-|
-|https://min-api.cryptocompare.com/pricing|96 /day or 2976/month|Personal|Free|100,000 calls/month|Also used by Seiza. "For personal / non-commercial projects or for commercial trial purposes." Terms: https://www.cryptocompare.com/free-api-use/|
+|https://min-api.cryptocompare.com/pricing|96 /day or 2976/month|Professional|$ 79.99 / mo. paid yearly|250,000 calls/month||
 |https://coinlayer.com/product|96 /day or 2976/month|Basic|$9.99| 5,000 calls/month||
 |https://coinmarketcap.com/api/pricing/|96 /day or 2976/month|Basic|Free|10,000 calls/month||
 |https://www.coinapi.io/Pricing|288 /day or 8928 /month|Startup|$79|1000 calls/day||
 |https://coinpaprika.com/api/||N/A|Free|Virtually no limits||
-|https://p.nomics.com/pricing||Personal Use (Only)|Free|No rate limits|Attribution Required, Not for Business Use|
+|https://p.nomics.com/pricing|192 /day or 5952/month|Testing|$1 / 1000 calls| N/A ||
 |https://www.cryptonator.com/api/||N/A|Free|No rate limits||
-|https://developers.shrimpy.io/#pricing||Data|Free|No rate limits||
-|https://cryptoapis.io/products/market-data/#plans|288 /day or 8928 /month|Free|Free|500 calls/day|Attribution required|
+|https://developers.shrimpy.io/#pricing|96 /day or 2976/month|N/A|$1 / 100000 calls|N/A||
+|https://my.cryptoapis.io/account/subscriptions-and-plans|864 /day or 26784 /month|Standard|€99 / mo|3000 calls/day|
 
-At 5 minutes refresh interval, the required frequency is 288 /day or 8928 /month and 26784 /month for 3 cryptos.
+Using 5 minutes refresh interval, the required frequency is 288 /day or 8928 /month and 26784 /month for 3 cryptos.
 
 |API provider|Requirement|Minimal plan|Fee/month|Rate limit|Comments|
 |-|-|-|-|-|-|
-|cryptocompare|288 /day or 8928 /month|Personal|Free|100,000 calls/month|"For personal / non-commercial projects or for commercial trial purposes." Terms: https://www.cryptocompare.com/free-api-use/|
+|cryptocompare|288 /day or 8928 /month|Professional|$ 79.99 / mo. paid yearly|250,000 calls/month||
 |coinlayer|288 /day or 8928 /month|Professional|$39.99| 30,000 calls/month|
 |coinmarketcap|288 /day or 8928 /month|Hobbyist|$29|40,000 calls/month|
 |coinapi|864 /day or 26784 /month|Startup|$79|1000 calls/day|
 |coinpaprika||N/A|Free|Virtually no limits|
-|nomics||Personal Use (Only)|Free|No rate limits|Attribution Required, Not for Business Use|
+|nomics|576 /day or 17856 /month|Testing|$1 / 1000 calls|N/A|
 |cryptonator||N/A|Free|No rate limits|
-|shrimpy||Data|Free|No rate limits|
-|cryptoapis|864 /day or 26784 /month|Growth|$75|2500 calls/day|
+|shrimpy|288 /day or 8928 /month|N/A|$1 / 100000 calls|N/A|
+|cryptoapis|864 /day or 26784 /month|Standard|€99 / mo|3000 calls/day|
 
-At 1 minute refresh interval, the required frequency is 1,440 /day or 44,640 /month and 133,920 /month for 3 cryptos.
+Using 1 minute refresh interval, the required frequency is 1,440 /day or 44,640 /month and 133,920 /month for 3 cryptos.
 
 |API provider|Requirement|Minimal plan|Fee/month|Rate limit|Comments|
 |-|-|-|-|-|-|
-|cryptocompare|1,440 /day or 44,640 /month|Commercial|$79.99|250,000 calls/month|
-|coinlayer|1,440 /day or 44,640 /month|Professional Plus|$79.99|100,000 calls / month|
+|cryptocompare|1,440 /day or 44,640 /month|Professional|$ 79.99 / mo. paid yearly|250,000 calls/month|
+|coinlayer|1,440 /day or 44,640 /month|Professional Plus|$79.99|10,000 calls / month|
 |coinmarketcap|1,440 /day or 44,640 /month|Startup|$79|120,000 calls/month|
-|coinapi|4,320 /day or 133,920 /month|Streamer|$249|10,000 calls/day|
+|coinapi|4,320 /day or 133,920 /month|Streamer|$249 / mo|10,000 calls/day|
 |coinpaprika||N/A|Free|Virtually no limits|
-|nomics||Personal Use (Only)|Free|No rate limits|Attribution Required, Not for Business Use|
+|nomics|2,880 /day or 89,280 /month|Standard|~ $80 / mo||
 |cryptonator||N/A|Free|No rate limits|
-|shrimpy||Data|Free|No rate limits|
-|cryptoapis|4,320 /day or 133,920 /month|Start-up|$241|7500 calls/day|
+|shrimpy|1,440 /day or 44,640 /month|N/A|$1 / 100000 calls|N/A|
+|cryptoapis|4,320 /day or 133,920 /month|Start-up|€299 / mo|10,000 calls/day|
 
 
 
