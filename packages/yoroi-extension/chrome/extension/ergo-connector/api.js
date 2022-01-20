@@ -329,6 +329,11 @@ function createMockHeader(bestBlock) {
   // and I'm also unsure if any of these 3 would impact signing or not.
   // Maybe version would later be used in the ergoscript context?
   return JSON.stringify({
+    id: '68ce7d31be888051a981333e712d8dde14f8f318ca9ed0796ae22d22e1b3debd',
+    adProofsRoot: '987a12bb83f9f1284f3e83598f2a401cd208e3c16cd58629c71022dc67face43',
+    stateRoot: 'da5805a87f029b24fc3938f9f633d74b6843a72c7ce1612e8a96158e61cb67b715',
+    transactionsRoot: 'e75411a5451979fa4002eb3b8c7b5366f30f07c611954d683d0d04cacd3cb200',
+    extensionHash: 'a0c7169b677e1f555d3c64d513a1ccedef82de45bd9d3f9d99c035a2cc3e2bd9',
     version: 2, // TODO: where to get version? (does this impact signing?)
     parentId: bestBlock.hash,
     timestamp: Date.now(),
