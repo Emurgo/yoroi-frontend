@@ -121,13 +121,6 @@ export default class PaperWalletDialog extends Component<Props> {
           ))}
         </Select>
 
-        {/* <CheckboxLabel
-          checked={printPaperWalletIdentification.value}
-          onChange={printPaperWalletIdentification.onChange}
-          label={this.context.intl.formatMessage(messages.printIdentificationSelectLabel)}
-          description={this.context.intl.formatMessage(messages.printIdentificationMessage)}
-        /> */}
-
         {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
       </Dialog>
     );
