@@ -4,7 +4,6 @@ import { observable, action, runInAction, computed } from 'mobx';
 import Request from './lib/LocalizedRequest';
 import Store from './base/Store';
 import type {
-  PublicDeriverCache,
   ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
@@ -13,14 +12,7 @@ import type {
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { LoadingWalletStates } from '../ergo-connector/types';
-import {
-  getWallets
-} from '../api/common/index';
-import {
-  isErgo,
-} from '../api/ada/lib/storage/database/prepackaged/networks';
-import { getConnectedSites, getProtocol, parseWalletsList } from '../ergo-connector/stores/ConnectorStore';
+import { getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -42,22 +34,6 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
   });
 }
 
-// function getConnectedSites(): Promise<ConnectedSites> {
-//   return new Promise((resolve, reject) => {
-//     window.chrome.runtime.sendMessage(
-//       ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-//       response => {
-//         if (window.chrome.runtime.lastError) {
-//           // eslint-disable-next-line prefer-promise-reject-errors
-//           reject('Could not establish connection: get_connected_sites ');
-//         }
-
-//         resolve(response);
-//       }
-//     );
-//   });
-// }
-
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -67,20 +43,6 @@ type SetWhitelistFunc = {|
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
-
-  @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
-  @observable errorWallets: string = '';
-  /**
-   * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
-   *   it will be displyed to the user at the `connect` screen for the user to choose
-   *   which wallet to connect
-   * - `allWallets`: list of all wallets the user have in yoroi
-   *    Will be displayed in the on the `connected webists screen` as we need all wallets
-   *    not only ergo or cardano ones
-   */
-  @observable filteredWallets: Array<PublicDeriverCache> = [];
-  @observable allWallets: Array<PublicDeriverCache> = [];
-
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
@@ -103,7 +65,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
-    this.actions.connector.refreshWallets.listen(this._getWallets);
     this._getConnectorWhitelist();
     this.currentConnectorWhitelist;
   }
@@ -123,51 +84,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       })
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
-  };
-
-  // ========== wallets info ========== //
-  @action
-  _getWallets: void => Promise<void> = async () => {
-    runInAction(() => {
-      this.loadingWallets = LoadingWalletStates.PENDING;
-      this.errorWallets = '';
-    });
-
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
-    }
-    try {
-      const wallets = await getWallets({ db: persistentDb });
-
-      const protocol = await getProtocol().then(res => res);
-      const isProtocolErgo = protocol.type === 'ergo';
-      const isProtocolCardano = protocol.type === 'cardano';
-      const isProtocolDefined = isProtocolErgo || isProtocolCardano;
-      const protocolFilter = wallet => {
-        const isWalletErgo = isErgo(wallet.getParent().getNetworkInfo());
-        return isProtocolErgo === isWalletErgo;
-      };
-      const filteredWallets = isProtocolDefined
-        ? wallets.filter(protocolFilter)
-        : wallets;
-
-      const filteredWalletsResult = await parseWalletsList(filteredWallets)
-      const allWallets = await parseWalletsList(wallets)
-
-      runInAction(() => {
-        this.loadingWallets = LoadingWalletStates.SUCCESS;
-
-        // note: "replace" is a mobx-specific function
-        (this.filteredWallets: any).replace(filteredWalletsResult);
-        (this.allWallets: any).replace(allWallets);
-      });
-    } catch (err) {
-      runInAction(() => {
-        this.loadingWallets = LoadingWalletStates.REJECTED;
-        this.errorWallets = err.message;
-      });
-    }
   };
 
   // ========== whitelist ========== //
