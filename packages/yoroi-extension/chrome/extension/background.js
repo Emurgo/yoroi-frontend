@@ -85,6 +85,13 @@ const onYoroiIconClicked = () => {
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
+// Inject dapp-connector api code
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  chrome.tabs.executeScript({
+    file: 'js/inject.js',
+    allFrames: true,
+  })
+});
 /**
  * we store the ID instead of an index
  * because the user could delete a wallet (causing indices to shift)
