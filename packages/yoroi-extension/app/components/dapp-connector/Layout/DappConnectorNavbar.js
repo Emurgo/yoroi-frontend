@@ -11,11 +11,30 @@ type Props = {|
 @observer
 export default class DappConnectorNavbar extends Component<Props> {
 
-    render(): Node {
-        return (
-          <div className={styles.component}>
-            <h1 className={styles.header}>Dapp connector</h1>
-          </div>
-        )
-    }
+  getPermission() {
+    chrome.permissions.request({
+      permissions: ['tabs', 'activeTab'],
+      // origins: [
+      //   'http://*/*',
+      //   'https://*/*',
+      // ]
+    }, (granted) => {
+      if (granted) {
+        alert('you have the permissions')
+      } else {
+        alert('You don\'t')
+      }
+    });
+  }
+
+  render(): Node {
+
+    
+    return (
+      <div className={styles.component}>
+        <h1 className={styles.header}>Dapp connector</h1>
+        <button onClick={this.getPermission} type='button'>Get Permission</button>
+      </div>
+    )
+  }
 }
