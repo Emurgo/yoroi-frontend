@@ -32,6 +32,9 @@ export default class YoroiPalettePage extends Component<Props> {
         currentTheme: 'classic',
     }
 
+    switchTheme(theme: string): void {
+        this.setState({ currentTheme: theme })
+    }
 
     render(): Node {
         const { currentTheme } = this.state
@@ -40,20 +43,24 @@ export default class YoroiPalettePage extends Component<Props> {
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
-              <button className={classNames([(currentTheme === 'classic') && styles.active])} type='button'>Classic Theme</button>
-              <button className={classNames([(currentTheme === 'modern') && styles.active])} type='button'>Modern Theme</button>
+              <button
+                className={classNames([(currentTheme === 'classic') && styles.active])}
+                type='button'
+                onClick={() => this.switchTheme('classic')}
+              >
+                Classic Theme
+              </button>
+              <button
+                onClick={() => this.switchTheme('modern')}
+                className={classNames([(currentTheme === 'modern') && styles.active])}
+                type='button'
+              >
+                Modern Theme
+              </button>
             </div>
-
-            <div className={styles.row}>
-              <p>Color</p>
-              <p className={styles.colorHex}>
-                Color Value
-              </p>
-              <p className={styles.colorName}>Name in code</p>
-
-            </div>
-            {Object.entries(palette).map((row) => (
-              <div className={styles.row} key={row[1]}>
+            
+            {Object.entries(palette).map((row, idx) => (
+              <div className={styles.row} key={idx}>
                 <span
                   className={styles.colorBox}
                   style={{
