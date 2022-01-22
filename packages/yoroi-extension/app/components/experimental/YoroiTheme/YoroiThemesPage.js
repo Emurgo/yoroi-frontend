@@ -1,12 +1,11 @@
 // @flow
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import styles from './YoroiPalette.scss'
+import styles from './YoroiThemesPage.scss'
 import type { Node } from 'react';
 import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
-import { getPalette } from './palette';
 
 type Props = {|
     header: string,
@@ -26,7 +25,7 @@ const themes = {
 }
 
 @observer
-export default class YoroiPalettePage extends Component<Props> {
+export default class YoroiThemesPage extends Component<Props> {
 
     state = {
         currentTheme: 'classic',
@@ -38,7 +37,6 @@ export default class YoroiPalettePage extends Component<Props> {
 
     render(): Node {
         const { currentTheme } = this.state
-        const palette = getPalette(themes[currentTheme])
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
@@ -57,20 +55,6 @@ export default class YoroiPalettePage extends Component<Props> {
                 Modern Theme
               </button>
             </div>
-            {Object.entries(palette).map((row, idx) => (
-              <div className={styles.row} key={idx}>
-                <span
-                  className={styles.colorBox}
-                  style={{
-                      backgroundColor: row[1]
-                  }}
-                />
-                <p className={styles.colorHex}>
-                  {row[1]}
-                </p>
-                <p className={styles.colorName}>{row[0]}</p>
-              </div>
-              ))}
           </div>
         )
     }

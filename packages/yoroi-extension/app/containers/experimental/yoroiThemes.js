@@ -15,8 +15,9 @@ import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebs
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
 import Navbar from '../../components/experimental/layout/Navbar'
 import YoroiPalettePage from '../../components/experimental/YoroiPalette/YoroiPalette'
+import YoroiThemesPage from '../../components/experimental/YoroiTheme/YoroiThemesPage'
 
-export type GeneratedData = typeof YoroiPaletteContainer.prototype.generated;
+export type GeneratedData = typeof YoroiThemesContainer.prototype.generated;
 
 type Props = InjectedOrGenerated<GeneratedData>
 
@@ -24,7 +25,7 @@ type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-class YoroiPaletteContainer extends Component<AllProps> {
+class YoroiThemesContainer extends Component<AllProps> {
 
   render (): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
@@ -39,7 +40,7 @@ class YoroiPaletteContainer extends Component<AllProps> {
         }
       >
         <FullscreenLayout bottomPadding={0}>
-          <YoroiPalettePage />
+          <YoroiThemesPage />
         </FullscreenLayout>
       </TopBarLayout>
     );
@@ -88,4 +89,4 @@ class YoroiPaletteContainer extends Component<AllProps> {
     });
   }
 }
-export default (withLayout(YoroiPaletteContainer): ComponentType<Props>);
+export default (withLayout(YoroiThemesContainer): ComponentType<Props>);
