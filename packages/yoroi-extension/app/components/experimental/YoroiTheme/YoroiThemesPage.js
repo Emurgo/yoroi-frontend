@@ -37,6 +37,7 @@ export default class YoroiThemesPage extends Component<Props> {
 
     render(): Node {
         const { currentTheme } = this.state
+        console.log(themes[currentTheme])
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
@@ -54,6 +55,21 @@ export default class YoroiThemesPage extends Component<Props> {
               >
                 Modern Theme
               </button>
+            </div>
+            <div className={styles.shadows}>
+              <h1>Shadows</h1>
+              <div className={styles.shadowsContainer}>
+                {themes[currentTheme].shadows.map(shadow => (
+                  <div
+                    className={styles.shadow}
+                    style={{
+                    boxShadow: shadow
+                  }}
+                    key={shadow}
+                  >{shadow}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )

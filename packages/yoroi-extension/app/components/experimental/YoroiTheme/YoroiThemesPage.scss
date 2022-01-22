@@ -1,0 +1,54 @@
+.component {
+    padding: 20px 40px;
+
+    .themes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 400px;
+        gap: 10px;
+        margin-bottom: 20px;
+        button {
+            font-size: 16px;
+            font-weight: 400;
+            color: #333438;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background-color: #F0F3F5;
+        }
+        .active {
+            background-color: #59B1F4;
+            color: #fff;
+        }
+    }
+
+    .shadows {
+        margin-top: 20px;
+
+        & h1 {
+            font-size: 32px;
+            color: var(--yoroi-palette-gray-900);
+            margin-bottom: 20px;
+        }
+
+        .shadowsContainer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+
+            .shadow {
+                background-color: var(--yoroi-palette-gray-100);
+                width: 100%;
+                height: 200px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                line-height: 32px;
+                font-family: monospace;
+                padding: 10px;
+            }
+        }
+    }
+
+}
