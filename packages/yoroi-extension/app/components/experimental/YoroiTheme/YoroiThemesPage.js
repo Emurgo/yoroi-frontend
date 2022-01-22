@@ -37,8 +37,7 @@ export default class YoroiThemesPage extends Component<Props> {
 
     render(): Node {
         const { currentTheme } = this.state
-        console.log(themes)
-        console.log(Object.entries(themes[currentTheme].typography))
+        delete themes[currentTheme].components
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
@@ -94,6 +93,29 @@ export default class YoroiThemesPage extends Component<Props> {
 
                 return ''
               })}
+              </div>
+            </div>
+
+            <div className={styles.jsonWrapper}>
+              <h1>Show All ({currentTheme})</h1>
+              <div className={styles.themes}>
+                <button
+                  className={classNames([(currentTheme === 'classic') && styles.active])}
+                  type='button'
+                  onClick={() => this.switchTheme('classic')}
+                >
+                  Classic Theme
+                </button>
+                <button
+                  onClick={() => this.switchTheme('modern')}
+                  className={classNames([(currentTheme === 'modern') && styles.active])}
+                  type='button'
+                >
+                  Modern Theme
+                </button>
+              </div>
+              <div className={styles.json}>
+                <pre>{JSON.stringify(themes[currentTheme], null, 5)}</pre>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 .component {
     padding: 20px 40px;
+    padding-bottom: 200px;
 
     .themes {
         display: grid;
@@ -92,6 +93,28 @@
                     }
                 }
             }
+        }
+    }
+
+    .jsonWrapper {
+        margin-top: 60px;
+
+        & h1 {
+            font-size: 32px;
+            color: var(--yoroi-palette-gray-900);
+            margin-bottom: 20px;
+        }
+
+        .json {
+            background-color: var(--yoroi-palette-gray-100);
+            padding: 30px 40px;
+            border-radius: 8px;
+            line-height: 25px;
+            letter-spacing: 2px;
+            font-family: 'RobotoMono';
+            font-weight: 500;
+            color: var(--yoroi-palette-gray-600);
+            box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 5px 8px 0px rgba(0,0,0,0.14),0px 1px 14px 0px rgba(0,0,0,0.12);
         }
     }
 
