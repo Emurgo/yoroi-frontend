@@ -51,4 +51,48 @@
         }
     }
 
+    .typographyWrapper {
+        margin-top: 60px;
+
+        & h1 {
+            font-size: 32px;
+            color: var(--yoroi-palette-gray-900);
+            margin-bottom: 20px;
+        }
+
+        .typographyList {
+            .row {
+                margin-bottom: 30px;
+                font-family: 'RobotoMono';
+                .rowKey {
+                    font-size: 19px;
+                    line-height: 20px;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                }
+
+                .subRow {
+                    background-color: var(--yoroi-palette-gray-50);
+                    padding: 20px 40px;
+                    margin-top: 10px;
+                    border-radius: 9px;
+
+                    .subRowItem {
+                        display: grid;
+                        grid-template-columns: 1fr 4fr;
+                        align-items: center;
+                        justify-content: flex-start;
+                        line-height: 30px;
+
+                        .key {
+                            color: var(--yoroi-palette-gray-600);
+                            margin-right: 20px;
+                            font-family: 'RobotoMono';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

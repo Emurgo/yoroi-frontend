@@ -72,25 +72,27 @@ export default class YoroiThemesPage extends Component<Props> {
                 ))}
               </div>
             </div>
-            <div>
+            <div className={styles.typographyWrapper}>
               <h1>Typography</h1>
-              <div>
+              <div className={styles.typographyList}>
                 {Object.entries(themes[currentTheme].typography).map(entry => {
                   if (typeof entry[1] === 'object') {
                     return (
-                      <div key={entry[0]}>
-                        <p>{entry[0]}</p>
-                        <ul>
+                      <div className={styles.row} key={entry[0]}>
+                        <p className={styles.rowKey}>{entry[0]}</p>
+                        <ul className={styles.subRow}>
                           {Object.entries(entry[1]).map(row => (
-                            <li key={row[0]}>
-                              <p>{row[0]}</p>
-                              <p>{row[1]}</p>
+                            <li className={styles.subRowItem} key={row[0]}>
+                              <p className={styles.key}>{row[0]}</p>
+                              <p className={styles.value}>{row[1]}</p>
                             </li>
                           ))}
                         </ul>
                       </div>
                   )
                 }
+
+                return ''
               })}
               </div>
             </div>
