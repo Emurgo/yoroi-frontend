@@ -63,5 +63,9 @@ export const ROUTES = {
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites'
+  },
+  // Experimental
+  EXPERIMENTAL: {
+    YOROI_PALETTE: '/experimental/yoroi-palette'
   }
 };
