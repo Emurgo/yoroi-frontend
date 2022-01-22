@@ -37,7 +37,8 @@ export default class YoroiThemesPage extends Component<Props> {
 
     render(): Node {
         const { currentTheme } = this.state
-        console.log(themes[currentTheme])
+        console.log(themes)
+        console.log(Object.entries(themes[currentTheme].typography))
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
@@ -69,6 +70,28 @@ export default class YoroiThemesPage extends Component<Props> {
                   >{shadow}
                   </div>
                 ))}
+              </div>
+            </div>
+            <div>
+              <h1>Typography</h1>
+              <div>
+                {Object.entries(themes[currentTheme].typography).map(entry => {
+                  if (typeof entry[1] === 'object') {
+                    return (
+                      <div key={entry[0]}>
+                        <p>{entry[0]}</p>
+                        <ul>
+                          {Object.entries(entry[1]).map(row => (
+                            <li key={row[0]}>
+                              <p>{row[0]}</p>
+                              <p>{row[1]}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                  )
+                }
+              })}
               </div>
             </div>
           </div>
