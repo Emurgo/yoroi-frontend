@@ -17,8 +17,8 @@ const PAGES = [
     route: ROUTES.EXPERIMENTAL.YOROI_PALETTE
   },
   {
-    label: 'Yoroi Components',
-    route: ROUTES.EXPERIMENTAL.YOROI_COMPONENTS
+    label: 'Themes',
+    route: ROUTES.EXPERIMENTAL.THEMES
   }
 ]
 @observer

@@ -67,6 +67,7 @@ export const ROUTES = {
   // Experimental
   EXPERIMENTAL: {
     YOROI_PALETTE: '/experimental/yoroi-palette',
-    YOROI_COMPONENTS: '/experimental/components'
+    YOROI_COMPONENTS: '/experimental/components',
+    THEMES: '/experimental/themes'
   }
 };

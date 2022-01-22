@@ -39,7 +39,7 @@ export default class YoroiPalettePage extends Component<Props> {
     render(): Node {
         const { currentTheme } = this.state
         const palette = getPalette(themes[currentTheme])
-
+      console.log(themes)
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
