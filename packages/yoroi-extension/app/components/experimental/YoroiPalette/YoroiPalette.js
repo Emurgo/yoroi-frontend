@@ -17,7 +17,7 @@ type Props = {|
  * 1. Display shadows
  * 2. Display All colors
  * 3. Toggle according to the theme
- *
+ * 4. Only accessable in nightly
  */
 
 const themes = {
