@@ -1,0 +1,26 @@
+.component {
+    padding: 20px 40px;
+
+    .row {
+        max-width: 1000px;
+        display: grid;
+        grid-template-columns: 1fr 2fr 2fr;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+
+        .colorBox {
+            margin-right: 20px;
+            width: 124px;
+            height: 40px;
+            box-shadow: 3px 6px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        .colorName {
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
+}
