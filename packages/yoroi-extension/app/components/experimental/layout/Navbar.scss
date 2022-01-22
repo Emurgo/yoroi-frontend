@@ -1,5 +1,5 @@
 .component {
-    background-color: #FFFFFF;
+    background-color: var(--yoroi-palette-gray-100);
     box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
 
     .tab {
@@ -9,11 +9,16 @@
         font-weight: 500;
         letter-spacing: 0;
         line-height: 28px;
-        padding: 32px 40px;
-        margin-right: 10px;
+        padding: 20px 40px;
+        color: var(--yoroi-palette-gray-600);
+
+        &:hover {
+            background-color: var(--yoroi-palette-common-white);
+        }
     }
 
     .active {
-        background-color: var(--yoroi-palette-secondary-200);
+        background-color: white;
+        color: var(--yoroi-palette-secondary-300);
     }
 }
