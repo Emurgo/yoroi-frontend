@@ -32,7 +32,12 @@ class YoroiPaletteContainer extends Component<AllProps> {
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
-        navbar={<Navbar header="Yoroi Palette" />}
+        navbar={
+          (<Navbar
+            header="Yoroi Palette"
+            goToRoute={this.generated.actions.router.goToRoute.trigger}
+          />)
+        }
       >
         <FullscreenLayout bottomPadding={0}>
           <YoroiPalettePage />
@@ -45,6 +50,23 @@ class YoroiPaletteContainer extends Component<AllProps> {
   @computed get generated (): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
+    actions: {|
+      router: {|
+        redirect: {|
+          trigger: (params: {|
+            params?: ?any,
+            route: string
+          |}) => void
+        |},
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |}
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -54,6 +76,12 @@ class YoroiPaletteContainer extends Component<AllProps> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+          redirect: { trigger: actions.router.redirect.trigger },
+        },
+      },
       SidebarContainerProps: (
         { actions, stores }: InjectedOrGenerated<SidebarContainerData>
       ),

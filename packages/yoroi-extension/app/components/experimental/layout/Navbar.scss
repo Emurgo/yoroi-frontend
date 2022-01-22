@@ -2,7 +2,7 @@
     background-color: #FFFFFF;
     box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
 
-    .header {
+    .tab {
         color: #38393D;
         font-family: Rubik;
         font-size: 20px;
@@ -10,5 +10,10 @@
         letter-spacing: 0;
         line-height: 28px;
         padding: 32px 40px;
+        margin-right: 10px;
+    }
+
+    .active {
+        background-color: var(--yoroi-palette-secondary-200);
     }
 }
