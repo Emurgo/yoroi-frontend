@@ -63,6 +63,7 @@ type Props = {|
   +exportTheme: void => PossiblyAsync<void>,
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
+  +switchToFirstWallet: void => void,
 |};
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
@@ -126,6 +127,10 @@ class ThemeSettingsBlock extends Component<AllProps> {
       </>
     );
 
+    const shouldDisplayRevampButton = environment.isDev()
+      || environment.isNightly()
+      || environment.isTest();
+
     const themeBlockClassicComponent = (
       <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingTop: '30px' }}>
         {commonHeader}
@@ -172,7 +177,8 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </Box>
-        {(environment.isNightly() || environment.isTest()) && (
+
+        {shouldDisplayRevampButton && (
           <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
             <Button
               sx={{
@@ -199,6 +205,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
               }}
               onClick={() => {
                 selectTheme({ theme: THEMES.YOROI_REVAMP });
+                this.props.switchToFirstWallet();
               }}
             >
               {intl.formatMessage(messages.tryYoroiRevamp)}
@@ -216,7 +223,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </Box>
-        {(environment.isNightly() || environment.isTest()) && (
+        {(environment.isNightly() || environment.isTest() || environment.isDev()) && (
           <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="ternary"

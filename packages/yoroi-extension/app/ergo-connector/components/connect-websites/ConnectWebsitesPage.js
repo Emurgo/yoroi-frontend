@@ -20,7 +20,7 @@ type Props = {|
   +whitelistEntries: ?Array<WhitelistEntry>,
   +activeSites: Array<string>,
   +wallets: ?Array<PublicDeriverCache>,
-  +onRemoveWallet: ?string => void,
+  +onRemoveWallet: (url: string, protocol: string) => void,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
 |};
@@ -63,7 +63,7 @@ export default class ConnectWebsitesPage extends Component<Props> {
           {intl.formatMessage(connectorMessages.connectedWebsites)}
         </h1>
         <div className={styles.walletList}>
-          {whitelistEntries.map(({ url, publicDeriverId }) => {
+          {whitelistEntries.map(({ url, publicDeriverId, protocol }) => {
             const wallet = wallets.find(
               cacheEntry => cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
             );
@@ -78,7 +78,7 @@ export default class ConnectWebsitesPage extends Component<Props> {
                 url={url}
                 isActiveSite={this.props.activeSites.includes(url)}
                 wallet={wallet}
-                onRemoveWallet={this.props.onRemoveWallet}
+                onRemoveWallet={() => { this.props.onRemoveWallet(url, protocol) }}
                 getTokenInfo={this.props.getTokenInfo}
                 shouldHideBalance={this.props.shouldHideBalance}
               />

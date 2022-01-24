@@ -40,7 +40,7 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
         .map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: getTokenIdentifierIfExists(token.info) ?? '-',
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
+          amount: Number(genFormatTokenAmount(getTokenInfo)(token.entry)),
         }));
     })();
 

@@ -20,28 +20,28 @@ const RobotoMonoFonts = `
     font-style: normal;
     font-display: swap;
     font-weight: 300;
-    src: local('RobotoMono'), local('RobotoMono-Light'), url(${RobotoMonoLightTtf}) format('truetype');
+    src: url(${RobotoMonoLightTtf}) format('truetype');
   }
   @font-face {
     font-family: 'RobotoMono';
     font-style: normal;
     font-display: swap;
     font-weight: 400;
-    src: local('RobotoMono'), local('RobotoMono-Regular'), url(${RobotoMonoRegularTtf}) format('truetype');
+    src: url(${RobotoMonoRegularTtf}) format('truetype');
   }
   @font-face {
     font-family: 'RobotoMono';
     font-style: normal;
     font-display: swap;
     font-weight: 500;
-    src: local('RobotoMono'), local('RobotoMono-Medium'), url(${RobotoMonoMediumTtf}) format('truetype');
+    src: url(${RobotoMonoMediumTtf}) format('truetype');
   }
   @font-face {
     font-family: 'RobotoMono';
     font-style: normal;
     font-display: swap;
     font-weight: 700;
-    src: local('RobotoMono'), local('RobotoMono-Bold'), url(${RobotoMonoBoldTtf}) format('truetype');
+    src: url(${RobotoMonoBoldTtf}) format('truetype');
   }
 `;
 
@@ -51,28 +51,28 @@ const RubikFonts = `
     font-style: normal;
     font-display: swap;
     font-weight: 300;
-    src: local('Rubik'), local('Rubik-Light'), url(${RubikLightTtf}) format('truetype');
+    src: url(${RubikLightTtf}) format('truetype');
   }
   @font-face {
     font-family: 'Rubik';
     font-style: normal;
     font-display: swap;
     font-weight: 400;
-    src: local('Rubik'), local('Rubik-Regular'), url(${RubikRegularTtf}) format('truetype');
+    src: url(${RubikRegularTtf}) format('truetype');
   }
   @font-face {
     font-family: 'Rubik';
     font-style: normal;
     font-display: swap;
     font-weight: 500;
-    src: local('Rubik'), local('Rubik-Medium'), url(${RubikMediumTtf}) format('truetype');
+    src: url(${RubikMediumTtf}) format('truetype');
   }
   @font-face {
     font-family: 'Rubik';
     font-style: normal;
     font-display: swap;
     font-weight: 700;
-    src: local('Rubik'), local('Rubik-Bold'), url(${RubikBoldTtf}) format('truetype');
+    src: url(${RubikBoldTtf}) format('truetype');
   }
 `;
 
@@ -82,28 +82,28 @@ const SFUIDisplayFonts = `
     font-style: normal;
     font-display: swap;
     font-weight: 300;
-    src: local('SFUIDisplay'), local('SFUIDisplay-Light'), url(${SFUIDisplayLightTtf}) format('woff');
+    src: url(${SFUIDisplayLightTtf}) format('woff');
   }
   @font-face {
     font-family: 'SFUIDisplay';
     font-style: normal;
     font-display: swap;
     font-weight: 400;
-    src: local('SFUIDisplay'), local('SFUIDisplay-Regular'), url(${SFUIDisplayRegularTtf}) format('woff');
+    src: url(${SFUIDisplayRegularTtf}) format('woff');
   }
   @font-face {
     font-family: 'SFUIDisplay';
     font-style: normal;
     font-display: swap;
     font-weight: 500;
-    src: local('SFUIDisplay'), local('SFUIDisplay-Medium'), url(${SFUIDisplayMediumTtf}) format('woff');
+    src: url(${SFUIDisplayMediumTtf}) format('woff');
   }
   @font-face {
     font-family: 'SFUIDisplay';
     font-style: normal;
     font-display: swap;
     font-weight: 700;
-    src: local('SFUIDisplay'), local('SFUIDisplay-Bold'), url(${SFUIDisplayBoldTtf}) format('woff');
+    src: url(${SFUIDisplayBoldTtf}) format('woff');
   }
 `;
 export { RobotoMonoFonts, RubikFonts, SFUIDisplayFonts };

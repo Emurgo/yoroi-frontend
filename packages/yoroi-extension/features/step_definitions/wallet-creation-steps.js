@@ -55,9 +55,11 @@ Then(/^I see the submit button is disabled$/, async function () {
 });
 
 When(/^I accept the creation terms$/, async function () {
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.WalletBackupPrivacyWarningDialog .primary');
-});
+  const privacyDlg =   await this.driver.findElement(By.xpath('//div[contains(@class,"WalletBackupPrivacyWarningDialog_component")]')) ;
+  const privacyChkbox = privacyDlg.findElement(By.xpath('//input[@type="checkbox"]'));
+  privacyChkbox.click();
+  await this.click('//button[text()="Continue"]', By.xpath);
+  });
 
 When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
   const mnemonicElement = await this.waitElementTextMatches(
@@ -73,14 +75,13 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
     // same word can occur many times, so we look for any copy of the desired word still unselected
     await this.click(
-      "(//button[contains(@class, 'SimpleButton_root') " + // any word
-      "and not(contains(@class, 'MnemonicWord_disabled'))" + // unselected word
-      ` and @label = '${word}'])[1]`, By.xpath // correct word
+      "(//button[contains(@class,'MnemonicWord_component') " + // any word
+      ` and (text() = '${word}')])`, By.xpath // correct word
     );
-  }
-  const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
+   }
+  const checkboxes = await this.driver.findElements(By.xpath("//input[contains(@class,'PrivateSwitchBase-input')]"));
   checkboxes.forEach((box) => box.click());
-  await this.click('.WalletRecoveryPhraseEntryDialog .primary');
+  await this.click('//button[text()="Confirm"]', By.xpath);
 });
 
 When(/^I enter random mnemonic phrase$/, async function () {

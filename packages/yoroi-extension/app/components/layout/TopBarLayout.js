@@ -44,6 +44,7 @@ function TopBarLayout({
           sx={{
             position: 'relative',
             overflow: 'auto',
+            height: '100%',
             '&::-webkit-scrollbar-button': {
               height: '7px',
               display: 'block',

@@ -259,6 +259,6 @@ function CustomWorld(cmdInput: WorldInput) {
 // no need to await
 RustModule.load().then(() => {
   setWorldConstructor(CustomWorld);
-  setDefaultTimeout(60 * 1000);
+  setDefaultTimeout(30 * 1000);
   return undefined;
 }).catch();
