@@ -28,6 +28,7 @@ import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 export type GeneratedData = typeof NavBarContainer.prototype.generated;
 
@@ -102,6 +103,8 @@ export default class NavBarContainer extends Component<Props> {
                 wallet.getParent().getNetworkInfo().NetworkId
               )}
               showEyeIcon={false}
+              unitOfAccountSetting={profile.unitOfAccount}
+              getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             />
           }
         />
@@ -137,6 +140,8 @@ export default class NavBarContainer extends Component<Props> {
             defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
               publicDeriver.getParent().getNetworkInfo().NetworkId
             )}
+            unitOfAccountSetting={profile.unitOfAccount}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
           />
         );
       };
@@ -232,6 +237,7 @@ export default class NavBarContainer extends Component<Props> {
       |},
       profile: {|
         shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -247,6 +253,9 @@ export default class NavBarContainer extends Component<Props> {
         getPublicKeyCache: IGetPublic => PublicKeyCache,
         publicDerivers: Array<PublicDeriver<>>,
         selected: null | PublicDeriver<>,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number,
       |},
     |},
   |} {
@@ -276,12 +285,16 @@ export default class NavBarContainer extends Component<Props> {
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
       },
       actions: {

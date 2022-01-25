@@ -1,3 +1,4 @@
+
 // @flow
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -18,6 +19,7 @@ import type {
   TokenLookupKey,
 } from '../../api/common/lib/MultiToken';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
@@ -36,6 +38,8 @@ type Props = {|
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
 @observer
@@ -164,21 +168,30 @@ export default class NavWalletDetails extends Component<Props> {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    let balanceDisplay = shiftedAmount
       .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
       .toString();
 
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = (<span>{hiddenAmount}</span>);
-    } else {
-      balanceDisplay = (
-        <>
-          {shiftedAmount}
-        </>
+    let unit = truncateToken(getTokenName(tokenInfo));
+
+    if (this.props.unitOfAccountSetting.enabled) {
+      const { currency } = this.props.unitOfAccountSetting;
+      const price = this.props.getCurrentPrice(
+        tokenInfo.Metadata.ticker,
+        currency
       );
+      if (price != null) {
+        balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
+        unit = currency;
+      }
     }
 
-    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>{hiddenAmount}</span>);
+    }
+
+    return (<>{balanceDisplay} {unit}</>);
   }
 }
