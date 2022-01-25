@@ -435,6 +435,14 @@ export default class BaseProfileStore
     return result || unitOfAccountDisabledValue;
   }
 
+  async getUnitOfAccountBlock(): () => UnitOfAccountSettingType {
+    let { result } = this.getUnitOfAccountRequest;
+    if (result == null) {
+      result = await this.getUnitOfAccountRequest.execute();
+    }
+    return this.getUnitOfAccountRequest.result;
+  }
+
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache

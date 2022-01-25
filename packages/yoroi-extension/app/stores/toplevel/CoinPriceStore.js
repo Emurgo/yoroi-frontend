@@ -6,11 +6,13 @@ import BaseCoinPriceStore from '../base/BaseCoinPriceStore';
 
 export default class CoinPriceStore extends BaseCoinPriceStore<StoresMap, ActionsMap> {
   setup(): void {
+    super.setup();
   }
   async updatePricesForWallet(): ?Promise<void> {
+    await this.refreshCurrentCoinPrice();
+    /*
     const { selected } = this.stores.wallets;
     if (selected) {
-      await this.refreshCurrentCoinPrice(selected.getParent().getNetworkInfo());
       const { allRequest } = this.stores.transactions
         .getTxRequests(selected).requests;
 
@@ -22,5 +24,6 @@ export default class CoinPriceStore extends BaseCoinPriceStore<StoresMap, Action
         });
       }
     }
+    */
   }
 }

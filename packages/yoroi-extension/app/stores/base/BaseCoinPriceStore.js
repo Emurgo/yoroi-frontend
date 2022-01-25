@@ -70,6 +70,10 @@ export default class BaseCoinPriceStore
   priceMap: Map<string, $ReadOnly<PriceDataRow>> = new Map();
 
   setup(): void {
+  }
+
+  startPoll(): void {
+    this._pollRefresh();
     setInterval(this._pollRefresh, CONFIG.app.coinPriceRefreshInterval);
     document.addEventListener(
       'visibilitychange',
@@ -110,14 +114,17 @@ export default class BaseCoinPriceStore
    * Since a ticker isn't enough to know which currency to to lookup
    * Since multiple tokens can have the same ticker
    */
-  getCurrentPrice(from: string, to: string): ?number {
+  getCurrentPrice: (from: string, to: string) => ?number = (
+    from: string, to: string
+  ) => {
     if (this.lastUpdateTimestamp === null) {
       return null;
     }
     const lastUpdateTimestamp: number = this.lastUpdateTimestamp;
+    /* fixme!!!
     if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
-    }
+    }*/
     return getPrice(from, to, this.currentPriceTickers);
   }
 
@@ -133,8 +140,8 @@ export default class BaseCoinPriceStore
     }
   };
 
-  @action refreshCurrentCoinPrice: $ReadOnly<NetworkRow> => Promise<void> = async () => {
-    const { unitOfAccount } = this.stores.profile;
+  @action refreshCurrentCoinPrice: () => Promise<void> = async () => {
+    const unitOfAccount= await this.stores.profile.getUnitOfAccountBlock();
     if (!unitOfAccount.enabled) return;
 
     const stateFetcher = this.stores.stateFetchStore.fetcher;
@@ -168,7 +175,6 @@ export default class BaseCoinPriceStore
       this.expirePriceDataTimeoutId = setTimeout(
         this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold
       );
-
       this._updatePriceData(response, unitOfAccount.currency);
     } catch (error) {
       Logger.error(`${nameof(BaseCoinPriceStore)}::${nameof(this.refreshCurrentCoinPrice)} ` + stringifyError(error));
