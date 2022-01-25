@@ -1,56 +1,51 @@
 // @flow
 import debounce from 'lodash/debounce';
 
-import {
-  getWallets
-} from '../../app/api/common/index';
-import {
-  PublicDeriver,
-} from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetAllUtxos,
-} from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import { getWallets } from '../../app/api/common/index';
+import { PublicDeriver, } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetAllUtxos, } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
+  CardanoTx,
+  ConfirmedSignData,
+  ConnectedSites,
+  ConnectingMessage,
+  ConnectResponseData,
+  ConnectRetrieveData,
+  FailedSignData,
+  GetConnectedSitesData,
+  GetConnectionProtocolData,
   PendingSignData,
   PendingTransaction,
-  SigningMessage,
-  ConnectingMessage,
-  ConnectedSites,
-  RpcUid,
-  ConnectResponseData,
-  ConfirmedSignData,
-  FailedSignData,
-  TxSignWindowRetrieveData,
-  ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
-  GetConnectedSitesData,
+  RpcUid,
+  SigningMessage,
   Tx,
-  CardanoTx,
-  GetConnectionProtocolData,
-  WhitelistEntry,
+  TxSignWindowRetrieveData,
   WalletAuthEntry,
+  WhitelistEntry,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
-  ConnectorError,
-  asTokenId,
-  asValue,
-  asTx,
-  asSignedTx,
   asPaginate,
+  asSignedTx,
+  asTokenId,
+  asTx,
+  asValue,
+  ConnectorError,
 } from './ergo-connector/types';
 import {
+  connectorCreateCardanoTx,
   connectorGetBalance,
+  connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
+  connectorGetUnusedAddresses,
+  connectorGetUsedAddresses,
+  connectorGetUtxosCardano,
   connectorGetUtxosErgo,
   connectorSendTx,
   connectorSendTxCardano,
-  connectorSignTx,
   connectorSignCardanoTx,
-  connectorCreateCardanoTx,
-  connectorGetUsedAddresses,
-  connectorGetUnusedAddresses,
-  connectorGetUtxosCardano
+  connectorSignTx
 } from './ergo-connector/api';
 import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
@@ -60,14 +55,9 @@ import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetche
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
+import type { lf$Database, } from 'lovefield';
 import { schema } from 'lovefield';
-import type {
-  lf$Database,
-} from 'lovefield';
-import {
-  loadLovefieldDB,
-  copyDbToMemory,
-} from '../../app/api/ada/lib/storage/database/index';
+import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
@@ -741,6 +731,8 @@ function handleInjectorConnect(port) {
   port.onMessage.addListener(async message => {
 
       connectionProtocol = message.protocol;
+      const isCardano = connectionProtocol === 'cardano';
+
       imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
@@ -762,12 +754,13 @@ function handleInjectorConnect(port) {
             err: e.toAPIError()
           });
         } else {
+          const prot = message.protocol;
           const func = message.function;
           const args = message.params.map(JSON.stringify).join(', ');
           if (e?.stack != null) {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
+            Logger.error(`RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
           } else {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
+            Logger.error(`RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}`);
           }
           rpcResponse({
             err: {
@@ -776,6 +769,34 @@ function handleInjectorConnect(port) {
             }
           });
         }
+      }
+      async function addressesToBech(addressesHex: string[]): Promise<string[]> {
+        await RustModule.load();
+        return addressesHex.map(a =>
+          RustModule.WalletV4.Address.from_bytes(
+            Buffer.from(a, 'hex'),
+          ).to_bech32()
+        );
+      }
+      function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
+        const groupedAssets = jsonAssets.reduce((res, a) => {
+          (res[a.policyId] = (res[a.policyId]||[])).push(a);
+          return res;
+        }, {})
+        const W4 = RustModule.WalletV4;
+        const multiasset = W4.MultiAsset.new();
+        for (const [policyHex, assetGroup] of Object.entries(groupedAssets)) {
+          const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+          const assets = RustModule.WalletV4.Assets.new();
+          for (const asset of assetGroup) {
+            assets.insert(
+              W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+              W4.BigNum.from_str(asset.amount),
+            );
+          }
+          multiasset.insert(policyId, assets);
+        }
+        return multiasset;
       }
       const connectParameters = () => ({
         protocol: message.protocol,
@@ -815,6 +836,13 @@ function handleInjectorConnect(port) {
           });
         }
       } else if (message.type === 'connector_rpc_request') {
+        const returnType = message.returnType;
+        if (returnType !== 'cbor' && returnType !== 'json') {
+          handleError(ConnectorError.invalidRequest(`Invalid return type "${returnType}". Expected "cbor" or "json"`));
+          return;
+        }
+        const isCBOR = isCardano && (returnType === 'cbor');
+        Logger.debug(`[yoroi][handleInjectorConnect] ${message.function} (Return type is: ${returnType})`);
         switch (message.function) {
           case 'sign_tx':
             try {
@@ -915,8 +943,37 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
-                    rpcResponse({ ok: balance });
+                    const balance =
+                      await connectorGetBalance(wallet, pendingTxs, tokenId, connectionProtocol);
+                    if (isCBOR) {
+                      await RustModule.load();
+                      const W4 = RustModule.WalletV4;
+                      if (tokenId === '*') {
+                        const value = W4.Value.new(
+                          W4.BigNum.from_str(balance.default),
+                        );
+                        if (balance.assets.length > 0) {
+                          const mappedAssets = balance.assets.map(a => {
+                            const [policyId, name] = a.identifier.split('.');
+                            return {
+                              amount: a.amount,
+                              assetId: a.identifier,
+                              policyId,
+                              name,
+                            };
+                          })
+                          value.set_multiasset(assetToRustMultiasset(mappedAssets));
+                        }
+                        rpcResponse({ ok: Buffer.from(value.to_bytes()).toString('hex') });
+                      } else {
+                        const value = W4.Value.new(
+                          W4.BigNum.from_str(balance),
+                        );
+                        rpcResponse({ ok: value });
+                      }
+                    } else {
+                      rpcResponse({ ok: balance });
+                    }
                   },
                   db,
                   localStorageApi,
@@ -936,9 +993,8 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const walletType = wallet.parent.defaultToken.Metadata.type
                     let utxos;
-                    if(walletType === 'Cardano') {
+                    if (isCardano) {
                       utxos = await connectorGetUtxosCardano(
                         wallet,
                         pendingTxs,
@@ -955,9 +1011,36 @@ function handleInjectorConnect(port) {
                         paginate
                         );
                     }
-                    rpcResponse({
-                      ok: utxos
-                    });
+                    await RustModule.load();
+                    const W4 = RustModule.WalletV4;
+                    if (isCBOR) {
+                      utxos = utxos.map(u => {
+                        const input = W4.TransactionInput.new(
+                          W4.TransactionHash.from_bytes(
+                            Buffer.from(u.tx_hash, 'hex')
+                          ),
+                          u.tx_index,
+                        );
+                        const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+                        if ((u.assets||[]).length > 0) {
+                          value.set_multiasset(assetToRustMultiasset(u.assets));
+                        }
+                        const output = W4.TransactionOutput.new(
+                          W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+                          value,
+                        );
+                        return Buffer.from(
+                          W4.TransactionUnspentOutput.new(input, output).to_bytes(),
+                        ).toString('hex');
+                      })
+                    } else {
+                      utxos.forEach(u => {
+                        u.receiver = W4.Address.from_bytes(
+                          Buffer.from(u.receiver, 'hex'),
+                        ).to_bech32();
+                      });
+                    }
+                    rpcResponse({ ok: utxos });
                   },
                   db,
                   localStorageApi,
@@ -976,9 +1059,11 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet) => {
                     const addresses = await connectorGetUsedAddresses(wallet, paginate);
-                    rpcResponse({
-                      ok: addresses
-                    });
+                    if (isCBOR) {
+                      rpcResponse({ ok: addresses });
+                    } else {
+                      rpcResponse({ ok: await addressesToBech(addresses) });
+                    }
                   },
                   db,
                   localStorageApi,
@@ -995,9 +1080,32 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet) => {
                     const addresses = await connectorGetUnusedAddresses(wallet);
-                    rpcResponse({
-                      ok: addresses
-                    });
+                    if (isCBOR) {
+                      rpcResponse({ ok: addresses });
+                    } else {
+                      rpcResponse({ ok: await addressesToBech(addresses) });
+                    }
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+            break;
+          case 'get_reward_addresses/cardano':
+            try {
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const addresses = await connectorGetCardanoRewardAddresses(wallet);
+                    if (isCBOR) {
+                      rpcResponse({ ok: addresses });
+                    } else {
+                      rpcResponse({ ok: await addressesToBech(addresses) });
+                    }
                   },
                   db,
                   localStorageApi,
@@ -1013,10 +1121,12 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const change = await connectorGetChangeAddress(wallet);
-                    rpcResponse({
-                      ok: change
-                    });
+                    const address = await connectorGetChangeAddress(wallet);
+                    if (isCBOR) {
+                      rpcResponse({ ok: address });
+                    } else {
+                      rpcResponse({ ok: await addressesToBech([address])[0] });
+                    }
                   },
                   db,
                   localStorageApi,

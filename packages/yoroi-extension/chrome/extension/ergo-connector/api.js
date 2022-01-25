@@ -84,7 +84,8 @@ function valueToBigNumber(x: Value): BigNumber {
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
-  tokenId: TokenId
+  tokenId: TokenId,
+  protocol: 'cardano' | 'ergo',
 ): Promise<Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     if (pendingTxs.length === 0) {
@@ -104,7 +105,7 @@ export async function connectorGetBalance(
       }
       return Promise.resolve(bigNumberToValue(total));
     }
-  } else {
+  } else if (protocol === 'ergo') {
     const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
     let total = new BigNumber(0);
     for (const box of allUtxos) {
@@ -115,6 +116,27 @@ export async function connectorGetBalance(
       }
     }
     return Promise.resolve(bigNumberToValue(total));
+  } else {
+    // can directly query for balance
+    const canGetBalance = asGetBalance(wallet);
+    if (canGetBalance != null) {
+      const balance = await canGetBalance.getBalance();
+      const nonDefaultEntries = balance.nonDefaultEntries();
+      if (tokenId === '*') {
+        return Promise.resolve({
+          default: bigNumberToValue(balance.getDefault()),
+          networkId: balance.getDefaultEntry().networkId,
+          assets: nonDefaultEntries.map(e => ({
+            identifier: e.identifier,
+            networkId: e.networkId,
+            amount: bigNumberToValue(e.amount),
+          }))
+        });
+      }
+      const entry = nonDefaultEntries.find(e => e.identifier === tokenId);
+      return Promise.resolve(bigNumberToValue(entry?.amount || new BigNumber(0)));
+    }
+    throw Error('asGetBalance failed in connectorGetBalance');
   }
 }
 
@@ -224,7 +246,7 @@ async function getAllFullAddresses(
     CoreAddressTypes.CARDANO_ENTERPRISE,
     CoreAddressTypes.CARDANO_LEGACY,
     CoreAddressTypes.CARDANO_PTR,
-    CoreAddressTypes.CARDANO_REWARD
+    // CoreAddressTypes.CARDANO_REWARD
   ] : [
     CoreAddressTypes.ERGO_P2PK,
     CoreAddressTypes.ERGO_P2SH,
@@ -246,6 +268,25 @@ async function getAllFullAddresses(
     });
 }
 
+async function getCardanoRewardAddresses(
+  wallet: IPublicDeriver<>,
+): Promise<FullAddressPayloadWithBase58[]> {
+  const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
+  if (!isCardano) {
+    throw new Error('Invalid wallet for a cardano request')
+  }
+  const type = CoreAddressTypes.CARDANO_REWARD;
+  const promise = getAllAddressesForDisplay({ publicDeriver: wallet, type });
+  await RustModule.load();
+  const addresses: FullAddressPayload[] = await promise;
+  return addresses.map(a => {
+    return {
+      fullAddress: a,
+      base58: a.address,
+    };
+  });
+}
+
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
   return getAllFullAddresses(wallet, usedFilter)
     .then(arr => arr.map(a => a.base58));
@@ -260,6 +301,11 @@ export async function connectorGetUsedAddresses(
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
   return getAllAddresses(wallet, false);
+}
+
+export async function connectorGetCardanoRewardAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+  return getCardanoRewardAddresses(wallet)
+    .then(arr => arr.map(a => a.base58));
 }
 
 export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promise<Address> {
