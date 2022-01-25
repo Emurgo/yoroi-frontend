@@ -945,32 +945,25 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const balance =
                       await connectorGetBalance(wallet, pendingTxs, tokenId, connectionProtocol);
-                    if (isCBOR) {
+                    if (isCBOR && tokenId === '*') {
                       await RustModule.load();
                       const W4 = RustModule.WalletV4;
-                      if (tokenId === '*') {
-                        const value = W4.Value.new(
-                          W4.BigNum.from_str(balance.default),
-                        );
-                        if (balance.assets.length > 0) {
-                          const mappedAssets = balance.assets.map(a => {
-                            const [policyId, name] = a.identifier.split('.');
-                            return {
-                              amount: a.amount,
-                              assetId: a.identifier,
-                              policyId,
-                              name,
-                            };
-                          })
-                          value.set_multiasset(assetToRustMultiasset(mappedAssets));
-                        }
-                        rpcResponse({ ok: Buffer.from(value.to_bytes()).toString('hex') });
-                      } else {
-                        const value = W4.Value.new(
-                          W4.BigNum.from_str(balance),
-                        );
-                        rpcResponse({ ok: value });
+                      const value = W4.Value.new(
+                        W4.BigNum.from_str(balance.default),
+                      );
+                      if (balance.assets.length > 0) {
+                        const mappedAssets = balance.assets.map(a => {
+                          const [policyId, name] = a.identifier.split('.');
+                          return {
+                            amount: a.amount,
+                            assetId: a.identifier,
+                            policyId,
+                            name,
+                          };
+                        })
+                        value.set_multiasset(assetToRustMultiasset(mappedAssets));
                       }
+                      rpcResponse({ ok: Buffer.from(value.to_bytes()).toString('hex') });
                     } else {
                       rpcResponse({ ok: balance });
                     }
