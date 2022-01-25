@@ -131,22 +131,27 @@ getAccountBalance.addEventListener('click', () => {
     if(!accessGranted) {
         alertError('Should request access first')
     } else {
-        toggleSpinner('show')
-        cardanoApi.getBalance().then(function(balance) {
-          toggleSpinner('hide')
-          let mainBalance;
-          let numAssets;
-          if (isCBOR()) {
-            const value = CardanoWasm.Value.from_bytes(Buffer.from(balance, 'hex'));
-            mainBalance = value.coin().to_str();
-            const ma = value.multiasset()
-            numAssets = ma ? ma.len() : 0;
-          } else {
-            mainBalance = balance.default;
-            numAssets = (balance.assets||[]).length;
+      toggleSpinner('show')
+      const tokenId = '*';
+      cardanoApi.getBalance(tokenId).then(function(balance) {
+        toggleSpinner('hide')
+        let mainBalance;
+        let numAssets;
+        if (isCBOR()) {
+          if (tokenId !== '*') {
+            alertSuccess(`Asset Balance: ${balance} (asset: ${tokenId})`)
+            return;
           }
-          alertSuccess(`Account Balance: ${mainBalance} (assets: ${numAssets})`)
-        });
+          const value = CardanoWasm.Value.from_bytes(Buffer.from(balance, 'hex'));
+          mainBalance = value.coin().to_str();
+          const ma = value.multiasset()
+          numAssets = ma ? ma.len() : 0;
+        } else {
+          mainBalance = balance.default;
+          numAssets = (balance.assets||[]).length;
+        }
+        alertSuccess(`Account Balance: ${mainBalance} (assets: ${numAssets})`)
+      });
     }
 })
 
@@ -262,7 +267,7 @@ getUtxos.addEventListener('click', () => {
                   const name = assetNames.get(j);
                   const amount = assets.get(name);
                   const policyIdHex = Buffer.from(policyId.to_bytes()).toString('hex');
-                  const encodedName = Buffer.from(name.to_bytes()).toString('hex');
+                  const encodedName = Buffer.from(name.name()).toString('hex');
                   result.push({
                     policyId: policyIdHex,
                     name: encodedName,
