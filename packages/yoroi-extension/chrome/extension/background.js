@@ -837,7 +837,7 @@ function handleInjectorConnect(port) {
         }
       } else if (message.type === 'connector_rpc_request') {
         const returnType = message.returnType;
-        if (returnType !== 'cbor' && returnType !== 'json') {
+        if (isCardano && returnType !== 'cbor' && returnType !== 'json') {
           handleError(ConnectorError.invalidRequest(`Invalid return type "${returnType}". Expected "cbor" or "json"`));
           return;
         }
@@ -1004,34 +1004,36 @@ function handleInjectorConnect(port) {
                         paginate
                         );
                     }
-                    await RustModule.load();
-                    const W4 = RustModule.WalletV4;
-                    if (isCBOR) {
-                      utxos = utxos.map(u => {
-                        const input = W4.TransactionInput.new(
-                          W4.TransactionHash.from_bytes(
-                            Buffer.from(u.tx_hash, 'hex')
-                          ),
-                          u.tx_index,
-                        );
-                        const value = W4.Value.new(W4.BigNum.from_str(u.amount));
-                        if ((u.assets||[]).length > 0) {
-                          value.set_multiasset(assetToRustMultiasset(u.assets));
-                        }
-                        const output = W4.TransactionOutput.new(
-                          W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
-                          value,
-                        );
-                        return Buffer.from(
-                          W4.TransactionUnspentOutput.new(input, output).to_bytes(),
-                        ).toString('hex');
-                      })
-                    } else {
-                      utxos.forEach(u => {
-                        u.receiver = W4.Address.from_bytes(
-                          Buffer.from(u.receiver, 'hex'),
-                        ).to_bech32();
-                      });
+                    if (isCardano) {
+                      await RustModule.load();
+                      const W4 = RustModule.WalletV4;
+                      if (isCBOR) {
+                        utxos = utxos.map(u => {
+                          const input = W4.TransactionInput.new(
+                            W4.TransactionHash.from_bytes(
+                              Buffer.from(u.tx_hash, 'hex')
+                            ),
+                            u.tx_index,
+                          );
+                          const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+                          if ((u.assets || []).length > 0) {
+                            value.set_multiasset(assetToRustMultiasset(u.assets));
+                          }
+                          const output = W4.TransactionOutput.new(
+                            W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+                            value,
+                          );
+                          return Buffer.from(
+                            W4.TransactionUnspentOutput.new(input, output).to_bytes(),
+                          ).toString('hex');
+                        })
+                      } else {
+                        utxos.forEach(u => {
+                          u.receiver = W4.Address.from_bytes(
+                            Buffer.from(u.receiver, 'hex'),
+                          ).to_bech32();
+                        });
+                      }
                     }
                     rpcResponse({ ok: utxos });
                   },
@@ -1052,7 +1054,7 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet) => {
                     const addresses = await connectorGetUsedAddresses(wallet, paginate);
-                    if (isCBOR) {
+                    if (!isCardano || isCBOR) {
                       rpcResponse({ ok: addresses });
                     } else {
                       rpcResponse({ ok: await addressesToBech(addresses) });
@@ -1073,7 +1075,7 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet) => {
                     const addresses = await connectorGetUnusedAddresses(wallet);
-                    if (isCBOR) {
+                    if (!isCardano || isCBOR) {
                       rpcResponse({ ok: addresses });
                     } else {
                       rpcResponse({ ok: await addressesToBech(addresses) });
@@ -1115,7 +1117,7 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet) => {
                     const address = await connectorGetChangeAddress(wallet);
-                    if (isCBOR) {
+                    if (!isCardano || isCBOR) {
                       rpcResponse({ ok: address });
                     } else {
                       rpcResponse({ ok: await addressesToBech([address])[0] });
