@@ -39,11 +39,6 @@ export default class DappConnectorNavbar extends Component<Props> {
       ]
     }, (granted) => {
       this.setState({ hasPermission: granted })
-      if (granted) {
-        alert('you have the permissions')
-      } else {
-        alert('You don\'t')
-      }
     });
   }
 
@@ -55,11 +50,6 @@ export default class DappConnectorNavbar extends Component<Props> {
       ]
     }, (removed) => {
       this.setState({ hasPermission: !removed })
-      if (removed) {
-        alert('permissions removed')
-      } else {
-        alert('permissions is not removed!')
-      }
     });
   }
 
