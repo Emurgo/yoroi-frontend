@@ -93,20 +93,7 @@ export default ({
   };
 
   if (shouldInjectConnector) {
-    base.content_scripts.push(
-      {
-        matches: [
-          'file://*/*',
-          'http://*/*',
-          'https://*/*',
-        ],
-        js: [
-          'js/inject.js',
-        ],
-        run_at: 'document_start',
-        all_frames: true,
-      }
-    );
+    base.optional_permissions = ['tabs', 'activeTab', '*://*/*']
   }
 
   const verName /*: {| version_name?: string |} */ = versionName != null
