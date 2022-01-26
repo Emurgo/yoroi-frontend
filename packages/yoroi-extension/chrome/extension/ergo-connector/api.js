@@ -354,20 +354,23 @@ function addressesToPkMap(addresses: Array<FullAddressPayloadWithBase58>) {
 // Returns the map with all extracted address-keys as keys
 // and the found matching local address as value, if it's found
 function createP2sAddressTreeExtractor(
-  addressesGetter: () => Promise<{ [string]: ?FullAddressPayloadWithBase58 }>,
+  addressesGetter: () => Promise<Array<FullAddressPayloadWithBase58>>,
 ): (
-  ErgoBoxJson => Promise<Array<FullAddressPayloadWithBase58>>
+  ErgoBoxJson => Promise<{ [string]: ?FullAddressPayloadWithBase58 }>
 ) {
   const keyAddressMapHolder = [];
   return async box => {
-    const keys: Array<string> = extractP2sKeysFromErgoBox(box);
-    if (keys.length === 0) {
-      return [];
+    const keys: Set<string> = extractP2sKeysFromErgoBox(box);
+    if (keys.size === 0) {
+      return {};
     }
     if (!keyAddressMapHolder[0]) {
       keyAddressMapHolder[0] = addressesToPkMap(await addressesGetter());
     }
-    return keys.reduce((res, k) => ({ ...res, [k]: keyAddressMapHolder[0][k] }), {});
+    return Array.from(keys).reduce(
+      (res, k) => ({ ...res, [k]: keyAddressMapHolder[0][k] }),
+      {},
+    );
   };
 }
 
