@@ -405,10 +405,6 @@ export async function connectorSignTx(
 
   // SIGNING INPUTS //
 
-  const p2sMatcher = createP2sAddressTreeMatcher(
-    () => getAllFullAddresses(publicDeriver, true),
-  );
-
   const signingKey = await wallet.getSigningKey()
     .then(key => wallet.normalizeKey({ ...key, password }))
     .then(key => BIP32PrivateKey.fromBuffer(Buffer.from(key.prvKeyHex, 'hex')));
@@ -424,11 +420,10 @@ export async function connectorSignTx(
       inputSigningKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
     } else {
       debug('signing', 'No UTxO found! Checking if input is P2S');
-      const { isP2S, matchingAddress } = await p2sMatcher(input.ergoTree);
+      const isP2S =
+          RustModule.SigmaRust.Address.from_base58(input.address).address_type_prefix() ===
+          RustModule.SigmaRust.AddressTypePrefix.Pay2S
       if (isP2S) {
-        if (!matchingAddress) {
-          throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
-        }
         debug('signing', 'Input is a P2S with valid matching address', matchingAddress);
         const { fullAddress } = matchingAddress;
         inputSigningKeys.add(generateKey({ addressing: fullAddress, keyLevel, signingKey }));
