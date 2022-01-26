@@ -517,13 +517,19 @@ function extractWalletPkFromHexConstant(hexConstant: string): ?string {
   return matched ? matched[1] : null;
 }
 
-export function extractP2sKeysFromErgoTree(ergoTree: string): Array<string> {
+export function extractP2sKeysFromErgoBox(box: ErgoBoxJson): Array<string> {
   const res = [];
-  const tree = RustModule.SigmaRust.ErgoTree.from_base16_bytes(ergoTree);
+  const tree = RustModule.SigmaRust.ErgoTree.from_base16_bytes(box.ergoTree);
   const constantsLen = tree.constants_len();
   for (let i = 0; i < constantsLen; i++) {
     const hex = tree.get_constant(i).encode_to_base16();
     const walletPk: ?string = extractWalletPkFromHexConstant(hex);
+    if (walletPk != null) {
+      res.push(walletPk);
+    }
+  }
+  for (const registerHex of Object.values(box.additionalRegisters||{})) {
+    const walletPk: ?string = extractWalletPkFromHexConstant(registerHex);
     if (walletPk != null) {
       res.push(walletPk);
     }

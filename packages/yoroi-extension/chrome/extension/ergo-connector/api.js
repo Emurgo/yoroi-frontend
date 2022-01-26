@@ -29,7 +29,7 @@ import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/Concep
 import BigNumber from 'bignumber.js';
 import JSONBigInt from 'json-bigint';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
-import { extractP2sKeysFromErgoTree, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
+import { extractP2sKeysFromErgoBox, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
 import { SendTransactionApiError } from '../../../app/api/common/errors';
 
@@ -356,11 +356,11 @@ function addressesToPkMap(addresses: Array<FullAddressPayloadWithBase58>) {
 function createP2sAddressTreeExtractor(
   addressesGetter: () => Promise<{ [string]: ?FullAddressPayloadWithBase58 }>,
 ): (
-  string => Promise<Array<FullAddressPayloadWithBase58>>
+  ErgoBoxJson => Promise<Array<FullAddressPayloadWithBase58>>
 ) {
   const keyAddressMapHolder = [];
-  return async ergoTree => {
-    const keys: Array<string> = extractP2sKeysFromErgoTree(ergoTree);
+  return async box => {
+    const keys: Array<string> = extractP2sKeysFromErgoBox(box);
     if (keys.length === 0) {
       return [];
     }
@@ -479,7 +479,7 @@ export async function connectorSignTx(
         S.Address.from_base58(input.address).address_type_prefix() ===
         S.AddressTypePrefix.Pay2S;
       if (isP2S) {
-        const matchingAddressMap = await p2sExtractor(input.ergoTree);
+        const matchingAddressMap = await p2sExtractor(input);
         const matchedAddresses = Object.values(matchingAddressMap);
         if (matchedAddresses.length > 0) {
           if (matchedAddresses.some(x => !x)) {
