@@ -1120,7 +1120,7 @@ function handleInjectorConnect(port) {
                     if (!isCardano || isCBOR) {
                       rpcResponse({ ok: address });
                     } else {
-                      rpcResponse({ ok: await addressesToBech([address])[0] });
+                      rpcResponse({ ok: (await addressesToBech([address]))[0] });
                     }
                   },
                   db,
