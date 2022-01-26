@@ -531,9 +531,18 @@ export async function connectorSignCardanoTx(
   // eslint-disable-next-line no-unused-vars
   const { tx: txHex, partialSign } = tx;
 
-  const txBody = RustModule.WalletV4.TransactionBody.from_bytes(
-    Buffer.from(txHex, 'hex')
-  );
+  let txBody;
+  const bytes = Buffer.from(txHex, 'hex');
+  try {
+    txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+  } catch (originalErr) {
+    try {
+      // Try parsing as body for backward compatibility
+      txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+    } catch (_e) {
+      throw originalErr;
+    }
+  }
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -564,10 +573,8 @@ export async function connectorSignCardanoTx(
   const utxoIdSet: Set<string> = new Set();
   for (let i = 0; i < txBody.inputs().len(); i++) {
     const input = txBody.inputs().get(i);
-    utxoIdSet.add(
-      Buffer.from(input.transaction_id().to_bytes()).toString('hex') +
-      String(input.index())
-    );
+    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    utxoIdSet.add(`${txHash}${String(input.index())}`);
   }
   const usedUtxos = addressedUtxos.filter(utxo =>
     utxoIdSet.has(utxo.utxo_id)
