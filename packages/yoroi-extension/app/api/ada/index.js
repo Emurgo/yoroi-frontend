@@ -60,6 +60,7 @@ import {
 } from './lib/storage/models/PublicDeriver/index';
 import {
   asDisplayCutoff,
+  asHasLevels,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
@@ -153,6 +154,7 @@ import {
 } from './lib/storage/models/utils';
 import {
   getAllAddressesForDisplay,
+  rawGetAddressRowsForWallet,
 } from './lib/storage/bridge/traitUtils';
 import {
   convertAdaTransactionsToExportRows,
@@ -174,7 +176,10 @@ import type {
   CreateWalletRequest, CreateWalletResponse,
   SendTokenList,
 } from '../common/types';
-import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
+import {
+  CoreAddressTypes,
+  TxStatusCodes,
+} from './lib/storage/database/primitives/enums';
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import {
   getCardanoHaskellBaseConfig,
@@ -188,6 +193,18 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
+import {
+  GetPathWithSpecific,
+  GetAddress,
+} from './lib/storage/database/primitives/api/read';
+import {
+  getAllSchemaTables,
+  raii,
+  mapToTables,
+} from './lib/storage/database/utils';
+import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
+import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
+import type { ISignRequest } from '../common/lib/transactions/ISignRequest';
 
 // ADA specific Request / Response params
 
@@ -1752,7 +1769,6 @@ export default class AdaApi {
       // Note: we only restore for 0th account
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
-
       if (request.mode === 'bip44') {
         const wallet = await createStandardBip44Wallet({
           db: request.db,
@@ -1773,6 +1789,7 @@ export default class AdaApi {
           request.db,
           wallet.bip44WrapperRow,
         );
+        console.log({mode: request.mode, request, wallet, bip44Wallet})
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
             pubDeriver.publicDeriverResult,
@@ -2167,6 +2184,79 @@ export default class AdaApi {
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
+  }
+
+  async createSubmittedTransactionData(
+    publicDeriver: PublicDeriver<>,
+    signRequest: ISignRequest<any>,
+    txId: string,
+    defaultNetworkId: number,
+    defaultToken: $ReadOnly<TokenRow>,
+  ): Promise<WalletTransactionCtorData> {
+    const p = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!p) {
+      throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
+    }
+    const derivationTables = p.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
+
+    const { utxoAddresses } = await raii(
+      publicDeriver.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(publicDeriver.getDb(), derivationTables),
+      ],
+      dbTx => rawGetAddressRowsForWallet(
+        dbTx,
+        deps,
+        { publicDeriver },
+        derivationTables,
+      ),
+    );
+    const ownAddresses = new Set(
+      utxoAddresses.map(a => a.Hash)
+    );
+    const amount = new MultiToken(
+      [],
+      {
+        defaultNetworkId,
+        defaultIdentifier: defaultToken.Identifier,
+      },
+    );
+    for (const input of signRequest.inputs()) {
+      amount.joinSubtractMutable(input.value);
+    }
+    let isIntraWallet = true;
+    for (const output of signRequest.outputs()) {
+      if (ownAddresses.has(output.address)) {
+        amount.joinAddMutable(output.value);
+      } else {
+        isIntraWallet = false;
+      }
+    }
+
+    return {
+      txid: txId,
+      type: isIntraWallet ? 'self' : 'expend',
+      amount,
+      fee: signRequest.fee(),
+      date: new Date,
+      addresses: {
+        from: signRequest.inputs(),
+        to: signRequest.outputs(),
+      },
+      state: TxStatusCodes.SUBMITTED,
+      errorMsg: null,
+      block: null,
+    };
   }
 }
 // ========== End of class AdaApi =========

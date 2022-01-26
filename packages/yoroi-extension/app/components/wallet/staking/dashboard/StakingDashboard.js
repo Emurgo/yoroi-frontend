@@ -34,7 +34,7 @@ const messages = defineMessages({
   },
 });
 
-const emptyDashboardMessages = defineMessages({
+export const emptyDashboardMessages: Object = defineMessages({
   title: {
     id: 'wallet.dashboard.empty.title',
     defaultMessage: '!!!You have not delegated your {ticker} yet',
@@ -92,11 +92,12 @@ export default class StakingDashboard extends Component<Props> {
           </WarningBox>
         </div>
       )
-      : (null);
+      : null;
 
     // don't show anything when user has never delegated
-    const hideGraph = (this.props.delegationHistory != null &&
-      this.props.delegationHistory.length === 0) || true; // <TODO:RWRD2109>
+    const hideGraph =
+      this.props.delegationHistory != null
+      && this.props.delegationHistory.length === 0;
 
     const graphs = hideGraph
       ? null

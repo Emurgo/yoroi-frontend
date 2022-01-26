@@ -11,7 +11,7 @@ import {
 import pkg from '../package.json';
 import { SEIZA_URL, POOLS_UI_URL_FOR_YOROI } from './manifestEnvs';
 
-export default (isDebug: boolean): * => buildManifest({
+export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi Shelley Testnet',
   titleOverride: true,
@@ -37,4 +37,5 @@ export default (isDebug: boolean): * => buildManifest({
   version: pkg.version,
   geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
   enableProtocolHandlers: false,
+  shouldInjectConnector,
 });

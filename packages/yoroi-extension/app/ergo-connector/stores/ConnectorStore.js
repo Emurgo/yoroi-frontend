@@ -1,45 +1,41 @@
 /* eslint-disable promise/always-return */
 // @flow
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed } from 'mobx';
+import { observable, action, runInAction, computed, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
-  PublicDeriverCache,
   ConfirmedSignData,
-  ConnectingMessage,
-  FailedSignData,
-  SigningMessage,
-  WhitelistEntry,
   ConnectedSites,
+  ConnectingMessage,
   ConnectRetrieveData,
-  TxSignWindowRetrieveData,
-  RemoveWalletFromWhitelistData,
+  FailedSignData,
   GetConnectedSitesData,
   Protocol,
+  PublicDeriverCache,
+  RemoveWalletFromWhitelistData,
+  SigningMessage,
   Tx,
+  TxSignWindowRetrieveData,
+  WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
+import type { CardanoConnectorSignRequest } from '../types';
 import { LoadingWalletStates } from '../types';
+import { getWallets } from '../../api/common/index';
 import {
-  getWallets
-} from '../../api/common/index';
-import {
+  getCardanoHaskellBaseConfig,
+  getErgoBaseConfig,
   isCardanoHaskell,
   isErgo,
-  getErgoBaseConfig,
-  getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
+  asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asGetAllUtxos,
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -49,16 +45,14 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 import { Logger } from '../../utils/logging';
-import type { CardanoConnectorSignRequest } from '../types';
-import {
-  asAddressedUtxo,
-} from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, } from '../../api/ada/transactions/utils';
 import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
   connectorGetChangeAddress,
 } from '../../../chrome/extension/ergo-connector/api';
+import { getWalletChecksum } from '../../api/export/utils';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -100,7 +94,7 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
   });
 }
 
-function getProtocol(): Promise<?Protocol> {
+export function getProtocol(): Promise<?Protocol> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
         ({ type: 'get_protocol' }),
@@ -116,7 +110,7 @@ function getProtocol(): Promise<?Protocol> {
   });
 }
 
-function getConnectedSites(): Promise<ConnectedSites> {
+export function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
       window.chrome.runtime.sendMessage(
@@ -133,6 +127,29 @@ function getConnectedSites(): Promise<ConnectedSites> {
   });
 }
 
+export async function parseWalletsList(
+  wallets: Array<PublicDeriver<>>
+  ): Promise<Array<PublicDeriverCache>> {
+  const result = [];
+  for (const currentWallet of wallets) {
+    const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
+    const withPubKey = asGetPublicKey(currentWallet);
+
+    const canGetBalance = asGetBalance(currentWallet);
+    const balance = canGetBalance == null
+      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+      : await canGetBalance.getBalance();
+    result.push({
+      publicDeriver: currentWallet,
+      name: conceptualInfo.Name,
+      balance,
+      checksum: await getWalletChecksum(withPubKey)
+    });
+  }
+
+  return result
+}
+
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
@@ -145,6 +162,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<PublicDeriverCache> = [];
+  /**
+   * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
+   *   it will be displyed to the user at the `connect` screen for the user to choose
+   *   which wallet to connect
+   * - `allWallets`: list of all wallets the user have in yoroi
+   *    Will be displayed in the on the `connected webists screen` as we need all wallets
+   *    not only ergo or cardano ones
+   */
+  @observable filteredWallets: Array<PublicDeriverCache> = [];
+  @observable allWallets: Array<PublicDeriverCache> = [];
   @observable protocol: ?string = ''
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
@@ -222,11 +249,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         runInAction(() => {
           this.signingMessage = response;
         });
-        if (response && response.sign.type === 'tx/cardano') {
-          this.createAdaTransaction();
-        }
-        if (response.sign.type === 'tx-create-req/cardano') {
-          this.generateAdaTransaction();
+        if (response) {
+          if (response.sign.type === 'tx/cardano') {
+            this.createAdaTransaction();
+          }
+          if (response.sign.type === 'tx-create-req/cardano') {
+            this.generateAdaTransaction();
+          }
         }
       })
       // eslint-disable-next-line no-console
@@ -244,7 +273,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const sendData: ConfirmedSignData = {
       type: 'sign_confirmed',
-      tx: signingMessage.sign.tx,
+      tx: toJS(signingMessage.sign.tx),
       uid: signingMessage.sign.uid,
       tabId: signingMessage.tabId,
       pw: password,
@@ -301,28 +330,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         await this._getTxAssets(filteredWallets);
       }
 
-      const result = [];
-      for (const currentWallet of filteredWallets) {
-        const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
-        const withPubKey = asGetPublicKey(currentWallet);
-
-        const canGetBalance = asGetBalance(currentWallet);
-        const balance = canGetBalance == null
-          ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-          : await canGetBalance.getBalance();
-        result.push({
-          publicDeriver: currentWallet,
-          name: conceptualInfo.Name,
-          balance,
-          checksum: await getChecksum(withPubKey)
-        });
-      }
+      const filteredWalletsResult = await parseWalletsList(filteredWallets)
+      const allWallets = await parseWalletsList(wallets)
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
 
         // note: "replace" is a mobx-specific function
-        (this.wallets: any).replace(result);
+        (this.wallets: any).replace(filteredWalletsResult);
+        (this.filteredWallets: any).replace(filteredWalletsResult);
+        (this.allWallets: any).replace(allWallets)
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
         this.createAdaTransaction();
@@ -425,9 +442,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       network.NetworkId
     );
 
-    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(
-      Buffer.from(tx, 'hex')
-    );
+
+    let txBody;
+    const bytes = Buffer.from(tx, 'hex');
+    try {
+      // <TODO:USE_METADATA_AND_WITNESSES>
+      txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+    } catch (originalErr) {
+      try {
+        // Try parsing as body for backward compatibility
+        txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+      } catch (_e) {
+        throw originalErr;
+      }
+    }
 
     const inputs = [];
     for (let i = 0; i < txBody.inputs().len(); i++) {
@@ -666,15 +694,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.setConnectorWhitelist.execute({ whitelist });
     await this.getConnectorWhitelist.execute();
   };
-  _removeWalletFromWhitelist: (url: string) => Promise<void> = async url => {
-    const filter = this.currentConnectorWhitelist.filter(e => e.url !== url);
+  _removeWalletFromWhitelist: (
+    request: {| url: string, protocol: string |}
+    ) => Promise<void> = async (request) => {
+    const filter = this.currentConnectorWhitelist.filter(
+      e => !(e.url === request.url && e.protocol === request.protocol)
+    );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
     window.chrome.runtime.sendMessage(({
       type: 'remove_wallet_from_whitelist',
-      url,
+      url: request.url,
     }: RemoveWalletFromWhitelistData));
   };
 
@@ -690,22 +722,4 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? { sites: [] };
   }
-}
-
-// TODO: do something better than duplicating the logic here
-async function getChecksum(
-  publicDeriver: ReturnType<typeof asGetPublicKey>,
-): Promise<void | WalletChecksum> {
-  if (publicDeriver == null) return undefined;
-
-  const hash = (await publicDeriver.getPublicKey()).Hash;
-
-  const isLegacyWallet =
-    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-    publicDeriver.getParent() instanceof Bip44Wallet;
-  const checksum = isLegacyWallet
-    ? legacyWalletChecksum(hash)
-    : walletChecksum(hash);
-
-  return checksum;
 }

@@ -14,6 +14,8 @@ import SpanishFlag from '../assets/images/flags/spanish.inline.svg';
 import ItalianFlag from '../assets/images/flags/italian.inline.svg';
 import IndonesianFlag from '../assets/images/flags/indonesian.inline.svg';
 import TurkishFlag from '../assets/images/flags/turkish.inline.svg';
+import CzechFlag from '../assets/images/flags/czech.inline.svg';
+import SlovakFlag from '../assets/images/flags/slovak.inline.svg';
 
 // This is essentially bulk require
 
@@ -103,4 +105,14 @@ export const LANGUAGES: Array<LanguageType> = [
     label: globalMessages.languageTurkish,
     svg: TurkishFlag
   },
+  {
+    value: 'cs-CZ',
+    label: globalMessages.languageCzech,
+    svg: CzechFlag
+  },
+  {
+    value: 'sk-SK',
+    label: globalMessages.languageSlovak,
+    svg: SlovakFlag
+  }
 ];

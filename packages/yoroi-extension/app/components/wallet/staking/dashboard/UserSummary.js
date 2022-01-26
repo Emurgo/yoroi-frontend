@@ -24,16 +24,12 @@ import type {
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { hiddenAmount } from '../../../../utils/strings';
-import { amountWithoutZeros, truncateToken } from '../../../../utils/formatters';
+import { truncateToken } from '../../../../utils/formatters';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.dashboard.summary.title',
     defaultMessage: '!!!Your Summary',
-  },
-  delegatedLabel: {
-    id: 'wallet.dashboard.summary.delegatedTitle',
-    defaultMessage: '!!!Total Delegated',
   },
   note: {
     id: 'wallet.dashboard.summary.note',
@@ -256,7 +252,7 @@ export default class UserSummary extends Component<Props, State> {
           <div className={styles.cardContent}>
             <div>
               <div className={styles.delegatedHeader}>
-                <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+                <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalDelegated)}:</h3>
                 <div className={styles.mangledSection}>
                   {mangledWarningIcon}
                 </div>
@@ -330,8 +326,9 @@ export default class UserSummary extends Component<Props, State> {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
     const tokenAmount = tokenEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-      .toFormat(tokenInfo.Metadata.numberOfDecimals)
-    const splitAmount = amountWithoutZeros(tokenAmount).split('.')
+      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
+      .toString();
+    const splitAmount = tokenAmount.split('.');
     const amountNode = this.props.shouldHideBalance
       ? <>{hiddenAmount}</>
       : (

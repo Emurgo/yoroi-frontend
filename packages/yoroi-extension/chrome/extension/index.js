@@ -12,6 +12,7 @@ import { Action } from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
+import { Logger } from '../../app/utils/logging';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -28,6 +29,8 @@ const initializeYoroi: void => Promise<void> = async () => {
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions, router);
 
+  Logger.debug(`[yoroi] stores created`);
+
   window.yoroi = {
     api,
     actions,
@@ -43,6 +46,8 @@ const initializeYoroi: void => Promise<void> = async () => {
   if (root == null) {
     throw new Error('Root element not found.');
   }
+  Logger.debug(`[yoroi] root located`);
+
   render(
     <App stores={stores} actions={actions} history={history} />,
     root

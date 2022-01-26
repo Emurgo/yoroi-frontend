@@ -11,7 +11,7 @@ import {
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
+import { truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 
@@ -25,6 +25,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletAssetsPage)}.`);
+    const network = publicDeriver.getParent().getNetworkInfo()
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
     const getTokenInfo= genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
 
@@ -38,7 +39,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         })).map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: amountWithoutZeros(genFormatTokenAmount(getTokenInfo)(token.entry)),
+          amount: Number(genFormatTokenAmount(getTokenInfo)(token.entry)),
         }));
       })();
 
@@ -50,9 +51,10 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
     return (
       <AssetsPage
         assetsList={assetsList}
-        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         assetDeposit={isNonZeroDeposit ? assetDeposit : null}
         shouldHideBalance={profile.shouldHideBalance}
+        network={network}
       />
     )
   }

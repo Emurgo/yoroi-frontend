@@ -20,7 +20,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
-import { allCategories } from '../../stores/stateless/topbarCategories';
+import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -29,6 +29,7 @@ import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -90,9 +91,24 @@ class Wallet extends Component<AllProps> {
     return undefined;
   }
 
-  navigateToWallets: string => void = destination => {
+  navigateToMyWallets: string => void = destination => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
+
+  renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
+
+    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
+      return (
+        <WalletSyncingOverlay
+          classicTheme={this.generated.stores.profile.isClassicTheme}
+          onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
+        />
+      )
+    }
+    return null
+  }
 
   render(): Node {
     // abort rendering if the page isn't valid for this wallet
@@ -126,7 +142,7 @@ class Wallet extends Component<AllProps> {
 
     const menu = (
       <SubMenu
-        options={allCategories
+        options={allSubcategoriesRevamp
           .filter(category => category.isVisible(visibilityContext))
           .map(category => ({
             className: category.className,
@@ -149,7 +165,7 @@ class Wallet extends Component<AllProps> {
             title={
               <NavBarBack
                 route={ROUTES.MY_WALLETS}
-                onBackClick={this.navigateToWallets}
+                onBackClick={this.navigateToMyWallets}
                 title={intl.formatMessage(messages.backButton)}
               />
             }
@@ -174,6 +190,7 @@ class Wallet extends Component<AllProps> {
             }))}
         >
           {this.props.children}
+          {this.renderOverlay()}
         </WalletWithNavigation>
       </TopBarLayout>
     );
@@ -193,6 +210,7 @@ class Wallet extends Component<AllProps> {
         showAsCard
       >
         {warning}
+        {this.renderOverlay()}
         {this.props.children}
       </TopBarLayout>
     );
@@ -235,12 +253,18 @@ class Wallet extends Component<AllProps> {
       walletSettings: {|
         getWalletWarnings: (PublicDeriver<>) => WarningList,
       |},
-      wallets: {| selected: null | PublicDeriver<> |},
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        firstSync: ?number,
+      |},
       router: {| location: any |},
       transactions: {|
         getBalanceRequest: {|
           result: ?MultiToken,
         |},
+      |},
+      profile: {|
+        isClassicTheme: boolean,
       |},
     |}
     |} {
@@ -259,6 +283,7 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          firstSync: stores.wallets.firstSync
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
@@ -278,6 +303,9 @@ class Wallet extends Component<AllProps> {
             };
           })(),
         },
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme
+        }
       },
       actions: {
         router: {

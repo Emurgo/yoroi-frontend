@@ -45,7 +45,7 @@ export type RestoreModeType = {|
 |};
 
 export default class WalletRestoreActions {
-  submitFields: Action<WalletRestoreMeta> = new Action();
+  submitFields: AsyncAction<WalletRestoreMeta> = new AsyncAction();
   startRestore: AsyncAction<void> = new AsyncAction();
   verifyMnemonic: AsyncAction<void> = new AsyncAction();
   startCheck: AsyncAction<void> = new AsyncAction();

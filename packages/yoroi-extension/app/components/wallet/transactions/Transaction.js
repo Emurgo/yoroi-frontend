@@ -540,8 +540,11 @@ export default class Transaction extends Component<Props, State> {
     const { isLastInList, state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
-    const isFailedTransaction = state < 0;
-    const isPendingTransaction = state === TxStatusCodes.PENDING || state === TxStatusCodes.SUBMITTED;
+    const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
+    const isFailedTransaction = state < 0 && !isSubmittedTransaction;
+    const isPendingTransaction = (
+      state === TxStatusCodes.PENDING || isSubmittedTransaction
+    );
     const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
       data.isValid :
       true;

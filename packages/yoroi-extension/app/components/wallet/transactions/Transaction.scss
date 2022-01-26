@@ -90,7 +90,7 @@
     min-width: $min-fee-width;
     text-align: $fee-align;
 
-    text-align: right;
+    text-align: center;
     font-weight: 400;
   }
   .amount {
@@ -114,7 +114,7 @@
       var(--yoroi-palette-tx-status-pending-stripes) 83.4%,
       var(--yoroi-palette-tx-status-pending-stripes)
     );
-    animation: pending-label-animation 1s linear infinite;
+    animation: pending-label-animation 3s linear infinite;
     :global {
       @keyframes pending-label-animation {
         0% {

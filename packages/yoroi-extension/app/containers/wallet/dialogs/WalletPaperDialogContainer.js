@@ -53,7 +53,6 @@ export default class WalletPaperDialogContainer
 
   createPaperWallet: ((data: {|
     numAddresses: number,
-    printAccountPlate: boolean,
   |}) => void) = (data) => {
     this.generated.actions.dialogs.open.trigger({ dialog: UserPasswordDialog });
     this.generated.actions.dialogs.updateDataForActiveDialog.trigger(data);

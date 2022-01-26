@@ -114,7 +114,7 @@ const genBaseProps: {|
       connector: {
         signingRequest: tentativeTx,
         signingMessage: message(request.wallet.publicDeriver.getPublicDeriverId()),
-        wallets: request.isLoading
+        filteredWallets: request.isLoading
           ? []
           : [{
             publicDeriver: request.wallet.publicDeriver,

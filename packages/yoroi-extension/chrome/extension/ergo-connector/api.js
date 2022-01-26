@@ -84,7 +84,8 @@ function valueToBigNumber(x: Value): BigNumber {
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
-  tokenId: TokenId
+  tokenId: TokenId,
+  protocol: 'cardano' | 'ergo',
 ): Promise<Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     if (pendingTxs.length === 0) {
@@ -104,7 +105,7 @@ export async function connectorGetBalance(
       }
       return Promise.resolve(bigNumberToValue(total));
     }
-  } else {
+  } else if (protocol === 'ergo') {
     const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
     let total = new BigNumber(0);
     for (const box of allUtxos) {
@@ -115,6 +116,27 @@ export async function connectorGetBalance(
       }
     }
     return Promise.resolve(bigNumberToValue(total));
+  } else {
+    // can directly query for balance
+    const canGetBalance = asGetBalance(wallet);
+    if (canGetBalance != null) {
+      const balance = await canGetBalance.getBalance();
+      const nonDefaultEntries = balance.nonDefaultEntries();
+      if (tokenId === '*') {
+        return Promise.resolve({
+          default: bigNumberToValue(balance.getDefault()),
+          networkId: balance.getDefaultEntry().networkId,
+          assets: nonDefaultEntries.map(e => ({
+            identifier: e.identifier,
+            networkId: e.networkId,
+            amount: bigNumberToValue(e.amount),
+          }))
+        });
+      }
+      const entry = nonDefaultEntries.find(e => e.identifier === tokenId);
+      return Promise.resolve(bigNumberToValue(entry?.amount || new BigNumber(0)));
+    }
+    throw Error('asGetBalance failed in connectorGetBalance');
   }
 }
 
@@ -224,7 +246,7 @@ async function getAllFullAddresses(
     CoreAddressTypes.CARDANO_ENTERPRISE,
     CoreAddressTypes.CARDANO_LEGACY,
     CoreAddressTypes.CARDANO_PTR,
-    CoreAddressTypes.CARDANO_REWARD
+    // CoreAddressTypes.CARDANO_REWARD
   ] : [
     CoreAddressTypes.ERGO_P2PK,
     CoreAddressTypes.ERGO_P2SH,
@@ -246,6 +268,25 @@ async function getAllFullAddresses(
     });
 }
 
+async function getCardanoRewardAddresses(
+  wallet: IPublicDeriver<>,
+): Promise<FullAddressPayloadWithBase58[]> {
+  const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
+  if (!isCardano) {
+    throw new Error('Invalid wallet for a cardano request')
+  }
+  const type = CoreAddressTypes.CARDANO_REWARD;
+  const promise = getAllAddressesForDisplay({ publicDeriver: wallet, type });
+  await RustModule.load();
+  const addresses: FullAddressPayload[] = await promise;
+  return addresses.map(a => {
+    return {
+      fullAddress: a,
+      base58: a.address,
+    };
+  });
+}
+
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
   return getAllFullAddresses(wallet, usedFilter)
     .then(arr => arr.map(a => a.base58));
@@ -260,6 +301,11 @@ export async function connectorGetUsedAddresses(
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
   return getAllAddresses(wallet, false);
+}
+
+export async function connectorGetCardanoRewardAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+  return getCardanoRewardAddresses(wallet)
+    .then(arr => arr.map(a => a.base58));
 }
 
 export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promise<Address> {
@@ -329,6 +375,11 @@ function createMockHeader(bestBlock) {
   // and I'm also unsure if any of these 3 would impact signing or not.
   // Maybe version would later be used in the ergoscript context?
   return JSON.stringify({
+    id: '68ce7d31be888051a981333e712d8dde14f8f318ca9ed0796ae22d22e1b3debd',
+    adProofsRoot: '987a12bb83f9f1284f3e83598f2a401cd208e3c16cd58629c71022dc67face43',
+    stateRoot: 'da5805a87f029b24fc3938f9f633d74b6843a72c7ce1612e8a96158e61cb67b715',
+    transactionsRoot: 'e75411a5451979fa4002eb3b8c7b5366f30f07c611954d683d0d04cacd3cb200',
+    extensionHash: 'a0c7169b677e1f555d3c64d513a1ccedef82de45bd9d3f9d99c035a2cc3e2bd9',
     version: 2, // TODO: where to get version? (does this impact signing?)
     parentId: bestBlock.hash,
     timestamp: Date.now(),
