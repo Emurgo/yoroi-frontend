@@ -14,8 +14,9 @@ import SidebarContainer from '../SidebarContainer'
 import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage'
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
 import Navbar from '../../components/experimental/layout/Navbar'
-import YoroiPalettePage from '../../components/experimental/YoroiPalette/YoroiPalette'
 import YoroiThemesPage from '../../components/experimental/YoroiTheme/YoroiThemesPage'
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+
 
 export type GeneratedData = typeof YoroiThemesContainer.prototype.generated;
 
@@ -35,7 +36,7 @@ class YoroiThemesContainer extends Component<AllProps> {
         sidebar={sidebarContainer}
         navbar={
           (<Navbar
-            goToRoute={this.generated.actions.router.goToRoute.trigger}
+            goToRoute={(route) => this.generated.actions.router.goToRoute.trigger({ route })}
           />)
         }
       >

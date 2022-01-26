@@ -1,5 +1,5 @@
 // @flow
-export const getPalette = (theme) => {
+export const getPalette: any => any = (theme: any) => {
    return  {
         /* === BASE === */
         '--yoroi-palette-common-white': theme.palette.common.white,

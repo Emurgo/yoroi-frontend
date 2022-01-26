@@ -104,14 +104,6 @@ export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
   isVisible: _request => !environment.isLight,
 });
 
-export const EXPERIMENTAL: SidebarCategory = registerCategory({
-  className: 'experimental',
-  route: ROUTES.EXPERIMENTAL.YOROI_PALETTE,
-  icon: dappConnectorIcon,
-  label: globalMessages.experimental,
-  isVisible: _request => environment.isNightly() || environment.isDev(),
-});
-
 export const NOTICE_BOARD: SidebarCategory = registerCategory({
   className: 'notice-board',
   route: ROUTES.NOTICE_BOARD.ROOT,

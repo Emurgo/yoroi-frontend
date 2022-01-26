@@ -7,8 +7,7 @@ import { ROUTES } from '../../../routes-config';
 import classNames from 'classnames';
 
 type Props = {|
-    header: string,
-    goToRoute: string,
+    goToRoute: string => void,
 |}
 
 const PAGES = [
@@ -30,7 +29,7 @@ export default class Navbar extends Component<Props> {
             {
               PAGES.map(page => (
                 <button
-                  onClick={() => this.props.goToRoute({ route: page.route })}
+                  onClick={() => this.props.goToRoute(page.route)}
                   className={classNames(
                     [styles.tab, window.location.href.endsWith(page.route) && styles.active]
                   )}

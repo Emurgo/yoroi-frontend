@@ -8,16 +8,16 @@ import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
 import { getPalette } from './palette';
 
-type Props = {|
-    header: string,
+type Props = {||}
+
+type Theme = 'classic' | 'modern'
+
+type State = {|
+  currentTheme: Theme
 |}
 
 /**
- * @todos
- * 1. Display shadows
- * 2. Display All colors
- * 3. Toggle according to the theme
- * 4. Only accessable in nightly
+ * @todos Only accessable in nightly
  */
 
 const themes = {
@@ -26,13 +26,13 @@ const themes = {
 }
 
 @observer
-export default class YoroiPalettePage extends Component<Props> {
+export default class YoroiPalettePage extends Component<Props, State> {
 
-    state = {
+    state: State = {
         currentTheme: 'classic',
     }
 
-    switchTheme(theme: string): void {
+    switchTheme(theme: Theme): void {
         this.setState({ currentTheme: theme })
     }
 
@@ -66,7 +66,7 @@ export default class YoroiPalettePage extends Component<Props> {
                   }}
                 />
                 <p className={styles.colorHex}>
-                  {row[1]}
+                  {JSON.stringify(row[1])}
                 </p>
                 <p className={styles.colorName}>{row[0]}</p>
               </div>

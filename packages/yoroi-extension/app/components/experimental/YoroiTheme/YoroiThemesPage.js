@@ -7,17 +7,12 @@ import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
 
-type Props = {|
-    header: string,
-|}
+type Props = {||}
+type Theme = 'classic' | 'modern'
 
-/**
- * @todos
- * 1. Display shadows
- * 2. Display All colors
- * 3. Toggle according to the theme
- * 4. Only accessable in nightly
- */
+type State = {|
+  currentTheme: Theme
+|}
 
 const themes = {
     classic: classicTheme,
@@ -25,13 +20,13 @@ const themes = {
 }
 
 @observer
-export default class YoroiThemesPage extends Component<Props> {
+export default class YoroiThemesPage extends Component<Props, State> {
 
-    state = {
+    state: State = {
         currentTheme: 'classic',
     }
 
-    switchTheme(theme: string): void {
+    switchTheme(theme: Theme): void {
         this.setState({ currentTheme: theme })
     }
 
@@ -80,10 +75,10 @@ export default class YoroiThemesPage extends Component<Props> {
                       <div className={styles.row} key={entry[0]}>
                         <p className={styles.rowKey}>{entry[0]}</p>
                         <ul className={styles.subRow}>
-                          {Object.entries(entry[1]).map(row => (
+                          {Object.entries(Object(entry[1])).map(row => (
                             <li className={styles.subRowItem} key={row[0]}>
-                              <p className={styles.key}>{row[0]}</p>
-                              <p className={styles.value}>{row[1]}</p>
+                              <p className={styles.key}>{JSON.stringify(row[0])}</p>
+                              <p className={styles.value}>{JSON.stringify(row[1])}</p>
                             </li>
                           ))}
                         </ul>
