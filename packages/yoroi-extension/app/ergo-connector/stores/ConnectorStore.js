@@ -458,6 +458,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const inputs = [];
+    const foreignInputs = [];
+
     for (let i = 0; i < txBody.inputs().len(); i++) {
       const input = txBody.inputs().get(i);
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
@@ -467,24 +469,21 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         // eslint-disable-next-line camelcase
         tx_hash === txHash && tx_index === txIndex
       );
-      if (!utxo) {
-        throw new Error(`missing UTXO for tx hash ${txHash} index ${txIndex}`);
-      }
-      inputs.push(
-        {
+      if (utxo) {
+        inputs.push({
           address: utxo.receiver,
           value: new MultiToken(
-            [
-              {
-                amount: new BigNumber(utxo.amount),
-                identifier: defaultToken.Identifier,
-                networkId: defaultToken.NetworkId
-              }
-            ],
+            [{
+              amount: new BigNumber(utxo.amount),
+              identifier: defaultToken.Identifier,
+              networkId: defaultToken.NetworkId
+            }],
             selectedWallet.publicDeriver.getParent().getDefaultToken()
-          )
-        }
-      );
+          ),
+        });
+      } else {
+        foreignInputs.push({ txHash, txIndex })
+      }
     }
 
     const outputs = [];
@@ -522,7 +521,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
 
     runInAction(() => {
-      this.adaTransaction = { inputs, outputs, fee, total, amount };
+      this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
     });
   }
 
