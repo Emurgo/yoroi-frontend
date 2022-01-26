@@ -90,11 +90,8 @@ export default ({
           uriTemplate: 'main_window.html#/send-from-uri?q=%s',
         },
       ],
+    optional_permissions: shouldInjectConnector ? ['tabs', 'activeTab', '*://*/*'] : []
   };
-
-  if (shouldInjectConnector) {
-    base.optional_permissions = ['tabs', 'activeTab', '*://*/*']
-  }
 
   const verName /*: {| version_name?: string |} */ = versionName != null
     ? { version_name: versionName }

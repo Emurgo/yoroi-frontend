@@ -10,6 +10,9 @@ type State = {|
   hasPermission: boolean,
 |}
 
+/*::
+declare var chrome;
+*/
 @observer
 export default class DappConnectorNavbar extends Component<Props, State> {
 
