@@ -54,7 +54,7 @@ export default class DappConnectorNavbar extends Component<Props> {
         '*://*/*'
       ]
     }, (removed) => {
-      this.setState({ hasPermission: removed })
+      this.setState({ hasPermission: !removed })
       if (removed) {
         alert('permissions removed')
       } else {
