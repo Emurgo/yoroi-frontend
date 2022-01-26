@@ -477,30 +477,23 @@ export async function connectorSignTx(
       debug('signing', 'UTxO found, regular signature');
       inputSigningKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
     } else {
-      debug('signing', 'No UTxO found! Checking if input is P2S');
-      const isP2S =
-        S.Address.from_base58(input.address).address_type_prefix() ===
-        S.AddressTypePrefix.Pay2S;
-      if (isP2S) {
-        const matchingAddressMap = await p2sExtractor(input);
-        const matchedAddresses = Object.values(matchingAddressMap);
-        if (matchedAddresses.length > 0) {
-          if (matchedAddresses.some(x => !x)) {
-            const emptyKeys = Object.entries(matchingAddressMap)
-              .filter(([, v]) => !v)
-              .map(([k]) => k);
-            throw new Error(
-              `Input ${inputId} is a P2S, but no matching address is found
+      debug('signing', 'No UTxO found! Checking if input needs some P2S signatures');
+      const matchingAddressMap = await p2sExtractor(input);
+      const matchedAddresses = Object.values(matchingAddressMap);
+      if (matchedAddresses.length > 0) {
+        if (matchedAddresses.some(x => !x)) {
+          const emptyKeys = Object.entries(matchingAddressMap)
+            .filter(([, v]) => !v)
+            .map(([k]) => k);
+          throw new Error(
+            `Input ${inputId} is a P2S, but no matching address are found
                for these keys: ${JSON.stringify(emptyKeys)}`
-            );
-          }
-          debug('signing', 'Input is a P2S with matching addresses:', Array.from(matchedAddresses));
-          matchedAddresses.forEach(({ fullAddress }) => {
-            inputSigningKeys.add(generateKey({ addressing: fullAddress, keyLevel, signingKey }));
-          });
+          );
         }
-      } else {
-        throw new Error(`Input ${inputId} is not recognised! No matching UTxO found and is not P2S!`)
+        debug('signing', 'Input is a P2S with matching addresses:', Array.from(matchedAddresses));
+        matchedAddresses.forEach(({ fullAddress }) => {
+          inputSigningKeys.add(generateKey({ addressing: fullAddress, keyLevel, signingKey }));
+        });
       }
     }
   }
