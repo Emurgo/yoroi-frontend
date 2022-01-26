@@ -16,6 +16,8 @@ import FullscreenLayout from '../../components/layout/FullscreenLayout'
 import Navbar from '../../components/experimental/layout/Navbar'
 import YoroiThemesPage from '../../components/experimental/YoroiTheme/YoroiThemesPage'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import environment from '../../environment'
+import { ROUTES } from '../../routes-config'
 
 
 export type GeneratedData = typeof YoroiThemesContainer.prototype.generated;
@@ -27,6 +29,12 @@ type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
 class YoroiThemesContainer extends Component<AllProps> {
+
+  componentDidMount() {
+    if(!environment.isNightly() && !environment.isDev()) {
+      this.generated.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS })
+    }
+  }
 
   render (): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />

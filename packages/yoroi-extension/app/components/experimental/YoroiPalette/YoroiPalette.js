@@ -16,10 +16,6 @@ type State = {|
   currentTheme: Theme
 |}
 
-/**
- * @todos Only accessable in nightly
- */
-
 const themes = {
     classic: classicTheme,
     modern: modernTheme
@@ -66,7 +62,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
                   }}
                 />
                 <p className={styles.colorHex}>
-                  {JSON.stringify(row[1])}
+                  {String(row[1])}
                 </p>
                 <p className={styles.colorName}>{row[0]}</p>
               </div>
