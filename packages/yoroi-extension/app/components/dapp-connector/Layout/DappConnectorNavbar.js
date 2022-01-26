@@ -5,14 +5,15 @@ import styles from './DappConnectorNavbar.scss'
 import type { Node } from 'react';
 import classnames from 'classnames';
 
-type Props = {|
-
+type Props = {||}
+type State = {|
+  hasPermission: boolean,
 |}
 
 @observer
-export default class DappConnectorNavbar extends Component<Props> {
+export default class DappConnectorNavbar extends Component<Props, State> {
 
-  state = {
+  state: State = {
     hasPermission: false,
   }
 
