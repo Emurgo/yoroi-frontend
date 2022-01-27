@@ -186,7 +186,7 @@ class WalletSummaryPage extends Component<AllProps> {
               })
             }
             unitOfAccountSetting={profile.unitOfAccount}
-            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
             getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               publicDeriver,
@@ -596,7 +596,7 @@ class WalletSummaryPage extends Component<AllProps> {
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
       |},
       memos: {|
         error: ?LocalizableError,
@@ -686,7 +686,7 @@ class WalletSummaryPage extends Component<AllProps> {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+          getHistoricalPrice: stores.coinPriceStore.getHistoricalPrice,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

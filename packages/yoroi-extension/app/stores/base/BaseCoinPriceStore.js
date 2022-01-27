@@ -125,7 +125,18 @@ export default class BaseCoinPriceStore
     if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
     }*/
-    return getPrice(from, to, this.currentPriceTickers);
+    const normalizedFrom = from === 'TADA' ? 'ADA' : from;
+    return getPrice(normalizedFrom, to, this.currentPriceTickers);
+  }
+
+  getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number = (
+    from: string, to: string, timestamp: number,
+  ) => {
+    const normalizedFrom = from === 'TADA' ? 'ADA' : from;
+    const price = this.priceMap.get(
+      getPriceKey(normalizedFrom, to, new Date(timestamp))
+    );
+    return price?.Price;
   }
 
   _pollRefresh: void => Promise<void> = async () => {
@@ -203,25 +214,30 @@ export default class BaseCoinPriceStore
   updateTransactionPriceData: {|
     db: lf$Database,
     timestamps: Array<number>,
+    defaultToken: string,
   |} => Promise<void> = async (request) => {
     const { unitOfAccount } = this.stores.profile;
     if (!unitOfAccount.enabled) return;
 
     const { timestamps } = request;
 
+    const from = request.defaultToken === 'TADA' ? 'ADA' : request.defaultToken;
+    if (from !== 'ADA') {
+      return;
+    }
+
     const missingPrices = timestamps.filter(
       timestamp => this.priceMap.get(
-        getPriceKey('ADA', unitOfAccount.currency, new Date(timestamp))
+        getPriceKey(from, unitOfAccount.currency, new Date(timestamp))
       ) == null
     );
     if (!missingPrices.length) {
       return;
     }
-
     const stateFetcher = this.stores.stateFetchStore.fetcher;
     try {
       const response: HistoricalCoinPriceResponse =
-        await stateFetcher.getHistoricalCoinPrice({ from: 'ADA', timestamps });
+        await stateFetcher.getHistoricalCoinPrice({ from, timestamps });
       if (response.error != null) {
         throw new Error('historical coin price query error: ' + response.error);
       }
@@ -234,10 +250,11 @@ export default class BaseCoinPriceStore
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
         }
+        /*
         if (!verifyTicker(ticker, this.pubKeyData)) {
           throw new Error('Invalid ticker signature: ' + JSON.stringify(ticker));
         }
-
+        */
         const tickers: Array<Ticker> =
           Object.entries(ticker.prices)
             .map(([To, Price]) => (

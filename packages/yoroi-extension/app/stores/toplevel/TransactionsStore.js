@@ -332,10 +332,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     // note: possible existing memos were modified on a difference instance, etc.
     await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
-    // note: possible we failed to get the historical price for something in the past
+
+    const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
     await this.stores.coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
       timestamps: result.timestamps,
+      defaultToken: defaultTokenInfo.Metadata.ticker,
     });
 
     const remoteTransactionIds = result.remoteTransactionIds;
@@ -552,16 +556,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
       const { assuranceMode } = this.stores.walletSettings
             .getPublicDeriverSettingsCache((publicDeriver: any));
-      const getUnitOfAccount = (timestamp: Date) =>
-            (!unitOfAccount.enabled
-             ? undefined
-             : this.stores.coinPriceStore.priceMap.get(getPriceKey(
-               getTokenName(this.stores.tokenInfoStore.getDefaultTokenInfo(
-                 publicDeriver.getParent().getNetworkInfo().NetworkId
-               )),
-               unitOfAccount.currency,
-               timestamp
-             )));
+      const getUnitOfAccount = (timestamp: Date) => undefined;
 
       let cursor = 0;
 

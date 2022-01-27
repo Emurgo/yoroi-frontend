@@ -10,20 +10,5 @@ export default class CoinPriceStore extends BaseCoinPriceStore<StoresMap, Action
   }
   async updatePricesForWallet(): ?Promise<void> {
     await this.refreshCurrentCoinPrice();
-    /*
-    const { selected } = this.stores.wallets;
-    if (selected) {
-      const { allRequest } = this.stores.transactions
-        .getTxRequests(selected).requests;
-
-      const timestamps = allRequest.result?.timestamps;
-      if (allRequest.wasExecuted && timestamps) {
-        await this.stores.coinPriceStore.updateTransactionPriceData({
-          db: selected.getDb(),
-          timestamps,
-        });
-      }
-    }
-    */
   }
 }
