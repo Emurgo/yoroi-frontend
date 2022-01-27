@@ -63,6 +63,7 @@ import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import type CardanoTxRequest from '../../app/api/ada';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
+import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 
 
 /*::
@@ -109,7 +110,7 @@ type PendingSign = {|
 |}
 
 let imgBase64Url: string = '';
-let connectionProtocol: string = '';
+let connectionProtocol: 'cardano' | 'ergo' = 'cardano';
 
 type ConnectedSite = {|
   url: string,
@@ -785,7 +786,8 @@ function handleInjectorConnect(port) {
         }, {})
         const W4 = RustModule.WalletV4;
         const multiasset = W4.MultiAsset.new();
-        for (const [policyHex, assetGroup] of Object.entries(groupedAssets)) {
+        for (const policyHex in groupedAssets) {
+          const assetGroup = groupedAssets[policyHex];
           const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
           const assets = RustModule.WalletV4.Assets.new();
           for (const asset of assetGroup) {
@@ -945,7 +947,7 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const balance =
                       await connectorGetBalance(wallet, pendingTxs, tokenId, connectionProtocol);
-                    if (isCBOR && tokenId === '*') {
+                    if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
                       await RustModule.load();
                       const W4 = RustModule.WalletV4;
                       const value = W4.Value.new(
@@ -1005,10 +1007,12 @@ function handleInjectorConnect(port) {
                         );
                     }
                     if (isCardano) {
+                      // $FlowFixMe[prop-missing]
+                      const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
                       await RustModule.load();
                       const W4 = RustModule.WalletV4;
                       if (isCBOR) {
-                        utxos = utxos.map(u => {
+                        utxos = cardanoUtxos.map(u => {
                           const input = W4.TransactionInput.new(
                             W4.TransactionHash.from_bytes(
                               Buffer.from(u.tx_hash, 'hex')
@@ -1028,10 +1032,13 @@ function handleInjectorConnect(port) {
                           ).toString('hex');
                         })
                       } else {
-                        utxos.forEach(u => {
-                          u.receiver = W4.Address.from_bytes(
-                            Buffer.from(u.receiver, 'hex'),
-                          ).to_bech32();
+                        utxos = cardanoUtxos.map(u => {
+                          return {
+                            ...u,
+                            receiver: W4.Address.from_bytes(
+                              Buffer.from(u.receiver, 'hex'),
+                            ).to_bech32(),
+                          };
                         });
                       }
                     }
