@@ -18,6 +18,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -40,6 +41,8 @@ type Props = {|
     conceptualWallet: ConceptualWallet,
     conceptualWalletName: string,
   |},
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
 function constructPlate(
@@ -108,14 +111,14 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                 amount: totalAmount,
               })}
             </div>
-            <div className={styles.fixedAmount}>
-              {/* TODO: fix value to USD */}
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}{' '}
-              USD
-            </div>
+            {this.props.unitOfAccountSetting.enabled && (
+              <div className={styles.fixedAmount}>
+                {this.renderAmountWithUnitOfAccount({
+                  shouldHideBalance,
+                  amount: totalAmount,
+                })}
+              </div>
+            )}
           </div>
           {totalAmount != null && showEyeIconSafe && (
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
@@ -172,4 +175,36 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       </>
     );
   };
+
+  renderAmountWithUnitOfAccount: {|
+    shouldHideBalance: boolean,
+    amount: ?MultiToken
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return null;
+    }
+    const { currency } = this.props.unitOfAccountSetting;
+    if (request.shouldHideBalance) {
+      return (
+        <>
+          <span>{hiddenAmount}</span>
+          {' ' + currency}
+        </>
+      );
+    }
+    let balanceDisplay;
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    const price = this.props.getCurrentPrice(
+      tokenInfo.Metadata.ticker,
+      currency
+    );
+
+    if (price != null) {
+      return calculateAndFormatValue(shiftedAmount, price) + ' ' + currency;
+    }
+  }
 }

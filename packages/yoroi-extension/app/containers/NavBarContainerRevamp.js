@@ -28,6 +28,7 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -103,6 +104,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
           defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
             publicDeriver.getParent().getNetworkInfo().NetworkId
           )}
+          unitOfAccountSetting={profile.unitOfAccount}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         />
       );
     };
@@ -319,6 +322,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       profile: {|
         shouldHideBalance: boolean,
         currentSortedWallets: ?Array<number>,
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -334,6 +338,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         getPublicKeyCache: IGetPublic => PublicKeyCache,
         publicDerivers: Array<PublicDeriver<>>,
         selected: null | PublicDeriver<>,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number,
       |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
@@ -369,12 +376,16 @@ export default class NavBarContainerRevamp extends Component<Props> {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
           currentSortedWallets: stores.profile.currentSortedWallets,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
       },
       actions: {
