@@ -27,7 +27,10 @@ export function calculateAndFormatValue(
 }
 
 export function formatValue(value: BigNumber): string {
-  if (value.lt(1)) {
+  if (value.isZero()) {
+    return '0';
+  }
+  if (value.abs().lt(1)) {
     return value.toFormat(6);
   }
   return value.toFixed(2);
