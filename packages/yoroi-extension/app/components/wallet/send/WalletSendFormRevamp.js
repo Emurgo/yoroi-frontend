@@ -40,6 +40,8 @@ import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -133,6 +135,8 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
 type State = {|
@@ -462,7 +466,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 </div>
 
                 <div className={styles.usd}>
-                  <p>$0</p>
+                  {this.renderUnitOfAccountAmount(amountFieldProps.value)}
                 </div>
               </div>
 
@@ -567,5 +571,34 @@ export default class WalletSendForm extends Component<Props, State> {
       >
         {intl.formatMessage(globalMessages.nextButtonLabel)}
       </Button>);
+  }
+
+  renderUnitOfAccountAmount(value: string): Node {
+    if (!this.props.unitOfAccountSetting.enabled) {
+      return null;
+    }
+    let convertedAmount;
+
+    const { currency } = this.props.unitOfAccountSetting;
+
+    let amount = null;
+    try{
+      amount = new BigNumber(value);
+    } catch {
+    }
+    if (!amount || amount.isNaN()) {
+      convertedAmount = '-';
+    } else {
+      const price = this.props.getCurrentPrice(
+        this.props.defaultToken.Metadata.ticker,
+        currency
+      );
+
+      if (price) {
+        convertedAmount = calculateAndFormatValue(amount, price);
+      }
+    }
+
+    return `${convertedAmount} ${currency}`;
   }
 }
