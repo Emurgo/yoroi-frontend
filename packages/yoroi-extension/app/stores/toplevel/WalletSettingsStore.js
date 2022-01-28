@@ -99,6 +99,8 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
   }
 
+  @observable isConnectorHasPermission: boolen = false;
+
   setup(): void {
     super.setup();
     const a = this.actions.walletSettings;
@@ -110,6 +112,47 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     a.updateSigningPassword.listen(this._changeSigningPassword);
     a.resyncHistory.listen(this._resyncHistory);
     a.removeWallet.listen(this._removeWallet);
+
+    this._checkConnectorInjectPermission()
+  }
+
+  @action _checkConnectorInjectPermission: void => void  = () => {
+    chrome.permissions.contains({
+      permissions: ['tabs', 'activeTab'],
+      origins: [
+        '*://*/*'
+      ]
+    }, (result) => {
+      runInAction(() => {
+        this.isConnectorHasPermission = Boolean(result)
+      })
+    });
+  }
+
+  @action _requestTabPermission: void => void = () => {
+    chrome.permissions.request({
+      permissions: ['tabs', 'activeTab'],
+      origins: [
+        '*://*/*'
+      ]
+    }, (granted) => {
+      runInAction(() => {
+        this.isConnectorHasPermission = Boolean(granted)
+      })
+    });
+  }
+
+  @action _removeTabPermission: void => void = () => {
+    chrome.permissions.remove({
+      permissions: ['tabs', 'activeTab'],
+      origins: [
+        '*://*/*'
+      ]
+    }, (removed) => {
+      runInAction(() => {
+        this.isConnectorHasPermission = Boolean(!removed)
+      })
+    });
   }
 
   @action _startEditingWalletField: {| field: string |} => void = (
