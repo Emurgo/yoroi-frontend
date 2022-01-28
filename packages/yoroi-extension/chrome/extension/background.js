@@ -786,7 +786,7 @@ function handleInjectorConnect(port) {
         }, {})
         const W4 = RustModule.WalletV4;
         const multiasset = W4.MultiAsset.new();
-        for (const policyHex in groupedAssets) {
+        for (const policyHex of Object.keys(groupedAssets)) {
           const assetGroup = groupedAssets[policyHex];
           const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
           const assets = RustModule.WalletV4.Assets.new();

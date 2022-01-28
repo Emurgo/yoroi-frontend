@@ -303,7 +303,9 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
   return getAllAddresses(wallet, false);
 }
 
-export async function connectorGetCardanoRewardAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+export async function connectorGetCardanoRewardAddresses(
+  wallet: PublicDeriver<>,
+): Promise<Address[]> {
   return getCardanoRewardAddresses(wallet)
     .then(arr => arr.map(a => a.base58));
 }
