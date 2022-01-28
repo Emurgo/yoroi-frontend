@@ -88,7 +88,7 @@ chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { l
 // Inject dapp-connector api code
 const rule = {
   conditions: [
-    new chrome.declarativeContent.PageStateMatcher({})
+    new chrome.declarativeContent.PageStateMatcher({}) // match all pages
   ],
   actions: [ new chrome.declarativeContent.RequestContentScript({ js: ['js/inject.js'] }) ]
 };
