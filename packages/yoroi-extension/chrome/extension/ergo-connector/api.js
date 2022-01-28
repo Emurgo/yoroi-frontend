@@ -9,7 +9,7 @@ import type {
   TxId,
   SignedTx,
   Value,
-  CardanoTx,
+  CardanoTx, AccountBalance,
 } from './types';
 import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -86,7 +86,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId,
   protocol: 'cardano' | 'ergo',
-): Promise<Value> {
+): Promise<AccountBalance | Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
@@ -303,7 +303,9 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
   return getAllAddresses(wallet, false);
 }
 
-export async function connectorGetCardanoRewardAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+export async function connectorGetCardanoRewardAddresses(
+  wallet: PublicDeriver<>,
+): Promise<Address[]> {
   return getCardanoRewardAddresses(wallet)
     .then(arr => arr.map(a => a.base58));
 }
