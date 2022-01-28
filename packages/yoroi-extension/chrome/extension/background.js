@@ -86,10 +86,7 @@ const onYoroiIconClicked = () => {
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
 // Inject dapp-connector api code
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  console.log({
-    tabId, changeInfo, tab
-  })
+chrome.tabs.onUpdated.addListener((tabId) => {
   chrome.tabs.executeScript(tabId, {
     file: 'js/inject.js',
     allFrames: true,
