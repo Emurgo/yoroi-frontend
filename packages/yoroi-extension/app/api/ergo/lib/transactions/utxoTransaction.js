@@ -532,7 +532,7 @@ export function extractP2sKeysFromErgoBox(box: ErgoBoxJson): Set<string> {
   }
   if (box.additionalRegisters != null) {
     for (const registerHex of Object.values(box.additionalRegisters)) {
-      const walletPk: ?string = extractWalletPkFromHexConstant(registerHex);
+      const walletPk: ?string = extractWalletPkFromHexConstant(String(registerHex));
       if (walletPk != null) {
         res.add(walletPk);
       }
