@@ -329,12 +329,11 @@ function injectIntoPage(code) {
 }
 
 function shouldInject() {
-    // const documentElement = document.documentElement.nodeName
-    // const docElemCheck = documentElement ? documentElement.toLowerCase() === 'html' : true;
-    // const { docType } = window.document;
-    // const docTypeCheck = docType ? docType.name === 'html' : true;
-    // return docElemCheck && docTypeCheck;
-    return true
+    const documentElement = document.documentElement.nodeName
+    const docElemCheck = documentElement ? documentElement.toLowerCase() === 'html' : true;
+    const { docType } = window.document;
+    const docTypeCheck = docType ? docType.name === 'html' : true;
+    return docElemCheck && docTypeCheck;
 }
 
 /**
