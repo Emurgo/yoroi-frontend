@@ -9,7 +9,7 @@ import type {
   TxId,
   SignedTx,
   Value,
-  CardanoTx,
+  CardanoTx, AccountBalance,
 } from './types';
 import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -84,8 +84,9 @@ function valueToBigNumber(x: Value): BigNumber {
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
-  tokenId: TokenId
-): Promise<Value> {
+  tokenId: TokenId,
+  protocol: 'cardano' | 'ergo',
+): Promise<AccountBalance | Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
@@ -104,7 +105,7 @@ export async function connectorGetBalance(
       }
       return Promise.resolve(bigNumberToValue(total));
     }
-  } else {
+  } else if (protocol === 'ergo') {
     const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
     let total = new BigNumber(0);
     for (const box of allUtxos) {
@@ -115,6 +116,27 @@ export async function connectorGetBalance(
       }
     }
     return Promise.resolve(bigNumberToValue(total));
+  } else {
+    // can directly query for balance
+    const canGetBalance = asGetBalance(wallet);
+    if (canGetBalance != null) {
+      const balance = await canGetBalance.getBalance();
+      const nonDefaultEntries = balance.nonDefaultEntries();
+      if (tokenId === '*') {
+        return Promise.resolve({
+          default: bigNumberToValue(balance.getDefault()),
+          networkId: balance.getDefaultEntry().networkId,
+          assets: nonDefaultEntries.map(e => ({
+            identifier: e.identifier,
+            networkId: e.networkId,
+            amount: bigNumberToValue(e.amount),
+          }))
+        });
+      }
+      const entry = nonDefaultEntries.find(e => e.identifier === tokenId);
+      return Promise.resolve(bigNumberToValue(entry?.amount || new BigNumber(0)));
+    }
+    throw Error('asGetBalance failed in connectorGetBalance');
   }
 }
 
@@ -224,7 +246,7 @@ async function getAllFullAddresses(
     CoreAddressTypes.CARDANO_ENTERPRISE,
     CoreAddressTypes.CARDANO_LEGACY,
     CoreAddressTypes.CARDANO_PTR,
-    CoreAddressTypes.CARDANO_REWARD
+    // CoreAddressTypes.CARDANO_REWARD
   ] : [
     CoreAddressTypes.ERGO_P2PK,
     CoreAddressTypes.ERGO_P2SH,
@@ -246,6 +268,25 @@ async function getAllFullAddresses(
     });
 }
 
+async function getCardanoRewardAddresses(
+  wallet: IPublicDeriver<>,
+): Promise<FullAddressPayloadWithBase58[]> {
+  const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
+  if (!isCardano) {
+    throw new Error('Invalid wallet for a cardano request')
+  }
+  const type = CoreAddressTypes.CARDANO_REWARD;
+  const promise = getAllAddressesForDisplay({ publicDeriver: wallet, type });
+  await RustModule.load();
+  const addresses: FullAddressPayload[] = await promise;
+  return addresses.map(a => {
+    return {
+      fullAddress: a,
+      base58: a.address,
+    };
+  });
+}
+
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
   return getAllFullAddresses(wallet, usedFilter)
     .then(arr => arr.map(a => a.base58));
@@ -260,6 +301,13 @@ export async function connectorGetUsedAddresses(
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
   return getAllAddresses(wallet, false);
+}
+
+export async function connectorGetCardanoRewardAddresses(
+  wallet: PublicDeriver<>,
+): Promise<Address[]> {
+  return getCardanoRewardAddresses(wallet)
+    .then(arr => arr.map(a => a.base58));
 }
 
 export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promise<Address> {
@@ -485,9 +533,18 @@ export async function connectorSignCardanoTx(
   // eslint-disable-next-line no-unused-vars
   const { tx: txHex, partialSign } = tx;
 
-  const txBody = RustModule.WalletV4.TransactionBody.from_bytes(
-    Buffer.from(txHex, 'hex')
-  );
+  let txBody;
+  const bytes = Buffer.from(txHex, 'hex');
+  try {
+    txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+  } catch (originalErr) {
+    try {
+      // Try parsing as body for backward compatibility
+      txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+    } catch (_e) {
+      throw originalErr;
+    }
+  }
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -518,10 +575,8 @@ export async function connectorSignCardanoTx(
   const utxoIdSet: Set<string> = new Set();
   for (let i = 0; i < txBody.inputs().len(); i++) {
     const input = txBody.inputs().get(i);
-    utxoIdSet.add(
-      Buffer.from(input.transaction_id().to_bytes()).toString('hex') +
-      String(input.index())
-    );
+    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    utxoIdSet.add(`${txHash}${String(input.index())}`);
   }
   const usedUtxos = addressedUtxos.filter(utxo =>
     utxoIdSet.has(utxo.utxo_id)
