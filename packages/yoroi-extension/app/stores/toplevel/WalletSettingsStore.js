@@ -49,6 +49,9 @@ export type WarningList = {|
   dialogs: Array<void => Node>,
 |};
 
+/*::
+declare var chrome;
+*/
 export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
   @observable renameModelRequest: Request<RenameModelFunc>
@@ -99,7 +102,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
   }
 
-  @observable isConnectorHasPermission: boolen = false;
+  @observable isConnectorHasPermission: boolean = false;
 
   setup(): void {
     super.setup();
