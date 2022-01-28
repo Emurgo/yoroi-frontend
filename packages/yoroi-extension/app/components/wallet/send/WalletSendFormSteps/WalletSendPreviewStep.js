@@ -113,7 +113,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     const coinPrice = this.props.getCurrentPrice(
-      tokenInfo.Identifier,
+      tokenInfo.Metadata.ticker,
       toCurrency
     );
 
