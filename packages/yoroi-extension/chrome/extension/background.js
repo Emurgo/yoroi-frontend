@@ -86,14 +86,17 @@ const onYoroiIconClicked = () => {
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
 // Inject dapp-connector api code
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  console.log({
-    tabId, changeInfo, tab
-  })
-  chrome.tabs.executeScript(tabId, {
-    file: 'js/inject.js',
-    allFrames: true,
-  })
+const rule = {
+  conditions: [
+    new chrome.declarativeContent.PageStateMatcher({})
+  ],
+  actions: [ new chrome.declarativeContent.RequestContentScript({ js: ['js/inject.js'] }) ]
+};
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
+    chrome.declarativeContent.onPageChanged.addRules([rule]);
+  });
 });
 /**
  * we store the ID instead of an index
