@@ -177,7 +177,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       return {
         walletId: wallet.getPublicDeriverId(),
-        rewards: this.getRewardBalance(publicDeriver),
+        rewards: this.getRewardBalance(wallet),
         walletAmount: walletBalance,
         getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
         plate,
