@@ -203,6 +203,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
           }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
           currentSortedWallets={this.generated.stores.profile.currentSortedWallets ?? []}
+          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         />
       );
     }

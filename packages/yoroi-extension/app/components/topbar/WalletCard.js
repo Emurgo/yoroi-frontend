@@ -28,6 +28,8 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import DragIcon from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import StarIcon from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -50,6 +52,8 @@ type Props = {|
   +onSelect?: void => void,
   +walletId: string,
   +idx: number,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
 type State = {| +isActionsShow: boolean |};
@@ -175,14 +179,14 @@ export default class WalletCard extends Component<Props, State> {
                       amount: totalAmount,
                     })}
                   </div>
+                {this.props.unitOfAccountSetting.enabled && (
                   <div className={styles.fixedAmount}>
-                    {/* TODO: fix value to USD */}
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}{' '}
-                    USD
+                      {this.renderAmountWithUnitOfAccount({
+                        shouldHideBalance,
+                        amount: totalAmount,
+                      })}
                   </div>
+                )}
                 </div>
                 <div className={styles.extraInfo}>
                   <p className={styles.label}>
@@ -249,6 +253,43 @@ export default class WalletCard extends Component<Props, State> {
       </>
     );
   };
+
+  renderAmountWithUnitOfAccount: {|
+    shouldHideBalance: boolean,
+    amount: ?MultiToken
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return null;
+    }
+    const { currency } = this.props.unitOfAccountSetting;
+    if (request.shouldHideBalance) {
+      return (
+        <>
+          <span>{hiddenAmount}</span>
+          {' ' + currency}
+        </>
+      );
+    }
+
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    const price = this.props.getCurrentPrice(
+      tokenInfo.Metadata.ticker,
+      currency
+    );
+
+    let balanceDisplay;
+    if (price != null) {
+      balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
+    } else {
+      balanceDisplay = '-';
+    }
+
+    return balanceDisplay + ' ' + currency;
+  }
 
   getTotalAmount: void => null | MultiToken = () => {
     if (this.props.rewards === undefined) {

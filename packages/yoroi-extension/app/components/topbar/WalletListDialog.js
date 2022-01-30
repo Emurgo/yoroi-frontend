@@ -19,6 +19,8 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
   addWallet: {
@@ -41,6 +43,8 @@ type Props = {|
   +wallets: Array<Object>,
   +currentSortedWallets: Array<number> | void,
   +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 type State = {|
   walletListIdx: Array<any>,
@@ -125,6 +129,43 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   };
 
+  renderAmountWithUnitOfAccount: {|
+    shouldHideBalance: boolean,
+    amount: ?MultiToken
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return null;
+    }
+    const { currency } = this.props.unitOfAccountSetting;
+    if (request.shouldHideBalance) {
+      return (
+        <>
+          <span>{hiddenAmount}</span>
+          {' ' + currency}
+        </>
+      );
+    }
+
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    const price = this.props.getCurrentPrice(
+      tokenInfo.Metadata.ticker,
+      currency
+    );
+
+    let balanceDisplay;
+    if (price != null) {
+      balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
+    } else {
+      balanceDisplay = '-';
+    }
+
+    return balanceDisplay + ' ' + currency;
+  }
+
   onDragEnd: Object => any = async result => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
@@ -176,9 +217,16 @@ export default class WalletListDialog extends Component<Props, State> {
                 {this.renderAmountDisplay({
                   shouldHideBalance,
                   amount: walletAmount,
-                })}{' '}
-                USD
+                })}
               </p>
+              {this.props.unitOfAccountSetting.enabled && (
+                <p className={styles.fixedAmount}>
+                  {this.renderAmountWithUnitOfAccount({
+                    shouldHideBalance,
+                    amount: walletAmount,
+                  })}
+                </p>
+              )}
             </div>
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
@@ -200,7 +248,15 @@ export default class WalletListDialog extends Component<Props, State> {
                     if (!wallet) {
                       return null;
                     }
-                    return <WalletCard key={walletId} idx={idx} {...wallet} />;
+                    return (
+                      <WalletCard
+                        key={walletId}
+                        idx={idx}
+                        {...wallet}
+                        unitOfAccountSetting={this.props.unitOfAccountSetting}
+                        getCurrentPrice={this.props.getCurrentPrice}
+                      />
+                    );
                   }).filter(Boolean)}
                 {provided.placeholder}
               </div>
