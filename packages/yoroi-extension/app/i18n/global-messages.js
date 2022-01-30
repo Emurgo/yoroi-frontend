@@ -212,6 +212,14 @@ const globalMessages: * = defineMessages({
     id: 'global.language.italian',
     defaultMessage: '!!!Italiano',
   },
+  languageCzech: {
+    id: 'global.language.czech',
+    defaultMessage: '!!!Czech',
+  },
+  languageSlovak: {
+    id: 'global.language.slovak',
+    defaultMessage: '!!!Slovak',
+  },
   addressLabel: {
     id: 'wallet.receive.confirmationDialog.addressLabel',
     defaultMessage: '!!!Address',

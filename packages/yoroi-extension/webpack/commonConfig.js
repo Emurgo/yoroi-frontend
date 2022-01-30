@@ -36,7 +36,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       template: path.join(__dirname, '../chrome/views/ergo-connector/main_window.html'),
       chunks: ['ergo'],
       alwaysWriteToDisk: true,
-      title: 'Yoroi-Ergo Dapp Connector',
+      title: 'Yoroi dApp Connector',
     }),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/background.html`),

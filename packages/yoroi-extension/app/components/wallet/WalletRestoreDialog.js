@@ -205,7 +205,6 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
-          if (walletPassword.length === 0) return [true];
           return [
             isValidRepeatPassword(walletPassword, field.value),
             this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)

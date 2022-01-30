@@ -38,7 +38,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
-  setDefaultTimeout(60 * 1000);
+  setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
   ErgoServer.getMockServer({});
@@ -105,7 +105,10 @@ After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({});
 });
 
-After(async function () {
+After( async function (scenario) {
+  if(scenario.result.status === 'failed'){
+    await takeScreenshot(this.driver, 'failedStep');
+  }
   await this.driver.quit();
 });
 
@@ -130,7 +133,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
+   if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
     }
 
@@ -245,16 +248,15 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
 Given(/^I have completed the basic setup$/, async function () {
   // language select page
   await this.waitForElement('.LanguageSelectionForm_component');
-  await this.click('.LanguageSelectionForm_submitButton');
-
+  await this.click('//button[text()="Continue"]', By.xpath);
   // ToS page
   await this.waitForElement('.TermsOfUseForm_component');
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.TermsOfUseForm_submitButton');
-
+  const tosClassElement = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
+  const checkbox = await tosClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  await checkbox.click();
+  await this.click('//button[text()="Continue"]', By.xpath);
   // uri prompt page
   await acceptUriPrompt(this);
-
   await this.waitForElement('.WalletAdd_component');
 });
 
