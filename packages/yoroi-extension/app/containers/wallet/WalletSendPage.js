@@ -46,7 +46,7 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
-import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFromSteps/WalletSendPreviewStepContainer';
+import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
