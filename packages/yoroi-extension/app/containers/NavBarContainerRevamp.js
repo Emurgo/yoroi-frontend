@@ -115,9 +115,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
           walletsCount={wallets.length}
           openWalletInfoDialog={() => {
             this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
-            this.generated.actions.router.goToRoute.trigger({
-              route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-            });
           }}
         />
       );
