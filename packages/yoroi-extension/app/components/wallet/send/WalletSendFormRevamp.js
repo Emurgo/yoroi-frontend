@@ -136,7 +136,7 @@ type Props = {|
 |};
 
 type State = {|
-  showMemoWarrning: boolean,
+  showMemoWarning: boolean,
   invalidMemo: boolean,
   memo: string,
   currentStep: number,
@@ -152,7 +152,7 @@ export default class WalletSendForm extends Component<Props, State> {
   };
 
   state: State = {
-    showMemoWarrning: false,
+    showMemoWarning: false,
     invalidMemo: false,
     memo: '',
     currentStep: SEND_FORM_STEP.RECEIVER
@@ -348,7 +348,7 @@ export default class WalletSendForm extends Component<Props, State> {
   renderCurrentStep(step: number): Node {
     const { form } = this
     const { intl } = this.context;
-    const { showMemoWarrning, invalidMemo, memo } = this.state
+    const { showMemoWarning, invalidMemo, memo } = this.state
     const { shouldSendAll } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
@@ -399,7 +399,7 @@ export default class WalletSendForm extends Component<Props, State> {
               <div className={styles.memoInput}>
                 <input
                   type="text"
-                  onFocus={() => this.setState({ showMemoWarrning: true })}
+                  onFocus={() => this.setState({ showMemoWarning: true })}
                   placeholder={intl.formatMessage(memoMessages.addMemo)}
                   onChange={(e) => this.onUpdateMemo(e.target.value)}
                   value={memo}
@@ -411,7 +411,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 </p>
               ):
                 <p className={classnames(
-                [ styles.memoWarning, !showMemoWarrning && styles.hide]
+                [ styles.memoWarning, !showMemoWarning && styles.hide]
                 )}
                 >
                   {intl.formatMessage(memoMessages.memoWarning)}
