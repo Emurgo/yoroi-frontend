@@ -83,8 +83,19 @@
                     display: inline-block;
                     width: 100%;
                     padding-left: 30px;
+                    
+                    svg {
+                        width: 35px;
+                        height: 35px;
+                    }
                 }
             }
         }
+    }
+
+    .nameToHexHeader {
+        font-size: 32px;
+        line-height: 32px;
+        margin: 20px 0px;
     }
 }

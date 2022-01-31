@@ -7,7 +7,7 @@ import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
 import { formatPalette, getPalette } from './palette';
-import ArrowDown from '../../../assets/images/my-wallets/arrow_down.inline.svg';
+import ArrowDown from '../../../assets/images/down-arrow.inline.svg';
 
 /**
  * @todos
@@ -111,6 +111,8 @@ export default class YoroiPalettePage extends Component<Props, State> {
               }
             </div>
           </div>
+
+          <h1 className={styles.nameToHexHeader}>Colors Direct Hex Colors</h1>
           {nameToHex.map((color, idx) => (
             <div className={styles.row} key={idx}>
               <span
