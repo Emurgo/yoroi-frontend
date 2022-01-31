@@ -17,7 +17,7 @@ import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import globalMessages from '../../../i18n/global-messages';
 import { hiddenAmount } from '../../../utils/strings';
-import { assetsMessage } from './AssetsList';
+import { assetsMessage, compareNumbers, compareStrings } from './AssetsList';
 import {
   Avatar,
   ButtonBase,
@@ -97,29 +97,11 @@ function TokenList({
     }
 
 
-    // if (field === 'amount') {
-    //   const first = new BigNumber(a[field])
-    //   const second = new BigNumber(b[field])
-    //   if (first.comparedTo(second) === -1){ // first < second
-    //     return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
-    //   }
-    //   if (first.comparedTo(second) === 1){ // first > second
-    //     return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-    //   }
-    //   return 0;
-    // }
-
-    console.log({
-      a: a[field], b: b[field], field
-    })
+    if (field === 'amount') {
+      return compareNumbers(a[field], b[field], newSortDirection)
+    }
     // Other fields
-    if (a[field] < b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
-    }
-    if (a[field] > b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-    }
-    return 0;
+    return compareStrings(a[field], b[field], newSortDirection)
   };
 
   const sortAssets: (field: string) => void = (field: string) => {

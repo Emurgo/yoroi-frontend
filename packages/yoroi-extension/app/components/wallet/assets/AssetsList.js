@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import Bignumber from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AssetsList.scss'
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
@@ -78,6 +78,29 @@ export const assetsMessage: Object = defineMessages({
     defaultMessage: '!!!No Asset Found',
   },
 });
+
+export function compareStrings(x: string, y: string, newSortDirection: string): number {
+  if (x < y){
+    return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+  }
+  if (x > y){
+    return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
+  }
+  return 0;
+}
+
+export function compareNumbers(x: string, y: string, newSortDirection: string): number {
+  const first = new BigNumber(x)
+  const second = new BigNumber(y)
+  const res = first.comparedTo(second)
+  if (res === -1){ // first < second
+    return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+  }
+  if (res === 1){ // first > second
+    return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
+  }
+  return 0;
+}
 @observer
 export default class AssetsList extends Component<Props, State> {
 
@@ -113,24 +136,10 @@ export default class AssetsList extends Component<Props, State> {
     this.setState({ sortingDirection: newSortDirection })
 
     if (field === 'amount') {
-      const first = new Bignumber(a[field])
-      const second = new Bignumber(b[field])
-      if (first.comparedTo(second) === -1){ // first < second
-        return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
-      }
-      if (first.comparedTo(second) === 1){ // first > second
-        return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-      }
-      return 0;
+      return compareNumbers(a[field], b[field], newSortDirection)
     }
     // Other fields
-    if (a[field] < b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
-    }
-    if (a[field] > b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-    }
-    return 0;
+    return compareStrings(a[field], b[field], newSortDirection)
   }
 
   sortAssets: ((field: string) => void) = (field: string) => {
