@@ -113,10 +113,12 @@ export default class AssetsList extends Component<Props, State> {
     this.setState({ sortingDirection: newSortDirection })
 
     if (field === 'amount') {
-      if (a[field] < b[field] ){
+      const first = new Bignumber(a[field])
+      const second = new Bignumber(b[field])
+      if (first.comparedTo(second) === -1){ // first < second
         return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
       }
-      if (a[field] > b[field] ){
+      if (first.comparedTo(second) === 1){ // first > second
         return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
       }
       return 0;
