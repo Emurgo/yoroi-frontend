@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-
+import Bignumber from 'bignumber.js'
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AssetsList.scss'
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
@@ -112,10 +112,20 @@ export default class AssetsList extends Component<Props, State> {
 
     this.setState({ sortingDirection: newSortDirection })
 
-    if ( a[field] < b[field] ){
+    if (field === 'amount') {
+      if (a[field] < b[field] ){
+        return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+      }
+      if (a[field] > b[field] ){
+        return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
+      }
+      return 0;
+    }
+    // Other fields
+    if (a[field] < b[field] ){
       return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
     }
-    if ( a[field] > b[field] ){
+    if (a[field] > b[field] ){
       return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
     }
     return 0;
