@@ -6,8 +6,14 @@ import type { Node } from 'react';
 import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
-import { getPalette } from './palette';
+import { formatPalette, getPalette } from './palette';
+import ArrowDown from '../../../assets/images/my-wallets/arrow_down.inline.svg';
 
+/**
+ * @todos
+ * 1. Print transaction status
+ * 2. Print the actual theme object
+ */
 type Props = {||}
 
 type Theme = 'classic' | 'modern'
@@ -36,6 +42,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
 
       const { currentTheme } = this.state
       const palette = getPalette(themes[currentTheme])
+      const { multiLayerColor, nameToHex } = formatPalette(palette, themes[currentTheme])
       return (
         <div className={styles.component}>
           <div className={styles.themes}>
@@ -54,18 +61,65 @@ export default class YoroiPalettePage extends Component<Props, State> {
               Modern Theme
             </button>
           </div>
-          {Object.entries(palette).map((row, idx) => (
+
+          <div className={styles.multiLayer}>
+            <h1>Design tokens</h1>
+            <div className={styles.multiLayerRows}>
+              {
+                multiLayerColor.map(color => (
+                  <ul className={styles.multiLayerRow}>
+                    <li className={classNames([styles.flexWithMargin, styles.multiLayerColorHex])}>
+                      <div
+                        style={{
+                        backgroundColor: color.hex,
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '3px',
+                      }}
+                      />
+                      <p>{color.hex}</p>
+                    </li>
+                    <li className={styles.arrowDown}><ArrowDown /></li>
+                    <li className={classNames([styles.flexWithMargin, styles.child])}>
+                      <div
+                        style={{
+                        backgroundColor: color.hex,
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '3px',
+                      }}
+                      />
+                      <p>{color.child}</p>
+                    </li>
+                    <li className={styles.arrowDown}><ArrowDown /></li>
+                    <li className={classNames([styles.flexWithMargin, styles.parent])}>
+                      <div
+                        style={{
+                        backgroundColor: color.hex,
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '3px',
+                      }}
+                      />
+                      <p>{color.parent}</p>
+                    </li>
+                  </ul>
+                ))
+              }
+            </div>
+          </div>
+          {nameToHex.map((color, idx) => (
             <div className={styles.row} key={idx}>
               <span
                 className={styles.colorBox}
                 style={{
-                    backgroundColor: row[1]
+                    backgroundColor: color.hex
                 }}
               />
               <p className={styles.colorHex}>
-                {String(row[1])}
+                {String(color.hex)}
               </p>
-              <p className={styles.colorName}>{row[0]}</p>
+              <p className={styles.colorName}>{color.name}</p>
             </div>
             ))}
         </div>

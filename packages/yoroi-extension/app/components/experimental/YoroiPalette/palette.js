@@ -197,3 +197,69 @@ export const getPalette: any => any = (theme: any) => {
    }
 
 }
+
+const getColorPath = (
+  themePalette: any,
+  color: string,
+  ) => {
+
+    const path = []
+    for (const entery of Object.entries(themePalette)) {
+      const [key, value] = entery
+      if (typeof value === 'object') {
+        for (const valueEntery of Object.entries(value)) {
+          if (valueEntery[1] === color) {
+            path.push(key, valueEntery[0])
+            break
+          }
+        }
+      }
+
+      if (path.length !== 0) break
+    }
+    return path
+}
+
+type MultiLayerColor = {|
+  parent: string,
+  child: string,
+  hex: string,
+  path: string[],
+|}
+
+type NameToHex = {|
+  name: string,
+  hex: string,
+|}
+
+type FormatedPalette = {|
+  multiLayersColor: MultiLayerColor,
+  nameToHex: NameToHex,
+|}
+
+export const formatPalette = (palette: any, theme: any): FormatedPalette => {
+  const formatedPalette: FormatedPalette = {
+    nameToHex: [],
+    multiLayerColor: []
+  }
+
+  for (const name of Object.keys(palette)) {
+    if(palette[name] && palette[name].startsWith('var(')) {
+      const secondColorName = palette[name].slice(4, -1)
+      const secondColorHex = palette[secondColorName]
+      const path = getColorPath(theme.palette, secondColorHex)
+      formatedPalette.multiLayerColor.push({
+        parent: name,
+        child: secondColorName,
+        hex: secondColorHex,
+        path
+      })
+    } else {
+      formatedPalette.nameToHex.push({
+        name, hex: palette[name]
+      })
+    }
+  }
+
+  return formatedPalette
+}
