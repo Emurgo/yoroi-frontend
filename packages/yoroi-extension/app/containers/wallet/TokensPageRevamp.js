@@ -36,7 +36,7 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
           entry,
           info: getTokenInfo(entry),
         }))
-        .filter(item => item.info.IsNFT === false)
+        // .filter(item => item.info.IsNFT === false)
         .map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: getTokenIdentifierIfExists(token.info) ?? '-',

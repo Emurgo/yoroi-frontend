@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
-
 import { injectIntl } from 'react-intl';
 import styles from './AssetsList.scss';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -34,6 +33,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { ListEmpty } from './ListEmpty';
+import BigNumber from 'bignumber.js';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -96,12 +96,27 @@ function TokenList({
       newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
-    setState(prev => ({ ...prev, sortingDirection: newSortDirection }));
 
-    if (a[field] < b[field]) {
+    // if (field === 'amount') {
+    //   const first = new BigNumber(a[field])
+    //   const second = new BigNumber(b[field])
+    //   if (first.comparedTo(second) === -1){ // first < second
+    //     return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+    //   }
+    //   if (first.comparedTo(second) === 1){ // first > second
+    //     return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
+    //   }
+    //   return 0;
+    // }
+
+    console.log({
+      a: a[field], b: b[field], field
+    })
+    // Other fields
+    if (a[field] < b[field] ){
       return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
     }
-    if (a[field] > b[field]) {
+    if (a[field] > b[field] ){
       return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
     }
     return 0;
