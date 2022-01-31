@@ -69,7 +69,9 @@
                     display: flex;
                     align-items: center;
                     justify-content: flex-start;
-                    background-color: green;
+                    font-family: Courier, monospace;
+                    font-weight: 500;
+                    color: var(--yoroi-palette-gray-900);
                     p {
                         margin-left: 10px;
                     }

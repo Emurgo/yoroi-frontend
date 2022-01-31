@@ -75,6 +75,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
                         width: '20px',
                         height: '20px',
                         borderRadius: '3px',
+                        border: '1px solid var(--yoroi-palette-gray-200)',
                       }}
                       />
                       <p>{color.hex}</p>
@@ -87,6 +88,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
                         width: '20px',
                         height: '20px',
                         borderRadius: '3px',
+                        border: '1px solid var(--yoroi-palette-gray-200)',
                       }}
                       />
                       <p>{color.child}</p>
@@ -99,6 +101,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
                         width: '20px',
                         height: '20px',
                         borderRadius: '3px',
+                        border: '1px solid var(--yoroi-palette-gray-200)',
                       }}
                       />
                       <p>{color.parent}</p>
