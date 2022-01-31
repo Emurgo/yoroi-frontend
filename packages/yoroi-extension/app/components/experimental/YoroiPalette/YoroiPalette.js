@@ -6,7 +6,7 @@ import type { Node } from 'react';
 import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
-import { getPalette } from './palette';
+import { getMainYoroiPalette } from '../../../styles/globalStyles';
 
 type Props = {||}
 
@@ -34,7 +34,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
 
     render(): Node {
         const { currentTheme } = this.state
-        const palette = getPalette(themes[currentTheme])
+        const palette = getMainYoroiPalette(themes[currentTheme])
         return (
           <div className={styles.component}>
             <div className={styles.themes}>
