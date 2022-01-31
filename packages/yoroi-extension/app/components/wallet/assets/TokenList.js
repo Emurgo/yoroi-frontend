@@ -33,7 +33,6 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { ListEmpty } from './ListEmpty';
-import BigNumber from 'bignumber.js';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
