@@ -47,7 +47,7 @@ const SORTING_COLUMNS = {
 export type Asset = {|
   name: string,
   id: string,
-  amount: number,
+  amount: string,
 |};
 type Props = {|
   +assetsList: Asset[],
