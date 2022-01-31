@@ -21,6 +21,7 @@ import type {
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -178,10 +179,11 @@ export default class NavWalletDetails extends Component<Props> {
 
     if (this.props.unitOfAccountSetting.enabled) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(
-        tokenInfo.Metadata.ticker,
-        currency
-      );
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getCurrentPrice(ticker, currency);
       if (price != null) {
         balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
         unit = currency;

@@ -589,13 +589,16 @@ export default class WalletSendForm extends Component<Props, State> {
     if (!amount || amount.isNaN()) {
       convertedAmount = '-';
     } else {
-      const price = this.props.getCurrentPrice(
-        this.props.defaultToken.Metadata.ticker,
-        currency
-      );
+      const ticker = this.props.defaultToken.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getCurrentPrice(ticker, currency);
 
       if (price) {
         convertedAmount = calculateAndFormatValue(amount, price);
+      } else {
+        convertedAmount = '-';
       }
     }
 

@@ -43,6 +43,7 @@ export default class BaseCoinPriceStore
       +stateFetchStore: StateFetchStore,
       +profile: {
         get unitOfAccount(): UnitOfAccountSettingType,
+        getUnitOfAccountBlock(): Promise<UnitOfAccountSettingType>,
         ...,
       },
       ...,

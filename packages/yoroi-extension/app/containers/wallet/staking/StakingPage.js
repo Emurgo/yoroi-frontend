@@ -50,7 +50,7 @@ import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../tra
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
-import type { TokenEntry } from '../../../../api/common/lib/MultiToken';
+import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -226,11 +226,11 @@ class StakingPage extends Component<AllProps> {
     const currency = stores.profile.unitOfAccount.currency;
 
     const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
-
-    const coinPrice = stores.coinPriceStore.getCurrentPrice(
-      tokenRow.Metadata.ticker,
-      currency
-    );
+    const ticker = tokenRow.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const coinPrice = stores.coinPriceStore.getCurrentPrice(ticker, currency);
     if (coinPrice == null) return { currency, amount: '-' };
     return {
       currency,

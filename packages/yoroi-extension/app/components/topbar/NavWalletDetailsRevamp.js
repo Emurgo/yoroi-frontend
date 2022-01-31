@@ -19,6 +19,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -184,11 +185,14 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       return null;
     }
     const { currency } = this.props.unitOfAccountSetting;
+    if (currency == null) {
+      throw new Error(`unexpected unit of account ${String(currency)}`);
+    }
     if (request.shouldHideBalance) {
       return (
         <>
           <span>{hiddenAmount}</span>
-          {' ' + currency}
+          {` ${currency}`}
         </>
       );
     }
@@ -197,14 +201,14 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
           .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    const price = this.props.getCurrentPrice(
-      tokenInfo.Metadata.ticker,
-      currency
-    );
-
-    if (price != null) {
-      return calculateAndFormatValue(shiftedAmount, price) + ' ' + currency;
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
     }
+    const price = this.props.getCurrentPrice(ticker, currency);
+    if (price != null) {
+      return `${calculateAndFormatValue(shiftedAmount, price)} ${currency}`;
+    }
+    return null;
   }
 }

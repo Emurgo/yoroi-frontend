@@ -28,7 +28,7 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 

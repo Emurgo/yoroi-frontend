@@ -336,10 +336,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
+    const ticker = defaultTokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected default token type');
+    }
     await this.stores.coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
       timestamps: result.timestamps,
-      defaultToken: defaultTokenInfo.Metadata.ticker,
+      defaultToken: ticker,
     });
 
     const remoteTransactionIds = result.remoteTransactionIds;

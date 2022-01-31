@@ -262,6 +262,9 @@ export default class WalletCard extends Component<Props, State> {
       return null;
     }
     const { currency } = this.props.unitOfAccountSetting;
+    if (!currency) {
+      throw new Error(`unexpected unit of account ${String(currency)}`);
+    }
     if (request.shouldHideBalance) {
       return (
         <>
@@ -275,11 +278,11 @@ export default class WalletCard extends Component<Props, State> {
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
           .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    const price = this.props.getCurrentPrice(
-      tokenInfo.Metadata.ticker,
-      currency
-    );
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const price = this.props.getCurrentPrice(ticker, currency);
 
     let balanceDisplay;
     if (price != null) {

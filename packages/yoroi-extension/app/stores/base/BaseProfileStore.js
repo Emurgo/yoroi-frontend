@@ -435,10 +435,13 @@ export default class BaseProfileStore
     return result || unitOfAccountDisabledValue;
   }
 
-  async getUnitOfAccountBlock(): () => UnitOfAccountSettingType {
+  getUnitOfAccountBlock: () => Promise<UnitOfAccountSettingType> = async () => {
     let { result } = this.getUnitOfAccountRequest;
     if (result == null) {
-      result = await this.getUnitOfAccountRequest.execute();
+      await this.getUnitOfAccountRequest.execute();
+    }
+    if (this.getUnitOfAccountRequest.result == null) {
+      throw new Error('failed to load unit of account setting');
     }
     return this.getUnitOfAccountRequest.result;
   }

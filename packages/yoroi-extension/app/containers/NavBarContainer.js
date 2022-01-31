@@ -28,7 +28,7 @@ import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
 
 export type GeneratedData = typeof NavBarContainer.prototype.generated;
 
