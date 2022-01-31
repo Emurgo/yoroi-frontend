@@ -33,41 +33,42 @@ export default class YoroiPalettePage extends Component<Props, State> {
     }
 
     render(): Node {
-        const { currentTheme } = this.state
-        const palette = getPalette(themes[currentTheme])
-        return (
-          <div className={styles.component}>
-            <div className={styles.themes}>
-              <button
-                className={classNames([(currentTheme === 'classic') && styles.active])}
-                type='button'
-                onClick={() => this.switchTheme('classic')}
-              >
-                Classic Theme
-              </button>
-              <button
-                onClick={() => this.switchTheme('modern')}
-                className={classNames([(currentTheme === 'modern') && styles.active])}
-                type='button'
-              >
-                Modern Theme
-              </button>
-            </div>
-            {Object.entries(palette).map((row, idx) => (
-              <div className={styles.row} key={idx}>
-                <span
-                  className={styles.colorBox}
-                  style={{
-                      backgroundColor: row[1]
-                  }}
-                />
-                <p className={styles.colorHex}>
-                  {String(row[1])}
-                </p>
-                <p className={styles.colorName}>{row[0]}</p>
-              </div>
-              ))}
+
+      const { currentTheme } = this.state
+      const palette = getPalette(themes[currentTheme])
+      return (
+        <div className={styles.component}>
+          <div className={styles.themes}>
+            <button
+              className={classNames([(currentTheme === 'classic') && styles.active])}
+              type='button'
+              onClick={() => this.switchTheme('classic')}
+            >
+              Classic Theme
+            </button>
+            <button
+              onClick={() => this.switchTheme('modern')}
+              className={classNames([(currentTheme === 'modern') && styles.active])}
+              type='button'
+            >
+              Modern Theme
+            </button>
           </div>
-        )
-    }
+          {Object.entries(palette).map((row, idx) => (
+            <div className={styles.row} key={idx}>
+              <span
+                className={styles.colorBox}
+                style={{
+                    backgroundColor: row[1]
+                }}
+              />
+              <p className={styles.colorHex}>
+                {String(row[1])}
+              </p>
+              <p className={styles.colorName}>{row[0]}</p>
+            </div>
+            ))}
+        </div>
+      )
+  }
 }
