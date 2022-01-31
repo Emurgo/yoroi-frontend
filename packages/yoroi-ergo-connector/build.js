@@ -43,8 +43,8 @@ Object.values(icons).forEach(path => fse.copyFileSync(`./${path}`, `./build/${pa
 
 const manifest = genManifest({
   displayName: isNightly
-    ? 'Yoroi-Ergo dApp Connector Nightly'
-    : 'Yoroi-Ergo dApp Connector',
+    ? 'Yoroi dApp Connector Nightly'
+    : 'Yoroi dApp Connector',
   version: package.version,
   icons: isNightly
     ? {
