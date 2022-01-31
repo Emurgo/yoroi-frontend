@@ -63,14 +63,15 @@ const initialInject = `
     }
   });
   
-  function cardano_rpc_call(func, params) {
+  function cardano_rpc_call(func, params, returnType) {
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_rpc_request",
         protocol: "cardano",
         uid: cardanoRpcUid,
         function: func,
-        params: params
+        params,
+        returnType,
       }, location.origin);
       console.debug("cardanoRpcUid = " + cardanoRpcUid);
       cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
@@ -158,10 +159,14 @@ class CardanoAuth {
 class CardanoAPI {
   
     constructor(auth, rpc) {
-      this._auth = new CardanoAuth(auth, rpc);
-      this._cardano_rpc_call = rpc;
-      this._disconnection = [false];
       const self = this;
+      function rpcWrapper(func, params) {
+        return rpc(func, params, self._returnType[0] || "cbor");
+      }
+      this._auth = new CardanoAuth(auth, rpcWrapper);
+      this._cardano_rpc_call = rpcWrapper;
+      this._disconnection = [false];
+      this._returnType = ["cbor"];
       window.addEventListener('yoroi_wallet_disconnected', function() {
           if (!self._disconnection[0]) {
               self._disconnection[0] = true;
@@ -169,6 +174,13 @@ class CardanoAPI {
           }
       });
     }
+    
+    setReturnType(returnType) {
+      if (returnType !== 'cbor' && returnType !== 'json') {
+        throw new Error('Possible return type values are: "cbor" or "json"');
+      }
+      this._returnType[0] = returnType;
+    } 
     
     getNetworkId() {
       // TODO
@@ -179,7 +191,7 @@ class CardanoAPI {
       return this._auth;
     }
     
-    getBalance(token_id = 'ADA') {
+    getBalance(token_id = '*') {
       return this._cardano_rpc_call("get_balance", [token_id]);
     }
     
@@ -192,8 +204,7 @@ class CardanoAPI {
     }
     
     getRewardAddresses() {
-      // TODO
-      throw new Error('Not implemented yet');
+      return this._cardano_rpc_call("get_reward_addresses/cardano", []);
     }
     
     getChangeAddress() {

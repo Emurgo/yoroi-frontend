@@ -442,9 +442,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       network.NetworkId
     );
 
-    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(
-      Buffer.from(tx, 'hex')
-    );
+
+    let txBody;
+    const bytes = Buffer.from(tx, 'hex');
+    try {
+      // <TODO:USE_METADATA_AND_WITNESSES>
+      txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+    } catch (originalErr) {
+      try {
+        // Try parsing as body for backward compatibility
+        txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+      } catch (_e) {
+        throw originalErr;
+      }
+    }
 
     const inputs = [];
     for (let i = 0; i < txBody.inputs().len(); i++) {
