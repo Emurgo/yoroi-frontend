@@ -243,8 +243,10 @@ export const formatPalette = (palette: any, theme: any): FormatedPalette => {
     multiLayerColor: []
   }
 
+  
   for (const name of Object.keys(palette)) {
-    if(palette[name] && palette[name].startsWith('var(')) {
+  
+    if(typeof palette[name] === 'string' && palette[name].startsWith('var')) {
       const secondColorName = palette[name].slice(4, -1)
       const secondColorHex = palette[secondColorName]
       const path = getColorPath(theme.palette, secondColorHex)
