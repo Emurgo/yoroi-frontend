@@ -31,6 +31,7 @@ import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../api/common/lib/MultiToken'
+import Permissions from '../../components/dapp-connector/ConnectedWebsites/Permissions'
 
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
@@ -96,7 +97,26 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   render (): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
     const wallets = this.generated.stores.wallets.publicDerivers;
-    // const isDappEnabled = this.generated.stores.
+    const isDappEnabled = this.generated.stores.walletSettings.isDappEnabled
+
+    let componentToRender = (
+      <ConnectedWebsitesPage
+        whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+        wallets={wallets}
+        onRemoveWallet={this.onRemoveWallet}
+        activeSites={this.generated.stores.connector.activeSites.sites}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        getConceptualWallet={this.getConceptualWallet.bind(this)}
+        getWalletInfo={this.getWalletInfo.bind(this)}
+      />
+    )
+
+    if (!isDappEnabled) {
+      componentToRender = (
+        <Permissions />
+      )
+    }
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -104,16 +124,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         navbar={<DappConnectorNavbar />}
       >
         <FullscreenLayout bottomPadding={0}>
-          <ConnectedWebsitesPage
-            whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-            wallets={wallets}
-            onRemoveWallet={this.onRemoveWallet}
-            activeSites={this.generated.stores.connector.activeSites.sites}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-            getConceptualWallet={this.getConceptualWallet.bind(this)}
-            getWalletInfo={this.getWalletInfo.bind(this)}
-          />
+          {componentToRender}
         </FullscreenLayout>
       </TopBarLayout>
     );
