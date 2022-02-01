@@ -3,7 +3,7 @@
 import type { Node } from 'react';
 import { GlobalStyles } from '@mui/material';
 
-export function getMainYoroiPalette(theme: Object) {
+export function getMainYoroiPalette(theme: Object): { [string]: string|number } {
   return {
     /*
       CSS variables follow the same name as mui using kebab case syntax
