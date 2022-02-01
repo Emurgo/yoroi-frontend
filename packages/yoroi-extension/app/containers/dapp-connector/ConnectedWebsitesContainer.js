@@ -96,6 +96,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   render (): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
     const wallets = this.generated.stores.wallets.publicDerivers;
+    // const isDappEnabled = this.generated.stores.
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -112,7 +113,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
             getConceptualWallet={this.getConceptualWallet.bind(this)}
             getWalletInfo={this.getWalletInfo.bind(this)}
-          />)
+          />
         </FullscreenLayout>
       </TopBarLayout>
     );
@@ -146,6 +147,11 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           |}) => void,
         |},
       |},
+      walletSettings: {|
+        requestTabPermission: {|
+          trigger: (params: void) => void,
+        |}
+      |}
     |},
     stores: {|
       profile: {|
@@ -157,7 +163,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
-        requestTabpermission: void => void,
+        requestTabPermission: void => void,
         isDappEnabled: boolean,
       |},
       tokenInfoStore: {|
@@ -191,7 +197,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           getConceptualWalletSettingsCache: stores.walletSettings
             .getConceptualWalletSettingsCache,
           isDappEnabled: stores.walletSettings.isDappEnabled,
-          requestTabpermission: stores.walletSettings.requestTabpermission,
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
@@ -219,6 +224,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
             trigger: actions.connector.removeWalletFromWhitelist.trigger,
           },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
+        },
+        walletSettings: {
+          requestTabPermission: { trigger: actions.walletSettings.requestTabPermission.trigger },
         },
       },
       SidebarContainerProps: (

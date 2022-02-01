@@ -27,5 +27,5 @@ export default class WalletSettingsActions {
   |}> = new AsyncAction();
 
   removeTabPermission: Action<void> = new Action();
-  requestTabpermission: Action<void> = new Action();
+  requestTabPermission: Action<void> = new Action();
 }

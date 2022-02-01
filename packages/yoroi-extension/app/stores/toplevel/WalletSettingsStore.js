@@ -116,7 +116,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     a.resyncHistory.listen(this._resyncHistory);
     a.removeWallet.listen(this._removeWallet);
     a.removeTabPermission.listen(this._removeTabPermission)
-    a.requestTabpermission.listen(this._requestTabPermission)
+    a.requestTabPermission.listen(this._requestTabPermission)
     this._checkConnectorInjectPermission()
   }
 
