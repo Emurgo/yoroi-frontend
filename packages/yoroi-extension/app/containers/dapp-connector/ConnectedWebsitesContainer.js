@@ -157,6 +157,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
+        requestTabpermission: void => void,
         isDappEnabled: boolean,
       |},
       tokenInfoStore: {|
@@ -189,7 +190,8 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings
             .getConceptualWalletSettingsCache,
-          isDappEnabled: stores.walletSettings.isisDappEnabled,
+          isDappEnabled: stores.walletSettings.isDappEnabled,
+          requestTabpermission: stores.walletSettings.requestTabpermission,
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
