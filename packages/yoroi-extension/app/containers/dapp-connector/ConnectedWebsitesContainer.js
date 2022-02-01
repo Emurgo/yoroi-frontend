@@ -156,7 +156,8 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         activeSites: {| sites: Array<string> |},
       |},
       walletSettings: {|
-        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
+        isDappEnabled: boolean,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -188,6 +189,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings
             .getConceptualWalletSettingsCache,
+          isDappEnabled: stores.walletSettings.isisDappEnabled,
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,

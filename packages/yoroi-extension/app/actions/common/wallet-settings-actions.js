@@ -25,4 +25,7 @@ export default class WalletSettingsActions {
   removeWallet: AsyncAction<{|
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
+
+  removeTabPermission: Action<void> = new Action();
+  requestTabpermission: Action<void> = new Action();
 }
