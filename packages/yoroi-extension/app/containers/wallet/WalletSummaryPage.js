@@ -272,6 +272,7 @@ class WalletSummaryPage extends Component<AllProps> {
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
         />
 
         {walletTransactions}
@@ -385,6 +386,7 @@ class WalletSummaryPage extends Component<AllProps> {
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
         />
 
         {walletTransactions}

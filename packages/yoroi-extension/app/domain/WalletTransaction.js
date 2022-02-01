@@ -14,7 +14,6 @@ import type {
 import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
-import { transactionTypes } from '../api/ada/transactions/types';
 import type { UnconfirmedAmount } from '../types/unconfirmedAmountType';
 import {
   MultiToken,
@@ -94,80 +93,6 @@ export default class WalletTransaction {
     }
     return assuranceLevels.HIGH;
   }
-}
-
-export function calculateUnconfirmedAmount(
-  transactions: Array<WalletTransaction>,
-  lastSyncBlock: number,
-  assuranceMode: AssuranceMode,
-  getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
-  defaultTokenInfo: DefaultTokenEntry,
-): UnconfirmedAmount {
-  const unconfirmedAmount = {
-    total: new MultiToken([], defaultTokenInfo),
-    incoming: new MultiToken([], defaultTokenInfo),
-    outgoing: new MultiToken([], defaultTokenInfo),
-    // If any of the below values becomes null, it means price data are
-    // unavailable for at least one of the transaction in the category
-    // and we just give up calculating the value.
-    incomingInSelectedCurrency: new BigNumber(0),
-    outgoingInSelectedCurrency: new BigNumber(0),
-  };
-
-  for (const transaction of transactions) {
-    // skip any failed transactions
-    if (transaction.state < 0) continue;
-
-    const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode, lastSyncBlock);
-    if (assuranceForTx !== assuranceLevels.HIGH) {
-      // total
-      unconfirmedAmount.total.joinAddMutable(transaction.amount.absCopy());
-
-      // outgoing
-      if (transaction.type === transactionTypes.EXPEND) {
-        unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.joinAddMutable(
-          transaction.amount.absCopy()
-        );
-        const unitOfAccount = getUnitOfAccount(transaction.date);
-        if (unitOfAccount != null) {
-          if (unconfirmedAmount.outgoingInSelectedCurrency) {
-            unconfirmedAmount.outgoingInSelectedCurrency =
-              unconfirmedAmount.outgoingInSelectedCurrency.plus(
-                transaction.amount
-                  .getDefault()
-                  .absoluteValue()
-                  .multipliedBy(String(unitOfAccount.Price))
-              );
-          } else {
-            unconfirmedAmount.outgoingInSelectedCurrency = null;
-          }
-        }
-      }
-
-      // incoming
-      if (transaction.type === transactionTypes.INCOME) {
-        unconfirmedAmount.incoming = unconfirmedAmount.incoming.joinAddMutable(
-          transaction.amount.absCopy()
-        );
-        const unitOfAccount = getUnitOfAccount(transaction.date);
-        if (unitOfAccount != null) {
-          if (unconfirmedAmount.incomingInSelectedCurrency) {
-            unconfirmedAmount.incomingInSelectedCurrency =
-              unconfirmedAmount.incomingInSelectedCurrency.plus(
-                transaction.amount
-                  .getDefault()
-                  .absoluteValue()
-                  .multipliedBy(String(unitOfAccount.Price))
-              );
-          } else {
-            unconfirmedAmount.incomingInSelectedCurrency = null;
-          }
-        }
-      }
-    }
-  }
-
-  return unconfirmedAmount;
 }
 
 export const toAddr: {|

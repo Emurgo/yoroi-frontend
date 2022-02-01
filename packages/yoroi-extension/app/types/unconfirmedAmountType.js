@@ -4,10 +4,12 @@ import {
   MultiToken,
 } from '../api/common/lib/MultiToken';
 
+type TimestampedAmount = {|
+  timestamp: number,
+  amount: MultiToken,
+|};
+
 export type UnconfirmedAmount = {|
-  total: MultiToken,
-  incoming: MultiToken,
-  outgoing: MultiToken,
-  incomingInSelectedCurrency: ?BigNumber,
-  outgoingInSelectedCurrency: ?BigNumber,
+  incoming: Array<TimestampedAmount>,
+  outgoing: Array<TimestampedAmount>,
 |};
