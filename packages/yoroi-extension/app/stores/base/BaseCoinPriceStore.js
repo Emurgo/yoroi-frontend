@@ -227,26 +227,28 @@ export default class BaseCoinPriceStore
       return;
     }
 
-    const missingPrices = timestamps.filter(
+    const missingTimestamps = timestamps.filter(
       timestamp => this.priceMap.get(
         getPriceKey(from, unitOfAccount.currency, new Date(timestamp))
       ) == null
     );
-    if (!missingPrices.length) {
+    if (!missingTimestamps.length) {
       return;
     }
     const stateFetcher = this.stores.stateFetchStore.fetcher;
     try {
       const response: HistoricalCoinPriceResponse =
-        await stateFetcher.getHistoricalCoinPrice({ from, timestamps });
+        await stateFetcher.getHistoricalCoinPrice(
+          { from, timestamps: missingTimestamps }
+        );
       if (response.error != null) {
         throw new Error('historical coin price query error: ' + response.error);
       }
-      if (response.tickers.length !== missingPrices.length) {
+      if (response.tickers.length !== missingTimestamps.length) {
         throw new Error('historical coin price query error: data length mismatch');
       }
 
-      for (let i = 0; i < missingPrices.length; i++) {
+      for (let i = 0; i < missingTimestamps.length; i++) {
         const ticker = response.tickers[i];
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
@@ -266,7 +268,7 @@ export default class BaseCoinPriceStore
           db: request.db,
           prices: tickers.map(singleTicker => ({
             ...singleTicker,
-            Time: new Date(missingPrices[i]),
+            Time: new Date(missingTimestamps[i]),
           })),
         });
         runInAction(() => {
