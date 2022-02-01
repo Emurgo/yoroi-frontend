@@ -102,7 +102,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
   }
 
-  @observable isConnectorHasPermission: boolean = false;
+  @observable isDappEnabled: boolean = false;
 
   setup(): void {
     super.setup();
@@ -127,7 +127,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       ]
     }, (result) => {
       runInAction(() => {
-        this.isConnectorHasPermission = Boolean(result)
+        this.isDappEnabled = Boolean(result)
       })
     });
   }
@@ -140,7 +140,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       ]
     }, (granted) => {
       runInAction(() => {
-        this.isConnectorHasPermission = Boolean(granted)
+        this.isDappEnabled = Boolean(granted)
       })
     });
   }
@@ -153,7 +153,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       ]
     }, (removed) => {
       runInAction(() => {
-        this.isConnectorHasPermission = Boolean(!removed)
+        this.isDappEnabled = Boolean(!removed)
       })
     });
   }
