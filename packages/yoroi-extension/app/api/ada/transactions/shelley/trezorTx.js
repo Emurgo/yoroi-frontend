@@ -54,10 +54,10 @@ export async function createTrezorSignTxPayload(
     if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
       throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
     }
-    const stakingKeyPath = [...firstUtxo.addressing.path];
-    stakingKeyPath[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
-    stakingKeyPath[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
-    return stakingKeyPath;
+    const result = [...firstUtxo.addressing.path];
+    result[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
+    result[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
+    return result;
   })();
 
   const txBody = signRequest.unsignedTx.build();
