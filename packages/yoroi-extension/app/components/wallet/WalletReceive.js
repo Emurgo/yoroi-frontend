@@ -109,10 +109,7 @@ export default class WalletReceive extends Component<Props> {
         {adjustedBefore}
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
         {' '}
-        {this.props.unitOfAccountSetting.enabled
-          ? this.props.unitOfAccountSetting.currency
-          : truncateToken(getTokenName(tokenInfo))
-        }
+        {truncateToken(getTokenName(tokenInfo))}
       </>
     );
   }
