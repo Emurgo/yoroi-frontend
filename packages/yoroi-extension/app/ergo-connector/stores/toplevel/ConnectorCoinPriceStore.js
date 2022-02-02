@@ -6,8 +6,12 @@ import BaseCoinPriceStore from '../../../stores/base/BaseCoinPriceStore';
 
 export default class ConnectorCoinPriceStore extends BaseCoinPriceStore<StoresMap, ActionsMap> {
   setup(): void {
+    super.setup();
+    this.loadPubKeyData().then(() => {
+      this.startPoll();
+    });
   }
   async updatePricesForWallet(): ?Promise<void> {
-    // TODO: connector has no real concept of a selected wallet
+    await this.refreshCurrentCoinPrice();
   }
 }

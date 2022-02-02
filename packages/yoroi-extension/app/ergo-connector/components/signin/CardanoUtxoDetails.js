@@ -89,16 +89,30 @@ class CardanoUtxoDetails extends Component<Props> {
     const ticker = tokenInfo ? this.getTicker(tokenInfo)
       : assetNameFromIdentifier(request.entry.identifier);
 
+    let fiatAmountDisplay = null;
+
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(request.entry.identifier, currency);
+      const price = this.props.getCurrentPrice(
+        getTokenName(tokenInfo),
+        currency
+      );
       if (price != null) {
-        return (
+        const fiatAmount = calculateAndFormatValue(shiftedAmount, price);
+        const [beforeDecimal, afterDecimal] = fiatAmount.split('.');
+        let beforeDecimalSigned;
+        if (beforeDecimal.startsWith('-')) {
+          beforeDecimalSigned = beforeDecimal;
+        } else {
+          beforeDecimalSigned = '+' + beforeDecimal;
+        }
+        fiatAmountDisplay = (
           <>
-            <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
-            <div>
-              {shiftedAmount.toString()} {ticker}
-            </div>
+            <span className={styles.amountRegular}>{beforeDecimalSigned}</span>
+            {afterDecimal && (
+              <span className={styles.afterDecimal}>.{afterDecimal}</span>
+            )}
+            {' '}{currency}
           </>
         );
       }
@@ -113,13 +127,33 @@ class CardanoUtxoDetails extends Component<Props> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    return (
+    const cryptoAmountDisplay = (
       <>
         <span>{adjustedBefore}</span>
         <span>{afterDecimalRewards}</span> {ticker}
       </>
     );
-  };
+
+    if (fiatAmountDisplay) {
+      return (
+        <>
+          <div className={styles.amountRegular}>
+            {fiatAmountDisplay}
+          </div>
+          <div className={styles.amountSmall}>
+            {cryptoAmountDisplay}
+          </div>
+        </>
+      );
+    }
+    return (
+      <>
+        <div className={styles.amountRegular}>
+          {cryptoAmountDisplay}
+        </div>
+      </>
+    );
+  }
 
   renderRow: ({|
     kind: string,

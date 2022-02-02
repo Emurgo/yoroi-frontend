@@ -99,7 +99,12 @@ export default class BaseCoinPriceStore
         this.priceMap.set(key, price);
       }
     });
+    this.loadPubKeyData();
+  }
 
+  @action
+  loadPubKeyData: void => Promise<void> = async () => {
+    await RustModule.load();
     const storedKey: ?string = await this.api.localStorage.getCoinPricePubKeyData();
     Logger.debug(`${nameof(BaseCoinPriceStore)}: stored pubKeyData ${storedKey == null ? 'null' : storedKey}`);
     runInAction(() => {
