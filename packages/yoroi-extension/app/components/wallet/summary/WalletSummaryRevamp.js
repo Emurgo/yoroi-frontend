@@ -135,14 +135,16 @@ export default class WalletSummaryRevamp extends Component<Props> {
           );
         }
         if (totalFiatAmount) {
-          const [beforeDecimal, afterDecimal = ''] = formatValue(totalFiatAmount).split('.');
+          const [beforeDecimal, afterDecimal] = formatValue(totalFiatAmount).split('.');
 
           pendingAmount = (
             <>
               {beforeDecimal}
-              <span className={styles.afterDecimal}>
-                .{afterDecimal}
-              </span>
+              {afterDecimal && (
+                <span className={styles.afterDecimal}>
+                  .{afterDecimal}
+                </span>
+              )}
               &nbsp;
               {currency}
             </>

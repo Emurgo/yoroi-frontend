@@ -235,10 +235,12 @@ export default class TransactionRevamp extends Component<Props, State> {
         return (
           <>
             {beforeDecimalWithSign}
-            <Typography as="span" fontWeight="inherit" fontSize="inherit">
-              .{afterDecimal}{' '}
-            </Typography>
-            {currency}
+            {afterDecimal && (
+              <Typography as="span" fontWeight="inherit" fontSize="inherit">
+                .{afterDecimal}
+              </Typography>
+            )}
+            &nbsp;{currency}
           </>
         );
       }
@@ -286,10 +288,12 @@ export default class TransactionRevamp extends Component<Props, State> {
         return (
           <>
             {beforeDecimal}
-            <Typography variant="body1" as="span">
-              .{afterDecimal}{' '}
-            </Typography>
-            {currency}
+            {afterDecimal && (
+              <Typography variant="body1" as="span">
+                .{afterDecimal}
+              </Typography>
+            )}
+            &nbsp;{currency}
           </>
         );
       }
