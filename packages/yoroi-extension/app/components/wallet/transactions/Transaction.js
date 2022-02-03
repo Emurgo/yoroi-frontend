@@ -382,13 +382,14 @@ export default class Transaction extends Component<Props, State> {
         currency,
         request.timestamp,
       );
+      let fiatDisplay;
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = amount.split('.');
         const beforeDecimalWithSign = beforeDecimal.startsWith('-')
           ? beforeDecimal
-          : '+' + beforeDecimal;
-        return (
+              : '+' + beforeDecimal;
+        fiatDisplay = (
           <>
             {beforeDecimalWithSign}
             {afterDecimal && (
@@ -396,10 +397,23 @@ export default class Transaction extends Component<Props, State> {
                 .{afterDecimal}
               </span>
             )}
-            &nbsp;{currency}
           </>
         );
+      } else {
+        fiatDisplay = '-';
       }
+      return (
+        <>
+          <div>
+            {fiatDisplay}&nbsp;{currency}
+          </div>
+          <div className={styles.amountSmall}>
+            {this.renderAmountDisplay({ entry: request.entry})}
+            {' '}
+            {this.getTicker(request.entry)}
+          </div>
+        </>
+      );
     }
 
     return (
@@ -422,10 +436,16 @@ export default class Transaction extends Component<Props, State> {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
     }
+
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
+
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+      shiftedAmount.abs(),
+      numberOfDecimals,
+    );
 
     if (this.props.unitOfAccountSetting.enabled) {
       const { currency } = this.props.unitOfAccountSetting;
@@ -439,10 +459,11 @@ export default class Transaction extends Component<Props, State> {
         request.timestamp,
       );
 
+      let fiatDisplay;
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = amount.split('.');
-        return (
+        fiatDisplay = (
           <>
             {beforeDecimal}
             {afterDecimal && (
@@ -450,29 +471,28 @@ export default class Transaction extends Component<Props, State> {
                 .{afterDecimal}
               </span>
             )}
-            &nbsp;{currency}
           </>
         );
+      } else {
+        fiatDisplay = '-';
       }
+      return (
+        <>
+          <div>{fiatDisplay}&nbsp;{currency}</div>
+          <div className={styles.amountSmall}>
+            {beforeDecimalRewards}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+            {' '}
+            {this.getTicker(defaultEntry)}
+          </div>
+        </>
+      );
     }
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount.abs(),
-      numberOfDecimals
-    );
 
     return (
       <>
         {beforeDecimalRewards}
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        { /*
-            The unit ('ADA') is not shown for fee when unit of account is not
-            enabled. But in case if it enabled and we failed to get the price
-            for the tx, show the unit here to avoid misleading the user.
-           */
-          this.props.unitOfAccountSetting.enabled
-            ? (' ' + this.getTicker(defaultEntry))
-            : ''
-        }
       </>
     );
   };
@@ -501,7 +521,7 @@ export default class Transaction extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })}{' '}{this.getTicker(entry)}
         </div>
       );
     }
@@ -528,7 +548,9 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length}
+        {' '}
+        {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
   };
