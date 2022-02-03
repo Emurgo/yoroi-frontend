@@ -14,6 +14,7 @@ const getUsedAddresses = document.querySelector('#get-used-addresses')
 const getChangeAddress = document.querySelector('#get-change-address')
 const getRewardAddresses = document.querySelector('#get-reward-addresses')
 const getAccountBalance = document.querySelector('#get-balance')
+const isEnabledBtn = document.querySelector('#is-enabled')
 const getUtxos = document.querySelector('#get-utxos')
 const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
@@ -126,6 +127,12 @@ cardanoAccessBtn.addEventListener('click', () => {
       },
     );
 })
+
+isEnabledBtn.addEventListener('click', () => {
+  window.cardano.yoroi.isEnabled().then(function(isEnabled) {
+    alertSuccess(`Is Yoroi connection enabled: ${isEnabled}`);
+  });
+});
 
 getAccountBalance.addEventListener('click', () => {
     if(!accessGranted) {
