@@ -230,7 +230,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
               </Button>
             </Box>
-            {(pendingAmount.incoming.length || pendingAmount.outgoing.length) && (
+            {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && (
               <Box sx={{ padding: '16px 30px' }}>
                 {this.renderPendingAmount(
                   pendingAmount.incoming,

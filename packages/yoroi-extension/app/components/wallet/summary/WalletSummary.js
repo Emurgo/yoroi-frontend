@@ -213,7 +213,7 @@ export default class WalletSummary extends Component<Props> {
                 <div className={styles.numberOfTransactions}>
                   {intl.formatMessage(messages.numOfTxsLabel)}: <span>{numberOfTransactions}</span>
                 </div>
-                {(pendingAmount.incoming.length || pendingAmount.outgoing.length) && (
+                {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && (
                   <div className={styles.pendingSection}>
                     {this.renderPendingAmount(
                       pendingAmount.incoming,
