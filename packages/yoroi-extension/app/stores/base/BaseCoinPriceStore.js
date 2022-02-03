@@ -127,10 +127,9 @@ export default class BaseCoinPriceStore
       return null;
     }
     const lastUpdateTimestamp: number = this.lastUpdateTimestamp;
-    /* fixme!!!
     if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
-    }*/
+    }
     const normalizedFrom = from === 'TADA' ? 'ADA' : from;
     return getPrice(normalizedFrom, to, this.currentPriceTickers);
   }
@@ -258,11 +257,9 @@ export default class BaseCoinPriceStore
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
         }
-        /*
         if (!verifyTicker(ticker, this.pubKeyData)) {
           throw new Error('Invalid ticker signature: ' + JSON.stringify(ticker));
         }
-        */
         const tickers: Array<Ticker> =
           Object.entries(ticker.prices)
             .map(([To, Price]) => (
