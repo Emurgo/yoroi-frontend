@@ -70,10 +70,11 @@ const initialInject = `
       window.postMessage({
         type: "connector_rpc_request",
         protocol: "cardano",
+        url: location.hostname,
         uid: cardanoRpcUid,
         function: func,
         params,
-        returnType,
+        returnType: returnType || "cbor",
       }, location.origin);
       console.debug("cardanoRpcUid = " + cardanoRpcUid);
       cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
@@ -100,11 +101,7 @@ const initialInject = `
   }
 
   function cardano_check_read_access() {
-    if (typeof cardano !== "undefined") {
-      return cardano._cardano_rpc_call("ping", []);
-    } else {
-      return Promise.resolve(false);
-    }
+    return cardano_rpc_call("is_enabled/cardano", []);
   }
   
   window.cardano = {
@@ -163,7 +160,7 @@ class CardanoAPI {
     constructor(auth, rpc) {
       const self = this;
       function rpcWrapper(func, params) {
-        return rpc(func, params, self._returnType[0] || "cbor");
+        return rpc(func, params, self._returnType[0]);
       }
       this._auth = new CardanoAuth(auth, rpcWrapper);
       this._cardano_rpc_call = rpcWrapper;
@@ -485,6 +482,9 @@ if (shouldInject()) {
             const dataType = event.data.type;
             if (dataType === "connector_rpc_request") {
                 console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+                if (event.data.function === 'is_enabled/cardano' && yoroiPort == null) {
+                    createYoroiPort();
+                }
                 if (yoroiPort) {
                     try {
                         yoroiPort.postMessage(event.data);
@@ -566,7 +566,7 @@ async function convertImgToBase64(origin, urls) {
                 continue;
             }
             console.error(`[yoroi-connector] Failed to fetch favicon at '${url}'`, e);
-            throw e;
+            // throw e;
         }
     }
     if (!response) {
