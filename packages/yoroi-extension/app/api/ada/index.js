@@ -1175,7 +1175,7 @@ export default class AdaApi {
       if (noInputs) {
         throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
       }
-      if (!onlyInputsIntended) {
+      if (Boolean(onlyInputsIntended) === false) {
         throw new Error('No outputs is specified and intended inputs flag is false');
       }
     }

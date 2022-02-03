@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { PublicDeriverCache, WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
+import type { WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
 import styles from './ConnectedWebsitesPage.scss'
 import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -11,17 +11,21 @@ import { connectorMessages } from '../../../i18n/global-messages';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WalletRow from './WalletRow';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { TokenLookupKey, } from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey, MultiToken } from '../../../api/common/lib/MultiToken';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver'
 
+type WalletInfo = {| balance: null | MultiToken, plate: WalletChecksum |}
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
     +activeSites: Array<string>,
-    +wallets: ?Array<PublicDeriverCache>,
+    +wallets: ?Array<PublicDeriver<>>,
     +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
-    +getConceptualWallet: number => ConceptualWalletSettingsCache | null
+    +getConceptualWallet: PublicDeriver<> => ConceptualWalletSettingsCache,
+    +getWalletInfo: (PublicDeriver<>) => WalletInfo
 |};
 
 const messages = defineMessages({
@@ -66,23 +70,25 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           { url, protocol, publicDeriverId, image }
         ) => {
           const wallet = wallets.find( cacheEntry =>
-            cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
+            cacheEntry.getPublicDeriverId() === publicDeriverId
           )
           if (wallet == null) {
             return [null, null]
           }
-          return [isErgo(wallet.publicDeriver.getParent().getNetworkInfo()), (
+          const { balance, plate } = this.props.getWalletInfo(wallet)
+          return [isErgo(wallet.getParent().getNetworkInfo()), (
             <WalletRow
               key={url}
               url={url}
               protocol={protocol}
-              wallet={wallet}
               websiteIcon={image}
               isActiveSite={this.props.activeSites.includes(url)}
               onRemoveWallet={this.props.onRemoveWallet}
+              balance={balance}
+              plate={plate}
               shouldHideBalance={this.props.shouldHideBalance}
               getTokenInfo={this.props.getTokenInfo}
-              settingsCache={this.props.getConceptualWallet(publicDeriverId)}
+              settingsCache={this.props.getConceptualWallet(wallet)}
             />
           )]
         }).reduce((acc, [isWalletErgo, node]) => {
