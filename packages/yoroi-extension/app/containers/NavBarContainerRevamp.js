@@ -194,9 +194,10 @@ export default class NavBarContainerRevamp extends Component<Props> {
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           walletAmount={balance}
-          onAddWallet={() =>
+          onAddWallet={() => {
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
             this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
-          }
+          }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
           currentSortedWallets={this.generated.stores.profile.currentSortedWallets ?? []}
         />
