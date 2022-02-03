@@ -20,7 +20,6 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {

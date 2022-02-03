@@ -22,9 +22,6 @@ import type { ConfigType } from '../../../config/config-types';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
 import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type {
-  NetworkRow,
-} from '../../api/ada/lib/storage/database/primitives/tables';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;

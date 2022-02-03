@@ -1,7 +1,6 @@
 // @flow
 import { computed, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
-import type { PriceDataRow } from '../api/ada/lib/storage/database/prices/tables';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 import type {
@@ -14,7 +13,6 @@ import type {
 import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
-import type { UnconfirmedAmount } from '../types/unconfirmedAmountType';
 import {
   MultiToken,
 } from '../api/common/lib/MultiToken';

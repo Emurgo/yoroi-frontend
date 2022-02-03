@@ -1,5 +1,4 @@
 // @flow
-import BigNumber from 'bignumber.js';
 import {
   MultiToken,
 } from '../api/common/lib/MultiToken';

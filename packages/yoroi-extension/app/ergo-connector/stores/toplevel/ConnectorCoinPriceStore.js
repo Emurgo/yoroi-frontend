@@ -8,7 +8,9 @@ export default class ConnectorCoinPriceStore extends BaseCoinPriceStore<StoresMa
   setup(): void {
     super.setup();
     this.loadPubKeyData().then(() => {
-      this.startPoll();
+      return this.startPoll();
+    }).catch(error => {
+      console.error('ConnectorCoinPriceStore init error:', error);
     });
   }
   async updatePricesForWallet(): ?Promise<void> {

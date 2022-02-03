@@ -408,7 +408,7 @@ export default class Transaction extends Component<Props, State> {
             {fiatDisplay}&nbsp;{currency}
           </div>
           <div className={styles.amountSmall}>
-            {this.renderAmountDisplay({ entry: request.entry})}
+            {this.renderAmountDisplay({ entry: request.entry })}
             {' '}
             {this.getTicker(request.entry)}
           </div>
@@ -418,7 +418,7 @@ export default class Transaction extends Component<Props, State> {
 
     return (
       <>
-        {this.renderAmountDisplay({ entry: request.entry})}
+        {this.renderAmountDisplay({ entry: request.entry })}
         {' '}
         {this.getTicker(request.entry)}
       </>

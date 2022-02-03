@@ -179,14 +179,14 @@ export default class WalletCard extends Component<Props, State> {
                       amount: totalAmount,
                     })}
                   </div>
-                {this.props.unitOfAccountSetting.enabled && (
-                  <div className={styles.fixedAmount}>
-                      {this.renderAmountWithUnitOfAccount({
-                        shouldHideBalance,
-                        amount: totalAmount,
-                      })}
-                  </div>
-                )}
+                  {this.props.unitOfAccountSetting.enabled && (
+                    <div className={styles.fixedAmount}>
+                        {this.renderAmountWithUnitOfAccount({
+                          shouldHideBalance,
+                          amount: totalAmount,
+                        })}
+                    </div>
+                  )}
                 </div>
                 <div className={styles.extraInfo}>
                   <p className={styles.label}>

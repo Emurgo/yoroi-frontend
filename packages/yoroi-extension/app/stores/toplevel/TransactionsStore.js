@@ -6,7 +6,6 @@ import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
-import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
   BaseGetTransactionsRequest,
@@ -54,7 +53,6 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import {
   persistSubmittedTransactions,
   loadSubmittedTransactions

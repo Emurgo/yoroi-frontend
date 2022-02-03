@@ -128,12 +128,12 @@ export default class WalletSummary extends Component<Props> {
           <>
             <span>{hiddenAmount}</span>
             &nbsp;
-           {currency}
+            {currency}
           </>
         );
       } else {
         let totalFiatAmount = new BigNumber('0');
-        for (const { amount, timestamp} of timestampedAmount) {
+        for (const { amount, timestamp } of timestampedAmount) {
           const tokenEntry = amount.getDefaultEntry();
           const tokenInfo = getTokenInfo(tokenEntry);
           const ticker = tokenInfo.Metadata.ticker;
@@ -223,7 +223,7 @@ export default class WalletSummary extends Component<Props> {
                       pendingAmount.outgoing,
                       intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
                     )}
-                </div>
+                  </div>
                 )}
               </>
             )}

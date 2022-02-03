@@ -248,7 +248,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         <>
           {fiatDisplay}&nbsp;{currency}
           <Typography>
-            {this.renderAmountDisplay({ entry: request.entry})}
+            {this.renderAmountDisplay({ entry: request.entry })}
             {' '}
             {this.getTicker(request.entry)}
           </Typography>
@@ -258,7 +258,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     return (
       <>
-        {this.renderAmountDisplay({ entry: request.entry})}
+        {this.renderAmountDisplay({ entry: request.entry })}
         {' '}
         {this.getTicker(request.entry)}
       </>

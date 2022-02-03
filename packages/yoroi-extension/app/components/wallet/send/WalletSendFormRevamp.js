@@ -581,10 +581,11 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const { currency } = this.props.unitOfAccountSetting;
 
-    let amount = null;
+    let amount;
     try{
       amount = new BigNumber(value);
     } catch {
+      amount = null;
     }
     if (!amount || amount.isNaN()) {
       convertedAmount = '-';

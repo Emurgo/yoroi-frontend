@@ -196,7 +196,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
         </>
       );
     }
-    let balanceDisplay;
+
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount

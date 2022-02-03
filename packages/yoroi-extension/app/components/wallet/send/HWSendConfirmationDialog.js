@@ -16,7 +16,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
