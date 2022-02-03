@@ -660,7 +660,7 @@ async function confirmConnect(
   ])
   return new Promise((resolve, reject) => {
     try {
-      if (whitelistEntry !== undefined) {
+      if (whitelistEntry != null) {
         // we already whitelisted this website, so no need to re-ask the user to confirm
         connectedSites.set(tabId, {
           url,
