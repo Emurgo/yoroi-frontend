@@ -101,6 +101,7 @@
   "connector.connectedWebsites.permissions.videoLink": "the video introduction",
   "connector.connectedWebsites.permissions.enable": "enable",
   "connector.appName": "DApp connector",
+  "connector.connector": "Connector",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",
   "global.connector.connectedWebsites": "Connected Websites",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",

@@ -11,6 +11,10 @@
     & svg > path {
       fill: var(--yoroi-palette-secondary-300);
     }
+
+    & svg > g > path:last-child {
+      fill: var(--yoroi-palette-secondary-300);
+    }
   }
   &.active:hover {
     cursor: default !important;
@@ -18,6 +22,10 @@
   &.active {
     background-color: var(--yoroi-sidebar-end);
     & svg > path {
+      fill: var(--yoroi-palette-secondary-300);
+    }
+
+    & svg > g > path:last-child {
       fill: var(--yoroi-palette-secondary-300);
     }
   }
