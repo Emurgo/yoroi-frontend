@@ -8,7 +8,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
     heading: {
-        id: 'clean',
+        id: 'connector.connectedWebsites.permissions.header',
         defaultMessage: '!!!Enable Yoroi to access dApps',
     }
 })
@@ -22,8 +22,8 @@ export default class Permissions extends Component {
         const { intl } = this.context
 
         return (
-          <div>
-            <div>
+          <div className={styles.component}>
+            <div className={styles.centered}>
               <h1>{intl.formatMessage(messages.heading)}</h1>
             </div>
           </div>

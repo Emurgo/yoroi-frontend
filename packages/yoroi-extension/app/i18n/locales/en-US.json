@@ -92,6 +92,7 @@
   "ergo-connector.connect.noWalletsFound": "No {network} wallets found.",
   "ergo-connector.label.connect": "Connect to",
   "ergo-connector.label.selectAllWallets": "Select all wallets",
+  "connector.connectedWebsites.permissions.header": "Enable Yoroi to access dApps",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",
   "global.connector.connectedWebsites": "Connected Websites",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",
