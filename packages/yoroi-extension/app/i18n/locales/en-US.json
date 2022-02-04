@@ -100,6 +100,7 @@
   "connector.connectedWebsites.permissions.secondBlockTextPt2": "and guide on how to work with the enabled dApp connector.",
   "connector.connectedWebsites.permissions.videoLink": "the video introduction",
   "connector.connectedWebsites.permissions.enable": "enable",
+  "connector.appName": "DApp connector",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",
   "global.connector.connectedWebsites": "Connected Websites",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",

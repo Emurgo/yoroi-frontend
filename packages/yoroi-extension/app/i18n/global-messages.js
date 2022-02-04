@@ -920,7 +920,7 @@ export const connectorMessages: * = defineMessages({
   },
   dappConnector: {
     id: 'connector.appName',
-    defaultMessage: 'Dapp Connector',
+    defaultMessage: 'DApp connector',
   }
 });
 

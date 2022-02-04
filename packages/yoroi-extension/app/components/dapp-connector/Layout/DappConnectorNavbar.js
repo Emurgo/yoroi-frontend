@@ -4,6 +4,10 @@ import { observer } from 'mobx-react';
 import styles from './DappConnectorNavbar.scss'
 import type { Node } from 'react';
 import classnames from 'classnames';
+import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { connectorMessages } from '../../../i18n/global-messages';
+
 
 type Props = {||}
 type State = {|
@@ -15,6 +19,9 @@ declare var chrome;
 */
 @observer
 export default class DappConnectorNavbar extends Component<Props, State> {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
 
   state: State = {
     hasPermission: false,
@@ -58,10 +65,10 @@ export default class DappConnectorNavbar extends Component<Props, State> {
   }
 
   render(): Node {
-
+    const { intl } = this.context
     return (
       <div className={styles.component}>
-        <h1 className={styles.header}>Dapp connector</h1>
+        <h1 className={styles.header}>{intl.formatMessage(connectorMessages.dappConnector)}</h1>
         <div className={styles.permissionsContainer}>
           <p className={styles.hasPermission}>{this.state.hasPermission? 'Has permission' : 'Has no permission'}</p>
           <button className={classnames([styles.permission, styles.getPermission])} onClick={this.getPermission.bind(this)} type='button'>Get Permission</button>
