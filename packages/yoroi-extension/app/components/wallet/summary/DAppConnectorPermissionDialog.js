@@ -43,8 +43,8 @@ export default class DAppConnectorPermissionDialog extends Component {
                   <DAppConnectorIcon />
                 </div>
                 <div className={styles.content}>
-                  <h3>{intl.formatMessage(messages.header)}</h3>
-                  <p>{intl.formatMessage(messages.text)}</p>
+                  <h3 className={styles.header}>{intl.formatMessage(messages.header)}</h3>
+                  <p className={styles.text}>{intl.formatMessage(messages.text)}</p>
                 </div>
 
                 <div className={styles.actions}>
