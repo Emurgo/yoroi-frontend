@@ -28,6 +28,7 @@ type Props = {|
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
+  +position?: [string, string],
 |};
 
 export default function DialogFn(props: Props): Node {
@@ -40,6 +41,7 @@ export default function DialogFn(props: Props): Node {
     className,
     closeButton,
     backButton,
+    position,
   } = props;
 
   const hasSubmitting =
@@ -60,8 +62,8 @@ export default function DialogFn(props: Props): Node {
       sx={{
         background: 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: position[0],
+        alignItems: position[1],
         '& .MuiBackdrop-root': {
           background: 'none',
         },
@@ -125,6 +127,7 @@ DialogFn.defaultProps = {
   styleOverride: undefined,
   onClose: undefined,
   closeOnOverlayClick: false,
+  position: ['center', 'center'],
 };
 
 const ModalContainer = styled(Box)(({ theme }) => ({

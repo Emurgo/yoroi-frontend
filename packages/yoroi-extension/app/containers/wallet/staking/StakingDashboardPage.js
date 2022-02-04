@@ -70,6 +70,7 @@ import {
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
+import DAppConnectorPermissionDialog from '../../../components/wallet/summary/DAppConnectorPermissionDialog'
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -643,6 +644,12 @@ export default class StakingDashboardPage extends Component<Props> {
           close={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
         />
       );
+    }
+
+    if (true) {
+      return (
+        <DAppConnectorPermissionDialog />
+      )
     }
 
     if (uiDialogs.isOpen(PoolWarningDialog)) {
