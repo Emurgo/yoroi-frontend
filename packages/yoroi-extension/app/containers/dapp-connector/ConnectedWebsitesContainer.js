@@ -114,7 +114,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
 
     if (!isDappEnabled) {
       componentToRender = (
-        <Permissions />
+        <Permissions
+          requestTabPermission={this.generated.actions.walletSettings.requestTabPermission.trigger}
+        />
       )
     }
     return (

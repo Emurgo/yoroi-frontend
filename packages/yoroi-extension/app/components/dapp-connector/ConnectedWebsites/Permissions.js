@@ -43,7 +43,11 @@ const messages = defineMessages({
     }
 })
 
-export default class Permissions extends Component {
+type Props = {|
+  requestTabPermission: void => void,
+|}
+
+export default class Permissions extends Component<Props> {
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,
     };
@@ -84,7 +88,7 @@ export default class Permissions extends Component {
               </div>
 
               <div className={styles.enable}>
-                <button className={styles.enableBtn} type='button'>{intl.formatMessage(messages.enable)}</button>
+                <button onClick={this.props.requestTabPermission} className={styles.enableBtn} type='button'>{intl.formatMessage(messages.enable)}</button>
               </div>
             </div>
           </div>
