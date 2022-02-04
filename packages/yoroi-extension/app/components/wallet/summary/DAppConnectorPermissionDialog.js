@@ -6,7 +6,6 @@ import styles from './DAppConnectorPermissionDialog.scss';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DAppConnectorIcon from '../../../assets/images/dapp-connector/dapp-connector-default.inline.svg'
-import classNames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
 import { Button } from '@mui/material';
 
@@ -34,7 +33,7 @@ export default class DAppConnectorPermissionDialog extends Component {
         const { intl } = this.context
         return (
           <Dialog
-            className={classNames([styles.DAppConnectorPermissionDialog])}
+            className={styles.DAppConnectorPermissionDialog}
             position={['center', 'flex-end']}
           >
             <div className={styles.component}>
