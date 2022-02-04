@@ -24,13 +24,21 @@ const messages = defineMessages({
     }
 })
 
-export default class DAppConnectorPermissionDialog extends Component {
+
+type Props = {|
+  requestTabPermission: void => void,
+  onClose: void => void,
+|}
+
+export default class DAppConnectorPermissionDialog extends Component<Props> {
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,
     };
 
     render() {
         const { intl } = this.context
+        const { requestTabPermission, onClose } = this.props
+
         return (
           <Dialog
             className={styles.DAppConnectorPermissionDialog}
@@ -47,8 +55,8 @@ export default class DAppConnectorPermissionDialog extends Component {
                 </div>
 
                 <div className={styles.actions}>
-                  <Button variant="secondary">{intl.formatMessage(globalMessages.cancel)}</Button>
-                  <Button variant="primary">{intl.formatMessage(messages.enable)}</Button>
+                  <Button onClick={onClose} variant="secondary">{intl.formatMessage(globalMessages.cancel)}</Button>
+                  <Button onClick={requestTabPermission} variant="primary">{intl.formatMessage(messages.enable)}</Button>
                 </div>
               </div>
             </div>

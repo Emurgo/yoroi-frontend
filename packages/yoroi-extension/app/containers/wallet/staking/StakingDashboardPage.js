@@ -96,6 +96,10 @@ export default class StakingDashboardPage extends Component<Props> {
     await timeCalcRequests.requests.currentEpochLength.execute().promise;
     await timeCalcRequests.requests.currentSlotLength.execute().promise;
     await timeCalcRequests.requests.timeSinceGenesis.execute().promise;
+
+    if (!this.generated.stores.walletSettings.isDappEnabled) {
+      this.generated.actions.dialogs.open.trigger({ dialog: DAppConnectorPermissionDialog })
+    }
   }
 
   componentWillUnmount() {
@@ -646,9 +650,12 @@ export default class StakingDashboardPage extends Component<Props> {
       );
     }
 
-    if (true) {
+    if (uiDialogs.isOpen(DAppConnectorPermissionDialog)) {
       return (
-        <DAppConnectorPermissionDialog />
+        <DAppConnectorPermissionDialog
+          onClose={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
+          requestTabPermission={this.generated.actions.walletSettings.requestTabPermission.trigger}
+        />
       )
     }
 
