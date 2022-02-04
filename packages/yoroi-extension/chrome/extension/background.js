@@ -617,6 +617,27 @@ async function confirmSign(
   });
 }
 
+async function findWhitelistedConnection(
+  url: string,
+  requestIdentification?: boolean,
+  protocol: 'cardano' | 'ergo',
+  localStorageApi: LocalStorageApi,
+): Promise<?WhitelistEntry> {
+  const isAuthRequested = Boolean(requestIdentification);
+  const appAuthID = isAuthRequested ? url : undefined;
+  const whitelist = await localStorageApi.getWhitelist() ?? [];
+  Logger.debug(`whitelist: ${JSON.stringify(whitelist)}`);
+  return whitelist.find((entry: WhitelistEntry) => {
+    // Whitelist is only matching if same auth or auth is not requested
+    const matchingUrl = entry.url === url;
+    const matchingProtocol = entry.protocol === protocol;
+    const matchingAuthId = entry.appAuthID === appAuthID;
+    const isAuthWhitelisted = entry.appAuthID != null;
+    const isAuthPermitted = isAuthWhitelisted && matchingAuthId;
+    return matchingUrl && matchingProtocol && (!isAuthRequested || isAuthPermitted);
+  });
+}
+
 async function confirmConnect(
   tabId: number,
   connectParameters: {|
@@ -633,21 +654,13 @@ async function confirmConnect(
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
-  const bounds = await getBoundsForTabWindow(tabId);
-  const whitelist = await localStorageApi.getWhitelist() ?? [];
+  const [bounds, whitelistEntry] = await Promise.all([
+    getBoundsForTabWindow(tabId),
+    findWhitelistedConnection(url, requestIdentification, protocol, localStorageApi),
+  ])
   return new Promise((resolve, reject) => {
     try {
-      Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
-      const whitelistEntry = whitelist.find((entry: WhitelistEntry) => {
-        // Whitelist is only matching if same auth or auth is not requested
-        const matchingUrl = entry.url === url;
-        const matchingProtocol = entry.protocol === protocol;
-        const matchingAuthId = entry.appAuthID === appAuthID;
-        const isAuthWhitelisted = entry.appAuthID != null;
-        const isAuthPermitted = isAuthWhitelisted && matchingAuthId;
-        return matchingUrl && matchingProtocol && (!isAuthRequested || isAuthPermitted);
-      });
-      if (whitelistEntry !== undefined) {
+      if (whitelistEntry != null) {
         // we already whitelisted this website, so no need to re-ask the user to confirm
         connectedSites.set(tabId, {
           url,
@@ -846,6 +859,28 @@ function handleInjectorConnect(port) {
         const isCBOR = isCardano && (returnType === 'cbor');
         Logger.debug(`[yoroi][handleInjectorConnect] ${message.function} (Return type is: ${returnType})`);
         switch (message.function) {
+          case 'is_enabled/cardano':
+            try {
+              await withDb(
+                async (_db, localStorageApi) => {
+                  const whitelistedEntry = await findWhitelistedConnection(
+                    message.url,
+                    false,
+                    message.protocol,
+                    localStorageApi,
+                  );
+                  const isWhitelisted = whitelistedEntry != null;
+                  rpcResponse({ ok: isWhitelisted });
+                }
+              );
+            } catch (e) {
+              port.postMessage({
+                type: 'yoroi_connect_response/cardano',
+                success: false,
+                err: stringifyError(e),
+              });
+            }
+            break;
           case 'sign_tx':
             try {
               checkParamCount(1);
