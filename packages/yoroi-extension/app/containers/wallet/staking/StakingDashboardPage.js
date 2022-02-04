@@ -984,6 +984,11 @@ export default class StakingDashboardPage extends Component<Props> {
       notifications: {|
         open: {| trigger: (params: Notification) => void |},
       |},
+      walletSettings: {|
+        requestTabPermission: {|
+          trigger: (params: void) => void,
+        |}
+      |}
     |},
     stores: {|
       coinPriceStore: {|
@@ -1045,6 +1050,9 @@ export default class StakingDashboardPage extends Component<Props> {
           isExecuting: boolean,
         |},
         selected: null | PublicDeriver<>,
+      |},
+      walletSettings: {|
+        isDappEnabled: boolean,
       |},
     |},
   |} {
@@ -1139,6 +1147,9 @@ export default class StakingDashboardPage extends Component<Props> {
             },
           },
         },
+        walletSettings: {
+          isDappEnabled: stores.walletSettings.isDappEnabled,
+        },
       },
       actions: {
         dialogs: {
@@ -1181,6 +1192,9 @@ export default class StakingDashboardPage extends Component<Props> {
               trigger: actions.jormungandr.delegationTransaction.createTransaction.trigger,
             },
           },
+        },
+        walletSettings: {
+          requestTabPermission: { trigger: actions.walletSettings.requestTabPermission.trigger },
         },
       },
       UnmangleTxDialogContainerProps: ({

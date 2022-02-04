@@ -176,7 +176,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
-        requestTabPermission: void => void,
         isDappEnabled: boolean,
       |},
       tokenInfoStore: {|
