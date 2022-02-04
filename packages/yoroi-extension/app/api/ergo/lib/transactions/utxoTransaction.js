@@ -517,15 +517,26 @@ function extractWalletPkFromHexConstant(hexConstant: string): ?string {
   return matched ? matched[1] : null;
 }
 
-export function extractP2sKeyFromErgoTree(ergoTree: string): ?string {
-  const tree = RustModule.SigmaRust.ErgoTree.from_base16_bytes(ergoTree);
-  const constantsLen = tree.constants_len();
-  for (let i = 0; i < constantsLen; i++) {
-    const hex = tree.get_constant(i).encode_to_base16();
-    const walletPk: ?string = extractWalletPkFromHexConstant(hex);
-    if (walletPk != null) {
-      return walletPk;
+export function extractP2sKeysFromErgoBox(box: ErgoBoxJson): Set<string> {
+  const res = new Set();
+  if (box.ergoTree != null && box.ergoTree.length > 0) {
+    const tree = RustModule.SigmaRust.ErgoTree.from_base16_bytes(box.ergoTree);
+    const constantsLen = tree.constants_len();
+    for (let i = 0; i < constantsLen; i++) {
+      const hex = tree.get_constant(i).encode_to_base16();
+      const walletPk: ?string = extractWalletPkFromHexConstant(hex);
+      if (walletPk != null) {
+        res.add(walletPk);
+      }
     }
   }
-  return null;
+  if (box.additionalRegisters != null) {
+    for (const registerHex of Object.values(box.additionalRegisters)) {
+      const walletPk: ?string = extractWalletPkFromHexConstant(String(registerHex));
+      if (walletPk != null) {
+        res.add(walletPk);
+      }
+    }
+  }
+  return res;
 }

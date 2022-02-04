@@ -39,7 +39,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         })).map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: Number(genFormatTokenAmount(getTokenInfo)(token.entry)),
+          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
         }));
       })();
 

@@ -12,7 +12,9 @@ const walletIconSpan = document.querySelector('#wallet-icon')
 const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
 const getUsedAddresses = document.querySelector('#get-used-addresses')
 const getChangeAddress = document.querySelector('#get-change-address')
+const getRewardAddresses = document.querySelector('#get-reward-addresses')
 const getAccountBalance = document.querySelector('#get-balance')
+const isEnabledBtn = document.querySelector('#is-enabled')
 const getUtxos = document.querySelector('#get-utxos')
 const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
@@ -22,9 +24,14 @@ const spinner = document.querySelector('#spinner')
 
 let accessGranted = false
 let cardanoApi
+let returnType = 'cbor'
 let utxos
 let changeAddress
 let transactionHex
+
+function isCBOR() {
+  return returnType === 'cbor';
+}
 
 const mkcolor = (primary, secondary, spots) => ({ primary, secondary, spots });
 const COLORS = [
@@ -54,6 +61,8 @@ function onApiConnectied(api) {
   toggleSpinner('hide');
   let walletDisplay = 'an anonymous Yoroi Wallet';
 
+  api.setReturnType(returnType);
+
   const auth = api.auth && api.auth();
   const authEnabled = auth && auth.isEnabled();
 
@@ -71,7 +80,7 @@ function onApiConnectied(api) {
   walletPlateSpan.innerHTML = walletDisplay;
   toggleConnectionUI('status');
   accessGranted = true;
-  cardanoApi = api;
+  window.cardanoApi = cardanoApi = api;
 
   api.onDisconnect(() => {
     alertWarrning(`Disconnected from ${walletDisplay}`);
@@ -119,32 +128,61 @@ cardanoAccessBtn.addEventListener('click', () => {
     );
 })
 
+isEnabledBtn.addEventListener('click', () => {
+  window.cardano.yoroi.isEnabled().then(function(isEnabled) {
+    alertSuccess(`Is Yoroi connection enabled: ${isEnabled}`);
+  });
+});
+
 getAccountBalance.addEventListener('click', () => {
     if(!accessGranted) {
         alertError('Should request access first')
     } else {
-        toggleSpinner('show')
-        cardanoApi.getBalance().then(function(balance) {
-            toggleSpinner('hide')
-            alertSuccess(`Account Balance: ${balance}`)
-        });
+      toggleSpinner('show')
+      const tokenId = '*';
+      cardanoApi.getBalance(tokenId).then(function(balance) {
+        toggleSpinner('hide')
+        let mainBalance;
+        let numAssets;
+        if (isCBOR()) {
+          if (tokenId !== '*') {
+            alertSuccess(`Asset Balance: ${balance} (asset: ${tokenId})`)
+            return;
+          }
+          const value = CardanoWasm.Value.from_bytes(Buffer.from(balance, 'hex'));
+          mainBalance = value.coin().to_str();
+          const ma = value.multiasset()
+          numAssets = ma ? ma.len() : 0;
+        } else {
+          mainBalance = balance.default;
+          numAssets = (balance.assets||[]).length;
+        }
+        alertSuccess(`Account Balance: ${mainBalance} (assets: ${numAssets})`)
+      });
     }
 })
+
+function addressesFromCborIfNeeded(addresses) {
+  return isCBOR() ? addresses.map(a => CardanoWasm.Address.from_bytes(
+    Buffer.from(a, 'hex'),
+  ).to_bech32()) : addresses;
+}
 
 getUnUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
        alertError('Should request access first')
     } else {
-        toggleSpinner('show')
-        cardanoApi.getUnusedAddresses().then(function(addresses) {
-            toggleSpinner('hide')
-            if(addresses.length === 0){
-                alertWarrning('No unused addresses')
-            } else {
-                alertSuccess(`Address: `)
-                alertEl.innerHTML = '<pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
-            }
-        });
+      toggleSpinner('show')
+      cardanoApi.getUnusedAddresses().then(function(addresses) {
+        toggleSpinner('hide')
+        if (addresses.length === 0) {
+          alertWarrning('No unused addresses')
+          return;
+        }
+        addresses = addressesFromCborIfNeeded(addresses)
+        alertSuccess(`Address: `)
+        alertEl.innerHTML = '<h2>Unused addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+      });
     }
 })
 
@@ -152,16 +190,17 @@ getUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
        alertError('Should request access first')
     } else {
-        toggleSpinner('show')
-        cardanoApi.getUsedAddresses().then(function(addresses) {
-            toggleSpinner('hide')
-           if(addresses.length === 0){
-               alertWarrning('No used addresses')
-           } else {
-               alertSuccess(`Address: ${addresses.concat(',')}`)
-               alertEl.innerHTML = '<pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
-           }
-        });
+      toggleSpinner('show')
+      cardanoApi.getUsedAddresses({ page: 0, limit: 5 }).then(function(addresses) {
+        toggleSpinner('hide')
+        if (addresses.length === 0) {
+          alertWarrning('No used addresses')
+          return;
+        }
+        addresses = addressesFromCborIfNeeded(addresses)
+        alertSuccess(`Address: ${addresses.concat(',')}`)
+        alertEl.innerHTML = '<h2>Used addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+      });
     }
 })
 
@@ -169,17 +208,35 @@ getChangeAddress.addEventListener('click', () => {
     if(!accessGranted) {
         alertError('Should request access first')
     } else {
-        toggleSpinner('show')
-        cardanoApi.getChangeAddress().then(function(address) {
-            toggleSpinner('hide')
-            if(address.length === 0){
-                alertWarrning('No change addresses')
-            } else {
-                changeAddress = address
-                alertSuccess(`Address: `)
-                alertEl.innerHTML = '<pre>' + JSON.stringify(address, undefined, 2) + '</pre>'
-            }
-        });
+      toggleSpinner('show')
+      cardanoApi.getChangeAddress().then(function(address) {
+        toggleSpinner('hide')
+        if (address.length === 0) {
+          alertWarrning('No change addresses')
+          return;
+        }
+        changeAddress = addressesFromCborIfNeeded([address])[0]
+        alertSuccess(`Address: `)
+        alertEl.innerHTML = '<h2>Change address:</h2><pre>' + JSON.stringify(address, undefined, 2) + '</pre>'
+      });
+    }
+})
+
+getRewardAddresses.addEventListener('click', () => {
+    if(!accessGranted) {
+        alertError('Should request access first')
+    } else {
+      toggleSpinner('show')
+      cardanoApi.getRewardAddresses().then(function(addresses) {
+        toggleSpinner('hide')
+        if (addresses.length === 0) {
+          alertWarrning('No change addresses')
+          return;
+        }
+        addresses = addressesFromCborIfNeeded(addresses)
+        alertSuccess(`Address: ${addresses.concat(',')}`)
+        alertEl.innerHTML = '<h2>Reward addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+      });
     }
 })
 
@@ -190,14 +247,59 @@ getUtxos.addEventListener('click', () => {
     }
     toggleSpinner('show')
     cardanoApi.getUtxos().then(utxosResponse => {
-        toggleSpinner('hide')
-        if(utxosResponse.length === 0){
-            alertWarrning('NO UTXOS')
+      toggleSpinner('hide')
+      if(utxosResponse.length === 0){
+        alertWarrning('NO UTXOS')
+      } else {
+        if (isCBOR()) {
+          utxos = utxosResponse.map(hex => {
+            const u = CardanoWasm.TransactionUnspentOutput.from_bytes(Buffer.from(hex, 'hex'))
+            const input = u.input();
+            const output = u.output();
+            const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+            const txIndex = input.index();
+            const value = output.amount();
+            const multiasset = value.multiasset();
+            function parseMultiasset() {
+              if (!multiasset) {
+                return [];
+              }
+              const result = [];
+              const policyIds = multiasset.keys();
+              for (let i = 0; i < policyIds.len(); i++) {
+                const policyId = policyIds.get(i);
+                const assets = multiasset.get(policyId);
+                const assetNames = assets.keys();
+                for (let j = 0; j < assetNames.len(); j++) {
+                  const name = assetNames.get(j);
+                  const amount = assets.get(name);
+                  const policyIdHex = Buffer.from(policyId.to_bytes()).toString('hex');
+                  const encodedName = Buffer.from(name.name()).toString('hex');
+                  result.push({
+                    policyId: policyIdHex,
+                    name: encodedName,
+                    amount: amount.to_str(),
+                    assetId: `${policyIdHex}.${encodedName}`,
+                  });
+                }
+              }
+              return result;
+            }
+            return {
+              utxo_id: `${txHash}${txIndex}`,
+              tx_hash: txHash,
+              tx_index: txIndex,
+              receiver: output.address().to_bech32(),
+              amount: value.coin().to_str(),
+              assets: parseMultiasset(),
+            }
+          })
         } else {
-            utxos = utxosResponse
-            alertSuccess(`Check the console`)
-            alertEl.innerHTML = '<pre>' + JSON.stringify(utxosResponse, undefined, 2) + '</pre>'
+          utxos = utxosResponse
         }
+        alertSuccess(`Check the console`)
+        alertEl.innerHTML = '<h2>UTxO:</h2><pre>' + JSON.stringify(utxos, undefined, 2) + '</pre>'
+      }
     })
 })
 
@@ -277,10 +379,7 @@ signTx.addEventListener('click', () => {
   )  
 
   const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS)
-
-  const shelleyChangeAddress = CardanoWasm.Address.from_bytes(
-    Buffer.from(changeAddress, 'hex')
-  )
+  const shelleyChangeAddress = CardanoWasm.Address.from_bech32(changeAddress)
 
   // add output to the tx
   txBuilder.add_output(
@@ -297,7 +396,14 @@ signTx.addEventListener('click', () => {
   txBuilder.add_change_if_needed(shelleyChangeAddress)
 
   const txBody = txBuilder.build()
-  const txHex = Buffer.from(txBody.to_bytes()).toString('hex')
+
+  const tx = CardanoWasm.Transaction.new(
+    txBody,
+    CardanoWasm.TransactionWitnessSet.new(),
+    undefined,
+  )
+
+  const txHex = Buffer.from(tx.to_bytes()).toString('hex')
 
   cardanoApi.signTx(txHex, true).then(witnessSetHex => {
     toggleSpinner('hide')
