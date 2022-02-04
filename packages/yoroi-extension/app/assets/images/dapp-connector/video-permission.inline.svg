@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>10DF94AE-C97C-4178-8800-22AFAB258444</title>
+    <g id="✅-REVAMP-1.1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="1.2---Permissions" transform="translate(-344.000000, -415.000000)">
+            <g id="icon/video-permission" transform="translate(344.000000, 415.000000)">
+                <rect id="Rectangle-Copy-29" fill="#3154CB" opacity="0.0799999982" x="0" y="0" width="80" height="80" rx="8"></rect>
+                <g id="icon/video" transform="translate(24.000000, 24.000000)">
+                    <rect id="Rectangle" x="0" y="0" width="32" height="32"></rect>
+                    <rect id="Rectangle" stroke="#3154CB" stroke-width="2" x="3" y="5.66666667" width="26" height="20.6666667" rx="2"></rect>
+                    <path d="M17.1007882,12.0930461 L21.5725317,19.9185972 C21.7095367,20.1583559 21.6262384,20.4637833 21.3864796,20.6007882 C21.3109308,20.643959 21.2254236,20.6666667 21.1384102,20.6666667 L12.1949232,20.6666667 C11.9187808,20.6666667 11.6949232,20.442809 11.6949232,20.1666667 C11.6949232,20.0796532 11.7176308,19.994146 11.7608016,19.9185972 L16.2325451,12.0930461 C16.3695501,11.8532874 16.6749774,11.769989 16.9147361,11.906994 C16.9922518,11.9512886 17.0564936,12.0155304 17.1007882,12.0930461 Z" id="Triangle" fill="#3154CB" transform="translate(16.666667, 16.000000) rotate(90.000000) translate(-16.666667, -16.000000) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

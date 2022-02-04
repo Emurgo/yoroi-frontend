@@ -4,7 +4,8 @@ import type { Node } from 'react';
 import styles from './Permissions.scss'
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import Video from '../../../assets/images/dapp-connector/video.inline.svg'
+import Video from '../../../assets/images/dapp-connector/video-permission.inline.svg'
+import DAppConnector from '../../../assets/images/dapp-connector/dapp-connector-permission.inline.svg'
 
 
 const messages = defineMessages({
@@ -57,7 +58,7 @@ export default class Permissions extends Component {
 
               <div className={styles.block}>
                 <div className={styles.icon}>
-                  <Video />
+                  <DAppConnector />
                 </div>
                 <div className={styles.blockContent}>
                   <h2 className={styles.blockHeader}>
