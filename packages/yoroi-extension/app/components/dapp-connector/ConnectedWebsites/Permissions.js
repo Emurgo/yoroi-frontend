@@ -35,6 +35,10 @@ const messages = defineMessages({
     videoLink: {
       id: 'connector.connectedWebsites.permissions.videoLink',
       defaultMessage: '!!!the video introduction'
+    },
+    enable: {
+      id: 'connector.connectedWebsites.permissions.enable',
+      defaultMessage: '!!!enable'
     }
 })
 
@@ -49,13 +53,37 @@ export default class Permissions extends Component {
         return (
           <div className={styles.component}>
             <div className={styles.centered}>
-              <h1>{intl.formatMessage(messages.header)}</h1>
+              <h1 className={styles.mainHeader}>{intl.formatMessage(messages.header)}</h1>
 
-              <div>
-                <div>
+              <div className={styles.block}>
+                <div className={styles.icon}>
                   <Video />
                 </div>
+                <div className={styles.blockContent}>
+                  <h2 className={styles.blockHeader}>
+                    {intl.formatMessage(messages.firstBlockHeader)}
+                  </h2>
+                  <p className={styles.blockText}>{intl.formatMessage(messages.firstBlockText)}</p>
+                </div>
+              </div>
+              <div className={styles.block}>
+                <div className={styles.icon}>
+                  <Video />
+                </div>
+                <div className={styles.blockContent}>
+                  <h2 className={styles.blockHeader}>
+                    {intl.formatMessage(messages.secondBlockHeader)}
+                  </h2>
+                  <p className={styles.blockText}>
+                    <span>{intl.formatMessage(messages.secondBlockTextPt1)}</span>
+                    <span><a href="go">{intl.formatMessage(messages.videoLink)}</a></span>
+                    <span>{intl.formatMessage(messages.secondBlockTextPt2)}</span>
+                  </p>
+                </div>
+              </div>
 
+              <div>
+                <button type='button'>{intl.formatMessage(messages.enable)}</button>
               </div>
             </div>
           </div>
