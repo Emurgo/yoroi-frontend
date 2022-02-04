@@ -77,14 +77,14 @@ export default class Permissions extends Component {
                   </h2>
                   <p className={styles.blockText}>
                     <span>{intl.formatMessage(messages.secondBlockTextPt1)}</span>
-                    <span><a href="go">{intl.formatMessage(messages.videoLink)}</a></span>
+                    <a href="https://www.youtube.com/" target='_blank' rel='noopener noreferrer'>{intl.formatMessage(messages.videoLink)}</a>
                     <span>{intl.formatMessage(messages.secondBlockTextPt2)}</span>
                   </p>
                 </div>
               </div>
 
-              <div>
-                <button type='button'>{intl.formatMessage(messages.enable)}</button>
+              <div className={styles.enable}>
+                <button className={styles.enableBtn} type='button'>{intl.formatMessage(messages.enable)}</button>
               </div>
             </div>
           </div>
