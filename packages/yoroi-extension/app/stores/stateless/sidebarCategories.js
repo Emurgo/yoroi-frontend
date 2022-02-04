@@ -167,6 +167,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: _request => true,
   },
   {
+    className: 'dapp-connector',
+    route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: _request => !environment.isLight,
+  }
+  ,
+  {
     className: 'faq',
     route: 'https://yoroi-wallet.com/faq',
     icon: faqIcon,
