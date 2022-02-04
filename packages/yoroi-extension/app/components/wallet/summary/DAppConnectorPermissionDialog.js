@@ -5,18 +5,17 @@ import Dialog from '../../widgets/Dialog';
 import styles from './DAppConnectorPermissionDialog.scss';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import DAppConnectorIcon from '../../../assets/images/dapp-connector/dapp-connector-default.inline.svg'
 import classNames from 'classnames';
+import globalMessages from '../../../i18n/global-messages';
+import { Button } from '@mui/material';
 
 const messages = defineMessages({
     header: {
         id: 'connector.connectedWebsites.permissions.header',
         defaultMessage: '!!!Enable Yoroi to access dApps',
     },
-    firstBlockHeader: {
-      id: 'connector.connectedWebsites.permissions.firstBlockHeader',
-      defaultMessage: '!!!Why do you need dApp connector?',
-    },
-    firstBlockText: {
+    text: {
       id: 'connector.connectedWebsites.permissions.firstBlockText',
       defaultMessage: '!!!DApp connector will allow the interaction between your Yoroi wallets and any Cardano dApps. You will be able to participate in any activities that the dApp permits such as purchasing or selling tokens, gaining access to resources, or using other features offered by the dApp.'
     },
@@ -35,10 +34,25 @@ export default class DAppConnectorPermissionDialog extends Component {
         const { intl } = this.context
         return (
           <Dialog
-            className={classNames([styles.component, styles.DAppConnectorPermissionDialog])}
+            className={classNames([styles.DAppConnectorPermissionDialog])}
             position={['center', 'flex-end']}
           >
-            <h1>Hello</h1>
+            <div className={styles.component}>
+              <div className={styles.centered}>
+                <div className={styles.icon}>
+                  <DAppConnectorIcon />
+                </div>
+                <div className={styles.content}>
+                  <h3>{intl.formatMessage(messages.header)}</h3>
+                  <p>{intl.formatMessage(messages.text)}</p>
+                </div>
+
+                <div className={styles.actions}>
+                  <Button variant="secondary">{intl.formatMessage(globalMessages.cancel)}</Button>
+                  <Button variant="primary">{intl.formatMessage(messages.enable)}</Button>
+                </div>
+              </div>
+            </div>
           </Dialog>
         )
     }
