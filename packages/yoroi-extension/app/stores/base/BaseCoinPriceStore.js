@@ -26,6 +26,8 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
+const SOURCE_CURRENCIES = ['ADA', 'ERG'];
+
 interface LoadingStore {
   getDatabase(): ?lf$Database
 }
@@ -158,39 +160,41 @@ export default class BaseCoinPriceStore
     if (!unitOfAccount.enabled) return;
 
     const stateFetcher = this.stores.stateFetchStore.fetcher;
-    try {
-      const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
-        from: 'ADA',
-      });
+    for (const from of SOURCE_CURRENCIES) {
+      try {
+        const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
+          from,
+        });
 
-      if (response.error != null) {
-        throw new Error('coin price backend error: ' + response.error);
-      }
+        if (response.error != null) {
+          throw new Error('coin price backend error: ' + response.error);
+        }
 
-      if (response.pubKeyData != null && response.pubKeyDataSignature != null) {
-        await this._replacePubKeyData(
-          response.pubKeyData,
-          response.pubKeyDataSignature
+        if (response.pubKeyData != null && response.pubKeyDataSignature != null) {
+          await this._replacePubKeyData(
+            response.pubKeyData,
+            response.pubKeyDataSignature
+          );
+        }
+        if (!this.pubKeyData) {
+          throw new Error('missing pubKeyData - should never happen');
+        }
+        if (!verifyTicker(response.ticker, this.pubKeyData)) {
+          throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
+        }
+
+        // if we got here before the timeout expired, clear the timeout
+        if (this.expirePriceDataTimeoutId) {
+          clearTimeout(this.expirePriceDataTimeoutId);
+        }
+        // then recreate the timeout (similar to resetting it to 0)
+        this.expirePriceDataTimeoutId = setTimeout(
+          this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold
         );
+        this._updatePriceData(response, unitOfAccount.currency);
+      } catch (error) {
+        Logger.error(`${nameof(BaseCoinPriceStore)}::${nameof(this.refreshCurrentCoinPrice)} ` + stringifyError(error));
       }
-      if (!this.pubKeyData) {
-        throw new Error('missing pubKeyData - should never happen');
-      }
-      if (!verifyTicker(response.ticker, this.pubKeyData)) {
-        throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
-      }
-
-      // if we got here before the timeout expired, clear the timeout
-      if (this.expirePriceDataTimeoutId) {
-        clearTimeout(this.expirePriceDataTimeoutId);
-      }
-      // then recreate the timeout (similar to resetting it to 0)
-      this.expirePriceDataTimeoutId = setTimeout(
-        this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold
-      );
-      this._updatePriceData(response, unitOfAccount.currency);
-    } catch (error) {
-      Logger.error(`${nameof(BaseCoinPriceStore)}::${nameof(this.refreshCurrentCoinPrice)} ` + stringifyError(error));
     }
   }
 
@@ -224,9 +228,6 @@ export default class BaseCoinPriceStore
     const { timestamps } = request;
 
     const from = request.defaultToken === 'TADA' ? 'ADA' : request.defaultToken;
-    if (from !== 'ADA') {
-      return;
-    }
 
     const missingTimestamps = timestamps.filter(
       timestamp => this.priceMap.get(
