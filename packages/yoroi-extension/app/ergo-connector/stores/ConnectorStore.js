@@ -521,6 +521,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
 
     runInAction(() => {
+      // <TODO:FOREIGN_INPUTS>
+      // $FlowFixMe[prop-missing]
       this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
     });
   }
