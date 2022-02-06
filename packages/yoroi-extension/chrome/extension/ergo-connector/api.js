@@ -9,7 +9,7 @@ import type {
   TxId,
   SignedTx,
   Value,
-  CardanoTx,
+  CardanoTx, AccountBalance,
 } from './types';
 import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -29,7 +29,7 @@ import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/Concep
 import BigNumber from 'bignumber.js';
 import JSONBigInt from 'json-bigint';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
-import { extractP2sKeyFromErgoTree, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
+import { extractP2sKeysFromErgoBox, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
 import { SendTransactionApiError } from '../../../app/api/common/errors';
 
@@ -86,7 +86,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId,
   protocol: 'cardano' | 'ergo',
-): Promise<Value> {
+): Promise<AccountBalance | Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
@@ -303,7 +303,9 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
   return getAllAddresses(wallet, false);
 }
 
-export async function connectorGetCardanoRewardAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+export async function connectorGetCardanoRewardAddresses(
+  wallet: PublicDeriver<>,
+): Promise<Address[]> {
   return getCardanoRewardAddresses(wallet)
     .then(arr => arr.map(a => a.base58));
 }
@@ -351,21 +353,27 @@ function addressesToPkMap(addresses: Array<FullAddressPayloadWithBase58>) {
   }, {});
 }
 
-function createP2sAddressTreeMatcher(
+// Returns the map with all extracted address-keys as keys
+// and the found matching local address as value, if it's found
+function createP2sAddressTreeExtractor(
   addressesGetter: () => Promise<Array<FullAddressPayloadWithBase58>>,
 ): (
-  string => Promise<{| isP2S: boolean, matchingAddress: ?FullAddressPayloadWithBase58 |}>
+  ErgoBoxJson => Promise<{ [string]: ?FullAddressPayloadWithBase58 }>
 ) {
   const keyAddressMapHolder = [];
-  return async ergoTree => {
-    const key: ?string = extractP2sKeyFromErgoTree(ergoTree);
-    if (key == null) {
-      return { isP2S: false, matchingAddress: null };
+  return async box => {
+    const keys: Set<string> = extractP2sKeysFromErgoBox(box);
+    if (keys.size === 0) {
+      return {};
     }
     if (!keyAddressMapHolder[0]) {
       keyAddressMapHolder[0] = addressesToPkMap(await addressesGetter());
     }
-    return { isP2S: true, matchingAddress: keyAddressMapHolder[0][key] };
+    // $FlowFixMe[incompatible-return]
+    return Array.from(keys).reduce(
+      (res, k) => ({ ...res, [k]: keyAddressMapHolder[0][k] }),
+      {},
+    );
   };
 }
 
@@ -451,7 +459,7 @@ export async function connectorSignTx(
 
   // SIGNING INPUTS //
 
-  const p2sMatcher = createP2sAddressTreeMatcher(
+  const p2sExtractor = createP2sAddressTreeExtractor(
     () => getAllFullAddresses(publicDeriver, true),
   );
 
@@ -460,7 +468,10 @@ export async function connectorSignTx(
     .then(key => BIP32PrivateKey.fromBuffer(Buffer.from(key.prvKeyHex, 'hex')));
 
   const keyLevel = wallet.getParent().getPublicDeriverLevel();
-  const inputSigningKeys = new RustModule.SigmaRust.SecretKeys();
+
+  const S = RustModule.SigmaRust;
+
+  const inputSigningKeys = new S.SecretKeys();
   for (const input of selectedInputs) {
     const inputId = input.boxId;
     debug('signing', 'Signing input ID', inputId);
@@ -469,30 +480,34 @@ export async function connectorSignTx(
       debug('signing', 'UTxO found, regular signature');
       inputSigningKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
     } else {
-      debug('signing', 'No UTxO found! Checking if input is P2S');
-      const { isP2S, matchingAddress } = await p2sMatcher(input.ergoTree);
-      if (isP2S) {
-        if (!matchingAddress) {
-          throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
+      debug('signing', 'No UTxO found! Checking if input needs some P2S signatures');
+      const matchingAddressMap = await p2sExtractor(input);
+      for (const key of Object.keys(matchingAddressMap)) {
+        const matchingAddress = matchingAddressMap[key];
+        if (matchingAddress == null) {
+          throw new Error(
+            `Input ${inputId} is a P2S, but no matching address is found for the key: ${key}`
+          );
         }
-        debug('signing', 'Input is a P2S with valid matching address', matchingAddress);
-        const { fullAddress } = matchingAddress;
-        inputSigningKeys.add(generateKey({ addressing: fullAddress, keyLevel, signingKey }));
-      } else {
-        throw new Error(`Input ${inputId} is not recognised! No matching UTxO found and is not P2S!`)
+        debug('signing', 'Input is a P2S, adding signature from matching address:', matchingAddress);
+        inputSigningKeys.add(generateKey({
+          addressing: matchingAddress.fullAddress,
+          keyLevel,
+          signingKey,
+        }));
       }
     }
   }
 
   debug('signing', 'Produced input keys', inputSigningKeys.len(), inputSigningKeys);
 
-  const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(createMockHeader(bestBlock));
-  const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
-  const ergoStateContext = new RustModule.SigmaRust.ErgoStateContext(preHeader);
-  const txBoxesToSpend = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(selectedInputs);
-  const dataBoxesToSpend = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs);
+  const blockHeader = S.BlockHeader.from_json(createMockHeader(bestBlock));
+  const preHeader = S.PreHeader.from_block_header(blockHeader);
+  const ergoStateContext = new S.ErgoStateContext(preHeader);
+  const txBoxesToSpend = S.ErgoBoxes.from_boxes_json(selectedInputs);
+  const dataBoxesToSpend = S.ErgoBoxes.from_boxes_json(dataInputs);
 
-  const signedTx = RustModule.SigmaRust.Wallet
+  const signedTx = S.Wallet
     .from_secrets(inputSigningKeys)
     .sign_transaction(
       ergoStateContext,
@@ -532,17 +547,13 @@ export async function connectorSignCardanoTx(
   const { tx: txHex, partialSign } = tx;
 
   let txBody;
-
+  const bytes = Buffer.from(txHex, 'hex');
   try {
-    txBody = RustModule.WalletV4.Transaction.from_bytes(
-      Buffer.from(txHex, 'hex')
-    ).body();
+    txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
   } catch (originalErr) {
     try {
-      // For backward compatibility
-      txBody = RustModule.WalletV4.TransactionBody.from_bytes(
-        Buffer.from(txHex, 'hex')
-      );
+      // Try parsing as body for backward compatibility
+      txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
     } catch (_e) {
       throw originalErr;
     }

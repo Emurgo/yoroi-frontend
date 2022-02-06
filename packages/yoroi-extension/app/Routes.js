@@ -54,6 +54,8 @@ import TokensDetailPageRevamp from './containers/wallet/TokenDetailPageRevamp';
 import NFTsPageRevamp from './containers/wallet/NFTsPageRevamp';
 import NFTDetailPageRevamp from './containers/wallet/NFTDetailPageRevamp';
 import ConnectedWebsitesPage from './containers/dapp-connector/ConnectedWebsitesContainer';
+import YoroiPalettePage from './containers/experimental/YoroiPalette';
+import YoroiThemesPage from './containers/experimental/yoroiThemes';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -123,6 +125,16 @@ export const Routes = (
         exact
         path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
         component={(props) => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
+        component={(props) => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXPERIMENTAL.THEMES}
+        component={(props) => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         path={ROUTES.WALLETS.ROOT}

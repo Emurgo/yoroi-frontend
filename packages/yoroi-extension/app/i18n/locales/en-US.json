@@ -722,6 +722,7 @@
   "wallet.send.trezor.confirmationDialog.info.line.2": "A new tab will appear. Please follow the instructions in the new tab.",
   "wallet.send.trezor.confirmationDialog.submit": "Send using Trezor",
   "wallet.send.trezor.error.101": "Signing cancelled on Trezor device. Please retry",
+  "wallet.send.trezor.error.noWitness": "Could not sign the transaction. Please ensure the passphrase you entered is the passhprase used to create this wallet.",
   "wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder": "Type current spending password",
   "wallet.settings.changePassword.dialog.currentPasswordLabel": "Current spending password",
   "wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder": "Type new spending password",
