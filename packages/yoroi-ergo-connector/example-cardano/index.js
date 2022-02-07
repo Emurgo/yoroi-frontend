@@ -477,7 +477,8 @@ createTx.addEventListener('click', () => {
       address: randomUtxo.receiver,
       assets: {
         [asset.assetId]: '1',
-      }
+      },
+      ensureRequiredMinimalValue: true,
     })
   }
   
