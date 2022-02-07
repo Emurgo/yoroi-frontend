@@ -174,20 +174,35 @@ class CardanoAPI {
       });
     }
     
-    setReturnType(returnType) {
-      if (returnType !== 'cbor' && returnType !== 'json') {
-        throw new Error('Possible return type values are: "cbor" or "json"');
-      }
-      this._returnType[0] = returnType;
-    } 
+    experimental = Object.freeze({
+    
+      setReturnType: (returnType) => {
+        if (returnType !== 'cbor' && returnType !== 'json') {
+          throw new Error('Possible return type values are: "cbor" or "json"');
+        }
+        this._returnType[0] = returnType;
+      },
+      
+      auth: () => {
+        return this._auth;
+      },
+      
+      createTx: (req) => {
+        return this._cardano_rpc_call("create_tx/cardano", [req]);
+      },
+      
+      onDisconnect: (callback) => {
+        if (this._disconnection[0]) {
+          throw new Error('Cardano API instance is already disconnected!');
+        }
+        this._disconnection.push(callback);
+      },
+      
+    }) 
     
     getNetworkId() {
       // TODO
       throw new Error('Not implemented yet');
-    }
-    
-    auth() {
-      return this._auth;
     }
     
     getBalance(token_id = '*') {
@@ -225,17 +240,6 @@ class CardanoAPI {
     signData(address, sigStructure) {
       // TODO
       throw new Error('Not implemented yet');
-    }
-    
-    createTx(req) {
-      return this._cardano_rpc_call("create_tx/cardano", [req]);
-    }
-    
-    onDisconnect(callback) {
-      if (this._disconnection[0]) {
-        throw new Error('Cardano API instance is already disconnected!');
-      }
-      this._disconnection.push(callback);
     }
 }
 `
