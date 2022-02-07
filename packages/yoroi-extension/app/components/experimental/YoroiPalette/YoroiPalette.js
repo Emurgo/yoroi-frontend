@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import { formatPalette, getPalette } from './palette';
 import ArrowDown from '../../../assets/images/down-arrow.inline.svg';
 import type { DesignToken } from './palette'
+import { getMainYoroiPalette } from '../../../styles/globalStyles';
 
 /**
  * @todos
@@ -42,7 +43,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
     render(): Node {
 
       const { currentTheme } = this.state
-      const palette = getPalette(themes[currentTheme])
+      const palette = getMainYoroiPalette(themes[currentTheme])
       const { designTokens, nameToHex } = formatPalette(palette, themes[currentTheme])
       return (
         <div className={styles.component}>

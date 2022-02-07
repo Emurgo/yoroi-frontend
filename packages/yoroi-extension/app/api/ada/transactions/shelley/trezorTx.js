@@ -43,6 +43,23 @@ export async function createTrezorSignTxPayload(
   byronNetworkMagic: number,
   networkId: number,
 ): Promise<$Exact<CardanoSignTransaction>> {
+  const stakingKeyPath = (() => {
+    // TODO: this entire block is super hacky
+    // need to instead pass in a mapping from wallet addresses to addressing
+    // or add something similar to the sign request
+
+    // assume the withdrawal is the same path as the UTXOs being spent
+    // so just take the first UTXO arbitrarily and change it to the staking key path
+    const firstUtxo = signRequest.senderUtxos[0];
+    if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
+      throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
+    }
+    const result = [...firstUtxo.addressing.path];
+    result[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
+    result[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
+    return result;
+  })();
+
   const txBody = signRequest.unsignedTx.build();
 
   // Inputs
@@ -53,7 +70,8 @@ export async function createTrezorSignTxPayload(
   // Output
   const trezorOutputs = _generateTrezorOutputs(
     txBody.outputs(),
-    signRequest.changeAddr
+    signRequest.changeAddr,
+    stakingKeyPath,
   );
 
   let request = {
@@ -68,30 +86,13 @@ export async function createTrezorSignTxPayload(
 
   // withdrawals
   const withdrawals = txBody.withdrawals();
-
-  const getStakingKeyPath = () => {
-    // TODO: this entire block is super hacky
-    // need to instead pass in a mapping from wallet addresses to addressing
-    // or add something similar to the sign request
-
-    // assume the withdrawal is the same path as the UTXOs being spent
-    // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.senderUtxos[0];
-    if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
-      throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
-    }
-    const stakingKeyPath = [...firstUtxo.addressing.path];
-    stakingKeyPath[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
-    stakingKeyPath[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
-    return stakingKeyPath;
-  };
   request = withdrawals == null
     ? request
     : {
       ...request,
       withdrawals: formatTrezorWithdrawals(
         withdrawals,
-        [getStakingKeyPath()],
+        [stakingKeyPath],
       )
     };
 
@@ -103,7 +104,7 @@ export async function createTrezorSignTxPayload(
       ...request,
       certificates: formatTrezorCertificates(
         certificates,
-        range(0, certificates.len()).map(_i => getStakingKeyPath()),
+        range(0, certificates.len()).map(_i => stakingKeyPath),
       )
     };
 
@@ -114,10 +115,10 @@ export async function createTrezorSignTxPayload(
       auxiliaryData: {
         catalystRegistrationParameters: {
           votingPublicKey: votingPublicKey.replace(/^0x/, ''),
-          stakingPath: getStakingKeyPath(),
+          stakingPath: stakingKeyPath,
           rewardAddressParameters: {
             addressType: ADDRESS_TYPE.Reward,
-            path: getStakingKeyPath(),
+            path: stakingKeyPath,
           },
           nonce: String(nonce),
         },
@@ -238,6 +239,7 @@ function toTrezorTokenBundle(
 function _generateTrezorOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
+  stakingKeyPath: Array<number>,
 ): Array<CardanoOutput> {
   const result = [];
   for (let i = 0; i < txOutputs.len(); i++) {
@@ -250,11 +252,15 @@ function _generateTrezorOutputs(
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
       verifyFromBip44Root(changeAddr.addressing);
+      if (!RustModule.WalletV4.BaseAddress.from_address(address)) {
+        throw new Error('expect change address to be a base address');
+      }
       result.push({
-        addressParameters: toTrezorAddressParameters(
-          address,
-          changeAddr.addressing.path
-        ),
+        addressParameters: {
+          addressType: ADDRESS_TYPE.Base,
+          path: changeAddr.addressing.path,
+          stakingPath: stakingKeyPath,
+        },
         amount: output.amount().coin().to_str(),
         ...tokenBundle
       });
