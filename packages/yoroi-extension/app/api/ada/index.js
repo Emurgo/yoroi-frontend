@@ -1016,7 +1016,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.network.NetworkId,
       };
@@ -1222,7 +1222,7 @@ export default class AdaApi {
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
       ),
-      minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       networkId: network.NetworkId,
     };
@@ -1275,9 +1275,12 @@ export default class AdaApi {
           throw new Error('Value is required for a valid tx output');
         }
       } else { // ensureRequiredMinimalValue is not defined or true
+        // <TODO:PLUTUS_SUPPORT>
+        const utxoHasDataHash = false;
         const minAmount = RustModule.WalletV4.min_ada_required(
           cardanoValueFromMultiToken(amount),
-          protocolParams.minimumUtxoVal,
+          utxoHasDataHash,
+          protocolParams.coinsPerUtxoWord,
         );
         if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
           amount = makeMultiToken(minAmount.to_str());
@@ -1334,7 +1337,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
@@ -1456,7 +1459,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
@@ -1619,7 +1622,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
