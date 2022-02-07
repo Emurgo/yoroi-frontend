@@ -233,7 +233,7 @@ type NameToHex = {|
 |}
 
 type FormatedPalette = {|
-  multiLayersColor: MultiLayerColor,
+  multiLayerColor: MultiLayerColor,
   nameToHex: NameToHex,
 |}
 
@@ -243,9 +243,9 @@ export const formatPalette = (palette: any, theme: any): FormatedPalette => {
     multiLayerColor: []
   }
 
-  
+
   for (const name of Object.keys(palette)) {
-  
+
     if(typeof palette[name] === 'string' && palette[name].startsWith('var')) {
       const secondColorName = palette[name].slice(4, -1)
       const secondColorHex = palette[secondColorName]
