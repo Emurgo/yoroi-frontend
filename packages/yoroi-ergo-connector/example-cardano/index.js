@@ -27,6 +27,7 @@ let cardanoApi
 let returnType = 'cbor'
 let utxos
 let changeAddress
+let unsignedTransactionHex
 let transactionHex
 
 function isCBOR() {
@@ -335,16 +336,18 @@ signTx.addEventListener('click', () => {
     return;
   }
 
-  if (!utxos) {
-    alertError('Should request utxos first');
-    return
-  }
+  if (!unsignedTransactionHex) {
 
-  if (!changeAddress) {
-    alertError('Should request change address first')
-  }
-  
-  const txBuilder = CardanoWasm.TransactionBuilder.new(
+    if (!utxos) {
+      alertError('Should request utxos first');
+      return
+    }
+
+    if (!changeAddress) {
+      alertError('Should request change address first')
+    }
+
+    const txBuilder = CardanoWasm.TransactionBuilder.new(
       CardanoWasm.TransactionBuilderConfigBuilder.new()
         // all of these are taken from the mainnet genesis settings
         // linear fee parameters (a*size + b)
@@ -360,66 +363,67 @@ signTx.addEventListener('click', () => {
         .max_value_size(5000)
         .max_tx_size(16384)
         .build()
-  )
+    )
 
-  // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
-  const utxo = utxos[0]
-  
-  const addr = CardanoWasm.Address.from_bytes(
-    Buffer.from(utxo.receiver, 'hex')
-  )
-  const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
-  const keyHash = baseAddr.payment_cred().to_keyhash();
-  txBuilder.add_key_input(
-    keyHash,
-    CardanoWasm.TransactionInput.new(
-      CardanoWasm.TransactionHash.from_bytes(
-        Buffer.from(utxo.tx_hash, "hex")
-      ), // tx hash
-      utxo.tx_index, // index
-    ),
-    CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
-  )  
+    // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
+    const utxo = utxos[0]
 
-  const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS)
-  const shelleyChangeAddress = CardanoWasm.Address.from_bech32(changeAddress)
+    const addr = CardanoWasm.Address.from_bytes(
+      Buffer.from(utxo.receiver, 'hex')
+    )
+    const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
+    const keyHash = baseAddr.payment_cred().to_keyhash();
+    txBuilder.add_key_input(
+      keyHash,
+      CardanoWasm.TransactionInput.new(
+        CardanoWasm.TransactionHash.from_bytes(
+          Buffer.from(utxo.tx_hash, "hex")
+        ), // tx hash
+        utxo.tx_index, // index
+      ),
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
+    )
 
-  // add output to the tx
-  txBuilder.add_output(
-    CardanoWasm.TransactionOutput.new(
-      shelleyOutputAddress,
-      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(AMOUNT_TO_SEND))    
-    ),
-  )
+    const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS)
+    const shelleyChangeAddress = CardanoWasm.Address.from_bech32(changeAddress)
 
-  const ttl = getTtl()
-  txBuilder.set_ttl(ttl)
+    // add output to the tx
+    txBuilder.add_output(
+      CardanoWasm.TransactionOutput.new(
+        shelleyOutputAddress,
+        CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(AMOUNT_TO_SEND))
+      ),
+    )
 
-  // calculate the min fee required and send any change to an address
-  txBuilder.add_change_if_needed(shelleyChangeAddress)
+    const ttl = getTtl()
+    txBuilder.set_ttl(ttl)
 
-  const txBody = txBuilder.build()
+    // calculate the min fee required and send any change to an address
+    txBuilder.add_change_if_needed(shelleyChangeAddress)
 
-  const tx = CardanoWasm.Transaction.new(
-    txBody,
-    CardanoWasm.TransactionWitnessSet.new(),
-    undefined,
-  )
+    unsignedTransactionHex = Buffer.from(
+      txBuilder.build_tx().to_bytes()
+    ).toString('hex');
+  }
 
-  const txHex = Buffer.from(tx.to_bytes()).toString('hex')
-
-  cardanoApi.signTx(txHex, true).then(witnessSetHex => {
+  cardanoApi.signTx(unsignedTransactionHex, true).then(witnessSetHex => {
     toggleSpinner('hide')
+
+    alertSuccess(`Sign response: ${witnessSetHex}`);
 
     const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
       Buffer.from(witnessSetHex, 'hex')
-    )
+    );
+    const tx = CardanoWasm.Transaction.from_bytes(
+      Buffer.from(unsignedTransactionHex, 'hex')
+    );
     const transaction = CardanoWasm.Transaction.new(
-      txBody,
+      tx.body(),
       witnessSet,
-      undefined,
-    )
+      tx.auxiliary_data(),
+    );
     transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
+    unsignedTransactionHex = null;
     alertSuccess('Signing tx succeeds: ' + transactionHex)
 
   }).catch(error => {
@@ -469,7 +473,9 @@ createTx.addEventListener('click', () => {
     ]
   }
 
-  const utxoWithAssets = utxos.find(u => u.assets.length > 0);
+  const utxosWithAssets = utxos.filter(u => u.assets.length > 0);
+  const utxoWithAssets = utxosWithAssets[Math.floor(Math.random() * utxosWithAssets.length)];
+
   if (utxoWithAssets) {
     const asset = utxoWithAssets.assets[0];
     console.log('[createTx] Including asset:', asset);
@@ -485,7 +491,7 @@ createTx.addEventListener('click', () => {
   cardanoApi.experimental.createTx(txReq, true).then(txHex => {
     toggleSpinner('hide')
     alertSuccess('Creating tx succeeds: ' + txHex)
-    transactionHex = txHex
+    unsignedTransactionHex = txHex
   }).catch(error => {
     console.error(error)
     toggleSpinner('hide')

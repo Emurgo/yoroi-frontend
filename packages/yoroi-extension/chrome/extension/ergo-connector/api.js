@@ -637,6 +637,12 @@ export async function connectorCreateCardanoTx(
     cardanoTxRequest,
   }: any));
 
+  if (password == null) {
+    return Buffer.from(
+      signRequest.unsignedTx.build_tx().to_bytes()
+    ).toString('hex');
+  }
+
   const withSigningKey = asGetSigningKey(publicDeriver);
   if (!withSigningKey) {
     throw new Error('expect to be able to get signing key');

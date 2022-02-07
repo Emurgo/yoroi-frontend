@@ -45,7 +45,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 import { Logger } from '../../utils/logging';
-import { asAddressedUtxo, } from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   connectorGetUsedAddresses,
@@ -472,14 +472,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       if (utxo) {
         inputs.push({
           address: utxo.receiver,
-          value: new MultiToken(
-            [{
-              amount: new BigNumber(utxo.amount),
-              identifier: defaultToken.Identifier,
-              networkId: defaultToken.NetworkId
-            }],
-            selectedWallet.publicDeriver.getParent().getDefaultToken()
-          ),
+          value: multiTokenFromRemote(utxo, defaultToken.NetworkId),
         });
       } else {
         foreignInputs.push({ txHash, txIndex })
@@ -494,16 +487,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       outputs.push(
         {
           address,
-          value: new MultiToken(
-            [
-              {
-                amount: new BigNumber(amount),
-                identifier: defaultToken.Identifier,
-                networkId: defaultToken.NetworkId
-              }
-            ],
-            selectedWallet.publicDeriver.getParent().getDefaultToken()
-          )
+          value: multiTokenFromCardanoValue(
+            output.amount(),
+            selectedWallet.publicDeriver.getParent().getDefaultToken(),
+          ),
         }
       );
     }

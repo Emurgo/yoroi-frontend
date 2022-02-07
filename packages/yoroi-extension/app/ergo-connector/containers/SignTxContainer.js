@@ -130,6 +130,7 @@ export default class SignTxContainer extends Component<
         break;
       }
       case 'tx/cardano':
+        // <TODO:REMOVE_UNUSED_CASE>
       case 'tx-create-req/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
         if (txData == null) return this.renderLoading();

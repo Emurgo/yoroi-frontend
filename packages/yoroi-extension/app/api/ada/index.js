@@ -1234,6 +1234,7 @@ export default class AdaApi {
       const output = RustModule.WalletV4.TransactionOutput.from_bytes(
           Buffer.from(outputHex, 'hex')
       )
+      // <TODO:PLUTUS_SUPPORT>
       outputs.push(
         {
           address: Buffer.from(output.address().to_bytes()).toString('hex'),
@@ -1275,7 +1276,8 @@ export default class AdaApi {
         if (target.value === undefined) {
           throw new Error('Value is required for a valid tx output');
         }
-      } else { // ensureRequiredMinimalValue is true
+      } else {
+        // ensureRequiredMinimalValue is true
         // <TODO:PLUTUS_SUPPORT>
         const utxoHasDataHash = false;
         const minAmount = RustModule.WalletV4.min_ada_required(

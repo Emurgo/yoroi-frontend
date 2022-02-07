@@ -480,6 +480,7 @@ const yoroiMessageHandler = async (
         break;
         case 'tx-create-req/cardano':
           {
+            // <TODO:REMOVE_UNUSED_CASE>
             const signedTx = await createCardanoTx(
               (request.tx: any),
               password,
@@ -1223,15 +1224,22 @@ function handleInjectorConnect(port) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx-create-req/cardano',
-                    tx: message.params[0],
-                    uid: message.uid
-                  },
-                  connection
-                );
-                rpcResponse(resp);
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const resp = await connectorCreateCardanoTx(
+                        wallet,
+                        null,
+                        message.params[0],
+                      );
+                      rpcResponse({
+                        ok: resp,
+                      });
+                    },
+                    db,
+                    localStorageApi
+                  );
+                });
               }
             } catch (e) {
               handleError(e);
