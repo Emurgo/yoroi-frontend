@@ -1270,11 +1270,12 @@ export default class AdaApi {
       };
       let amount = makeMultiToken(target.value ?? '0');
 
-      if (target.ensureRequiredMinimalValue === false) {
+      const ensureMinValue = target.ensureRequiredMinimalValue;
+      if (ensureMinValue == null || ensureMinValue === false) {
         if (target.value === undefined) {
           throw new Error('Value is required for a valid tx output');
         }
-      } else { // ensureRequiredMinimalValue is not defined or true
+      } else { // ensureRequiredMinimalValue is true
         // <TODO:PLUTUS_SUPPORT>
         const utxoHasDataHash = false;
         const minAmount = RustModule.WalletV4.min_ada_required(

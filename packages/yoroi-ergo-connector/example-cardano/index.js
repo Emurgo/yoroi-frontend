@@ -436,28 +436,49 @@ createTx.addEventListener('click', () => {
     alertError('Should request access first');
     return;
   }
-  
-  const output = CardanoWasm.TransactionOutput.new(
-    CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS),
-    CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000002'))
-  )
-  
+
+  if (!utxos || utxos.length === 0) {
+    alertError('Should request utxos first');
+    return
+  }
+
+  const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
+  if (!randomUtxo) {
+    alertError('Failed to select a random utxo from the available list!');
+    return;
+  }
+
+  console.log('[createTx] Including random utxo input: ', randomUtxo);
+
+  const outputHex = Buffer.from(
+    CardanoWasm.TransactionOutput.new(
+      CardanoWasm.Address.from_bech32(randomUtxo.receiver),
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000000')),
+    ).to_bytes()
+  ).toString('hex');
+
   const txReq = {
-    includeInputs: [
-      'a8ecebf0632518736474012f8d644b6b287859713f60624e961d230422e45c192'
-    ],
-    includeOutputs: [
-      Buffer.from(output.to_bytes()).toString('hex'),
-    ],
+    includeInputs: [randomUtxo.utxo_id],
+    includeOutputs: [outputHex],
     includeTargets: [
       {
         // do not specify value, the connector will use minimum value
-        address: '00756c95f9967c214e571500a0140b88f6dd9c4a7444e74acc1841ce92c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e',
-        assets: {
-          '2c9d0ecfc2ee1288056df15be4196d8ded73db345ea5b4cd5c7fac3f.76737562737465737435': 1,
-        },
+        address: randomUtxo.receiver,
+        value: '2000000',
       }
     ]
+  }
+
+  const utxoWithAssets = utxos.find(u => u.assets.length > 0);
+  if (utxoWithAssets) {
+    const asset = utxoWithAssets.assets[0];
+    console.log('[createTx] Including asset:', asset);
+    txReq.includeTargets.push({
+      address: randomUtxo.receiver,
+      assets: {
+        [asset.assetId]: '1',
+      }
+    })
   }
   
   cardanoApi.experimental.createTx(txReq, true).then(txHex => {
@@ -472,6 +493,7 @@ createTx.addEventListener('click', () => {
 })
 
 function alertError (text) {
+    toggleSpinner('hide');
     alertEl.className = 'alert alert-danger'
     alertEl.innerHTML = text
 }
