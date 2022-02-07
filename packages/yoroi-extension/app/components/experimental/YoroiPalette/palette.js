@@ -207,6 +207,7 @@ const getColorPath = (
     for (const entery of Object.entries(themePalette)) {
       const [key, value] = entery
       if (typeof value === 'object') {
+        //$FlowFixMe
         for (const valueEntery of Object.entries(value)) {
           if (valueEntery[1] === color) {
             path.push(key, valueEntery[0])
@@ -233,8 +234,8 @@ type NameToHex = {|
 |}
 
 type FormatedPalette = {|
-  multiLayerColor: MultiLayerColor,
-  nameToHex: NameToHex,
+  multiLayerColor: MultiLayerColor[],
+  nameToHex: NameToHex[],
 |}
 
 export const formatPalette = (palette: any, theme: any): FormatedPalette => {
