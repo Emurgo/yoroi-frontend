@@ -221,7 +221,7 @@ const getColorPath = (
     return path
 }
 
-type MultiLayerColor = {|
+export type DesignToken = {|
   parent: string,
   child: string,
   hex: string,
@@ -234,14 +234,14 @@ type NameToHex = {|
 |}
 
 type FormatedPalette = {|
-  multiLayerColor: MultiLayerColor[],
+  designTokens: DesignToken[],
   nameToHex: NameToHex[],
 |}
 
 export const formatPalette = (palette: any, theme: any): FormatedPalette => {
   const formatedPalette: FormatedPalette = {
     nameToHex: [],
-    multiLayerColor: []
+    designTokens: []
   }
 
 
@@ -251,7 +251,7 @@ export const formatPalette = (palette: any, theme: any): FormatedPalette => {
       const secondColorName = palette[name].slice(4, -1)
       const secondColorHex = palette[secondColorName]
       const path = getColorPath(theme.palette, secondColorHex)
-      formatedPalette.multiLayerColor.push({
+      formatedPalette.designTokens.push({
         parent: name,
         child: secondColorName,
         hex: secondColorHex,

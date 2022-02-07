@@ -42,7 +42,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
 
       const { currentTheme } = this.state
       const palette = getPalette(themes[currentTheme])
-      const { multiLayerColor, nameToHex } = formatPalette(palette, themes[currentTheme])
+      const { designTokens, nameToHex } = formatPalette(palette, themes[currentTheme])
       return (
         <div className={styles.component}>
           <div className={styles.themes}>
@@ -66,46 +66,9 @@ export default class YoroiPalettePage extends Component<Props, State> {
             <h1>Design tokens</h1>
             <div className={styles.multiLayerRows}>
               {
-                multiLayerColor.map(color => (
+                designTokens.map(color => (
                   <ul className={styles.multiLayerRow}>
-                    <li className={classNames([styles.flexWithMargin, styles.multiLayerColorHex])}>
-                      <div
-                        style={{
-                        backgroundColor: color.hex,
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '3px',
-                        border: '1px solid var(--yoroi-palette-gray-200)',
-                      }}
-                      />
-                      <p>{color.hex}</p>
-                    </li>
-                    <li className={styles.arrowDown}><ArrowDown /></li>
-                    <li className={classNames([styles.flexWithMargin, styles.child])}>
-                      <div
-                        style={{
-                        backgroundColor: color.hex,
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '3px',
-                        border: '1px solid var(--yoroi-palette-gray-200)',
-                      }}
-                      />
-                      <p>{color.child}</p>
-                    </li>
-                    <li className={styles.arrowDown}><ArrowDown /></li>
-                    <li className={classNames([styles.flexWithMargin, styles.parent])}>
-                      <div
-                        style={{
-                        backgroundColor: color.hex,
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '3px',
-                        border: '1px solid var(--yoroi-palette-gray-200)',
-                      }}
-                      />
-                      <p>{color.parent}</p>
-                    </li>
+                    {this.renderRow(color).map(node => node)}
                   </ul>
                 ))
               }
@@ -129,5 +92,51 @@ export default class YoroiPalettePage extends Component<Props, State> {
             ))}
         </div>
       )
+  }
+
+  renderRow(color: DesignToken): Node {
+    const subRows = [
+      {
+        text: color.hex,
+        classnames: [styles.flexWithMargin, styles.multiLayerColorHex],
+      },
+      {
+        text: color.path.join('-'),
+        classnames: [styles.flexWithMargin, styles.designTokens]
+      },
+      {
+        text: color.child,
+        classnames: [styles.flexWithMargin, styles.child],
+      },
+      {
+        text: color.parent,
+        classnames: [styles.flexWithMargin, styles.parent],
+      }
+    ]
+
+    const nodes = []
+
+    for(let i = 0; i < subRows.length; i++) {
+      const subRow = subRows[i]
+      nodes.push(
+        <>
+          <li className={classNames(subRow.classnames)}>
+            <div
+              style={{
+                backgroundColor: color.hex,
+                width: '20px',
+                height: '20px',
+                borderRadius: '3px',
+                border: '1px solid var(--yoroi-palette-gray-200)',
+              }}
+            />
+            <p>{subRow.text}</p>
+          </li>
+          {i < subRows.length -1 && <li className={styles.arrowDown}><ArrowDown /></li>}
+        </>
+      )
+    }
+
+    return nodes
   }
 }
