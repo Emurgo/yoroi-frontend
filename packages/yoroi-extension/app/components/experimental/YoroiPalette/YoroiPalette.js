@@ -6,10 +6,9 @@ import type { Node } from 'react';
 import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
-import { formatPalette, getPalette } from './palette';
 import ArrowDown from '../../../assets/images/down-arrow.inline.svg';
-import type { DesignToken } from './palette'
-import { getMainYoroiPalette } from '../../../styles/globalStyles';
+import { getMainYoroiPalette, formatPalette } from '../../../styles/globalStyles';
+import type { DesignToken } from '../../../styles/globalStyles'
 
 /**
  * @todos
