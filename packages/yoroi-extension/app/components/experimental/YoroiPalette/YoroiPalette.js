@@ -8,6 +8,7 @@ import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
 import { formatPalette, getPalette } from './palette';
 import ArrowDown from '../../../assets/images/down-arrow.inline.svg';
+import type { DesignToken } from './palette'
 
 /**
  * @todos
@@ -94,7 +95,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
       )
   }
 
-  renderRow(color: DesignToken): Node {
+  renderRow(color: DesignToken): Node[] {
     const subRows = [
       {
         text: color.hex,
