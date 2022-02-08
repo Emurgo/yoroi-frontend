@@ -118,6 +118,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     a.removeWallet.listen(this._removeWallet);
     a.removeTabPermission.listen(this._removeTabPermission)
     a.requestTabPermission.listen(this._requestTabPermission)
+    a.hidePermissionsDialog.listen(this._hidePermissionsDialog)
     this._checkConnectorInjectPermission()
     this._shouldShowPermissionsDialog()
   }

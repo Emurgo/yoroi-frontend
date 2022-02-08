@@ -1001,6 +1001,9 @@ export default class StakingDashboardPage extends Component<Props> {
       walletSettings: {|
         requestTabPermission: {|
           trigger: (params: void) => void,
+        |},
+        hidePermissionsDialog: {|
+          trigger: (params: void) => void,
         |}
       |}
     |},
@@ -1067,6 +1070,7 @@ export default class StakingDashboardPage extends Component<Props> {
       |},
       walletSettings: {|
         isDappEnabled: boolean,
+        shouldShowPermissionsDialog: boolean,
       |},
     |},
   |} {
@@ -1163,6 +1167,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         walletSettings: {
           isDappEnabled: stores.walletSettings.isDappEnabled,
+          shouldShowPermissionsDialog: stores.walletSettings.shouldShowPermissionsDialog,
         },
       },
       actions: {
@@ -1209,6 +1214,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         walletSettings: {
           requestTabPermission: { trigger: actions.walletSettings.requestTabPermission.trigger },
+          hidePermissionsDialog: { trigger: actions.walletSettings.hidePermissionsDialog.trigger },
         },
       },
       UnmangleTxDialogContainerProps: ({
