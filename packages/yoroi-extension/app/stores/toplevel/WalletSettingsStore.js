@@ -103,6 +103,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @observable isDappEnabled: boolean = false;
+  @observable shouldShowPermissionsDialog: boolean = false;
 
   setup(): void {
     super.setup();
@@ -118,6 +119,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     a.removeTabPermission.listen(this._removeTabPermission)
     a.requestTabPermission.listen(this._requestTabPermission)
     this._checkConnectorInjectPermission()
+    this._shouldShowPermissionsDialog()
   }
 
   @action _checkConnectorInjectPermission: void => void  = () => {
@@ -131,6 +133,10 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         this.isDappEnabled = Boolean(result)
       })
     });
+  }
+
+  @action _shouldShowPermissionsDialog: void => boolean = () => {
+    console.log(this.api.localStorage)
   }
 
   @action _requestTabPermission: void => void = () => {
