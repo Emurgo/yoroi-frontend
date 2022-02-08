@@ -6,6 +6,7 @@ import { computed } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import PermissionsPage from '../../../components/settings/categories/PermissionsPage';
 
 const currencyLabels = defineMessages({
 });
@@ -22,9 +23,7 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
   render(): Node {
 
     return (
-      <>
-            <h1>I ahm here</h1>
-      </>
+      <PermissionsPage />
     );
   }
 
