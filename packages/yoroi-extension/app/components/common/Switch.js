@@ -1,11 +1,9 @@
 // @flow
 import { Component } from 'react';
+import type { Node } from 'react'
 import { styled } from '@mui/material/styles';
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import SwitchBase from '@mui/material/Switch';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 
 const IOSSwitch = styled((props) => (
   <SwitchBase focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -21,7 +19,7 @@ const IOSSwitch = styled((props) => (
       transform: 'translateX(16px)',
       color: '#fff',
       '& + .MuiSwitch-track': {
-        backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#65C466',
+        backgroundColor: '#17D1AA' ,
         opacity: 1,
         border: 0,
       },
@@ -30,7 +28,7 @@ const IOSSwitch = styled((props) => (
       },
     },
     '&.Mui-focusVisible .MuiSwitch-thumb': {
-      color: '#33cf4d',
+      color: '#17D1AA',
       border: '6px solid #fff',
     },
     '&.Mui-disabled .MuiSwitch-thumb': {
@@ -59,13 +57,18 @@ const IOSSwitch = styled((props) => (
 }));
 
 
-export default class Switch extends Component {
+type Props = {|
+  +checked: boolean,
+  +onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+|}
+export default class Switch extends Component<Props> {
     render(): Node {
-        return (
-          <FormControlLabel
-            control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
-            label=""
-          />
-        )
+      const { onChange, checked } = this.props
+      return (
+        <FormControlLabel
+          control={<IOSSwitch sx={{ m: 1 }} checked={checked} onChange={onChange} />}
+          label=""
+        />
+      )
     }
 }
