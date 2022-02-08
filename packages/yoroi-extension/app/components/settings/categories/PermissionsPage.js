@@ -38,15 +38,24 @@ export default class PermissionsPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <div>
-          <h1>{intl.formatMessage(globalMessages.uriSchemeLabel)}</h1>
-          <p>{intl.formatMessage(messages.cardanoPaymentExplained)}</p>
-          <Switch />
+        <div className={styles.section}>
+          <h1 className={styles.header}>
+            {intl.formatMessage(globalMessages.uriSchemeLabel)}
+          </h1>
+          <p className={styles.text}>
+            {intl.formatMessage(messages.cardanoPaymentExplained)}
+          </p>
+          <div className={styles.switch}>
+            <Switch />
+          </div>
         </div>
-        <div>
-          <h1>{intl.formatMessage(messages.accessToDapps)}</h1>
-          <p>{intl.formatMessage(messages.accessToDappsExplained)}</p>
-          <Switch />
+        <div className={styles.devider} />
+        <div className={styles.section}>
+          <h1 className={styles.header}>{intl.formatMessage(messages.accessToDapps)}</h1>
+          <p className={styles.text}>{intl.formatMessage(messages.accessToDappsExplained)}</p>
+          <div className={styles.switch}>
+            <Switch checked />
+          </div>
         </div>
       </div>
     );
