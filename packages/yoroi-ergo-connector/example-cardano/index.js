@@ -485,7 +485,7 @@ createTx.addEventListener('click', () => {
   }
 
   const tokenAssetName = 'V42';
-  const nftAssetName = `V42/NFT#${Math.floor(Math.random()*1_000_000_000)}`;
+  const nftAssetName = `V42/NFT#${Math.floor(Math.random() * 1000000000)}`;
   const tokenAssetNameHex = convertAssetNameToHEX(tokenAssetName);
   const nftAssetNameHex = convertAssetNameToHEX(nftAssetName);
 

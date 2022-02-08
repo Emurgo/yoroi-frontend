@@ -57,6 +57,10 @@ type TxMint = {|
   amount: string,
 |};
 
+type TxMetadata = {
+  [tag: string]: string,
+};
+
 export function sendAllUnsignedTx(
   receiver: {| ...Address, ...InexactSubset<Addressing> |},
   allUtxos: Array<CardanoAddressedUtxo>,
@@ -385,6 +389,7 @@ export function newAdaUnsignedTx(
 export function newAdaUnsignedTxForConnector(
   outputs: Array<TxOutput>,
   mint: Array<TxMint>,
+  metadata: TxMetadata,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<CardanoAddressedUtxo>,
   coinSelectUtxos: Array<CardanoAddressedUtxo>,
@@ -416,6 +421,7 @@ export function newAdaUnsignedTxForConnector(
   const unsignedTxResponse = newAdaUnsignedTxFromUtxoForConnector(
     outputs,
     mint,
+    metadata,
     changeAdaAddr,
     Array.from(addressingMapForMustIncludeUtxos.keys()),
     Array.from(addressingMapForCoinSelectUtxos.keys()),
@@ -920,6 +926,7 @@ function _newAdaUnsignedTxFromUtxo(
 function newAdaUnsignedTxFromUtxoForConnector(
   outputs: Array<TxOutput>,
   mint: Array<TxMint>,
+  metadata: TxMetadata,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<RemoteUnspentOutput>,
   coinSelectUtxos: Array<RemoteUnspentOutput>,
@@ -1011,6 +1018,14 @@ function newAdaUnsignedTxFromUtxoForConnector(
       );
     }
   }
+  {
+    for (const tag of Object.keys(metadata)) {
+      txBuilder.add_json_metadatum(
+        RustModule.WalletV4.BigNum.from_str(String(tag)),
+        metadata[tag],
+      )
+    }
+  }
 
   // output excluding fee
   const targetOutput = txBuilder
@@ -1035,12 +1050,9 @@ function newAdaUnsignedTxFromUtxoForConnector(
       usedUtxos.push(utxo);
     }
 
-    // recall: we might have some implicit input to start with from deposit refunds
-    const implicitSum = txBuilder.get_implicit_input();
-
     // add utxos until we have enough to send the transaction
     for (const utxo of coinSelectUtxos) {
-      const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+      const currentInputSum = txBuilder.get_total_input();
       const neededInput = targetOutput
         .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
       const excessiveInputAssets = currentInputSum.multiasset()
@@ -1093,7 +1105,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
     }
     // check to see if we have enough balance in the wallet to cover the transaction
     {
-       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+       const currentInputSum = txBuilder.get_total_input();
 
       // need to recalculate each time because fee changes
       const output = targetOutput
