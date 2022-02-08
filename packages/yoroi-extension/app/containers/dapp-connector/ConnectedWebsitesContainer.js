@@ -164,7 +164,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         requestTabPermission: {|
           trigger: (params: void) => void,
         |}
-      |}
+      |},
     |},
     stores: {|
       profile: {|

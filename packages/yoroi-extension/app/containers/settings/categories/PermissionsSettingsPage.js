@@ -76,51 +76,6 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
   };
 
   render(): Node {
-    const walletsStore = this.generated.stores.wallets;
-    if (walletsStore.selected == null) {
-      return (<NoWalletMessage />);
-    }
-    const networkInfo = walletsStore.selected.getParent().getNetworkInfo();
-
-    const { stores } = this.generated;
-
-    const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
-    const isSubmittingUnitOfAccount = stores.profile.setUnitOfAccountRequest.isExecuting
-      || stores.coinPriceStore.refreshCurrentUnit.isExecuting;
-
-    const uriSettings = (
-      isCardanoHaskell(networkInfo) &&
-      this.generated.canRegisterProtocol()
-    )
-      ? (
-        <UriSettingsBlock
-          registerUriScheme={() => registerProtocols()}
-          isFirefox={environment.userAgentInfo.isFirefox()}
-        />
-      )
-      : null;
-
-    const currencies = stores.profile.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
-      const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
-      return {
-        value: c.symbol,
-        label: `${c.symbol} - ${name}`,
-        name,
-        price: stores.coinPriceStore.getCurrentPrice('ADA', c.symbol),
-        svg: c.svg
-      };
-    });
-    currencies.unshift({
-      value: 'ADA',
-      label: 'ADA - Cardano',
-      name: 'Cardano',
-      native: true,
-      svg: AdaCurrency,
-    });
-
-    const unitOfAccountValue = stores.profile.unitOfAccount.enabled
-      ? stores.profile.unitOfAccount.currency
-      : 'ADA';
 
     return (
       <>
@@ -144,7 +99,12 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
             params: UnitOfAccountSettingType
           ) => Promise<void>
         |}
-      |}
+      |},
+      walletSettings: {|
+        requestTabPermission: {|
+          trigger: (params: void) => void,
+        |}
+      |},
     |},
     canRegisterProtocol: () => boolean,
     stores: {|
@@ -177,7 +137,10 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
       |},
       wallets: {|
         selected: null | PublicDeriver<>
-      |}
+      |},
+      walletSettings: {|
+        isDappEnabled: boolean,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -216,6 +179,9 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
         wallets: {
           selected: stores.wallets.selected,
         },
+        walletSettings: {
+            isDappEnabled: stores.walletSettings.isDappEnabled,
+        },
       },
       actions: {
         explorers: {
@@ -223,6 +189,9 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
         },
         profile: {
           updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
+        },
+        walletSettings: {
+            requestTabPermission: { trigger: actions.walletSettings.requestTabPermission.trigger },
         },
       },
       canRegisterProtocol: environment.userAgentInfo.canRegisterProtocol,
