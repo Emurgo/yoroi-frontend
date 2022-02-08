@@ -56,6 +56,7 @@ import NFTDetailPageRevamp from './containers/wallet/NFTDetailPageRevamp';
 import ConnectedWebsitesPage from './containers/dapp-connector/ConnectedWebsitesContainer';
 import YoroiPalettePage from './containers/experimental/YoroiPalette';
 import YoroiThemesPage from './containers/experimental/yoroiThemes';
+import PermissionsSettingsPage from './containers/settings/categories/PermissionsSettingsPage'
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -262,6 +263,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.PERMISSIONS}
+      component={(props) => <PermissionsSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact

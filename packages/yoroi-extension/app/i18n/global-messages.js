@@ -140,6 +140,10 @@ const globalMessages: * = defineMessages({
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
   },
+  permissionsLabel: {
+    id: 'settings.menu.permissions.link.label',
+    defaultMessage: '!!!Permissions',
+  },
   assetDepositLabel: {
     id: 'settings.menu.assetDeposit.link.label',
     defaultMessage: '!!!Locked assets deposit',

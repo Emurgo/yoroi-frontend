@@ -58,6 +58,11 @@ export default class SettingsMenu extends Component<Props> {
         route: ROUTES.SETTINGS.WALLET,
         className: 'wallet',
       },
+      {
+        label: intl.formatMessage(globalMessages.permissionsLabel),
+        route: ROUTES.SETTINGS.PERMISSIONS,
+        className: 'permissions',
+      },
       !environmnent.isProduction() && {
         label: intl.formatMessage(messages.externalStorage),
         route: ROUTES.SETTINGS.EXTERNAL_STORAGE,
