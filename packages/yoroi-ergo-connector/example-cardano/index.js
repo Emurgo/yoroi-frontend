@@ -520,11 +520,20 @@ createTx.addEventListener('click', () => {
         }, {
           script: mintScriptHex,
           assetName: nftAssetNameHex,
-          metadata: JSON.stringify({
-            name: nftAssetName,
-            description: `V42 NFT Collection`,
-            image: 'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
-          })
+          metadata: {
+            tag: 721,
+            json: JSON.stringify({
+              name: nftAssetName,
+              description: `V42 NFT Collection`,
+              mediaType: 'image/png',
+              image: 'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+              files: [{
+                name: nftAssetName,
+                mediaType: 'image/png',
+                src: 'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+              }]
+            }),
+          }
         }]
       }
     ]
