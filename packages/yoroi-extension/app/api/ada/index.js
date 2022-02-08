@@ -367,6 +367,7 @@ export type CardanoTxRequest = {|
     address: string,
     value?: string,
     assets?: {| [assetId: string]: string |},
+    dataHash?: string,
     ensureRequiredMinimalValue?: boolean,
   |}>,
   onlyInputsIntended?: boolean,
@@ -1234,13 +1235,16 @@ export default class AdaApi {
       const output = RustModule.WalletV4.TransactionOutput.from_bytes(
           Buffer.from(outputHex, 'hex')
       )
-      // <TODO:PLUTUS_SUPPORT>
-      outputs.push(
-        {
-          address: Buffer.from(output.address().to_bytes()).toString('hex'),
-          amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
-        }
-      );
+      const newOutput = {
+        address: Buffer.from(output.address().to_bytes()).toString('hex'),
+        amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
+      };
+      if (output.data_hash() != null) {
+        newOutput.dataHash = Buffer.from(
+          output.data_hash().to_bytes()
+        ).toString('hex');
+      }
+      outputs.push(newOutput);
     }
 
     for (const target of (includeTargets ?? [])) {
@@ -1270,7 +1274,7 @@ export default class AdaApi {
         );
       };
       let amount = makeMultiToken(target.value ?? '0');
-
+      const dataHash = target.dataHash;
       const ensureMinValue = target.ensureRequiredMinimalValue;
       if (ensureMinValue == null || ensureMinValue === false) {
         if (target.value === undefined) {
@@ -1278,23 +1282,20 @@ export default class AdaApi {
         }
       } else {
         // ensureRequiredMinimalValue is true
-        // <TODO:PLUTUS_SUPPORT>
-        const utxoHasDataHash = false;
         const minAmount = RustModule.WalletV4.min_ada_required(
           cardanoValueFromMultiToken(amount),
-          utxoHasDataHash,
+          dataHash != null,
           protocolParams.coinsPerUtxoWord,
         );
         if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
           amount = makeMultiToken(minAmount.to_str());
         }
       }
-      outputs.push(
-        {
-          address: target.address,
-          amount,
-        }
-      );
+      outputs.push({
+        address: target.address,
+        amount,
+        dataHash,
+      });
     }
 
     const unsignedTxResponse = shelleyNewAdaUnsignedTxForConnector(

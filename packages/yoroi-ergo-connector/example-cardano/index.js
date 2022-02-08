@@ -476,7 +476,6 @@ createTx.addEventListener('click', () => {
     includeOutputs: [outputHex],
     includeTargets: [
       {
-        // do not specify value, the connector will use minimum value
         address: randomUtxo.receiver,
         value: '2000000',
       }
@@ -490,6 +489,7 @@ createTx.addEventListener('click', () => {
     const asset = utxoWithAssets.assets[0];
     console.log('[createTx] Including asset:', asset);
     txReq.includeTargets.push({
+      // do not specify value, the connector will use minimum value
       address: randomUtxo.receiver,
       assets: {
         [asset.assetId]: '1',

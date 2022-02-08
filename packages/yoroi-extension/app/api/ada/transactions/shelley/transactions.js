@@ -48,6 +48,7 @@ const defaultTtlOffset = 7200;
 type TxOutput = {|
   ...Address,
   amount: MultiToken,
+  dataHash?: string,
 |};
 
 export function sendAllUnsignedTx(
@@ -961,11 +962,17 @@ function newAdaUnsignedTxFromUtxoForConnector(
         throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
       }
       try {
+        const newOutput = RustModule.WalletV4.TransactionOutput.new(
+          wasmReceiver,
+          cardanoValueFromMultiToken(output.amount),
+        );
+        if (output.dataHash != null) {
+          newOutput.set_data_hash(RustModule.WalletV4.DataHash.from_bytes(
+            Buffer.from(output.dataHash, 'hex')
+          ));
+        }
         txBuilder.add_output(
-          RustModule.WalletV4.TransactionOutput.new(
-            wasmReceiver,
-            cardanoValueFromMultiToken(output.amount),
-          )
+          newOutput
         );
       } catch (e) {
         if (String(e).includes('less than the minimum UTXO value')) {
