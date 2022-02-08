@@ -479,7 +479,15 @@ createTx.addEventListener('click', () => {
       CardanoWasm.ScriptAll.new(scripts),
     ).to_bytes()
   ).toString('hex');
-  const assetNameHex = Buffer.from('V42', 'utf-8').toString('hex');
+
+  function convertAssetNameToHEX(name) {
+    return Buffer.from(name, 'utf-8').toString('hex');
+  }
+
+  const tokenAssetName = 'V42';
+  const nftAssetName = `V42/NFT#${Math.floor(Math.random()*1_000_000_000)}`;
+  const tokenAssetNameHex = convertAssetNameToHEX(tokenAssetName);
+  const nftAssetNameHex = convertAssetNameToHEX(nftAssetName);
 
   const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
   if (!randomUtxo) {
@@ -496,7 +504,7 @@ createTx.addEventListener('click', () => {
     ).to_bytes()
   ).toString('hex');
 
-  console.log('[createTx] Including mint request: ', { mintScriptHex, assetNameHex });
+  console.log('[createTx] Including mint request: ', { mintScriptHex, assetNameHex: tokenAssetNameHex });
 
   const txReq = {
     includeInputs: [randomUtxo.utxo_id],
@@ -507,8 +515,16 @@ createTx.addEventListener('click', () => {
         value: '2000000',
         mintRequest: [{
           script: mintScriptHex,
-          assetName: assetNameHex,
+          assetName: tokenAssetNameHex,
           amount: '42',
+        }, {
+          script: mintScriptHex,
+          assetName: nftAssetNameHex,
+          metadata: JSON.stringify({
+            name: nftAssetName,
+            description: `V42 NFT Collection`,
+            image: 'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+          })
         }]
       }
     ]
