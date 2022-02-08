@@ -14,7 +14,7 @@ import {
   TabIdKeys,
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { WhitelistEntry, DAppConnectorConfig } from '../../../chrome/extension/ergo-connector/types';
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -33,6 +33,7 @@ const storageKeys = {
   SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
+  DAPP_CONNECTOR_CONFIG: 'dapp-connector-config',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -206,6 +207,31 @@ export default class LocalStorageApi {
     this.setWhitelist(filteredWhitelist);
     return filteredWhitelist;
   }
+  // ========== Connector permissions  ========== //
+  setConnectorConfig: DAppConnectorConfig => Promise<void> = (
+    config
+  ) => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.DAPP_CONNECTOR_CONFIG, JSON.stringify(config));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+
+  getConnectorConfig: void => Promise<DAppConnectorConfig> = (
+    ) => new Promise((resolve, reject) => {
+      try {
+        const config = localStorage.getItem(storageKeys.DAPP_CONNECTOR_CONFIG)
+        if (config == null) resolve({
+          hasPermission: false,
+        })
+        else resolve(JSON.stringify(config))
+      } catch (error) {
+        return reject(error)
+      }
+    })
 
   setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
     setLocalItem(
