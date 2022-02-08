@@ -61,9 +61,9 @@ function onApiConnectied(api) {
   toggleSpinner('hide');
   let walletDisplay = 'an anonymous Yoroi Wallet';
 
-  api.setReturnType(returnType);
+  api.experimental.setReturnType(returnType);
 
-  const auth = api.auth && api.auth();
+  const auth = api.experimental.auth && api.experimental.auth();
   const authEnabled = auth && auth.isEnabled();
 
   if (authEnabled) {
@@ -82,7 +82,7 @@ function onApiConnectied(api) {
   accessGranted = true;
   window.cardanoApi = cardanoApi = api;
 
-  api.onDisconnect(() => {
+  api.experimental.onDisconnect(() => {
     alertWarrning(`Disconnected from ${walletDisplay}`);
     toggleConnectionUI('button');
     walletPlateSpan.innerHTML = '';
@@ -460,7 +460,7 @@ createTx.addEventListener('click', () => {
     ]
   }
   
-  cardanoApi.createTx(txReq, true).then(txHex => {
+  cardanoApi.experimental.createTx(txReq, true).then(txHex => {
     toggleSpinner('hide')
     alertSuccess('Creating tx succeeds: ' + txHex)
     transactionHex = txHex
