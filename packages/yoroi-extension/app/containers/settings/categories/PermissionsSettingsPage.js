@@ -3,27 +3,23 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import PermissionsPage from '../../../components/settings/categories/PermissionsPage';
 
-const currencyLabels = defineMessages({
-});
 
 type GeneratedData = typeof PermissionsSettingsPage.prototype.generated;
 
 @observer
 export default class PermissionsSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
   render(): Node {
-
+    const { stores, actions } = this.generated
     return (
-      <PermissionsPage />
+      <PermissionsPage
+        isDappEnabled={stores.walletSettings.isDappEnabled}
+        requestTabPermission={actions.walletSettings.requestTabPermission.trigger}
+        removeTabPermission={actions.walletSettings.removeTabPermission.trigger}
+      />
     );
   }
 
@@ -32,6 +28,9 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
       walletSettings: {|
         requestTabPermission: {|
           trigger: (params: void) => void,
+        |},
+        removeTabPermission: {|
+            trigger: (params: void) => void,
         |}
       |},
     |},
@@ -57,6 +56,7 @@ export default class PermissionsSettingsPage extends Component<InjectedOrGenerat
       actions: {
         walletSettings: {
             requestTabPermission: { trigger: actions.walletSettings.requestTabPermission.trigger },
+            removeTabPermission: { trigger: actions.walletSettings.removeTabPermission.trigger },
         },
       },
     });

@@ -23,7 +23,11 @@ const messages = defineMessages({
     },
 });
 
-type Props = {||};
+type Props = {|
+    isDappEnabled: boolean,
+    requestTabPermission: void => void,
+    removeTabPermission: void => void,
+|};
 
 @observer
 export default class PermissionsPage extends Component<Props> {
@@ -32,9 +36,19 @@ export default class PermissionsPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  togglePermission: void => void = () => {
+    const { isDappEnabled, requestTabPermission, removeTabPermission } = this.props
+
+    if (isDappEnabled) {
+        removeTabPermission()
+        return
+    }
+    requestTabPermission()
+  }
+
   render(): Node {
     const { intl } = this.context;
-
+    const { isDappEnabled } = this.props
 
     return (
       <div className={styles.component}>
@@ -54,7 +68,7 @@ export default class PermissionsPage extends Component<Props> {
           <h1 className={styles.header}>{intl.formatMessage(messages.accessToDapps)}</h1>
           <p className={styles.text}>{intl.formatMessage(messages.accessToDappsExplained)}</p>
           <div className={styles.switch}>
-            <Switch checked />
+            <Switch checked={isDappEnabled} onChange={this.togglePermission} />
           </div>
         </div>
       </div>
