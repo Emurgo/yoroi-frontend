@@ -6,7 +6,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Video from '../../../assets/images/dapp-connector/video-permission.inline.svg'
 import DAppConnector from '../../../assets/images/dapp-connector/dapp-connector-permission.inline.svg'
-
+import { Button } from '@mui/material';
 
 const messages = defineMessages({
     header: {
@@ -54,6 +54,7 @@ export default class Permissions extends Component<Props> {
 
     render(): Node {
         const { intl } = this.context
+        const { requestTabPermission } = this.props
 
         return (
           <div className={styles.component}>
@@ -88,7 +89,9 @@ export default class Permissions extends Component<Props> {
               </div>
 
               <div className={styles.enable}>
-                <button onClick={this.props.requestTabPermission} className={styles.enableBtn} type='button'>{intl.formatMessage(messages.enable)}</button>
+                <Button variant='primary' onClick={requestTabPermission}>
+                  {intl.formatMessage(messages.enable)}
+                </Button>
               </div>
             </div>
           </div>
