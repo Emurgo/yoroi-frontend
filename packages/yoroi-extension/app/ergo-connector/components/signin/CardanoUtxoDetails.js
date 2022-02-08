@@ -16,7 +16,11 @@ import type {
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName,
+  getTokenIdentifierIfExists,
+  assetNameFromIdentifier
+} from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
@@ -101,8 +105,10 @@ class CardanoUtxoDetails extends Component<Props> {
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo)
+      : assetNameFromIdentifier(request.entry.identifier);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
@@ -118,7 +124,7 @@ class CardanoUtxoDetails extends Component<Props> {
             </span>
             {' '}{currency}
             <div className={styles.amountSmall}>
-              {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
+              {shiftedAmount.toString()} {ticker}
             </div>
           </>
         );
@@ -126,7 +132,7 @@ class CardanoUtxoDetails extends Component<Props> {
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -138,7 +144,7 @@ class CardanoUtxoDetails extends Component<Props> {
       <>
         <span className={styles.amountRegular}>{adjustedBefore}</span>
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        {' '}{this.getTicker(tokenInfo)}
+        {' '}{ticker}
       </>
     );
   }

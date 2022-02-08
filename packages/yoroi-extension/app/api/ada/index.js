@@ -1263,6 +1263,7 @@ export default class AdaApi {
     }
 
     for (const target of (includeTargets ?? [])) {
+      const targetAssets = { ...(target.assets || {}) };
       const makeMultiToken = (adaValue: string) => {
         const values = [
           {
@@ -1271,15 +1272,14 @@ export default class AdaApi {
             amount: new BigNumber(adaValue),
           },
         ];
-        if (target.assets != null && target.assets.length > 0) {
-          for (const assetId of Object.keys(target.assets)) {
-            if (target.assets[assetId] != null) {
-              values.push({
-                identifier: assetId,
-                networkId: protocolParams.networkId,
-                amount: new BigNumber(target.assets[assetId]),
-              });
-            }
+        for (const assetId of Object.keys(targetAssets)) {
+          const assetValue = targetAssets[assetId];
+          if (assetValue != null) {
+            values.push({
+              identifier: assetId,
+              networkId: protocolParams.networkId,
+              amount: new BigNumber(assetValue),
+            });
           }
         }
         return new MultiToken(
@@ -1292,7 +1292,6 @@ export default class AdaApi {
       };
 
       if (target.mintRequest != null && target.mintRequest.length > 0) {
-        target.assets = target.assets || {};
         for (const mintEntry of target.mintRequest) {
           const { script, assetName, amount, metadata } = mintEntry;
           const policyId = Buffer.from(
@@ -1301,7 +1300,7 @@ export default class AdaApi {
             ).hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
           ).toString('hex');
           const assetId = `${policyId}.${assetName}`;
-          const assetAmountBignum = new BigNumber(target.assets[assetId] ?? '0')
+          const assetAmountBignum = new BigNumber(targetAssets[assetId] ?? '0')
             .plus(new BigNumber(amount ?? '1'));
           if (!assetAmountBignum.isPositive()) {
             throw new Error('Target mint cannot sum to a non-positive amount! Use root mint-request for burning!')
@@ -1314,7 +1313,7 @@ export default class AdaApi {
             amount: assetAmount,
           });
           // Set the new amount to the target assets
-          target.assets[assetId] = assetAmount;
+          targetAssets[assetId] = assetAmount;
         }
       }
 

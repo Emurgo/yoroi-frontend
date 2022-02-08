@@ -479,6 +479,7 @@ createTx.addEventListener('click', () => {
       CardanoWasm.ScriptAll.new(scripts),
     ).to_bytes()
   ).toString('hex');
+  const assetNameHex = Buffer.from('V42', 'utf-8').toString('hex');
 
   const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
   if (!randomUtxo) {
@@ -495,6 +496,8 @@ createTx.addEventListener('click', () => {
     ).to_bytes()
   ).toString('hex');
 
+  console.log('[createTx] Including mint request: ', { mintScriptHex, assetNameHex });
+
   const txReq = {
     includeInputs: [randomUtxo.utxo_id],
     includeOutputs: [outputHex],
@@ -504,7 +507,7 @@ createTx.addEventListener('click', () => {
         value: '2000000',
         mintRequest: [{
           script: mintScriptHex,
-          assetName: Buffer.from('V42', 'utf-8').toString('hex'),
+          assetName: assetNameHex,
           amount: '42',
         }]
       }
