@@ -135,8 +135,9 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
-  @action _shouldShowPermissionsDialog: void => boolean = () => {
-    console.log(this.api.localStorage)
+  @action _shouldShowPermissionsDialog: void => boolean = async () => {
+    const config = await this.api.localStorage.getConnectorConfig()
+    console.log(config)
   }
 
   @action _requestTabPermission: void => void = () => {

@@ -225,7 +225,7 @@ export default class LocalStorageApi {
       try {
         const config = localStorage.getItem(storageKeys.DAPP_CONNECTOR_CONFIG)
         if (config == null) resolve({
-          hasPermission: false,
+          showPermissionsDialog: true,
         })
         else resolve(JSON.stringify(config))
       } catch (error) {

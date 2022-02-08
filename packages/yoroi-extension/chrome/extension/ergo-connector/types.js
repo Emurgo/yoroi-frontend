@@ -12,7 +12,7 @@ import type CardanoTxRequest from '../../../app/api/ada';
 // raw data received from the connector and throw an Error if it does not
 // conform to the flow definitions (+ additional checks in some cases)
 export type DAppConnectorConfig = {|
-  hasPermission: boolean,
+  showPermissionsDialog: boolean,
 |}
 
 export type Address = string;
