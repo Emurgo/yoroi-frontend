@@ -36,6 +36,7 @@ export const ROUTES = {
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
     LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
+    PERMISSIONS: '/settings/permissions',
   },
   TRANSFER: {
     ROOT: '/transfer',
