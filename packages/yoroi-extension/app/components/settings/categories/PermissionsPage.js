@@ -6,6 +6,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import styles from './PermissionsPage.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
+import Switch from '../../common/Switch';
 
 const messages = defineMessages({
     cardanoPaymentExplained: {
@@ -32,7 +33,6 @@ export default class PermissionsPage extends Component<Props> {
   };
 
   render(): Node {
-    const { on } = this.props;
     const { intl } = this.context;
 
 
@@ -41,10 +41,12 @@ export default class PermissionsPage extends Component<Props> {
         <div>
           <h1>{intl.formatMessage(globalMessages.uriSchemeLabel)}</h1>
           <p>{intl.formatMessage(messages.cardanoPaymentExplained)}</p>
+          <Switch />
         </div>
         <div>
           <h1>{intl.formatMessage(messages.accessToDapps)}</h1>
           <p>{intl.formatMessage(messages.accessToDappsExplained)}</p>
+          <Switch />
         </div>
       </div>
     );
