@@ -360,16 +360,28 @@ export type CreateUnsignedTxRequest = {|
   tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
 |};
+export type CardanoTxRequestMint = {|
+  script: string, // the HEX of the policy script,
+  assetName: string, // HEX
+  amount?: string, // default to 1 for NFTs
+  metadata?: {
+    // This metadata will be wrapped into { tag: { [policyId]: { [assetName]: json } } }
+    tag: number | string, // the metadata tag, e.g. 721 for NFTs
+    json: string, // JSON string with the metadata
+  }
+|};
 export type CardanoTxRequest = {|
-  includeInputs?: Array<string>,
-  includeOutputs?: Array<string>,
+  includeInputs?: Array<string>, // Array of UTxO IDs
+  includeOutputs?: Array<string>, // HEX of WASM TransactionOutput values
   includeTargets?: Array<{|
     address: string,
     value?: string,
     assets?: {| [assetId: string]: string |},
     dataHash?: string,
+    mintRequest?: Array<CardanoTxRequestMint>, // this mint is sent directly to the target
     ensureRequiredMinimalValue?: boolean,
   |}>,
+  mintRequest?: Array<CardanoTxRequestMint>, // this ming must be manually set to the outputs
   onlyInputsIntended?: boolean,
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
@@ -1162,6 +1174,7 @@ export default class AdaApi {
       includeInputs,
       includeOutputs,
       includeTargets,
+      mintRequest,
       onlyInputsIntended,
     } = request.cardanoTxRequest;
     const noneOrEmpty = a => {
@@ -1231,6 +1244,8 @@ export default class AdaApi {
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const outputs = [];
+    const mint = [];
+
     for (const outputHex of (includeOutputs ?? [])) {
       const output = RustModule.WalletV4.TransactionOutput.from_bytes(
           Buffer.from(outputHex, 'hex')
@@ -1256,13 +1271,15 @@ export default class AdaApi {
             amount: new BigNumber(adaValue),
           },
         ];
-        if (target.assets) {
+        if (target.assets != null && target.assets.length > 0) {
           for (const assetId of Object.keys(target.assets)) {
-            values.push({
-              identifier: assetId,
-              networkId: protocolParams.networkId,
-              amount: new BigNumber(target.assets[assetId]),
-            });
+            if (target.assets[assetId] != null) {
+              values.push({
+                identifier: assetId,
+                networkId: protocolParams.networkId,
+                amount: new BigNumber(target.assets[assetId]),
+              });
+            }
           }
         }
         return new MultiToken(
@@ -1273,6 +1290,34 @@ export default class AdaApi {
           },
         );
       };
+
+      if (target.mintRequest != null && target.mintRequest.length > 0) {
+        target.assets = target.assets || {};
+        for (const mintEntry of target.mintRequest) {
+          const { script, assetName, amount, metadata } = mintEntry;
+          const policyId = Buffer.from(
+            RustModule.WalletV4.NativeScript.from_bytes(
+              Buffer.from(script, 'hex'),
+            ).hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
+          ).toString('hex');
+          const assetId = `${policyId}.${assetName}`;
+          const assetAmountBignum = new BigNumber(target.assets[assetId] ?? '0')
+            .plus(new BigNumber(amount ?? '1'));
+          if (!assetAmountBignum.isPositive()) {
+            throw new Error('Target mint cannot sum to a non-positive amount! Use root mint-request for burning!')
+          }
+          const assetAmount = assetAmountBignum.toString();
+          // Adding minting request
+          mint.push({
+            policyScript: script,
+            assetName,
+            amount: assetAmount,
+          });
+          // Set the new amount to the target assets
+          target.assets[assetId] = assetAmount;
+        }
+      }
+
       let amount = makeMultiToken(target.value ?? '0');
       const dataHash = target.dataHash;
       const ensureMinValue = target.ensureRequiredMinimalValue;
@@ -1298,8 +1343,19 @@ export default class AdaApi {
       });
     }
 
+    for (const mintEntry of (mintRequest || [])) {
+      const { script, assetName, amount, metadata } = mintEntry;
+      // Adding minting request
+      mint.push({
+        policyScript: script,
+        assetName,
+        amount,
+      });
+    }
+
     const unsignedTxResponse = shelleyNewAdaUnsignedTxForConnector(
       outputs,
+      mint,
       changeAdaAddr,
       mustIncludeUtxos,
       coinSelectUtxos,

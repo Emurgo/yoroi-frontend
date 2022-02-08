@@ -26,6 +26,7 @@ let accessGranted = false
 let cardanoApi
 let returnType = 'cbor'
 let utxos
+let usedAddresses
 let changeAddress
 let unsignedTransactionHex
 let transactionHex
@@ -222,9 +223,9 @@ getUsedAddresses.addEventListener('click', () => {
           alertWarrning('No used addresses')
           return;
         }
-        addresses = addressesFromCborIfNeeded(addresses)
-        alertSuccess(`Address: ${addresses.concat(',')}`)
-        alertEl.innerHTML = '<h2>Used addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+        usedAddresses = addressesFromCborIfNeeded(addresses)
+        alertSuccess(`Address: ${usedAddresses.concat(',')}`)
+        alertEl.innerHTML = '<h2>Used addresses:</h2><pre>' + JSON.stringify(usedAddresses, undefined, 2) + '</pre>'
       });
     }
 })
@@ -456,6 +457,29 @@ createTx.addEventListener('click', () => {
     return
   }
 
+  if (!usedAddresses || utxos.length === 0) {
+    alertError('Should request used addresses first');
+    return
+  }
+
+  const scripts = CardanoWasm.NativeScripts.new();
+  scripts.add(CardanoWasm.NativeScript.new_script_pubkey(
+    CardanoWasm.ScriptPubkey.new(
+      CardanoWasm.BaseAddress.from_address(
+        CardanoWasm.Address.from_bech32(usedAddresses[0]),
+      ).payment_cred().to_keyhash()
+    ),
+  ));
+  scripts.add(CardanoWasm.NativeScript.new_timelock_start(
+    CardanoWasm.TimelockStart.new(42),
+  ));
+
+  const mintScriptHex = Buffer.from(
+    CardanoWasm.NativeScript.new_script_all(
+      CardanoWasm.ScriptAll.new(scripts),
+    ).to_bytes()
+  ).toString('hex');
+
   const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
   if (!randomUtxo) {
     alertError('Failed to select a random utxo from the available list!');
@@ -478,6 +502,11 @@ createTx.addEventListener('click', () => {
       {
         address: randomUtxo.receiver,
         value: '2000000',
+        mintRequest: [{
+          script: mintScriptHex,
+          assetName: Buffer.from('V42', 'utf-8').toString('hex'),
+          amount: '42',
+        }]
       }
     ]
   }

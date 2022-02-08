@@ -51,6 +51,12 @@ type TxOutput = {|
   dataHash?: string,
 |};
 
+type TxMint = {|
+  policyScript: string, // HEX of the WASM policy script,
+  assetName: string, // HEX
+  amount: string,
+|};
+
 export function sendAllUnsignedTx(
   receiver: {| ...Address, ...InexactSubset<Addressing> |},
   allUtxos: Array<CardanoAddressedUtxo>,
@@ -378,6 +384,7 @@ export function newAdaUnsignedTx(
 
 export function newAdaUnsignedTxForConnector(
   outputs: Array<TxOutput>,
+  mint: Array<TxMint>,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<CardanoAddressedUtxo>,
   coinSelectUtxos: Array<CardanoAddressedUtxo>,
@@ -408,6 +415,7 @@ export function newAdaUnsignedTxForConnector(
   }
   const unsignedTxResponse = newAdaUnsignedTxFromUtxoForConnector(
     outputs,
+    mint,
     changeAdaAddr,
     Array.from(addressingMapForMustIncludeUtxos.keys()),
     Array.from(addressingMapForCoinSelectUtxos.keys()),
@@ -911,6 +919,7 @@ function _newAdaUnsignedTxFromUtxo(
 
 function newAdaUnsignedTxFromUtxoForConnector(
   outputs: Array<TxOutput>,
+  mint: Array<TxMint>,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<RemoteUnspentOutput>,
   coinSelectUtxos: Array<RemoteUnspentOutput>,
@@ -980,6 +989,26 @@ function newAdaUnsignedTxFromUtxoForConnector(
         }
         throw e;
       }
+    }
+  }
+  {
+    for (const m of mint) {
+      const mintScript = RustModule.WalletV4.NativeScript.from_bytes(
+        Buffer.from(m.policyScript, 'hex'),
+      );
+      const mintName = RustModule.WalletV4.AssetName.new(
+        Buffer.from(m.assetName, 'hex'),
+      );
+      const amountBignum = new BigNumber(m.amount);
+      const wasmAmountBignum = RustModule.WalletV4.BigNum.from_str(amountBignum.abs().toString());
+      const wasmAmount = amountBignum.isPositive() ?
+        RustModule.WalletV4.Int.new(wasmAmountBignum)
+        : RustModule.WalletV4.Int.new_negative(wasmAmountBignum);
+      txBuilder.add_mint_asset(
+        mintScript,
+        mintName,
+        wasmAmount,
+      );
     }
   }
 
