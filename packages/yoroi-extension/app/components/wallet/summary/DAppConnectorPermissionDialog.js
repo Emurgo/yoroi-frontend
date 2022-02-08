@@ -37,12 +37,16 @@ export default class DAppConnectorPermissionDialog extends Component<Props> {
 
     enable: void => void = () => {
       this.props.requestTabPermission()
+      this.close()
+    }
+
+    close: void => void = () => {
+      this.props.hidePermissionsDialog()
       this.props.onClose()
     }
 
     render() {
         const { intl } = this.context
-        const { onClose } = this.props
 
         return (
           <Dialog
@@ -60,7 +64,7 @@ export default class DAppConnectorPermissionDialog extends Component<Props> {
                 </div>
 
                 <div className={styles.actions}>
-                  <Button onClick={onClose} variant="secondary">{intl.formatMessage(globalMessages.cancel)}</Button>
+                  <Button onClick={this.close} variant="secondary">{intl.formatMessage(globalMessages.cancel)}</Button>
                   <Button onClick={this.enable} variant="primary">{intl.formatMessage(messages.enable)}</Button>
                 </div>
               </div>

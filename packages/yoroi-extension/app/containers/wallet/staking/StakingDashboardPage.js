@@ -96,8 +96,7 @@ export default class StakingDashboardPage extends Component<Props> {
     await timeCalcRequests.requests.currentEpochLength.execute().promise;
     await timeCalcRequests.requests.currentSlotLength.execute().promise;
     await timeCalcRequests.requests.timeSinceGenesis.execute().promise;
-
-    if (!this.generated.stores.walletSettings.isDappEnabled) {
+    if (this.generated.stores.walletSettings.shouldShowPermissionsDialog) {
       this.generated.actions.dialogs.open.trigger({ dialog: DAppConnectorPermissionDialog })
     }
   }
@@ -641,6 +640,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
   getDialog: (PublicDeriver<>) => Node = publicDeriver => {
     const uiDialogs = this.generated.stores.uiDialogs;
+    const walletSettingsActions = this.generated.actions.walletSettings
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
@@ -654,7 +654,8 @@ export default class StakingDashboardPage extends Component<Props> {
       return (
         <DAppConnectorPermissionDialog
           onClose={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
-          requestTabPermission={this.generated.actions.walletSettings.requestTabPermission.trigger}
+          requestTabPermission={walletSettingsActions.requestTabPermission.trigger}
+          hidePermissionsDialog={walletSettingsActions.hidePermissionsDialog.trigger}
         />
       )
     }
