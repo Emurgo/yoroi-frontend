@@ -38,4 +38,22 @@ const registerProtocols = () => {
   }
 };
 
+export function unergisterProtocols() {
+  if (!environment.userAgentInfo.canRegisterProtocol()) {
+    Logger.error(`uri-protocols:registerProtocols cannot use registerProtocolHandler on this page`);
+    return;
+  }
+  try {
+    // Unregistering the protocol before calling register again will make the browser
+    // to always show the allow/block dialog.
+    // $FlowExpectedError[prop-missing] handled by try-catch
+    navigator.unregisterProtocolHandler(
+      cardanoURI.PROTOCOL,
+      cardanoURI.URL,
+    );
+  } catch (err) {
+    Logger.error(`uri-protocols:unregisterProtocols ${stringifyError(err)}`);
+  }
+}
+
 export default registerProtocols;
