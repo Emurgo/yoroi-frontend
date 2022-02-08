@@ -122,6 +122,13 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     this._shouldShowPermissionsDialog()
   }
 
+  @action _shouldShowPermissionsDialog: void => boolean = async () => {
+    const { shouldShowPermissionsDialog } = await this.api.localStorage.getConnectorConfig()
+    runInAction(() => {
+      this.shouldShowPermissionsDialog = shouldShowPermissionsDialog
+    })
+  }
+
   @action _checkConnectorInjectPermission: void => void  = () => {
     chrome.permissions.contains({
       permissions: ['tabs', 'activeTab'],
@@ -133,11 +140,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         this.isDappEnabled = Boolean(result)
       })
     });
-  }
-
-  @action _shouldShowPermissionsDialog: void => boolean = async () => {
-    const config = await this.api.localStorage.getConnectorConfig()
-    console.log(config)
   }
 
   @action _requestTabPermission: void => void = () => {
