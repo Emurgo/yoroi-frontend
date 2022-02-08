@@ -406,25 +406,35 @@ signTx.addEventListener('click', () => {
     ).toString('hex');
   }
 
-  cardanoApi.signTx(unsignedTransactionHex, true).then(witnessSetHex => {
+  // Experimental feature, false by default, in which case only the witness set is returned.
+  const returnTx = true;
+
+  cardanoApi.signTx({
+    tx: unsignedTransactionHex,
+    returnTx,
+  }).then(responseHex => {
     toggleSpinner('hide')
+    console.log(`[signTx] response: ${responseHex}`);
 
-    alertSuccess(`Sign response: ${witnessSetHex}`);
+    if (returnTx) {
+      transactionHex = responseHex;
+    } else {
+      const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
+        Buffer.from(responseHex, 'hex')
+      );
+      const tx = CardanoWasm.Transaction.from_bytes(
+        Buffer.from(unsignedTransactionHex, 'hex')
+      );
+      const transaction = CardanoWasm.Transaction.new(
+        tx.body(),
+        witnessSet,
+        tx.auxiliary_data(),
+      );
+      transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
+    }
 
-    const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
-      Buffer.from(witnessSetHex, 'hex')
-    );
-    const tx = CardanoWasm.Transaction.from_bytes(
-      Buffer.from(unsignedTransactionHex, 'hex')
-    );
-    const transaction = CardanoWasm.Transaction.new(
-      tx.body(),
-      witnessSet,
-      tx.auxiliary_data(),
-    );
-    transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
     unsignedTransactionHex = null;
-    alertSuccess('Signing tx succeeds: ' + transactionHex)
+    alertSuccess('Signing tx succeeded: ' + transactionHex)
 
   }).catch(error => {
     console.error(error)

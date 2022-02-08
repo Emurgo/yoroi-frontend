@@ -605,7 +605,7 @@ export async function connectorSignCardanoTx(
     undefined, // metadata
   );
 
-  return Buffer.from(signedTx.witness_set().to_bytes()).toString('hex');
+  return Buffer.from(signedTx.to_bytes()).toString('hex');
 }
 
 export async function connectorCreateCardanoTx(

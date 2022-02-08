@@ -915,18 +915,24 @@ function handleInjectorConnect(port) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
+                const { tx, partialSign, returnTx } = message.params[0];
                 const resp = await confirmSign(tabId,
                   {
                     type: 'tx/cardano',
-                    tx: {
-                      tx: message.params[0],
-                      partialSign: message.params[1],
-                    },
+                    tx: { tx: { tx, partialSign } },
                     uid: message.uid
                   },
                   connection
                 );
-                rpcResponse(resp);
+                if (returnTx) {
+                  rpcResponse(resp);
+                }
+                const witnessSetResp = Buffer.from(
+                  RustModule.WalletV4.Transaction.from_bytes(
+                    Buffer.from(resp.ok, 'hex'),
+                  ).witness_set().to_bytes()
+                ).toString('hex');
+                rpcResponse({ ok: witnessSetResp });
               }
             } catch (e) {
               handleError(e);
