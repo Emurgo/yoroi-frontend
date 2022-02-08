@@ -122,10 +122,21 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     this._shouldShowPermissionsDialog()
   }
 
-  @action _shouldShowPermissionsDialog: void => boolean = async () => {
+  @action _shouldShowPermissionsDialog: void => Promise<void> = async () => {
     const { shouldShowPermissionsDialog } = await this.api.localStorage.getConnectorConfig()
     runInAction(() => {
       this.shouldShowPermissionsDialog = shouldShowPermissionsDialog
+    })
+  }
+
+  @action _hidePermissionsDialog: void => Promise<void> = async () => {
+    const config = await this.api.localStorage.getConnectorConfig()
+    // Overwrite exsiting status
+    config.shouldShowPermissionsDialog = false
+    await this.api.localStorage.setConnectorConfig(config)
+
+    runInAction(() => {
+      this.shouldShowPermissionsDialog = false
     })
   }
 
