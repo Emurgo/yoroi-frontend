@@ -133,6 +133,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action _shouldShowPermissionsDialog: void => Promise<void> = async () => {
+    // $FlowFixMe
     const { shouldShowPermissionsDialog } = await this.getConnectorConfig.execute()
 
     runInAction(() => {
@@ -141,6 +142,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action _hidePermissionsDialog: void => Promise<void> = async () => {
+     // $FlowFixMe
     const config = await this.getConnectorConfig.execute()
     // Overwrite exsiting status
     config.shouldShowPermissionsDialog = false
