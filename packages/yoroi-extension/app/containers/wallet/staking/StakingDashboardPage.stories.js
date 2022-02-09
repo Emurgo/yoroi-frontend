@@ -352,10 +352,6 @@ const genBaseProps: {|
               },
             ]]),
           },
-          walletSettings: {
-            isDappEnabled: true,
-            shouldShowPermissionsDialog: false,
-          },
           transactionBuilderStore: request.transactionBuilderStore || (null: any),
         },
         actions: {
