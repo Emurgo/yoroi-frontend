@@ -62,7 +62,7 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string): Pro
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
     await customWorld.driver
-      .findElement(By.id('downshift-0-input'))
+      .findElement(By.xpath('//input[starts-with(@id, "downshift-") and contains(@id, "-input")]'))
       .sendKeys(word, Key.RETURN);
   }
 }
@@ -108,7 +108,9 @@ When(/^I click the "Restore Wallet" button$/, async function () {
 });
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
-  await this.waitForElement('.SimpleAutocomplete_errored');
+  await this.driver.sleep(500);
+  const error = this.driver.findElement(By.xpath('//p[contains(@class, "-error") and contains(@id, "recoveryPhrase")]'));
+  expect(await error.isDisplayed()).to.be.true;
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
@@ -166,7 +168,7 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
 });
 
 // eslint-disable-next-line no-unused-vars
-Then(/^I should see an "X words left" error message:$/, async function (data) {
+Then(/^I should see an "X words left" error message:$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
   const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .FormFieldOverridesClassic_error';
   await this.waitUntilText(errorSelector, errorMessage);

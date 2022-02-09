@@ -12,7 +12,7 @@ Feature: Transfer Daedalus Wallet funds
     When I select the 12-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
-    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal |
     Then I should see an "Invalid recovery phrase" error message
   
   @it-84
