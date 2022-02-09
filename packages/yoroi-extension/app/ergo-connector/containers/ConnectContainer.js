@@ -198,7 +198,7 @@ export default class ConnectContainer extends Component<
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
-        protocol: string,
+        protocol: ?string,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,

@@ -225,6 +225,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
       const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
 
+      // <TODO:PLUTUS_SUPPORT>
+      const utxoHasDataHash = false;
+
       const genTokenList = (userInput) => {
         const tokens = [userInput];
         if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
@@ -244,7 +247,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
           );
           const minAmount = RustModule.WalletV4.min_ada_required(
             cardanoValueFromMultiToken(fakeMultitoken),
-            RustModule.WalletV4.BigNum.from_str(squashedConfig.MinimumUtxoVal)
+            utxoHasDataHash,
+            RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
           );
           // if the user is sending a token, we need to make sure the resulting utxo
           // has at least the minimum amount of ADA in it

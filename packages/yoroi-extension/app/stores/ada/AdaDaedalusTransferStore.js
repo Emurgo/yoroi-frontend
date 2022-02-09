@@ -38,7 +38,7 @@ export default class AdaDaedalusTransferStore extends Store<StoresMap, ActionsMa
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: selectedNetwork.NetworkId,
       },
