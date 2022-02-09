@@ -478,17 +478,6 @@ const yoroiMessageHandler = async (
             responseData.resolve({ ok: signedTx });
           }
         break;
-        case 'tx-create-req/cardano':
-          {
-            // <TODO:REMOVE_UNUSED_CASE>
-            const signedTx = await createCardanoTx(
-              (request.tx: any),
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx });
-          }
-        break;
         case 'data':
           // mocked data sign
           responseData.resolve({ err: 'Generic data signing is not implemented yet' });

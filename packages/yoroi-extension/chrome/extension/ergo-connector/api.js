@@ -547,9 +547,14 @@ export async function connectorSignCardanoTx(
   const { tx: txHex, partialSign } = tx;
 
   let txBody;
+  let witnessSet;
+  let auxiliaryData;
   const bytes = Buffer.from(txHex, 'hex');
   try {
-    txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+    const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
+    txBody = fullTx.body();
+    witnessSet = fullTx.witness_set();
+    auxiliaryData = fullTx.auxiliary_data();
   } catch (originalErr) {
     try {
       // Try parsing as body for backward compatibility
@@ -602,7 +607,8 @@ export async function connectorSignCardanoTx(
       Buffer.from(normalizedKey.prvKeyHex, 'hex')
     ),
     new Set(), // stakingKeyWits
-    undefined, // metadata
+    auxiliaryData, // metadata
+    witnessSet,
   );
 
   return Buffer.from(signedTx.to_bytes()).toString('hex');
