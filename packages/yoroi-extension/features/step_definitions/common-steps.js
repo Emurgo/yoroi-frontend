@@ -12,6 +12,7 @@ import { expect } from 'chai';
 import {
   satisfies,
 } from 'semver';
+// eslint-disable-next-line import/named
 import { truncateLongName, } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
@@ -50,6 +51,9 @@ AfterAll(() => {
 });
 
 Before((scenario) => {
+  const pathItems = scenario.sourceLocation.uri.split('/');
+  // eslint-disable-next-line no-console
+  console.log(`\n### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`);
   CardanoServer.setExpectedTx(undefined);
   ErgoServer.setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly

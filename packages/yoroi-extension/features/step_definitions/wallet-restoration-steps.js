@@ -62,7 +62,7 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string): Pro
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
     await customWorld.driver
-      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
+      .findElement(By.id('downshift-0-input'))
       .sendKeys(word, Key.RETURN);
   }
 }
@@ -75,7 +75,7 @@ When(/^I enter the master key:$/, async function (table) {
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
   await this.driver
-      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
+      .findElement(By.id('downshift-0-input'))
       .sendKeys(words.word, Key.RETURN);
   const lastWord = await this.driver.findElements(By.xpath(`//span[contains(text(), '${words.word}')]`));
   expect(lastWord.length).to.be.equal(0);
