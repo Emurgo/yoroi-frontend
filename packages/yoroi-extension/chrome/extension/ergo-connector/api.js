@@ -239,6 +239,52 @@ export async function connectorGetUtxosCardano(
   return Promise.resolve(paginateResults(formattedUtxos, paginate))
 }
 
+const MAX_COLLATERAL = new BigNumber('5000000');
+// only consider UTXO value <= (${requiredAmount} + 1 ADA)
+const MAX_PER_UTXO_SURPLUS = new BigNumber('100000');
+
+export async function connectorGetCollateralUtxos(
+  wallet: PublicDeriver<>,
+  pendingTxs: PendingTransaction[],
+  requiredAmount: Value,
+): Promise<Array<RemoteUnspentOutput>> {
+  const required = new BigNumber(requiredAmount)
+  if (required.gt(MAX_COLLATERAL)) {
+    throw new Error('requested collateral amount is beyond the allowed limits')
+  }
+  const withUtxos = asGetAllUtxos(wallet)
+  if (withUtxos == null) {
+    throw new Error('wallet doesn\'t support IGetAllUtxos')
+  }
+  const utxos = await withUtxos.getAllUtxos()
+  const formattedUtxos = asAddressedUtxoCardano(utxos).map(u => {
+    // eslint-disable-next-line no-unused-vars
+    const { addressing, ...rest } = u
+    return rest
+  })
+  const utxosToConsider = formattedUtxos
+    .filter(
+      utxo => utxo.assets.length === 0 &&
+      new BigNumber(utxo.amount).lt(required.plus(MAX_PER_UTXO_SURPLUS))
+    )
+  utxosToConsider.sort(
+    (utxo1, utxo2) => (new BigNumber(utxo1.amount)).comparedTo(utxo2.amount)
+  )
+  const utxosToUse = []
+  let sum = new BigNumber('0')
+  let enough = false
+  for (const utxo of utxosToConsider) {
+    utxosToUse.push(utxo)
+    sum = sum.plus(utxo.amount)
+    if (sum.gte(required)) {
+      enough = true
+      break
+    }
+  }
+
+  return enough ? utxosToUse : []
+}
+
 export type FullAddressPayloadWithBase58 = {|
   fullAddress: FullAddressPayload,
   base58: Address,

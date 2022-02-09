@@ -48,6 +48,7 @@ import {
   connectorSignTx,
   connectorRecordSubmittedCardanoTransaction,
   connectorRecordSubmittedErgoTransaction,
+  connectorGetCollateralUtxos,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -821,27 +822,6 @@ function handleInjectorConnect(port) {
           ).to_bech32()
         );
       }
-      function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
-        const groupedAssets = jsonAssets.reduce((res, a) => {
-          (res[a.policyId] = (res[a.policyId]||[])).push(a);
-          return res;
-        }, {})
-        const W4 = RustModule.WalletV4;
-        const multiasset = W4.MultiAsset.new();
-        for (const policyHex of Object.keys(groupedAssets)) {
-          const assetGroup = groupedAssets[policyHex];
-          const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
-          const assets = RustModule.WalletV4.Assets.new();
-          for (const asset of assetGroup) {
-            assets.insert(
-              W4.AssetName.new(Buffer.from(asset.name, 'hex')),
-              W4.BigNum.from_str(asset.amount),
-            );
-          }
-          multiasset.insert(policyId, assets);
-        }
-        return multiasset;
-      }
       const connectParameters = () => ({
         protocol: message.protocol,
         ...message.connectParameters,
@@ -1068,6 +1048,7 @@ function handleInjectorConnect(port) {
                         tokenId,
                         paginate
                       );
+                      utxos = await transformCardanoUtxos(utxos, isCBOR);
                     } else {
                       utxos = await connectorGetUtxosErgo(
                         wallet,
@@ -1076,42 +1057,6 @@ function handleInjectorConnect(port) {
                         tokenId,
                         paginate
                         );
-                    }
-                    if (isCardano) {
-                      // $FlowFixMe[prop-missing]
-                      const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
-                      await RustModule.load();
-                      const W4 = RustModule.WalletV4;
-                      if (isCBOR) {
-                        utxos = cardanoUtxos.map(u => {
-                          const input = W4.TransactionInput.new(
-                            W4.TransactionHash.from_bytes(
-                              Buffer.from(u.tx_hash, 'hex')
-                            ),
-                            u.tx_index,
-                          );
-                          const value = W4.Value.new(W4.BigNum.from_str(u.amount));
-                          if ((u.assets || []).length > 0) {
-                            value.set_multiasset(assetToRustMultiasset(u.assets));
-                          }
-                          const output = W4.TransactionOutput.new(
-                            W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
-                            value,
-                          );
-                          return Buffer.from(
-                            W4.TransactionUnspentOutput.new(input, output).to_bytes(),
-                          ).toString('hex');
-                        })
-                      } else {
-                        utxos = cardanoUtxos.map(u => {
-                          return {
-                            ...u,
-                            receiver: W4.Address.from_bytes(
-                              Buffer.from(u.receiver, 'hex'),
-                            ).to_bech32(),
-                          };
-                        });
-                      }
                     }
                     rpcResponse({ ok: utxos });
                   },
@@ -1356,6 +1301,33 @@ function handleInjectorConnect(port) {
               handleError(e);
             }
           break;
+          case 'get_collateral_utxos':
+            try {
+              checkParamCount(1);
+              const requiredAmount = String(message.params[0]);
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    let utxos;
+                    utxos = await connectorGetCollateralUtxos(
+                      wallet,
+                      pendingTxs,
+                      requiredAmount,
+                    );
+                    utxos = await transformCardanoUtxos(utxos, isCBOR);
+                    rpcResponse({
+                      ok: utxos
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           default:
             rpcResponse({
               err: {
@@ -1366,5 +1338,67 @@ function handleInjectorConnect(port) {
             break;
       }
     }
+  });
+}
+
+function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
+  const groupedAssets = jsonAssets.reduce((res, a) => {
+    (res[a.policyId] = (res[a.policyId]||[])).push(a);
+    return res;
+  }, {})
+  const W4 = RustModule.WalletV4;
+  const multiasset = W4.MultiAsset.new();
+  for (const policyHex of Object.keys(groupedAssets)) {
+    const assetGroup = groupedAssets[policyHex];
+    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const assets = RustModule.WalletV4.Assets.new();
+    for (const asset of assetGroup) {
+      assets.insert(
+        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.BigNum.from_str(asset.amount),
+      );
+    }
+    multiasset.insert(policyId, assets);
+  }
+  return multiasset;
+}
+
+async function transformCardanoUtxos(
+  utxos: Array<RemoteUnspentOutput>,
+  isCBOR: boolean,
+) {
+  // $FlowFixMe[prop-missing]
+  const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
+  await RustModule.load();
+  const W4 = RustModule.WalletV4;
+  if (isCBOR) {
+    return cardanoUtxos.map(u => {
+      const input = W4.TransactionInput.new(
+        W4.TransactionHash.from_bytes(
+          Buffer.from(u.tx_hash, 'hex')
+        ),
+        u.tx_index,
+      );
+      const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+      if ((u.assets || []).length > 0) {
+        value.set_multiasset(assetToRustMultiasset(u.assets));
+      }
+      const output = W4.TransactionOutput.new(
+        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+        value,
+      );
+      return Buffer.from(
+        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
+      ).toString('hex');
+    })
+  }
+
+  return cardanoUtxos.map(u => {
+    return {
+        ...u,
+      receiver: W4.Address.from_bytes(
+        Buffer.from(u.receiver, 'hex'),
+      ).to_bech32(),
+    };
   });
 }
