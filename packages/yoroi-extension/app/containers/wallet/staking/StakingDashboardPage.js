@@ -1004,7 +1004,7 @@ export default class StakingDashboardPage extends Component<Props> {
           trigger: (params: void) => void,
         |},
         hidePermissionsDialog: {|
-          trigger: (params: void) => void,
+          trigger: (params: void) => Promise<void>,
         |}
       |}
     |},

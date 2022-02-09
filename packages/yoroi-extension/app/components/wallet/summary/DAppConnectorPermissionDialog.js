@@ -28,7 +28,7 @@ const messages = defineMessages({
 type Props = {|
   requestTabPermission: void => void,
   onClose: void => void,
-  hidePermissionsDialog: void => void,
+  hidePermissionsDialog: void => Promise<void>,
 |}
 
 export default class DAppConnectorPermissionDialog extends Component<Props> {
@@ -41,8 +41,8 @@ export default class DAppConnectorPermissionDialog extends Component<Props> {
       this.close()
     }
 
-    close: void => void = () => {
-      this.props.hidePermissionsDialog()
+    close: void => Promise<void> = async () => {
+      await this.props.hidePermissionsDialog()
       this.props.onClose()
     }
 

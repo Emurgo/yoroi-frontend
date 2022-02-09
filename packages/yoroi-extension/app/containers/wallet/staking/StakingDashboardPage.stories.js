@@ -128,6 +128,10 @@ const genBaseProps: {|
   );
   return {
     stores: {
+      walletSettings: {
+        isDappEnabled: true,
+        shouldShowPermissionsDialog: false,
+      },
       explorers: {
         selectedExplorer: defaultToSelectedExplorer(),
       },
@@ -238,6 +242,14 @@ const genBaseProps: {|
           },
         },
       },
+      walletSettings: {
+        requestTabPermission: {
+          trigger: action('requestTabPermission')
+        },
+        hidePermissionsDialog: {
+          trigger: async (req) => action('hidePermissionsDialog')(req),
+        }
+      }
     },
     WithdrawalTxDialogContainerProps: request.withdrawalTxProps ?? (null: any),
     DeregisterDialogContainerProps: {
@@ -339,6 +351,10 @@ const genBaseProps: {|
                 wasExecuted: true,
               },
             ]]),
+          },
+          walletSettings: {
+            isDappEnabled: true,
+            shouldShowPermissionsDialog: false,
           },
           transactionBuilderStore: request.transactionBuilderStore || (null: any),
         },
