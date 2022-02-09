@@ -28,6 +28,7 @@ const messages = defineMessages({
 type Props = {|
   requestTabPermission: void => void,
   onClose: void => void,
+  hidePermissionsDialog: void => void,
 |}
 
 export default class DAppConnectorPermissionDialog extends Component<Props> {

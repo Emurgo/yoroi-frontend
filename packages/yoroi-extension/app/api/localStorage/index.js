@@ -227,7 +227,7 @@ export default class LocalStorageApi {
         if (config == null) resolve({
           shouldShowPermissionsDialog: true,
         })
-        else resolve(JSON.stringify(config))
+        else resolve(JSON.parse(config))
       } catch (error) {
         return reject(error)
       }

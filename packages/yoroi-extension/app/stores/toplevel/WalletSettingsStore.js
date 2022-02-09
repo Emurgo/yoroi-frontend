@@ -30,6 +30,7 @@ import {
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { removeWalletFromLS } from '../../utils/localStorage';
+import type { DAppConnectorConfig } from '../../../chrome/extension/ergo-connector/types';
 
 export type PublicDeriverSettingsCache = {|
   publicDeriver: PublicDeriver<>,
@@ -102,6 +103,14 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
   }
 
+  @observable getConnectorConfig:  Request<(void) => Promise<DAppConnectorConfig>> = new Request<
+  (void) => Promise<DAppConnectorConfig>
+  >(this.api.localStorage.getConnectorConfig);
+
+  @observable setConnectorConfig: Request<(DAppConnectorConfig) => Promise<void>> = new Request<
+    (DAppConnectorConfig) => Promise<void>
+  >(this.api.localStorage.setConnectorConfig);
+
   @observable isDappEnabled: boolean = false;
   @observable shouldShowPermissionsDialog: boolean = false;
 
@@ -124,17 +133,18 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action _shouldShowPermissionsDialog: void => Promise<void> = async () => {
-    const { shouldShowPermissionsDialog } = await this.api.localStorage.getConnectorConfig()
+    const { shouldShowPermissionsDialog } = await this.getConnectorConfig.execute()
+
     runInAction(() => {
       this.shouldShowPermissionsDialog = shouldShowPermissionsDialog
     })
   }
 
   @action _hidePermissionsDialog: void => Promise<void> = async () => {
-    const config = await this.api.localStorage.getConnectorConfig()
+    const config = await this.getConnectorConfig.execute()
     // Overwrite exsiting status
     config.shouldShowPermissionsDialog = false
-    await this.api.localStorage.setConnectorConfig(config)
+    await this.setConnectorConfig.execute(config)
 
     runInAction(() => {
       this.shouldShowPermissionsDialog = false

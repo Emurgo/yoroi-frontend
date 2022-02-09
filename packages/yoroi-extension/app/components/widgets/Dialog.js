@@ -28,7 +28,7 @@ type Props = {|
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
-  +position?: [string, string],
+  +position?: string[],
 |};
 
 export default function DialogFn(props: Props): Node {
