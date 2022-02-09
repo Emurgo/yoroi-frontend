@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react'
 import { styled } from '@mui/material/styles';
 import FormControlLabel from '@mui/material/FormControlLabel';

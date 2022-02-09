@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './PermissionsPage.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
+// import globalMessages from '../../../i18n/global-messages';
 import Switch from '../../common/Switch';
 
 const messages = defineMessages({
