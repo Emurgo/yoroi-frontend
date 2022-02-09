@@ -1,6 +1,6 @@
 // @flow
-
 import { Component } from 'react';
+import type { Node } from 'react'
 import Dialog from '../../widgets/Dialog';
 import styles from './DAppConnectorPermissionDialog.scss';
 import { defineMessages, intlShape } from 'react-intl';
@@ -46,7 +46,7 @@ export default class DAppConnectorPermissionDialog extends Component<Props> {
       this.props.onClose()
     }
 
-    render() {
+    render(): Node {
         const { intl } = this.context
 
         return (

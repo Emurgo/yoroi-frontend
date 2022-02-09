@@ -28,7 +28,7 @@ type Props = {|
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
-  +position?: string[],
+  +position?: Array<string>,
 |};
 
 export default function DialogFn(props: Props): Node {
@@ -62,8 +62,8 @@ export default function DialogFn(props: Props): Node {
       sx={{
         background: 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
-        justifyContent: position[0],
-        alignItems: position[1],
+        justifyContent: position ? position[0] : 'center',
+        alignItems: position ? position[1] : 'center',
         '& .MuiBackdrop-root': {
           background: 'none',
         },

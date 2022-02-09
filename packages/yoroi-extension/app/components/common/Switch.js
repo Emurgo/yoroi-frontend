@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import React, { Component } from 'react';
 import type { Node } from 'react'
 import { styled } from '@mui/material/styles';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -59,7 +59,7 @@ const IOSSwitch = styled((props) => (
 
 type Props = {|
   +checked: boolean,
-  +onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  +onChange: () => void
 |}
 export default class Switch extends Component<Props> {
     render(): Node {

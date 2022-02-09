@@ -52,7 +52,7 @@ export default class PermissionsPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <div className={styles.section}>
+        {/* <div className={styles.section}>
           <h1 className={styles.header}>
             {intl.formatMessage(globalMessages.uriSchemeLabel)}
           </h1>
@@ -63,7 +63,7 @@ export default class PermissionsPage extends Component<Props> {
             <Switch />
           </div>
         </div>
-        <div className={styles.devider} />
+        <div className={styles.devider} /> */}
         <div className={styles.section}>
           <h1 className={styles.header}>{intl.formatMessage(messages.accessToDapps)}</h1>
           <p className={styles.text}>{intl.formatMessage(messages.accessToDappsExplained)}</p>
