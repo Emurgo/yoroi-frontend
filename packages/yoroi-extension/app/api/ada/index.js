@@ -1126,6 +1126,8 @@ export default class AdaApi {
       includeTargets,
       mintRequest,
       onlyInputsIntended,
+      validityIntervalStart,
+      ttl,
     } = request.cardanoTxRequest;
     const noneOrEmpty = a => {
       if (a != null && !Array.isArray(a)) {
@@ -1340,6 +1342,8 @@ export default class AdaApi {
       mustIncludeUtxos,
       coinSelectUtxos,
       request.absSlotNumber,
+      validityIntervalStart,
+      ttl,
       protocolParams,
     );
 

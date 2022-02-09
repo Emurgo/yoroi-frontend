@@ -394,6 +394,8 @@ export function newAdaUnsignedTxForConnector(
   mustIncludeUtxos: Array<CardanoAddressedUtxo>,
   coinSelectUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
+  validityStart: ?number,
+  ttl: ?number,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -426,6 +428,8 @@ export function newAdaUnsignedTxForConnector(
     Array.from(addressingMapForMustIncludeUtxos.keys()),
     Array.from(addressingMapForCoinSelectUtxos.keys()),
     absSlotNumber,
+    validityStart,
+    ttl,
     protocolParams,
   );
 
@@ -931,6 +935,8 @@ function newAdaUnsignedTxFromUtxoForConnector(
   mustIncludeUtxos: Array<RemoteUnspentOutput>,
   coinSelectUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
+  validityStart: ?number,
+  ttl: ?number,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -970,7 +976,14 @@ function newAdaUnsignedTxFromUtxoForConnector(
   shouldForceChange(undefined);
 
   const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
-  txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+  if (validityStart != null) {
+    txBuilder.set_validity_start_interval(validityStart)
+  }
+  if (ttl != null) {
+    txBuilder.set_ttl(ttl);
+  } else {
+    txBuilder.set_ttl((absSlotNumber.plus(defaultTtlOffset).toNumber()));
+  }
   {
     for (const output of outputs) {
       const wasmReceiver = normalizeToAddress(output.address);

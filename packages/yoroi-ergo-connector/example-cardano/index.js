@@ -2,6 +2,8 @@ import * as CardanoWasm from "@emurgo/cardano-serialization-lib-browser"
 import { textPartFromWalletChecksumImagePart } from "@emurgo/cip4-js"
 import { createIcon } from "@download/blockies"
 import { getTtl } from './utils'
+import { Bech32Prefix } from '../../yoroi-extension/app/config/stringConfig';
+import { bytesToHex, hexToBytes } from '../../yoroi-extension/app/coreUtils';
 
 const cardanoAccessBtnRow = document.querySelector('#request-button-row')
 const cardanoAuthCheck = document.querySelector('#check-identification')
@@ -418,20 +420,35 @@ signTx.addEventListener('click', () => {
     console.log(`[signTx] response: ${responseHex}`);
 
     if (returnTx) {
+
+      const signedTx = CardanoWasm.Transaction.from_bytes(hexToBytes(responseHex));
+      const wit = signedTx.witness_set();
+
+      const wkeys = wit.vkeys();
+      for (let i = 0; i < wkeys.len(); i++) {
+        const wk = wkeys.get(i);
+        const vk = wk.vkey();
+        console.log(`[signTx] wit vkey ${i}:`, {
+          vkBytes: bytesToHex(vk.to_bytes()),
+          vkPubBech: vk.public_key().to_bech32(),
+          vkPubHashBech: vk.public_key().hash().to_bech32(Bech32Prefix.PAYMENT_KEY_HASH),
+        })
+      }
+
       transactionHex = responseHex;
     } else {
       const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
-        Buffer.from(responseHex, 'hex')
+        hexToBytes(responseHex)
       );
       const tx = CardanoWasm.Transaction.from_bytes(
-        Buffer.from(unsignedTransactionHex, 'hex')
+        hexToBytes(unsignedTransactionHex)
       );
       const transaction = CardanoWasm.Transaction.new(
         tx.body(),
         witnessSet,
         tx.auxiliary_data(),
       );
-      transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
+      transactionHex = bytesToHex(transaction.to_bytes())
     }
 
     unsignedTransactionHex = null;
@@ -457,28 +474,38 @@ createTx.addEventListener('click', () => {
     return
   }
 
-  if (!usedAddresses || utxos.length === 0) {
+  if (!usedAddresses || usedAddresses.length === 0) {
     alertError('Should request used addresses first');
     return
   }
 
+  const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
+  if (!randomUtxo) {
+    alertError('Failed to select a random utxo from the available list!');
+    return;
+  }
+
+  console.log('[createTx] Including random utxo input: ', randomUtxo);
+
+  const usedAddress = randomUtxo.receiver; // usedAddresses[0];
+  const keyHash = CardanoWasm.BaseAddress.from_address(
+    CardanoWasm.Address.from_bech32(usedAddress),
+  ).payment_cred().to_keyhash();
+
+  const keyHashBech = keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH);
+
   const scripts = CardanoWasm.NativeScripts.new();
   scripts.add(CardanoWasm.NativeScript.new_script_pubkey(
-    CardanoWasm.ScriptPubkey.new(
-      CardanoWasm.BaseAddress.from_address(
-        CardanoWasm.Address.from_bech32(usedAddresses[0]),
-      ).payment_cred().to_keyhash()
-    ),
+    CardanoWasm.ScriptPubkey.new(keyHash),
   ));
   scripts.add(CardanoWasm.NativeScript.new_timelock_start(
     CardanoWasm.TimelockStart.new(42),
   ));
 
-  const mintScriptHex = Buffer.from(
-    CardanoWasm.NativeScript.new_script_all(
-      CardanoWasm.ScriptAll.new(scripts),
-    ).to_bytes()
-  ).toString('hex');
+  const mintScript = CardanoWasm.NativeScript.new_script_all(
+    CardanoWasm.ScriptAll.new(scripts),
+  );
+  const mintScriptHex = Buffer.from(mintScript.to_bytes()).toString('hex');
 
   function convertAssetNameToHEX(name) {
     return Buffer.from(name, 'utf-8').toString('hex');
@@ -489,13 +516,9 @@ createTx.addEventListener('click', () => {
   const tokenAssetNameHex = convertAssetNameToHEX(tokenAssetName);
   const nftAssetNameHex = convertAssetNameToHEX(nftAssetName);
 
-  const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
-  if (!randomUtxo) {
-    alertError('Failed to select a random utxo from the available list!');
-    return;
-  }
+  const expectedPolicyId = Buffer.from(mintScript.hash().to_bytes()).toString('hex');
 
-  console.log('[createTx] Including random utxo input: ', randomUtxo);
+  console.log('[createTx] Including mint request: ', { keyHashBech, mintScriptHex, assetNameHex: tokenAssetNameHex, expectedPolicyId });
 
   const outputHex = Buffer.from(
     CardanoWasm.TransactionOutput.new(
@@ -504,9 +527,8 @@ createTx.addEventListener('click', () => {
     ).to_bytes()
   ).toString('hex');
 
-  console.log('[createTx] Including mint request: ', { mintScriptHex, assetNameHex: tokenAssetNameHex });
-
   const txReq = {
+    validityIntervalStart: 42,
     includeInputs: [randomUtxo.utxo_id],
     includeOutputs: [outputHex],
     includeTargets: [
