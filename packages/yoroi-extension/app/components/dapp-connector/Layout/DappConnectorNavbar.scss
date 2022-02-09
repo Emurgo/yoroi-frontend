@@ -2,7 +2,7 @@
     background-color: #FFFFFF;
     box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 
     .header {
@@ -13,38 +13,5 @@
         letter-spacing: 0;
         line-height: 28px;
         padding: 32px 40px;
-    }
-
-    .permissionsContainer {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        padding-right: 40px;
-
-        .hasPermission {
-            padding: 8px 16px;
-            font-size: 12px;
-            background-color: var(--yoroi-palette-gray-400);
-            color: var(--yoroi-palette-gray-800);
-            border-radius: 8px;
-            margin-right: 10px;
-        }
-
-        .permission {
-            margin-right: 10px;
-            padding: 8px 16px;
-            font-size: 12px;
-            border-radius: 8px;
-        }
-
-        .getPermission {
-            background-color: var(--yoroi-palette-secondary-300);
-            color: #fff;
-        }
-
-        .removePermission {
-            background-color: var(--yoroi-palette-error-200);
-            color: #fff;
-        }
     }
 }
