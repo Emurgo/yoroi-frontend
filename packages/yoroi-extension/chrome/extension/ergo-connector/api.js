@@ -540,10 +540,10 @@ export async function connectorSignTx(
 }
 
 function getScriptRequiredSigningKeys(
-  witnessSet: RustModule.WalletV4.TransactionWitnessSet,
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
 ): Set<string> {
   const set = new Set<string>();
-  const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet.native_scripts();
+  const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
   if (nativeScripts != null && nativeScripts.len() > 0) {
     for (let i = 0; i < nativeScripts.len(); i++) {
       const ns = nativeScripts.get(i);
@@ -567,7 +567,7 @@ export async function connectorSignCardanoTx(
 
   let txBody: RustModule.WalletV4.TransactionBody;
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
-  let auxiliaryData: RustModule.WalletV4.AuxiliaryData;
+  let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
   const bytes = Buffer.from(txHex, 'hex');
   try {
     const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
@@ -621,7 +621,10 @@ export async function connectorSignCardanoTx(
       .from_bytes(hexToBytes(allBaseAddresses[0].address));
     const parsedNetworkId = parsedBaseAddr.network_id();
     const parsedStakingCred = RustModule.WalletV4.BaseAddress
-      .from_address(parsedBaseAddr).stake_cred();
+      .from_address(parsedBaseAddr)?.stake_cred();
+    if (parsedStakingCred == null) {
+      throw new Error('Cannot sign transaction script - failed to parse the base address staking cred!');
+    }
     for (const scriptKeyHash of requiredScriptSignKeys) {
       const requiredKeyHash = RustModule.WalletV4.Ed25519KeyHash
         .from_bytes(hexToBytes(scriptKeyHash));
@@ -689,7 +692,7 @@ export async function connectorSignCardanoTx(
 
 export async function connectorCreateCardanoTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
-  password: string,
+  password: ?string,
   cardanoTxRequest: CardanoTxRequest,
 ): Promise<string> {
   const withUtxos = asGetAllUtxos(publicDeriver);

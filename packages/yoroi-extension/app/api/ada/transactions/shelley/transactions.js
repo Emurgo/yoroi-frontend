@@ -1221,7 +1221,7 @@ export function signTransaction(
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
-  metadata: void | RustModule.WalletV4.AuxiliaryData,
+  metadata: ?RustModule.WalletV4.AuxiliaryData,
   witnessSet: RustModule.WalletV4.TransactionWitnessSet = null,
   otherRequiredSigners: Array<{| ...Address, ...Addressing |}> = [],
 ): RustModule.WalletV4.Transaction {
