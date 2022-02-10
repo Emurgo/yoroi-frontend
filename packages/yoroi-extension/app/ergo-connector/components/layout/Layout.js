@@ -10,6 +10,7 @@ import { ROUTES } from '../../routes-config';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
+import DappConnectorIcon from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
 
 type Props = {|
   children: Node,
@@ -42,6 +43,7 @@ export default class Layout extends Component<Props> {
             <div className={styles.logo}>
               <h3>{intl.formatMessage(messages.yoroiDappConnector)}</h3>
             </div>
+            <DappConnectorIcon style={{ marginLeft: 10 }} />
           </div>
         </div>
         <div className={styles.content}>{this.props.children}</div>

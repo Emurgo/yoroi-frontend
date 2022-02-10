@@ -6,7 +6,7 @@ import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
-import { Button } from '@mui/material';
+import { Button, Stack, styled, Typography } from '@mui/material';
 import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -20,14 +20,27 @@ import ProgressBar from '../ProgressBar';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { environment } from '../../../environment';
-import CheckboxLabel from '../../../components/common/CheckboxLabel';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { Box } from '@mui/system';
+import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
+import TextField from '../../../components/common/TextField';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import config from '../../../config';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 
 const messages = defineMessages({
   subtitle: {
     id: 'ergo-connector.label.connect',
     defaultMessage: '!!!Connect to',
+  },
+  connectWallet: {
+    id: 'ergo-connector.label.connectWallet',
+    defaultMessage: '!!!Connect Wallet',
+  },
+  yourWallets: {
+    id: 'ergo-connector.label.yourWallets',
+    defaultMessage: '!!!Your Wallets',
   },
   selectAllWallets: {
     id: 'ergo-connector.label.selectAllWallets',
@@ -39,7 +52,7 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
-    defaultMessage: '!!!No {network} wallets found.',
+    defaultMessage: '!!!Ooops, no {network} wallets found',
   },
 });
 
@@ -47,12 +60,21 @@ type Props = {|
   +publicDerivers: Array<PublicDeriverCache>,
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
+  +isAppAuth: boolean,
+  +onConnect: (
+    deriver: PublicDeriver<>,
+    checksum: ?WalletChecksum,
+    password: ?string
+  ) => Promise<void>,
+  +onCancel: void => void,
+  +selectedWallet: {|
+    index: number,
+    deriver: ?PublicDeriver<>,
+    checksum: ?WalletChecksum,
+  |},
   +message: ?ConnectingMessage,
-  +onToggleCheckbox: (PublicDeriver<>, ?WalletChecksum) => void,
-  +onCancel: () => void,
-  +handleSubmit: () => void,
-  +selected: number,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +onSelectWallet: (PublicDeriver<>, ?WalletChecksum) => void,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
 |};
@@ -63,6 +85,55 @@ class ConnectPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        walletPassword: {
+          type: 'password',
+          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
+          placeholder: this.context.intl.formatMessage(
+            globalMessages.walletPasswordFieldPlaceholder
+          ),
+          value: '',
+          validators: [
+            ({ field }) => {
+              if (field.value === '') {
+                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+              }
+              return [true];
+            },
+          ],
+        },
+      },
+    },
+    {
+      options: {
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      },
+      plugins: {
+        vjf: vjf(),
+      },
+    }
+  );
+
+  submit: void => void = () => {
+    this.form.submit({
+      onSuccess: form => {
+        const { walletPassword } = form.values();
+        const { deriver, checksum } = this.props.selectedWallet;
+        if (deriver && checksum) {
+          this.props.onConnect(deriver, checksum, walletPassword);
+        }
+      },
+      onError: () => {},
+    });
+  };
+
+  onCancel: void => void = () => {
+    this.props.onCancel();
+  };
+
   render(): Node {
     const { intl } = this.context;
     const {
@@ -70,101 +141,152 @@ class ConnectPage extends Component<Props> {
       error,
       publicDerivers,
       message,
-      onCancel,
-      onToggleCheckbox,
-      handleSubmit,
-      selected,
+      onSelectWallet,
       network,
       shouldHideBalance,
+      isAppAuth,
     } = this.props;
 
-    const isNightly = environment.isNightly()
-    const componentClasses = classNames([
-      styles.component,
-      isNightly && styles.isNightly
-    ]);
+    const isNightly = environment.isNightly();
+    const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
 
-    const isLoading = (
-      loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING
-    );
+    const isLoading =
+      loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING;
     const isSuccess = loading === LoadingWalletStates.SUCCESS;
     const isError = loading === LoadingWalletStates.REJECTED;
-
-    const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
 
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
 
+    const walletPasswordField = this.form.$('walletPassword');
+
+    const hasWallets = isSuccess && Boolean(publicDerivers.length);
+    const hasNoWallets = isSuccess && !publicDerivers.length;
+
+    const passwordForm = (
+      <>
+        <div>
+          <TextField
+            type="password"
+            {...walletPasswordField.bind()}
+            error={walletPasswordField.error}
+          />
+        </div>
+        <Stack direction="row" spacing={2} mt={16}>
+          <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
+            {intl.formatMessage(globalMessages.cancel)}
+          </Button>
+          <Button
+            variant="primary"
+            sx={{ minWidth: 'auto' }}
+            fullWidth
+            disabled={!walletPasswordField.isValid}
+            onClick={this.submit}
+          >
+            {intl.formatMessage(globalMessages.confirm)}
+          </Button>
+        </Stack>
+      </>
+    );
+
     return (
       <div className={componentClasses}>
-        <ProgressBar step={1} />
-        <div className={styles.connectWrapper}>
-          {faviconUrl != null && faviconUrl !== '' ? (
-            <div className={styles.image}>
-              <img src={faviconUrl} alt={`${url} favicon`} />
-            </div>
-          ) : null}
-          <div className={styles.title}>
-            <h2>{intl.formatMessage(messages.subtitle)}</h2>
-            <p>{url}</p>
-          </div>
-        </div>
-        <ul className={styles.list}>
-          {isError ? <div className={styles.errorMessage}>{error}</div> : null}
-          {isLoading ? (
-            <div className={styles.loading}>
-              <LoadingSpinner />
-            </div>
-          ) : isSuccess && publicDerivers.length ? (
-            publicDerivers.map(item => (
-              <li key={item.name} className={styles.listItem}>
-                <CheckboxLabel
-                  label={
-                    <WalletCard
-                      shouldHideBalance={shouldHideBalance}
-                      publicDeriver={item}
-                      getTokenInfo={this.props.getTokenInfo}
-                    />
-                  }
-                  onChange={() => onToggleCheckbox(
-                    item.publicDeriver,
-                    item.checksum,
-                  )}
-                  checked={selected === item.publicDeriver.getPublicDeriverId()}
-                />
-              </li>
-            ))
-          ) : isSuccess && !publicDerivers.length ? (
-            <p>
-              <FormattedHTMLMessage
-                {...messages.noWalletsFound}
-                values={{ network }}
-              />
-            </p>
-          ) : null}
-        </ul>
-        <div className={styles.bottom}>
-          <div className={styles.infoText}>
-            <p>{intl.formatMessage(messages.connectInfo)}</p>
-            <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
-          </div>
-          <div className={styles.wrapperBtn}>
-            <Button variant="secondary" onClick={onCancel} sx={{ minWidth: 'unset', flex: 1 }}>
-              {intl.formatMessage(globalMessages.cancel)}
-            </Button>
-            <Button
-              variant="primary"
-              disabled={isCheckedWallet}
-              onClick={handleSubmit}
-              sx={{ minWidth: 'unset', flex: 1 }}
+        {hasWallets ? (
+          <>
+            <ProgressBar step={1} />
+            <Typography
+              variant="h3"
+              color="var(--yoroi-palette-gray-900)"
+              marginTop="20px"
+              paddingLeft="32px"
+              fontWeight="400"
             >
-              {intl.formatMessage(globalMessages.connectLabel)}
-            </Button>
+              {intl.formatMessage(messages.connectWallet)}
+            </Typography>
+            <div className={styles.connectWrapper}>
+              {faviconUrl != null && faviconUrl !== '' ? (
+                <div className={styles.image}>
+                  <img src={faviconUrl} alt={`${url} favicon`} />
+                </div>
+              ) : null}
+              <Box marginTop="16px">
+                <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-900)">
+                  {intl.formatMessage(messages.subtitle)}{' '}
+                  <Typography as="span" variant="h5" fontWeight="500">
+                    {url}
+                  </Typography>
+                </Typography>
+              </Box>
+            </div>
+          </>
+        ) : null}
+        <Box flex={1} padding="0 32px 17px">
+          {isAppAuth ? (
+            <Box borderBottom="1px solid #dce0e9">
+              {isError ? <div className={styles.errorMessage}>{error}</div> : null}
+              {isLoading ? (
+                <div className={styles.loading}>
+                  <LoadingSpinner />
+                </div>
+              ) : hasWallets ? (
+                <Box>
+                  <Typography
+                    variant="h5"
+                    fontWeight="300"
+                    color="var(--yoroi-palette-gray-600)"
+                    mb="14px"
+                  >
+                    {intl.formatMessage(messages.yourWallets)}
+                  </Typography>
+                  <ul className={styles.list}>
+                    {publicDerivers.map(item => (
+                      <li key={item.name} className={styles.listItem}>
+                        <WalletButton
+                          onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
+                        >
+                          <WalletCard
+                            shouldHideBalance={shouldHideBalance}
+                            publicDeriver={item}
+                            getTokenInfo={this.props.getTokenInfo}
+                          />
+                        </WalletButton>
+                      </li>
+                    ))}
+                  </ul>
+                </Box>
+              ) : hasNoWallets ? (
+                <Box display="flex" flexDirection="column" alignItems="center" pt={4}>
+                  <NoItemsFoundImg style={{ width: 170 }} />
+                  <Typography variant="h3" fontWeight="400" color="var(--yoroi-palette-gray-900)">
+                    <FormattedHTMLMessage {...messages.noWalletsFound} values={{ network }} />
+                  </Typography>
+                </Box>
+              ) : null}
+            </Box>
+          ) : (
+            passwordForm
+          )}
+        </Box>
+
+        {hasWallets && isAppAuth ? (
+          <div className={styles.bottom}>
+            <div className={styles.infoText}>
+              <p>{intl.formatMessage(messages.connectInfo)}</p>
+              <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     );
   }
 }
 
 export default ConnectPage;
+
+const WalletButton = styled('button')({
+  cursor: 'pointer',
+  width: '100%',
+  fontSize: '1rem',
+  paddingTop: 5,
+  paddingBottom: 5,
+});
