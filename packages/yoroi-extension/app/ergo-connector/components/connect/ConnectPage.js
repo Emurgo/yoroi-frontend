@@ -255,7 +255,10 @@ class ConnectPage extends Component<Props> {
                   </Typography>
                   <ul className={styles.list}>
                     {publicDerivers.map(item => (
-                      <li key={item.name} className={styles.listItem}>
+                      <li
+                        key={item.publicDeriver.getPublicDeriverId()}
+                        className={styles.listItem}
+                      >
                         <WalletButton
                           onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
                         >
