@@ -4,7 +4,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { WalletAuthEntry } from '../../../chrome/extension/ergo-connector/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import blake2b from 'blake2b';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 export const createAuthEntry: ({|
@@ -34,7 +33,7 @@ export const createAuthEntry: ({|
   );
   const derivedSignKey = signingKey.derive(0).derive(0).to_raw_key();
 
-  const entropy = cip8Sign(
+  const entropy = await cip8Sign(
     derivedSignKey,
     Buffer.from(`DAPP_LOGIN: ${appAuthID}`, 'utf8'),
   );
@@ -76,17 +75,4 @@ const cip8Sign = async (
   const signedSigStruct = signKey.sign(toSign).to_bytes();
   const coseSign1 = builder.build(signedSigStruct);
   return Buffer.from(coseSign1.to_bytes());
-}
-
-const cip8Verify = async (
-  publicKey: RustModule.WalletV4.PublicKey,
-  coseSign1Hex: string,
-): Promise<boolean> => {
-  const coseSign1 = RustModule.MessageSigning.COSESign1.from_bytes(
-    Buffer.from(coseSign1Hex, 'hex')
-  );
-  const sigStructReconstructed = coseSign1.signed_data().to_bytes();
-  const signature = RustModule.WalletV4.Ed25519Signature.from_bytes(coseSign1.signature());
-
-  return publicKey.verify(sigStructReconstructed, signature);
 }

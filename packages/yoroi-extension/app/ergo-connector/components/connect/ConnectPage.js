@@ -106,7 +106,12 @@ class ConnectPage extends Component<Props> {
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
               if (field.value === null) {
-                return [false, this.context.intl.formatMessage(messages.incorrectWalletPasswordError)];
+                return [
+                  false,
+                  this.context.intl.formatMessage(
+                    messages.incorrectWalletPasswordError
+                  )
+                ];
               }
               return [true];
             },
