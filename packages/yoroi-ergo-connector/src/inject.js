@@ -70,10 +70,11 @@ const initialInject = `
       window.postMessage({
         type: "connector_rpc_request",
         protocol: "cardano",
+        url: location.hostname,
         uid: cardanoRpcUid,
         function: func,
         params,
-        returnType,
+        returnType: returnType || "cbor",
       }, location.origin);
       console.debug("cardanoRpcUid = " + cardanoRpcUid);
       cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
@@ -100,11 +101,7 @@ const initialInject = `
   }
 
   function cardano_check_read_access() {
-    if (typeof cardano !== "undefined") {
-      return cardano._cardano_rpc_call("ping", []);
-    } else {
-      return Promise.resolve(false);
-    }
+    return cardano_rpc_call("is_enabled/cardano", []);
   }
   
   window.cardano = {
@@ -163,7 +160,7 @@ class CardanoAPI {
     constructor(auth, rpc) {
       const self = this;
       function rpcWrapper(func, params) {
-        return rpc(func, params, self._returnType[0] || "cbor");
+        return rpc(func, params, self._returnType[0]);
       }
       this._auth = new CardanoAuth(auth, rpcWrapper);
       this._cardano_rpc_call = rpcWrapper;
@@ -177,20 +174,35 @@ class CardanoAPI {
       });
     }
     
-    setReturnType(returnType) {
-      if (returnType !== 'cbor' && returnType !== 'json') {
-        throw new Error('Possible return type values are: "cbor" or "json"');
-      }
-      this._returnType[0] = returnType;
-    } 
+    experimental = Object.freeze({
+    
+      setReturnType: (returnType) => {
+        if (returnType !== 'cbor' && returnType !== 'json') {
+          throw new Error('Possible return type values are: "cbor" or "json"');
+        }
+        this._returnType[0] = returnType;
+      },
+      
+      auth: () => {
+        return this._auth;
+      },
+      
+      createTx: (req) => {
+        return this._cardano_rpc_call("create_tx/cardano", [req]);
+      },
+      
+      onDisconnect: (callback) => {
+        if (this._disconnection[0]) {
+          throw new Error('Cardano API instance is already disconnected!');
+        }
+        this._disconnection.push(callback);
+      },
+      
+    }) 
     
     getNetworkId() {
       // TODO
       throw new Error('Not implemented yet');
-    }
-    
-    auth() {
-      return this._auth;
     }
     
     getBalance(token_id = '*') {
@@ -228,17 +240,6 @@ class CardanoAPI {
     signData(address, sigStructure) {
       // TODO
       throw new Error('Not implemented yet');
-    }
-    
-    createTx(req) {
-      return this._cardano_rpc_call("create_tx/cardano", [req]);
-    }
-    
-    onDisconnect(callback) {
-      if (this._disconnection[0]) {
-        throw new Error('Cardano API instance is already disconnected!');
-      }
-      this._disconnection.push(callback);
     }
 }
 `
@@ -511,6 +512,9 @@ function handleConnectorConnectRequest(event, protocol) {
 
 function handleConnectorRpcRequest(event) {
     console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+    if (event.data.function === 'is_enabled/cardano' && yoroiPort == null) {
+      createYoroiPort();
+    }
     if (!yoroiPort) {
         // No active wallet connection
         window.postMessage({
@@ -576,7 +580,7 @@ async function convertImgToBase64(origin, urls) {
                 continue;
             }
             console.error(`[yoroi-connector] Failed to fetch favicon at '${url}'`, e);
-            throw e;
+            // throw e;
         }
     }
     if (!response) {

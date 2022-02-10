@@ -95,10 +95,10 @@ type SubmittedTransactionEntry = {|
   transaction: WalletTransaction,
 |};
 
-function getMinUtxoValue(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
+function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
   const config = getCardanoHaskellBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
-  return RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal);
+  return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
 }
 
 function newMultiToken(
@@ -363,7 +363,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
     const isCardano = isCardanoHaskell(networkInfo);
-    const minUtxoVal = isCardano ? getMinUtxoValue(networkInfo) : RustModule.WalletV4.BigNum.zero();
+    const coinsPerUtxoWord = isCardano ? getCoinsPerUtxoWord(networkInfo) : RustModule.WalletV4.BigNum.zero();
+
+    // <TODO:PLUTUS_SUPPORT>
+    const utxoHasDataHash = false;
 
     // calculate pending transactions just to cache the result
     const requests = this.getTxRequests(request.publicDeriver).requests;
@@ -406,7 +409,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
                   return WalletV4.min_ada_required(
                     // $FlowFixMe[prop-missing]
                     cardanoValueFromRemoteFormat(u),
-                    minUtxoVal,
+                    utxoHasDataHash,
+                    coinsPerUtxoWord,
                   );
                 } catch (e) {
                   // eslint-disable-next-line no-console

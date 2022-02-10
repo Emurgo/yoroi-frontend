@@ -17,6 +17,10 @@ const messages = defineMessages({
     id: 'wallet.send.tezor.error.firmwareCatalystSupport',
     defaultMessage: '!!!Registering for Catalyst voting requires Trezor firmware 2.4.1',
   },
+  noWitnessError: {
+    id: 'wallet.send.trezor.error.noWitness',
+    defaultMessage: '!!!Could not sign the transaction. Please ensure the passphrase you entered is the passhprase used to create this wallet.',
+  },
 });
 
 /** Converts error(from API or Trezor API) to LocalizableError */
@@ -27,8 +31,12 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     // It means some API Error has been thrown
     localizableError = error;
   } else if (error && error.message) {
-    // Trezor device related error happend, convert then to LocalizableError
-    switch (error.message) {
+    if (error.message.includes('no witness for')) {
+      // from `buildSignedTransaction()`, the only realistic cause being passphrase mismatch
+      localizableError = new LocalizableError(messages.noWitnessError);
+    } else {
+      // Trezor device related error happend, convert then to LocalizableError
+      switch (error.message) {
       case 'Iframe timeout':
         localizableError = new LocalizableError(globalMessages.trezorError101);
         break;
@@ -51,6 +59,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         Logger.error(`TrezorLocalizedError::${nameof(convertToLocalizableError)}::error: ${error.message}`);
         localizableError = new UnexpectedError();
         break;
+      }
     }
   }
 

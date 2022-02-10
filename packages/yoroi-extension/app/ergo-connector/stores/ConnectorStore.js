@@ -94,7 +94,7 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
   });
 }
 
-export function getProtocol(): Promise<Protocol> {
+export function getProtocol(): Promise<?Protocol> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
         ({ type: 'get_protocol' }),
@@ -172,7 +172,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
    */
   @observable filteredWallets: Array<PublicDeriverCache> = [];
   @observable allWallets: Array<PublicDeriverCache> = [];
-  @observable protocol: string = ''
+  @observable protocol: ?string = ''
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
@@ -238,7 +238,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   _getProtocol: () => Promise<void> = async () => {
     const protocol = await getProtocol()
     runInAction(() => {
-      this.protocol = protocol.type
+      this.protocol = protocol?.type
     })
   }
 
@@ -458,6 +458,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const inputs = [];
+    const foreignInputs = [];
+
     for (let i = 0; i < txBody.inputs().len(); i++) {
       const input = txBody.inputs().get(i);
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
@@ -467,24 +469,21 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         // eslint-disable-next-line camelcase
         tx_hash === txHash && tx_index === txIndex
       );
-      if (!utxo) {
-        throw new Error(`missing UTXO for tx hash ${txHash} index ${txIndex}`);
-      }
-      inputs.push(
-        {
+      if (utxo) {
+        inputs.push({
           address: utxo.receiver,
           value: new MultiToken(
-            [
-              {
-                amount: new BigNumber(utxo.amount),
-                identifier: defaultToken.Identifier,
-                networkId: defaultToken.NetworkId
-              }
-            ],
+            [{
+              amount: new BigNumber(utxo.amount),
+              identifier: defaultToken.Identifier,
+              networkId: defaultToken.NetworkId
+            }],
             selectedWallet.publicDeriver.getParent().getDefaultToken()
-          )
-        }
-      );
+          ),
+        });
+      } else {
+        foreignInputs.push({ txHash, txIndex })
+      }
     }
 
     const outputs = [];
@@ -522,7 +521,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
 
     runInAction(() => {
-      this.adaTransaction = { inputs, outputs, fee, total, amount };
+      // <TODO:FOREIGN_INPUTS>
+      // $FlowFixMe[prop-missing]
+      this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
     });
   }
 
