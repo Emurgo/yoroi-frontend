@@ -1222,13 +1222,14 @@ export function signTransaction(
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
   metadata: void | RustModule.WalletV4.AuxiliaryData,
-  _witnessSet: RustModule.WalletV4.TransactionWitnessSet = null,
+  witnessSet: RustModule.WalletV4.TransactionWitnessSet = null,
+  otherRequiredSigners: Array<{| ...Address, ...Addressing |}> = [],
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();
-  const deduped: Array<CardanoAddressedUtxo> = [];
-  for (const senderUtxo of senderUtxos) {
-    const wasmAddr = normalizeToAddress(senderUtxo.receiver);
+  const deduped: Array<Addressing> = [];
+  function addIfUnique(address: string, item: Addressing): void {
+    const wasmAddr = normalizeToAddress(address);
     if (wasmAddr == null) {
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
     }
@@ -1237,9 +1238,9 @@ export function signTransaction(
     if (keyHash === null) {
       if (!seenByronKeys.has(addrHex)) {
         seenByronKeys.add(addrHex);
-        deduped.push(senderUtxo);
+        deduped.push(item);
       }
-      continue;
+      return;
     }
     if (keyHash === undefined) {
       throw new Error(`${nameof(signTransaction)} cannot sign script inputs`);
@@ -1248,9 +1249,15 @@ export function signTransaction(
       const keyHex = Buffer.from(keyHash.to_bytes()).toString('hex');
       if (!seenKeyHashes.has(keyHex)) {
         seenKeyHashes.add(keyHex);
-        deduped.push(senderUtxo);
+        deduped.push(item);
       }
     }
+  }
+  for (const senderUtxo of senderUtxos) {
+    addIfUnique(senderUtxo.receiver, senderUtxo);
+  }
+  for (const otherSigner of otherRequiredSigners) {
+    addIfUnique(otherSigner.address, otherSigner);
   }
 
   const txBody = unsignedTx instanceof RustModule.WalletV4.TransactionBuilder
@@ -1283,7 +1290,7 @@ export function signTransaction(
     );
   }
 
-  const witnessSet = _witnessSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
+  witnessSet = witnessSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
 
@@ -1307,14 +1314,14 @@ function utxoToTxInput(
 
 function addWitnesses(
   txHash: RustModule.WalletV4.TransactionHash,
-  uniqueUtxos: Array<CardanoAddressedUtxo>, // pre-req: does not contain duplicate keys
+  uniqueAddressings: Array<CardanoAddressedUtxo | {| ...Address, ...Addressing |}>, // pre-req: does not contain duplicate keys
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   vkeyWits: RustModule.WalletV4.Vkeywitnesses,
   bootstrapWits: RustModule.WalletV4.BootstrapWitnesses,
 ): void {
   // get private keys
-  const privateKeys = uniqueUtxos.map(utxo => {
+  const privateKeys = uniqueAddressings.map(utxo => {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
     if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
       throw new Error(`${nameof(addWitnesses)} incorrect addressing size`);
@@ -1329,8 +1336,9 @@ function addWitnesses(
   });
 
   // sign the transactions
-  for (let i = 0; i < uniqueUtxos.length; i++) {
-    const wasmAddr = normalizeToAddress(uniqueUtxos[i].receiver);
+  for (let i = 0; i < uniqueAddressings.length; i++) {
+    const { receiver, address } = uniqueAddressings[i];
+    const wasmAddr = normalizeToAddress(receiver || address);
     if (wasmAddr == null) {
       throw new Error(`${nameof(addWitnesses)} utxo not a valid Shelley address`);
     }

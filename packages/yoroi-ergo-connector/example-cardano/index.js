@@ -3,7 +3,7 @@ import { textPartFromWalletChecksumImagePart } from "@emurgo/cip4-js"
 import { createIcon } from "@download/blockies"
 import { getTtl } from './utils'
 import { Bech32Prefix } from '../../yoroi-extension/app/config/stringConfig';
-import { bytesToHex, hexToBytes } from '../../yoroi-extension/app/coreUtils';
+import { bytesToHex, hexToBytes } from './coreUtils';
 
 const cardanoAccessBtnRow = document.querySelector('#request-button-row')
 const cardanoAuthCheck = document.querySelector('#check-identification')
@@ -47,7 +47,7 @@ const COLORS = [
 ];
 
 function createBlockiesIcon(seed) {
-  const colorIdx = Buffer.from(seed, 'hex')[0] % COLORS.length;
+  const colorIdx = hexToBytes(seed)[0] % COLORS.length;
   const color = COLORS[colorIdx];
   return createIcon({
     seed,
@@ -99,7 +99,7 @@ function onApiConnectied(api) {
       type: 'this is a random test message object',
       rndValue: Math.random(),
     });
-    const messageHex = Buffer.from(messageJson).toString('hex');
+    const messageHex = bytesToHex(messageJson);
     console.log('Signing randomized message: ', JSON.stringify({
       messageJson,
       messageHex,
@@ -129,8 +129,8 @@ function reduceWasmMultiasset(multiasset, reducer, initValue) {
       for (let j = 0; j < assetNames.len(); j++) {
         const name = assetNames.get(j);
         const amount = assets.get(name);
-        const policyIdHex = Buffer.from(policyId.to_bytes()).toString('hex');
-        const encodedName = Buffer.from(name.name()).toString('hex');
+        const policyIdHex = bytesToHex(policyId.to_bytes());
+        const encodedName = bytesToHex(name.name());
         result = reducer(result, {
           policyId: policyIdHex,
           name: encodedName,
@@ -178,7 +178,7 @@ getAccountBalance.addEventListener('click', () => {
             alertSuccess(`Asset Balance: ${balance} (asset: ${tokenId})`)
             return;
           }
-          const value = CardanoWasm.Value.from_bytes(Buffer.from(balance, 'hex'));
+          const value = CardanoWasm.Value.from_bytes(hexToBytes(balance));
           balanceJson = { default: value.coin().to_str() };
           balanceJson.assets = reduceWasmMultiasset(value.multiasset(), (res, asset) => {
             res[asset.assetId] = asset.amount;
@@ -191,9 +191,8 @@ getAccountBalance.addEventListener('click', () => {
 })
 
 function addressesFromCborIfNeeded(addresses) {
-  return isCBOR() ? addresses.map(a => CardanoWasm.Address.from_bytes(
-    Buffer.from(a, 'hex'),
-  ).to_bech32()) : addresses;
+  return isCBOR() ? addresses.map(a =>
+    CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32()) : addresses;
 }
 
 getUnUsedAddresses.addEventListener('click', () => {
@@ -281,10 +280,10 @@ getUtxos.addEventListener('click', () => {
       } else {
         if (isCBOR()) {
           utxos = utxosResponse.map(hex => {
-            const u = CardanoWasm.TransactionUnspentOutput.from_bytes(Buffer.from(hex, 'hex'))
+            const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex))
             const input = u.input();
             const output = u.output();
-            const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+            const txHash = bytesToHex(input.transaction_id().to_bytes());
             const txIndex = input.index();
             const value = output.amount();
             return {
@@ -372,7 +371,7 @@ signTx.addEventListener('click', () => {
     const utxo = utxos[0]
 
     const addr = CardanoWasm.Address.from_bytes(
-      Buffer.from(utxo.receiver, 'hex')
+      hexToBytes(utxo.receiver)
     )
     const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
     const keyHash = baseAddr.payment_cred().to_keyhash();
@@ -380,7 +379,7 @@ signTx.addEventListener('click', () => {
       keyHash,
       CardanoWasm.TransactionInput.new(
         CardanoWasm.TransactionHash.from_bytes(
-          Buffer.from(utxo.tx_hash, "hex")
+          hexToBytes(utxo.tx_hash)
         ), // tx hash
         utxo.tx_index, // index
       ),
@@ -404,9 +403,7 @@ signTx.addEventListener('click', () => {
     // calculate the min fee required and send any change to an address
     txBuilder.add_change_if_needed(shelleyChangeAddress)
 
-    unsignedTransactionHex = Buffer.from(
-      txBuilder.build_tx().to_bytes()
-    ).toString('hex');
+    unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
   }
 
   // Experimental feature, false by default, in which case only the witness set is returned.
@@ -487,7 +484,7 @@ createTx.addEventListener('click', () => {
 
   console.log('[createTx] Including random utxo input: ', randomUtxo);
 
-  const usedAddress = randomUtxo.receiver; // usedAddresses[0];
+  const usedAddress = usedAddresses[0];
   const keyHash = CardanoWasm.BaseAddress.from_address(
     CardanoWasm.Address.from_bech32(usedAddress),
   ).payment_cred().to_keyhash();
@@ -505,10 +502,10 @@ createTx.addEventListener('click', () => {
   const mintScript = CardanoWasm.NativeScript.new_script_all(
     CardanoWasm.ScriptAll.new(scripts),
   );
-  const mintScriptHex = Buffer.from(mintScript.to_bytes()).toString('hex');
+  const mintScriptHex = bytesToHex(mintScript.to_bytes());
 
   function convertAssetNameToHEX(name) {
-    return Buffer.from(name, 'utf-8').toString('hex');
+    return bytesToHex(name);
   }
 
   const tokenAssetName = 'V42';
@@ -516,16 +513,16 @@ createTx.addEventListener('click', () => {
   const tokenAssetNameHex = convertAssetNameToHEX(tokenAssetName);
   const nftAssetNameHex = convertAssetNameToHEX(nftAssetName);
 
-  const expectedPolicyId = Buffer.from(mintScript.hash().to_bytes()).toString('hex');
+  const expectedPolicyId = bytesToHex(mintScript.hash().to_bytes());
 
   console.log('[createTx] Including mint request: ', { keyHashBech, mintScriptHex, assetNameHex: tokenAssetNameHex, expectedPolicyId });
 
-  const outputHex = Buffer.from(
+  const outputHex = bytesToHex(
     CardanoWasm.TransactionOutput.new(
       CardanoWasm.Address.from_bech32(randomUtxo.receiver),
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000000')),
     ).to_bytes()
-  ).toString('hex');
+  );
 
   const txReq = {
     validityIntervalStart: 42,
