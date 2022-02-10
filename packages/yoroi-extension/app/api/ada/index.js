@@ -154,6 +154,7 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import type { ISignRequest } from '../common/lib/transactions/ISignRequest';
+import { bytesToHex, hexToBytes } from '../../coreUtils';
 
 // ADA specific Request / Response params
 
@@ -333,6 +334,8 @@ export type CardanoTxRequest = {|
   |}>,
   mintRequest?: Array<CardanoTxRequestMint>, // this ming must be manually set to the outputs
   onlyInputsIntended?: boolean,
+  validityIntervalStart?: number,
+  ttl?: number,
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
@@ -1212,31 +1215,28 @@ export default class AdaApi {
       }
     }
 
-    function mintEntryToIdentifier(mintEntry: CardanoTxRequestMint): {
+    function mintEntryToIdentifier(mintEntry: CardanoTxRequestMint): {|
       policyId: string, assetId: string,
-    } {
+    |} {
       const { script, assetName } = mintEntry;
-      const policyId = Buffer.from(
-        RustModule.WalletV4.NativeScript.from_bytes(
-          Buffer.from(script, 'hex'),
-        ).hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
-      ).toString('hex');
+      const policyId = bytesToHex(
+        RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(script))
+          .hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
+      );
       const assetId = `${policyId}.${assetName}`;
       return { policyId, assetId };
     }
 
     for (const outputHex of (includeOutputs ?? [])) {
-      const output = RustModule.WalletV4.TransactionOutput.from_bytes(
-          Buffer.from(outputHex, 'hex')
-      )
+      const output = RustModule.WalletV4.TransactionOutput.from_bytes(hexToBytes(outputHex))
       const newOutput = {
-        address: Buffer.from(output.address().to_bytes()).toString('hex'),
+        address: bytesToHex(output.address().to_bytes()),
         amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
       };
-      if (output.data_hash() != null) {
-        newOutput.dataHash = Buffer.from(
-          output.data_hash().to_bytes()
-        ).toString('hex');
+      const outputDataHash = output.data_hash();
+      if (outputDataHash != null) {
+        // $FlowFixMe[prop-missing]
+        newOutput.dataHash = bytesToHex(outputDataHash.to_bytes());
       }
       outputs.push(newOutput);
     }
@@ -1319,12 +1319,12 @@ export default class AdaApi {
 
     for (const mintEntry of (mintRequest || [])) {
       const { script, assetName, amount, metadata } = mintEntry;
-      const { policyId, assetId } = mintEntryToIdentifier(mintEntry);
+      const { policyId } = mintEntryToIdentifier(mintEntry);
       // Adding minting request
       mint.push({
         policyScript: script,
         assetName,
-        amount,
+        amount: amount ?? '1',
       });
       appendMintMetadata(metadata, policyId, assetName);
     }

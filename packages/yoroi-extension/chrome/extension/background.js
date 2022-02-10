@@ -394,26 +394,6 @@ const yoroiMessageHandler = async (
       );
     });
   }
-  async function createCardanoTx(
-    tx: CardanoTxRequest,
-    password: string,
-    tabId: number
-  ): Promise<string> {
-    return await withDb(async (db, localStorageApi) => {
-      return await withSelectedWallet(
-        tabId,
-        async (wallet) => {
-          return await connectorCreateCardanoTx(
-            wallet,
-            password,
-            tx,
-          );
-        },
-        db,
-        localStorageApi
-      );
-    });
-  }
 
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
@@ -470,8 +450,8 @@ const yoroiMessageHandler = async (
           {
             const signedTx = await signCardanoTx(
               // $FlowFixMe[prop-missing]
-              // $FlowFixMe[incompatible-cast]
-              (request.tx.tx: CardanoTx),
+              // $FlowFixMe[incompatible-exact]
+              (request.tx: CardanoTx),
               password,
               request.tabId
             );
@@ -908,20 +888,21 @@ function handleInjectorConnect(port) {
                 const resp = await confirmSign(tabId,
                   {
                     type: 'tx/cardano',
-                    tx: { tx: { tx, partialSign } },
+                    tx: { tx, partialSign },
                     uid: message.uid
                   },
                   connection
                 );
-                if (returnTx) {
+                if (!returnTx && resp?.ok != null) {
+                  const witnessSetResp = Buffer.from(
+                    RustModule.WalletV4.Transaction.from_bytes(
+                      Buffer.from(resp.ok, 'hex'),
+                    ).witness_set().to_bytes()
+                  ).toString('hex');
+                  rpcResponse({ ok: witnessSetResp });
+                } else {
                   rpcResponse(resp);
                 }
-                const witnessSetResp = Buffer.from(
-                  RustModule.WalletV4.Transaction.from_bytes(
-                    Buffer.from(resp.ok, 'hex'),
-                  ).witness_set().to_bytes()
-                ).toString('hex');
-                rpcResponse({ ok: witnessSetResp });
               }
             } catch (e) {
               handleError(e);

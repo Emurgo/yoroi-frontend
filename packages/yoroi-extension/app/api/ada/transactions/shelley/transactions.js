@@ -1222,13 +1222,13 @@ export function signTransaction(
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
   metadata: ?RustModule.WalletV4.AuxiliaryData,
-  witnessSet: RustModule.WalletV4.TransactionWitnessSet = null,
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet = null,
   otherRequiredSigners: Array<{| ...Address, ...Addressing |}> = [],
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();
-  const deduped: Array<Addressing> = [];
-  function addIfUnique(address: string, item: Addressing): void {
+  const deduped: Array<CardanoAddressedUtxo | {| ...Address, ...Addressing |}> = [];
+  function addIfUnique(address: string, item: CardanoAddressedUtxo | {| ...Address, ...Addressing |}): void {
     const wasmAddr = normalizeToAddress(address);
     if (wasmAddr == null) {
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
@@ -1297,6 +1297,7 @@ export function signTransaction(
   return RustModule.WalletV4.Transaction.new(
     txBody,
     witnessSet,
+    // $FlowFixMe[incompatible-call]
     metadata,
   );
 }
@@ -1337,8 +1338,15 @@ function addWitnesses(
 
   // sign the transactions
   for (let i = 0; i < uniqueAddressings.length; i++) {
-    const { receiver, address } = uniqueAddressings[i];
-    const wasmAddr = normalizeToAddress(receiver || address);
+    const uniqueAddressing = uniqueAddressings[i];
+    const resolveAddress = (): string => {
+      if (uniqueAddressing.receiver != null)
+        return uniqueAddressing.receiver;
+      if (uniqueAddressing.address != null)
+        return uniqueAddressing.address;
+      throw new Error(`[addWitnesses] Unexpected addressing for signing: ${JSON.stringify(uniqueAddressing)}`)
+    }
+    const wasmAddr = normalizeToAddress(resolveAddress());
     if (wasmAddr == null) {
       throw new Error(`${nameof(addWitnesses)} utxo not a valid Shelley address`);
     }
