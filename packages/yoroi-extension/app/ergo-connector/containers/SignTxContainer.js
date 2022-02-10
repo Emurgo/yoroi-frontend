@@ -10,7 +10,7 @@ import SignTxPage from '../components/signin/SignTxPage';
 import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type { SigningMessage, PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types';
-import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
+import { genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';

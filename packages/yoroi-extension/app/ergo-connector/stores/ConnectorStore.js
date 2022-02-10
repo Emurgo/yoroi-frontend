@@ -482,7 +482,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const outputs = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
-      const amount = output.amount().coin().to_str();
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       outputs.push(
         {
