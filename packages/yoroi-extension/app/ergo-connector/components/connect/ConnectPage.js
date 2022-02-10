@@ -28,6 +28,7 @@ import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
 
 const messages = defineMessages({
   subtitle: {
@@ -53,6 +54,10 @@ const messages = defineMessages({
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
     defaultMessage: '!!!Ooops, no {network} wallets found',
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
   },
 });
 
@@ -100,6 +105,9 @@ class ConnectPage extends Component<Props> {
               if (field.value === '') {
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
+              if (field.value === null) {
+                return [false, this.context.intl.formatMessage(messages.incorrectWalletPasswordError)];
+              }
               return [true];
             },
           ],
@@ -123,7 +131,13 @@ class ConnectPage extends Component<Props> {
         const { walletPassword } = form.values();
         const { deriver, checksum } = this.props.selectedWallet;
         if (deriver && checksum) {
-          this.props.onConnect(deriver, checksum, walletPassword);
+          this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
+            if (error instanceof WrongPassphraseError) {
+              this.form.$('walletPassword').value = null;
+            } else {
+              throw error;
+            }
+          });
         }
       },
       onError: () => {},
