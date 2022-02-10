@@ -510,7 +510,7 @@ export default class WalletSendForm extends Component<Props> {
             labelId="amount-options-select"
             renderValue={value => (
               <Typography sx={{ textTransform: 'uppercase' }}>
-                {sendAmountOptions.filter(item => item.value === value)[0].label}
+                {sendAmountOptions.filter(item => item.value === value)[0]?.label ?? '-'}
               </Typography>
             )}
             onChange={value => {
