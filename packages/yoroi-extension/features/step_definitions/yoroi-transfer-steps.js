@@ -9,6 +9,7 @@ import {
 import i18n from '../support/helpers/i18n-helpers';
 import {
   checkAddressesRecoveredAreCorrect,
+  checkFinalBalanceIsCorrect,
   checkWithdrawalAddressesRecoveredAreCorrect,
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
@@ -86,8 +87,9 @@ Then(/^I should see on the Yoroi transfer summary screen:$/, async function (tab
 
 Then(/^I should see on the Yoroi withdrawal transfer summary screen:$/, async function (table) {
   const rows = table.hashes();
+  const fields = rows[0];
   await checkWithdrawalAddressesRecoveredAreCorrect(rows, this);
-  await checkTotalAmountIsCorrect(rows, this);
+  await checkFinalBalanceIsCorrect(fields, this);
 });
 
 When(/^I confirm Yoroi transfer funds$/, async function () {
