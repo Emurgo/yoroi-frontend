@@ -146,7 +146,6 @@ class ConnectPage extends Component<Props> {
       shouldHideBalance,
       isAppAuth,
     } = this.props;
-
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
 
@@ -222,6 +221,8 @@ class ConnectPage extends Component<Props> {
         ) : null}
         <Box flex={1} padding="0 32px 17px">
           {isAppAuth ? (
+            passwordForm
+          ) : (
             <Box borderBottom="1px solid #dce0e9">
               {isError ? <div className={styles.errorMessage}>{error}</div> : null}
               {isLoading ? (
@@ -263,8 +264,6 @@ class ConnectPage extends Component<Props> {
                 </Box>
               ) : null}
             </Box>
-          ) : (
-            passwordForm
           )}
         </Box>
 

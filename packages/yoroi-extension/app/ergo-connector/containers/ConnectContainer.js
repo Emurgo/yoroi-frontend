@@ -37,7 +37,7 @@ export default class ConnectContainer extends Component<
   State
 > {
   state: State = {
-    isAppAuth: true,
+    isAppAuth: false,
     selectedWallet: {
       index: -1,
       deriver: null,
@@ -81,11 +81,6 @@ export default class ConnectContainer extends Component<
     const url = chromeMessage.url;
     const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
-
-    if (appAuthID == null && password == null) {
-      this.setState({ isAppAuth: false });
-      return;
-    }
 
     let authEntry;
     if (password != null) {
@@ -141,7 +136,11 @@ export default class ConnectContainer extends Component<
         },
       }));
       if (index >= 0 && deriver) {
-        this.onConnect(deriver, checksum);
+        if (this.generated.stores.connector.connectingMessage.appAuthID) {
+          this.setState({ isAppAuth: true });
+        } else {
+          this.onConnect(deriver, checksum);
+        }
       }
     }
   };
