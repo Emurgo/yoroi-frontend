@@ -80,7 +80,7 @@ export default class ConnectContainer extends Component<
     const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
 
-    const authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
+    const authEntry = await createAuthEntry({ appAuthID, deriver, checksum, password: '1234567890' });
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;

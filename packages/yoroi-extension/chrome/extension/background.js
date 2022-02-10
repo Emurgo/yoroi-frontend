@@ -1244,10 +1244,14 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet, connection) => {
+                    if (!connection?.status?.auth) {
+                      rpcResponse({
+                        err: 'auth_sign_hex_payload is requested but no auth is present in the connection!',
+                      });
+                    }
                     await RustModule.load();
                     const signatureHex = await authSignHexPayload({
-                      appAuthID: connection?.appAuthID,
-                      deriver: wallet,
+                      privKey: connection.status.auth.privkey,
                       payloadHex: message.params[0],
                     });
                     rpcResponse({

@@ -11,48 +11,40 @@ export const createAuthEntry: ({|
   appAuthID: ?string,
   deriver: PublicDeriver<>,
   checksum: ?WalletChecksum,
-|}) => Promise<?WalletAuthEntry> = async ({ appAuthID, deriver, checksum }) => {
+  password: string,
+|}) => Promise<?WalletAuthEntry> = async ({ appAuthID, deriver, checksum, password }) => {
   if (appAuthID == null) {
     return null;
   }
   if (checksum == null) {
     throw new Error(`[createAuthEntry] app auth is requested but wallet-checksum does not exist`)
   }
-  // <TODO:AUTH> this is a temporary insecure dev stub using the deriver public key
-  // $FlowFixMe[prop-missing]
-  const walletPubKey = (await deriver.getPublicKey()).Hash;
-  const appPubKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(walletPubKey, 'hex'),
-    Buffer.from(
-      blake2b(64)
-        .update(Buffer.from(appAuthID))
-        .digest('binary'),
-    ),
-  ).to_raw_key().to_public();
+  const entropy = cip8Sign(
+    deriver,
+    password,
+    Buffer.from(`DAPP_LOGIN: ${appAuthID}`, 'utf8'),
+  );
+
+  const appPrivKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
+    entropy,
+    Buffer.from(''),
+  ).to_raw_key();
+  const appPubKey = appPrivKey.to_public();
+
   return {
     walletId: checksum.ImagePart,
     pubkey: Buffer.from(appPubKey.as_bytes()).toString('hex'),
+    privkey: Buffer.from(appPrivKey.as_bytes()).toString('hex'),
   };
 };
 
 export const authSignHexPayload: ({|
-  appAuthID: ?string,
-  deriver: PublicDeriver<>,
+  privKey: string,
   payloadHex: string,
-|}) => Promise<string> = async ({ appAuthID, deriver, payloadHex }) => {
-  if (appAuthID == null) {
-    throw new Error(`[authSignHexPayload] app auth sign is requested but no auth is present in connection`)
-  }
-  // $FlowFixMe[prop-missing]
-  const walletPubKey = (await deriver.getPublicKey()).Hash;
-  const appPrivKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(walletPubKey, 'hex'),
-    Buffer.from(
-      blake2b(64)
-        .update(Buffer.from(appAuthID))
-        .digest('binary'),
-    ),
-  ).to_raw_key();
+|}) => Promise<string> = async ({ privKey, payloadHex }) => {
+  const appPrivKey = RustModule.WalletV4.PrivateKey.from_extended_bytes(
+    Buffer.from(privKey, 'hex')
+  );
   return appPrivKey.sign(Buffer.from(payloadHex, 'hex')).to_hex();
 }
 
@@ -61,7 +53,7 @@ const cip8Sign = async (
   deriver: PublicDeriver<>,
   password: string,
   payload: Buffer,
-): Promise<string> => {
+): Promise<Buffer> => {
   const withSigningKey = asGetSigningKey(deriver);
   if (!withSigningKey) {
     throw new Error(`[createAuthEntry] no signing key`);
@@ -84,7 +76,7 @@ const cip8Sign = async (
   const toSign = builder.make_data_to_sign().to_bytes();
   const signedSigStruct = derivedSignKey.sign(toSign).to_bytes();
   const coseSign1 = builder.build(signedSigStruct);
-  return Buffer.from(coseSign1.to_bytes()).toString('hex');
+  return Buffer.from(coseSign1.to_bytes());
 }
 
 const cip8Verify = async (
