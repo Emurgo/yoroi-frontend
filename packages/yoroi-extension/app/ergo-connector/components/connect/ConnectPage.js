@@ -105,14 +105,6 @@ class ConnectPage extends Component<Props> {
               if (field.value === '') {
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
-              if (field.value === null) {
-                return [
-                  false,
-                  this.context.intl.formatMessage(
-                    messages.incorrectWalletPasswordError
-                  )
-                ];
-              }
               return [true];
             },
           ],
@@ -122,6 +114,7 @@ class ConnectPage extends Component<Props> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
@@ -138,7 +131,9 @@ class ConnectPage extends Component<Props> {
         if (deriver && checksum) {
           this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
             if (error instanceof WrongPassphraseError) {
-              this.form.$('walletPassword').value = null;
+              this.form.$('walletPassword').invalidate(
+                this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+              )
             } else {
               throw error;
             }
