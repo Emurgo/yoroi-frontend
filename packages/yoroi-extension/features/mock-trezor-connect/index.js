@@ -179,11 +179,14 @@ class MockTrezorConnect {
   }
 
   static setSelectedWallet: string => Promise<void> = async (deviceId) => {
+    console.log('MockTrezorConnect.setSelectedWallet');
     MockTrezorConnect.selectedWallet = await genWalletInfo(deviceId);
   }
 
   static cardanoGetAddress: $PropertyType<API, 'cardanoGetAddress'> = async (params) => {
     MockTrezorConnect.mockConnectDevice();
+    console.log('MockTrezorConnect.cardanoGetAddress');
+    console.log(params);
 
     const genPayload = (request: CardanoGetAddress): CardanoAddress => {
       // this.checkSerial;
@@ -236,6 +239,8 @@ class MockTrezorConnect {
 
   static cardanoGetPublicKey: $PropertyType<API, 'cardanoGetPublicKey'> = async (params) => {
     MockTrezorConnect.mockConnectDevice();
+    console.log('MockTrezorConnect.cardanoGetPublicKey');
+    console.log(params);
 
     const genPayload = (key: CardanoGetPublicKey): CardanoPublicKey => {
       // this.checkSerial;
@@ -276,6 +281,8 @@ class MockTrezorConnect {
 
   static cardanoSignTransaction: $PropertyType<API, 'cardanoSignTransaction'> = async (request) => {
     MockTrezorConnect.mockConnectDevice();
+    console.log('MockTrezorConnect.cardanoSignTransaction');
+    console.log(request);
 
     if (MockTrezorConnect.selectedWallet == null) {
       throw new Error(`No mock Trezor wallet selected`);
@@ -474,14 +481,19 @@ class MockTrezorConnect {
   };
 
   static manifest: $PropertyType<API, 'manifest'> = (_data) => {
+    console.log('MockTrezorConnect.manifest');
   }
 
   static init: $PropertyType<API, 'init'> = async (_settings) => {
+    console.log('MockTrezorConnect.init');
   }
+
   static dispose: $PropertyType<API, 'dispose'> = (): void => {
+    console.log('MockTrezorConnect.dispose');
   }
 
   static on: $PropertyType<API, 'on'> = (type, fn: any): void => {
+    console.log('MockTrezorConnect.on');
     if (type === DEVICE_EVENT) {
       this.deviceEventListeners.push(fn);
     }
@@ -491,6 +503,7 @@ class MockTrezorConnect {
   }
 
   static off: $PropertyType<API, 'off'> = (type, fn: any): void => {
+    console.log('MockTrezorConnect.off');
     if (type === DEVICE_EVENT) {
       this.deviceEventListeners = this.deviceEventListeners.filter(event => event !== fn);
     }
@@ -500,6 +513,7 @@ class MockTrezorConnect {
   }
 
   static mockConnectDevice: void => void = () => {
+    console.log('MockTrezorConnect.mockConnectDevice');
     if (MockTrezorConnect.selectedWallet == null) {
       throw new Error(`No mock Trezor wallet selected`);
     }
