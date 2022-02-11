@@ -74,5 +74,5 @@ const cip8Sign = async (
   const toSign = builder.make_data_to_sign().to_bytes();
   const signedSigStruct = signKey.sign(toSign).to_bytes();
   const coseSign1 = builder.build(signedSigStruct);
-  return Buffer.from(coseSign1.to_bytes());
+  return Buffer.from(coseSign1.signature());
 }
