@@ -36,22 +36,62 @@ class Module {
   get WalletV4(): WasmV4 {
     return this._wasmv4;
   }
+  WalletV4TxBuilderFromConfig(config: {
+    +LinearFee: {|
+      +coefficient: string,
+      +constant: string,
+    |};
+    +CoinsPerUtxoWord: string,
+    +PoolDeposit: string,
+    +KeyDeposit: string,
+    ...
+  }): TransactionBuilder {
+    return this.WalletV4TxBuilder({
+      linearFee: RustModule.WalletV4.LinearFee.new(
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+      ),
+      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+      poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+      keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+    });
+  }
   // Need to expose through a getter to get Flow to detect the type correctly
-  WalletV4TxBuilder(
+  WalletV4TxBuilder(params: {
     linearFee: LinearFee,
-    minimumUtxoVal: BigNum,
+    coinsPerUtxoWord: BigNum,
     poolDeposit: BigNum,
     keyDeposit: BigNum,
-    maxValueBytes: number = MAX_VALUE_BYTES,
-    maxTxBytes: number = MAX_TX_BYTES,
-  ): TransactionBuilder {
-    return this.WalletV4.TransactionBuilder.new(
+    maxValueBytes: ?number,
+    maxTxBytes: ?number,
+    ...
+  } | {
+    linearFee: LinearFee,
+    coinsPerUtxoWord: BigNum,
+    poolDeposit: BigNum,
+    keyDeposit: BigNum,
+    ...
+  }): TransactionBuilder {
+    const {
       linearFee,
-      minimumUtxoVal,
+      coinsPerUtxoWord,
       poolDeposit,
       keyDeposit,
+      // $FlowFixMe[prop-missing]
       maxValueBytes,
+      // $FlowFixMe[prop-missing]
       maxTxBytes,
+    } = params;
+    return this.WalletV4.TransactionBuilder.new(
+      this.WalletV4.TransactionBuilderConfigBuilder.new()
+        .fee_algo(linearFee)
+        .pool_deposit(poolDeposit)
+        .key_deposit(keyDeposit)
+        .coins_per_utxo_word(coinsPerUtxoWord)
+        .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
+        .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
+        .prefer_pure_change(true)
+        .build()
     );
   }
   // Need to expose through a getter to get Flow to detect the type correctly
