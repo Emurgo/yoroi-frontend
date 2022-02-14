@@ -32,8 +32,19 @@ export const createAuthEntry: ({|
     Buffer.from(normalizedKey.prvKeyHex, 'hex')
   );
   const derivedSignKey = signingKey.derive(0).derive(0).to_raw_key();
+  const stakingKey = signingKey.derive(2).derive(0).to_raw_key();
 
+  const address = RustModule.WalletV4.BaseAddress.new(
+    deriver.getParent().networkInfo.NetworkId,
+    RustModule.WalletV4.StakeCredential.from_keyhash(
+      derivedSignKey.to_public().hash()
+    ),
+    RustModule.WalletV4.StakeCredential.from_keyhash(
+      stakingKey.to_public().hash()
+    )
+  ).to_address();
   const entropy = await cip8Sign(
+    Buffer.from(address.to_bytes()),
     derivedSignKey,
     Buffer.from(`DAPP_LOGIN: ${appAuthID}`, 'utf8'),
   );
@@ -63,6 +74,7 @@ export const authSignHexPayload: ({|
 
 // return the hex string representation of the COSESign1
 const cip8Sign = async (
+  address: Buffer,
   signKey: RustModule.WalletV4.PrivateKey,
   payload: Buffer,
 ): Promise<Buffer> => {
@@ -71,6 +83,10 @@ const cip8Sign = async (
     RustModule.MessageSigning.Label.from_algorithm_id(
       RustModule.MessageSigning.AlgorithmId.EdDSA
     )
+  );
+  protectedHeader.set_header(
+    RustModule.MessageSigning.Label.new_text('address'),
+    RustModule.MessageSigning.CBORValue.new_bytes(address)
   );
   const protectedSerialized = RustModule.MessageSigning.ProtectedHeaderMap.new(protectedHeader);
   const unprotected = RustModule.MessageSigning.HeaderMap.new();
