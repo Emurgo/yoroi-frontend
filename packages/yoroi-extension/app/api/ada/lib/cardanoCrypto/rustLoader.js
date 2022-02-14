@@ -19,7 +19,12 @@ class Module {
   _messageSigning: WasmMessageSigning;
 
   async load(): Promise<void> {
-    if (this._wasmv2 != null || this._wasmv3 != null || this._wasmv4 != null) return;
+    if (
+      this._wasmv2 != null
+        || this._wasmv3 != null
+        || this._wasmv4 != null
+        || this._messageSigning != null
+    ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv3 = await import('@emurgo/js-chain-libs/js_chain_libs');
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
