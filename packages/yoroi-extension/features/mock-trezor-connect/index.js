@@ -43,11 +43,11 @@ type WalletInfo = {|
   |},
 |};
 
-const CardanoTxSigningMode = {
+const CardanoTxSigningMode = Object.freeze({
   ORDINARY_TRANSACTION: 'ordinary_transaction',
   POOL_REGISTRATION_AS_OWNER: 'pool_registration_as_owner',
   MULTISIG_TRANSACTION: 'multisig_transaction',
-};
+});
 const mockVersion = {
   major_version: 2,
   minor_version: 3,
@@ -320,7 +320,7 @@ class MockTrezorConnect {
         witnessesToReturn.push({
           type: 0,
           pubKey,
-          signature: asString,
+          signature: Buffer.from(sig.to_bytes()).toString('hex'),
           chainCode: Buffer.from(key.chaincode()).toString('hex'),
         });
         return;
@@ -337,7 +337,7 @@ class MockTrezorConnect {
       witnessesToReturn.push({
         type: 1,
         pubKey,
-        signature: witAsStr,
+        signature: Buffer.from(sig.to_bytes()).toString('hex'),
       });
     };
 
