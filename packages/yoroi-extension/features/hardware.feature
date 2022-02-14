@@ -20,7 +20,7 @@ Feature: Hardware device
     Then I add a transaction memo that says "my awesome memo"
     And I click on the next button in the wallet send form
     Then I see the hardware send money confirmation dialog
-    Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACb4hAxoR/pTNoQKBhFgg8elBZl4BQGla+Tli4OXssZO+OKu0a4uE90ZUlPqOjApYQFfNdN84xjlYUK+VJmNfrCv5BsNoKskjkCN4ixLwUUrICfdRrmvqgAdQI2eczTSA1wvWZjl8mkFwPxNtZVjH6gVYINNT5ssGb8HUyAOT9k5hdlJG+NKzPSnWME87YabidYnjQaD2"
+    Given The expected transaction is "hKQAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACb4hAxoR/pTNoQKBhFgg8elBZl4BQGla+Tli4OXssZO+OKu0a4uE90ZUlPqOjApYQFfNdN84xjlYUK+VJmNfrCv5BsNoKskjkCN4ixLwUUrICfdRrmvqgAdQI2eczTSA1wvWZjl8mkFwPxNtZVjH6gVYINNT5ssGb8HUyAOT9k5hdlJG+NKzPSnWME87YabidYnjQaD19g=="
     Then I submit the wallet send form
     Then I should see the successfully sent page
     And I click the transaction page button

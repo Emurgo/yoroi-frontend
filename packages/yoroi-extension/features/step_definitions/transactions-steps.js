@@ -69,7 +69,9 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
-  await this.click('.WalletSendForm_nextButton');
+  const button = '.WalletSendForm_component .MuiButton-primary';
+  await this.waitForElement(button);
+  await this.click(button);
   /**
    * Sometimes out tests fail because clicking this button isn't triggering a dialog
    * However it works flawlessly both locally and on localci
@@ -81,7 +83,7 @@ When(/^I click on the next button in the wallet send form$/, async function () {
    */
   await this.driver.sleep(500);
   try {
-    await this.click('.WalletSendForm_nextButton');
+    await this.click(button);
   } catch (e) {
     // if the first click succeeded, the second will throw an exception
     // saying that the button can't be clicked because a dialog is in the way
@@ -110,7 +112,7 @@ Then(/^I should see the successfully sent page$/, async function () {
 })
 
 Then(/^I click the transaction page button$/, async function () {
-  await this.click("//button[contains(@label, 'Transaction page')]", By.xpath);
+  await this.click("//button[contains(text(), 'Transaction page')]", By.xpath);
 });
 
 Then(/^I should see the summary screen$/, async function () {

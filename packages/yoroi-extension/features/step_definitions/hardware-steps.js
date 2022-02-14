@@ -91,9 +91,10 @@ When(/^I see the derivation path "([^"]*)"$/, async function (path) {
 });
 
 Then(/^I verify the address on my ledger device$/, async function () {
-  await this.click('.Dialog_actions .primary');
-  await this.waitDisable('.Dialog_actions .primary'); // disable when communicating with device
-  await this.waitEnable('.Dialog_actions .primary'); // enable after it's done
+  await this.click('.VerifyAddressDialog_component .primary');
+  await this.waitDisable('.VerifyAddressDialog_component .primary'); // disable when communicating with device
+  await this.waitEnable('.VerifyAddressDialog_component .primary'); // enable after it's done
+  await this.driver.sleep(1000);
   await this.waitForElementNotPresent('.ErrorBlock_component');
 });
 
