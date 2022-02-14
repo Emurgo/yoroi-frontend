@@ -121,7 +121,9 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
+
   this.getText = locator => this.getElementBy(locator).getText();
   // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.getValue = this.driver.getValue = async locator =>
