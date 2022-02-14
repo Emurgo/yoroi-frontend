@@ -73,14 +73,16 @@ Feature: Yoroi delegation dashboard
     Given There is a Shelley wallet stored named shelley-mangled
     And I have a wallet with funds
     And I go to the dashboard screen
+    Then I should see the dashboard screen
     When I click on the unmangle warning
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |   
-    | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 | 10000000    |
+      | recoveredBalance | fees     | fromAddress                                                                                             |
+      | 10               | 0.165457 | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWEC8CGgAChlEDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhA2GPUG8kGwqxTG/+UYJfKt4qoQn4rxUh6/Df2gd0L+imMJg9v6LfkiKGCXoNU/d3T971A7KbbTE94hcny6EpHB/X2"
     And I enter the wallet password:
-      | password   |
+      | password     |
       | asdfasdfasdf |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWEFsCGgAChiUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhA0LkC9dcwcE8kORl7Oo4D4lql/IEmb+pFM9JXsKFjTXpKLIftor3/GXjnZRZh9TWkoQhBFisxgf65tR2Pfsq+AfY="
     When I confirm Yoroi transfer funds
+    Then I do not see the deregistration for the transaction
     Then I should see the summary screen
     And I should see 1 pending transactions
