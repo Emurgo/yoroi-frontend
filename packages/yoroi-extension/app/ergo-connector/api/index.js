@@ -67,6 +67,11 @@ const cip8Sign = async (
   payload: Buffer,
 ): Promise<Buffer> => {
   const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
+  protectedHeader.set_algorithm_id(
+    RustModule.MessageSigning.Label.from_algorithm_id(
+      RustModule.MessageSigning.AlgorithmId.EdDSA
+    )
+  );
   const protectedSerialized = RustModule.MessageSigning.ProtectedHeaderMap.new(protectedHeader);
   const unprotected = RustModule.MessageSigning.HeaderMap.new();
   const headers = RustModule.MessageSigning.Headers.new(protectedSerialized, unprotected);
