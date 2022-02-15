@@ -69,7 +69,7 @@ class ConnectPage extends Component<Props> {
   };
 
   onCreateWallet: void => void = () => {
-    chrome.tabs.create({
+    window.chrome.tabs.create({
       url: `${window.location.origin}/main_window.html#/wallets/add`
     })
 
