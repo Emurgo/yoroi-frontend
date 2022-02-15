@@ -73,6 +73,12 @@ export default class Settings extends Component<Props> {
         shouldHide: signingMessage === null,
       },
       {
+        label: intl.formatMessage(connectorMessages.connect),
+        icon: <SendIcon />,
+        route: ROUTES.ROOT,
+        shouldHide: false,
+      },
+      {
         label: intl.formatMessage(globalMessages.support),
         icon: <SupportIcon />,
         route: ROUTES.SETTINGS.SUPPORT,
