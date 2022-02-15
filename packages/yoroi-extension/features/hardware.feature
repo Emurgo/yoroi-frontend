@@ -71,7 +71,7 @@ Feature: Hardware device
     # test restoration
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
-    Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAWdAwCGgACjFUDGhH+lM2hAoGEWCDx6UFmXgFAaVr5OWLg5eyxk744q7Rri4T3RlSU+o6MClhAAjDtKmE/1bQbqYZpTBpvrmy4/DV2JW56CzHCxXrNFkU/oVJjZRWva84jOTVSZu21LJGjO83BsodyxpzqtoGSCVgg01PmywZvwdTIA5P2TmF2Ukb40rM9KdYwTzthpuJ1ieNBoPY="
+    Given The expected transaction is "hKQAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAWc+ACGgACjIEDGhH+lM2hAoGEWCDx6UFmXgFAaVr5OWLg5eyxk744q7Rri4T3RlSU+o6MClhA8JNsFwN1WFUz6F3jt72Xgdwc0k9NwIs7X1P1vpumle3BmRxf2eTL4uSZJipKy2MLiJjP7eZWeWgN2QVcjPmnBFgg01PmywZvwdTIA5P2TmF2Ukb40rM9KdYwTzthpuJ1ieNBoPX2"
     Then I see the transfer transaction
     And I accept the prompt
     Then I should see the dashboard screen
