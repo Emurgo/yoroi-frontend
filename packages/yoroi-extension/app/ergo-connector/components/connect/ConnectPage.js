@@ -23,6 +23,7 @@ import { environment } from '../../../environment';
 import CheckboxLabel from '../../../components/common/CheckboxLabel';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import NoWalletImage from '../../assets/images/no-websites-connected.inline.svg'
 
 const messages = defineMessages({
   subtitle: {
@@ -39,7 +40,7 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
-    defaultMessage: '!!!No {network} wallets found.',
+    defaultMessage: '!!!Ooops, No {network} wallets found.',
   },
 });
 
@@ -143,13 +144,15 @@ class ConnectPage extends Component<Props> {
               </li>
             ))
           ) : isSuccess && !publicDerivers.length ? (
-            <p>
-              {/* <FormattedHTMLMessage
-                {...messages.noWalletsFound}
-                values={{ network }}
-              /> */}
-              <button onClick={this.onAddWallet} type="button">Add Wallet</button>
-            </p>
+            <div>
+              <div className={styles.noWallets}>
+                <NoWalletImage />
+              </div>
+              <div>
+                <p>{intl.formatMessage(messages.noWalletsFound, { network })}</p>
+                <button onClick={this.onAddWallet} type="button">Add Wallet</button>
+              </div>
+            </div>
           ) : null}
         </ul>
         <div className={styles.bottom}>
