@@ -2,7 +2,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
