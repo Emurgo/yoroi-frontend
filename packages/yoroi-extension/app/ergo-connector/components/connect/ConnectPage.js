@@ -118,7 +118,7 @@ class ConnectPage extends Component<Props> {
             <p className={styles.noWalletsText}>
               {intl.formatMessage(messages.noWalletsFound, { network })}
             </p>
-            <button className={styles.createWalelt} onClick={this.onCreateWallet} type="button">
+            <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
               {intl.formatMessage(messages.createWallet)}
             </button>
           </div>

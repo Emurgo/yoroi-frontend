@@ -45,6 +45,27 @@
   justify-content: center;
   flex-direction: column;
   text-align: center;
+  margin-top: 60px;
+  letter-spacing: 0;
+
+  .noWalletsImage {
+    margin-bottom: 33px;
+  }
+
+  .noWalletsText {
+    color: #242838;
+    font-size: 24px;
+    letter-spacing: 0;
+    line-height: 32px;
+    margin-bottom: 16px;
+  }
+
+  .createWallet {
+    color: #17D1AA;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+  }
 }
 
 .list {
