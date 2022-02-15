@@ -61,9 +61,9 @@ function onApiConnectied(api) {
   toggleSpinner('hide');
   let walletDisplay = 'an anonymous Yoroi Wallet';
 
-  api.setReturnType(returnType);
+  api.experimental.setReturnType(returnType);
 
-  const auth = api.auth && api.auth();
+  const auth = api.experimental.auth && api.experimental.auth();
   const authEnabled = auth && auth.isEnabled();
 
   if (authEnabled) {
@@ -82,7 +82,7 @@ function onApiConnectied(api) {
   accessGranted = true;
   window.cardanoApi = cardanoApi = api;
 
-  api.onDisconnect(() => {
+  api.experimental.onDisconnect(() => {
     alertWarrning(`Disconnected from ${walletDisplay}`);
     toggleConnectionUI('button');
     walletPlateSpan.innerHTML = '';
@@ -287,7 +287,7 @@ getUtxos.addEventListener('click', () => {
               utxo_id: `${txHash}${txIndex}`,
               tx_hash: txHash,
               tx_index: txIndex,
-              receiver: output.address().to_bech32(),
+              receiver: Buffer.from(output.address().to_bytes()).toString('hex'),
               amount: value.coin().to_str(),
               assets: reduceWasmMultiasset(value.multiasset(), (res, asset) => {
                 res.push(asset);
@@ -364,7 +364,7 @@ signTx.addEventListener('click', () => {
 
   // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
   const utxo = utxos[0]
-  
+
   const addr = CardanoWasm.Address.from_bytes(
     Buffer.from(utxo.receiver, 'hex')
   )
@@ -460,7 +460,7 @@ createTx.addEventListener('click', () => {
     ]
   }
   
-  cardanoApi.createTx(txReq, true).then(txHex => {
+  cardanoApi.experimental.createTx(txReq, true).then(txHex => {
     toggleSpinner('hide')
     alertSuccess('Creating tx succeeds: ' + txHex)
     transactionHex = txHex
