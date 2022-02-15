@@ -42,6 +42,10 @@ const messages = defineMessages({
     id: 'ergo-connector.connect.noWalletsFound',
     defaultMessage: '!!!Ooops, No {network} wallets found.',
   },
+  createWallet: {
+    id: 'ergo-connector.connect.createWallet',
+    defaultMessage: '!!!create wallet',
+  },
 });
 
 type Props = {|
@@ -64,7 +68,7 @@ class ConnectPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  onAddWallet: void => void = () => {
+  onCreateWallet: void => void = () => {
     chrome.tabs.create({
       url: `${window.location.origin}/main_window.html#/wallets/add`
     })
@@ -103,6 +107,24 @@ class ConnectPage extends Component<Props> {
 
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
+
+    if (isSuccess && !publicDerivers.length) {
+      return (
+        <div className={styles.noWallets}>
+          <div className={styles.noWalletsImage}>
+            <NoWalletImage />
+          </div>
+          <div>
+            <p className={styles.noWalletsText}>
+              {intl.formatMessage(messages.noWalletsFound, { network })}
+            </p>
+            <button className={styles.createWalelt} onClick={this.onCreateWallet} type="button">
+              {intl.formatMessage(messages.createWallet)}
+            </button>
+          </div>
+        </div>
+      )
+    }
 
     return (
       <div className={componentClasses}>
@@ -143,16 +165,6 @@ class ConnectPage extends Component<Props> {
                 />
               </li>
             ))
-          ) : isSuccess && !publicDerivers.length ? (
-            <div>
-              <div className={styles.noWallets}>
-                <NoWalletImage />
-              </div>
-              <div>
-                <p>{intl.formatMessage(messages.noWalletsFound, { network })}</p>
-                <button onClick={this.onAddWallet} type="button">Add Wallet</button>
-              </div>
-            </div>
           ) : null}
         </ul>
         <div className={styles.bottom}>
