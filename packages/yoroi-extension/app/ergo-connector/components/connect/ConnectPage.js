@@ -40,7 +40,7 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
-    defaultMessage: '!!!Ooops, No {network} wallets found.',
+    defaultMessage: '!!!Ooops, no {network} wallets found.',
   },
   createWallet: {
     id: 'ergo-connector.connect.createWallet',
