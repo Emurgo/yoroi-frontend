@@ -53,6 +53,7 @@ export default class Settings extends Component<Props> {
   };
   render(): Node {
     const { intl } = this.context;
+    const { signingMessage } = this.props
 
     const navItems = [
       {
@@ -69,6 +70,7 @@ export default class Settings extends Component<Props> {
         label: intl.formatMessage(connectorMessages.signTransaction),
         icon: <SendIcon />,
         route: ROUTES.SIGNIN_TRANSACTION,
+        shouldHide: signingMessage === null,
       },
       {
         label: intl.formatMessage(globalMessages.support),
@@ -93,7 +95,7 @@ export default class Settings extends Component<Props> {
 
     return (
       <ul className={styles.list}>
-        {navItems.map(({ label, icon, route }) => (
+        {navItems.filter(({ shouldHide }) => !shouldHide).map(({ label, icon, route }) => (
           <li key={label} className={styles.listItem}>
             <Link to={route}>
               {icon}

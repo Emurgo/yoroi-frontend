@@ -49,6 +49,7 @@ export default class SettingsContainer extends Component<Props> {
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
+          signingMessage={this.generated.stores.connector.signingMessage}
         />
       </SettingLayout>
     );
@@ -92,6 +93,9 @@ export default class SettingsContainer extends Component<Props> {
           },
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           currentLocale: profileStore.currentLocale,
+        },
+        connector: {
+          signingMessage: stores.connector.signingMessage,
         },
       },
       actions: {
