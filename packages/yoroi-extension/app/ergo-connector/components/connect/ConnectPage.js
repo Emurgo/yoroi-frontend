@@ -63,6 +63,14 @@ class ConnectPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  onAddWallet: void => void = () => {
+    chrome.tabs.create({
+      url: `${window.location.origin}/main_window.html#/wallets/add`
+    })
+
+    this.props.onCancel()
+  }
+
   render(): Node {
     const { intl } = this.context;
     const {
@@ -136,10 +144,11 @@ class ConnectPage extends Component<Props> {
             ))
           ) : isSuccess && !publicDerivers.length ? (
             <p>
-              <FormattedHTMLMessage
+              {/* <FormattedHTMLMessage
                 {...messages.noWalletsFound}
                 values={{ network }}
-              />
+              /> */}
+              <button onClick={this.onAddWallet} type="button">Add Wallet</button>
             </p>
           ) : null}
         </ul>
