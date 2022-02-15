@@ -921,6 +921,10 @@ export const connectorMessages: * = defineMessages({
   dappConnector: {
     id: 'connector.appName',
     defaultMessage: 'Dapp Connector',
+  },
+  signTransaction: {
+    id: 'connector.settings.signTransaction',
+    defaultMessage: 'Sign transaction'
   }
 });
 

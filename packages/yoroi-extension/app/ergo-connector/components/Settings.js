@@ -18,6 +18,7 @@ import SupportIcon from '../assets/images/support_icon.inline.svg';
 import TermsUseIcon from '../assets/images/terms_of_use_icon.inline.svg';
 import LanguageIcon from '../assets/images/language_icon.inline.svg';
 import ConnectedIcon from '../assets/images/connected_icon.inline.svg';
+import SendIcon from '../assets/images/send.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LanguageType } from '../../i18n/translations';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -63,6 +64,11 @@ export default class Settings extends Component<Props> {
         label: intl.formatMessage(connectorMessages.connectedWebsites),
         icon: <ConnectedIcon />,
         route: ROUTES.CONNECTED_WEBSITES,
+      },
+      {
+        label: intl.formatMessage(connectorMessages.signTransaction),
+        icon: <SendIcon />,
+        route: ROUTES.SIGNIN_TRANSACTION,
       },
       {
         label: intl.formatMessage(globalMessages.support),
