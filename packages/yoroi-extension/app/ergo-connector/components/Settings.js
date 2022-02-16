@@ -53,7 +53,7 @@ export default class Settings extends Component<Props> {
   };
   render(): Node {
     const { intl } = this.context;
-    const { signingMessage } = this.props
+    const { signingMessage, connectingMessage } = this.props
 
     const navItems = [
       {
@@ -76,7 +76,7 @@ export default class Settings extends Component<Props> {
         label: intl.formatMessage(connectorMessages.connect),
         icon: <SendIcon />,
         route: ROUTES.ROOT,
-        shouldHide: false,
+        shouldHide: connectingMessage === null,
       },
       {
         label: intl.formatMessage(globalMessages.support),

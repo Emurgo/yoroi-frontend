@@ -50,6 +50,7 @@ export default class SettingsContainer extends Component<Props> {
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
           signingMessage={this.generated.stores.connector.signingMessage}
+          connectingMessage={this.generated.stores.connector.connectingMessage}
         />
       </SettingLayout>
     );
@@ -96,6 +97,7 @@ export default class SettingsContainer extends Component<Props> {
         },
         connector: {
           signingMessage: stores.connector.signingMessage,
+          connectingMessage: stores.connector.connectingMessage,
         },
       },
       actions: {
