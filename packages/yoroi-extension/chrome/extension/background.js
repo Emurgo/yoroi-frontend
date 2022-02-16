@@ -61,7 +61,6 @@ import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import type CardanoTxRequest from '../../app/api/ada';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 
@@ -394,26 +393,6 @@ const yoroiMessageHandler = async (
       );
     });
   }
-  async function createCardanoTx(
-    tx: CardanoTxRequest,
-    password: string,
-    tabId: number
-  ): Promise<string> {
-    return await withDb(async (db, localStorageApi) => {
-      return await withSelectedWallet(
-        tabId,
-        async (wallet) => {
-          return await connectorCreateCardanoTx(
-            wallet,
-            password,
-            tx,
-          );
-        },
-        db,
-        localStorageApi
-      );
-    });
-  }
 
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
@@ -470,18 +449,8 @@ const yoroiMessageHandler = async (
           {
             const signedTx = await signCardanoTx(
               // $FlowFixMe[prop-missing]
-              // $FlowFixMe[incompatible-cast]
-              (request.tx.tx: CardanoTx),
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx });
-          }
-        break;
-        case 'tx-create-req/cardano':
-          {
-            const signedTx = await createCardanoTx(
-              (request.tx: any),
+              // $FlowFixMe[incompatible-exact]
+              (request.tx: CardanoTx),
               password,
               request.tabId
             );
@@ -914,18 +883,25 @@ function handleInjectorConnect(port) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
+                const { tx, partialSign, returnTx } = message.params[0];
                 const resp = await confirmSign(tabId,
                   {
                     type: 'tx/cardano',
-                    tx: {
-                      tx: message.params[0],
-                      partialSign: message.params[1],
-                    },
+                    tx: { tx, partialSign },
                     uid: message.uid
                   },
                   connection
                 );
-                rpcResponse(resp);
+                if (!returnTx && resp?.ok != null) {
+                  const witnessSetResp = Buffer.from(
+                    RustModule.WalletV4.Transaction.from_bytes(
+                      Buffer.from(resp.ok, 'hex'),
+                    ).witness_set().to_bytes()
+                  ).toString('hex');
+                  rpcResponse({ ok: witnessSetResp });
+                } else {
+                  rpcResponse(resp);
+                }
               }
             } catch (e) {
               handleError(e);
@@ -1223,15 +1199,22 @@ function handleInjectorConnect(port) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx-create-req/cardano',
-                    tx: message.params[0],
-                    uid: message.uid
-                  },
-                  connection
-                );
-                rpcResponse(resp);
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const resp = await connectorCreateCardanoTx(
+                        wallet,
+                        null,
+                        message.params[0],
+                      );
+                      rpcResponse({
+                        ok: resp,
+                      });
+                    },
+                    db,
+                    localStorageApi
+                  );
+                });
               }
             } catch (e) {
               handleError(e);
