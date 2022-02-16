@@ -12,7 +12,6 @@ import type {
   ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
