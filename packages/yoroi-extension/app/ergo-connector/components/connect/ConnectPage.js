@@ -39,6 +39,10 @@ const messages = defineMessages({
     id: 'ergo-connector.label.connectWallet',
     defaultMessage: '!!!Connect Wallet',
   },
+  connectWalletAuthRequest: {
+    id: 'ergo-connector.label.connectWalletAuthRequest',
+    defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
+  },
   yourWallets: {
     id: 'ergo-connector.label.yourWallets',
     defaultMessage: '!!!Your Wallets',
@@ -179,6 +183,16 @@ class ConnectPage extends Component<Props> {
     const passwordForm = (
       <>
         <div>
+          <Typography
+            variant="h4"
+            align='center'
+            color="var(--yoroi-palette-gray-900)"
+            marginBottom="20px"
+            paddingLeft="32px"
+            fontWeight="400"
+          >
+            {intl.formatMessage(messages.connectWalletAuthRequest)}
+          </Typography>
           <TextField
             type="password"
             {...walletPasswordField.bind()}
