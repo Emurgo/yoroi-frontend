@@ -57,7 +57,9 @@ export default class ConnectContainer extends Component<
   }
 
 
-  onToggleCheckbox: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
+  onToggleCheckbox: (
+    deriver: PublicDeriver<>, checksum: ?WalletChecksum
+    ) => void = (deriver, checksum) => {
     const index = deriver.getPublicDeriverId();
     this.setState((prevState) => prevState.selected === index
       ? { selected: -1, deriver: null, checksum: null }
