@@ -73,7 +73,8 @@ class App extends Component<Props, State> {
 
   onUnload: (SyntheticEvent<>) => void = ev => {
     ev.preventDefault();
-    const chromeMessage = this.generated.stores.connector.connectingMessage;
+    const chromeMessage = this.props.stores.connector.connectingMessage;
+    // this.generated.actions.connector.cancelSignInTx.trigger();
     chrome.runtime.sendMessage({
       type: 'connect_response',
       accepted: false,
