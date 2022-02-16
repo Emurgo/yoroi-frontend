@@ -71,6 +71,25 @@ class App extends Component<Props, State> {
     Logger.error(errorInfo.componentStack);
   }
 
+  onUnload: (SyntheticEvent<>) => void = ev => {
+    ev.preventDefault();
+    const chromeMessage = this.generated.stores.connector.connectingMessage;
+    chrome.runtime.sendMessage({
+      type: 'connect_response',
+      accepted: false,
+      tabId: chromeMessage?.tabId,
+    });
+  };
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
+    window.addEventListener('unload', this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('unload', this.onUnload);
+  }
+
   render(): Node {
     const { stores } = this.props;
     const locale = stores.profile.currentLocale;

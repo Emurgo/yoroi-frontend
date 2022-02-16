@@ -56,9 +56,6 @@ export default class ConnectContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('unload', this.onUnload);
-  }
 
   onToggleCheckbox: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
     const index = deriver.getPublicDeriverId();
