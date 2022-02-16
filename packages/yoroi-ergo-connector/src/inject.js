@@ -93,7 +93,11 @@ const initialInject = `
       connectRequests.push({
         protocol: 'cardano',
         resolve: (auth) => {
-            resolve(Object.freeze(new CardanoAPI(auth, cardano_rpc_call)));
+            const authWrapper = auth == null ? null : Object.freeze({
+              walletId: auth.walletId,
+              pubkey: auth.pubkey,
+            });
+            resolve(Object.freeze(new CardanoAPI(authWrapper, cardano_rpc_call)));
         },
         reject: reject
       });

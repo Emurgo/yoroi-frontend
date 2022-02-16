@@ -290,7 +290,7 @@ getUtxos.addEventListener('click', () => {
               utxo_id: `${txHash}${txIndex}`,
               tx_hash: txHash,
               tx_index: txIndex,
-              receiver: output.address().to_bech32(),
+              receiver: Buffer.from(output.address().to_bytes()).toString('hex'),
               amount: value.coin().to_str(),
               assets: reduceWasmMultiasset(value.multiasset(), (res, asset) => {
                 res.push(asset);

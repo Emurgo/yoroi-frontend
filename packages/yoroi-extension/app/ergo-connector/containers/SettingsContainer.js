@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
-
+import type { SigningMessage, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types'
 import Settings from '../components/Settings';
 import { computed } from 'mobx';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -49,6 +49,8 @@ export default class SettingsContainer extends Component<Props> {
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
+          signingMessage={this.generated.stores.connector.signingMessage}
+          connectingMessage={this.generated.stores.connector.connectingMessage}
         />
       </SettingLayout>
     );
@@ -73,6 +75,10 @@ export default class SettingsContainer extends Component<Props> {
           isExecuting: boolean,
         |},
       |},
+      connector: {|
+        signingMessage: ?SigningMessage,
+        connectingMessage: ?ConnectingMessage,
+      |}
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -92,6 +98,10 @@ export default class SettingsContainer extends Component<Props> {
           },
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           currentLocale: profileStore.currentLocale,
+        },
+        connector: {
+          signingMessage: stores.connector.signingMessage,
+          connectingMessage: stores.connector.connectingMessage,
         },
       },
       actions: {

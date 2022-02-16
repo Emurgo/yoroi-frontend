@@ -18,9 +18,11 @@ import SupportIcon from '../assets/images/support_icon.inline.svg';
 import TermsUseIcon from '../assets/images/terms_of_use_icon.inline.svg';
 import LanguageIcon from '../assets/images/language_icon.inline.svg';
 import ConnectedIcon from '../assets/images/connected_icon.inline.svg';
+import SendIcon from '../assets/images/send.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LanguageType } from '../../i18n/translations';
 import LocalizableError from '../../i18n/LocalizableError';
+import type { SigningMessage, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types'
 
 type Props = {|
   +languages: Array<LanguageType>,
@@ -28,8 +30,16 @@ type Props = {|
   +onSelectLanguage: ({| locale: string |}) => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
+  +connectingMessage: ?ConnectingMessage,
+  +signingMessage: ?SigningMessage
 |};
 
+type NavItem = {|
+  label: string,
+  icon: Node,
+  route: string,
+  shouldHide?: boolean,
+|}
 @observer
 export default class Settings extends Component<Props> {
   static defaultProps: {| error: void |} = {
@@ -52,8 +62,9 @@ export default class Settings extends Component<Props> {
   };
   render(): Node {
     const { intl } = this.context;
+    const { signingMessage, connectingMessage } = this.props
 
-    const navItems = [
+    const navItems: NavItem[] = [
       {
         label: intl.formatMessage(connectorMessages.about),
         icon: <InfoIcon />,
@@ -63,6 +74,18 @@ export default class Settings extends Component<Props> {
         label: intl.formatMessage(connectorMessages.connectedWebsites),
         icon: <ConnectedIcon />,
         route: ROUTES.CONNECTED_WEBSITES,
+      },
+      {
+        label: intl.formatMessage(connectorMessages.signTransaction),
+        icon: <SendIcon />,
+        route: ROUTES.SIGNIN_TRANSACTION,
+        shouldHide: signingMessage === null,
+      },
+      {
+        label: intl.formatMessage(connectorMessages.connect),
+        icon: <SendIcon />,
+        route: ROUTES.ROOT,
+        shouldHide: connectingMessage === null,
       },
       {
         label: intl.formatMessage(globalMessages.support),
@@ -87,7 +110,7 @@ export default class Settings extends Component<Props> {
 
     return (
       <ul className={styles.list}>
-        {navItems.map(({ label, icon, route }) => (
+        {navItems.filter(({ shouldHide }) => !shouldHide).map(({ label, icon, route }) => (
           <li key={label} className={styles.listItem}>
             <Link to={route}>
               {icon}
