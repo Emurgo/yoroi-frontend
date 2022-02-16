@@ -22,6 +22,7 @@ import SendIcon from '../assets/images/send.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LanguageType } from '../../i18n/translations';
 import LocalizableError from '../../i18n/LocalizableError';
+import type { SigningMessage, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types'
 
 type Props = {|
   +languages: Array<LanguageType>,
@@ -29,8 +30,16 @@ type Props = {|
   +onSelectLanguage: ({| locale: string |}) => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
+  +connectingMessage: ?ConnectingMessage,
+  +signingMessage: ?SigningMessage
 |};
 
+type NavItem = {|
+  label: string,
+  icon: Node,
+  route: string,
+  shouldHide?: boolean,
+|}
 @observer
 export default class Settings extends Component<Props> {
   static defaultProps: {| error: void |} = {
@@ -55,7 +64,7 @@ export default class Settings extends Component<Props> {
     const { intl } = this.context;
     const { signingMessage, connectingMessage } = this.props
 
-    const navItems = [
+    const navItems: NavItem[] = [
       {
         label: intl.formatMessage(connectorMessages.about),
         icon: <InfoIcon />,
