@@ -23,7 +23,6 @@ import { environment } from '../../../environment';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
-import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import config from '../../../config';
@@ -209,7 +208,6 @@ class ConnectPage extends Component<Props> {
     const walletPasswordField = this.form.$('walletPassword');
 
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
-    const hasNoWallets = isSuccess && !publicDerivers.length;
 
     const passwordForm = (
       <>
