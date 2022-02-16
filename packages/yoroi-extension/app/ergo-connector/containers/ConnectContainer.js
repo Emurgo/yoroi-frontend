@@ -12,7 +12,6 @@ import type {
   ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -136,7 +135,7 @@ export default class ConnectContainer extends Component<
         },
       }));
       if (index >= 0 && deriver) {
-        if (this.generated.stores.connector.connectingMessage?.appAuthID) {
+        if (this.generated.stores.connector.connectingMessage?.appAuthID != null) {
           this.setState({ isAppAuth: true });
         } else {
           this.onConnect(deriver, checksum);
@@ -164,16 +163,7 @@ export default class ConnectContainer extends Component<
     const error = this.generated.stores.connector.errorWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const protocol = this.generated.stores.connector.protocol;
-    let network = '';
-    if (protocol === 'ergo') {
-      network = networks.ErgoMainnet.NetworkName;
-    } else if (protocol === 'cardano') {
-      /**
-       * For Cardano we are displaying all type of wallet main and test net wallets
-       * So will name the network "Cardano" for now until we apply the filter.
-       */
-      network = 'Cardano';
-    }
+    const network = protocol === 'ergo' ? 'ERG' : 'Cardano';
 
     return (
       <ConnectPage

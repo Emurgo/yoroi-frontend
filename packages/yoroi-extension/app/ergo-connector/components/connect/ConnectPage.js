@@ -2,7 +2,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
@@ -23,12 +23,12 @@ import { environment } from '../../../environment';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
-import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
+import NoWalletImage from '../../assets/images/no-websites-connected.inline.svg'
 
 const messages = defineMessages({
   subtitle: {
@@ -62,6 +62,10 @@ const messages = defineMessages({
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
     defaultMessage: '!!!Incorrect wallet password.',
+  },
+  createWallet: {
+    id: 'ergo-connector.connect.createWallet',
+    defaultMessage: '!!!create wallet',
   },
 });
 
@@ -152,6 +156,14 @@ class ConnectPage extends Component<Props> {
     this.props.onCancel();
   };
 
+  onCreateWallet: void => void = () => {
+    window.chrome.tabs.create({
+      url: `${window.location.origin}/main_window.html#/wallets/add`
+    })
+
+    this.props.onCancel()
+  }
+
   render(): Node {
     const { intl } = this.context;
     const {
@@ -175,10 +187,27 @@ class ConnectPage extends Component<Props> {
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
 
+    if (isSuccess && !publicDerivers.length) {
+      return (
+        <div className={styles.noWallets}>
+          <div className={styles.noWalletsImage}>
+            <NoWalletImage />
+          </div>
+          <div>
+            <p className={styles.noWalletsText}>
+              {intl.formatMessage(messages.noWalletsFound, { network })}
+            </p>
+            <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
+              {intl.formatMessage(messages.createWallet)}
+            </button>
+          </div>
+        </div>
+      )
+    }
+
     const walletPasswordField = this.form.$('walletPassword');
 
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
-    const hasNoWallets = isSuccess && !publicDerivers.length;
 
     const passwordForm = (
       <>
@@ -285,13 +314,6 @@ class ConnectPage extends Component<Props> {
                       </li>
                     ))}
                   </ul>
-                </Box>
-              ) : hasNoWallets ? (
-                <Box display="flex" flexDirection="column" alignItems="center" pt={4}>
-                  <NoItemsFoundImg style={{ width: 170 }} />
-                  <Typography variant="h3" fontWeight="400" color="var(--yoroi-palette-gray-900)">
-                    <FormattedHTMLMessage {...messages.noWalletsFound} values={{ network }} />
-                  </Typography>
                 </Box>
               ) : null}
             </Box>
