@@ -135,7 +135,7 @@ export default class ConnectContainer extends Component<
         },
       }));
       if (index >= 0 && deriver) {
-        if (this.generated.stores.connector.connectingMessage?.appAuthID) {
+        if (this.generated.stores.connector.connectingMessage?.appAuthID != null) {
           this.setState({ isAppAuth: true });
         } else {
           this.onConnect(deriver, checksum);

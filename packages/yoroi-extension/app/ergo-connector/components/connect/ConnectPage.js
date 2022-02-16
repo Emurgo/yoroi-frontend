@@ -317,13 +317,6 @@ class ConnectPage extends Component<Props> {
                     ))}
                   </ul>
                 </Box>
-              ) : hasNoWallets ? (
-                <Box display="flex" flexDirection="column" alignItems="center" pt={4}>
-                  <NoItemsFoundImg style={{ width: 170 }} />
-                  <Typography variant="h3" fontWeight="400" color="var(--yoroi-palette-gray-900)">
-                    <FormattedHTMLMessage {...messages.noWalletsFound} values={{ network }} />
-                  </Typography>
-                </Box>
               ) : null}
             </Box>
           )}
