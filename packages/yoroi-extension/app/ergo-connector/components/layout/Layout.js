@@ -19,7 +19,7 @@ type Props = {|
 const messages = defineMessages({
   yoroiDappConnector: {
     id: 'global.connector.yoroiDappConnector',
-    defaultMessage: '!!!Yoroi Dapp Connector',
+    defaultMessage: '!!!Yoroi DApp Connector',
   },
 });
 @observer
