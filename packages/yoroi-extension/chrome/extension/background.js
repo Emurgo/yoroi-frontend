@@ -610,7 +610,7 @@ async function confirmSign(
     });
       chrome.windows.create({
         ...popupProps,
-      url: chrome.extension.getURL(`/main_window_ergo.html#/signin-transaction`),
+      url: chrome.extension.getURL(`/main_window_connector.html#/signin-transaction`),
       left: (bounds.width + bounds.positionX) - popupProps.width,
       top: bounds.positionY + 80,
     });
@@ -697,7 +697,7 @@ async function confirmConnect(
       });
       chrome.windows.create({
         ...popupProps,
-        url: chrome.extension.getURL('main_window_ergo.html'),
+        url: chrome.extension.getURL('main_window_connector.html'),
         left: (bounds.width + bounds.positionX) - popupProps.width,
         top: bounds.positionY + 80,
       });
@@ -716,7 +716,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
         const bounds = getBoundsForWindow(currentWindow);
         chrome.windows.create({
           ...popupProps,
-          url: chrome.extension.getURL(`/main_window_ergo.html#/settings`),
+          url: chrome.extension.getURL(`/main_window_connector.html#/settings`),
           left: (bounds.width + bounds.positionX) - popupProps.width,
           top: bounds.positionY + 80,
         });
@@ -1244,15 +1244,21 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet, connection) => {
-                    await RustModule.load();
-                    const signatureHex = await authSignHexPayload({
-                      appAuthID: connection?.appAuthID,
-                      deriver: wallet,
-                      payloadHex: message.params[0],
-                    });
-                    rpcResponse({
-                      ok: signatureHex
-                    });
+                    const auth = connection?.status?.auth;
+                    if (auth) {
+                      await RustModule.load();
+                      const signatureHex = await authSignHexPayload({
+                        privKey: auth.privkey,
+                        payloadHex: message.params[0],
+                      });
+                      rpcResponse({
+                        ok: signatureHex
+                      });
+                    } else {
+                      rpcResponse({
+                        err: 'auth_sign_hex_payload is requested but no auth is present in the connection!',
+                      });
+                    }
                   },
                   db,
                   localStorageApi,
