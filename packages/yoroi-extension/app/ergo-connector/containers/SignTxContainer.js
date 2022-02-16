@@ -40,10 +40,6 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  // componentWillUnmount() {
-  //   window.removeEventListener('unload', this.onUnload);
-  // }
-
   onConfirm: string => void = password => {
     window.removeEventListener('unload', this.onUnload);
     this.generated.actions.connector.confirmSignInTx.trigger(password);
