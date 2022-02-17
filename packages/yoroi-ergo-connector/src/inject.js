@@ -93,7 +93,11 @@ const initialInject = `
       connectRequests.push({
         protocol: 'cardano',
         resolve: (auth) => {
-            resolve(Object.freeze(new CardanoAPI(auth, cardano_rpc_call)));
+            const authWrapper = auth == null ? null : Object.freeze({
+              walletId: auth.walletId,
+              pubkey: auth.pubkey,
+            });
+            resolve(Object.freeze(new CardanoAPI(authWrapper, cardano_rpc_call)));
         },
         reject: reject
       });
@@ -233,8 +237,21 @@ class CardanoAPI {
       return this._cardano_rpc_call('submit_tx', [tx]);
     }
     
-    signTx(tx, partialSign = false) {
-      return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign }]);
+    signTx(param, _partialSign = false) {
+      if (param == null) {
+        throw new Error('.signTx argument cannot be null!');
+      }
+      let tx = param;
+      let partialSign = _partialSign;
+      let returnTx = false;
+      if (typeof param === 'object') {
+        tx = param.tx;
+        partialSign = param.partialSign;
+        returnTx = param.returnTx;
+      } else if (typeof param !== 'string') {
+        throw new Error('.signTx argument is expected to be an object or a string!')
+      }
+      return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign, returnTx }]);
     }
     
     signData(address, sigStructure) {

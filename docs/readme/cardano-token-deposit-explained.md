@@ -35,4 +35,4 @@ One additional feature that is being developed at the moment and is targeted to 
 
 ### References
 
-For more technical details and the exact math plz check the IOHK document for "Min-Ada-Value Requirement" explanation: https://github.com/input-output-hk/cardano-ledger-specs/blob/master/doc/explanations/min-utxo.rst
+For more technical details and the exact math plz check the IOHK document for "Min-Ada-Value Requirement" explanation: https://github.com/input-output-hk/cardano-ledger/blob/51c044cafa350bf6626a89d9b4cb3d4788aaae34/doc/explanations/min-utxo-alonzo.rst
