@@ -100,7 +100,7 @@ Feature: Hardware device
     Given I click on see dashboard
     Then I should see the dashboard screen
 
-  @it-120
+  @it-120 @ignore
   Scenario: Test Byron Trezor (IT-120)
     Given I connected Trezor device 6495958994A4025BB5EE1DB0
     # test restoration
@@ -131,7 +131,7 @@ Feature: Hardware device
     And I see the derivation path "m/44'/1815'/0'/0/8"
     Then I verify the address on my trezor device
 
-  @it-136
+  @it-136 @ignore
   Scenario: Test Shelley Trezor (IT-136)
     Given I connected Trezor device 6495958994A4025BB5EE1DB0
     # test restoration
@@ -175,7 +175,7 @@ Feature: Hardware device
     Then I see the stakepool ticker "YOROI"
     And I click on the next button in the delegation by id
     Then I see the delegation confirmation dialog
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglg5AWUcSwdFBud7UJKQ+QefaKw+IqQtpmDiefjzV7dkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSGgAyvy8CGgACqLEDGhH+lM0EgoIAggBYHGQji8OcliqigVakWkYSE3cNiNgIiWeF+Sw6pNKDAoIAWBxkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggIL1t3O4RKx2YKpd4BSHseH/S7owdieZYrByrYgJ36IhYQOKensoFx6NP7xLo3odtnzYuCstQ3BPKT/MTsL5K3FUODS77ZBqN6YcjCqfpyzfIswX3xNnDBeTkDzYFiQctAw6CWCBSNIIHv+9Ne4kuzm9920PNEffFihrFH/jaJK5cLCyehlhA9CJLFmF9uAaB3+hVkvxu9SSqPKlI2nJ1uJLH99S9h5MO+SZKlP56WSsPbZLHwe1IF0ue+RfeyOYnSI+gayDLC/Y="
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglg5AWUcSwdFBud7UJKQ+QefaKw+IqQtpmDiefjzV7dkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSGgAyvwMCGgACqN0DGhH+lM0EgoIAggBYHGQji8OcliqigVakWkYSE3cNiNgIiWeF+Sw6pNKDAoIAWBxkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggIL1t3O4RKx2YKpd4BSHseH/S7owdieZYrByrYgJ36IhYQO1UXCZaLUzxEB0ww7GVRBLBlVJfifKVNe7wBQypSJc+9zOLmcQhkpAUB03iaM/+nSmfLhRFoOJ+zz43gDJGKQKCWCBSNIIHv+9Ne4kuzm9920PNEffFihrFH/jaJK5cLCyehlhAVLgIT2aPqRMFOJB+LPss8b47x5iXf43zSldgwlaR5t4Eed8UzDuHRkbNrGutD86iY/ry6YcS4Jxrgh7xJljuBfX2"
     Then I submit the wallet send form
     Given I click on see dashboard
     Then I should see the dashboard screen
