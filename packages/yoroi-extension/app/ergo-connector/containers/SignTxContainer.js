@@ -22,6 +22,7 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { CardanoConnectorSignRequest } from '../types';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -41,7 +42,7 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConfirm: string => void = deriver => async (password) => {
+  onConfirm: PublicDeriver<> => string => Promise<void> = deriver => async (password) => {
     const withSigningKey = asGetSigningKey(deriver);
     if (!withSigningKey) {
       throw new Error(`[sign tx] no signing key`);

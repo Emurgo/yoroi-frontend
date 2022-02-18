@@ -52,7 +52,7 @@ type Props = {|
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
-  +onConfirm: string => void,
+  +onConfirm: string => Promise<void>,
   +notification: ?Notification,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => ?$ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
