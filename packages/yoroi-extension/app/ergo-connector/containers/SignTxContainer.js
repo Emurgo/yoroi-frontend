@@ -42,7 +42,7 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConfirm: PublicDeriver<> => string => Promise<void> = deriver => async (password) => {
+  onConfirm: (PublicDeriver<> => (string => Promise<void>)) = deriver => async (password) => {
     const withSigningKey = asGetSigningKey(deriver);
     if (!withSigningKey) {
       throw new Error(`[sign tx] no signing key`);
