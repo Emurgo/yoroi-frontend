@@ -1,0 +1,141 @@
+.component {
+  padding: 30px 15px 50px 15px ;
+  overflow: scroll;
+  width: 100%;
+  height: 100%;
+
+  .title {
+    font-size: 24px;
+    line-height: 32px;
+    margin-bottom: 20px;
+    padding: 0px 20px;
+  }
+
+  .transactionWrapper {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 0px 20px;
+
+    .transactionId {
+      font-size: 16px;
+      line-height: 24px;
+      margin-bottom: 4px;
+    }
+
+    .more {
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--yoroi-palette-secondary-200);
+    }
+
+    .more:hover {
+      color: var(--yoroi-palette-secondary-300)
+    }
+
+    .hash {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      color: #6B7384;
+      font-size: 14px;
+      line-height: 22px;
+      .address {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    .utxo {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 8px;
+      font-size: 16px;
+      line-height: 24px;
+      cursor: pointer;
+      width: 100%;
+      color: var(--yoroi-palette-gray-800);
+
+    }    
+  }
+
+  .info {
+    margin-bottom: 60px;
+    .infoRaw {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #EAEDF2;
+      padding: 10px 20px;
+      .label {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .labelValue {
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 24px;
+      }
+    }
+
+    .infoRaw:nth-child(2) {
+      border: none;
+    }
+  }
+
+  .amountRegular {
+    font-weight: 500;
+  }
+
+  .amount {
+    font-weight: 400;
+    color: var(--yoroi-palette-gray-800);
+  }
+
+  .message {
+    padding: 10px 20px;
+    font-family: Rubik;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+    p {
+      margin-bottom: 24px;
+    }
+    text-align: justify;
+  }
+
+  .errorMessage {
+    padding: 10px 20px;
+    color: var(--yoroi-palette-error-200);
+  }
+}
+
+.label {
+  color: var(--yoroi-palette-gray-900);
+  font-size: 14px;
+  margin-bottom: 4px;
+  letter-spacing: 0;
+  line-height: 22px;
+}
+
+.wrapperBtn {
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 5px;
+}
+
+.totalAmoundCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 20px;
+  background-color: var(--yoroi-palette-primary-200);
+  color: #FFFFFF;
+  margin-top: 20px;
+  border-radius: 9px;
+  font-size: 17px;
+  font-weight: 500;
+}

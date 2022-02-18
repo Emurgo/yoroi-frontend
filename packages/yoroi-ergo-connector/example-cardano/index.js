@@ -593,9 +593,15 @@ getCollateralUtxos.addEventListener('click', () => {
     alertError('Should request access first');
     return;
   }
-  const amount = '2000000';
+  const amount = '2100000';
 
-  cardanoApi.getCollateralUtxos(amount).then(utxos => {
+  cardanoApi.getCollateralUtxos(
+    Buffer.from(
+      CardanoWasm.Value.new(
+        CardanoWasm.BigNum.from_str(amount)
+      ).to_bytes()
+    ).toString('hex')
+  ).then(utxos => {
     toggleSpinner('hide')
     alertSuccess('Getting collateral UTXOs succeeds: ' + utxos)
   }).catch(error => {

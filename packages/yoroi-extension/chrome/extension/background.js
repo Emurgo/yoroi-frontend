@@ -517,11 +517,16 @@ const yoroiMessageHandler = async (
           responseData.resolve({ err: 'transaction signing failed' })
         }
       }
-        break;
       case 'data':
         // mocked data sign
         responseData.resolve({ err: 'Generic data signing is not implemented yet' });
         break;
+      case 'tx-reorg/cardano':
+        {
+          const utxos = request.utxos;
+          responseData.resolve({ ok: utxos });
+        }
+      break;
       default:
         // log?
         break;
@@ -1304,21 +1309,59 @@ function handleInjectorConnect(port) {
           case 'get_collateral_utxos':
             try {
               checkParamCount(1);
-              const requiredAmount = String(message.params[0]);
+              const requiredAmount = RustModule.WalletV4.Value.from_bytes(
+                Buffer.from(message.params[0], 'hex')
+              ).coin().to_str();
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    let utxos;
-                    utxos = await connectorGetCollateralUtxos(
+                    const {
+                      utxosToUse,
+                      reorgTargetAmount
+                    } = await connectorGetCollateralUtxos(
                       wallet,
                       pendingTxs,
                       requiredAmount,
                     );
-                    utxos = await transformCardanoUtxos(utxos, isCBOR);
-                    rpcResponse({
-                      ok: utxos
-                    });
+                    if (!reorgTargetAmount) {
+                      const utxos = await transformCardanoUtxos(
+                        utxosToUse,
+                        isCBOR
+                      );
+                      rpcResponse({
+                        ok: utxos,
+                      });
+                      return;
+                    }
+                    const connection = connectedSites.get(tabId);
+                    if (connection == null) {
+                      Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                      return;
+                    }
+
+                    const resp = await confirmSign(
+                      tabId,
+                      {
+                        type: 'tx-reorg/cardano',
+                        tx: {
+                          usedUtxoIds: utxosToUse.map(utxo => utxo.utxo_id),
+                          reorgTargetAmount
+                        },
+                        uid: message.uid,
+                      },
+                      connection,
+                    );
+                    if (!resp.ok) {
+                      rpcResponse({ error: 'sign failed' });
+                      return;
+                    }
+                    const utxos = await transformCardanoUtxos(
+                      [...utxosToUse, ...resp.ok],
+                      isCBOR
+                    );
+                    rpcResponse({ ok: utxos });
                   },
                   db,
                   localStorageApi,

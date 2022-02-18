@@ -243,11 +243,16 @@ const MAX_COLLATERAL = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('100000');
 
+type GetCollateralUtxosRespose = {|
+  utxosToUse: Array<RemoteUnspentOutput>,
+  reorgTargetAmount: ?string,
+|};
+
 export async function connectorGetCollateralUtxos(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
   requiredAmount: Value,
-): Promise<Array<RemoteUnspentOutput>> {
+): Promise<GetCollateralUtxosRespose> {
   const required = new BigNumber(requiredAmount)
   if (required.gt(MAX_COLLATERAL)) {
     throw new Error('requested collateral amount is beyond the allowed limits')
@@ -282,7 +287,14 @@ export async function connectorGetCollateralUtxos(
     }
   }
 
-  return enough ? utxosToUse : []
+  if (enough) {
+    return { utxosToUse, reorgTargetAmount: null };
+  }
+
+  return {
+    utxosToUse,
+    reorgTargetAmount: required.minus(sum).toString(),
+  };
 }
 
 export type FullAddressPayloadWithBase58 = {|
