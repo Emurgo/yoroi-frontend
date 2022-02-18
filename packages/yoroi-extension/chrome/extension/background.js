@@ -422,39 +422,51 @@ const yoroiMessageHandler = async (
       switch (responseData.request.type) {
         case 'tx':
           {
-            // We know `tx` is a `Tx` here
-            const txToSign: Tx = (request.tx: any);
-            const allIndices = [];
-            for (let i = 0; i < txToSign.inputs.length; i += 1) {
-              allIndices.push(i);
+            try {
+              // We know `tx` is a `Tx` here
+              const txToSign: Tx = (request.tx: any);
+              const allIndices = [];
+              for (let i = 0; i < txToSign.inputs.length; i += 1) {
+                allIndices.push(i);
+              }
+              const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
+              responseData.resolve({ ok: signedTx });
+            } catch (error) {
+              responseData.resolve({ err: 'transaction signing failed' })
             }
-            const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
-            responseData.resolve({ ok: signedTx });
           }
           break;
         case 'tx_input':
           {
-            const data = responseData.request;
-            const txToSign: Tx = (request.tx: any);
-            const signedTx = await signTxInputs(
-              txToSign,
-              [data.index],
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx.inputs[data.index] });
+            try {
+              const data = responseData.request;
+              const txToSign: Tx = (request.tx: any);
+              const signedTx = await signTxInputs(
+                txToSign,
+                [data.index],
+                password,
+                request.tabId
+              );
+              responseData.resolve({ ok: signedTx.inputs[data.index] });
+            } catch (error) {
+              responseData.resolve({ err: 'transaction signing failed' })
+            }
           }
           break;
         case 'tx/cardano':
           {
-            const signedTx = await signCardanoTx(
-              // $FlowFixMe[prop-missing]
-              // $FlowFixMe[incompatible-exact]
-              (request.tx: CardanoTx),
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx });
+            try {
+              const signedTx = await signCardanoTx(
+                // $FlowFixMe[prop-missing]
+                // $FlowFixMe[incompatible-exact]
+                (request.tx: CardanoTx),
+                password,
+                request.tabId
+              );
+              responseData.resolve({ ok: signedTx });
+            } catch (error) {
+              responseData.resolve({ err: 'transaction signing failed' })
+            }
           }
         break;
         case 'data':
