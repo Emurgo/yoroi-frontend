@@ -290,7 +290,7 @@ getUtxos.addEventListener('click', () => {
               utxo_id: `${txHash}${txIndex}`,
               tx_hash: txHash,
               tx_index: txIndex,
-              receiver: Buffer.from(output.address().to_bytes()).toString('hex'),
+              receiver: output.address().to_bech32(),
               amount: value.coin().to_str(),
               assets: reduceWasmMultiasset(value.multiasset(), (res, asset) => {
                 res.push(asset);
@@ -370,9 +370,8 @@ signTx.addEventListener('click', () => {
     // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
     const utxo = utxos[0]
 
-    const addr = CardanoWasm.Address.from_bytes(
-      hexToBytes(utxo.receiver)
-    )
+    const addr = CardanoWasm.Address.from_bech32(utxo.receiver);
+
     const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
     const keyHash = baseAddr.payment_cred().to_keyhash();
     txBuilder.add_key_input(

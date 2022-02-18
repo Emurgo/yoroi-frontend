@@ -53,6 +53,7 @@ import {
   connectorGetChangeAddress,
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -309,7 +310,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
     }
     try {
-      const wallets = await getWallets({ db: persistentDb });
+      const wallets = (await getWallets({ db: persistentDb }))
+        .filter(w => w.getParent().getWalletType() === WalletTypeOption.WEB_WALLET);
 
       const protocol = this.protocol;
       const isProtocolErgo = protocol === 'ergo';
