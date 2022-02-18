@@ -63,7 +63,6 @@ import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
-import { WrongPassphraseError } from '../../app/api/ada/lib/cardanoCrypto/cryptoErrors';
 
 
 /*::
