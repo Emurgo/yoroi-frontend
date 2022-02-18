@@ -123,6 +123,7 @@ class SignTxPage extends Component<Props> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
