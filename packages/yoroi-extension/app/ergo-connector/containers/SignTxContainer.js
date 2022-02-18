@@ -10,7 +10,7 @@ import SignTxPage from '../components/signin/SignTxPage';
 import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type { SigningMessage, PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types';
-import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
+import { genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -38,10 +38,6 @@ export default class SignTxContainer extends Component<
   componentDidMount() {
     this.generated.actions.connector.refreshWallets.trigger();
     window.addEventListener('unload', this.onUnload);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('unload', this.onUnload);
   }
 
   onConfirm: string => void = password => {
@@ -129,8 +125,7 @@ export default class SignTxContainer extends Component<
         );
         break;
       }
-      case 'tx/cardano':
-      case 'tx-create-req/cardano': {
+      case 'tx/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
         if (txData == null) return this.renderLoading();
         component = (
@@ -154,7 +149,7 @@ export default class SignTxContainer extends Component<
             }
             tx={signingMessage.sign.tx}
             txData={txData}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
             onConfirm={this.onConfirm}

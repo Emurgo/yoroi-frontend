@@ -48,7 +48,18 @@ const defaultTtlOffset = 7200;
 type TxOutput = {|
   ...Address,
   amount: MultiToken,
+  dataHash?: string,
 |};
+
+type TxMint = {|
+  policyScript: string, // HEX of the WASM policy script,
+  assetName: string, // HEX
+  amount: string,
+|};
+
+type TxMetadata = {
+  [tag: string]: string,
+};
 
 export function sendAllUnsignedTx(
   receiver: {| ...Address, ...InexactSubset<Addressing> |},
@@ -377,10 +388,14 @@ export function newAdaUnsignedTx(
 
 export function newAdaUnsignedTxForConnector(
   outputs: Array<TxOutput>,
+  mint: Array<TxMint>,
+  metadata: TxMetadata,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<CardanoAddressedUtxo>,
   coinSelectUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
+  validityStart: ?number,
+  ttl: ?number,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -407,10 +422,14 @@ export function newAdaUnsignedTxForConnector(
   }
   const unsignedTxResponse = newAdaUnsignedTxFromUtxoForConnector(
     outputs,
+    mint,
+    metadata,
     changeAdaAddr,
     Array.from(addressingMapForMustIncludeUtxos.keys()),
     Array.from(addressingMapForCoinSelectUtxos.keys()),
     absSlotNumber,
+    validityStart,
+    ttl,
     protocolParams,
   );
 
@@ -910,10 +929,14 @@ function _newAdaUnsignedTxFromUtxo(
 
 function newAdaUnsignedTxFromUtxoForConnector(
   outputs: Array<TxOutput>,
+  mint: Array<TxMint>,
+  metadata: TxMetadata,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<RemoteUnspentOutput>,
   coinSelectUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
+  validityStart: ?number,
+  ttl: ?number,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -953,7 +976,14 @@ function newAdaUnsignedTxFromUtxoForConnector(
   shouldForceChange(undefined);
 
   const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
-  txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+  if (validityStart != null) {
+    txBuilder.set_validity_start_interval(validityStart)
+  }
+  if (ttl != null) {
+    txBuilder.set_ttl(ttl);
+  } else {
+    txBuilder.set_ttl((absSlotNumber.plus(defaultTtlOffset).toNumber()));
+  }
   {
     for (const output of outputs) {
       const wasmReceiver = normalizeToAddress(output.address);
@@ -961,11 +991,17 @@ function newAdaUnsignedTxFromUtxoForConnector(
         throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
       }
       try {
+        const newOutput = RustModule.WalletV4.TransactionOutput.new(
+          wasmReceiver,
+          cardanoValueFromMultiToken(output.amount),
+        );
+        if (output.dataHash != null) {
+          newOutput.set_data_hash(RustModule.WalletV4.DataHash.from_bytes(
+            Buffer.from(output.dataHash, 'hex')
+          ));
+        }
         txBuilder.add_output(
-          RustModule.WalletV4.TransactionOutput.new(
-            wasmReceiver,
-            cardanoValueFromMultiToken(output.amount),
-          )
+          newOutput
         );
       } catch (e) {
         if (String(e).includes('less than the minimum UTXO value')) {
@@ -973,6 +1009,34 @@ function newAdaUnsignedTxFromUtxoForConnector(
         }
         throw e;
       }
+    }
+  }
+  {
+    for (const m of mint) {
+      const mintScript = RustModule.WalletV4.NativeScript.from_bytes(
+        Buffer.from(m.policyScript, 'hex'),
+      );
+      const mintName = RustModule.WalletV4.AssetName.new(
+        Buffer.from(m.assetName, 'hex'),
+      );
+      const amountBignum = new BigNumber(m.amount);
+      const wasmAmountBignum = RustModule.WalletV4.BigNum.from_str(amountBignum.abs().toString());
+      const wasmAmount = amountBignum.isPositive() ?
+        RustModule.WalletV4.Int.new(wasmAmountBignum)
+        : RustModule.WalletV4.Int.new_negative(wasmAmountBignum);
+      txBuilder.add_mint_asset(
+        mintScript,
+        mintName,
+        wasmAmount,
+      );
+    }
+  }
+  {
+    for (const tag of Object.keys(metadata)) {
+      txBuilder.add_json_metadatum(
+        RustModule.WalletV4.BigNum.from_str(String(tag)),
+        metadata[tag],
+      )
     }
   }
 
@@ -999,12 +1063,9 @@ function newAdaUnsignedTxFromUtxoForConnector(
       usedUtxos.push(utxo);
     }
 
-    // recall: we might have some implicit input to start with from deposit refunds
-    const implicitSum = txBuilder.get_implicit_input();
-
     // add utxos until we have enough to send the transaction
     for (const utxo of coinSelectUtxos) {
-      const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+      const currentInputSum = txBuilder.get_total_input();
       const neededInput = targetOutput
         .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
       const excessiveInputAssets = currentInputSum.multiasset()
@@ -1057,7 +1118,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
     }
     // check to see if we have enough balance in the wallet to cover the transaction
     {
-       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+       const currentInputSum = txBuilder.get_total_input();
 
       // need to recalculate each time because fee changes
       const output = targetOutput
@@ -1160,13 +1221,15 @@ export function signTransaction(
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
-  metadata: void | RustModule.WalletV4.AuxiliaryData,
+  metadata: ?RustModule.WalletV4.AuxiliaryData,
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet = null,
+  otherRequiredSigners: Array<{| ...Address, ...Addressing |}> = [],
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();
-  const deduped: Array<CardanoAddressedUtxo> = [];
-  for (const senderUtxo of senderUtxos) {
-    const wasmAddr = normalizeToAddress(senderUtxo.receiver);
+  const deduped: Array<CardanoAddressedUtxo | {| ...Address, ...Addressing |}> = [];
+  function addIfUnique(address: string, item: CardanoAddressedUtxo | {| ...Address, ...Addressing |}): void {
+    const wasmAddr = normalizeToAddress(address);
     if (wasmAddr == null) {
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
     }
@@ -1175,9 +1238,9 @@ export function signTransaction(
     if (keyHash === null) {
       if (!seenByronKeys.has(addrHex)) {
         seenByronKeys.add(addrHex);
-        deduped.push(senderUtxo);
+        deduped.push(item);
       }
-      continue;
+      return;
     }
     if (keyHash === undefined) {
       throw new Error(`${nameof(signTransaction)} cannot sign script inputs`);
@@ -1186,9 +1249,15 @@ export function signTransaction(
       const keyHex = Buffer.from(keyHash.to_bytes()).toString('hex');
       if (!seenKeyHashes.has(keyHex)) {
         seenKeyHashes.add(keyHex);
-        deduped.push(senderUtxo);
+        deduped.push(item);
       }
     }
+  }
+  for (const senderUtxo of senderUtxos) {
+    addIfUnique(senderUtxo.receiver, senderUtxo);
+  }
+  for (const otherSigner of otherRequiredSigners) {
+    addIfUnique(otherSigner.address, otherSigner);
   }
 
   const txBody = unsignedTx instanceof RustModule.WalletV4.TransactionBuilder
@@ -1221,13 +1290,14 @@ export function signTransaction(
     );
   }
 
-  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witnessSet = witnessSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
 
   return RustModule.WalletV4.Transaction.new(
     txBody,
     witnessSet,
+    // $FlowFixMe[incompatible-call]
     metadata,
   );
 }
@@ -1245,14 +1315,14 @@ function utxoToTxInput(
 
 function addWitnesses(
   txHash: RustModule.WalletV4.TransactionHash,
-  uniqueUtxos: Array<CardanoAddressedUtxo>, // pre-req: does not contain duplicate keys
+  uniqueAddressings: Array<CardanoAddressedUtxo | {| ...Address, ...Addressing |}>, // pre-req: does not contain duplicate keys
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   vkeyWits: RustModule.WalletV4.Vkeywitnesses,
   bootstrapWits: RustModule.WalletV4.BootstrapWitnesses,
 ): void {
   // get private keys
-  const privateKeys = uniqueUtxos.map(utxo => {
+  const privateKeys = uniqueAddressings.map(utxo => {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
     if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
       throw new Error(`${nameof(addWitnesses)} incorrect addressing size`);
@@ -1267,8 +1337,16 @@ function addWitnesses(
   });
 
   // sign the transactions
-  for (let i = 0; i < uniqueUtxos.length; i++) {
-    const wasmAddr = normalizeToAddress(uniqueUtxos[i].receiver);
+  for (let i = 0; i < uniqueAddressings.length; i++) {
+    const uniqueAddressing = uniqueAddressings[i];
+    const resolveAddress = (): string => {
+      if (uniqueAddressing.receiver != null)
+        return uniqueAddressing.receiver;
+      if (uniqueAddressing.address != null)
+        return uniqueAddressing.address;
+      throw new Error(`[addWitnesses] Unexpected addressing for signing: ${JSON.stringify(uniqueAddressing)}`)
+    }
+    const wasmAddr = normalizeToAddress(resolveAddress());
     if (wasmAddr == null) {
       throw new Error(`${nameof(addWitnesses)} utxo not a valid Shelley address`);
     }
