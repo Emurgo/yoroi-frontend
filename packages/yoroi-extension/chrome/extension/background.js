@@ -433,11 +433,7 @@ const yoroiMessageHandler = async (
               const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
               responseData.resolve({ ok: signedTx });
             } catch (error) {
-              let err = 'transaction signing failed'
-              if (error instanceof WrongPassphraseError) {
-                err = 'Incorrect Password'
-              }
-              responseData.resolve({ err })
+              responseData.resolve({ err: 'transaction signing failed' })
             }
           }
           break;
@@ -454,11 +450,7 @@ const yoroiMessageHandler = async (
               );
               responseData.resolve({ ok: signedTx.inputs[data.index] });
             } catch (error) {
-              let err = 'transaction signing failed'
-              if (error instanceof WrongPassphraseError) {
-                err = 'Incorrect Password'
-              }
-              responseData.resolve({ err })
+              responseData.resolve({ err: 'transaction signing failed' })
             }
           }
           break;
@@ -474,11 +466,7 @@ const yoroiMessageHandler = async (
               );
               responseData.resolve({ ok: signedTx });
             } catch (error) {
-              let err = 'transaction signing failed'
-              if (error instanceof WrongPassphraseError) {
-                err = 'Incorrect Password'
-              }
-              responseData.resolve({ err })
+              responseData.resolve({ err: 'transaction signing failed' })
             }
           }
         break;
