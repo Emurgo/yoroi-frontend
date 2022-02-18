@@ -1215,6 +1215,8 @@ function newAdaUnsignedTxFromUtxoForConnector(
   };
 }
 
+type UtxoOrAddressing = CardanoAddressedUtxo | {| ...Address, ...Addressing |};
+
 export function signTransaction(
   senderUtxos: Array<CardanoAddressedUtxo>,
   unsignedTx: RustModule.WalletV4.TransactionBuilder | RustModule.WalletV4.TransactionBody,
@@ -1227,8 +1229,8 @@ export function signTransaction(
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();
-  const deduped: Array<CardanoAddressedUtxo | {| ...Address, ...Addressing |}> = [];
-  function addIfUnique(address: string, item: CardanoAddressedUtxo | {| ...Address, ...Addressing |}): void {
+  const deduped: Array<UtxoOrAddressing> = [];
+  function addIfUnique(address: string, item: UtxoOrAddressing): void {
     const wasmAddr = normalizeToAddress(address);
     if (wasmAddr == null) {
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
@@ -1315,7 +1317,7 @@ function utxoToTxInput(
 
 function addWitnesses(
   txHash: RustModule.WalletV4.TransactionHash,
-  uniqueAddressings: Array<CardanoAddressedUtxo | {| ...Address, ...Addressing |}>, // pre-req: does not contain duplicate keys
+  uniqueAddressings: Array<UtxoOrAddressing>, // pre-req: does not contain duplicate keys
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   vkeyWits: RustModule.WalletV4.Vkeywitnesses,

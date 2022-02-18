@@ -1833,7 +1833,8 @@ export default class AdaApi {
           request.db,
           wallet.bip44WrapperRow,
         );
-        console.log({mode: request.mode, request, wallet, bip44Wallet})
+        // eslint-disable-next-line no-console
+        console.log({ mode: request.mode, request, wallet, bip44Wallet })
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
             pubDeriver.publicDeriverResult,
