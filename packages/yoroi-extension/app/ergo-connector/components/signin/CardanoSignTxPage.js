@@ -44,6 +44,7 @@ import type { CardanoConnectorSignRequest } from '../../types';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
 import type CardanoTxRequest from '../../../api/ada';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 
 type Props = {|
   +tx: Tx | CardanoTx | CardanoTxRequest,
@@ -77,7 +78,11 @@ const messages = defineMessages({
   more: {
     id: 'connector.signin.more',
     defaultMessage: '!!!more'
-  }
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
 });
 
 @observer
@@ -134,8 +139,14 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword).catch(err => {
-          console.log(err)
+        this.props.onConfirm(walletPassword).catch(error => {
+          if (error instanceof WrongPassphraseError) {
+            this.form.$('walletPassword').invalidate(
+              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+            )
+          } else {
+            throw error;
+          }
         });
       },
       onError: () => {},
