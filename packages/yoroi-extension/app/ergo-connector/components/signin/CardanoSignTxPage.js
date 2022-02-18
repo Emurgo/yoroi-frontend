@@ -134,7 +134,9 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
+        this.props.onConfirm(walletPassword).catch(err => {
+          console.log(err)
+        });
       },
       onError: () => {},
     });
