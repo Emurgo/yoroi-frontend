@@ -63,6 +63,7 @@ import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
+import { WrongPassphraseError } from '../../app/api/ada/lib/cardanoCrypto/cryptoErrors';
 
 
 /*::
@@ -422,39 +423,63 @@ const yoroiMessageHandler = async (
       switch (responseData.request.type) {
         case 'tx':
           {
-            // We know `tx` is a `Tx` here
-            const txToSign: Tx = (request.tx: any);
-            const allIndices = [];
-            for (let i = 0; i < txToSign.inputs.length; i += 1) {
-              allIndices.push(i);
+            try {
+              // We know `tx` is a `Tx` here
+              const txToSign: Tx = (request.tx: any);
+              const allIndices = [];
+              for (let i = 0; i < txToSign.inputs.length; i += 1) {
+                allIndices.push(i);
+              }
+              const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
+              responseData.resolve({ ok: signedTx });
+            } catch (error) {
+              let err = 'transaction signing failed'
+              if (error instanceof WrongPassphraseError) {
+                err = 'Incorrect Password'
+              }
+              responseData.resolve({ err })
             }
-            const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
-            responseData.resolve({ ok: signedTx });
           }
           break;
         case 'tx_input':
           {
-            const data = responseData.request;
-            const txToSign: Tx = (request.tx: any);
-            const signedTx = await signTxInputs(
-              txToSign,
-              [data.index],
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx.inputs[data.index] });
+            try {
+              const data = responseData.request;
+              const txToSign: Tx = (request.tx: any);
+              const signedTx = await signTxInputs(
+                txToSign,
+                [data.index],
+                password,
+                request.tabId
+              );
+              responseData.resolve({ ok: signedTx.inputs[data.index] });
+            } catch (error) {
+              let err = 'transaction signing failed'
+              if (error instanceof WrongPassphraseError) {
+                err = 'Incorrect Password'
+              }
+              responseData.resolve({ err })
+            }
           }
           break;
         case 'tx/cardano':
           {
-            const signedTx = await signCardanoTx(
-              // $FlowFixMe[prop-missing]
-              // $FlowFixMe[incompatible-exact]
-              (request.tx: CardanoTx),
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx });
+            try {
+              const signedTx = await signCardanoTx(
+                // $FlowFixMe[prop-missing]
+                // $FlowFixMe[incompatible-exact]
+                (request.tx: CardanoTx),
+                password,
+                request.tabId
+              );
+              responseData.resolve({ ok: signedTx });
+            } catch (error) {
+              let err = 'transaction signing failed'
+              if (error instanceof WrongPassphraseError) {
+                err = 'Incorrect Password'
+              }
+              responseData.resolve({ err })
+            }
           }
         break;
         case 'data':
