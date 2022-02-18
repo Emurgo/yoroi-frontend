@@ -145,7 +145,7 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.form$('isSubmitting').set(true)
+        this.form.$('isSubmitting').set(true)
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
@@ -155,7 +155,7 @@ class SignTxPage extends Component<Props> {
             throw error;
           }
         });
-        this.form$('isSubmitting').set(false)
+        this.form.$('isSubmitting').set(false)
       },
       onError: () => {},
     });
@@ -338,7 +338,7 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight } = form.values();
+    const { showUtxoDetails, currentWindowHeight, isSubmitting } = form.values();
 
     return (
       <>
@@ -434,9 +434,9 @@ class SignTxPage extends Component<Props> {
                   </Button>
                   <LoadingButton
                     variant="primary"
-                    disabled={false}
+                    disabled={!walletPasswordField.isValid}
                     onClick={this.submit.bind(this)}
-                    loading
+                    loading={isSubmitting}
                   >
                     {intl.formatMessage(globalMessages.confirm)}
                   </LoadingButton>
