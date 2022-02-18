@@ -33,6 +33,8 @@ import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx,
@@ -66,7 +68,11 @@ const messages = defineMessages({
   more: {
     id: 'connector.signin.more',
     defaultMessage: '!!!more'
-  }
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
 });
 
 type State = {|
@@ -92,6 +98,10 @@ class SignTxPage extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
+        isSubmitting: {
+          type: 'boolean',
+          value: false,
+        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -125,7 +135,17 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
+        this.form.$('isSubmitting').set(true);
+        this.props.onConfirm(walletPassword).catch(error => {
+          if (error instanceof WrongPassphraseError) {
+            this.form.$('walletPassword').invalidate(
+              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+            )
+          } else {
+            throw error;
+          }
+        });
+        this.form.$('isSubmitting').set(false);
       },
       onError: () => {},
     });
@@ -249,6 +269,7 @@ class SignTxPage extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
+    const { isSubmitting } = form.values();
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
@@ -333,14 +354,15 @@ class SignTxPage extends Component<Props, State> {
                <Button fullWidth variant="secondary" onClick={onCancel}>
                  {intl.formatMessage(globalMessages.cancel)}
                </Button>
-               <Button
+               <LoadingButton
                  variant="primary"
                  fullWidth
                  disabled={!walletPasswordField.isValid}
                  onClick={this.submit.bind(this)}
+                 loading={isSubmitting}
                >
                  {intl.formatMessage(globalMessages.confirm)}
-               </Button>
+               </LoadingButton>
              </div>
            </div>
          ): <UtxoDetails
