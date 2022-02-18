@@ -45,6 +45,7 @@ import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
 import type CardanoTxRequest from '../../../api/ada';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx | CardanoTx | CardanoTxRequest,
@@ -98,6 +99,10 @@ class SignTxPage extends Component<Props> {
           type: 'boolean',
           value: false,
         },
+        isSubmitting: {
+          type: 'boolean',
+          value: false,
+        },
         currentWindowHeight: {
           type: 'integer',
           value: window.innerHeight
@@ -140,6 +145,7 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
+        this.form$('isSubmitting').set(true)
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
@@ -149,6 +155,7 @@ class SignTxPage extends Component<Props> {
             throw error;
           }
         });
+        this.form$('isSubmitting').set(false)
       },
       onError: () => {},
     });
@@ -425,13 +432,14 @@ class SignTxPage extends Component<Props> {
                   >
                     {intl.formatMessage(globalMessages.cancel)}
                   </Button>
-                  <Button
+                  <LoadingButton
                     variant="primary"
-                    disabled={!walletPasswordField.isValid}
+                    disabled={false}
                     onClick={this.submit.bind(this)}
+                    loading
                   >
                     {intl.formatMessage(globalMessages.confirm)}
-                  </Button>
+                  </LoadingButton>
                 </div>
               </div>
             ) : (
