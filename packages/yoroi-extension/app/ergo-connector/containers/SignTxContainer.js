@@ -47,13 +47,13 @@ export default class SignTxContainer extends Component<
       throw new Error(`[sign tx] no signing key`);
     }
     const signingKeyFromStorage = await withSigningKey.getSigningKey();
-    // will trow a WrongPasswordError
+    // will throw a WrongPasswordError
     await withSigningKey.normalizeKey({
       ...signingKeyFromStorage,
       password,
     });
-    // window.removeEventListener('unload', this.onUnload);
-    // this.generated.actions.connector.confirmSignInTx.trigger(password);
+    window.removeEventListener('unload', this.onUnload);
+    this.generated.actions.connector.confirmSignInTx.trigger(password);
   };
   onCancel: () => void = () => {
     this.generated.actions.connector.cancelSignInTx.trigger();
