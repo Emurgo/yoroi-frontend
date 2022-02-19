@@ -53,18 +53,18 @@ export default class YoroiPalettePage extends Component<Props, State> {
                 Modern Theme
               </button>
             </div>
-            {Object.entries(palette).map((row, idx) => (
-              <div className={styles.row} key={idx}>
+            {Object.entries(palette).map(([key, val]) => (
+              <div className={styles.row} key={key}>
                 <span
                   className={styles.colorBox}
                   style={{
-                      backgroundColor: row[1]
+                      backgroundColor: val
                   }}
                 />
                 <p className={styles.colorHex}>
-                  {String(row[1])}
+                  {String(val)}
                 </p>
-                <p className={styles.colorName}>{row[0]}</p>
+                <p className={styles.colorName}>{key}</p>
               </div>
               ))}
           </div>

@@ -21,6 +21,8 @@ import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { CardanoConnectorSignRequest } from '../types';
+import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -40,7 +42,17 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConfirm: string => void = password => {
+  onConfirm: (PublicDeriver<> => (string => Promise<void>)) = deriver => async (password) => {
+    const withSigningKey = asGetSigningKey(deriver);
+    if (!withSigningKey) {
+      throw new Error(`[sign tx] no signing key`);
+    }
+    const signingKeyFromStorage = await withSigningKey.getSigningKey();
+    // will throw a WrongPasswordError
+    await withSigningKey.normalizeKey({
+      ...signingKeyFromStorage,
+      password,
+    });
     window.removeEventListener('unload', this.onUnload);
     this.generated.actions.connector.confirmSignInTx.trigger(password);
   };
@@ -105,7 +117,7 @@ export default class SignTxContainer extends Component<
             getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={this.onConfirm}
+            onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
             onCancel={this.onCancel}
             addressToDisplayString={addr => addressToDisplayString(
               addr,
@@ -152,7 +164,7 @@ export default class SignTxContainer extends Component<
             getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={this.onConfirm}
+            onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
             onCancel={this.onCancel}
             addressToDisplayString={addr => addressToDisplayString(
               addr,

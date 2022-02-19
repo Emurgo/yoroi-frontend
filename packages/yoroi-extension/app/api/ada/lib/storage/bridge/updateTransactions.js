@@ -2003,7 +2003,7 @@ export async function genCardanoAssetMap(
       }
       // tokens rows that have never been queried from the network
       const { lastUpdatedAt } = row.Metadata;
-      if (!lastUpdatedAt) {
+      if (lastUpdatedAt == null) {
         return false;
       }
       // fresh enough, no need for updating this time
