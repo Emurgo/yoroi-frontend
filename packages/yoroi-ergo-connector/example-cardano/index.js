@@ -2,6 +2,8 @@ import * as CardanoWasm from "@emurgo/cardano-serialization-lib-browser"
 import { textPartFromWalletChecksumImagePart } from "@emurgo/cip4-js"
 import { createIcon } from "@download/blockies"
 import { getTtl } from './utils'
+import { Bech32Prefix } from '../../yoroi-extension/app/config/stringConfig';
+import { bytesToHex, hexToBytes } from './coreUtils';
 
 const cardanoAccessBtnRow = document.querySelector('#request-button-row')
 const cardanoAuthCheck = document.querySelector('#check-identification')
@@ -26,7 +28,9 @@ let accessGranted = false
 let cardanoApi
 let returnType = 'cbor'
 let utxos
+let usedAddresses
 let changeAddress
+let unsignedTransactionHex
 let transactionHex
 
 function isCBOR() {
@@ -43,7 +47,7 @@ const COLORS = [
 ];
 
 function createBlockiesIcon(seed) {
-  const colorIdx = Buffer.from(seed, 'hex')[0] % COLORS.length;
+  const colorIdx = hexToBytes(seed)[0] % COLORS.length;
   const color = COLORS[colorIdx];
   return createIcon({
     seed,
@@ -61,9 +65,9 @@ function onApiConnectied(api) {
   toggleSpinner('hide');
   let walletDisplay = 'an anonymous Yoroi Wallet';
 
-  api.setReturnType(returnType);
+  api.experimental.setReturnType(returnType);
 
-  const auth = api.auth && api.auth();
+  const auth = api.experimental.auth && api.experimental.auth();
   const authEnabled = auth && auth.isEnabled();
 
   if (authEnabled) {
@@ -82,7 +86,7 @@ function onApiConnectied(api) {
   accessGranted = true;
   window.cardanoApi = cardanoApi = api;
 
-  api.onDisconnect(() => {
+  api.experimental.onDisconnect(() => {
     alertWarrning(`Disconnected from ${walletDisplay}`);
     toggleConnectionUI('button');
     walletPlateSpan.innerHTML = '';
@@ -95,7 +99,7 @@ function onApiConnectied(api) {
       type: 'this is a random test message object',
       rndValue: Math.random(),
     });
-    const messageHex = Buffer.from(messageJson).toString('hex');
+    const messageHex = bytesToHex(messageJson);
     console.log('Signing randomized message: ', JSON.stringify({
       messageJson,
       messageHex,
@@ -112,6 +116,31 @@ function onApiConnectied(api) {
       console.error('Sig failed', err);
     });
   }
+}
+
+function reduceWasmMultiasset(multiasset, reducer, initValue) {
+  let result = initValue;
+  if (multiasset) {
+    const policyIds = multiasset.keys();
+    for (let i = 0; i < policyIds.len(); i++) {
+      const policyId = policyIds.get(i);
+      const assets = multiasset.get(policyId);
+      const assetNames = assets.keys();
+      for (let j = 0; j < assetNames.len(); j++) {
+        const name = assetNames.get(j);
+        const amount = assets.get(name);
+        const policyIdHex = bytesToHex(policyId.to_bytes());
+        const encodedName = bytesToHex(name.name());
+        result = reducer(result, {
+          policyId: policyIdHex,
+          name: encodedName,
+          amount: amount.to_str(),
+          assetId: `${policyIdHex}.${encodedName}`,
+        });
+      }
+    }
+  }
+  return result;
 }
 
 cardanoAccessBtn.addEventListener('click', () => {
@@ -141,31 +170,29 @@ getAccountBalance.addEventListener('click', () => {
       toggleSpinner('show')
       const tokenId = '*';
       cardanoApi.getBalance(tokenId).then(function(balance) {
+        console.log('[getBalance]', balance);
         toggleSpinner('hide')
-        let mainBalance;
-        let numAssets;
+        let balanceJson = balance;
         if (isCBOR()) {
           if (tokenId !== '*') {
             alertSuccess(`Asset Balance: ${balance} (asset: ${tokenId})`)
             return;
           }
-          const value = CardanoWasm.Value.from_bytes(Buffer.from(balance, 'hex'));
-          mainBalance = value.coin().to_str();
-          const ma = value.multiasset()
-          numAssets = ma ? ma.len() : 0;
-        } else {
-          mainBalance = balance.default;
-          numAssets = (balance.assets||[]).length;
+          const value = CardanoWasm.Value.from_bytes(hexToBytes(balance));
+          balanceJson = { default: value.coin().to_str() };
+          balanceJson.assets = reduceWasmMultiasset(value.multiasset(), (res, asset) => {
+            res[asset.assetId] = asset.amount;
+            return res;
+          }, {});
         }
-        alertSuccess(`Account Balance: ${mainBalance} (assets: ${numAssets})`)
+        alertSuccess(`Account Balance: ${JSON.stringify(balanceJson, null, 2)}`)
       });
     }
 })
 
 function addressesFromCborIfNeeded(addresses) {
-  return isCBOR() ? addresses.map(a => CardanoWasm.Address.from_bytes(
-    Buffer.from(a, 'hex'),
-  ).to_bech32()) : addresses;
+  return isCBOR() ? addresses.map(a =>
+    CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32()) : addresses;
 }
 
 getUnUsedAddresses.addEventListener('click', () => {
@@ -197,9 +224,9 @@ getUsedAddresses.addEventListener('click', () => {
           alertWarrning('No used addresses')
           return;
         }
-        addresses = addressesFromCborIfNeeded(addresses)
-        alertSuccess(`Address: ${addresses.concat(',')}`)
-        alertEl.innerHTML = '<h2>Used addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+        usedAddresses = addressesFromCborIfNeeded(addresses)
+        alertSuccess(`Address: ${usedAddresses.concat(',')}`)
+        alertEl.innerHTML = '<h2>Used addresses:</h2><pre>' + JSON.stringify(usedAddresses, undefined, 2) + '</pre>'
       });
     }
 })
@@ -253,45 +280,22 @@ getUtxos.addEventListener('click', () => {
       } else {
         if (isCBOR()) {
           utxos = utxosResponse.map(hex => {
-            const u = CardanoWasm.TransactionUnspentOutput.from_bytes(Buffer.from(hex, 'hex'))
+            const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex))
             const input = u.input();
             const output = u.output();
-            const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+            const txHash = bytesToHex(input.transaction_id().to_bytes());
             const txIndex = input.index();
             const value = output.amount();
-            const multiasset = value.multiasset();
-            function parseMultiasset() {
-              if (!multiasset) {
-                return [];
-              }
-              const result = [];
-              const policyIds = multiasset.keys();
-              for (let i = 0; i < policyIds.len(); i++) {
-                const policyId = policyIds.get(i);
-                const assets = multiasset.get(policyId);
-                const assetNames = assets.keys();
-                for (let j = 0; j < assetNames.len(); j++) {
-                  const name = assetNames.get(j);
-                  const amount = assets.get(name);
-                  const policyIdHex = Buffer.from(policyId.to_bytes()).toString('hex');
-                  const encodedName = Buffer.from(name.name()).toString('hex');
-                  result.push({
-                    policyId: policyIdHex,
-                    name: encodedName,
-                    amount: amount.to_str(),
-                    assetId: `${policyIdHex}.${encodedName}`,
-                  });
-                }
-              }
-              return result;
-            }
             return {
               utxo_id: `${txHash}${txIndex}`,
               tx_hash: txHash,
               tx_index: txIndex,
               receiver: output.address().to_bech32(),
               amount: value.coin().to_str(),
-              assets: parseMultiasset(),
+              assets: reduceWasmMultiasset(value.multiasset(), (res, asset) => {
+                res.push(asset);
+                return res;
+              }, []),
             }
           })
         } else {
@@ -334,90 +338,117 @@ signTx.addEventListener('click', () => {
     return;
   }
 
-  if (!utxos) {
-    alertError('Should request utxos first');
-    return
+  if (!unsignedTransactionHex) {
+
+    if (!utxos) {
+      alertError('Should request utxos first');
+      return
+    }
+
+    if (!changeAddress) {
+      alertError('Should request change address first')
+    }
+
+    const txBuilder = CardanoWasm.TransactionBuilder.new(
+      CardanoWasm.TransactionBuilderConfigBuilder.new()
+        // all of these are taken from the mainnet genesis settings
+        // linear fee parameters (a*size + b)
+        .fee_algo(
+          CardanoWasm.LinearFee.new(
+            CardanoWasm.BigNum.from_str('44'),
+            CardanoWasm.BigNum.from_str('155381'),
+          )
+        )
+        .coins_per_utxo_word(CardanoWasm.BigNum.from_str('34482'))
+        .pool_deposit(CardanoWasm.BigNum.from_str('500000000'))
+        .key_deposit(CardanoWasm.BigNum.from_str('2000000'))
+        .max_value_size(5000)
+        .max_tx_size(16384)
+        .build()
+    )
+
+    // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
+    const utxo = utxos[0]
+
+    const addr = CardanoWasm.Address.from_bech32(utxo.receiver);
+
+    const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
+    const keyHash = baseAddr.payment_cred().to_keyhash();
+    txBuilder.add_key_input(
+      keyHash,
+      CardanoWasm.TransactionInput.new(
+        CardanoWasm.TransactionHash.from_bytes(
+          hexToBytes(utxo.tx_hash)
+        ), // tx hash
+        utxo.tx_index, // index
+      ),
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
+    )
+
+    const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS)
+    const shelleyChangeAddress = CardanoWasm.Address.from_bech32(changeAddress)
+
+    // add output to the tx
+    txBuilder.add_output(
+      CardanoWasm.TransactionOutput.new(
+        shelleyOutputAddress,
+        CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(AMOUNT_TO_SEND))
+      ),
+    )
+
+    const ttl = getTtl()
+    txBuilder.set_ttl(ttl)
+
+    // calculate the min fee required and send any change to an address
+    txBuilder.add_change_if_needed(shelleyChangeAddress)
+
+    unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
   }
 
-  if (!changeAddress) {
-    alertError('Should request change address first')
-  }
-  
-  const txBuilder = CardanoWasm.TransactionBuilder.new(
-    // all of these are taken from the mainnet genesis settings
-    // linear fee parameters (a*size + b)
-    CardanoWasm.LinearFee.new(CardanoWasm.BigNum.from_str('44'), CardanoWasm.BigNum.from_str('155381')),
-    // minimum utxo value
-    CardanoWasm.BigNum.from_str('1000000'),
-    // pool deposit
-    CardanoWasm.BigNum.from_str('500000000'),
-    // key deposit
-    CardanoWasm.BigNum.from_str('2000000'),
-    // maxValueBytes
-    5000,
-    // maxTxBytes
-    16384,
-  )
+  // Experimental feature, false by default, in which case only the witness set is returned.
+  const returnTx = true;
 
-  // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
-  const utxo = utxos[0]
-  
-  const addr = CardanoWasm.Address.from_bytes(
-    Buffer.from(utxo.receiver, 'hex')
-  )
-  const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
-  const keyHash = baseAddr.payment_cred().to_keyhash();
-  txBuilder.add_key_input(
-    keyHash,
-    CardanoWasm.TransactionInput.new(
-      CardanoWasm.TransactionHash.from_bytes(
-        Buffer.from(utxo.tx_hash, "hex")
-      ), // tx hash
-      utxo.tx_index, // index
-    ),
-    CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
-  )  
-
-  const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS)
-  const shelleyChangeAddress = CardanoWasm.Address.from_bech32(changeAddress)
-
-  // add output to the tx
-  txBuilder.add_output(
-    CardanoWasm.TransactionOutput.new(
-      shelleyOutputAddress,
-      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(AMOUNT_TO_SEND))    
-    ),
-  )
-
-  const ttl = getTtl()
-  txBuilder.set_ttl(ttl)
-
-  // calculate the min fee required and send any change to an address
-  txBuilder.add_change_if_needed(shelleyChangeAddress)
-
-  const txBody = txBuilder.build()
-
-  const tx = CardanoWasm.Transaction.new(
-    txBody,
-    CardanoWasm.TransactionWitnessSet.new(),
-    undefined,
-  )
-
-  const txHex = Buffer.from(tx.to_bytes()).toString('hex')
-
-  cardanoApi.signTx(txHex, true).then(witnessSetHex => {
+  cardanoApi.signTx({
+    tx: unsignedTransactionHex,
+    returnTx,
+  }).then(responseHex => {
     toggleSpinner('hide')
+    console.log(`[signTx] response: ${responseHex}`);
 
-    const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
-      Buffer.from(witnessSetHex, 'hex')
-    )
-    const transaction = CardanoWasm.Transaction.new(
-      txBody,
-      witnessSet,
-      undefined,
-    )
-    transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
-    alertSuccess('Signing tx succeeds: ' + transactionHex)
+    if (returnTx) {
+
+      const signedTx = CardanoWasm.Transaction.from_bytes(hexToBytes(responseHex));
+      const wit = signedTx.witness_set();
+
+      const wkeys = wit.vkeys();
+      for (let i = 0; i < wkeys.len(); i++) {
+        const wk = wkeys.get(i);
+        const vk = wk.vkey();
+        console.log(`[signTx] wit vkey ${i}:`, {
+          vkBytes: bytesToHex(vk.to_bytes()),
+          vkPubBech: vk.public_key().to_bech32(),
+          vkPubHashBech: vk.public_key().hash().to_bech32(Bech32Prefix.PAYMENT_KEY_HASH),
+        })
+      }
+
+      transactionHex = responseHex;
+    } else {
+      const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
+        hexToBytes(responseHex)
+      );
+      const tx = CardanoWasm.Transaction.from_bytes(
+        hexToBytes(unsignedTransactionHex)
+      );
+      const transaction = CardanoWasm.Transaction.new(
+        tx.body(),
+        witnessSet,
+        tx.auxiliary_data(),
+      );
+      transactionHex = bytesToHex(transaction.to_bytes())
+    }
+
+    unsignedTransactionHex = null;
+    alertSuccess('Signing tx succeeded: ' + transactionHex)
 
   }).catch(error => {
     console.error(error)
@@ -433,34 +464,119 @@ createTx.addEventListener('click', () => {
     alertError('Should request access first');
     return;
   }
-  
-  const output = CardanoWasm.TransactionOutput.new(
-    CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS),
-    CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000002'))
-  )
-  
+
+  if (!utxos || utxos.length === 0) {
+    alertError('Should request utxos first');
+    return
+  }
+
+  if (!usedAddresses || usedAddresses.length === 0) {
+    alertError('Should request used addresses first');
+    return
+  }
+
+  const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
+  if (!randomUtxo) {
+    alertError('Failed to select a random utxo from the available list!');
+    return;
+  }
+
+  console.log('[createTx] Including random utxo input: ', randomUtxo);
+
+  const usedAddress = usedAddresses[0];
+  const keyHash = CardanoWasm.BaseAddress.from_address(
+    CardanoWasm.Address.from_bech32(usedAddress),
+  ).payment_cred().to_keyhash();
+
+  const keyHashBech = keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH);
+
+  const scripts = CardanoWasm.NativeScripts.new();
+  scripts.add(CardanoWasm.NativeScript.new_script_pubkey(
+    CardanoWasm.ScriptPubkey.new(keyHash),
+  ));
+  scripts.add(CardanoWasm.NativeScript.new_timelock_start(
+    CardanoWasm.TimelockStart.new(42),
+  ));
+
+  const mintScript = CardanoWasm.NativeScript.new_script_all(
+    CardanoWasm.ScriptAll.new(scripts),
+  );
+  const mintScriptHex = bytesToHex(mintScript.to_bytes());
+
+  function convertAssetNameToHEX(name) {
+    return bytesToHex(name);
+  }
+
+  const tokenAssetName = 'V42';
+  const nftAssetName = `V42/NFT#${Math.floor(Math.random() * 1000000000)}`;
+  const tokenAssetNameHex = convertAssetNameToHEX(tokenAssetName);
+  const nftAssetNameHex = convertAssetNameToHEX(nftAssetName);
+
+  const expectedPolicyId = bytesToHex(mintScript.hash().to_bytes());
+
+  console.log('[createTx] Including mint request: ', { keyHashBech, mintScriptHex, assetNameHex: tokenAssetNameHex, expectedPolicyId });
+
+  const outputHex = bytesToHex(
+    CardanoWasm.TransactionOutput.new(
+      CardanoWasm.Address.from_bech32(randomUtxo.receiver),
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000000')),
+    ).to_bytes()
+  );
+
   const txReq = {
-    includeInputs: [
-      'a8ecebf0632518736474012f8d644b6b287859713f60624e961d230422e45c192'
-    ],
-    includeOutputs: [
-      Buffer.from(output.to_bytes()).toString('hex'),
-    ],
+    validityIntervalStart: 42,
+    includeInputs: [randomUtxo.utxo_id],
+    includeOutputs: [outputHex],
     includeTargets: [
       {
-        // do not specify value, the connector will use minimum value
-        address: '00756c95f9967c214e571500a0140b88f6dd9c4a7444e74acc1841ce92c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e',
-        assets: {
-          '2c9d0ecfc2ee1288056df15be4196d8ded73db345ea5b4cd5c7fac3f.76737562737465737435': 1,
-        },
+        address: randomUtxo.receiver,
+        value: '2000000',
+        mintRequest: [{
+          script: mintScriptHex,
+          assetName: tokenAssetNameHex,
+          amount: '42',
+        }, {
+          script: mintScriptHex,
+          assetName: nftAssetNameHex,
+          metadata: {
+            tag: 721,
+            json: JSON.stringify({
+              name: nftAssetName,
+              description: `V42 NFT Collection`,
+              mediaType: 'image/png',
+              image: 'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+              files: [{
+                name: nftAssetName,
+                mediaType: 'image/png',
+                src: 'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+              }]
+            }),
+          }
+        }]
       }
     ]
   }
+
+  const utxosWithAssets = utxos.filter(u => u.assets.length > 0);
+  const utxoWithAssets = utxosWithAssets[Math.floor(Math.random() * utxosWithAssets.length)];
+
+  if (utxoWithAssets) {
+    const asset = utxoWithAssets.assets[0];
+    console.log('[createTx] Including asset:', asset);
+    txReq.includeTargets.push({
+      // do not specify value, the connector will use minimum value
+      address: randomUtxo.receiver,
+      assets: {
+        [asset.assetId]: '1',
+      },
+      ensureRequiredMinimalValue: true,
+    })
+  }
   
-  cardanoApi.createTx(txReq, true).then(txHex => {
+  cardanoApi.experimental.createTx(txReq, true).then(txHex => {
     toggleSpinner('hide')
     alertSuccess('Creating tx succeeds: ' + txHex)
-    transactionHex = txHex
+    unsignedTransactionHex = txHex
   }).catch(error => {
     console.error(error)
     toggleSpinner('hide')
@@ -469,6 +585,7 @@ createTx.addEventListener('click', () => {
 })
 
 function alertError (text) {
+    toggleSpinner('hide');
     alertEl.className = 'alert alert-danger'
     alertEl.innerHTML = text
 }

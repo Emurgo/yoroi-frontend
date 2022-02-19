@@ -22,7 +22,11 @@ import type {
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName,
+  getTokenIdentifierIfExists,
+  assetNameFromIdentifier
+} from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
@@ -40,15 +44,17 @@ import type { CardanoConnectorSignRequest } from '../../types';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
 import type CardanoTxRequest from '../../../api/ada';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx | CardanoTx | CardanoTxRequest,
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
-  +onConfirm: string => void,
+  +onConfirm: string => Promise<void>,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => ?$ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -73,7 +79,11 @@ const messages = defineMessages({
   more: {
     id: 'connector.signin.more',
     defaultMessage: '!!!more'
-  }
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
 });
 
 @observer
@@ -86,6 +96,10 @@ class SignTxPage extends Component<Props> {
     {
       fields: {
         showUtxoDetails: {
+          type: 'boolean',
+          value: false,
+        },
+        isSubmitting: {
           type: 'boolean',
           value: false,
         },
@@ -114,6 +128,7 @@ class SignTxPage extends Component<Props> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
@@ -130,7 +145,17 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
+        this.form.$('isSubmitting').set(true);
+        this.props.onConfirm(walletPassword).catch(error => {
+          if (error instanceof WrongPassphraseError) {
+            this.form.$('walletPassword').invalidate(
+              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+            )
+          } else {
+            throw error;
+          }
+        });
+        this.form.$('isSubmitting').set(false);
       },
       onError: () => {},
     });
@@ -163,7 +188,7 @@ class SignTxPage extends Component<Props> {
     return undefined;
   }
 
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => ?$ReadOnly<TokenRow> = tokenEntry => {
     return this.props.getTokenInfo(tokenEntry);
   }
 
@@ -187,8 +212,10 @@ class SignTxPage extends Component<Props> {
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo)
+      : assetNameFromIdentifier(request.entry.identifier);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
@@ -204,7 +231,7 @@ class SignTxPage extends Component<Props> {
             </span>
             {' '}{currency}
             <div className={styles.amountSmall}>
-              {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
+              {shiftedAmount.toString()} {ticker}
             </div>
           </>
         );
@@ -212,7 +239,7 @@ class SignTxPage extends Component<Props> {
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -224,7 +251,7 @@ class SignTxPage extends Component<Props> {
       <>
         <span className={styles.amountRegular}>{adjustedBefore}</span>
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        {' '}{this.getTicker(tokenInfo)}
+        {' '}{ticker}
       </>
     );
   }
@@ -311,7 +338,7 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight } = form.values();
+    const { showUtxoDetails, currentWindowHeight, isSubmitting } = form.values();
 
     return (
       <>
@@ -405,13 +432,14 @@ class SignTxPage extends Component<Props> {
                   >
                     {intl.formatMessage(globalMessages.cancel)}
                   </Button>
-                  <Button
+                  <LoadingButton
                     variant="primary"
                     disabled={!walletPasswordField.isValid}
                     onClick={this.submit.bind(this)}
+                    loading={isSubmitting}
                   >
                     {intl.formatMessage(globalMessages.confirm)}
-                  </Button>
+                  </LoadingButton>
                 </div>
               </div>
             ) : (

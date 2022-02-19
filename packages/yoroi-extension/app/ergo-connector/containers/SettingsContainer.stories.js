@@ -33,6 +33,10 @@ export const Generic = (): Node => {
               LANGUAGE_OPTIONS: LANGUAGES,
               currentLocale: globalKnobs.locale(),
             },
+            connector: {
+              signingMessage: null,
+              connectingMessage: null,
+            }
           },
           actions: {
             profile: {
