@@ -502,6 +502,16 @@ const yoroiMessageHandler = async (
         }
       }
         break;
+      case 'data':
+        // mocked data sign
+        responseData.resolve({ err: 'Generic data signing is not implemented yet' });
+        break;
+      case 'tx-reorg/cardano':
+      {
+          const utxos = (request.tx: any);
+          responseData.resolve({ ok: utxos });
+      }
+        break;
       case 'tx/cardano':
       {
         try {
@@ -522,11 +532,11 @@ const yoroiMessageHandler = async (
         responseData.resolve({ err: 'Generic data signing is not implemented yet' });
         break;
       case 'tx-reorg/cardano':
-        {
-          const utxos = request.utxos;
-          responseData.resolve({ ok: utxos });
-        }
-      break;
+      {
+        const utxos = request.utxos;
+        responseData.resolve({ ok: utxos });
+      }
+        break;
       default:
         // log?
         break;
@@ -634,7 +644,7 @@ async function confirmSign(
   tabId: number,
   request: PendingSignData,
   connectedSite: ConnectedSite,
-): Promise<void | ({| ok: any |} | {| err: any |})> {
+): Promise<({| ok: any |} | {| err: any |})> {
   const bounds = await getBoundsForTabWindow(tabId);
   return new Promise(resolve => {
     connectedSite.pendingSigns.set(request.uid, {
@@ -1309,6 +1319,7 @@ function handleInjectorConnect(port) {
           case 'get_collateral_utxos':
             try {
               checkParamCount(1);
+              await RustModule.load();
               const requiredAmount = RustModule.WalletV4.Value.from_bytes(
                 Buffer.from(message.params[0], 'hex')
               ).coin().to_str();

@@ -133,6 +133,7 @@ const genBaseProps: {|
           }],
         adaTransaction: null,
         currentConnectorWhitelist: []
+        submissionError: null,
       },
       coinPriceStore: {
         getCurrentPrice: (_from, _to) => 5,

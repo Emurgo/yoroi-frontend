@@ -1152,8 +1152,9 @@ export default class AdaApi {
     let utxos = asAddressedUtxo(
       await request.publicDeriver.getAllUtxos()
     );
-    if (request.dontUseUtxoIds) {
-      utxos = utxos.filter(utxo => !request.dontUseUtxoIds.has(utxo.utxo_id))
+    const { dontUseUtxoIds } = request;
+    if (dontUseUtxoIds) {
+      utxos = utxos.filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id))
     }
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
     const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {

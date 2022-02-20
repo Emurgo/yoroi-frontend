@@ -63,6 +63,14 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 import {
   signTransaction as shelleySignTransaction
 } from '../../api/ada/transactions/shelley/transactions';
+import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import type {
+  HaskellShelleyTxSignRequest
+} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -83,7 +91,6 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
       );
   });
 }
-import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 
 // Need to run only once - Sign Tx Confirmation
 let initedSigning = false;
@@ -215,7 +222,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
+    this.actions.connector.confirmSignInTx.listen((password) => {
+      this._confirmSignInTx(password);
+    });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
@@ -283,7 +292,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action
-  _confirmSignInTx: string => void = async (password) => {
+  _confirmSignInTx: string => Promise<void> = async (password) => {
     runInAction(() => {
       this.submissionError = null;
     });
@@ -295,8 +304,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (signingMessage.sign.tx == null) {
       throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
     }
-    const wallet = this.wallets.find(wallet =>
-      wallet.publicDeriver.getPublicDeriverId() === this.signingMessage?.publicDeriverId
+    const wallet = this.wallets.find(w =>
+      w.publicDeriver.getPublicDeriverId() === this.signingMessage?.publicDeriverId
     );
     if (!wallet) {
       throw new Error('unexpected nullish wallet');
@@ -314,9 +323,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             this.submissionError = 'WRONG_PASSWORD';
           });
           return;
-        } else {
-          throw error;
         }
+        throw error;
       }
       try {
         await connectorSendTxCardano(
@@ -337,12 +345,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       );
       sendData = {
         type: 'sign_confirmed',
-        utxos,
+        tx: utxos,
         uid: signingMessage.sign.uid,
         tabId: signingMessage.tabId,
         pw: password,
       };
-    } else {
+    } else if (
+      signingMessage.sign.type === 'tx' ||
+        signingMessage.sign.type === 'tx_input' ||
+        signingMessage.sign.type === 'tx/cardano' ||
+        signingMessage.sign.type === 'tx-create-req/cardano'
+    ) {
       sendData = {
         type: 'sign_confirmed',
         tx: toJS(signingMessage.sign.tx),
@@ -350,6 +363,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         tabId: signingMessage.tabId,
         pw: password,
       };
+    } else {
+      throw new Error(`unkown sign data type ${signingMessage.sign.type}`);
     }
 
     window.chrome.runtime.sendMessage(sendData);
@@ -659,7 +674,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
 
     if (selectedWallet == null) return undefined;
-    if (!signingMessage.sign.tx) return undefined;
+    if (signingMessage.sign.type !== 'tx-reorg/cardano') {
+      throw new Error('unexpected signing data type');
+    }
+    const { usedUtxoIds, reorgTargetAmount } = signingMessage.sign.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
@@ -683,11 +701,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         selectedWallet.publicDeriver
       );
       const includeTargets = [];
-      this.collateralOutputAddressSet = new Set<string>();
-      const reorgTargetAmount = new BigNumber(
-        signingMessage.sign.tx.reorgTargetAmount
-      );
-      const reorgOutputCount = reorgTargetAmount
+      const collateralOutputAddressSet = new Set<string>();
+      const reorgOutputCount = (new BigNumber(reorgTargetAmount))
             .div(REORG_OUTPUT_AMOUNT)
             .integerValue(BigNumber.ROUND_CEIL)
             .toNumber();
@@ -699,7 +714,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           address: unusedAddresses[i],
           value: REORG_OUTPUT_AMOUNT,
         });
-        this.collateralOutputAddressSet.add(unusedAddresses[i]);
+        collateralOutputAddressSet.add(unusedAddresses[i]);
       }
       const result = await this.api.ada.createUnsignedTxForConnector({
         publicDeriver: withHasUtxoChains,
@@ -707,9 +722,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         cardanoTxRequest: {
           includeTargets,
         },
-        dontUseUtxoIds: new Set(signingMessage.sign.tx.usedUtxoIds),
+        dontUseUtxoIds: new Set(usedUtxoIds),
       });
+
+      // record the unsigned tx, so that after the user's approval, we can sign
+      // it without re-generating
       this.reorgTxSignRequest = result;
+      // record which addresses are used for collaterals, so that we can compute the
+      // collateral UTXOs without waiting for the re-organization tx to be confirmed
+      this.collateralOutputAddressSet = collateralOutputAddressSet;
+
       const fee = {
         tokenId: result.fee().getDefaultEntry().identifier,
         networkId: result.fee().getDefaultEntry().networkId,
@@ -734,7 +756,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
   }
-  signReorgTx = async (publicDeriver, password) => {
+  signReorgTx: (PublicDeriver<>, string) => Promise<RustModule.WalletV4.Transaction> = async (
+    publicDeriver,
+    password
+  ) => {
     const signRequest = this.reorgTxSignRequest;
 
     if (!signRequest) {
@@ -767,7 +792,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       signRequest.metadata,
     );
   }
-  getUtxosAfterReorg = (txId) => {
+  getUtxosAfterReorg: (string) => Array<RemoteUnspentOutput> = (txId) => {
     const allOutputs = this.adaTransaction?.outputs;
     if (!allOutputs) {
       throw new Error('unexpected nullish transaction');

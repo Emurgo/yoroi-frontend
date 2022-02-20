@@ -27,4 +27,4 @@ export type CardanoConnectorSignRequest = {|
   total: MultiToken,
 |};
 
-type SignSubmissionErrorType = 'WRONG_PASSWORD' | 'SEND_TX_ERROR';
+export type SignSubmissionErrorType = 'WRONG_PASSWORD' | 'SEND_TX_ERROR';

@@ -60,6 +60,9 @@ export default class ConnectContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('unload', this.onUnload);
+  }
 
   onConnect: (
     deriver: PublicDeriver<>,

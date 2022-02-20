@@ -54,7 +54,6 @@ import { LoadingButton } from '@mui/lab';
 import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
-  +tx: Tx | CardanoTx | CardanoTxRequest,
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
@@ -538,9 +537,9 @@ class SignTxPage extends Component<Props, State> {
               />
             </div>
             <div className={styles.errorMessage}>
-            {this.props.submissionError === 'SEND_TX_ERROR' && (
-              intl.formatMessage(messages.sendError)
-            )}
+              {this.props.submissionError === 'SEND_TX_ERROR' && (
+                intl.formatMessage(messages.sendError)
+              )}
             </div>
             <div className={styles.wrapperBtn}>
               <Button
