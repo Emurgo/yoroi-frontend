@@ -532,10 +532,14 @@ export function newAdaUnsignedTxFromUtxo(
   }, new Set<string>());
   const isAssetsRequired = outputAssets.size > 0;
 
-  const utxosMapped: Array<[RemoteUnspentOutput, boolean, boolean, number]> =
+  let collateralCompatibleCount = 0;
+
+  const utxosMapped: Array<[RemoteUnspentOutput, boolean, boolean, number, ?number]> =
     utxos.map((u: RemoteUnspentOutput) => {
       if (u.assets.length === 0) {
-        return [u, true, false, 0];
+        const collateralCompatibleIdx = new BigNumber(u.amount).lte(2_000_000) ?
+          collateralCompatibleCount++ : null;
+        return [u, true, false, 0, collateralCompatibleIdx];
       }
       const hasRequiredAsset = isAssetsRequired
         && u.assets.some(a => outputAssets.has(a.assetId));
@@ -552,19 +556,27 @@ export function newAdaUnsignedTxFromUtxo(
       const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
       // Round down the spendable value to the nearest full ADA for safer deposit
       // TODO: unmagic the constant
-      return [u, false, hasRequiredAsset, Math.floor(spendable / 1_000_000) * 1_000_000];
+      return [u, false, hasRequiredAsset,  Math.floor(spendable / 1_000_000) * 1_000_000, null];
     });
 
   // prioritize inputs
   const sortedUtxos: Array<RemoteUnspentOutput> = utxosMapped.sort((v1, v2) => {
-    const [u1, isPure1, hasRequiredAsset1, spendableValue1] = v1;
-    const [u2, isPure2, hasRequiredAsset2, spendableValue2] = v2;
+    const [u1, isPure1, hasRequiredAsset1, spendableValue1, collateralCompatibleIdx1] = v1;
+    const [u2, isPure2, hasRequiredAsset2, spendableValue2, collateralCompatibleIdx2] = v2;
     // $FlowFixMe[unsafe-addition]
-    if (hasRequiredAsset1 ^ hasRequiredAsset2) {
+    if (hasRequiredAsset1 !== hasRequiredAsset2) {
       // one but not both of the utxos has required assets
       // utxos with required assets are always prioritized
       // ahead of any other, pure or dirty
       return hasRequiredAsset1 ? -1 : 1;
+    }
+    const isCollateral1 = collateralCompatibleIdx1 != null && collateralCompatibleIdx1 < 5;
+    const isCollateral2 = collateralCompatibleIdx2 != null && collateralCompatibleIdx2 < 5;
+    if (isCollateral1 !== isCollateral2) {
+      // one but not both of the utxos is collateral compatible
+      // utxos compatible for collateral are always deprioritized
+      // below of any other, pure or dirty
+      return isCollateral1 ? 1 : -1;
     }
     if (isPure1 && isPure2) {
       // both utxos are clean - randomize them
@@ -725,16 +737,11 @@ function _newAdaUnsignedTxFromUtxo(
   }
 
   // output excluding fee
-  const targetOutput = txBuilder
-    .get_explicit_output()
-    .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
+  const targetOutput = txBuilder.get_total_output();
 
   // pick inputs
   const usedUtxos: Array<RemoteUnspentOutput> = [];
   {
-    // recall: we might have some implicit input to start with from deposit refunds
-    const implicitSum = txBuilder.get_implicit_input();
-
     // this flag is set when one extra input is added
     let oneExtraAdded = false;
     // add utxos until we have enough to send the transaction
@@ -743,7 +750,7 @@ function _newAdaUnsignedTxFromUtxo(
       if (oneExtraAdded) {
         break;
       }
-      const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+      const currentInputSum = txBuilder.get_total_input();
       const neededInput = targetOutput
         .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
       const excessiveInputAssets = currentInputSum.multiasset()
@@ -830,7 +837,7 @@ function _newAdaUnsignedTxFromUtxo(
     }
     // check to see if we have enough balance in the wallet to cover the transaction
     {
-       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+       const currentInputSum = txBuilder.get_total_input();
 
       // need to recalculate each time because fee changes
       const output = targetOutput
