@@ -15,21 +15,10 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
   if (stores.loading.isLoading) {
     return <LoadingPage stores={stores} actions={actions} />;
   }
-  return ToplevelPages(stores, actions);
+  return wrapPages(getContent(stores, actions));
 };
 
-const ToplevelPages = (stores: StoresMap, actions: ActionsMap): Node => (
-  <Switch>
-    <Route
-      path={ROUTES.ROOT}
-      component={_props =>
-        wrapGeneralPages(GeneralSubpages(stores, actions))
-      }
-    />
-  </Switch>
-);
-
-const GeneralSubpages = (stores, actions) => (
+const getContent = (stores, actions) => (
   <Switch>
     <Route
       exact
@@ -44,6 +33,6 @@ const GeneralSubpages = (stores, actions) => (
   </Switch>
 );
 
-export function wrapGeneralPages(children: Node): Node {
+export function wrapPages(children: Node): Node {
   return <Layout>{children}</Layout>;
 }
