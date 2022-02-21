@@ -38,7 +38,7 @@ import {
   cardanoValueFromMultiToken,
   parseTokenList,
 } from '../utils';
-import { classifyUtxos } from './coinSelection';
+import { classifyUtxoDescriptors, describeUtxos } from './coinSelection';
 import type { UtxoDescriptor } from './coinSelection';
 
 /**
@@ -533,44 +533,22 @@ export function newAdaUnsignedTxFromUtxo(
     return set;
   }, new Set<string>());
 
-  const { utxoDescriptors } = classifyUtxos(
+  const { utxoDescriptors } = describeUtxos(
     utxos,
     requiredAssetIds,
     protocolParams.coinsPerUtxoWord,
   )
 
+  const { withRequiredAssets, pure, dirty, collateralReserve } =
+    classifyUtxoDescriptors(utxoDescriptors);
+
   // prioritize inputs
-  const sortedUtxos: Array<RemoteUnspentOutput> = utxoDescriptors.sort((v1: UtxoDescriptor, v2: UtxoDescriptor) => {
-    // $FlowFixMe[unsafe-addition]
-    if (v1.hasRequiredAssets !== v2.hasRequiredAssets) {
-      // one but not both of the utxos has required assets
-      // utxos with required assets are always prioritized
-      // ahead of any other, pure or dirty
-      return v1.hasRequiredAssets ? -1 : 1;
-    }
-    if (v1.isCollateralReserve !== v2.isCollateralReserve) {
-      // one but not both of the utxos is marked as collateral reserve
-      // utxos reserved for collateral are always deprioritized
-      // below of any other, pure or dirty
-      return v1.isCollateralReserve ? 1 : -1;
-    }
-    if (v1.isPure && v2.isPure) {
-      // both utxos are clean - randomize them
-      return Math.random() - 0.5;
-    }
-    if (v1.isPure || v2.isPure) {
-      // At least one of the utxos is clean
-      // The clean utxo is prioritized
-      return v1.isPure ? -1 : 1;
-    }
-    // both utxos are dirty
-    if (v1.spendableValue !== v2.spendableValue) {
-      // dirty utxos with highest spendable ADA are prioritised
-      return v2.spendableValue - v1.spendableValue;
-    }
-    // utxo with fewer assets is prioritised
-    return v1.utxo.assets.length - v2.utxo.assets.length;
-  }).map((u: UtxoDescriptor) => u.utxo);
+  const sortedUtxos: Array<RemoteUnspentOutput> = [
+    ...withRequiredAssets,
+    ...pure,
+    ...dirty,
+    ...collateralReserve,
+  ].map((u: UtxoDescriptor) => u.utxo);
 
   /*
     This is an ad-hoc optimization for one specific senario:
