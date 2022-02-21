@@ -338,11 +338,9 @@ class SignTxPage extends Component<Props, State> {
     const { showUtxoDetails } = this.state
 
     return (
-      <div>
+      <div className={styles.component}>
         <ProgressBar step={2} />
-        <div
-          className={styles.component}
-        >
+        <div>
           {
             !showUtxoDetails ?(
               <div className={styles.signTx}>
