@@ -96,23 +96,11 @@ type Props = {|
   +shouldHideBalance: boolean,
 |};
 
-type State = {|
-  currentWindowHeight: number,
-|}
-
 @observer
 class ConnectPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-
-  state: State = {
-    currentWindowHeight: window.innerHeight
-  }
-
-  componentDidMount() {
-    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
-  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -263,9 +251,6 @@ class ConnectPage extends Component<Props, State> {
 
     return (
       <div
-        style={{
-        height: this.state.currentWindowHeight + 'px',
-      }}
         className={componentClasses}
       >
         {hasWallets ? (

@@ -1,7 +1,6 @@
 .component {
   height: calc(100vh - 92px);
   overflow: scroll;
-  padding-bottom: 70px;
   display: flex;
   flex-direction: column;
   &.isNightly {
