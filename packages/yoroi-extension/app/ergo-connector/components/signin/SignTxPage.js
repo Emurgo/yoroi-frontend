@@ -77,7 +77,6 @@ const messages = defineMessages({
 
 type State = {|
   showUtxoDetails: boolean,
-  currentWindowHeight: number,
 |}
 
 @observer
@@ -88,12 +87,8 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
-    currentWindowHeight: window.innerHeight
   }
 
-  componentDidMount() {
-    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
-  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -274,18 +269,14 @@ class SignTxPage extends Component<Props, State> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight } = this.state
+    const { showUtxoDetails } = this.state
     const totalInput = txData.totalInput();
     const fee = txData.fee()
     const amount = totalInput.joinSubtractCopy(fee)
     return (
       <>
         <ProgressBar step={2} />
-        <div
-          style={{
-            height: currentWindowHeight + 'px',
-          }}
-        >
+        <div>
           {
          !showUtxoDetails ? (
            <div
