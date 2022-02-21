@@ -57,6 +57,7 @@ import {
   connectorGetUnusedAddresses,
   connectorGetChangeAddress,
   connectorSendTxCardano,
+  connectorGenerateReorgTx,
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -172,8 +173,6 @@ type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
-
-const REORG_OUTPUT_AMOUNT = '1000000';
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
@@ -679,82 +678,38 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const { usedUtxoIds, reorgTargetAmount } = signingMessage.sign.tx;
 
-    const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
+    const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
+      selectedWallet.publicDeriver,
+      usedUtxoIds,
+      reorgTargetAmount,
+    );
+    // record the unsigned tx, so that after the user's approval, we can sign
+    // it without re-generating
+    this.reorgTxSignRequest = unsignedTx;
+    // record which addresses are used for collaterals, so that we can compute the
+    // collateral UTXOs without waiting for the re-organization tx to be confirmed
+    this.collateralOutputAddressSet = collateralOutputAddressSet;
 
-    if (isCardanoHaskell(network)) {
-      const withUtxos = asGetAllUtxos(selectedWallet.publicDeriver);
-      if (withUtxos == null) {
-        throw new Error(`missing utxo functionality`);
-      }
-
-      const withHasUtxoChains = asHasUtxoChains(withUtxos);
-      if (withHasUtxoChains == null) {
-        throw new Error(`missing chains functionality`);
-      }
-
-      const fullConfig = getCardanoHaskellBaseConfig(network);
-      const timeToSlot = await genTimeToSlot(fullConfig);
-      const absSlotNumber = new BigNumber(timeToSlot({
-        time: new Date(),
-      }).slot);
-      const unusedAddresses = await connectorGetUnusedAddresses(
-        selectedWallet.publicDeriver
-      );
-      const includeTargets = [];
-      const collateralOutputAddressSet = new Set<string>();
-      const reorgOutputCount = (new BigNumber(reorgTargetAmount))
-            .div(REORG_OUTPUT_AMOUNT)
-            .integerValue(BigNumber.ROUND_CEIL)
-            .toNumber();
-      if (reorgOutputCount > unusedAddresses.length) {
-        throw new Error('unexpected: too many collaterals required');
-      }
-      for (let i = 0; i < reorgOutputCount; i++) {
-        includeTargets.push({
-          address: unusedAddresses[i],
-          value: REORG_OUTPUT_AMOUNT,
-        });
-        collateralOutputAddressSet.add(unusedAddresses[i]);
-      }
-      const result = await this.api.ada.createUnsignedTxForConnector({
-        publicDeriver: withHasUtxoChains,
-        absSlotNumber,
-        cardanoTxRequest: {
-          includeTargets,
-        },
-        dontUseUtxoIds: new Set(usedUtxoIds),
-      });
-
-      // record the unsigned tx, so that after the user's approval, we can sign
-      // it without re-generating
-      this.reorgTxSignRequest = result;
-      // record which addresses are used for collaterals, so that we can compute the
-      // collateral UTXOs without waiting for the re-organization tx to be confirmed
-      this.collateralOutputAddressSet = collateralOutputAddressSet;
-
-      const fee = {
-        tokenId: result.fee().getDefaultEntry().identifier,
-        networkId: result.fee().getDefaultEntry().networkId,
-        amount: result.fee().getDefaultEntry().amount.toString(),
-      };
-      const { amount, total } = await this._calculateAmountAndTotal(
-        selectedWallet.publicDeriver,
-        result.inputs(),
-        result.outputs(),
+    const fee = {
+      tokenId: unsignedTx.fee().getDefaultEntry().identifier,
+      networkId: unsignedTx.fee().getDefaultEntry().networkId,
+      amount: unsignedTx.fee().getDefaultEntry().amount.toString(),
+    };
+    const { amount, total } = await this._calculateAmountAndTotal(
+      selectedWallet.publicDeriver,
+      unsignedTx.inputs(),
+      unsignedTx.outputs(),
+      fee,
+    );
+    runInAction(() => {
+      this.adaTransaction = {
+        inputs: unsignedTx.inputs(),
+        outputs: unsignedTx.outputs(),
         fee,
-      );
-      runInAction(() => {
-        this.adaTransaction = {
-          inputs: result.inputs(),
-          outputs: result.outputs(),
-          fee,
-          amount,
-          total,
-        };
-      });
-    } else {
-      throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
-    }
+        amount,
+        total,
+      };
+    });
   }
   signReorgTx: (PublicDeriver<>, string) => Promise<RustModule.WalletV4.Transaction> = async (
     publicDeriver,
@@ -808,7 +763,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           tx_hash: txId,
           tx_index: i,
           receiver: allOutputs[i].address,
-          amount: REORG_OUTPUT_AMOUNT,
+          amount: allOutputs[i].value.getDefault().toString(),
           assets: [],
         });
       }

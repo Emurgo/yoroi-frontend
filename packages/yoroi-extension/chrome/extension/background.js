@@ -49,6 +49,7 @@ import {
   connectorRecordSubmittedCardanoTransaction,
   connectorRecordSubmittedErgoTransaction,
   connectorGetCollateralUtxos,
+  connectorGenerateReorgTx,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -70,7 +71,7 @@ import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
-
+import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 
 /*::
 declare var chrome;
@@ -1345,19 +1346,35 @@ function handleInjectorConnect(port) {
                       });
                       return;
                     }
+
+
+                    const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
+                    try {
+                      await connectorGenerateReorgTx(
+                        wallet,
+                        usedUtxoIds,
+                        reorgTargetAmount
+                      );
+                    } catch (error) {
+                      if (error instanceof NotEnoughMoneyToSendError) {
+                        rpcResponse({ error: 'not enough UTXOs'});
+                        return;
+                      }
+                      throw error;
+                    }
                     const connection = connectedSites.get(tabId);
                     if (connection == null) {
                       Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
                       rpcResponse(undefined); // shouldn't happen
                       return;
                     }
-
+                      
                     const resp = await confirmSign(
                       tabId,
                       {
                         type: 'tx-reorg/cardano',
                         tx: {
-                          usedUtxoIds: utxosToUse.map(utxo => utxo.utxo_id),
+                          usedUtxoIds,
                           reorgTargetAmount
                         },
                         uid: message.uid,

@@ -71,6 +71,9 @@ import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { WalletTransactionCtorData } from '../../../app/domain/WalletTransaction';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
+import type {
+  HaskellShelleyTxSignRequest
+} from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -1147,3 +1150,61 @@ export async function connectorRecordSubmittedCardanoTransaction(
 }
 
 // TODO: generic data sign
+
+const REORG_OUTPUT_AMOUNT  = '1000000';
+
+export async function connectorGenerateReorgTx(
+  publicDeriver: PublicDeriver<>,
+  usedUtxoIds: Array<string>,
+  reorgTargetAmount: string,
+): Promise<{|
+  unsignedTx: HaskellShelleyTxSignRequest,
+  collateralOutputAddressSet: Set<string>,
+|}> {
+  const network = publicDeriver.getParent().getNetworkInfo();
+
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (withUtxos == null) {
+    throw new Error(`missing utxo functionality`);
+  }
+
+  const withHasUtxoChains = asHasUtxoChains(withUtxos);
+  if (withHasUtxoChains == null) {
+    throw new Error(`missing chains functionality`);
+  }
+
+  const fullConfig = getCardanoHaskellBaseConfig(network);
+  const timeToSlot = await genTimeToSlot(fullConfig);
+  const absSlotNumber = new BigNumber(timeToSlot({
+    time: new Date(),
+  }).slot);
+  const unusedAddresses = await connectorGetUnusedAddresses(
+    publicDeriver
+  );
+  const includeTargets = [];
+  const collateralOutputAddressSet = new Set<string>();
+  const reorgOutputCount = (new BigNumber(reorgTargetAmount))
+        .div(REORG_OUTPUT_AMOUNT)
+        .integerValue(BigNumber.ROUND_CEIL)
+        .toNumber();
+  if (reorgOutputCount > unusedAddresses.length) {
+    throw new Error('unexpected: too many collaterals required');
+  }
+  for (let i = 0; i < reorgOutputCount; i++) {
+    includeTargets.push({
+      address: unusedAddresses[i],
+      value: REORG_OUTPUT_AMOUNT,
+    });
+    collateralOutputAddressSet.add(unusedAddresses[i]);
+  }
+  const adaApi = new AdaApi();
+  const unsignedTx = await adaApi.createUnsignedTxForConnector({
+    publicDeriver: withHasUtxoChains,
+    absSlotNumber,
+    cardanoTxRequest: {
+      includeTargets,
+    },
+    dontUseUtxoIds: new Set(usedUtxoIds),
+  });
+  return { unsignedTx, collateralOutputAddressSet };
+}
