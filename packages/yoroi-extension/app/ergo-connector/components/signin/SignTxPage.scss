@@ -1,8 +1,8 @@
 .component {
-  padding: 30px 15px 100px 15px ;
+  height: calc(100vh - 92px);
+  padding: 30px 15px ;
   overflow: scroll;
   width: 100%;
-  height: 100%;
 
   .title {
     font-size: 24px;
