@@ -274,13 +274,13 @@ class SignTxPage extends Component<Props, State> {
     const fee = txData.fee()
     const amount = totalInput.joinSubtractCopy(fee)
     return (
-      <>
+      <div className={styles.component}>
         <ProgressBar step={2} />
         <div>
           {
          !showUtxoDetails ? (
            <div
-             className={styles.component}
+             className={styles.signTx}
            >
              <div>
                <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
@@ -371,7 +371,7 @@ class SignTxPage extends Component<Props, State> {
          />
         }
         </div>
-      </>
+      </div>
     );
   }
 }
