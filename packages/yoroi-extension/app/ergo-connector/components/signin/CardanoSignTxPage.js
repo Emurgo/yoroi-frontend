@@ -92,20 +92,17 @@ class SignTxPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  state: State = {
+    showUtxoDetails: false,
+    currentWindowHeight: window.innerHeight
+  }
+
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        showUtxoDetails: {
-          type: 'boolean',
-          value: false,
-        },
         isSubmitting: {
           type: 'boolean',
           value: false,
-        },
-        currentWindowHeight: {
-          type: 'integer',
-          value: window.innerHeight
         },
         walletPassword: {
           type: 'password',
@@ -138,7 +135,7 @@ class SignTxPage extends Component<Props> {
   );
 
   componentDidMount() {
-    window.onresize = () => this.form.$('currentWindowHeight').set(window.innerHeight);
+    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
   }
 
   submit(): void {
@@ -162,7 +159,7 @@ class SignTxPage extends Component<Props> {
   }
 
   toggleUtxoDetails: boolean => void = (newState) => {
-    this.form.$('showUtxoDetails').set(newState);
+    this.setState({ showUtxoDetails: newState })
   }
 
   getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
@@ -338,7 +335,8 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight, isSubmitting } = form.values();
+    const { isSubmitting } = form.values();
+    const { showUtxoDetails, currentWindowHeight } = this.state
 
     return (
       <>
