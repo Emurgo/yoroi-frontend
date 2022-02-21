@@ -260,6 +260,7 @@ class ConnectPage extends Component<Props> {
               marginTop="20px"
               paddingLeft="32px"
               fontWeight="400"
+              className={styles.pageTitle}
             >
               {intl.formatMessage(messages.connectWallet)}
             </Typography>
