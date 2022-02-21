@@ -86,8 +86,13 @@ const messages = defineMessages({
   },
 });
 
+type State = {|
+  showUtxoDetails: boolean,
+  currentWindowHeight: number,
+|}
+
 @observer
-class SignTxPage extends Component<Props> {
+class SignTxPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
