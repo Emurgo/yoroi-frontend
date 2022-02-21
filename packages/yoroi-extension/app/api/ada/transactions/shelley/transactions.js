@@ -38,6 +38,8 @@ import {
   cardanoValueFromMultiToken,
   parseTokenList,
 } from '../utils';
+import { classifyUtxos } from './coinSelection';
+import type { UtxoDescriptor } from './coinSelection';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -523,78 +525,52 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const outputAssets = outputs.reduce((set, o) => {
+  const requiredAssetIds = outputs.reduce((set, o) => {
     o.amount.values
       .map(v => v.identifier)
       .filter(id => id.length > 0)
       .forEach(id => set.add(id));
     return set;
   }, new Set<string>());
-  const isAssetsRequired = outputAssets.size > 0;
 
-  let collateralCompatibleCount = 0;
-
-  const utxosMapped: Array<[RemoteUnspentOutput, boolean, boolean, number, ?number]> =
-    utxos.map((u: RemoteUnspentOutput) => {
-      if (u.assets.length === 0) {
-        const collateralCompatibleIdx = new BigNumber(u.amount).lte(2_000_000) ?
-          collateralCompatibleCount++ : null;
-        return [u, true, false, 0, collateralCompatibleIdx];
-      }
-      const hasRequiredAsset = isAssetsRequired
-        && u.assets.some(a => outputAssets.has(a.assetId));
-      const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
-
-      // <TODO:PLUTUS_SUPPORT>
-      const utxoHasDataHash = false;
-
-      const minRequired = RustModule.WalletV4.min_ada_required(
-        cardanoValueFromRemoteFormat(u),
-        utxoHasDataHash,
-        protocolParams.coinsPerUtxoWord,
-      );
-      const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
-      // Round down the spendable value to the nearest full ADA for safer deposit
-      // TODO: unmagic the constant
-      return [u, false, hasRequiredAsset,  Math.floor(spendable / 1_000_000) * 1_000_000, null];
-    });
+  const { utxoDescriptors } = classifyUtxos(
+    utxos,
+    requiredAssetIds,
+    protocolParams.coinsPerUtxoWord,
+  )
 
   // prioritize inputs
-  const sortedUtxos: Array<RemoteUnspentOutput> = utxosMapped.sort((v1, v2) => {
-    const [u1, isPure1, hasRequiredAsset1, spendableValue1, collateralCompatibleIdx1] = v1;
-    const [u2, isPure2, hasRequiredAsset2, spendableValue2, collateralCompatibleIdx2] = v2;
+  const sortedUtxos: Array<RemoteUnspentOutput> = utxoDescriptors.sort((v1: UtxoDescriptor, v2: UtxoDescriptor) => {
     // $FlowFixMe[unsafe-addition]
-    if (hasRequiredAsset1 !== hasRequiredAsset2) {
+    if (v1.hasRequiredAssets !== v2.hasRequiredAssets) {
       // one but not both of the utxos has required assets
       // utxos with required assets are always prioritized
       // ahead of any other, pure or dirty
-      return hasRequiredAsset1 ? -1 : 1;
+      return v1.hasRequiredAssets ? -1 : 1;
     }
-    const isCollateral1 = collateralCompatibleIdx1 != null && collateralCompatibleIdx1 < 5;
-    const isCollateral2 = collateralCompatibleIdx2 != null && collateralCompatibleIdx2 < 5;
-    if (isCollateral1 !== isCollateral2) {
-      // one but not both of the utxos is collateral compatible
-      // utxos compatible for collateral are always deprioritized
+    if (v1.isCollateralReserve !== v2.isCollateralReserve) {
+      // one but not both of the utxos is marked as collateral reserve
+      // utxos reserved for collateral are always deprioritized
       // below of any other, pure or dirty
-      return isCollateral1 ? 1 : -1;
+      return v1.isCollateralReserve ? 1 : -1;
     }
-    if (isPure1 && isPure2) {
+    if (v1.isPure && v2.isPure) {
       // both utxos are clean - randomize them
       return Math.random() - 0.5;
     }
-    if (isPure1 || isPure2) {
+    if (v1.isPure || v2.isPure) {
       // At least one of the utxos is clean
       // The clean utxo is prioritized
-      return isPure1 ? -1 : 1;
+      return v1.isPure ? -1 : 1;
     }
     // both utxos are dirty
-    if (spendableValue1 !== spendableValue2) {
+    if (v1.spendableValue !== v2.spendableValue) {
       // dirty utxos with highest spendable ADA are prioritised
-      return spendableValue2 - spendableValue1;
+      return v2.spendableValue - v1.spendableValue;
     }
     // utxo with fewer assets is prioritised
-    return u1.assets.length - u2.assets.length;
-  }).map(([u]) => u);
+    return v1.utxo.assets.length - v2.utxo.assets.length;
+  }).map((u: UtxoDescriptor) => u.utxo);
 
   /*
     This is an ad-hoc optimization for one specific senario:
