@@ -4,6 +4,7 @@ import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { cardanoValueFromRemoteFormat } from '../utils';
+import { MultiToken } from '../../../common/lib/MultiToken';
 
 export type UtxoDescriptor = {|
   utxo: RemoteUnspentOutput,
@@ -17,13 +18,10 @@ export function describeUtxos(
   utxos: Array<RemoteUnspentOutput>,
   requiredAssetIds: Array<string>,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
-): {|
-  utxoDescriptors: Array<UtxoDescriptor>,
-  collateralCompatibleCount: number,
-|} {
+): Array<UtxoDescriptor> {
   let collateralCompatibleCount = 0;
   const isAssetsRequired = requiredAssetIds.size > 0;
-  const utxoDescriptors = utxos.map((u: RemoteUnspentOutput): UtxoDescriptor => {
+  return utxos.map((u: RemoteUnspentOutput): UtxoDescriptor => {
     const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
     if (u.assets.length === 0) {
       const isCollateralCompatibleValue = new BigNumber(u.amount).lte(2_000_000);
@@ -57,7 +55,6 @@ export function describeUtxos(
       collateralCompatibleIndex: null,
     }
   });
-  return { utxoDescriptors, collateralCompatibleCount };
 }
 
 function utxoDescriptorSortBySpendableValueTopHigh(u1: UtxoDescriptor, u2: UtxoDescriptor): number {
@@ -99,4 +96,24 @@ export function classifyUtxoDescriptors(
     dirty: dirty.sort(utxoDescriptorSortBySpendableValueTopHigh),
     collateralReserve: collateralReserve.sort(utxoDescriptorSortBySpendableValueTopHigh),
   }
+}
+
+export function classifyUtxoForValues(
+  utxos: Array<RemoteUnspentOutput>,
+  requiredValues: Array<MultiToken>,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+): UtxoDescriptorClassification {
+  const requiredAssetIds = requiredValues.reduce((set, mt: MultiToken) => {
+    mt.nonDefaultEntries()
+      .map(v => v.identifier)
+      .filter(id => id.length > 0)
+      .forEach(id => set.add(id));
+    return set;
+  }, new Set<string>());
+  const utxoDescriptors = describeUtxos(
+    utxos,
+    requiredAssetIds,
+    coinsPerUtxoWord,
+  );
+  return classifyUtxoDescriptors(utxoDescriptors);
 }

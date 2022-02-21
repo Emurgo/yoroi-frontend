@@ -38,7 +38,7 @@ import {
   cardanoValueFromMultiToken,
   parseTokenList,
 } from '../utils';
-import { classifyUtxoDescriptors, describeUtxos } from './coinSelection';
+import { classifyUtxoForValues } from './coinSelection';
 import type { UtxoDescriptor } from './coinSelection';
 
 /**
@@ -525,22 +525,11 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const requiredAssetIds = outputs.reduce((set, o) => {
-    o.amount.values
-      .map(v => v.identifier)
-      .filter(id => id.length > 0)
-      .forEach(id => set.add(id));
-    return set;
-  }, new Set<string>());
-
-  const { utxoDescriptors } = describeUtxos(
+  const { withRequiredAssets, pure, dirty, collateralReserve } = classifyUtxoForValues(
     utxos,
-    requiredAssetIds,
+    outputs.map(o => o.amount),
     protocolParams.coinsPerUtxoWord,
   )
-
-  const { withRequiredAssets, pure, dirty, collateralReserve } =
-    classifyUtxoDescriptors(utxoDescriptors);
 
   // prioritize inputs
   const sortedUtxos: Array<RemoteUnspentOutput> = [
