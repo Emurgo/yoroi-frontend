@@ -88,7 +88,6 @@ const messages = defineMessages({
 
 type State = {|
   showUtxoDetails: boolean,
-  currentWindowHeight: number,
 |}
 
 @observer
@@ -99,7 +98,6 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
-    currentWindowHeight: window.innerHeight
   }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
@@ -138,10 +136,6 @@ class SignTxPage extends Component<Props, State> {
       },
     }
   );
-
-  componentDidMount() {
-    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
-  }
 
   submit(): void {
     this.form.submit({
@@ -341,22 +335,17 @@ class SignTxPage extends Component<Props, State> {
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
     const { isSubmitting } = form.values();
-    const { showUtxoDetails, currentWindowHeight } = this.state
+    const { showUtxoDetails } = this.state
 
     return (
       <div>
         <ProgressBar step={2} />
         <div
           className={styles.component}
-          // style={{
-          //   height: currentWindowHeight + 'px',
-          // }}
         >
           {
             !showUtxoDetails ?(
-              <div 
-              // className={styles.component}
-              >
+              <div className={styles.signTx}>
                 <div>
                   <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
                 </div>

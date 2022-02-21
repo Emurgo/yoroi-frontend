@@ -1,8 +1,11 @@
 .component {
   height: calc(100vh - 92px);
-  padding: 30px 15px ;
   overflow: scroll;
   width: 100%;
+  
+  .signTx {
+    padding: 30px 15px ;
+  }
 
   .title {
     font-size: 24px;
