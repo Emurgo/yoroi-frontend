@@ -83,8 +83,8 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.ChangeWalletPasswordDialog_newPasswordClassic .FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
+  const errorSelector = '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]';
+  await checkErrorByTranslationId(this, errorSelector, error, By.xpath);
 });
 
 Then(/^I should see "Doesn't match" error message:$/, async function (data) {
@@ -99,8 +99,8 @@ Then(/^I should see the following submit error messages:$/, async function (data
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
+async function checkErrorByTranslationId(client, errorSelector, error, method = By.css) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message), 15000, method);
 }
 
 Then(/^I should stay in the change password dialog$/, async function () {
