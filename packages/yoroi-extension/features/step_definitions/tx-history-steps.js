@@ -186,11 +186,11 @@ const displayInfo = {
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'HIGH',
     txFrom: [
-      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.820000 ADA'],
+      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.82 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...iLjTnt34Aj', 'BYRON - EXTERNAL', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.650000 ADA'],
+      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.65 ADA'],
     ],
     txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
     txConfirmations: 'High. 104 confirmations.',
