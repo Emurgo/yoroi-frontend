@@ -202,7 +202,7 @@ const displayInfo = {
     txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
     txFrom: [
-      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1.000000 ADA'],
+      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...sTrQfTxPVX', 'PROCESSING...', '+0.000001 ADA']
@@ -212,15 +212,15 @@ const displayInfo = {
   },
   'failed-single-tx': {
     txType: 'ADA sent',
-    txAmount: '-0.180000',
+    txAmount: '-0.18',
     txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
     txFrom: [
-      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1.000000 ADA'],
+      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...xJPmFzi6G2', 'ADDRESS BOOK', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.820000 ADA'],
+      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.82 ADA'],
     ],
     txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',
     txFee: '0.179999',
