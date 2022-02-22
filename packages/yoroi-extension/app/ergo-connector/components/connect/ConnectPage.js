@@ -97,7 +97,7 @@ type Props = {|
 |};
 
 @observer
-class ConnectPage extends Component<Props, State> {
+class ConnectPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
