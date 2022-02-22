@@ -232,7 +232,7 @@ class ConnectPage extends Component<Props> {
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt={16}>
+        <Stack direction="row" spacing={2} mt={3}>
           <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
