@@ -67,15 +67,17 @@ Then(
   /^I should see ([^"]*) ([^"]*) transactions$/,
   async function (txsNumber, txExpectedStatus) {
     const txsAmount = parseInt(txsNumber, 10);
+    const showMoreLocator = '.WalletTransactionsList_component .MuiButton-primary';
 
     await this.driver.sleep(500);
     // press the show more transaction button until all transactions are visible
+    await this.click('.WalletTransactionsList_component .MuiButton-primary');
     for (let i = 1; i < txsAmount; i++) {
-      const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
+      const webElements = await this.driver.findElements(By.css(showMoreLocator));
       if (webElements.length === 0) {
         break;
       }
-      await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+      await this.click(showMoreLocator);
       await this.driver.sleep(500);
     }
 
