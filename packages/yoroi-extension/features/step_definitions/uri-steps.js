@@ -12,7 +12,7 @@ When(/^I click on "generate payment URL" button$/, async function () {
 
 Then(/^I generate a URI for ([0-9]+) ADA$/, async function (amount) {
   await this.input("input[name='amount']", amount);
-  await this.click('.URIGenerateDialog .primary');
+  await this.click('.URIGenerateDialog_component .MuiButton-primary');
 });
 
 Then(/^I should see the URI displayed in a new dialog$/, async function () {
