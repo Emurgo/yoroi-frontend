@@ -71,10 +71,9 @@ Then(
 
     await this.driver.sleep(500);
     // press the show more transaction button until all transactions are visible
-    await this.click('.WalletTransactionsList_component .MuiButton-primary');
     for (let i = 1; i < txsAmount; i++) {
-      const webElements = await this.driver.findElements(By.css(showMoreLocator));
-      if (webElements.length === 0) {
+      const buttonShowMoreExists = await this.checkIfExists(By.css(showMoreLocator));
+      if (!buttonShowMoreExists) {
         break;
       }
       await this.click(showMoreLocator);
