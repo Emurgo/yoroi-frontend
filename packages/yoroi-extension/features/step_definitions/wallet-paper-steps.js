@@ -1,18 +1,19 @@
 // @flow
 
 import { Given, Then } from 'cucumber';
-import { By, Key } from 'selenium-webdriver';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
+import { enterRecoveryPhrase } from './wallet-restoration-steps';
 
 // ========== Paper wallet ==========
 
 Then(/^I open Number of Adddresses selection dropdown$/, async function () {
-  await this.click('.WalletPaperDialog_component .SimpleInput_input');
+  await this.click('.WalletPaperDialog_component .MuiSelect-select');
 });
 
 Then(/^I select 2 addresses$/, async function () {
-  return this.click('//span[contains(text(), "2")]', By.xpath);
+  return this.click('//li[contains(text(), "2")]', By.xpath);
 });
 
 Then(/^I click the create paper wallet button$/, async function () {
@@ -31,12 +32,8 @@ Then(/^I enter the paper recovery phrase$/, async function () {
   const recoveryPhrase = await this.driver.executeScript(() => (
     window.yoroi.stores.substores.ada.paperWallets.paper.scrambledWords
   ));
-  for (let i = 0; i < recoveryPhrase.length; i++) {
-    const word = recoveryPhrase[i];
-    await this.driver
-      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
-      .sendKeys(word, Key.RETURN);
-  }
+
+  await enterRecoveryPhrase(this, recoveryPhrase.join(' '));
 });
 
 Given(/^I swap the paper wallet addresses$/, async function () {
