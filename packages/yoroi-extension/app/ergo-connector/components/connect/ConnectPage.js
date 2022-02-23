@@ -250,9 +250,7 @@ class ConnectPage extends Component<Props> {
     );
 
     return (
-      <div
-        className={componentClasses}
-      >
+      <div className={componentClasses}>
         {hasWallets ? (
           <>
             <ProgressBar step={1} />
