@@ -71,7 +71,7 @@ export async function checkFinalBalanceIsCorrect(
   const givenAmount = useReward
     ? parseFloat(fields.reward) + reservedFunds
     : parseFloat(fields.recoveredBalance);
-  const finalAmount = givenAmount - parseFloat(fields.fees);
+  const finalAmount = parseFloat(givenAmount - parseFloat(fields.fees)).toFixed(6);
 
   const network = networks.CardanoMainnet;
 

@@ -6,6 +6,25 @@ import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers
 import i18n from '../support/helpers/i18n-helpers';
 import { By } from 'selenium-webdriver';
 
+export async function selectSubmenuSettings(customWorld: Object, buttonName: string){
+  const formattedButtonName = camelCase(buttonName);
+  const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
+  await customWorld.click(buttonSelector);
+  await customWorld.waitForElement(`.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`);
+}
+
+export async function getComplexityLevelButton(customWorld: Object, isLow: boolean = true){
+  await customWorld.waitForElement('.ComplexityLevelForm_cardsWrapper');
+  const levels = await customWorld.driver.findElements(By.css('.ComplexityLevelForm_card'));
+  let card;
+  if (isLow){
+    card = levels[0];
+  } else {
+    card = levels[levels.length - 1];
+  }
+  return await card.findElement(By.xpath('.//button'));
+}
+
 When(/^I navigate to the general settings screen$/, async function () {
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
@@ -56,17 +75,11 @@ Then(/^The selected level is "([^"]*)"$/, async function (level) {
 });
 
 Then(/^I select the most complex level$/, async function () {
-  await this.waitForElement('.ComplexityLevelForm_cardsWrapper');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_card'));
-  const highestLevelCard = levels[levels.length - 1];
-  const cardChoseButton = await highestLevelCard.findElement(By.xpath('.//button'));
+  const cardChoseButton = await getComplexityLevelButton(this, false);
   await cardChoseButton.click(); // choose most complex level for tests
 });
 
 Then(/^I select the simplest level$/, async function () {
-  await this.waitForElement('.ComplexityLevelForm_cardsWrapper');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_card'));
-  const simplestLevelCard = levels[0];
-  const cardChoseButton = await simplestLevelCard.findElement(By.xpath('.//button'));
+  const cardChoseButton = await getComplexityLevelButton(this, true);
   await cardChoseButton.click(); // chose the simplest
 });
