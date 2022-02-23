@@ -1,7 +1,7 @@
 // @flow
 
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import { Builder, By, Key, until, error, promise } from 'selenium-webdriver';
+import { Builder, By, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
@@ -279,6 +279,12 @@ function CustomWorld(cmdInput: WorldInput) {
     }
     return false;
   };
+
+  this.highlightElement = async (element: WebElement) => {
+    await this.driver.executeScript(
+      "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');",
+      element);
+  }
 }
 
 // no need to await
