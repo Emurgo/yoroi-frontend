@@ -979,6 +979,7 @@ declare class webdriver$promise {
 
   defer(): webdriver$Resolver;
   all(arr: Array<webdriver$Promise<any>>): webdriver$Promise<any>;
+  rejected(error: any): webdriver$Promise<any>;
 }
 
 // WIP
