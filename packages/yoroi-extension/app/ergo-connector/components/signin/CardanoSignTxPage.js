@@ -98,15 +98,12 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
+    isSubmitting: false,
   }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        isSubmitting: {
-          type: 'boolean',
-          value: false,
-        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -141,7 +138,7 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.form.$('isSubmitting').set(true);
+        this.setState({ isSubmitting: true })
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
@@ -150,8 +147,8 @@ class SignTxPage extends Component<Props, State> {
           } else {
             throw error;
           }
+          this.setState({ isSubmitting: false })
         });
-        this.form.$('isSubmitting').set(false);
       },
       onError: () => {},
     });
@@ -334,7 +331,7 @@ class SignTxPage extends Component<Props, State> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { isSubmitting } = form.values();
+    const { isSubmitting } = this.state;
     const { showUtxoDetails } = this.state
 
     return (
