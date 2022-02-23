@@ -112,6 +112,7 @@ Feature: Wallet UI Settings
     Then I should see "Wallet name requires at least 1 and at most 40 letters." error message:
     | message                             |
     | global.errors.invalidWalletName     |
+
     Examples:
     | walletName                                | |
     | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwerd |41 characters length |

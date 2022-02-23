@@ -124,7 +124,7 @@ Then(
   /^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/,
   async function (data) {
     const error = data.hashes()[0];
-    const errorSelector = '.FormFieldOverridesClassic_error';
+    const errorSelector = '.walletName .MuiFormHelperText-root';
     await checkErrorByTranslationId(this, errorSelector, error);
   }
 );
