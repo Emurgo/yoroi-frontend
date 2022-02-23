@@ -77,7 +77,7 @@ const messages = defineMessages({
 
 type State = {|
   showUtxoDetails: boolean,
-  currentWindowHeight: number,
+  isSubmitting: boolean,
 |}
 
 @observer
@@ -88,20 +88,13 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
-    currentWindowHeight: window.innerHeight
+    isSubmitting: false,
   }
 
-  componentDidMount() {
-    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
-  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        isSubmitting: {
-          type: 'boolean',
-          value: false,
-        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -136,7 +129,7 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.form.$('isSubmitting').set(true);
+        this.setState({ isSubmitting: true })
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
@@ -145,8 +138,8 @@ class SignTxPage extends Component<Props, State> {
           } else {
             throw error;
           }
+          this.setState({ isSubmitting: false })
         });
-        this.form.$('isSubmitting').set(false);
       },
       onError: () => {},
     });
@@ -270,26 +263,22 @@ class SignTxPage extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
-    const { isSubmitting } = form.values();
+    const { isSubmitting } = this.state;
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight } = this.state
+    const { showUtxoDetails } = this.state
     const totalInput = txData.totalInput();
     const fee = txData.fee()
     const amount = totalInput.joinSubtractCopy(fee)
     return (
-      <>
+      <div className={styles.component}>
         <ProgressBar step={2} />
-        <div
-          style={{
-            height: currentWindowHeight + 'px',
-          }}
-        >
+        <div>
           {
          !showUtxoDetails ? (
            <div
-             className={styles.component}
+             className={styles.signTx}
            >
              <div>
                <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
@@ -380,7 +369,7 @@ class SignTxPage extends Component<Props, State> {
          />
         }
         </div>
-      </>
+      </div>
     );
   }
 }
