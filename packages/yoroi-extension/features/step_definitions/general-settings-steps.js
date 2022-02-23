@@ -26,7 +26,7 @@ When(/^I select second theme$/, async function () {
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
-  await this.click('.SettingsLayout_settingsPaneWrapper .SimpleInput_input');
+  await this.click('//div[starts-with(@id, "languageId")]', By.xpath);
 });
 
 Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonName) {
