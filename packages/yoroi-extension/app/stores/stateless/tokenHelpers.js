@@ -41,6 +41,11 @@ function decodeAssetNameIfASCII(assetName: ?string): void | string {
   return ASCII_ASSET_NAME_BLACKLIST.has(asciiName) ? undefined : asciiName;
 }
 
+export function assetNameFromIdentifier(identifier: string): string {
+  const [, name ] = identifier.split('.');
+  return decodeAssetNameIfASCII(name) || name;
+}
+
 export function getTokenStrictName(
   tokenRow: $ReadOnly<{
     Identifier: string,

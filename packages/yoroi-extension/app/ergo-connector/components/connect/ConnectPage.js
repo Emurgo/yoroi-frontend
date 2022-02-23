@@ -43,6 +43,10 @@ const messages = defineMessages({
     id: 'ergo-connector.label.connectWalletAuthRequest',
     defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
   },
+  connectWalletNoHardwareSupported: {
+    id: 'ergo-connector.label.connectWalletNoHardwareSupported',
+    defaultMessage: '!!!Note, hardware wallets are not supported for the dapp connecting yet.',
+  },
   yourWallets: {
     id: 'ergo-connector.label.yourWallets',
     defaultMessage: '!!!Your Wallets',
@@ -216,7 +220,7 @@ class ConnectPage extends Component<Props> {
             variant="h4"
             align='center'
             color="var(--yoroi-palette-gray-900)"
-            marginBottom="20px"
+            marginBottom="40px"
             paddingLeft="32px"
             fontWeight="400"
           >
@@ -228,7 +232,7 @@ class ConnectPage extends Component<Props> {
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt={16}>
+        <Stack direction="row" spacing={2} mt="15px">
           <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
@@ -280,43 +284,52 @@ class ConnectPage extends Component<Props> {
           {isAppAuth ? (
             passwordForm
           ) : (
-            <Box borderBottom="1px solid #dce0e9">
-              {isError ? <div className={styles.errorMessage}>{error}</div> : null}
-              {isLoading ? (
-                <div className={styles.loading}>
-                  <LoadingSpinner />
-                </div>
-              ) : hasWallets ? (
-                <Box>
-                  <Typography
-                    variant="h5"
-                    fontWeight="300"
-                    color="var(--yoroi-palette-gray-600)"
-                    mb="14px"
-                  >
-                    {intl.formatMessage(messages.yourWallets)}
-                  </Typography>
-                  <ul className={styles.list}>
-                    {publicDerivers.map(item => (
-                      <li
-                        key={item.publicDeriver.getPublicDeriverId()}
-                        className={styles.listItem}
-                      >
-                        <WalletButton
-                          onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
+            <>
+              <Box borderBottom="1px solid #dce0e9">
+                {isError ? <div className={styles.errorMessage}>{error}</div> : null}
+                {isLoading ? (
+                  <div className={styles.loading}>
+                    <LoadingSpinner />
+                  </div>
+                ) : hasWallets ? (
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      fontWeight="300"
+                      color="var(--yoroi-palette-gray-600)"
+                      mb="14px"
+                    >
+                      {intl.formatMessage(messages.yourWallets)}
+                    </Typography>
+                    <ul className={styles.list}>
+                      {publicDerivers.map(item => (
+                        <li
+                          key={item.publicDeriver.getPublicDeriverId()}
+                          className={styles.listItem}
                         >
-                          <WalletCard
-                            shouldHideBalance={shouldHideBalance}
-                            publicDeriver={item}
-                            getTokenInfo={this.props.getTokenInfo}
-                          />
-                        </WalletButton>
-                      </li>
-                    ))}
-                  </ul>
-                </Box>
-              ) : null}
-            </Box>
+                          <WalletButton
+                            onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
+                          >
+                            <WalletCard
+                              shouldHideBalance={shouldHideBalance}
+                              publicDeriver={item}
+                              getTokenInfo={this.props.getTokenInfo}
+                            />
+                          </WalletButton>
+                        </li>
+                      ))}
+                    </ul>
+                  </Box>
+                ) : null}
+              </Box>
+              <Typography
+                align='left'
+                color="var(--yoroi-palette-gray-600)"
+                marginTop="20px"
+              >
+                {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
+              </Typography>
+            </>
           )}
         </Box>
 
