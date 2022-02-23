@@ -47,11 +47,14 @@ import {
   connectorSignCardanoTx,
   connectorSignTx
 } from './ergo-connector/api';
-import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
 import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
-import { RemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
-import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
+import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
+import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
@@ -227,9 +230,12 @@ async function withDb<T>(
 
 async function getStateFetcher(
   localStorageApi: LocalStorageApi,
+  isCardano: boolean,
 ): Promise<IFetcher> {
+  const batchedFetcher = isCardano ? CardanoBatchedFetcher : ErgoBatchedFetcher;
+  const remotefetcher = isCardano ? CardanoRemoteFetcher : ErgoRemoteFetcher;
   const locale = await localStorageApi.getUserLocale() ?? 'en-US';
-  return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
+  return new batchedFetcher(new remotefetcher(
     () => environment.getVersion(),
     () => locale,
     () => {
@@ -241,7 +247,7 @@ async function getStateFetcher(
       }
       return '-';
     },
-  )));
+  ));
 }
 
 // This is a temporary workaround to DB duplicate key constraint violations
@@ -253,41 +259,54 @@ async function syncWallet(
   wallet: PublicDeriver<>,
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
+  const isCardano = isCardanoHaskell(wallet.getParent().getNetworkInfo());
   try {
     const lastSync = await wallet.getLastSyncInfo();
     // don't sync more than every 30 seconds
     const now = Date.now();
     if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
       if (syncing == null) {
-        syncing = RustModule.load()
-          .then(() => {
-            Logger.debug('sync started');
-            return getStateFetcher(localStorageApi)
-          })
-          .then(stateFetcher => updateTransactions(
+        syncing = true;
+        await RustModule.load();
+        Logger.debug('sync started');
+        const stateFetcher = await getStateFetcher(localStorageApi, isCardano);
+        if (isCardano) {
+          await cardanoUpdateTransactions(
+            wallet.getDb(),
+            wallet,
+            stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
+            stateFetcher.getBestBlock,
+            stateFetcher.getTokenInfo,
+            stateFetcher.getMultiAssetMintMetadata,
+          )
+        } else {
+          await ergoUpdateTransactions(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
             stateFetcher.getTransactionsHistoryForAddresses,
             stateFetcher.getAssetInfo,
-            stateFetcher.getBestBlock))
-          .then(() => {
-            // to be safe we filter possibly accepted txs for up to 10 minutes
-            // this could be accepted in a variable amount of time due to Ergo's PoW
-            // but this is probably an okay amount. If it was not accepted then at worst
-            // the values are just temporarily withheld for a few minutes too long,
-            // and if it was accepted, then none of the UTXOs held would have been
-            // reuseable anyway.
-            pendingTxs = pendingTxs.filter(
-              pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
-            Logger.debug('sync ended');
-            return Promise.resolve();
-          });
+            stateFetcher.getBestBlock
+          );
+        }
+        if (!isCardano) {
+          // to be safe we filter possibly accepted txs for up to 10 minutes
+          // this could be accepted in a variable amount of time due to Ergo's PoW
+          // but this is probably an okay amount. If it was not accepted then at worst
+          // the values are just temporarily withheld for a few minutes too long,
+          // and if it was accepted, then none of the UTXOs held would have been
+          // reuseable anyway.
+          pendingTxs = pendingTxs.filter(
+            pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10 * 60 * 1000);
+        }
+        Logger.debug('sync ended');
       }
-      syncing = await syncing;
     }
   } catch (e) {
     Logger.error(`Syncing failed: ${e}`);
+  } finally {
+    syncing = null;
   }
 }
 
@@ -361,9 +380,10 @@ const yoroiMessageHandler = async (
             throw new Error('could not get all utxos');
           }
           const network = wallet.getParent().getNetworkInfo();
+          const isCardano = isCardanoHaskell(network);
           const [utxos, bestBlock] = await Promise.all([
             canGetAllUtxos.getAllUtxos(),
-            getStateFetcher(localStorageApi)
+            getStateFetcher(localStorageApi, isCardano)
               .then(f => f.getBestBlock({ network })),
           ])
           return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
@@ -607,7 +627,6 @@ async function findWhitelistedConnection(
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
   const whitelist = await localStorageApi.getWhitelist() ?? [];
-  Logger.debug(`whitelist: ${JSON.stringify(whitelist)}`);
   return whitelist.find((entry: WhitelistEntry) => {
     // Whitelist is only matching if same auth or auth is not requested
     const matchingUrl = entry.url === url;
