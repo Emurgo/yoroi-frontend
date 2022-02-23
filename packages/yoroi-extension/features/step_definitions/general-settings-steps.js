@@ -56,13 +56,17 @@ Then(/^The selected level is "([^"]*)"$/, async function (level) {
 });
 
 Then(/^I select the most complex level$/, async function () {
-  await this.waitForElement('.ComplexityLevelForm_submitButton');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
-  await levels[levels.length - 1].click(); // choose most complex level for tests
+  await this.waitForElement('.ComplexityLevelForm_cardsWrapper');
+  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_card'));
+  const highestLevelCard = levels[levels.length - 1];
+  const cardChoseButton = await highestLevelCard.findElement(By.xpath('.//button'));
+  await cardChoseButton.click(); // choose most complex level for tests
 });
 
 Then(/^I select the simplest level$/, async function () {
-  await this.waitForElement('.ComplexityLevelForm_submitButton');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
-  await levels[0].click(); // chose the simplest
+  await this.waitForElement('.ComplexityLevelForm_cardsWrapper');
+  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_card'));
+  const simplestLevelCard = levels[0];
+  const cardChoseButton = await simplestLevelCard.findElement(By.xpath('.//button'));
+  await cardChoseButton.click(); // chose the simplest
 });

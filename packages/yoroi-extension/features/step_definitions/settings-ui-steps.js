@@ -116,7 +116,7 @@ Then(/^I should see support screen$/, async function () {
 });
 
 Then(/^I should see blockchain screen$/, async function () {
-  await this.waitForElement('.ExplorerSettings_explorer');
+  await this.waitForElement('.ExplorerSettings_component');
   await this.waitForElement("//h2[contains(text(), 'Cardano Payment URLs')]", By.xpath);
   await this.waitForElement("//h2[contains(text(), 'Currency Conversion')]", By.xpath);
 });
