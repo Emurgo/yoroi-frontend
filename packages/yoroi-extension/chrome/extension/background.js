@@ -50,7 +50,8 @@ import {
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
-import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
+import type { IFetcher as ErgoIFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
+import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
 import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
@@ -227,15 +228,12 @@ async function withDb<T>(
   });
 }
 
-
-async function getStateFetcher(
+async function createFetcher(
+  fetcherType: Function,
   localStorageApi: LocalStorageApi,
-  isCardano: boolean,
-): Promise<IFetcher> {
-  const batchedFetcher = isCardano ? CardanoBatchedFetcher : ErgoBatchedFetcher;
-  const remotefetcher = isCardano ? CardanoRemoteFetcher : ErgoRemoteFetcher;
+): * {
   const locale = await localStorageApi.getUserLocale() ?? 'en-US';
-  return new batchedFetcher(new remotefetcher(
+  return new fetcherType(
     () => environment.getVersion(),
     () => locale,
     () => {
@@ -247,14 +245,26 @@ async function getStateFetcher(
       }
       return '-';
     },
-  ));
+  )
+}
+
+async function getErgoStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<ErgoIFetcher> {
+  return new ErgoBatchedFetcher(await createFetcher(ErgoRemoteFetcher, localStorageApi));
+}
+
+async function getCardanoStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<CardanoIFetcher> {
+  return new CardanoBatchedFetcher(await createFetcher(CardanoRemoteFetcher, localStorageApi));
 }
 
 // This is a temporary workaround to DB duplicate key constraint violations
 // that is happening when multiple DBs are loaded at the same time, or possibly
 // this one being loaded while Yoroi's main App is doing DB operations.
 // Promise<void>
-let syncing: ?Promise<void> = null;
+let syncing: ?boolean = null;
 async function syncWallet(
   wallet: PublicDeriver<>,
   localStorageApi: LocalStorageApi,
@@ -269,8 +279,9 @@ async function syncWallet(
         syncing = true;
         await RustModule.load();
         Logger.debug('sync started');
-        const stateFetcher = await getStateFetcher(localStorageApi, isCardano);
         if (isCardano) {
+          const stateFetcher: CardanoIFetcher =
+            await getCardanoStateFetcher(localStorageApi);
           await cardanoUpdateTransactions(
             wallet.getDb(),
             wallet,
@@ -281,6 +292,8 @@ async function syncWallet(
             stateFetcher.getMultiAssetMintMetadata,
           )
         } else {
+          const stateFetcher: ErgoIFetcher =
+            await getErgoStateFetcher(localStorageApi);
           await ergoUpdateTransactions(
             wallet.getDb(),
             wallet,
@@ -380,11 +393,10 @@ const yoroiMessageHandler = async (
             throw new Error('could not get all utxos');
           }
           const network = wallet.getParent().getNetworkInfo();
-          const isCardano = isCardanoHaskell(network);
           const [utxos, bestBlock] = await Promise.all([
             canGetAllUtxos.getAllUtxos(),
-            getStateFetcher(localStorageApi, isCardano)
-              .then(f => f.getBestBlock({ network })),
+            getErgoStateFetcher(localStorageApi)
+              .then((f: ErgoIFetcher) => f.getBestBlock({ network })),
           ])
           return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
