@@ -220,7 +220,7 @@ class ConnectPage extends Component<Props> {
             variant="h4"
             align='center'
             color="var(--yoroi-palette-gray-900)"
-            marginBottom="20px"
+            marginBottom="40px"
             paddingLeft="32px"
             fontWeight="400"
           >
@@ -232,7 +232,7 @@ class ConnectPage extends Component<Props> {
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt={3}>
+        <Stack direction="row" spacing={2} mt="15px">
           <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
