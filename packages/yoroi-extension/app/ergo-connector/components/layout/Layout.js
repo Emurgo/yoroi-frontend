@@ -33,7 +33,7 @@ export default class Layout extends Component<Props> {
 
     return (
       <div className={styles.layout}>
-        <TestnetWarningBanner isTestnet={true} />
+        <TestnetWarningBanner isTestnet={false} />
         <div className={styles.header}>
           <Link to={ROUTES.SETTINGS.GENERAL} className={styles.menuIcon}>
             <MenuIcon />
