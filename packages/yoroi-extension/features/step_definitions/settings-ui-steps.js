@@ -89,7 +89,7 @@ Then(/^I should see the following error messages:$/, async function (data) {
 
 Then(/^I should see "Doesn't match" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.FormFieldOverridesClassic_error';
+  const errorSelector = '.MuiFormHelperText-root';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
@@ -106,7 +106,7 @@ async function checkErrorByTranslationId(client, errorSelector, error, method = 
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.dialog__title', changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {
