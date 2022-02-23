@@ -88,6 +88,7 @@ const messages = defineMessages({
 
 type State = {|
   showUtxoDetails: boolean,
+  isSubmitting: boolean,
 |}
 
 @observer
