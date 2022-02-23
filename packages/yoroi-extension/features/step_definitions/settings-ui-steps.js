@@ -154,7 +154,11 @@ Then(/^I should see a no wallet message$/, async function () {
   await this.waitUntilText('.FullscreenMessage_title', noWalletMessage);
 });
 
-
 Then(/^I sleep for ([^"]*)$/, async function (ms) {
   await this.driver.sleep(Number.parseInt(ms, 10));
+});
+
+Then(/^I should see "Incorrect wallet password." error message$/, async function(){
+  const errorSelector = '.ChangeWalletPasswordDialog_error';
+  await this.waitUntilText(errorSelector, 'Incorrect wallet password.', 15000);
 });

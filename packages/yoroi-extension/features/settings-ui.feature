@@ -129,7 +129,7 @@ Feature: Wallet UI Settings
     | asdfasdfasdf         | newSecret123 | newSecret123     |
     And I clear the current wallet password asdfasdfasdf
     And I submit the wallet password dialog
-    Then I should stay in the change password dialog
+    Then I should see "Incorrect wallet password." error message
 
   @it-40
   Scenario: User can't change password without filling Password repeat field (IT-40)
