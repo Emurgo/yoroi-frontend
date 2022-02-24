@@ -78,6 +78,7 @@ type Props = {|
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
   +isAppAuth: boolean,
+  +hidePasswordForm: void => void,
   +onConnect: (
     deriver: PublicDeriver<>,
     checksum: ?WalletChecksum,
@@ -134,6 +135,11 @@ class ConnectPage extends Component<Props> {
       },
     }
   );
+
+  hidePasswordForm: void => void = () => {
+    this.form.$('walletPassword').clear()
+    this.props.hidePasswordForm()
+  }
 
   submit: void => void = () => {
     this.form.submit({
@@ -233,7 +239,7 @@ class ConnectPage extends Component<Props> {
           />
         </div>
         <Stack direction="row" spacing={2} mt="15px">
-          <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
+          <Button fullWidth variant="secondary" onClick={this.hidePasswordForm} sx={{ minWidth: 'auto' }}>
             {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
           <Button
