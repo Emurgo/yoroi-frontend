@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import type { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 
@@ -10,13 +10,15 @@ type SyncedWallet = {|
 
 type StoredWallets = {|
     wallets: SyncedWallet[],
-    isFirstTime: boolean,    
+    isFirstTime: boolean,
 |}
-    
+
 const SYNCED_WALLETS = 'wallets/synced'
 const SYNCED_WALLETS_DEFAULT = JSON.stringify({
     wallets: [],
-    // When we push this into production we want to take existing wallets, store them and mark them as synced. 
+    // When we push this into production
+    // we want to take existing wallets,
+    // store them and mark them as synced.
     isFirstTime: true,
 });
 
@@ -38,7 +40,9 @@ const createSyncedWalletObj = async (publicDeriver: PublicDeriver<>): Promise<Sy
     }
 }
 
-export const getCurrentWalletFromLS = async (publicDeriver: PublicDeriver<>): Promise<void | SyncedWallet> => {
+export const getCurrentWalletFromLS = async (
+  publicDeriver: PublicDeriver<>,
+): Promise<void | SyncedWallet> => {
     const syncedWallet = await createSyncedWalletObj(publicDeriver)
     return getSyncedWallets().wallets.find(wallet => compareWallets(wallet, syncedWallet))
 }
@@ -47,8 +51,12 @@ export const getCurrentWalletFromLS = async (publicDeriver: PublicDeriver<>): Pr
 export const removeWalletFromLS = async (publicDeriver: PublicDeriver<>): Promise<void> => {
     const syncedWallet = await createSyncedWalletObj(publicDeriver)
     const syncedWallets = getSyncedWallets()
-    const filteredWallets = syncedWallets.wallets.filter(wallet => !compareWallets(wallet, syncedWallet)) 
-    localStorage.setItem(SYNCED_WALLETS, JSON.stringify({ isFirstTime: syncedWallets.isFirstTime, wallets: filteredWallets }))
+    const filteredWallets = syncedWallets.wallets
+      .filter(wallet => !compareWallets(wallet, syncedWallet))
+    localStorage.setItem(SYNCED_WALLETS, JSON.stringify({
+        isFirstTime: syncedWallets.isFirstTime,
+        wallets: filteredWallets,
+    }))
 }
 
 export const updateSyncedWallets = async (publicDeriver: PublicDeriver<>): Promise<void> => {
@@ -64,12 +72,14 @@ export const updateSyncedWallets = async (publicDeriver: PublicDeriver<>): Promi
 }
 
 /**
- * Take all the exsiting wallets, store them and mark them as synced. 
+ * Take all the exsiting wallets, store them and mark them as synced.
  * This is nessary as when we push this into production every wallet will see the syncing overlay
  * Due to empty localstorage.
- * to avoid this we are using the `isFirstTime` flage to store these wallet. 
+ * to avoid this we are using the `isFirstTime` flage to store these wallet.
  */
-export const markExistingWalletsAsSynced = async (publicDerivers: PublicDeriver<>[]): Promise<void> => {
+export const markExistingWalletsAsSynced = async (
+  publicDerivers: PublicDeriver<>[],
+): Promise<void> => {
     const syncedWallets = getSyncedWallets()
     if (!syncedWallets.isFirstTime) return
     for (const publicDeriver of publicDerivers) {
@@ -80,7 +90,8 @@ export const markExistingWalletsAsSynced = async (publicDerivers: PublicDeriver<
     localStorage.setItem(SYNCED_WALLETS, JSON.stringify(syncedWallets))
 }
 
-// Utils 
+// Utils
 function compareWallets (first: SyncedWallet, second: SyncedWallet) {
-    return (first.publicKey === second.publicKey) && (first.publicDeriverId === second.publicDeriverId)
+    return (first.publicKey === second.publicKey)
+      && (first.publicDeriverId === second.publicDeriverId)
 }
