@@ -302,7 +302,7 @@ getUtxos.addEventListener('click', () => {
           utxos = utxosResponse
         }
         alertSuccess(`Check the console`)
-        alertEl.innerHTML = '<h2>UTxO:</h2><pre>' + JSON.stringify(utxos, undefined, 2) + '</pre>'
+        alertEl.innerHTML = `<h2>UTxO (${utxos.length}):</h2><pre>` + JSON.stringify(utxos, undefined, 2) + '</pre>'
       }
     })
 })
