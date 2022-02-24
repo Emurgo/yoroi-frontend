@@ -323,7 +323,7 @@ submitTx.addEventListener('click', () => {
     alertSuccess(`Transaction ${txId} submitted`);
   }).catch(error => {
     toggleSpinner('hide')
-    alertWarrning('Transaction submission failed')
+    alertWarrning(`Transaction submission failed: ${JSON.stringify(error)}`)
   })
 })
 
