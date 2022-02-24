@@ -234,7 +234,7 @@ class ConnectPage extends Component<Props> {
         </div>
         <Stack direction="row" spacing={2} mt="15px">
           <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
-            {intl.formatMessage(globalMessages.cancel)}
+            {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
           <Button
             variant="primary"
