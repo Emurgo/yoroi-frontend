@@ -47,11 +47,15 @@ import {
   connectorSignCardanoTx,
   connectorSignTx
 } from './ergo-connector/api';
-import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
-import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
-import { RemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
-import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import type { IFetcher as ErgoIFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
+import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
+import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
+import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
+import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
@@ -224,12 +228,12 @@ async function withDb<T>(
   });
 }
 
-
-async function getStateFetcher(
+async function createFetcher(
+  fetcherType: Function,
   localStorageApi: LocalStorageApi,
-): Promise<IFetcher> {
+): * {
   const locale = await localStorageApi.getUserLocale() ?? 'en-US';
-  return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
+  return new fetcherType(
     () => environment.getVersion(),
     () => locale,
     () => {
@@ -241,53 +245,81 @@ async function getStateFetcher(
       }
       return '-';
     },
-  )));
+  )
+}
+
+async function getErgoStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<ErgoIFetcher> {
+  return new ErgoBatchedFetcher(await createFetcher(ErgoRemoteFetcher, localStorageApi));
+}
+
+async function getCardanoStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<CardanoIFetcher> {
+  return new CardanoBatchedFetcher(await createFetcher(CardanoRemoteFetcher, localStorageApi));
 }
 
 // This is a temporary workaround to DB duplicate key constraint violations
 // that is happening when multiple DBs are loaded at the same time, or possibly
 // this one being loaded while Yoroi's main App is doing DB operations.
 // Promise<void>
-let syncing: ?Promise<void> = null;
+let syncing: ?boolean = null;
 async function syncWallet(
   wallet: PublicDeriver<>,
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
+  const isCardano = isCardanoHaskell(wallet.getParent().getNetworkInfo());
   try {
     const lastSync = await wallet.getLastSyncInfo();
     // don't sync more than every 30 seconds
     const now = Date.now();
     if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
       if (syncing == null) {
-        syncing = RustModule.load()
-          .then(() => {
-            Logger.debug('sync started');
-            return getStateFetcher(localStorageApi)
-          })
-          .then(stateFetcher => updateTransactions(
+        syncing = true;
+        await RustModule.load();
+        Logger.debug('sync started');
+        if (isCardano) {
+          const stateFetcher: CardanoIFetcher =
+            await getCardanoStateFetcher(localStorageApi);
+          await cardanoUpdateTransactions(
+            wallet.getDb(),
+            wallet,
+            stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
+            stateFetcher.getBestBlock,
+            stateFetcher.getTokenInfo,
+            stateFetcher.getMultiAssetMintMetadata,
+          )
+        } else {
+          const stateFetcher: ErgoIFetcher =
+            await getErgoStateFetcher(localStorageApi);
+          await ergoUpdateTransactions(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
             stateFetcher.getTransactionsHistoryForAddresses,
             stateFetcher.getAssetInfo,
-            stateFetcher.getBestBlock))
-          .then(() => {
-            // to be safe we filter possibly accepted txs for up to 10 minutes
-            // this could be accepted in a variable amount of time due to Ergo's PoW
-            // but this is probably an okay amount. If it was not accepted then at worst
-            // the values are just temporarily withheld for a few minutes too long,
-            // and if it was accepted, then none of the UTXOs held would have been
-            // reuseable anyway.
-            pendingTxs = pendingTxs.filter(
-              pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
-            Logger.debug('sync ended');
-            return Promise.resolve();
-          });
+            stateFetcher.getBestBlock
+          );
+        }
+        if (!isCardano) {
+          // to be safe we filter possibly accepted txs for up to 10 minutes
+          // this could be accepted in a variable amount of time due to Ergo's PoW
+          // but this is probably an okay amount. If it was not accepted then at worst
+          // the values are just temporarily withheld for a few minutes too long,
+          // and if it was accepted, then none of the UTXOs held would have been
+          // reuseable anyway.
+          pendingTxs = pendingTxs.filter(
+            pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10 * 60 * 1000);
+        }
+        Logger.debug('sync ended');
       }
-      syncing = await syncing;
     }
   } catch (e) {
     Logger.error(`Syncing failed: ${e}`);
+  } finally {
+    syncing = null;
   }
 }
 
@@ -363,8 +395,8 @@ const yoroiMessageHandler = async (
           const network = wallet.getParent().getNetworkInfo();
           const [utxos, bestBlock] = await Promise.all([
             canGetAllUtxos.getAllUtxos(),
-            getStateFetcher(localStorageApi)
-              .then(f => f.getBestBlock({ network })),
+            getErgoStateFetcher(localStorageApi)
+              .then((f: ErgoIFetcher) => f.getBestBlock({ network })),
           ])
           return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
@@ -607,7 +639,6 @@ async function findWhitelistedConnection(
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
   const whitelist = await localStorageApi.getWhitelist() ?? [];
-  Logger.debug(`whitelist: ${JSON.stringify(whitelist)}`);
   return whitelist.find((entry: WhitelistEntry) => {
     // Whitelist is only matching if same auth or auth is not requested
     const matchingUrl = entry.url === url;
