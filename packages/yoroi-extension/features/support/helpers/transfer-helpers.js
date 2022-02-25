@@ -13,11 +13,11 @@ type TransferSourceType = Array<{|
   amount: string | number,
 |}>;
 
-type WithdrawSourceType = {
+type WithdrawSourceType = {|
   fromAddress: string,
   reward: string | number,
   fees: string | number,
-};
+|};
 
 export async function baseCheckAddressesRecoveredAreCorrect(
   rows: TransferSourceType,
