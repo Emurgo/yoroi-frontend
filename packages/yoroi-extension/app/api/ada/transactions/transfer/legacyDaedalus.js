@@ -83,7 +83,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
   protocolParams: {|
     keyDeposit: RustModule.WalletV4.BigNum,
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
   |}
