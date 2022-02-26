@@ -211,13 +211,13 @@ Feature: Transfer Yoroi Wallet funds
     # And I enter the decryption password
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
