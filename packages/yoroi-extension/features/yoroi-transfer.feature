@@ -142,9 +142,9 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate KOTZ-1730
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |   
-    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2000000    |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CwGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAG/qTAhoAAontAxoR/pTNoQKBhFgg18n9dDSQAQOaCZv45nr6Siugpa1UECrB4PoeJf11D51YQGW1xr8X1ZlQUInliQFbAZkysvSOUyc6DfeeckohKXXhNfCYtusb4mJL3v6xEbqmhRR4jpodgrZQSEjWX/L8IAtYIHos8jfmh7thEmh9Z4iWlGgVLpvfY779btjkhmBoW8dQQaD2"
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2                | 0.166425 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CwGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAG/pnAhoAAooZAxoR/pTNoQKBhFgg18n9dDSQAQOaCZv45nr6Siugpa1UECrB4PoeJf11D51YQH7FvLGwOx0vFm9SpYsA8qBlv3LmHh+Q/oQ82FRjrfcUdQEKy/1/oEX+8K/2CN+n8lKnouQovKGJNw0qfTaBbQBYIHos8jfmh7thEmh9Z4iWlGgVLpvfY779btjkhmBoW8dQQaD19g=="
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
