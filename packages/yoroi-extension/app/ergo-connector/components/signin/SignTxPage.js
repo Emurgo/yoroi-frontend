@@ -34,7 +34,6 @@ import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx,
@@ -95,18 +94,16 @@ export const signTxMessages: Object = defineMessages({
 });
 
 type State = {|
-  showUtxoDetails: boolean,
   isSubmitting: boolean,
 |}
 
 @observer
-class SignTxPage extends Component<Props> {
+class SignTxPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   state: State = {
-    showUtxoDetails: false,
     isSubmitting: false,
   }
 
@@ -152,7 +149,7 @@ class SignTxPage extends Component<Props> {
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
-              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+              this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
             )
           } else {
             throw error;

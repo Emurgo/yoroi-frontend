@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import TextField from '../../../components/common/TextField';
@@ -45,7 +45,6 @@ import WalletCard from '../connect/WalletCard';
 import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx | CardanoTx | CardanoTxRequest,
@@ -74,7 +73,6 @@ const messages = defineMessages({
 });
 
 type State = {|
-  showUtxoDetails: boolean,
   isSubmitting: boolean,
 |}
 
@@ -85,7 +83,6 @@ class SignTxPage extends Component<Props, State> {
   };
 
   state: State = {
-    showUtxoDetails: false,
     isSubmitting: false,
   }
 
@@ -140,10 +137,6 @@ class SignTxPage extends Component<Props, State> {
       },
       onError: () => {},
     });
-  }
-
-  toggleUtxoDetails: boolean => void = (newState) => {
-    this.setState({ showUtxoDetails: newState })
   }
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
@@ -289,28 +282,16 @@ class SignTxPage extends Component<Props, State> {
     );
   };
 
-  renderAddresses(): Node {
-    const addresses = this.props.txData.outputs.map(({ address }) =>  address);
-    return (
-      <div className={styles.toAddresses}>
-        <p className={styles.address}>{addresses[0]}</p>
-        { addresses.length >= 2 &&  (
-        <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
-          {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
-        </button>)}
-      </div>
-    )
-  }
-
-
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
     const { txData, onCancel, connectedWebsite } = this.props;
+
+    // TODO: figure if needed
+    // eslint-disable-next-line no-unused-vars
     const { isSubmitting } = this.state;
-    const { showUtxoDetails } = this.state;
 
     const url = connectedWebsite?.url ?? '';
     const faviconUrl = connectedWebsite?.image ?? '';
