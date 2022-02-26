@@ -63,24 +63,24 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate ZKTZ-4614
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount |   
-    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4      |
-    | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj | 1      |
-    | Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3 | 820000 |
-    | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD | 820000 |
-    | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w | 820000 |
-    | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd | 650000 |
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 3.110005         | 0.209237 |
+    | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
+    | Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3 |                  |          |
+    | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
+    | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
+    | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd |                  |          |
     Then A successful tx gets sent from my wallet from another client
     When I confirm Yoroi transfer funds
     Then I should see wallet changed notice
     And I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |
-    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4      |
-    | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj | 1      |
-    | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD | 820000 |
-    | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w | 820000 |
-    | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd | 650000 |
-    Given The expected transaction is "g6QAiIJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAH93oAhoAAxNtAxoR/pTNoQKFhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQFrUhsiUMcRyhw6Uf/XRqPjhixUrVz92rwhXZHZSL5M4G/fgFzBOJLALQhRFFDkPr2Pdp0N1Oj666bs1wDg+4ARYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hAX1ZN6WNFs3O5VtOekVCE06XVhz718ICbIDvlSbk5pDEaMw9H0PFG3FtoS0DMo+sneAOPmYEaj/SrbpRqOsbrAlggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEAzoliU3eXhzZ2azuzPRtQ7zsxOvP4Wq8L272TXHVUkh1Hu/cJiPnvnUqBql5Q4Lj63dBCKKMNWVIBJgyJ8dwMFWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQESoTbBXvd+NWw8RLCeijbeiCyvo8diOudi+GxLwCslfIzps9cONpo4qiVvWp+/wDyNbm7035lnQBZoUtQMcdQBYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCC5TTZuZiJW+mD46uJ/IIwwoYvtsvdGnWfNR4HzHKY/BlhAA3+rED2TO7YnkQBoj1X7aiJ2Wz0QFxcpDe5dgo4oLYD/mKqsk0XsUmFzo7SG34OZCeN7nKHoBtFn8HDf7oCcAFggrsddVEovzNzpsw4Y3PHrjzmP9bkBd+LCRWEJPOQv66VBoPY="
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 2.290005         | 0.201625 |
+      | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
+      | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
+      | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
+      | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd |                  |          |
+    Given The expected transaction is "hKQAiIJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAH928AhoAAxOZAxoR/pTNoQKFhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQA7VNvJA2sJitEnFDKr5Bh1qdpn9hSavj8dCwIvGGWk4CdyLjopgdbTy1XqakezWGWLrIGKrr9pqIB2y66F40wlYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hA/IqZJK3qx7W7Uw1aeQh1KJlHCnqQ/lQnXwQDhFHrMuqNsZpxXZELid52k974JYZyXJH1Y0CnQEF6mDR1sbZDDFggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDM6M+ZB43mgqKGBksQMjWlaIvVl9dlhLYoirHrrzPESfZ6lq1w+IeL7JBezWDrWT1kab1zU+ZBfvBVkRwvWVIHWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQKRP2cf7y2v/NhPFdd/RCJw2v7M4c2zAxeBIPtVzpyDRXUVL1FYDhMcl4hr76lTK3AvTX4j6S5F2nMITQ2Z0IwVYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCC5TTZuZiJW+mD46uJ/IIwwoYvtsvdGnWfNR4HzHKY/BlhA8qvNTlrNvhYdDc447O1YY7ZfZUZoVdcfFWEmCsKoxb1KsT26b9x1DEN1TUkT+et2D2WDhgtnwdmpkYtBovB9AVggrsddVEovzNzpsw4Y3PHrjzmP9bkBd+LCRWEJPOQv66VBoPX2"
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
