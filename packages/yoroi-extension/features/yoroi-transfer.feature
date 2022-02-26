@@ -164,13 +164,13 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate ZDDC-9858
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    | fromAddress                                                 | reward | fees     |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5      | 0.173157 |
     And I see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6YAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgC8F+cCGgACpDkDGhH+lM0EgYIBggBYHJVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gFoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECS1+tbK3tpoKvXsIOw2gRb4KpSKTzXTj/mWzq/mfraAIY9AM0NgLHfEiI1oXY27NRXdvGkZ+xAX/U8MUQk/vAJglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQE8XIDQhaNToTahlPCrgcUtxhfNt0aJ5Z6vsLe5kiPv3jdQhJ6ckiiW2d/s0iX93PfkYFicBfu2qN6nHTB5YAQ72"
+    Given The expected transaction is "hKYAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgC8F7sCGgACpGUDGhH+lM0EgYIBggBYHJVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gFoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEC5+g3rJd9kHeUUnmKGYbjXwDXc0iBc1bRLQ7H6mm938Lj7iO0r6cSwYWq6JUZyx0ju+vzYtKGcXPXkREW/+BgFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQP+FLcC/rvz4IMw22JtivP6Ow9jabwE2fqTFMjlbxv9h3GctDyOHN/vBXeDniUg10E/C/gwuuc//Lt7oZ5OpaAL19g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
