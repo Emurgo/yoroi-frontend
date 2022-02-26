@@ -251,6 +251,9 @@ class SignTxPage extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
+
+    // TODO: figure if needed
+    // eslint-disable-next-line no-unused-vars
     const { isSubmitting } = this.state;
 
     const { intl } = this.context;

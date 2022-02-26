@@ -259,7 +259,7 @@ class SignTxPage extends Component<Props, State> {
             hash={this.props.addressToDisplayString(request.address.address)}
             light
             linkType="address"
-        >
+          >
             <Typography
               as="span"
               variant="body2"
