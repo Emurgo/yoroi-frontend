@@ -364,6 +364,6 @@ Feature: Transfer Yoroi Wallet funds
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgBv0y8CGgACnbEDGhH+lM0EgYIBggBYHHVsMspvo8GlXypDW5P6AAkVsR41Lg4sbWgEAFShAIKCWCDMmAmUQVDADzkTzSsQPptC/mJD/Danb564AGkuK9o/LlhAX7Ac7du9tpQs/zExXmDd3Tbb8O7P14P+KHUUkFvi3fCkdcawCvmhDCVRaqc5WnxndOp/2o+WKUikmvu73xoPCIJYIPOlcWS3t2uMM0elCy5Y8VhUv0SFmwE0b4nY9XZQ10F2WEBPr5pZpIE01H1wshcmhhtGB5zwfnrqdv+e78pxRtgS2IIe+wGCoSqJ2xgrifzSxSSvhtqnCYvi/7zZq2ZcaP4J9g=="
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgBv0wMCGgACnd0DGhH+lM0EgYIBggBYHHVsMspvo8GlXypDW5P6AAkVsR41Lg4sbWgEAFShAIKCWCDMmAmUQVDADzkTzSsQPptC/mJD/Danb564AGkuK9o/LlhARylnPEYMRpZAykAvNBQfEI7hC5MLlftV160D47CskbyW9df++XmiOATKXpJxqnykpeCxuyquTRhOxZIkfPqVBYJYIPOlcWS3t2uMM0elCy5Y8VhUv0SFmwE0b4nY9XZQ10F2WEBi1oDMWw2RW2xFIuw8/a8dy8S02EL7paBHUBX6UMie04lQWOeFHmHHABsMUZcOLo4+k1ubZREoL89CSU40g1MG9fY="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
