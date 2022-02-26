@@ -33,13 +33,15 @@ import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx,
   +txData: ISignRequest<any>,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
-  +onConfirm: string => void,
+  +onConfirm: string => Promise<void>,
   +notification: ?Notification,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
@@ -84,15 +86,30 @@ export const signTxMessages: Object = defineMessages({
   },
   more: {
     id: 'connector.signin.more',
-    defaultMessage: '!!!more',
+    defaultMessage: '!!!more'
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
   },
 });
+
+type State = {|
+  showUtxoDetails: boolean,
+  isSubmitting: boolean,
+|}
 
 @observer
 class SignTxPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+  state: State = {
+    showUtxoDetails: false,
+    isSubmitting: false,
+  }
+
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -118,6 +135,7 @@ class SignTxPage extends Component<Props> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
@@ -130,7 +148,17 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
+        this.setState({ isSubmitting: true })
+        this.props.onConfirm(walletPassword).catch(error => {
+          if (error instanceof WrongPassphraseError) {
+            this.form.$('walletPassword').invalidate(
+              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+            )
+          } else {
+            throw error;
+          }
+          this.setState({ isSubmitting: false })
+        });
       },
       onError: () => {},
     });
@@ -226,6 +254,7 @@ class SignTxPage extends Component<Props> {
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
+    const { isSubmitting } = this.state;
 
     const { intl } = this.context;
     const { txData, onCancel, connectedWebsite } = this.props;

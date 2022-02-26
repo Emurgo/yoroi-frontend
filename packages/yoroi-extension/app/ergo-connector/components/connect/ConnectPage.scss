@@ -1,7 +1,5 @@
 .component {
   height: calc(100vh - 92px);
-  display: flex;
-  flex-direction: column;
   overflow: overlay;
   &.isNightly {
     height: calc(100vh - 138px);
@@ -32,6 +30,39 @@
     font-size: 18px;
     font-weight: 500;
   }
+
+}
+.noWallets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 60px;
+  letter-spacing: 0;
+
+  .noWalletsImage {
+    margin-bottom: 33px;
+  }
+
+  .noWalletsText {
+    color: #242838;
+    font-size: 24px;
+    letter-spacing: 0;
+    line-height: 32px;
+    margin-bottom: 16px;
+  }
+
+  .createWallet {
+    color: #17D1AA;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
 }
 
 .list {
@@ -46,10 +77,10 @@
       color: var(--yoroi-palette-gray-900);
     }
   }
+  overflow: auto;
 }
 
 .bottom {
-  padding-top: 23px;
   padding-left: 32px;
   padding-right: 32px;
 

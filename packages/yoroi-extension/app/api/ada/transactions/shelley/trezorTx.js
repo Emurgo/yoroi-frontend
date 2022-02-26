@@ -43,6 +43,23 @@ export async function createTrezorSignTxPayload(
   byronNetworkMagic: number,
   networkId: number,
 ): Promise<$Exact<CardanoSignTransaction>> {
+  const stakingKeyPath = (() => {
+    // TODO: this entire block is super hacky
+    // need to instead pass in a mapping from wallet addresses to addressing
+    // or add something similar to the sign request
+
+    // assume the withdrawal is the same path as the UTXOs being spent
+    // so just take the first UTXO arbitrarily and change it to the staking key path
+    const firstUtxo = signRequest.senderUtxos[0];
+    if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
+      throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
+    }
+    const result = [...firstUtxo.addressing.path];
+    result[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
+    result[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
+    return result;
+  })();
+
   const txBody = signRequest.unsignedTx.build();
 
   // Inputs
@@ -53,7 +70,8 @@ export async function createTrezorSignTxPayload(
   // Output
   const trezorOutputs = _generateTrezorOutputs(
     txBody.outputs(),
-    signRequest.changeAddr
+    signRequest.changeAddr,
+    stakingKeyPath,
   );
 
   let request = {
@@ -68,30 +86,13 @@ export async function createTrezorSignTxPayload(
 
   // withdrawals
   const withdrawals = txBody.withdrawals();
-
-  const getStakingKeyPath = () => {
-    // TODO: this entire block is super hacky
-    // need to instead pass in a mapping from wallet addresses to addressing
-    // or add something similar to the sign request
-
-    // assume the withdrawal is the same path as the UTXOs being spent
-    // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.senderUtxos[0];
-    if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
-      throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
-    }
-    const stakingKeyPath = [...firstUtxo.addressing.path];
-    stakingKeyPath[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
-    stakingKeyPath[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
-    return stakingKeyPath;
-  };
   request = withdrawals == null
     ? request
     : {
       ...request,
       withdrawals: formatTrezorWithdrawals(
         withdrawals,
-        [getStakingKeyPath()],
+        [stakingKeyPath],
       )
     };
 
@@ -103,7 +104,7 @@ export async function createTrezorSignTxPayload(
       ...request,
       certificates: formatTrezorCertificates(
         certificates,
-        range(0, certificates.len()).map(_i => getStakingKeyPath()),
+        range(0, certificates.len()).map(_i => stakingKeyPath),
       )
     };
 
@@ -114,10 +115,10 @@ export async function createTrezorSignTxPayload(
       auxiliaryData: {
         catalystRegistrationParameters: {
           votingPublicKey: votingPublicKey.replace(/^0x/, ''),
-          stakingPath: getStakingKeyPath(),
+          stakingPath: stakingKeyPath,
           rewardAddressParameters: {
             addressType: ADDRESS_TYPE.Reward,
-            path: getStakingKeyPath(),
+            path: stakingKeyPath,
           },
           nonce: String(nonce),
         },
@@ -238,6 +239,7 @@ function toTrezorTokenBundle(
 function _generateTrezorOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
+  stakingKeyPath: Array<number>,
 ): Array<CardanoOutput> {
   const result = [];
   for (let i = 0; i < txOutputs.len(); i++) {
@@ -250,14 +252,27 @@ function _generateTrezorOutputs(
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
       verifyFromBip44Root(changeAddr.addressing);
-      result.push({
-        addressParameters: toTrezorAddressParameters(
-          address,
-          changeAddr.addressing.path
-        ),
-        amount: output.amount().coin().to_str(),
-        ...tokenBundle
-      });
+      if (RustModule.WalletV4.BaseAddress.from_address(address)) {
+        result.push({
+          addressParameters: {
+            addressType: ADDRESS_TYPE.Base,
+            path: changeAddr.addressing.path,
+            stakingPath: stakingKeyPath,
+          },
+          amount: output.amount().coin().to_str(),
+          ...tokenBundle
+        });
+      } else if (RustModule.WalletV4.ByronAddress.from_address(address)) {
+        result.push({
+          addressParameters: {
+            addressType: ADDRESS_TYPE.Byron,
+            path: changeAddr.addressing.path,
+          },
+          amount: output.amount().coin().to_str(),
+        });
+      } else {
+        throw new Error('unexpected change address type');
+      }
     } else {
       const byronWasm = RustModule.WalletV4.ByronAddress.from_address(address);
       result.push({
@@ -346,8 +361,8 @@ export function buildSignedTransaction(
     ...Addressing,
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
-  stakingKey: RustModule.WalletV4.Bip32PublicKey,
-  metadata: RustModule.WalletV4.AuxiliaryData | void
+  stakingKey: ?RustModule.WalletV4.Bip32PublicKey,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): RustModule.WalletV4.Transaction {
   const findWitness = (pubKey: string) => {
     for (const witness of witnesses) {
@@ -416,10 +431,15 @@ export function buildSignedTransaction(
   }
 
   // add any staking key needed
-  const stakingPubKey = Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex');
+  const stakingPubKey = stakingKey
+    ? Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex')
+    : null;
 
   for (const witness of witnesses) {
     if (witness.pubKey === stakingPubKey) {
+      if (stakingKey == null) {
+        throw new Error('unexpected nullish staking key');
+      }
       const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
         RustModule.WalletV4.Vkey.new(stakingKey.to_raw_key()),
         RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.signature, 'hex')),

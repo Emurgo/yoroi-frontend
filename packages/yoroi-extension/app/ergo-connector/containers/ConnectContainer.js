@@ -12,7 +12,6 @@ import type {
   ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -37,7 +36,7 @@ export default class ConnectContainer extends Component<
   State
 > {
   state: State = {
-    isAppAuth: true,
+    isAppAuth: false,
     selectedWallet: {
       index: -1,
       deriver: null,
@@ -61,9 +60,6 @@ export default class ConnectContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('unload', this.onUnload);
-  }
 
   onConnect: (
     deriver: PublicDeriver<>,
@@ -82,17 +78,11 @@ export default class ConnectContainer extends Component<
     const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
 
-    if (appAuthID == null && password == null) {
-      this.setState({ isAppAuth: false });
-      return;
-    }
-
     let authEntry;
     if (password != null) {
-      // $FlowFixMe: TODO: Add password in createAuthEntry
       authEntry = await createAuthEntry({ appAuthID, deriver, checksum, password });
     } else {
-      authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
+      authEntry = null;
     }
 
     const publicDeriverId = deriver.getPublicDeriverId();
@@ -130,7 +120,7 @@ export default class ConnectContainer extends Component<
     deriver,
     checksum
   ) => {
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.filteredWallets;
     if (wallets) {
       const index = deriver.getPublicDeriverId();
       this.setState(prevState => ({
@@ -142,7 +132,11 @@ export default class ConnectContainer extends Component<
         },
       }));
       if (index >= 0 && deriver) {
-        this.onConnect(deriver, checksum);
+        if (this.generated.stores.connector.connectingMessage?.appAuthID != null) {
+          this.setState({ isAppAuth: true });
+        } else {
+          this.onConnect(deriver, checksum);
+        }
       }
     }
   };
@@ -162,20 +156,11 @@ export default class ConnectContainer extends Component<
 
   render(): Node {
     const responseMessage = this.generated.stores.connector.connectingMessage;
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.filteredWallets;
     const error = this.generated.stores.connector.errorWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const protocol = this.generated.stores.connector.protocol;
-    let network = '';
-    if (protocol === 'ergo') {
-      network = networks.ErgoMainnet.NetworkName;
-    } else if (protocol === 'cardano') {
-      /**
-       * For Cardano we are displaying all type of wallet main and test net wallets
-       * So will name the network "Cardano" for now until we apply the filter.
-       */
-      network = 'Cardano';
-    }
+    const network = protocol === 'ergo' ? 'ERG' : 'Cardano';
 
     return (
       <ConnectPage
@@ -223,11 +208,11 @@ export default class ConnectContainer extends Component<
       |},
       connector: {|
         connectingMessage: ?ConnectingMessage,
-        wallets: Array<PublicDeriverCache>,
+        filteredWallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
-        protocol: string,
+        protocol: ?string,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -249,7 +234,7 @@ export default class ConnectContainer extends Component<
         connector: {
           connectingMessage: stores.connector.connectingMessage,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
-          wallets: stores.connector.wallets,
+          filteredWallets: stores.connector.filteredWallets,
           errorWallets: stores.connector.errorWallets,
           loadingWallets: stores.connector.loadingWallets,
           protocol: stores.connector.protocol,

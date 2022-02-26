@@ -328,6 +328,16 @@ export function asTxId(input: any): TxId {
 
 export type Value = string;
 
+export type AccountBalance = {|
+  default: string,
+  networkId: number,
+  assets: Array<{|
+    identifier: string,
+    networkId: number,
+    amount: string,
+  |}>
+|};
+
 export function asValue(input: any): Value {
   if (typeof input === 'string') {
     return input;
@@ -396,6 +406,7 @@ export type PublicDeriverCache = {|
 export type WalletAuthEntry = {|
   walletId: string,
   pubkey: string,
+  privkey: string,
 |};
 
 export type WhitelistEntry = {|

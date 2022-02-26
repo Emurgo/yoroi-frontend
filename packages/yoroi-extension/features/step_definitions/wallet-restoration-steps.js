@@ -1,12 +1,12 @@
 // @flow
 
 import { When, Then } from 'cucumber';
-import { By, Key } from 'selenium-webdriver';
+import { By, error, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
 
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
+async function checkErrorByTranslationId(client, errorSelector, errorObject) {
+  await client.waitUntilText(errorSelector, await client.intl(errorObject.message));
 }
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
@@ -62,7 +62,7 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string): Pro
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
     await customWorld.driver
-      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
+      .findElement(By.xpath('//input[starts-with(@id, "downshift-") and contains(@id, "-input")]'))
       .sendKeys(word, Key.RETURN);
   }
 }
@@ -74,9 +74,13 @@ When(/^I enter the master key:$/, async function (table) {
 
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
-  await this.driver
-      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
-      .sendKeys(words.word, Key.RETURN);
+  const inputElement = await this.driver.findElement(By.xpath('//input[starts-with(@id, "downshift-") and contains(@id, "-input")]'));
+  try {
+    await inputElement.sendKeys(words.word, Key.RETURN);
+    expect(false, 'Recovery phrase is intractable').to.true
+  } catch (e) {
+    expect(e instanceof error.ElementNotInteractableError).to.be.true
+  }
   const lastWord = await this.driver.findElements(By.xpath(`//span[contains(text(), '${words.word}')]`));
   expect(lastWord.length).to.be.equal(0);
 });
@@ -108,7 +112,9 @@ When(/^I click the "Restore Wallet" button$/, async function () {
 });
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
-  await this.waitForElement('.SimpleAutocomplete_errored');
+  await this.driver.sleep(500);
+  const errorElement = this.driver.findElement(By.xpath('//p[contains(@class, "-error") and contains(@id, "recoveryPhrase")]'));
+  expect(await errorElement.isDisplayed()).to.be.true;
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
@@ -154,9 +160,9 @@ Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
 });
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
-  const error = data.hashes()[0];
+  const expectedError = data.hashes()[0];
   const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
+  await checkErrorByTranslationId(this, errorSelector, expectedError);
 });
 
 Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
@@ -166,7 +172,7 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
 });
 
 // eslint-disable-next-line no-unused-vars
-Then(/^I should see an "X words left" error message:$/, async function (data) {
+Then(/^I should see an "X words left" error message:$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
   const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .FormFieldOverridesClassic_error';
   await this.waitUntilText(errorSelector, errorMessage);

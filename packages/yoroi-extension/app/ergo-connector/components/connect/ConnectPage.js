@@ -2,7 +2,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
@@ -23,11 +23,12 @@ import { environment } from '../../../environment';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
-import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
+import NoWalletImage from '../../assets/images/no-websites-connected.inline.svg'
 
 const messages = defineMessages({
   subtitle: {
@@ -37,6 +38,14 @@ const messages = defineMessages({
   connectWallet: {
     id: 'ergo-connector.label.connectWallet',
     defaultMessage: '!!!Connect Wallet',
+  },
+  connectWalletAuthRequest: {
+    id: 'ergo-connector.label.connectWalletAuthRequest',
+    defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
+  },
+  connectWalletNoHardwareSupported: {
+    id: 'ergo-connector.label.connectWalletNoHardwareSupported',
+    defaultMessage: '!!!Note, hardware wallets are not supported for the dapp connecting yet.',
   },
   yourWallets: {
     id: 'ergo-connector.label.yourWallets',
@@ -53,6 +62,14 @@ const messages = defineMessages({
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
     defaultMessage: '!!!Ooops, no {network} wallets found',
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
+  createWallet: {
+    id: 'ergo-connector.connect.createWallet',
+    defaultMessage: '!!!create wallet',
   },
 });
 
@@ -109,6 +126,7 @@ class ConnectPage extends Component<Props> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
@@ -123,7 +141,15 @@ class ConnectPage extends Component<Props> {
         const { walletPassword } = form.values();
         const { deriver, checksum } = this.props.selectedWallet;
         if (deriver && checksum) {
-          this.props.onConnect(deriver, checksum, walletPassword);
+          this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
+            if (error instanceof WrongPassphraseError) {
+              this.form.$('walletPassword').invalidate(
+                this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+              )
+            } else {
+              throw error;
+            }
+          });
         }
       },
       onError: () => {},
@@ -133,6 +159,14 @@ class ConnectPage extends Component<Props> {
   onCancel: void => void = () => {
     this.props.onCancel();
   };
+
+  onCreateWallet: void => void = () => {
+    window.chrome.tabs.create({
+      url: `${window.location.origin}/main_window.html#/wallets/add`
+    })
+
+    this.props.onCancel()
+  }
 
   render(): Node {
     const { intl } = this.context;
@@ -146,7 +180,6 @@ class ConnectPage extends Component<Props> {
       shouldHideBalance,
       isAppAuth,
     } = this.props;
-
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
 
@@ -158,21 +191,48 @@ class ConnectPage extends Component<Props> {
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
 
+    if (isSuccess && !publicDerivers.length) {
+      return (
+        <div className={styles.noWallets}>
+          <div className={styles.noWalletsImage}>
+            <NoWalletImage />
+          </div>
+          <div>
+            <p className={styles.noWalletsText}>
+              {intl.formatMessage(messages.noWalletsFound, { network })}
+            </p>
+            <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
+              {intl.formatMessage(messages.createWallet)}
+            </button>
+          </div>
+        </div>
+      )
+    }
+
     const walletPasswordField = this.form.$('walletPassword');
 
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
-    const hasNoWallets = isSuccess && !publicDerivers.length;
 
     const passwordForm = (
       <>
         <div>
+          <Typography
+            variant="h4"
+            align='center'
+            color="var(--yoroi-palette-gray-900)"
+            marginBottom="40px"
+            paddingLeft="32px"
+            fontWeight="400"
+          >
+            {intl.formatMessage(messages.connectWalletAuthRequest)}
+          </Typography>
           <TextField
             type="password"
             {...walletPasswordField.bind()}
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt={16}>
+        <Stack direction="row" spacing={2} mt="15px">
           <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
@@ -222,49 +282,54 @@ class ConnectPage extends Component<Props> {
         ) : null}
         <Box flex={1} padding="0 32px 17px">
           {isAppAuth ? (
-            <Box borderBottom="1px solid #dce0e9">
-              {isError ? <div className={styles.errorMessage}>{error}</div> : null}
-              {isLoading ? (
-                <div className={styles.loading}>
-                  <LoadingSpinner />
-                </div>
-              ) : hasWallets ? (
-                <Box>
-                  <Typography
-                    variant="h5"
-                    fontWeight="300"
-                    color="var(--yoroi-palette-gray-600)"
-                    mb="14px"
-                  >
-                    {intl.formatMessage(messages.yourWallets)}
-                  </Typography>
-                  <ul className={styles.list}>
-                    {publicDerivers.map(item => (
-                      <li key={item.name} className={styles.listItem}>
-                        <WalletButton
-                          onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
-                        >
-                          <WalletCard
-                            shouldHideBalance={shouldHideBalance}
-                            publicDeriver={item}
-                            getTokenInfo={this.props.getTokenInfo}
-                          />
-                        </WalletButton>
-                      </li>
-                    ))}
-                  </ul>
-                </Box>
-              ) : hasNoWallets ? (
-                <Box display="flex" flexDirection="column" alignItems="center" pt={4}>
-                  <NoItemsFoundImg style={{ width: 170 }} />
-                  <Typography variant="h3" fontWeight="400" color="var(--yoroi-palette-gray-900)">
-                    <FormattedHTMLMessage {...messages.noWalletsFound} values={{ network }} />
-                  </Typography>
-                </Box>
-              ) : null}
-            </Box>
-          ) : (
             passwordForm
+          ) : (
+            <>
+              <Box borderBottom="1px solid #dce0e9">
+                {isError ? <div className={styles.errorMessage}>{error}</div> : null}
+                {isLoading ? (
+                  <div className={styles.loading}>
+                    <LoadingSpinner />
+                  </div>
+                ) : hasWallets ? (
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      fontWeight="300"
+                      color="var(--yoroi-palette-gray-600)"
+                      mb="14px"
+                    >
+                      {intl.formatMessage(messages.yourWallets)}
+                    </Typography>
+                    <ul className={styles.list}>
+                      {publicDerivers.map(item => (
+                        <li
+                          key={item.publicDeriver.getPublicDeriverId()}
+                          className={styles.listItem}
+                        >
+                          <WalletButton
+                            onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
+                          >
+                            <WalletCard
+                              shouldHideBalance={shouldHideBalance}
+                              publicDeriver={item}
+                              getTokenInfo={this.props.getTokenInfo}
+                            />
+                          </WalletButton>
+                        </li>
+                      ))}
+                    </ul>
+                  </Box>
+                ) : null}
+              </Box>
+              <Typography
+                align='left'
+                color="var(--yoroi-palette-gray-600)"
+                marginTop="20px"
+              >
+                {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
+              </Typography>
+            </>
           )}
         </Box>
 

@@ -11,7 +11,11 @@ import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName,
+  getTokenIdentifierIfExists,
+  assetNameFromIdentifier
+} from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -26,7 +30,7 @@ type Props = {|
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
@@ -63,7 +67,7 @@ class CardanoUtxoDetails extends Component<Props> {
   };
 
   // Tokens can be minted inside the transaction so we have to look it up there first
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => ?$ReadOnly<TokenRow> = tokenEntry => {
     return this.props.getTokenInfo(tokenEntry);
   };
 
@@ -80,7 +84,10 @@ class CardanoUtxoDetails extends Component<Props> {
     entry: TokenEntry,
   |}) => Node = request => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo)
+      : assetNameFromIdentifier(request.entry.identifier);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
@@ -90,7 +97,7 @@ class CardanoUtxoDetails extends Component<Props> {
           <>
             <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
             <div>
-              {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
+              {shiftedAmount.toString()} {ticker}
             </div>
           </>
         );
@@ -98,7 +105,7 @@ class CardanoUtxoDetails extends Component<Props> {
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -109,7 +116,7 @@ class CardanoUtxoDetails extends Component<Props> {
     return (
       <>
         <span>{adjustedBefore}</span>
-        <span>{afterDecimalRewards}</span> {this.getTicker(tokenInfo)}
+        <span>{afterDecimalRewards}</span> {ticker}
       </>
     );
   };

@@ -46,6 +46,7 @@ export type CardanoHaskellShelleyBaseConfig = {|
     +constant: string,
   |};
   +MinimumUtxoVal: string,
+  +CoinsPerUtxoWord: string,
   +PoolDeposit: string,
   +KeyDeposit: string,
 |};

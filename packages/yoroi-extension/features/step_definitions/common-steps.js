@@ -1,6 +1,15 @@
 // @flow
 
-import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
+import {
+  Before,
+  BeforeAll,
+  Given,
+  Then,
+  After,
+  AfterAll,
+  setDefinitionFunctionWrapper,
+  setDefaultTimeout,
+} from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By } from 'selenium-webdriver';
@@ -9,17 +18,14 @@ import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import { expect } from 'chai';
-import {
-  satisfies,
-} from 'semver';
-import { truncateLongName, } from '../../app/utils/formatters';
+import { satisfies } from 'semver';
+// eslint-disable-next-line import/named
+import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
-import {
-  waitUntilUrlEquals,
-  navigateTo,
-} from '../support/helpers/route-helpers';
+import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { camelCase } from 'lodash';
+import { promises as fsAsync } from 'fs';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -32,13 +38,13 @@ const snapshotsDir = './features/yoroi_snapshots/';
 const testProgress = {
   scenarioName: '',
   lineNum: 0, // we need this to differentiate scenarios with multiple "examples"
-  step: 0
+  step: 0,
 };
 
 BeforeAll(() => {
   rimraf.sync(screenshotsDir);
   fs.mkdirSync(screenshotsDir);
-  setDefaultTimeout(60 * 1000);
+  setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
   ErgoServer.getMockServer({});
@@ -49,7 +55,12 @@ AfterAll(() => {
   ErgoServer.closeMockServer();
 });
 
-Before((scenario) => {
+Before(scenario => {
+  const pathItems = scenario.sourceLocation.uri.split('/');
+  // eslint-disable-next-line no-console
+  console.log(
+    `\n### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`
+  );
   CardanoServer.setExpectedTx(undefined);
   ErgoServer.setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly
@@ -94,9 +105,9 @@ Before({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({
     signedTransaction: (req, res) => {
       res.status(400).jsonp({
-        message: 'Invalid witness'
+        message: 'Invalid witness',
       });
-    }
+    },
   });
 });
 
@@ -105,19 +116,18 @@ After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({});
 });
 
-After(async function () {
+After(async function (scenario) {
+  if (scenario.result.status === 'failed') {
+    await takeScreenshot(this.driver, 'failedStep');
+    await takePageSnapshot(this.driver, 'failedStep');
+  }
   await this.driver.quit();
 });
 
 const writeFile = promisify(fs.writeFile);
 
 // Steps that contain these patterns will trigger screenshots:
-const SCREENSHOT_STEP_PATTERNS = [
-  'I should see',
-  'I see',
-  'I click',
-  'by clicking',
-];
+const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
 
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
@@ -132,6 +142,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
+      await takePageSnapshot(this.driver, cleanString);
     }
 
     testProgress.step += 1;
@@ -151,16 +162,23 @@ async function takeScreenshot(driver, name) {
   await writeFile(path, screenshot, 'base64');
 }
 
+async function takePageSnapshot(driver, name) {
+  const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+  const htmlLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-dom.html`;
+  const html = await driver.executeScript('return document.body.innerHTML;');
+  await fsAsync.writeFile(htmlLogPath, html);
+}
+
 async function inputMnemonicForWallet(
   customWorld: any,
   walletName: string,
-  restoreInfo: RestorationInput,
+  restoreInfo: RestorationInput
 ): Promise<void> {
   await customWorld.input("input[name='walletName']", restoreInfo.name);
-  await enterRecoveryPhrase(
-    customWorld,
-    restoreInfo.mnemonic,
-  );
+  await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
   await customWorld.input("input[name='walletPassword']", restoreInfo.password);
   await customWorld.input("input[name='repeatPassword']", restoreInfo.password);
   await customWorld.click('.WalletRestoreDialog .primary');
@@ -191,11 +209,7 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
   await this.waitForElement('.WalletRestoreDialog');
 
-  await inputMnemonicForWallet(
-    this,
-    walletName,
-    restoreInfo,
-  );
+  await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
@@ -213,11 +227,7 @@ Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (wallet
   await this.click('.WalletEraOptionDialog_bgShelleyMainnet');
   await this.waitForElement('.WalletRestoreDialog');
 
-  await inputMnemonicForWallet(
-    this,
-    walletName,
-    restoreInfo,
-  );
+  await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
 
 Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
@@ -235,30 +245,25 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
   await this.click('.WalletEraOptionDialog_bgByronMainnet');
   await this.waitForElement('.WalletRestoreDialog');
 
-  await inputMnemonicForWallet(
-    this,
-    walletName,
-    restoreInfo,
-  );
+  await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
 
 Given(/^I have completed the basic setup$/, async function () {
   // language select page
   await this.waitForElement('.LanguageSelectionForm_component');
-  await this.click('.LanguageSelectionForm_submitButton');
-
+  await this.click('//button[text()="Continue"]', By.xpath);
   // ToS page
   await this.waitForElement('.TermsOfUseForm_component');
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.TermsOfUseForm_submitButton');
-
+  const tosClassElement = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
+  const checkbox = await tosClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  await checkbox.click();
+  await this.click('//button[text()="Continue"]', By.xpath);
   // uri prompt page
   await acceptUriPrompt(this);
-
   await this.waitForElement('.WalletAdd_component');
 });
 
-Given(/^I switched to the advanced level$/, async function(){
+Given(/^I switched to the advanced level$/, async function () {
   // Navigate to the general settings screen
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
@@ -267,9 +272,7 @@ Given(/^I switched to the advanced level$/, async function(){
   // Click on secondary menu "levelOfComplexity" item
   const buttonSelector = `.SettingsMenuItem_component.${camelCase('levelOfComplexity')}`;
   await this.click(buttonSelector);
-  await this.waitForElement(
-    `${buttonSelector}.SettingsMenuItem_active`
-  );
+  await this.waitForElement(`${buttonSelector}.SettingsMenuItem_active`);
   // Select the most complex level
   await this.waitForElement('.ComplexityLevelForm_submitButton');
   const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
@@ -279,7 +282,7 @@ Given(/^I switched to the advanced level$/, async function(){
   await navigateTo.call(this, '/wallets/add');
   await waitUntilUrlEquals.call(this, '/wallets/add');
   await this.waitForElement('.WalletAdd_component');
-})
+});
 
 Then(/^I accept uri registration$/, async function () {
   await acceptUriPrompt(this);
@@ -338,7 +341,8 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 async function setLedgerWallet(client, serial) {
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.substores.ada.ledgerConnect.setSelectedMockWallet(data)
+    window.yoroi.stores.substores.ada.ledgerConnect
+      .setSelectedMockWallet(data)
       .then(done)
       .catch(err => done(err));
   }, serial);
@@ -349,7 +353,8 @@ Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
 
 async function setTrezorWallet(client, deviceId) {
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.substores.ada.trezorConnect.setSelectedMockWallet(data)
+    window.yoroi.stores.substores.ada.trezorConnect
+      .setSelectedMockWallet(data)
       .then(done)
       .catch(err => done(err));
   }, deviceId);
@@ -359,8 +364,9 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
 });
 
 async function restoreWalletsFromStorage(client) {
-  await client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.wallets.restoreWalletsFromStorage()
+  await client.driver.executeAsyncScript(done => {
+    window.yoroi.stores.wallets
+      .restoreWalletsFromStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -376,8 +382,9 @@ async function exportYoroiSnapshot(client, exportDir: string) {
 
 async function exportLocalStorage(client, exportDir: string) {
   const localStoragePath = `${exportDir}/localStorage.json`;
-  const localStorage = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.localStorage.getStorage()
+  const localStorage = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.localStorage
+      .getStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -386,10 +393,9 @@ async function exportLocalStorage(client, exportDir: string) {
 
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
-  const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.common.exportLocalDatabase(
-      window.yoroi.stores.loading.getDatabase(),
-    )
+  const indexedDB = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.common
+      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
@@ -411,8 +417,9 @@ async function importLocalStorage(client, importDir: string) {
   const version: string = storage['test-LAST-LAUNCH-VER'] || '0.0.0';
 
   // Clear anything in memory to effectively override it with the snapshot
-  await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.localStorage.clear()
+  await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.localStorage
+      .clear()
       .then(done)
       .catch(err => done(err));
   });
@@ -429,7 +436,8 @@ async function importLocalStorage(client, importDir: string) {
     }, storage);
   } else {
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.localStorage.setStorage(data)
+      window.yoroi.api.localStorage
+        .setStorage(data)
         .then(done)
         .catch(err => done(err));
     }, storage);
@@ -447,9 +455,8 @@ async function importIndexedDB(client, importDir: string) {
     return;
   }
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.loading.importOldDatabase(
-      data
-    )
+    window.yoroi.stores.loading
+      .importOldDatabase(data)
       .then(done)
       .catch(err => done(err));
   }, JSON.parse(indexedDBData));
@@ -457,10 +464,9 @@ async function importIndexedDB(client, importDir: string) {
 
 let capturedDbState = undefined;
 async function captureDbStae(client) {
-  const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.common.exportLocalDatabase(
-      window.yoroi.stores.loading.getDatabase(),
-    )
+  const rawDb = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.common
+      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
@@ -468,10 +474,9 @@ async function captureDbStae(client) {
 }
 async function compareToCapturedDbState(client, excludeSyncTime) {
   if (capturedDbState == null) throw new Error('Db state was never captured');
-  const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.common.exportLocalDatabase(
-      window.yoroi.stores.loading.getDatabase(),
-    )
+  const rawDb = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.common
+      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });

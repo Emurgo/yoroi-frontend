@@ -14,7 +14,6 @@ import type {
   CurrentCoinPriceResponse,
   HistoricalCoinPriceResponse,
 } from '../../api/common/lib/state-fetch/types';
-import WalletTransaction from '../../domain/WalletTransaction';
 import type { Ticker, PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type { GetAllPricesFunc } from '../../api/common/lib/storage/bridge/prices';
@@ -197,12 +196,13 @@ export default class BaseCoinPriceStore
 
   updateTransactionPriceData: {|
     db: lf$Database,
-    transactions: Array<WalletTransaction>
+    timestamps: Array<number>,
   |} => Promise<void> = async (request) => {
     const { unitOfAccount } = this.stores.profile;
     if (!unitOfAccount.enabled) return;
 
-    const timestamps = Array.from(new Set(request.transactions.map(tx => tx.date.valueOf())));
+    const { timestamps } = request;
+
     const missingPrices = timestamps.filter(
       timestamp => this.priceMap.get(
         getPriceKey('ADA', unitOfAccount.currency, new Date(timestamp))

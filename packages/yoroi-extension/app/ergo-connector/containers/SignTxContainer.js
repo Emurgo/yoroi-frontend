@@ -14,7 +14,7 @@ import type {
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
-import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -25,6 +25,8 @@ import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { CardanoConnectorSignRequest } from '../types';
+import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -44,11 +46,17 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('unload', this.onUnload);
-  }
-
-  onConfirm: string => void = password => {
+  onConfirm: (PublicDeriver<> => (string => Promise<void>)) = deriver => async (password) => {
+    const withSigningKey = asGetSigningKey(deriver);
+    if (!withSigningKey) {
+      throw new Error(`[sign tx] no signing key`);
+    }
+    const signingKeyFromStorage = await withSigningKey.getSigningKey();
+    // will throw a WrongPasswordError
+    await withSigningKey.normalizeKey({
+      ...signingKeyFromStorage,
+      password,
+    });
     window.removeEventListener('unload', this.onUnload);
     this.generated.actions.connector.confirmSignInTx.trigger(password);
   };
@@ -78,7 +86,7 @@ export default class SignTxContainer extends Component<
     const { signingMessage } = this.generated.stores.connector;
     if (signingMessage == null) return this.renderLoading();
 
-    const selectedWallet = this.generated.stores.connector.wallets.find(
+    const selectedWallet = this.generated.stores.connector.filteredWallets.find(
       wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
     );
     if (selectedWallet == null) return this.renderLoading();
@@ -120,7 +128,7 @@ export default class SignTxContainer extends Component<
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={this.onConfirm}
+            onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
             onCancel={this.onCancel}
             addressToDisplayString={addr =>
               addressToDisplayString(
@@ -142,8 +150,7 @@ export default class SignTxContainer extends Component<
         );
         break;
       }
-      case 'tx/cardano':
-      case 'tx-create-req/cardano': {
+      case 'tx/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
         if (txData == null) return this.renderLoading();
         component = (
@@ -170,10 +177,10 @@ export default class SignTxContainer extends Component<
             }
             tx={signingMessage.sign.tx}
             txData={txData}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={this.onConfirm}
+            onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
             onCancel={this.onCancel}
             addressToDisplayString={addr =>
               addressToDisplayString(
@@ -226,7 +233,7 @@ export default class SignTxContainer extends Component<
       |},
       connector: {|
         signingMessage: ?SigningMessage,
-        wallets: Array<PublicDeriverCache>,
+        filteredWallets: Array<PublicDeriverCache>,
         signingRequest: ?ISignRequest<any>,
         adaTransaction: ?CardanoConnectorSignRequest,
         currentConnectorWhitelist: Array<WhitelistEntry>,
@@ -262,7 +269,7 @@ export default class SignTxContainer extends Component<
         },
         connector: {
           signingMessage: stores.connector.signingMessage,
-          wallets: stores.connector.wallets,
+          filteredWallets: stores.connector.filteredWallets,
           signingRequest: stores.connector.signingRequest,
           adaTransaction: stores.connector.adaTransaction,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,

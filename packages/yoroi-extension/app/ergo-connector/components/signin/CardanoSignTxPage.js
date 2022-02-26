@@ -20,7 +20,11 @@ import type {
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName,
+  getTokenIdentifierIfExists,
+  assetNameFromIdentifier
+} from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -40,15 +44,17 @@ import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx | CardanoTx | CardanoTxRequest,
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
-  +onConfirm: string => void,
+  +onConfirm: string => Promise<void>,
   +notification: ?Notification,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -60,11 +66,28 @@ type Props = {|
   +connectedWebsite: ?WhitelistEntry,
 |};
 
+const messages = defineMessages({
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
+});
+
+type State = {|
+  showUtxoDetails: boolean,
+  isSubmitting: boolean,
+|}
+
 @observer
-class SignTxPage extends Component<Props> {
+class SignTxPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+  state: State = {
+    showUtxoDetails: false,
+    isSubmitting: false,
+  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -90,6 +113,7 @@ class SignTxPage extends Component<Props> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
@@ -102,10 +126,24 @@ class SignTxPage extends Component<Props> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
+        this.setState({ isSubmitting: true })
+        this.props.onConfirm(walletPassword).catch(error => {
+          if (error instanceof WrongPassphraseError) {
+            this.form.$('walletPassword').invalidate(
+              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+            )
+          } else {
+            throw error;
+          }
+          this.setState({ isSubmitting: false })
+        });
       },
       onError: () => {},
     });
+  }
+
+  toggleUtxoDetails: boolean => void = (newState) => {
+    this.setState({ showUtxoDetails: newState })
   }
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
@@ -131,7 +169,7 @@ class SignTxPage extends Component<Props> {
     return undefined;
   };
 
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => ?$ReadOnly<TokenRow> = tokenEntry => {
     return this.props.getTokenInfo(tokenEntry);
   };
 
@@ -153,7 +191,10 @@ class SignTxPage extends Component<Props> {
     entry: TokenEntry,
   |}) => Node = request => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo)
+      : assetNameFromIdentifier(request.entry.identifier);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
@@ -163,7 +204,7 @@ class SignTxPage extends Component<Props> {
           <>
             <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
             <div>
-              {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
+              {shiftedAmount.toString()} {ticker}
             </div>
           </>
         );
@@ -171,7 +212,7 @@ class SignTxPage extends Component<Props> {
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -182,7 +223,7 @@ class SignTxPage extends Component<Props> {
     return (
       <>
         <span>{adjustedBefore}</span>
-        <span>{afterDecimalRewards}</span> {this.getTicker(tokenInfo)}
+        <span>{afterDecimalRewards}</span> {ticker}
       </>
     );
   };
@@ -248,12 +289,28 @@ class SignTxPage extends Component<Props> {
     );
   };
 
+  renderAddresses(): Node {
+    const addresses = this.props.txData.outputs.map(({ address }) =>  address);
+    return (
+      <div className={styles.toAddresses}>
+        <p className={styles.address}>{addresses[0]}</p>
+        { addresses.length >= 2 &&  (
+        <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
+          {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
+        </button>)}
+      </div>
+    )
+  }
+
+
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
     const { txData, onCancel, connectedWebsite } = this.props;
+    const { isSubmitting } = this.state;
+    const { showUtxoDetails } = this.state;
 
     const url = connectedWebsite?.url ?? '';
     const faviconUrl = connectedWebsite?.image ?? '';

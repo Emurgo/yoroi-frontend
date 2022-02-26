@@ -92,7 +92,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     assets: [],
   },
   {
-    amount: '1000001',
+    amount: '2000001',
     receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
       // external addr 0, staking key 0
       'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
@@ -179,7 +179,7 @@ beforeAll(async () => {
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
-  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   keyDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
@@ -189,7 +189,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str('2'),
       RustModule.WalletV4.BigNum.from_str('500'),
     ),
-    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
     poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     networkId: network.NetworkId,
@@ -232,7 +232,7 @@ describe('Create unsigned TX from UTXO', () => {
     const output = new MultiToken(
       [{
         // bigger than input including fees
-        amount: new BigNumber(1),
+        amount: new BigNumber(1000000),
         identifier: defaultIdentifier,
         networkId: network.NetworkId,
       }],
@@ -262,7 +262,7 @@ describe('Create unsigned TX from UTXO', () => {
     const output = new MultiToken(
       [{
         // bigger than input including fees
-        amount: new BigNumber(1),
+        amount: new BigNumber(1000000),
         identifier: defaultIdentifier,
         networkId: network.NetworkId,
       }],
@@ -302,7 +302,7 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999100'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('99000'),
       },
       [],
       [],
@@ -316,7 +316,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('31000'),
       },
       [],
       [],
@@ -330,7 +330,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('998500'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('30000'),
       },
       [],
       [],
@@ -406,23 +406,23 @@ describe('Create unsigned TX from UTXO', () => {
 
     testTxConstruction([0.2, 0.2, 0.2, 0.2, 0.2], {
       inputs: [utxos[3]],
-      fee: '1022',
+      fee: '1024',
       sumInputs: '30000000',
-      sumOutputs: '29998978',
+      sumOutputs: '29998976',
     });
 
     testTxConstruction([0.7, 0.7, 0.7, 0.7, 0.7], {
       inputs: [utxos[0], utxos[1]],
-      fee: '1166',
+      fee: '1168',
       sumInputs: '1000702',
-      sumOutputs: '999536',
+      sumOutputs: '999534',
     });
 
     testTxConstruction([0.7, 0.2, 0.7, 0.2, 0.7], {
       inputs: [utxos[0], utxos[3]],
-      fee: '1372',
+      fee: '1374',
       sumInputs: '30000701',
-      sumOutputs: '29999329',
+      sumOutputs: '29999327',
     });
   });
 
@@ -459,7 +459,7 @@ describe('Create unsigned TX from UTXO', () => {
           ),
           RustModule.WalletV4.BigNum.from_str('500'),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
         poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         networkId: network.NetworkId,
@@ -470,10 +470,10 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
-    const expectedFee = new BigNumber('208994');
+    const expectedFee = new BigNumber('209696');
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('791007');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('790305');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
   });
 
@@ -513,10 +513,10 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will order utxos to have the ones with the required token at the top
     // it will take only one of the utxos because it covers the required token and the fee
-    const expectedFee = '1192';
+    const expectedFee = '1290';
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('998817');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('2000001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('1998711');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee);
 
     const assetInfo = identifierToCardanoAsset(testAssetId);
@@ -541,7 +541,7 @@ describe('Create unsigned TX from UTXO', () => {
     const output = new MultiToken(
       [{
         // smaller than input
-        amount: new BigNumber(900000),
+        amount: new BigNumber(2000000),
         identifier: defaultIdentifier,
         networkId: network.NetworkId,
       }, {
@@ -566,7 +566,7 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
       },
       [],
       [],
@@ -585,7 +585,7 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
       },
       undefined,
     )).not.toThrow(NotEnoughMoneyToSendError);
@@ -597,7 +597,7 @@ describe('Create unsigned TX from UTXO', () => {
     const output = new MultiToken(
       [{
         // bigger than input including fees
-        amount: new BigNumber(1900001),
+        amount: new BigNumber(2900001),
         identifier: defaultIdentifier,
         networkId: network.NetworkId,
       }],
@@ -710,7 +710,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1000000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
       },
       [],
       [],
@@ -718,7 +718,7 @@ describe('Create unsigned TX from UTXO', () => {
     );
 
     expect(result.senderUtxos.length).toEqual(2);
-    expect(result.txBuilder.get_fee_if_set()?.to_str()).toEqual('1170');
+    expect(result.txBuilder.get_fee_if_set()?.to_str()).toEqual('1172');
   });
 });
 
@@ -755,7 +755,7 @@ describe('Create unsigned TX from addresses', () => {
 
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('992');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('994');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
@@ -1058,7 +1058,7 @@ describe('Create signed transactions', () => {
     const txBody = unsignedTxResponse.txBuilder.build();
     expect(txBody.withdrawals()?.len()).toEqual(1);
     const fee = txBody.fee().to_str();
-    expect(fee).toEqual('1302');
+    expect(fee).toEqual('1304');
     expect(txBody.outputs().len()).toEqual(1);
     expect(txBody.outputs().get(0).amount().coin().to_str()).toEqual(
       new BigNumber(addressedUtxos[3].amount)
@@ -1075,8 +1075,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840d684b2ee3f8959eb76024280903236edebb244e41c16bafca05d0a30669c7e9df19c3896002c976d8734e25a64d7273b5b58400102fffeb4f858a81f191c8204',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840168146e19cf1074036b48b0ba6b26f9ff08cd2e6fa381f84480e9c8c9fb582a5c8d85062e62809143b1c0edc4b9412b5504f78f3de6413386a0088d302d2b301',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840c30826d23e831e2df595de29450c444a3fccac6872b159f3e126ad91a2b5cbf5c10404478af377488e4f112c0574fea2b4b1d85e8180b2c2b315d00a2dd8bf02',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d58406db397b6835d0bc5e14e09c7f8e963082d993caaffc250f8029bcb0f9d667c3e1773b1a0e7e5838914414f5e2964638fdd1f588b38ad6a806954941dc7a5050c',
     ]);
   });
 });
@@ -1095,7 +1095,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         getProtocolParams(),
       );
 
-      const expectedFee = new BigNumber('1342');
+      const expectedFee = new BigNumber('1344');
       const expectedInput = new BigNumber('11000002');
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
       expect(
@@ -1104,7 +1104,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       expect(
         sendAllResponse.txBuilder.get_explicit_output().coin().to_str()
       ).toEqual(expectedInput.minus(expectedFee).toString());
-      expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual('1342');
+      expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual('1344');
       // make sure we don't accidentally burn a lot of coins
       expect(
         sendAllResponse.txBuilder.get_explicit_input().checked_sub(
