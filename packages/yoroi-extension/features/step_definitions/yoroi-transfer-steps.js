@@ -60,8 +60,12 @@ Then(/^I accept the prompt$/, async function () {
 });
 Then(/^I select the trezor option$/, async function () {
   await this.click('.fromTrezor_connectTrezor');
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.primary');
+  // Attention screen
+  await this.waitForElement('.HardwareDisclaimer_component');
+  const disclaimerClassElement = await this.driver.findElement(By.css('.HardwareDisclaimer_component'));
+  const checkbox = await disclaimerClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  await checkbox.click();
+  await this.click('//button[text()="I understand"]', By.xpath);
 });
 Then(/^I select the ledger option$/, async function () {
   await this.click('.fromLedger_connectLedger');
@@ -127,6 +131,7 @@ When(/^I keep the staking key$/, async function () {
 Then(/^I see the deregistration for the transaction$/, async function () {
   await this.waitForElement('.TransferSummaryPage_refund');
 });
+
 Then(/^I do not see the deregistration for the transaction$/, async function () {
   await this.waitForElementNotPresent('.TransferSummaryPage_refund');
 });
