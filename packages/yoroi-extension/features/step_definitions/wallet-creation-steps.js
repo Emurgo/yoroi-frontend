@@ -138,8 +138,6 @@ Then(/^I see the security warning prior:$/, async function (data) {
 });
 
 Then(/^I click to add an additional wallet$/, async function () {
-  await this.click(
-    `//div[@class='TopBarLayout_navbar']//button[contains(@class, 'NavBarAddButton_button')]`,
-    By.xpath
-  );
+  await this.click(`.NavBar_navbar .NavBar_content .MuiButton-primary`);
+  await this.driver.sleep(3000);
 });

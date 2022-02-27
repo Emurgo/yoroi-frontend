@@ -209,3 +209,11 @@ Then(/^I should see an "(\d{1,2}) words left" error message:$/, async function (
   const errorSelector = '//p[starts-with(@id, "recoveryPhrase--")]';
   await this.waitUntilText(errorSelector, errorMessage, 15000, By.xpath);
 });
+
+Then(/^I should see the wallet already exist window$/, async function () {
+  await this.waitForElement('.WalletAlreadyExistDialog_component');
+});
+
+When(/^I click the Open wallet button$/, async function () {
+  await this.click('.confirmButton');
+});
