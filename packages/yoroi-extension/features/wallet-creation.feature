@@ -42,8 +42,8 @@ Feature: Wallet creation
     Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
-    | password   | repeatedPassword  |
-    | asdfasdfasdf | asdfasdfasdf        |
+    | password     | repeatedPassword |
+    | asdfasdfasdf | asdfasdfasdf     |
     And I click the "Create personal wallet" button
     And I accept the creation terms
     And I enter random mnemonic phrase
@@ -116,8 +116,8 @@ Feature: Wallet creation
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
-  | wrongPassword |                         |
-  | Secre1      | too short                 |
+  | wrongPassword |           |
+  | Secre1        | too short |
 
   @it-131
   Scenario: Wallet creation (IT-131)

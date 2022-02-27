@@ -92,7 +92,7 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
 When(/^I enter random mnemonic phrase$/, async function () {
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
-  for (let i = 1; i < 16; i++) {
+  for (let i = 15; i > 1; i--) {
     await this.click(
       `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`,
       By.xpath
