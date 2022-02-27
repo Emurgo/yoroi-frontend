@@ -86,12 +86,11 @@ Feature: Wallet creation
     Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
-    | password   | repeatedPassword  |
-    | asdfasdfasdf | asdfasdfasdf        |
+    | password     | repeatedPassword |
+    | asdfasdfasdf | asdfasdfasdf     |
     And I clear the name "Created Wallet"
     Then I see the submit button is disabled
     And I should stay in the create wallet dialog
-
     And I enter the name "<invalidWalletName>"
     Then I see the submit button is disabled
     And I should stay in the create wallet dialog
@@ -112,12 +111,13 @@ Feature: Wallet creation
     | password        | repeatedPassword  |
     | <wrongPassword> | <wrongPassword>   |
     Then I see the submit button is disabled
-    And I should see "Invalid Password" error message:
+    And I should see the invalid password error message:
     | message                             |
     | global.errors.invalidWalletPassword |
-  Examples:
-  | wrongPassword |           |
-  | Secre1        | too short |
+
+    Examples:
+    | wrongPassword |           |
+    | Secre1        | too short |
 
   @it-131
   Scenario: Wallet creation (IT-131)
