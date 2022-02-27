@@ -189,7 +189,7 @@ Feature: Restore Wallet
     | recoveryPhrase                                                                                   |                    |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow | 14-words phrase    |
 
-  @it-92
+  @it-92 @ignore
   Scenario: Create & delete (3 wallets) (IT-92)
     # wallet 1
     When I click the restore button for cardano
