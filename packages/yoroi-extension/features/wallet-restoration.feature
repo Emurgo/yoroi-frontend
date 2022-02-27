@@ -144,7 +144,7 @@ Feature: Restore Wallet
     And I click the restore button for cardano
     Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
+    And I can't enter more then 15 words from the recovery phrase:
     | recoveryPhrase   |
     | <recoveryPhrase> |
     Then I don't see last word of <recoveryPhrase> in recovery phrase field

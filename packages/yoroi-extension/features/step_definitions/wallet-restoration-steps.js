@@ -54,6 +54,22 @@ When(/^I enter the recovery phrase:$/, async function (table) {
   await enterRecoveryPhrase(this, fields.recoveryPhrase);
 });
 
+When(/^I can't enter more then 15 words from the recovery phrase:$/, async function (table) {
+  const fields = table.hashes()[0];
+  let result = false;
+  try {
+    await enterRecoveryPhrase(this, fields.recoveryPhrase);
+  } catch (e) {
+    if (e instanceof error.ElementNotInteractableError) {
+      result = true;
+    } else {
+      throw e;
+    }
+  }
+
+  expect(result).to.be.true;
+});
+
 export async function enterRecoveryPhrase(customWorld: any, phrase: string): Promise<void> {
   const recoveryPhrase = phrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
