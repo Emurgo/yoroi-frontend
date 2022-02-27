@@ -181,12 +181,13 @@ Feature: Restore Wallet
     And I enter the recovery phrase:
     | recoveryPhrase   |
     | <recoveryPhrase> |
-    Then I should see an "X words left" error message:
-    | message                                                 |
+    Then I should see an "1 words left" error message:
+    | message                                               |
     | wallet.restore.dialog.form.errors.shortRecoveryPhrase |
+
     Examples:
-    | recoveryPhrase                                                                                           |                    |
-    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
+    | recoveryPhrase                                                                                   |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow | 14-words phrase    |
 
   @it-92
   Scenario: Create & delete (3 wallets) (IT-92)
