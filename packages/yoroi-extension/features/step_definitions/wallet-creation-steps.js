@@ -5,8 +5,8 @@ import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect, assert } from 'chai';
 
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
+async function checkErrorByTranslationId(client, errorSelector, error, method = By.css) {
+  await client.waitUntilText(errorSelector, await client.intl(error.message), 15000, method);
 }
 
 When(/^I click the create button$/, async function () {
@@ -43,14 +43,13 @@ When(/^I click the "Create personal wallet" button$/, async function () {
 
 Then(/^I should see the invalid password error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.walletPassword .FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
+  const errorSelector = '//p[starts-with(@id, "walletPassword") and contains(@id, "-helper-text")]';
+  await checkErrorByTranslationId(this, errorSelector, error, By.xpath);
 });
 
 Then(/^I see the submit button is disabled$/, async function () {
-  const disabledButton = await this.driver.findElement(
-    By.xpath('//div[contains(@class, "Dialog")]//button[contains(@class, "confirmButton")]')
-  );
+  const dialogElement = await this.driver.findElement(By.xpath('//div[contains(@class, "Dialog")]'));
+  const disabledButton = await dialogElement.findElement(By.xpath('.//button[contains(@class, "primary")]'));
   const buttonState = await disabledButton.isEnabled();
   expect(buttonState).to.be.false;
 });

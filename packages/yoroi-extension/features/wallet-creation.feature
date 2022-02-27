@@ -57,8 +57,8 @@ Feature: Wallet creation
     Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
-    | password   | repeatedPassword  |
-    | asdfasdfasdf | asdfasdfasdf        |
+    | password     | repeatedPassword |
+    | asdfasdfasdf | asdfasdfasdf     |
     And I clear the created wallet password asdfasdfasdf
     Then I see the submit button is disabled
     And I should see the invalid password error message:
