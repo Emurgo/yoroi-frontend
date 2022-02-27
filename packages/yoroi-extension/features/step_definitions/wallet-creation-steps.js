@@ -4,10 +4,7 @@ import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect, assert } from 'chai';
-
-async function checkErrorByTranslationId(client, errorSelector, error, method = By.css) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message), 15000, method);
-}
+import { checkErrorByTranslationId } from './common-steps';
 
 When(/^I click the create button$/, async function () {
   await this.click('.WalletAdd_btnCreateWallet');

@@ -206,6 +206,15 @@ async function inputMnemonicForWallet(
   await customWorld.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 }
 
+export async function checkErrorByTranslationId(
+  client,
+  errorSelector,
+  errorObject,
+  method = By.css
+) {
+  await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000, method);
+}
+
 Then(/^I pause the test to debug$/, async function () {
   await this.waitForElement('.element_that_does_not_exist');
 });

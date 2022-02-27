@@ -5,6 +5,7 @@ import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
 import { truncateLongName, } from '../../app/utils/formatters';
 import { expect } from 'chai';
+import { checkErrorByTranslationId } from './common-steps';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -98,10 +99,6 @@ Then(/^I should see the following submit error messages:$/, async function (data
   const errorSelector = '.ChangeWalletPasswordDialog_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
-
-async function checkErrorByTranslationId(client, errorSelector, error, method = By.css) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message), 15000, method);
-}
 
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,

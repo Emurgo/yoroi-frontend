@@ -4,10 +4,7 @@ import { When, Then } from 'cucumber';
 import { By, error, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
-
-async function checkErrorByTranslationId(client, errorSelector, errorObject) {
-  await client.waitUntilText(errorSelector, await client.intl(errorObject.message));
-}
+import { checkErrorByTranslationId } from './common-steps';
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click('.WalletAdd_btnRestoreWallet');
@@ -161,8 +158,8 @@ Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
   const expectedError = data.hashes()[0];
-  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, expectedError);
+  const errorSelector = '//p[starts-with(@id, "recoveryPhrase--")]';
+  await checkErrorByTranslationId(this, errorSelector, expectedError, By.xpath);
 });
 
 Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
