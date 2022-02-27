@@ -136,7 +136,7 @@ Then(/^I should see "Invalid Password" error message:$/, async function (data) {
 
 Then(/^I see the security warning prior:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleCheckbox_label';
+  const errorSelector = '.MuiFormControlLabel-root';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
