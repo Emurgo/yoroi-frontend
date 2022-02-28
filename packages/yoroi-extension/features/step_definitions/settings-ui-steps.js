@@ -141,7 +141,9 @@ Then(/^I should see the wallet export for key "([^"]*)"$/, async function (expec
 });
 
 Then(/^I click on the checkbox$/, async function () {
-  await this.click('.DangerousActionDialog_checkbox > .SimpleCheckbox_root');
+  const warningCheckboxElement = await this.driver.findElement(By.css('.DangerousActionDialog_checkbox'));
+  const checkbox = await warningCheckboxElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  await checkbox.click();
 });
 
 Then(/^I should see a no wallet message$/, async function () {
