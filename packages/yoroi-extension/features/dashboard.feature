@@ -15,14 +15,14 @@ Feature: Yoroi delegation dashboard
     When I click on the withdraw button
     Then I click on the checkbox
     And I click the next button
-    Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1u9tdkhx53zwggygdfh5scr2s8dgms3xm8ehas7v3ywyetwcufngyf | 5000000    |
     And I see the deregistration for the transaction
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+      | fromAddress                                                 | reward | fees     |
+      | stake1u9tdkhx53zwggygdfh5scr2s8dgms3xm8ehas7v3ywyetwcufngyf | 5      | 0.173157 |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8kcCGgACpDkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAd3HanTLSyDKwCsumQcfnUVXaupHr7ozsqYR/GMEzFvF/099CFY8K8lbcr+RJbECvDCDucXXiqmgvsqvw11EYKglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQI/U3TR7lVdU73V2AUPVBA4kSbEwNv+S+HOjgakFxsp9AXTOI6JkNeSW2GyperZx1Zmpk0G6UMPLrgmtwcHUkQT2"
+    Given The expected transaction is "hKYAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8hsCGgACpGUDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAXpQuoGfhAzvgfp0H9ouqVNr4ZQPpQnFG9frwUkkyzA7dLIl1GmIuFbkJFMp3AakfKpXSZ9s+3dpaw9hYFkKgLglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQICDQmLn20i7qEzQSnFGhJv3Yp2qiAFF/6XxaqOeIvva6u/jxDYC/CFoA3UV4B6thf4QFJZ9owY9EsOhQuu14A319g=="
     When I confirm Yoroi transfer funds
     Then I should see the dashboard screen
 

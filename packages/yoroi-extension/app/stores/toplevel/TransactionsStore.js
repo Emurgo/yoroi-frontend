@@ -363,7 +363,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
     const isCardano = isCardanoHaskell(networkInfo);
-    const coinsPerUtxoWord = isCardano ? getCoinsPerUtxoWord(networkInfo) : RustModule.WalletV4.BigNum.zero();
+    const coinsPerUtxoWord = isCardano ?
+      getCoinsPerUtxoWord(networkInfo)
+      : RustModule.WalletV4.BigNum.zero();
 
     // <TODO:PLUTUS_SUPPORT>
     const utxoHasDataHash = false;
@@ -857,6 +859,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       });
       this._submittedTransactions.splice(0, 0, ...txs);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
     }
   }
