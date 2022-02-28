@@ -110,3 +110,13 @@ Then(/^I should wait until funds are recovered:$/, async function (table) {
   await checkAddressesRecoveredAreCorrect(rows, this);
   await checkTotalAmountIsCorrect(rows, this);
 });
+
+When(/^I see transfer CONFIRM TRANSACTION Pop up:$/, async function (table) {
+  const rows = table.hashes();
+  const fields = rows[0];
+  const totalRecoveredBalance = parseFloat(fields.amount) - parseFloat(fields.fee);
+  await checkAddressesRecoveredAreCorrect(rows, this);
+  await this.waitUntilContainsText('.TransferSummaryPage_fees', fields.fee);
+  await this.waitUntilContainsText('.TransferSummaryPage_amount', fields.amount);
+  await this.waitUntilContainsText('.TransferSummaryPage_totalAmount', totalRecoveredBalance);
+})

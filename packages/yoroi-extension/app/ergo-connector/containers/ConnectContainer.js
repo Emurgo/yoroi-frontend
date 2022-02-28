@@ -154,6 +154,10 @@ export default class ConnectContainer extends Component<
     this.generated.actions.connector.closeWindow.trigger();
   };
 
+  hidePasswordForm: void => void = () => {
+    this.setState({ isAppAuth: false })
+  }
+
   render(): Node {
     const responseMessage = this.generated.stores.connector.connectingMessage;
     const wallets = this.generated.stores.connector.filteredWallets;
@@ -168,6 +172,7 @@ export default class ConnectContainer extends Component<
         onConnect={this.onConnect}
         onCancel={this.onCancel}
         isAppAuth={this.state.isAppAuth}
+        hidePasswordForm={this.hidePasswordForm}
         loading={loadingWallets}
         error={error}
         message={responseMessage}

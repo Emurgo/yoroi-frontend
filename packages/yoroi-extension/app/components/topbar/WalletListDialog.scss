@@ -4,7 +4,12 @@
   padding-right: 0 !important;
 
   .header {
-    margin-top: 14px;
+    position: sticky;
+    top: 0px;
+    background: var(--yoroi-comp-dialog-background);
+    padding-bottom: 14px;
+
+    padding-top: 14px;
     padding-left: 40px;
   }
   .totalInfo {
@@ -32,9 +37,12 @@
     padding: 30px 0;
     padding-left: 24px;
     overflow-y: scroll;
-    height: 400px;
+    min-height: 400px;
   }
   .footer {
+    position: sticky;
+    bottom: 0px;
+    background: var(--yoroi-comp-dialog-background);
     border-top: 1px solid #dce0e9;
     padding: 20px 0;
     display: flex;
