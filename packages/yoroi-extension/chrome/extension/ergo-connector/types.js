@@ -406,6 +406,7 @@ export type PublicDeriverCache = {|
 export type WalletAuthEntry = {|
   walletId: string,
   pubkey: string,
+  privkey: string,
 |};
 
 export type WhitelistEntry = {|

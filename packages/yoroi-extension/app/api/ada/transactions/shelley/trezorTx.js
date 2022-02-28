@@ -252,18 +252,27 @@ function _generateTrezorOutputs(
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
       verifyFromBip44Root(changeAddr.addressing);
-      if (!RustModule.WalletV4.BaseAddress.from_address(address)) {
-        throw new Error('expect change address to be a base address');
+      if (RustModule.WalletV4.BaseAddress.from_address(address)) {
+        result.push({
+          addressParameters: {
+            addressType: ADDRESS_TYPE.Base,
+            path: changeAddr.addressing.path,
+            stakingPath: stakingKeyPath,
+          },
+          amount: output.amount().coin().to_str(),
+          ...tokenBundle
+        });
+      } else if (RustModule.WalletV4.ByronAddress.from_address(address)) {
+        result.push({
+          addressParameters: {
+            addressType: ADDRESS_TYPE.Byron,
+            path: changeAddr.addressing.path,
+          },
+          amount: output.amount().coin().to_str(),
+        });
+      } else {
+        throw new Error('unexpected change address type');
       }
-      result.push({
-        addressParameters: {
-          addressType: ADDRESS_TYPE.Base,
-          path: changeAddr.addressing.path,
-          stakingPath: stakingKeyPath,
-        },
-        amount: output.amount().coin().to_str(),
-        ...tokenBundle
-      });
     } else {
       const byronWasm = RustModule.WalletV4.ByronAddress.from_address(address);
       result.push({
@@ -352,8 +361,8 @@ export function buildSignedTransaction(
     ...Addressing,
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
-  stakingKey: RustModule.WalletV4.Bip32PublicKey,
-  metadata: RustModule.WalletV4.AuxiliaryData | void
+  stakingKey: ?RustModule.WalletV4.Bip32PublicKey,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): RustModule.WalletV4.Transaction {
   const findWitness = (pubKey: string) => {
     for (const witness of witnesses) {
@@ -422,10 +431,15 @@ export function buildSignedTransaction(
   }
 
   // add any staking key needed
-  const stakingPubKey = Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex');
+  const stakingPubKey = stakingKey
+    ? Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex')
+    : null;
 
   for (const witness of witnesses) {
     if (witness.pubKey === stakingPubKey) {
+      if (stakingKey == null) {
+        throw new Error('unexpected nullish staking key');
+      }
       const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
         RustModule.WalletV4.Vkey.new(stakingKey.to_raw_key()),
         RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.signature, 'hex')),

@@ -115,9 +115,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
           walletsCount={wallets.length}
           openWalletInfoDialog={() => {
             this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
-            this.generated.actions.router.goToRoute.trigger({
-              route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-            });
           }}
         />
       );
@@ -177,7 +174,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       return {
         walletId: wallet.getPublicDeriverId(),
-        rewards: this.getRewardBalance(publicDeriver),
+        rewards: this.getRewardBalance(wallet),
         walletAmount: walletBalance,
         getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
         plate,
@@ -197,9 +194,10 @@ export default class NavBarContainerRevamp extends Component<Props> {
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           walletAmount={balance}
-          onAddWallet={() =>
+          onAddWallet={() => {
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
             this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
-          }
+          }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
           currentSortedWallets={this.generated.stores.profile.currentSortedWallets ?? []}
         />

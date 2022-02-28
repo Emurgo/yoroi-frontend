@@ -162,20 +162,20 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         },
       };
 
+      let stakingKey;
       const withStakingKey = asGetStakingKey(request.publicDeriver);
-      if (!withStakingKey) {
-        // noinspection ExceptionCaughtLocallyJS
-        throw new Error(`${nameof(this.signAndBroadcast)} can't get staking key`);
-      }
-      const stakingKeyResp = await withStakingKey.getStakingKey();
+      // Byron wallets have no staking key
+      if (withStakingKey) {
+        const stakingKeyResp = await withStakingKey.getStakingKey();
 
-      const stakingKey = derivePublicByAddressing({
-        addressing: stakingKeyResp.addressing,
-        startingFrom: {
-          level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
-          key: publicKeyInfo.key,
-        }
-      });
+        stakingKey = derivePublicByAddressing({
+          addressing: stakingKeyResp.addressing,
+          startingFrom: {
+            level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
+            key: publicKeyInfo.key,
+          }
+        });
+      }
 
       let metadata;
 
