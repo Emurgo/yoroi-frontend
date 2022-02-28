@@ -17,6 +17,7 @@ type WithdrawSourceType = {|
   fromAddress: string,
   reward: string | number,
   fees: string | number,
+  recoveredBalance: string | number,
 |};
 
 export async function baseCheckAddressesRecoveredAreCorrect(
@@ -64,10 +65,14 @@ export async function checkTotalAmountIsCorrect(
 
 export async function checkFinalBalanceIsCorrect(
   fields: WithdrawSourceType,
-  world: Object
+  world: Object,
+  useReward: boolean
 ): Promise<void> {
   const reservedFunds = 2;
-  const finalAmount = parseFloat(fields.reward) + reservedFunds - parseFloat(fields.fees);
+  const givenAmount = useReward
+    ? parseFloat(fields.reward) + reservedFunds
+    : parseFloat(fields.recoveredBalance);
+  const finalAmount = givenAmount - parseFloat(fields.fees);
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];

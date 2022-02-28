@@ -59,7 +59,7 @@ Then(
     await this.driver.sleep(500);
     await this.click('.addMemoButton');
     await this.driver.sleep(500);
-    await this.click('.Dialog_actions .primary');
+    await this.click('.MemoDialogCommon_component .primary');
     await this.driver.sleep(500);
     await this.input("input[name='memo']", memo);
   }

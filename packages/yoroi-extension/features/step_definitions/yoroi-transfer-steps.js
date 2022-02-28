@@ -11,7 +11,6 @@ import {
   checkAddressesRecoveredAreCorrect,
   checkFinalBalanceIsCorrect,
   checkWithdrawalAddressesRecoveredAreCorrect,
-  checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
 
 Given(/^I am on the transfer start screen$/, async function () {
@@ -81,15 +80,16 @@ Then(/^I should see the Yoroi transfer error screen$/, async function () {
 
 Then(/^I should see on the Yoroi transfer summary screen:$/, async function (table) {
   const rows = table.hashes();
+  const fields = rows[0];
   await checkAddressesRecoveredAreCorrect(rows, this);
-  await checkTotalAmountIsCorrect(rows, this);
+  await checkFinalBalanceIsCorrect(fields, this, !!fields.reward);
 });
 
 Then(/^I should see on the Yoroi withdrawal transfer summary screen:$/, async function (table) {
   const rows = table.hashes();
   const fields = rows[0];
   await checkWithdrawalAddressesRecoveredAreCorrect(rows, this);
-  await checkFinalBalanceIsCorrect(fields, this);
+  await checkFinalBalanceIsCorrect(fields, this, !!fields.reward);
 });
 
 When(/^I confirm Yoroi transfer funds$/, async function () {
