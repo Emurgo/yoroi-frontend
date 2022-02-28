@@ -896,23 +896,26 @@ function handleInjectorConnect(port) {
           case 'sign_tx':
             try {
               checkParamCount(1);
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx',
-                    tx,
-                    uid: message.uid
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (_wallet, connection) => {
+                    await RustModule.load();
+                    const tx = asTx(message.params[0], RustModule.SigmaRust);
+                    const resp = await confirmSign(tabId,
+                      {
+                        type: 'tx',
+                        tx,
+                        uid: message.uid
+                      },
+                      connection
+                    );
+                    rpcResponse(resp);
                   },
-                  connection
-                );
-                rpcResponse(resp);
-              }
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
@@ -920,32 +923,35 @@ function handleInjectorConnect(port) {
           case 'sign_tx/cardano':
             try {
               checkParamCount(1);
-              await RustModule.load();
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const { tx, partialSign, returnTx } = message.params[0];
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx/cardano',
-                    tx: { tx, partialSign },
-                    uid: message.uid
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet, connection) => {
+                    await RustModule.load();
+                    const { tx, partialSign, returnTx } = message.params[0];
+                    const resp = await confirmSign(tabId,
+                      {
+                        type: 'tx/cardano',
+                        tx: { tx, partialSign },
+                        uid: message.uid
+                      },
+                      connection
+                    );
+                    if (!returnTx && resp?.ok != null) {
+                      const witnessSetResp = Buffer.from(
+                        RustModule.WalletV4.Transaction.from_bytes(
+                          Buffer.from(resp.ok, 'hex'),
+                        ).witness_set().to_bytes()
+                      ).toString('hex');
+                      rpcResponse({ ok: witnessSetResp });
+                    } else {
+                      rpcResponse(resp);
+                    }
                   },
-                  connection
-                );
-                if (!returnTx && resp?.ok != null) {
-                  const witnessSetResp = Buffer.from(
-                    RustModule.WalletV4.Transaction.from_bytes(
-                      Buffer.from(resp.ok, 'hex'),
-                    ).witness_set().to_bytes()
-                  ).toString('hex');
-                  rpcResponse({ ok: witnessSetResp });
-                } else {
-                  rpcResponse(resp);
-                }
-              }
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
@@ -953,28 +959,31 @@ function handleInjectorConnect(port) {
           case 'sign_tx_input':
             try {
               checkParamCount(2);
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const txIndex = message.params[1];
-              if (typeof txIndex !== 'number') {
-                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
-              }
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx_input',
-                    tx,
-                    index: txIndex,
-                    uid: message.uid
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (_wallet, connection) => {
+                    await RustModule.load();
+                    const tx = asTx(message.params[0], RustModule.SigmaRust);
+                    const txIndex = message.params[1];
+                    if (typeof txIndex !== 'number') {
+                      throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
+                    }
+                    const resp = await confirmSign(tabId,
+                      {
+                        type: 'tx_input',
+                        tx,
+                        index: txIndex,
+                        uid: message.uid
+                      },
+                      connection
+                    );
+                    rpcResponse(resp);
                   },
-                  connection
-                );
-                rpcResponse(resp);
-              }
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
