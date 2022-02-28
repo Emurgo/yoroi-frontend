@@ -17,6 +17,7 @@ type WithdrawSourceType = {|
   fromAddress: string,
   reward: string | number,
   fees: string | number,
+  recoveredBalance: string | number,
 |};
 
 export async function baseCheckAddressesRecoveredAreCorrect(
