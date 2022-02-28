@@ -49,12 +49,12 @@ Feature: Transfer Daedalus Wallet funds
     | recoveryPhrase                                                          |
     | leaf immune metal phrase river cool domain snow year below result three |
     And I proceed with the recovery
-    Then I should wait until funds are recovered:
-    | fromAddress                                                                                              | amount |   
-    | DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb | 2000000 |
-    | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm | 2000000 |
-    Given The expected transaction is "g6QAgoJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CgGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAOlWnAhoAArNZAxoR/pTNoQKChFggYl7pBU3amzE1pil1r1ST2mJ5DvV9yGTU4Y1ChQ9DVOZYQK2lw7lqfAiCe9TJxrps+r9jpXlTTuiNJGPLfOSmsPs6UGk5WdKMcZi4TMqp+oGmMziZ9D8MiOiXa/sxA3DfwwFYIFmMawkFtjRm2CxVuEFZJ57SV8Pxo/rmi1W73FTfMNSOWCKhAVgeWBypg7XhsgcTZ7wcnJCT4Ge537janRgFqjmR+aGyhFgg8yfLKHBscpfqq7TpUh4rWj5tSofEZ3UgHmA4yo4dCExYQC8mLLrUKNi15ttjP5IrKSl4oiAPq0uWtudSqr2fbxEHUz+ssAo2MEzhOS/zarHww7510AFvuZpiB11wL96JfAJYIHS37xxfMSPsLLV88sfVa4xwz+PdhlDaPoXmQM6TX7OqWCKhAVgeWBypg7XhsgcTNtAHZpBr3/PspPxn2cLst4Q2lh9t9g=="
-    When I confirm Daedalus transfer funds
+    And I see transfer CONFIRM TRANSACTION Pop up:
+    | amount| fee     | fromAddress                                                                                              |
+    | 4     | 0.177029| DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb |
+    |       |         | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm |
+    Given The expected transaction is "hKQAgoJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CgGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAOlV7AhoAArOFAxoR/pTNoQKChFggYl7pBU3amzE1pil1r1ST2mJ5DvV9yGTU4Y1ChQ9DVOZYQJz5L4DQc6wUYd82mWgqW6cZRFYGQbG3+aIyv/JdePVLTrPq1Nn+l0K30gt2yLq/ZwW6QUPnOAGY38Eiczl8LgBYIFmMawkFtjRm2CxVuEFZJ57SV8Pxo/rmi1W73FTfMNSOWCKhAVgeWBypg7XhsgcTZ7wcnJCT4Ge537janRgFqjmR+aGyhFgg8yfLKHBscpfqq7TpUh4rWj5tSofEZ3UgHmA4yo4dCExYQPNs1ZwnMJEPt2G8VrrjWH3drtHrprAaCNLw0osKzHFe7RQu6opHlFBJxaL1YktVrCSs2ODNRyaRFbOwJu0AQwVYIHS37xxfMSPsLLV88sfVa4xwz+PdhlDaPoXmQM6TX7OqWCKhAVgeWBypg7XhsgcTNtAHZpBr3/PspPxn2cLst4Q2lh9t9fY="
+    Then I confirm Daedalus transfer funds
     Then I should see the summary screen
     
   @withWebSocketConnection @it-80
@@ -82,10 +82,10 @@ Feature: Transfer Daedalus Wallet funds
     | masterKey |
     | 50d1b52581adefa3e99025ade8f7189318e1e9ac2f0a1d66d9a1c86f3908ca5fe1a5e08866b500a9a0e11d48c41dbb4957c550b418e7b5c6c9a531ab37037c35d0e9ecaab457c8dea556bb2ef43ec59cc943b12adb39c9d38d4d90563b9014a7 |
     And I proceed with the recovery
-    Then I should wait until funds are recovered:
-    | fromAddress                                                                                          | amount |   
-    | DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb | 2000000 |
-    | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm | 2000000 |
-    Given The expected transaction is "g6QAgoJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CgGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAOlWnAhoAArNZAxoR/pTNoQKChFggYl7pBU3amzE1pil1r1ST2mJ5DvV9yGTU4Y1ChQ9DVOZYQK2lw7lqfAiCe9TJxrps+r9jpXlTTuiNJGPLfOSmsPs6UGk5WdKMcZi4TMqp+oGmMziZ9D8MiOiXa/sxA3DfwwFYIFmMawkFtjRm2CxVuEFZJ57SV8Pxo/rmi1W73FTfMNSOWCKhAVgeWBypg7XhsgcTZ7wcnJCT4Ge537janRgFqjmR+aGyhFgg8yfLKHBscpfqq7TpUh4rWj5tSofEZ3UgHmA4yo4dCExYQC8mLLrUKNi15ttjP5IrKSl4oiAPq0uWtudSqr2fbxEHUz+ssAo2MEzhOS/zarHww7510AFvuZpiB11wL96JfAJYIHS37xxfMSPsLLV88sfVa4xwz+PdhlDaPoXmQM6TX7OqWCKhAVgeWBypg7XhsgcTNtAHZpBr3/PspPxn2cLst4Q2lh9t9g=="
+    And I see transfer CONFIRM TRANSACTION Pop up:
+      | amount| fee     | fromAddress                                                                                              |
+      | 4     | 0.177029| DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb |
+      |       |         | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm |
+    Given The expected transaction is "hKQAgoJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CgGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAOlV7AhoAArOFAxoR/pTNoQKChFggYl7pBU3amzE1pil1r1ST2mJ5DvV9yGTU4Y1ChQ9DVOZYQJz5L4DQc6wUYd82mWgqW6cZRFYGQbG3+aIyv/JdePVLTrPq1Nn+l0K30gt2yLq/ZwW6QUPnOAGY38Eiczl8LgBYIFmMawkFtjRm2CxVuEFZJ57SV8Pxo/rmi1W73FTfMNSOWCKhAVgeWBypg7XhsgcTZ7wcnJCT4Ge537janRgFqjmR+aGyhFgg8yfLKHBscpfqq7TpUh4rWj5tSofEZ3UgHmA4yo4dCExYQPNs1ZwnMJEPt2G8VrrjWH3drtHrprAaCNLw0osKzHFe7RQu6opHlFBJxaL1YktVrCSs2ODNRyaRFbOwJu0AQwVYIHS37xxfMSPsLLV88sfVa4xwz+PdhlDaPoXmQM6TX7OqWCKhAVgeWBypg7XhsgcTNtAHZpBr3/PspPxn2cLst4Q2lh9t9fY="
     When I confirm Daedalus transfer funds
     Then I should see the summary screen
