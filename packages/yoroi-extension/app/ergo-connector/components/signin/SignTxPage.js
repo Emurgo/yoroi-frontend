@@ -33,13 +33,15 @@ import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx,
   +txData: ISignRequest<any>,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
-  +onConfirm: string => void,
+  +onConfirm: string => Promise<void>,
   +notification: ?Notification,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
   +defaultToken: DefaultTokenEntry,
@@ -66,12 +68,16 @@ const messages = defineMessages({
   more: {
     id: 'connector.signin.more',
     defaultMessage: '!!!more'
-  }
+  },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
 });
 
 type State = {|
   showUtxoDetails: boolean,
-  currentWindowHeight: number,
+  isSubmitting: boolean,
 |}
 
 @observer
@@ -82,12 +88,9 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
-    currentWindowHeight: window.innerHeight
+    isSubmitting: false,
   }
 
-  componentDidMount() {
-    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
-  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -113,6 +116,7 @@ class SignTxPage extends Component<Props, State> {
     {
       options: {
         validateOnChange: true,
+        validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
       plugins: {
@@ -125,7 +129,17 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
+        this.setState({ isSubmitting: true })
+        this.props.onConfirm(walletPassword).catch(error => {
+          if (error instanceof WrongPassphraseError) {
+            this.form.$('walletPassword').invalidate(
+              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+            )
+          } else {
+            throw error;
+          }
+          this.setState({ isSubmitting: false })
+        });
       },
       onError: () => {},
     });
@@ -249,25 +263,22 @@ class SignTxPage extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
+    const { isSubmitting } = this.state;
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight } = this.state
+    const { showUtxoDetails } = this.state
     const totalInput = txData.totalInput();
     const fee = txData.fee()
     const amount = totalInput.joinSubtractCopy(fee)
     return (
-      <>
+      <div className={styles.component}>
         <ProgressBar step={2} />
-        <div
-          style={{
-            height: currentWindowHeight + 'px',
-          }}
-        >
+        <div>
           {
          !showUtxoDetails ? (
            <div
-             className={styles.component}
+             className={styles.signTx}
            >
              <div>
                <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
@@ -333,14 +344,15 @@ class SignTxPage extends Component<Props, State> {
                <Button fullWidth variant="secondary" onClick={onCancel}>
                  {intl.formatMessage(globalMessages.cancel)}
                </Button>
-               <Button
+               <LoadingButton
                  variant="primary"
                  fullWidth
                  disabled={!walletPasswordField.isValid}
                  onClick={this.submit.bind(this)}
+                 loading={isSubmitting}
                >
                  {intl.formatMessage(globalMessages.confirm)}
-               </Button>
+               </LoadingButton>
              </div>
            </div>
          ): <UtxoDetails
@@ -357,7 +369,7 @@ class SignTxPage extends Component<Props, State> {
          />
         }
         </div>
-      </>
+      </div>
     );
   }
 }

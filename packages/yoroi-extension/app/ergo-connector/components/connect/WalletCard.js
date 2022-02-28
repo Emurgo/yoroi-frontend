@@ -19,7 +19,7 @@ type Props = {|
 function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
-  divClass: string
+  divClass: string,
 ): [string, React$Element<'div'>] {
   return [
     plate.TextPart,
@@ -28,6 +28,7 @@ function constructPlate(
         iconSeed={plate.ImagePart}
         saturationFactor={saturationFactor}
         scalePx={6}
+        size={5}
       />
     </div>,
   ];

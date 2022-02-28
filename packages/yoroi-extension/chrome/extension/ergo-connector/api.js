@@ -11,7 +11,7 @@ import type {
   Value,
   CardanoTx, AccountBalance,
 } from './types';
-import { ConnectorError } from './types';
+import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   IGetAllUtxosResponse,
@@ -57,6 +57,7 @@ import {
 import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import AdaApi from '../../../app/api/ada';
 import type CardanoTxRequest from '../../../app/api/ada';
+import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -538,6 +539,24 @@ export async function connectorSignTx(
   };
 }
 
+function getScriptRequiredSigningKeys(
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
+): Set<string> {
+  const set = new Set<string>();
+  const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
+  if (nativeScripts != null && nativeScripts.len() > 0) {
+    for (let i = 0; i < nativeScripts.len(); i++) {
+      const ns = nativeScripts.get(i);
+      const scriptRequiredSigners = ns.get_required_signers();
+      for (let j = 0; j < scriptRequiredSigners.len(); j++) {
+        const requiredKeyHash = scriptRequiredSigners.get(j);
+        set.add(bytesToHex(requiredKeyHash.to_bytes()));
+      }
+    }
+  }
+  return set;
+}
+
 export async function connectorSignCardanoTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
@@ -546,10 +565,15 @@ export async function connectorSignCardanoTx(
   // eslint-disable-next-line no-unused-vars
   const { tx: txHex, partialSign } = tx;
 
-  let txBody;
+  let txBody: RustModule.WalletV4.TransactionBody;
+  let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
+  let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
   const bytes = Buffer.from(txHex, 'hex');
   try {
-    txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+    const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
+    txBody = fullTx.body();
+    witnessSet = fullTx.witness_set();
+    auxiliaryData = fullTx.auxiliary_data();
   } catch (originalErr) {
     try {
       // Try parsing as body for backward compatibility
@@ -568,7 +592,62 @@ export async function connectorSignCardanoTx(
   if (withHasUtxoChains == null) {
     throw new Error(`missing chains functionality`);
   }
-  const utxos = await withHasUtxoChains.getAllUtxos();
+
+  const requiredScriptSignAddresses = new Set<string>();
+  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet);
+  const scriptSignaturesRequired = requiredScriptSignKeys.size > 0;
+  const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
+    if (scriptSignaturesRequired) {
+      return getAllAddressesForDisplay({
+        publicDeriver,
+        type: CoreAddressTypes.CARDANO_BASE,
+      });
+    }
+    return Promise.resolve([]);
+  }
+
+  const [utxos, allBaseAddresses] = await Promise.all([
+    withHasUtxoChains.getAllUtxos(),
+    queryAllBaseAddresses(),
+  ]);
+
+  const otherRequiredSigners = [];
+
+  if (scriptSignaturesRequired) {
+    if (allBaseAddresses.length === 0) {
+      throw new Error('Cannot sign transaction script - no base addresses are available in the wallet!');
+    }
+    const parsedBaseAddr = RustModule.WalletV4.Address
+      .from_bytes(hexToBytes(allBaseAddresses[0].address));
+    const parsedNetworkId = parsedBaseAddr.network_id();
+    const parsedStakingCred = RustModule.WalletV4.BaseAddress
+      .from_address(parsedBaseAddr)?.stake_cred();
+    if (parsedStakingCred == null) {
+      throw new Error('Cannot sign transaction script - failed to parse the base address staking cred!');
+    }
+    for (const scriptKeyHash of requiredScriptSignKeys) {
+      const requiredKeyHash = RustModule.WalletV4.Ed25519KeyHash
+        .from_bytes(hexToBytes(scriptKeyHash));
+      const requiredPaymentCred = RustModule.WalletV4.StakeCredential
+        .from_keyhash(requiredKeyHash);
+      const requiredAddressBytes = RustModule.WalletV4.BaseAddress.new(
+        parsedNetworkId,
+        requiredPaymentCred,
+        parsedStakingCred,
+      ).to_address().to_bytes();
+      requiredScriptSignAddresses.add(bytesToHex(requiredAddressBytes))
+    }
+    for (const baseAddress of allBaseAddresses) {
+      const { address, addressing } = baseAddress;
+      if (requiredScriptSignAddresses.delete(address)) {
+        otherRequiredSigners.push({ address, addressing });
+      }
+      if (requiredScriptSignAddresses.size === 0) {
+        break;
+      }
+    }
+  }
+
   const addressedUtxos = asAddressedUtxoCardano(utxos);
 
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
@@ -594,6 +673,7 @@ export async function connectorSignCardanoTx(
   const usedUtxos = addressedUtxos.filter(utxo =>
     utxoIdSet.has(utxo.utxo_id)
   );
+
   const signedTx = shelleySignTransaction(
     usedUtxos,
     txBody,
@@ -602,15 +682,17 @@ export async function connectorSignCardanoTx(
       Buffer.from(normalizedKey.prvKeyHex, 'hex')
     ),
     new Set(), // stakingKeyWits
-    undefined, // metadata
+    auxiliaryData, // metadata
+    witnessSet,
+    otherRequiredSigners,
   );
 
-  return Buffer.from(signedTx.witness_set().to_bytes()).toString('hex');
+  return Buffer.from(signedTx.to_bytes()).toString('hex');
 }
 
 export async function connectorCreateCardanoTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
-  password: string,
+  password: ?string,
   cardanoTxRequest: CardanoTxRequest,
 ): Promise<string> {
   const withUtxos = asGetAllUtxos(publicDeriver);
@@ -636,6 +718,12 @@ export async function connectorCreateCardanoTx(
     absSlotNumber,
     cardanoTxRequest,
   }: any));
+
+  if (password == null) {
+    return Buffer.from(
+      signRequest.unsignedTx.build_tx().to_bytes()
+    ).toString('hex');
+  }
 
   const withSigningKey = asGetSigningKey(publicDeriver);
   if (!withSigningKey) {
@@ -725,8 +813,12 @@ export async function connectorSendTxCardano(
     }
   ).then(_response => {
     return Promise.resolve();
-  }).catch((_error) => {
-    throw new SendTransactionApiError();
+  }).catch((error) => {
+    const code = error.response?.status === 400
+      ? TxSendErrorCodes.REFUSED : TxSendErrorCodes.FAILURE;
+    const info = error.response?.data
+      ?? `Failed to submit transaction: ${String(error)}`;
+    throw new ConnectorError({ code, info });
   });
 }
 
