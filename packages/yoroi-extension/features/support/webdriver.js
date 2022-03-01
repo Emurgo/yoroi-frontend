@@ -1,7 +1,7 @@
 // @flow
 
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import { Builder, By, Key, until, error, promise } from 'selenium-webdriver';
+import { Builder, By, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
@@ -31,6 +31,8 @@ function encode(file) {
  */
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
+const defaultWaitTimeout = 10 * 1000;
+const defaultRepeatPeriod = 1000;
 
 function getBraveBuilder() {
   return new Builder().forBrowser('chrome').setChromeOptions(
@@ -121,8 +123,10 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
-  this.getText = locator => this.getElementBy(locator).getText();
+
+  this.getText = (locator, method = By.css) => this.getElementBy(locator, method).getText();
   // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.getValue = this.driver.getValue = async locator =>
     this.getElementBy(locator).getAttribute('value');
@@ -172,10 +176,10 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator, text, timeout = 75000) => {
+  this.waitUntilText = async (locator, text, timeout = 75000, method = By.css) => {
     await this.driver.wait(async () => {
       try {
-        const value = await this.getText(locator);
+        const value = await this.getText(locator, method);
         return value === text;
       } catch (err) {
         return false;
@@ -261,6 +265,26 @@ function CustomWorld(cmdInput: WorldInput) {
       }
     );
   };
+
+  this.customWaiter = async (
+    condition,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) => {
+    const endTime = Date.now() + timeout;
+
+    while(endTime >= Date.now()){
+      if (condition()) return true;
+      await this.driver.sleep(repeatPeriod);
+    }
+    return false;
+  };
+
+  this.highlightElement = async (element: WebElement) => {
+    await this.driver.executeScript(
+      "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');",
+      element);
+  }
 }
 
 // no need to await

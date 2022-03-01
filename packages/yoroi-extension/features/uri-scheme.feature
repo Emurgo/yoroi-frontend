@@ -35,7 +35,7 @@ Feature: URI scheme
     Then I should see an "invalid URI" dialog
 
   @it-167
-  Scenario: Ensure user can send a tx from a shelley URI link (IT-110)
+  Scenario: Ensure user can send a tx from a shelley URI link (IT-167)
     When I open a cardano URI for address addr1qyg8whf7u4sjlw0fjapgyf6jzayx7svd9xqsv6thymk7s3kr3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0quke8qu and 10 ADA
     Then I should see and accept a warning dialog
     Then I should see a dialog with the transaction details

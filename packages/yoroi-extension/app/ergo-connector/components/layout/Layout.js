@@ -8,6 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
 import DappConnectorIcon from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import environment from '../../../environment';
 
 type Props = {|
   children: Node,
@@ -30,7 +31,7 @@ export default class Layout extends Component<Props> {
 
     return (
       <div className={styles.layout}>
-        <TestnetWarningBanner isTestnet={false} />
+        <TestnetWarningBanner isTestnet={environment.isTest()} />
         <div className={styles.header}>
           <div className={styles.menu}>
             <YoroiLogo />

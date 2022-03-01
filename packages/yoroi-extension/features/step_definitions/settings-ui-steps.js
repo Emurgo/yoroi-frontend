@@ -5,6 +5,7 @@ import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
 import { truncateLongName, } from '../../app/utils/formatters';
 import { expect } from 'chai';
+import { checkErrorByTranslationId } from './common-steps';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -83,13 +84,13 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.ChangeWalletPasswordDialog_newPasswordClassic .FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
+  const errorSelector = '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]';
+  await checkErrorByTranslationId(this, errorSelector, error, By.xpath);
 });
 
 Then(/^I should see "Doesn't match" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.FormFieldOverridesClassic_error';
+  const errorSelector = '.MuiFormHelperText-root';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
@@ -99,14 +100,10 @@ Then(/^I should see the following submit error messages:$/, async function (data
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
-}
-
 Then(/^I should stay in the change password dialog$/, async function () {
   const changePasswordMessage = await i18n.formatMessage(this.driver,
     { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText('.Dialog_title', changePasswordMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.dialog__title', changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {
@@ -116,7 +113,7 @@ Then(/^I should see support screen$/, async function () {
 });
 
 Then(/^I should see blockchain screen$/, async function () {
-  await this.waitForElement('.ExplorerSettings_explorer');
+  await this.waitForElement('.ExplorerSettings_component');
   await this.waitForElement("//h2[contains(text(), 'Cardano Payment URLs')]", By.xpath);
   await this.waitForElement("//h2[contains(text(), 'Currency Conversion')]", By.xpath);
 });
@@ -141,7 +138,9 @@ Then(/^I should see the wallet export for key "([^"]*)"$/, async function (expec
 });
 
 Then(/^I click on the checkbox$/, async function () {
-  await this.click('.DangerousActionDialog_checkbox > .SimpleCheckbox_root');
+  const warningCheckboxElement = await this.driver.findElement(By.css('.DangerousActionDialog_checkbox'));
+  const checkbox = await warningCheckboxElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  await checkbox.click();
 });
 
 Then(/^I should see a no wallet message$/, async function () {
@@ -152,7 +151,11 @@ Then(/^I should see a no wallet message$/, async function () {
   await this.waitUntilText('.FullscreenMessage_title', noWalletMessage);
 });
 
-
 Then(/^I sleep for ([^"]*)$/, async function (ms) {
   await this.driver.sleep(Number.parseInt(ms, 10));
+});
+
+Then(/^I should see "Incorrect wallet password." error message$/, async function(){
+  const errorSelector = '.ChangeWalletPasswordDialog_error';
+  await this.waitUntilText(errorSelector, 'Incorrect wallet password.', 15000);
 });

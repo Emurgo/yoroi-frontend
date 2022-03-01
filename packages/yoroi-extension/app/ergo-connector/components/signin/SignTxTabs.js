@@ -8,6 +8,7 @@ import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { observer } from 'mobx-react';
 import { Tab } from '@mui/material';
+import environment from '../../../environment';
 
 type Props = {|
   overviewContent: Node,
@@ -61,7 +62,13 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
           </TabList>
         </Box>
         {tabs.map(({ component, id }) => (
-          <TabPanel sx={{ height: '84vh', overflow: 'overlay' }} value={id}>
+          <TabPanel
+            sx={{
+              height: environment.isNightly() || environment.isTest() ? 'calc(84vh - 55px)': '84vh',
+              overflow: 'overlay'
+            }}
+            value={id}
+          >
             {component}
           </TabPanel>
         ))}
