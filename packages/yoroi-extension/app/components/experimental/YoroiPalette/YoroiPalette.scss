@@ -43,4 +43,59 @@
             font-size: 16px;
         }
     }
+
+    .multiLayer {
+
+        h1 {
+            font-size: 32px;
+            line-height: 32px;
+            margin: 40px 0px;
+        }
+        .multiLayerRows {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            .multiLayerRow {
+                background-color: var(--yoroi-palette-gray-50);
+                margin-bottom: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: center;
+                padding: 20px 40px;
+                border-radius: 9px;
+
+                .flexWithMargin {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    font-family: Courier, monospace;
+                    font-weight: 500;
+                    color: var(--yoroi-palette-gray-900);
+                    p {
+                        margin-left: 10px;
+                    }
+                }
+
+                .arrowDown {
+                    margin-bottom: 10px;
+                    margin-top: 10px;
+                    display: inline-block;
+                    width: 100%;
+                    padding-left: 30px;
+                    
+                    svg {
+                        width: 35px;
+                        height: 35px;
+                    }
+                }
+            }
+        }
+    }
+
+    .nameToHexHeader {
+        font-size: 32px;
+        line-height: 32px;
+        margin: 20px 0px;
+    }
 }
