@@ -95,6 +95,7 @@
   "daedalusTransfer.waiting.title.label": "Daedalus wallet is being restored",
   "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
   "decryption.label": "Decryption password",
+  "connector.signIn.tabs.utxoAddreses": "UTXO addresses",
   "ergo-connector.connect.info": "Your connection preferences will be saved to your Yoroi dApp list.",
   "ergo-connector.connect.noWalletsFound": "Ooops, no {network} wallets found.",
   "ergo-connector.connect.createWallet": "create wallet",

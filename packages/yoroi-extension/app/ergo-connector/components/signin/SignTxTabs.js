@@ -1,6 +1,5 @@
 // @flow
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
+import { $npm$ReactIntl$IntlShape, defineMessages,  injectIntl } from 'react-intl';
 import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import globalMessages from '../../../i18n/global-messages';
@@ -17,6 +16,13 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
+const messages = defineMessages({
+  utxoAddresses: {
+    id: 'connector.signIn.tabs.utxoAddreses',
+    defaultMessage: '!!!UTXO addresses',
+  },
+});
+
 function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
@@ -32,7 +38,7 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
     },
     {
       id: 1,
-      label: 'UTXO addresses',
+      label: intl.formatMessage(messages.utxoAddresses),
       component: utxoAddressContent,
     },
   ];
