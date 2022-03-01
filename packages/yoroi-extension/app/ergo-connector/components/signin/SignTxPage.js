@@ -35,6 +35,7 @@ import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
+import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +tx: Tx,
@@ -282,26 +283,24 @@ class SignTxPage extends Component<Props, State> {
               minHeight="88px"
               mb="8px"
             >
-              {faviconUrl != null && faviconUrl !== '' ? (
-                <Box
-                  sx={{
-                    marginRight: '12px',
-                    width: '32px',
-                    height: '32px',
-                    border: '1px solid #a7afc0',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#f8f8f8',
-                    img: {
-                      width: '20px',
-                    },
-                  }}
-                >
-                  <img src={faviconUrl} alt={`${url} favicon`} />
-                </Box>
-              ) : null}
+              <Box
+                sx={{
+                  marginRight: '12px',
+                  width: '32px',
+                  height: '32px',
+                  border: '1px solid #a7afc0',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f8f8',
+                  img: {
+                    width: '20px',
+                  },
+                }}
+              >
+                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
+              </Box>
               <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
                 {url}
               </Typography>
