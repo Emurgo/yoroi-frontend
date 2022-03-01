@@ -45,6 +45,7 @@ import WalletCard from '../connect/WalletCard';
 import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx | CardanoTx | CardanoTxRequest,
@@ -289,8 +290,6 @@ class SignTxPage extends Component<Props, State> {
     const { intl } = this.context;
     const { txData, onCancel, connectedWebsite } = this.props;
 
-    // TODO: figure if needed
-    // eslint-disable-next-line no-unused-vars
     const { isSubmitting } = this.state;
 
     const url = connectedWebsite?.url ?? '';
@@ -426,15 +425,15 @@ class SignTxPage extends Component<Props, State> {
                 <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
                   {intl.formatMessage(globalMessages.cancel)}
                 </Button>
-                <Button
+                <LoadingButton
                   variant="primary"
                   fullWidth
-                  sx={{ minWidth: 'auto' }}
                   disabled={!walletPasswordField.isValid}
                   onClick={this.submit.bind(this)}
+                  loading={isSubmitting}
                 >
                   {intl.formatMessage(globalMessages.confirm)}
-                </Button>
+                </LoadingButton>
               </Box>
             </Box>
           </Box>

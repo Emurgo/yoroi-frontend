@@ -34,6 +34,7 @@ import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { LoadingButton } from '@mui/lab';
 
 type Props = {|
   +tx: Tx,
@@ -252,8 +253,6 @@ class SignTxPage extends Component<Props, State> {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
-    // TODO: figure if needed
-    // eslint-disable-next-line no-unused-vars
     const { isSubmitting } = this.state;
 
     const { intl } = this.context;
@@ -392,15 +391,15 @@ class SignTxPage extends Component<Props, State> {
                 <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
                   {intl.formatMessage(globalMessages.cancel)}
                 </Button>
-                <Button
+                <LoadingButton
                   variant="primary"
                   fullWidth
-                  sx={{ minWidth: 'auto' }}
                   disabled={!walletPasswordField.isValid}
                   onClick={this.submit.bind(this)}
+                  loading={isSubmitting}
                 >
                   {intl.formatMessage(globalMessages.confirm)}
-                </Button>
+                </LoadingButton>
               </Box>
             </Box>
           </Box>
