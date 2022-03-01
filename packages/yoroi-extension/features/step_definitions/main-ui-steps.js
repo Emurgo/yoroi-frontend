@@ -34,7 +34,9 @@ Then(/^I click on "copy to clipboard" button$/, async function () {
 Then(/^I should see "copied" tooltip message:$/, async function (data) {
   const notification = data.hashes()[0];
   const notificationMessage = await this.intl(notification.message);
-  await this.waitForElement(`//div[contains(@class, 'SimpleBubble_bubble') and contains(text(), '${notificationMessage}')]`, By.xpath);
+  const messageParentElement = await this.driver.findElement(By.xpath('//div[contains(@role, "tooltip")]'));
+  const message = await messageParentElement.findElement(By.xpath(`//span[contains(text(), "${notificationMessage}")]`));
+  expect(await message.isDisplayed()).to.be.true;
 });
 
 Then(/^I see transactions buttons are disabled$/, async function () {
@@ -81,7 +83,7 @@ Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
 
 Then(/^I select buy-sell from the dropdown$/, async function () {
   await this.click('.NavDropdown_toggle');
-  await this.click('.BuySellAdaButton_button');
+  await this.click('.NavDropdownContent_buyButton');
 });
 
 Then(/^I should see the pre-filled address "([^"]*)"$/, async function (address) {
