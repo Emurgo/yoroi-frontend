@@ -29,6 +29,7 @@ import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
 import NoWalletImage from '../../assets/images/no-websites-connected.inline.svg'
+import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 const messages = defineMessages({
   subtitle: {
@@ -271,11 +272,9 @@ class ConnectPage extends Component<Props> {
               {intl.formatMessage(messages.connectWallet)}
             </Typography>
             <div className={styles.connectWrapper}>
-              {faviconUrl != null && faviconUrl !== '' ? (
-                <div className={styles.image}>
-                  <img src={faviconUrl} alt={`${url} favicon`} />
-                </div>
-              ) : null}
+              <div className={styles.image}>
+                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} />: <NoDappIcon />}
+              </div>
               <Box marginTop="16px">
                 <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-900)">
                   {intl.formatMessage(messages.subtitle)}{' '}
