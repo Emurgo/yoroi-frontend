@@ -24,8 +24,8 @@ import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
-import { camelCase } from 'lodash';
 import { promises as fsAsync } from 'fs';
+import { selectSubmenuSettings, getComplexityLevelButton } from './general-settings-steps';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -206,6 +206,15 @@ async function inputMnemonicForWallet(
   await customWorld.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 }
 
+export async function checkErrorByTranslationId(
+  client: Object,
+  errorSelector: string,
+  errorObject: Object,
+  method:any = By.css
+) {
+  await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000, method);
+}
+
 Then(/^I pause the test to debug$/, async function () {
   await this.waitForElement('.element_that_does_not_exist');
 });
@@ -285,13 +294,10 @@ Given(/^I switched to the advanced level$/, async function () {
   await waitUntilUrlEquals.call(this, '/settings/general');
   await this.waitForElement('.SettingsLayout_component');
   // Click on secondary menu "levelOfComplexity" item
-  const buttonSelector = `.SettingsMenuItem_component.${camelCase('levelOfComplexity')}`;
-  await this.click(buttonSelector);
-  await this.waitForElement(`${buttonSelector}.SettingsMenuItem_active`);
+  await selectSubmenuSettings(this, 'levelOfComplexity');
   // Select the most complex level
-  await this.waitForElement('.ComplexityLevelForm_submitButton');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
-  await levels[levels.length - 1].click(); // choose most complex level for tests
+  const cardChoseButton = await getComplexityLevelButton(this, false);
+  await cardChoseButton.click(); // choose most complex level for tests
 
   // Navigate back to the main page
   await navigateTo.call(this, '/wallets/add');

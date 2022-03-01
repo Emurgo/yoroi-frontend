@@ -20,6 +20,23 @@ type WithdrawSourceType = {|
   recoveredBalance: string | number,
 |};
 
+function stripZerosFromEnd(inputNumber: string) {
+  const inputLength = inputNumber.length;
+  const inputArray = inputNumber.split('');
+  for (let i = inputLength - 1; i >= 0; i--) {
+    if (inputArray[i] === '0') {
+      inputArray.splice(i, 1);
+    } else if (inputArray[i] === '.') {
+      inputArray.splice(i, 1);
+      break;
+    } else {
+      break;
+    }
+  }
+
+  return inputArray.join('');
+}
+
 export async function baseCheckAddressesRecoveredAreCorrect(
   rows: TransferSourceType,
   world: Object,
@@ -72,7 +89,9 @@ export async function checkFinalBalanceIsCorrect(
   const givenAmount = useReward
     ? parseFloat(fields.reward) + reservedFunds
     : parseFloat(fields.recoveredBalance);
-  const finalAmount = givenAmount - parseFloat(fields.fees);
+  const finalAmount = stripZerosFromEnd(
+    parseFloat(givenAmount - parseFloat(fields.fees)).toFixed(6)
+  );
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];

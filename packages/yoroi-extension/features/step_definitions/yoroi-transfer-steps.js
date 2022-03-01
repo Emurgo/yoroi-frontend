@@ -13,6 +13,15 @@ import {
   checkWithdrawalAddressesRecoveredAreCorrect,
 } from '../support/helpers/transfer-helpers';
 
+async function confirmAttentionScreen(customWorld: Object){
+  // Attention screen
+  await customWorld.waitForElement('.HardwareDisclaimer_component');
+  const disclaimerClassElement = await customWorld.driver.findElement(By.css('.HardwareDisclaimer_component'));
+  const checkbox = await disclaimerClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  await checkbox.click();
+  await customWorld.click('//button[text()="I understand"]', By.xpath);
+}
+
 Given(/^I am on the transfer start screen$/, async function () {
   await navigateTo.call(this, '/transfer');
   await waitUntilUrlEquals.call(this, '/transfer');
@@ -60,13 +69,13 @@ Then(/^I accept the prompt$/, async function () {
 });
 Then(/^I select the trezor option$/, async function () {
   await this.click('.fromTrezor_connectTrezor');
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.primary');
+  // Attention screen
+  await confirmAttentionScreen(this);
 });
 Then(/^I select the ledger option$/, async function () {
   await this.click('.fromLedger_connectLedger');
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.primary');
+  // Attention screen
+  await confirmAttentionScreen(this);
 });
 When(/^I click on the yoroiPaper button on the Yoroi Transfer start screen$/, async function () {
   await this.click('.yoroiPaper');
@@ -127,6 +136,7 @@ When(/^I keep the staking key$/, async function () {
 Then(/^I see the deregistration for the transaction$/, async function () {
   await this.waitForElement('.TransferSummaryPage_refund');
 });
+
 Then(/^I do not see the deregistration for the transaction$/, async function () {
   await this.waitForElementNotPresent('.TransferSummaryPage_refund');
 });

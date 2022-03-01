@@ -16,6 +16,7 @@ import {
   checkAddressesRecoveredAreCorrect,
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
+import { checkErrorByTranslationId } from './common-steps';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
@@ -29,10 +30,6 @@ After({ tags: '@withWebSocketConnection' }, () => {
 
   getMockServer({});
 });
-
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
-}
 
 Given(/^My Daedalus wallet has funds/, () => {
   const daedalusAddresses = [
