@@ -45,7 +45,8 @@ import {
   connectorSendTx,
   connectorSendTxCardano,
   connectorSignCardanoTx,
-  connectorSignTx
+  connectorSignTx,
+  connectorRecordSubmittedCardanoTransaction,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -342,6 +343,7 @@ async function withSelectedWallet<T>(
   continuation: (PublicDeriver<>, ?ConnectedSite) => Promise<T>,
   db: lf$Database,
   localStorageApi: LocalStorageApi,
+  shouldSyncWallet: boolean = true,
 ): Promise<T> {
   const wallets = await getWallets({ db });
   return await withSelectedSiteConnection(tabId, async connected => {
@@ -355,7 +357,9 @@ async function withSelectedWallet<T>(
       await removeWallet(tabId, publicDeriverId, localStorageApi);
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
-    await syncWallet(selectedWallet, localStorageApi);
+    if (shouldSyncWallet) {
+      await syncWallet(selectedWallet, localStorageApi);
+    }
 
     // we need to make sure this runs within the withDb call
     // since the publicDeriver contains a DB reference inside it
@@ -1204,14 +1208,23 @@ function handleInjectorConnect(port) {
                       const tx = RustModule.WalletV4.Transaction.from_bytes(
                         Buffer.from(message.params[0], 'hex'),
                       );
+                      /* fixme
                       await connectorSendTxCardano(
                         wallet,
                         tx.to_bytes(),
                         localStorageApi,
                       );
+                      */
                       id = Buffer.from(
                         RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
                       ).toString('hex');
+                      try {
+                        await connectorRecordSubmittedCardanoTransaction(
+                          wallet,
+                          tx,
+                        );
+                      } catch {
+                      }
                     } else { // is Ergo
                       const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
                       id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
@@ -1222,6 +1235,7 @@ function handleInjectorConnect(port) {
                   },
                   db,
                   localStorageApi,
+                  false,
                 )
               });
             } catch (e) {

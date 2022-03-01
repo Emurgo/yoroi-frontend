@@ -58,6 +58,15 @@ import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils
 import AdaApi from '../../../app/api/ada';
 import type CardanoTxRequest from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
+import { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import { multiTokenFromCardanoValue } from '../../../app/api/ada/transactions/utils';
+import {
+  TxStatusCodes,
+} from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import {
+  loadSubmittedTransactions,
+  persistSubmittedTransactions,
+} from '../../../app/api/localStorage';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -820,6 +829,109 @@ export async function connectorSendTxCardano(
       ?? `Failed to submit transaction: ${String(error)}`;
     throw new ConnectorError({ code, info });
   });
+}
+
+export async function connectorRecordSubmittedCardanoTransaction(
+  publicDeriver: PublicDeriver<>,
+  tx: RustModule.WalletV4.Transaction,
+) {
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (!withUtxos) {
+    throw new Error('expect to be able to get all UTXOs');
+  }
+  const allAddresses = new Set(
+    (await withUtxos.getAllUtxoAddresses())
+      .flatMap(utxoAddr => utxoAddr.addrs.map(addr => addr.Hash))
+  );
+  const utxos = asAddressedUtxoCardano(
+    await withUtxos.getAllUtxos()
+  );
+
+  const txId = Buffer.from(
+    RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
+  ).toString('hex');
+  const defaultToken = publicDeriver.getParent().defaultToken;
+  const defaults = {
+    defaultNetworkId: defaultToken.NetworkId,
+    defaultIdentifier: defaultToken.Identifier
+  };
+
+  const amount = new MultiToken([], defaults);
+  const fee = new MultiToken([], defaults);
+  const addresses = { from: [], to: [] };
+  let isIntraWallet = true;
+  const txBody = tx.body();
+  const txInputs = txBody.inputs();
+  for (let i = 0; i < txInputs.len(); i++) {
+    const input = txInputs.get(i);
+    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    const index = input.index();
+    const utxo = utxos.find(
+      utxo => utxo.tx_hash === txHash && utxo.tx_index === index
+    );
+    //fixme, update allAddresses
+    if (!utxo) {
+      throw new Error('failed to get UTXO info');
+    }
+
+    const value = new MultiToken([], defaults);
+
+    value.add({
+      amount: new BigNumber(utxo.amount),
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    for (const asset of utxo.assets) {
+      value.add({
+        amount: new BigNumber(asset.amount),
+        identifier: asset.assetId,
+        networkId: defaultToken.NetworkId,
+      });
+    }
+    addresses.from.push({
+      address: utxo.receiver,
+      value,
+    });
+    if (allAddresses.has(utxo.receiver)) {
+      amount.joinSubtractMutable(value);
+    }
+    fee.joinAddMutable(value);
+  }
+  const txOutputs = txBody.outputs();
+  for (let i = 0; i < txOutputs.len(); i++) {
+    const output = txOutputs.get(i);
+    const value = multiTokenFromCardanoValue(output.amount(), defaults);
+    const address = Buffer.from(output.address().to_bytes()).toString('hex');
+    addresses.to.push({
+      address,
+      value,
+    });
+    if (allAddresses.has(address)) {
+      amount.joinAddMutable(value);
+    } else {
+      isIntraWallet = false;
+    }
+    fee.joinSubtractMutable(value);
+  }
+
+  const submittedTx = {
+    txid: txId,
+    type: isIntraWallet ? 'self' : 'expend',
+    amount,
+    fee,
+    date: new Date,
+    addresses,
+    state: TxStatusCodes.SUBMITTED,
+    errorMsg: null,
+    block: null,
+  };
+
+  const submittedTxs = loadSubmittedTransactions() || [];
+  submittedTxs.push({
+    publicDeriverId: publicDeriver.publicDeriverId,
+    transaction: submittedTx,
+  });
+  persistSubmittedTransactions(submittedTxs);
 }
 
 // TODO: generic data sign

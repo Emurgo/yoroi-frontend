@@ -53,6 +53,10 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
 import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
+import {
+  persistSubmittedTransactions,
+  loadSubmittedTransactions
+} from '../../api/localStorage';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -108,7 +112,6 @@ function newMultiToken(
   return new MultiToken(values, defaultTokenInfo)
 }
 
-const SUBMITTED_TRANSACTIONS_KEY = 'submittedTransactions';
 const TRANSACTION_LIST_COMPUTATION_BATCH_SIZE = 60;
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
@@ -814,20 +817,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   _persistSubmittedTransactions: () => void = () => {
-    localStorage.setItem(
-      SUBMITTED_TRANSACTIONS_KEY,
-      JSON.stringify(this._submittedTransactions)
-    );
+    persistSubmittedTransactions(this._submittedTransactions);
   }
 
   _loadSubmittedTransactions: () => void = () => {
     try {
-      const dataStr = localStorage.getItem(SUBMITTED_TRANSACTIONS_KEY);
-      if (dataStr == null) {
+      const data = loadSubmittedTransactions();
+      if (!data) {
         return;
       }
-      const data = JSON.parse(dataStr);
-
       const txs = data.map(({ publicDeriverId, transaction }) => {
         if (transaction.block) {
           throw new Error('submitted transaction should not have block data');
