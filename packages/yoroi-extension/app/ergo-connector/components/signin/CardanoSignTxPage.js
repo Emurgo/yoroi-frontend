@@ -86,27 +86,25 @@ const messages = defineMessages({
   },
 });
 
+type State = {|
+  showUtxoDetails: boolean,
+  isSubmitting: boolean,
+|}
+
 @observer
-class SignTxPage extends Component<Props> {
+class SignTxPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
+  state: State = {
+    showUtxoDetails: false,
+    isSubmitting: false,
+  }
+
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        showUtxoDetails: {
-          type: 'boolean',
-          value: false,
-        },
-        isSubmitting: {
-          type: 'boolean',
-          value: false,
-        },
-        currentWindowHeight: {
-          type: 'integer',
-          value: window.innerHeight
-        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -137,15 +135,11 @@ class SignTxPage extends Component<Props> {
     }
   );
 
-  componentDidMount() {
-    window.onresize = () => this.form.$('currentWindowHeight').set(window.innerHeight);
-  }
-
   submit(): void {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.form.$('isSubmitting').set(true);
+        this.setState({ isSubmitting: true })
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
@@ -154,15 +148,15 @@ class SignTxPage extends Component<Props> {
           } else {
             throw error;
           }
+          this.setState({ isSubmitting: false })
         });
-        this.form.$('isSubmitting').set(false);
       },
       onError: () => {},
     });
   }
 
   toggleUtxoDetails: boolean => void = (newState) => {
-    this.form.$('showUtxoDetails').set(newState);
+    this.setState({ showUtxoDetails: newState })
   }
 
   getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
@@ -338,19 +332,16 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHeight, isSubmitting } = form.values();
+    const { isSubmitting } = this.state;
+    const { showUtxoDetails } = this.state
 
     return (
-      <>
+      <div className={styles.component}>
         <ProgressBar step={2} />
-        <div
-          style={{
-            height: currentWindowHeight + 'px',
-          }}
-        >
+        <div>
           {
             !showUtxoDetails ?(
-              <div className={styles.component}>
+              <div className={styles.signTx}>
                 <div>
                   <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
                 </div>
@@ -457,7 +448,7 @@ class SignTxPage extends Component<Props> {
             )
           }
         </div>
-      </>
+      </div>
     );
   }
 }

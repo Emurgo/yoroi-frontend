@@ -78,6 +78,7 @@ type Props = {|
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
   +isAppAuth: boolean,
+  +hidePasswordForm: void => void,
   +onConnect: (
     deriver: PublicDeriver<>,
     checksum: ?WalletChecksum,
@@ -134,6 +135,11 @@ class ConnectPage extends Component<Props> {
       },
     }
   );
+
+  hidePasswordForm: void => void = () => {
+    this.form.$('walletPassword').clear()
+    this.props.hidePasswordForm()
+  }
 
   submit: void => void = () => {
     this.form.submit({
@@ -220,7 +226,7 @@ class ConnectPage extends Component<Props> {
             variant="h4"
             align='center'
             color="var(--yoroi-palette-gray-900)"
-            marginBottom="20px"
+            marginBottom="40px"
             paddingLeft="32px"
             fontWeight="400"
           >
@@ -232,9 +238,9 @@ class ConnectPage extends Component<Props> {
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt={16}>
-          <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
-            {intl.formatMessage(globalMessages.cancel)}
+        <Stack direction="row" spacing={2} mt="15px">
+          <Button fullWidth variant="secondary" onClick={this.hidePasswordForm} sx={{ minWidth: 'auto' }}>
+            {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
           <Button
             variant="primary"
@@ -260,6 +266,7 @@ class ConnectPage extends Component<Props> {
               marginTop="20px"
               paddingLeft="32px"
               fontWeight="400"
+              className={styles.pageTitle}
             >
               {intl.formatMessage(messages.connectWallet)}
             </Typography>

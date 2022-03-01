@@ -11,7 +11,7 @@ import type {
   Value,
   CardanoTx, AccountBalance,
 } from './types';
-import { ConnectorError } from './types';
+import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   IGetAllUtxosResponse,
@@ -813,8 +813,12 @@ export async function connectorSendTxCardano(
     }
   ).then(_response => {
     return Promise.resolve();
-  }).catch((_error) => {
-    throw new SendTransactionApiError();
+  }).catch((error) => {
+    const code = error.response?.status === 400
+      ? TxSendErrorCodes.REFUSED : TxSendErrorCodes.FAILURE;
+    const info = error.response?.data
+      ?? `Failed to submit transaction: ${String(error)}`;
+    throw new ConnectorError({ code, info });
   });
 }
 

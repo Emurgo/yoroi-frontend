@@ -7,7 +7,7 @@ production-key.pem
 
 build/
 dev/
-screenshots/
+testRunsData/
 storybook-static/
 __screenshots__/
 coverage/
