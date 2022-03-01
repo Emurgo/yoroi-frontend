@@ -31,6 +31,8 @@ function encode(file) {
  */
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
+const defaultWaitTimeout = 10 * 1000;
+const defaultRepeatPeriod = 1000;
 
 function getBraveBuilder() {
   return new Builder().forBrowser('chrome').setChromeOptions(
@@ -262,6 +264,20 @@ function CustomWorld(cmdInput: WorldInput) {
         promise.rejected(err); // some other error
       }
     );
+  };
+
+  this.customWaiter = async (
+    condition,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) => {
+    const endTime = Date.now() + timeout;
+
+    while(endTime >= Date.now()){
+      if (condition()) return true;
+      await this.driver.sleep(repeatPeriod);
+    }
+    return false;
   };
 }
 
