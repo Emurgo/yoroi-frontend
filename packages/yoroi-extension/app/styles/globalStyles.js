@@ -3,6 +3,75 @@
 import type { Node } from 'react';
 import { GlobalStyles } from '@mui/material';
 
+const getColorPath = (
+  themePalette: any,
+  color: string,
+  ) => {
+
+    const path = []
+    for (const entery of Object.entries(themePalette)) {
+      const [key, value] = entery
+      if (typeof value === 'object') {
+        //$FlowFixMe
+        for (const valueEntery of Object.entries(value)) {
+          if (valueEntery[1] === color) {
+            path.push(key, valueEntery[0])
+            break
+          }
+        }
+      }
+
+      if (path.length !== 0) break
+    }
+    return path
+}
+
+export type DesignToken = {|
+  parent: string,
+  child: string,
+  hex: string,
+  path: string[],
+|}
+
+type NameToHex = {|
+  name: string,
+  hex: string,
+|}
+
+type FormatedPalette = {|
+  designTokens: DesignToken[],
+  nameToHex: NameToHex[],
+|}
+
+export const formatPalette = (palette: any, theme: any): FormatedPalette => {
+  const formatedPalette: FormatedPalette = {
+    nameToHex: [],
+    designTokens: []
+  }
+
+
+  for (const name of Object.keys(palette)) {
+
+    if(typeof palette[name] === 'string' && palette[name].startsWith('var')) {
+      const secondColorName = palette[name].slice(4, -1)
+      const secondColorHex = palette[secondColorName]
+      const path = getColorPath(theme.palette, secondColorHex)
+      formatedPalette.designTokens.push({
+        parent: name,
+        child: secondColorName,
+        hex: secondColorHex,
+        path
+      })
+    } else {
+      formatedPalette.nameToHex.push({
+        name, hex: palette[name]
+      })
+    }
+  }
+
+  return formatedPalette
+}
+
 export function getMainYoroiPalette(theme: Object): { [string]: string|number } {
   return {
     /*

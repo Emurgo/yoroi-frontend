@@ -918,6 +918,14 @@ export const connectorMessages: * = defineMessages({
     id: 'connector.settings.about',
     defaultMessage: '!!!About',
   },
+  signTransaction: {
+    id: 'connector.settings.signTransaction',
+    defaultMessage: '!!!Sign transaction'
+  },
+  connect: {
+    id: 'connector.settings.connect',
+    defaultMessage: '!!!Connect'
+  },
   dappConnector: {
     id: 'connector.appName',
     defaultMessage: 'Dapp Connector',

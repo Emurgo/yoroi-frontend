@@ -123,7 +123,7 @@ After(async function (scenario) {
     await getConsoleLogs(this.driver, 'failedStep');
   }
   await this.driver.quit();
-});
+}); 
 
 const writeFile = promisify(fs.writeFile);
 

@@ -13,11 +13,12 @@ type TransferSourceType = Array<{|
   amount: string | number,
 |}>;
 
-type WithdrawSourceType = {
+type WithdrawSourceType = {|
   fromAddress: string,
   reward: string | number,
   fees: string | number,
-};
+  recoveredBalance: string | number,
+|};
 
 function stripZerosFromEnd(inputNumber: string) {
   const inputLength = inputNumber.length;
@@ -93,7 +94,6 @@ export async function checkFinalBalanceIsCorrect(
   );
 
   const network = networks.CardanoMainnet;
-
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
   const ticker = getTokenName(assetInfo);
   const finalBalance = `${finalAmount} ${ticker}`;

@@ -61,7 +61,7 @@ export default class WalletSyncingOverlay extends Component<Props> {
               {intl.formatMessage(messages.title)}
             </div>
             <div className={styles.text}>
-             {intl.formatMessage(messages.explanation)}
+              {intl.formatMessage(messages.explanation)}
             </div>
             <div className={styles.spinnerSection}>
               <LoadingSpinner />
