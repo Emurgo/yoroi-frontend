@@ -5,6 +5,7 @@ import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
+import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -15,13 +16,20 @@ class Module {
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;
   _ergo: SigmaRust;
+  _messageSigning: WasmMessageSigning;
 
   async load(): Promise<void> {
-    if (this._wasmv2 != null || this._wasmv3 != null || this._wasmv4 != null) return;
+    if (
+      this._wasmv2 != null
+        || this._wasmv3 != null
+        || this._wasmv4 != null
+        || this._messageSigning != null
+    ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv3 = await import('@emurgo/js-chain-libs/js_chain_libs');
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
     this._ergo = await import('ergo-lib-wasm-browser');
+    this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
@@ -97,6 +105,9 @@ class Module {
   // Need to expose through a getter to get Flow to detect the type correctly
   get SigmaRust(): SigmaRust {
     return this._ergo;
+  }
+  get MessageSigning(): WasmMessageSigning {
+    return this._messageSigning;
   }
 }
 

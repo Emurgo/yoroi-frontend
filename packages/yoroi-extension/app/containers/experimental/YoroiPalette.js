@@ -54,7 +54,6 @@ class YoroiPaletteContainer extends Component<AllProps> {
     );
   }
 
-
   @computed get generated (): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
