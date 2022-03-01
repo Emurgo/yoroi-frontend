@@ -25,7 +25,7 @@ import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
-import { selectSubmenuSettings, getComplexityLevelButton } from "./general-settings-steps";
+import { selectSubmenuSettings, getComplexityLevelButton } from './general-settings-steps';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -207,10 +207,10 @@ async function inputMnemonicForWallet(
 }
 
 export async function checkErrorByTranslationId(
-  client,
-  errorSelector,
-  errorObject,
-  method = By.css
+  client: Object,
+  errorSelector: string,
+  errorObject: Object,
+  method:any = By.css
 ) {
   await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000, method);
 }

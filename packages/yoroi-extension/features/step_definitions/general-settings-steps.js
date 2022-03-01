@@ -4,20 +4,25 @@ import { When, Then } from 'cucumber';
 import { camelCase } from 'lodash';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
-import { By } from 'selenium-webdriver';
+import { By, WebElement } from 'selenium-webdriver';
 
-export async function selectSubmenuSettings(customWorld: Object, buttonName: string){
+export async function selectSubmenuSettings(customWorld: Object, buttonName: string) {
   const formattedButtonName = camelCase(buttonName);
   const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
   await customWorld.click(buttonSelector);
-  await customWorld.waitForElement(`.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`);
+  await customWorld.waitForElement(
+    `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`
+  );
 }
 
-export async function getComplexityLevelButton(customWorld: Object, isLow: boolean = true){
+export async function getComplexityLevelButton(
+  customWorld: Object,
+  isLow: boolean = true
+): Promise<WebElement> {
   await customWorld.waitForElement('.ComplexityLevelForm_cardsWrapper');
   const levels = await customWorld.driver.findElements(By.css('.ComplexityLevelForm_card'));
   let card;
-  if (isLow){
+  if (isLow) {
     card = levels[0];
   } else {
     card = levels[levels.length - 1];
