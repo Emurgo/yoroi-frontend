@@ -45,7 +45,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 import { Logger } from '../../utils/logging';
-import { asAddressedUtxo, } from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   connectorGetUsedAddresses,
@@ -53,6 +53,7 @@ import {
   connectorGetChangeAddress,
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -309,7 +310,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
     }
     try {
-      const wallets = await getWallets({ db: persistentDb });
+      const wallets = (await getWallets({ db: persistentDb }))
+        .filter(w => w.getParent().getWalletType() === WalletTypeOption.WEB_WALLET);
 
       const protocol = this.protocol;
       const isProtocolErgo = protocol === 'ergo';
@@ -418,7 +420,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/* , partialSign */ } = signingMessage.sign.tx.tx;
+    const { tx/* , partialSign */ } = signingMessage.sign.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
@@ -472,14 +474,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       if (utxo) {
         inputs.push({
           address: utxo.receiver,
-          value: new MultiToken(
-            [{
-              amount: new BigNumber(utxo.amount),
-              identifier: defaultToken.Identifier,
-              networkId: defaultToken.NetworkId
-            }],
-            selectedWallet.publicDeriver.getParent().getDefaultToken()
-          ),
+          value: multiTokenFromRemote(utxo, defaultToken.NetworkId),
         });
       } else {
         foreignInputs.push({ txHash, txIndex })
@@ -489,21 +484,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const outputs = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
-      const amount = output.amount().coin().to_str();
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       outputs.push(
         {
           address,
-          value: new MultiToken(
-            [
-              {
-                amount: new BigNumber(amount),
-                identifier: defaultToken.Identifier,
-                networkId: defaultToken.NetworkId
-              }
-            ],
-            selectedWallet.publicDeriver.getParent().getDefaultToken()
-          )
+          value: multiTokenFromCardanoValue(
+            output.amount(),
+            selectedWallet.publicDeriver.getParent().getDefaultToken(),
+          ),
         }
       );
     }

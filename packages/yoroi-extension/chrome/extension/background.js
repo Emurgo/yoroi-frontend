@@ -47,11 +47,15 @@ import {
   connectorSignCardanoTx,
   connectorSignTx
 } from './ergo-connector/api';
-import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
-import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
-import { RemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
-import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import type { IFetcher as ErgoIFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
+import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
+import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
+import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
+import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
@@ -61,7 +65,6 @@ import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import type CardanoTxRequest from '../../app/api/ada';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 
@@ -225,12 +228,12 @@ async function withDb<T>(
   });
 }
 
-
-async function getStateFetcher(
+async function createFetcher(
+  fetcherType: Function,
   localStorageApi: LocalStorageApi,
-): Promise<IFetcher> {
+): * {
   const locale = await localStorageApi.getUserLocale() ?? 'en-US';
-  return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
+  return new fetcherType(
     () => environment.getVersion(),
     () => locale,
     () => {
@@ -242,53 +245,81 @@ async function getStateFetcher(
       }
       return '-';
     },
-  )));
+  )
+}
+
+async function getErgoStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<ErgoIFetcher> {
+  return new ErgoBatchedFetcher(await createFetcher(ErgoRemoteFetcher, localStorageApi));
+}
+
+async function getCardanoStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<CardanoIFetcher> {
+  return new CardanoBatchedFetcher(await createFetcher(CardanoRemoteFetcher, localStorageApi));
 }
 
 // This is a temporary workaround to DB duplicate key constraint violations
 // that is happening when multiple DBs are loaded at the same time, or possibly
 // this one being loaded while Yoroi's main App is doing DB operations.
 // Promise<void>
-let syncing: ?Promise<void> = null;
+let syncing: ?boolean = null;
 async function syncWallet(
   wallet: PublicDeriver<>,
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
+  const isCardano = isCardanoHaskell(wallet.getParent().getNetworkInfo());
   try {
     const lastSync = await wallet.getLastSyncInfo();
     // don't sync more than every 30 seconds
     const now = Date.now();
     if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
       if (syncing == null) {
-        syncing = RustModule.load()
-          .then(() => {
-            Logger.debug('sync started');
-            return getStateFetcher(localStorageApi)
-          })
-          .then(stateFetcher => updateTransactions(
+        syncing = true;
+        await RustModule.load();
+        Logger.debug('sync started');
+        if (isCardano) {
+          const stateFetcher: CardanoIFetcher =
+            await getCardanoStateFetcher(localStorageApi);
+          await cardanoUpdateTransactions(
+            wallet.getDb(),
+            wallet,
+            stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
+            stateFetcher.getBestBlock,
+            stateFetcher.getTokenInfo,
+            stateFetcher.getMultiAssetMintMetadata,
+          )
+        } else {
+          const stateFetcher: ErgoIFetcher =
+            await getErgoStateFetcher(localStorageApi);
+          await ergoUpdateTransactions(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
             stateFetcher.getTransactionsHistoryForAddresses,
             stateFetcher.getAssetInfo,
-            stateFetcher.getBestBlock))
-          .then(() => {
-            // to be safe we filter possibly accepted txs for up to 10 minutes
-            // this could be accepted in a variable amount of time due to Ergo's PoW
-            // but this is probably an okay amount. If it was not accepted then at worst
-            // the values are just temporarily withheld for a few minutes too long,
-            // and if it was accepted, then none of the UTXOs held would have been
-            // reuseable anyway.
-            pendingTxs = pendingTxs.filter(
-              pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
-            Logger.debug('sync ended');
-            return Promise.resolve();
-          });
+            stateFetcher.getBestBlock
+          );
+        }
+        if (!isCardano) {
+          // to be safe we filter possibly accepted txs for up to 10 minutes
+          // this could be accepted in a variable amount of time due to Ergo's PoW
+          // but this is probably an okay amount. If it was not accepted then at worst
+          // the values are just temporarily withheld for a few minutes too long,
+          // and if it was accepted, then none of the UTXOs held would have been
+          // reuseable anyway.
+          pendingTxs = pendingTxs.filter(
+            pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10 * 60 * 1000);
+        }
+        Logger.debug('sync ended');
       }
-      syncing = await syncing;
     }
   } catch (e) {
     Logger.error(`Syncing failed: ${e}`);
+  } finally {
+    syncing = null;
   }
 }
 
@@ -364,8 +395,8 @@ const yoroiMessageHandler = async (
           const network = wallet.getParent().getNetworkInfo();
           const [utxos, bestBlock] = await Promise.all([
             canGetAllUtxos.getAllUtxos(),
-            getStateFetcher(localStorageApi)
-              .then(f => f.getBestBlock({ network })),
+            getErgoStateFetcher(localStorageApi)
+              .then((f: ErgoIFetcher) => f.getBestBlock({ network })),
           ])
           return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
@@ -384,26 +415,6 @@ const yoroiMessageHandler = async (
         tabId,
         async (wallet) => {
           return await connectorSignCardanoTx(
-            wallet,
-            password,
-            tx,
-          );
-        },
-        db,
-        localStorageApi
-      );
-    });
-  }
-  async function createCardanoTx(
-    tx: CardanoTxRequest,
-    password: string,
-    tabId: number
-  ): Promise<string> {
-    return await withDb(async (db, localStorageApi) => {
-      return await withSelectedWallet(
-        tabId,
-        async (wallet) => {
-          return await connectorCreateCardanoTx(
             wallet,
             password,
             tx,
@@ -443,49 +454,51 @@ const yoroiMessageHandler = async (
       switch (responseData.request.type) {
         case 'tx':
           {
-            // We know `tx` is a `Tx` here
-            const txToSign: Tx = (request.tx: any);
-            const allIndices = [];
-            for (let i = 0; i < txToSign.inputs.length; i += 1) {
-              allIndices.push(i);
+            try {
+              // We know `tx` is a `Tx` here
+              const txToSign: Tx = (request.tx: any);
+              const allIndices = [];
+              for (let i = 0; i < txToSign.inputs.length; i += 1) {
+                allIndices.push(i);
+              }
+              const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
+              responseData.resolve({ ok: signedTx });
+            } catch (error) {
+              responseData.resolve({ err: 'transaction signing failed' })
             }
-            const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
-            responseData.resolve({ ok: signedTx });
           }
           break;
         case 'tx_input':
           {
-            const data = responseData.request;
-            const txToSign: Tx = (request.tx: any);
-            const signedTx = await signTxInputs(
-              txToSign,
-              [data.index],
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx.inputs[data.index] });
+            try {
+              const data = responseData.request;
+              const txToSign: Tx = (request.tx: any);
+              const signedTx = await signTxInputs(
+                txToSign,
+                [data.index],
+                password,
+                request.tabId
+              );
+              responseData.resolve({ ok: signedTx.inputs[data.index] });
+            } catch (error) {
+              responseData.resolve({ err: 'transaction signing failed' })
+            }
           }
           break;
         case 'tx/cardano':
           {
-            const signedTx = await signCardanoTx(
-              // $FlowFixMe[prop-missing]
-              // $FlowFixMe[incompatible-cast]
-              (request.tx.tx: CardanoTx),
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx });
-          }
-        break;
-        case 'tx-create-req/cardano':
-          {
-            const signedTx = await createCardanoTx(
-              (request.tx: any),
-              password,
-              request.tabId
-            );
-            responseData.resolve({ ok: signedTx });
+            try {
+              const signedTx = await signCardanoTx(
+                // $FlowFixMe[prop-missing]
+                // $FlowFixMe[incompatible-exact]
+                (request.tx: CardanoTx),
+                password,
+                request.tabId
+              );
+              responseData.resolve({ ok: signedTx });
+            } catch (error) {
+              responseData.resolve({ err: 'transaction signing failed' })
+            }
           }
         break;
         case 'data':
@@ -610,7 +623,7 @@ async function confirmSign(
     });
       chrome.windows.create({
         ...popupProps,
-      url: chrome.extension.getURL(`/main_window_ergo.html#/signin-transaction`),
+      url: chrome.extension.getURL(`/main_window_connector.html#/signin-transaction`),
       left: (bounds.width + bounds.positionX) - popupProps.width,
       top: bounds.positionY + 80,
     });
@@ -626,7 +639,6 @@ async function findWhitelistedConnection(
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
   const whitelist = await localStorageApi.getWhitelist() ?? [];
-  Logger.debug(`whitelist: ${JSON.stringify(whitelist)}`);
   return whitelist.find((entry: WhitelistEntry) => {
     // Whitelist is only matching if same auth or auth is not requested
     const matchingUrl = entry.url === url;
@@ -697,7 +709,7 @@ async function confirmConnect(
       });
       chrome.windows.create({
         ...popupProps,
-        url: chrome.extension.getURL('main_window_ergo.html'),
+        url: chrome.extension.getURL('main_window_connector.html'),
         left: (bounds.width + bounds.positionX) - popupProps.width,
         top: bounds.positionY + 80,
       });
@@ -716,7 +728,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
         const bounds = getBoundsForWindow(currentWindow);
         chrome.windows.create({
           ...popupProps,
-          url: chrome.extension.getURL(`/main_window_ergo.html#/settings`),
+          url: chrome.extension.getURL(`/main_window_connector.html#/settings`),
           left: (bounds.width + bounds.positionX) - popupProps.width,
           top: bounds.positionY + 80,
         });
@@ -914,18 +926,25 @@ function handleInjectorConnect(port) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
+                const { tx, partialSign, returnTx } = message.params[0];
                 const resp = await confirmSign(tabId,
                   {
                     type: 'tx/cardano',
-                    tx: {
-                      tx: message.params[0],
-                      partialSign: message.params[1],
-                    },
+                    tx: { tx, partialSign },
                     uid: message.uid
                   },
                   connection
                 );
-                rpcResponse(resp);
+                if (!returnTx && resp?.ok != null) {
+                  const witnessSetResp = Buffer.from(
+                    RustModule.WalletV4.Transaction.from_bytes(
+                      Buffer.from(resp.ok, 'hex'),
+                    ).witness_set().to_bytes()
+                  ).toString('hex');
+                  rpcResponse({ ok: witnessSetResp });
+                } else {
+                  rpcResponse(resp);
+                }
               }
             } catch (e) {
               handleError(e);
@@ -1223,15 +1242,22 @@ function handleInjectorConnect(port) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx-create-req/cardano',
-                    tx: message.params[0],
-                    uid: message.uid
-                  },
-                  connection
-                );
-                rpcResponse(resp);
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const resp = await connectorCreateCardanoTx(
+                        wallet,
+                        null,
+                        message.params[0],
+                      );
+                      rpcResponse({
+                        ok: resp,
+                      });
+                    },
+                    db,
+                    localStorageApi
+                  );
+                });
               }
             } catch (e) {
               handleError(e);
@@ -1244,15 +1270,21 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet, connection) => {
-                    await RustModule.load();
-                    const signatureHex = await authSignHexPayload({
-                      appAuthID: connection?.appAuthID,
-                      deriver: wallet,
-                      payloadHex: message.params[0],
-                    });
-                    rpcResponse({
-                      ok: signatureHex
-                    });
+                    const auth = connection?.status?.auth;
+                    if (auth) {
+                      await RustModule.load();
+                      const signatureHex = await authSignHexPayload({
+                        privKey: auth.privkey,
+                        payloadHex: message.params[0],
+                      });
+                      rpcResponse({
+                        ok: signatureHex
+                      });
+                    } else {
+                      rpcResponse({
+                        err: 'auth_sign_hex_payload is requested but no auth is present in the connection!',
+                      });
+                    }
                   },
                   db,
                   localStorageApi,

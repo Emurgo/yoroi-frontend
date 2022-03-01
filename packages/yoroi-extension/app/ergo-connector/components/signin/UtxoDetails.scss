@@ -6,6 +6,7 @@
   overflow-y: scroll;
   width: 100%;
   height: 100%;
+  min-width: 450px;
   padding-bottom: 100px;
 }
 
@@ -86,5 +87,16 @@
 
   .addressItem {
     grid-template-columns: 250px 1fr 10px;
+  }
+}
+
+@media (min-width: 678px) {
+  .component {
+    max-width: 600px;
+    margin: auto;
+
+    .back {
+      margin-top: 30px;
+    }
   }
 }
