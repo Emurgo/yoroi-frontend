@@ -2,7 +2,7 @@
 
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
-import { truncateLongName, } from '../../app/utils/formatters';
+import { truncateLongName } from '../../app/utils/formatters';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
   await this.input("input[name='walletName']", walletName);
@@ -22,7 +22,7 @@ Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (wal
 });
 
 Then(/^I unselect the wallet$/, async function () {
-  await this.click(`//div[@class='TopBarLayout_navbar']//button[@class='NavBarBack_backButton']`, By.xpath);
+  await this.click('.NavBar_navbar .NavBar_title .NavBarBack_backButton');
 });
 
 When(/^I am on the my wallets screen$/, async function () {

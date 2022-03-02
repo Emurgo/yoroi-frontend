@@ -12,7 +12,7 @@ When(/^I click on "generate payment URL" button$/, async function () {
 
 Then(/^I generate a URI for ([0-9]+) ADA$/, async function (amount) {
   await this.input("input[name='amount']", amount);
-  await this.click('.URIGenerateDialog .primary');
+  await this.click('.URIGenerateDialog_component .MuiButton-primary');
 });
 
 Then(/^I should see the URI displayed in a new dialog$/, async function () {
@@ -33,7 +33,7 @@ When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async func
 
 Then(/^I should see and accept a warning dialog$/, async function () {
   await this.waitForElement('.URILandingDialog');
-  await this.click('.URILandingDialog .primary');
+  await this.click('.URILandingDialog .MuiButton-primary');
 });
 
 Then(/^I should see a dialog with the transaction details$/, async function (table) {

@@ -18,9 +18,10 @@ Feature: Wallet UI Settings
     And I should see the following error messages:
     | message                             |
     | global.errors.invalidWalletPassword |
-  Examples:
-  | currentPassword | password    | repeatedPassword | |
-  | asdfasdfasdf      | Secre1      | Secre1           | too short                 |
+
+    Examples:
+    | currentPassword | password    | repeatedPassword |
+    | asdfasdfasdf    | Secre1      | Secre1           |
 
   @it-94
   Scenario Outline: User is able to change spending password (IT-94)
@@ -52,9 +53,9 @@ Feature: Wallet UI Settings
     And I click the transaction page button
     Then I should see the summary screen
 
-        Examples:
-      | amount              | fee       | |
-      | 1.000000            | 0.168801  | # Sent tx to a valid adress|
+    Examples:
+    | amount              | fee       |
+    | 1.000000            | 0.168801  |
   
   @it-91
   Scenario Outline: Password should be case-sensitive [Wallet password changing] (IT-91)
@@ -90,13 +91,13 @@ Feature: Wallet UI Settings
     And I navigate to wallet sidebar category
     Then I should see new wallet name "<walletName>"
     Examples:
-    | walletName                               |                    |
-    | first Edited                             |2 words name        | 
-    |ウォレットの追加                             |Japanese            |
-    |지갑 추가                                 | Korean             |
-    |НАСТРОЙКИ                                 | Russian            |
-    | a                                        |1-characters length |
-    | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwer |40 characters length|
+    | walletName                               |                      |
+    | first Edited                             | 2 words name         |
+    |ウォレットの追加                             | Japanese             |
+    |지갑 추가                                   | Korean               |
+    |НАСТРОЙКИ                                 | Russian              |
+    | a                                        | 1-characters length  |
+    | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwer | 40 characters length |
 
   @it-41
   Scenario Outline: Wallet can't be renamed if new wallet name doesn't meet requirements (IT-41)
@@ -111,6 +112,7 @@ Feature: Wallet UI Settings
     Then I should see "Wallet name requires at least 1 and at most 40 letters." error message:
     | message                             |
     | global.errors.invalidWalletName     |
+
     Examples:
     | walletName                                | |
     | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwerd |41 characters length |
@@ -127,7 +129,7 @@ Feature: Wallet UI Settings
     | asdfasdfasdf         | newSecret123 | newSecret123     |
     And I clear the current wallet password asdfasdfasdf
     And I submit the wallet password dialog
-    Then I should stay in the change password dialog
+    Then I should see "Incorrect wallet password." error message
 
   @it-40
   Scenario: User can't change password without filling Password repeat field (IT-40)

@@ -43,6 +43,11 @@ type WalletInfo = {|
   |},
 |};
 
+const CardanoTxSigningMode = Object.freeze({
+  ORDINARY_TRANSACTION: 'ordinary_transaction',
+  POOL_REGISTRATION_AS_OWNER: 'pool_registration_as_owner',
+  MULTISIG_TRANSACTION: 'multisig_transaction',
+});
 const mockVersion = {
   major_version: 2,
   minor_version: 3,
@@ -180,7 +185,7 @@ class MockTrezorConnect {
 
   static setSelectedWallet: string => Promise<void> = async (deviceId) => {
     MockTrezorConnect.selectedWallet = await genWalletInfo(deviceId);
-  }
+  };
 
   static cardanoGetAddress: $PropertyType<API, 'cardanoGetAddress'> = async (params) => {
     MockTrezorConnect.mockConnectDevice();
@@ -315,7 +320,7 @@ class MockTrezorConnect {
         witnessesToReturn.push({
           type: 0,
           pubKey,
-          signature: asString,
+          signature: Buffer.from(sig.to_bytes()).toString('hex'),
           chainCode: Buffer.from(key.chaincode()).toString('hex'),
         });
         return;
@@ -332,7 +337,7 @@ class MockTrezorConnect {
       witnessesToReturn.push({
         type: 1,
         pubKey,
-        signature: witAsStr,
+        signature: Buffer.from(sig.to_bytes()).toString('hex'),
       });
     };
 
@@ -478,6 +483,7 @@ class MockTrezorConnect {
 
   static init: $PropertyType<API, 'init'> = async (_settings) => {
   }
+
   static dispose: $PropertyType<API, 'dispose'> = (): void => {
   }
 
@@ -566,4 +572,4 @@ class MockTrezorConnect {
 
 export default MockTrezorConnect;
 
-export { UI_EVENT, DEVICE_EVENT, };
+export { UI_EVENT, DEVICE_EVENT, CardanoTxSigningMode, };

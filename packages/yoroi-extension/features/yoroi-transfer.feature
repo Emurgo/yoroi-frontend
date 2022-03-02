@@ -38,9 +38,9 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate EDAO-9229
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |   
-    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfib8AIaAAKKnQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEDAuojJWVNYQ6FC1IlHrP2WunBGRikOrUxIeyTbobos/wUiR2CQNaOAbnqeGMTQpp+41FA7+JApvvIwS5t6eOsFWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9g=="
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567.898765   | 0.166601 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfibxAIaAAKKyQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEA97UHd+arHPWEd8xAv3ZQtmkL58YcVrg8ekQLoEMX3MO8CrtVCwWYUgfLSgaqja9/dLnvPy0zghsbnrVszs+QCWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9fY="
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
     
@@ -63,24 +63,24 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate ZKTZ-4614
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount |   
-    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4      |
-    | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj | 1      |
-    | Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3 | 820000 |
-    | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD | 820000 |
-    | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w | 820000 |
-    | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd | 650000 |
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 3.110005         | 0.209237 |
+    | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
+    | Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3 |                  |          |
+    | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
+    | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
+    | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd |                  |          |
     Then A successful tx gets sent from my wallet from another client
     When I confirm Yoroi transfer funds
     Then I should see wallet changed notice
     And I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |
-    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4      |
-    | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj | 1      |
-    | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD | 820000 |
-    | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w | 820000 |
-    | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd | 650000 |
-    Given The expected transaction is "g6QAiIJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAH93oAhoAAxNtAxoR/pTNoQKFhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQFrUhsiUMcRyhw6Uf/XRqPjhixUrVz92rwhXZHZSL5M4G/fgFzBOJLALQhRFFDkPr2Pdp0N1Oj666bs1wDg+4ARYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hAX1ZN6WNFs3O5VtOekVCE06XVhz718ICbIDvlSbk5pDEaMw9H0PFG3FtoS0DMo+sneAOPmYEaj/SrbpRqOsbrAlggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEAzoliU3eXhzZ2azuzPRtQ7zsxOvP4Wq8L272TXHVUkh1Hu/cJiPnvnUqBql5Q4Lj63dBCKKMNWVIBJgyJ8dwMFWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQESoTbBXvd+NWw8RLCeijbeiCyvo8diOudi+GxLwCslfIzps9cONpo4qiVvWp+/wDyNbm7035lnQBZoUtQMcdQBYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCC5TTZuZiJW+mD46uJ/IIwwoYvtsvdGnWfNR4HzHKY/BlhAA3+rED2TO7YnkQBoj1X7aiJ2Wz0QFxcpDe5dgo4oLYD/mKqsk0XsUmFzo7SG34OZCeN7nKHoBtFn8HDf7oCcAFggrsddVEovzNzpsw4Y3PHrjzmP9bkBd+LCRWEJPOQv66VBoPY="
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 2.290005         | 0.201625 |
+      | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
+      | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
+      | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
+      | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd |                  |          |
+    Given The expected transaction is "hKQAiIJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAH928AhoAAxOZAxoR/pTNoQKFhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQA7VNvJA2sJitEnFDKr5Bh1qdpn9hSavj8dCwIvGGWk4CdyLjopgdbTy1XqakezWGWLrIGKrr9pqIB2y66F40wlYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hA/IqZJK3qx7W7Uw1aeQh1KJlHCnqQ/lQnXwQDhFHrMuqNsZpxXZELid52k974JYZyXJH1Y0CnQEF6mDR1sbZDDFggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDM6M+ZB43mgqKGBksQMjWlaIvVl9dlhLYoirHrrzPESfZ6lq1w+IeL7JBezWDrWT1kab1zU+ZBfvBVkRwvWVIHWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQKRP2cf7y2v/NhPFdd/RCJw2v7M4c2zAxeBIPtVzpyDRXUVL1FYDhMcl4hr76lTK3AvTX4j6S5F2nMITQ2Z0IwVYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCC5TTZuZiJW+mD46uJ/IIwwoYvtsvdGnWfNR4HzHKY/BlhA8qvNTlrNvhYdDc447O1YY7ZfZUZoVdcfFWEmCsKoxb1KsT26b9x1DEN1TUkT+et2D2WDhgtnwdmpkYtBovB9AVggrsddVEovzNzpsw4Y3PHrjzmP9bkBd+LCRWEJPOQv66VBoPX2"
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
@@ -92,15 +92,15 @@ Feature: Transfer Yoroi Wallet funds
     When I click on the icarus tab
     Then I select the trezor option
     And I enter the recovery phrase:
-    | recoveryPhrase                                                                                           |
+    | recoveryPhrase                                                                               |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
     And I proceed with the recovery
     Then I should see a plate EDAO-9229
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |
-    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfib8AIaAAKKnQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEDAuojJWVNYQ6FC1IlHrP2WunBGRikOrUxIeyTbobos/wUiR2CQNaOAbnqeGMTQpp+41FA7+JApvvIwS5t6eOsFWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9g=="
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567.898765   | 0.166601 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfibxAIaAAKKyQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEA97UHd+arHPWEd8xAv3ZQtmkL58YcVrg8ekQLoEMX3MO8CrtVCwWYUgfLSgaqja9/dLnvPy0zghsbnrVszs+QCWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9fY="
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
@@ -118,9 +118,9 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate JSKA-2258
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |
-    | Ae2tdPwUPEYyHfxoQYGPhyHuAfLHKfLubzo4kxyw2XDnLsLmACtjufaBs33 | 1638497    |
-    Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAFnZ0AhoAAontAxoR/pTNoQKBhFgg8elBZl4BQGla+Tli4OXssZO+OKu0a4uE90ZUlPqOjApYQCIaUi4RVqYE2XMDwYgShwXSGep65x8SEjkpAeAnfmALNjfQ3jNXB43Gr8gn8ga+F5YIcZe5Z0c5knITeHOzDQ1YINNT5ssGb8HUyAOT9k5hdlJG+NKzPSnWME87YabidYnjQaD2"
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEYyHfxoQYGPhyHuAfLHKfLubzo4kxyw2XDnLsLmACtjufaBs33 | 1.638497         | 0.166425 |
+    Given The expected transaction is "hKQAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAFnZIAhoAAooZAxoR/pTNoQKBhFgg8elBZl4BQGla+Tli4OXssZO+OKu0a4uE90ZUlPqOjApYQIBH5jupap+Jngy81DdvR6P5lYpNTID5wTdO4zD/9r5LakFD8ibRUngv/Y83/2BPL7LZkgSzl3DydaxhllJ26A1YINNT5ssGb8HUyAOT9k5hdlJG+NKzPSnWME87YabidYnjQaD19g=="
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
@@ -142,9 +142,9 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate KOTZ-1730
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |   
-    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2000000    |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CwGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAG/qTAhoAAontAxoR/pTNoQKBhFgg18n9dDSQAQOaCZv45nr6Siugpa1UECrB4PoeJf11D51YQGW1xr8X1ZlQUInliQFbAZkysvSOUyc6DfeeckohKXXhNfCYtusb4mJL3v6xEbqmhRR4jpodgrZQSEjWX/L8IAtYIHos8jfmh7thEmh9Z4iWlGgVLpvfY779btjkhmBoW8dQQaD2"
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2                | 0.166425 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CwGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAG/pnAhoAAooZAxoR/pTNoQKBhFgg18n9dDSQAQOaCZv45nr6Siugpa1UECrB4PoeJf11D51YQH7FvLGwOx0vFm9SpYsA8qBlv3LmHh+Q/oQ82FRjrfcUdQEKy/1/oEX+8K/2CN+n8lKnouQovKGJNw0qfTaBbQBYIHos8jfmh7thEmh9Z4iWlGgVLpvfY779btjkhmBoW8dQQaD19g=="
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
@@ -164,13 +164,13 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate ZDDC-9858
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    | fromAddress                                                 | reward | fees     |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5      | 0.173157 |
     And I see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6YAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgC8F+cCGgACpDkDGhH+lM0EgYIBggBYHJVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gFoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECS1+tbK3tpoKvXsIOw2gRb4KpSKTzXTj/mWzq/mfraAIY9AM0NgLHfEiI1oXY27NRXdvGkZ+xAX/U8MUQk/vAJglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQE8XIDQhaNToTahlPCrgcUtxhfNt0aJ5Z6vsLe5kiPv3jdQhJ6ckiiW2d/s0iX93PfkYFicBfu2qN6nHTB5YAQ72"
+    Given The expected transaction is "hKYAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgC8F7sCGgACpGUDGhH+lM0EgYIBggBYHJVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gFoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEC5+g3rJd9kHeUUnmKGYbjXwDXc0iBc1bRLQ7H6mm938Lj7iO0r6cSwYWq6JUZyx0ju+vzYtKGcXPXkREW/+BgFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQP+FLcC/rvz4IMw22JtivP6Ow9jabwE2fqTFMjlbxv9h3GctDyOHN/vBXeDniUg10E/C/gwuuc//Lt7oZ5OpaAL19g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -189,13 +189,13 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate ZDDC-9858
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -211,13 +211,13 @@ Feature: Transfer Yoroi Wallet funds
     # And I enter the decryption password
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -233,13 +233,13 @@ Feature: Transfer Yoroi Wallet funds
     And I enter the decryption password "asdfasdfasdf"
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -255,13 +255,13 @@ Feature: Transfer Yoroi Wallet funds
     # And I enter the decryption password "asdfasdfasdf"
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -277,13 +277,13 @@ Feature: Transfer Yoroi Wallet funds
     And I enter the decryption password "asdfasdfasdf"
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -303,13 +303,13 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see a plate ZDDC-9858
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
-    | fromAddress                                                | amount           |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmWsCGgACnjUDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEAa5C/oQozPDkiO9oSFuZLyuIfC9BO3li9TpsR2Y6sJXuWePo4kxYI/SCk13cmewndxZusFNF2BWAHuG3rteNcFglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQDp4rMWDFUIxDjpEqRIotbWZCKf7/wISRG/Am8B3M8Ic1cVkRArwCNrgCWx//yDNjIK1qRw0qSvviK8Fp4Zrkg319g=="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
@@ -364,6 +364,6 @@ Feature: Transfer Yoroi Wallet funds
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgBv0y8CGgACnbEDGhH+lM0EgYIBggBYHHVsMspvo8GlXypDW5P6AAkVsR41Lg4sbWgEAFShAIKCWCDMmAmUQVDADzkTzSsQPptC/mJD/Danb564AGkuK9o/LlhAX7Ac7du9tpQs/zExXmDd3Tbb8O7P14P+KHUUkFvi3fCkdcawCvmhDCVRaqc5WnxndOp/2o+WKUikmvu73xoPCIJYIPOlcWS3t2uMM0elCy5Y8VhUv0SFmwE0b4nY9XZQ10F2WEBPr5pZpIE01H1wshcmhhtGB5zwfnrqdv+e78pxRtgS2IIe+wGCoSqJ2xgrifzSxSSvhtqnCYvi/7zZq2ZcaP4J9g=="
+    Given The expected transaction is "hKUAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgBv0wMCGgACnd0DGhH+lM0EgYIBggBYHHVsMspvo8GlXypDW5P6AAkVsR41Lg4sbWgEAFShAIKCWCDMmAmUQVDADzkTzSsQPptC/mJD/Danb564AGkuK9o/LlhARylnPEYMRpZAykAvNBQfEI7hC5MLlftV160D47CskbyW9df++XmiOATKXpJxqnykpeCxuyquTRhOxZIkfPqVBYJYIPOlcWS3t2uMM0elCy5Y8VhUv0SFmwE0b4nY9XZQ10F2WEBi1oDMWw2RW2xFIuw8/a8dy8S02EL7paBHUBX6UMie04lQWOeFHmHHABsMUZcOLo4+k1ubZREoL89CSU40g1MG9fY="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
