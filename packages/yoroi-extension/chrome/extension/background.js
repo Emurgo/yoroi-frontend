@@ -3,7 +3,7 @@ import debounce from 'lodash/debounce';
 
 import { getWallets } from '../../app/api/common/index';
 import { PublicDeriver, } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetAllUtxos, } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetAllUtxos, asHasUtxoChains} from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   CardanoTx,
   ConfirmedSignData,
@@ -929,10 +929,14 @@ function handleInjectorConnect(port) {
                   async (wallet, connection) => {
                     await RustModule.load();
                     const { tx, partialSign, returnTx } = message.params[0];
+                    const withUtxos = asGetAllUtxos(wallet)
+                    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+                    const utxos = await withHasUtxoChains.getAllUtxos();
+                    console.log({cardanoUtxos: utxos})
                     const resp = await confirmSign(tabId,
                       {
                         type: 'tx/cardano',
-                        tx: { tx, partialSign },
+                        tx: { tx, partialSign, utxos },
                         uid: message.uid
                       },
                       connection

@@ -420,7 +420,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/* , partialSign */ } = signingMessage.sign.tx;
+    const { tx/* , partialSign */, utxos } = signingMessage.sign.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
@@ -437,7 +437,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (withHasUtxoChains == null) {
       throw new Error(`missing chains functionality`);
     }
-    const utxos = await withHasUtxoChains.getAllUtxos();
+    // const utxos = await withHasUtxoChains.getAllUtxos();
+    console.log({utxos, signingMessage: JSON.parse(JSON.stringify(signingMessage))})
     const addressedUtxos = asAddressedUtxo(utxos);
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
