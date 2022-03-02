@@ -29,7 +29,7 @@ export default class LedgerSendActions {
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
-    network: $ReadOnly<NetworkRow>,
+    publicDeriver: PublicDeriver<>,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
   |}> = new AsyncAction();

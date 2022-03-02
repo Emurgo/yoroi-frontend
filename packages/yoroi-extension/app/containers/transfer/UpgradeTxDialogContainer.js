@@ -61,7 +61,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
-    network: $ReadOnly<NetworkRow>,
+    publicDeriver: PublicDeriver<>,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
   |} => Promise<void> = async (request) => {
@@ -175,7 +175,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
           trigger: async () => await this.submit({
-            network,
+            publicDeriver: selected,
             addressingMap: genAddressingLookup(
               selected,
               this.generated.stores.addresses.addressSubgroupMap
@@ -219,7 +219,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
                 ...Addressing,
               |},
               addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-              network: $ReadOnly<NetworkRow>,
+              publicDeriver: PublicDeriver<>,
               expectedSerial: string | void,
             |} => Promise<void>,
           |},

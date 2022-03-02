@@ -180,7 +180,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       return this.signAndBroadcast({
         ...request.params,
         publicKey: publicKeyInfo,
-        network: request.publicDeriver.getParent().getNetworkInfo(),
+        publicDeriver: request.publicDeriver,
         addressingMap: genAddressingLookup(
           request.publicDeriver,
           this.stores.addresses.addressSubgroupMap
@@ -200,7 +200,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       ...Addressing,
     |},
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    network: $ReadOnly<NetworkRow>,
+    publicDeriver: PublicDeriver<>,
     expectedSerial: string | void,
   |} => Promise<{| txId: string |}> = async (request) => {
     let ledgerConnect: LedgerConnect;
@@ -212,9 +212,11 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/multisig/#/v4.1',
       });
 
+      const network = request.publicDeriver.getParent().getNetworkInfo();
+
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
-        network: request.network,
+        network,
         addressingMap: request.addressingMap,
       });
 
@@ -285,7 +287,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
       await this.api.ada.broadcastLedgerSignedTx({
         signedTxRequest: {
-          network: request.network,
+          network,
           id: txId,
           encodedTx: signedTx.to_bytes(),
         },
@@ -293,6 +295,12 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       });
 
       Logger.info('SUCCESS: ADA sent using Ledger SignTx');
+
+      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
+        request.publicDeriver,
+        request.signRequest,
+        txId,
+      );
 
       return {
         txId,
