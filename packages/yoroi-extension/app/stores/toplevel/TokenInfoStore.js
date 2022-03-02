@@ -64,25 +64,30 @@ export default class TokenInfoStore<
     // the Ergo connector doesn't have this action
     if (this.actions.wallets?.setActiveWallet) {
       this.actions.wallets.setActiveWallet.listen(
-        wallet => { this._fetchMissingTokenInfo(wallet) }
+        ({ wallet }) => { this.fetchMissingTokenInfo(wallet) }
       );
     }
   }
 
-  @action _fetchMissingTokenInfo
-    : ({| wallet: PublicDeriver<> |}) => Promise<void>
-  = async ({ wallet }) => {
-
+  @action fetchMissingTokenInfo: (
+    wallet: PublicDeriver<>,
+    submittedTxTokenIds?: ?Set<string>,
+  ) => Promise<void> = async (wallet, submittedTxTokenIds) => {
     // the Ergo connector doesn't have this store, but it this function won't be invoked
     if (!this.stores.transactions) {
-      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this._fetchMissingTokenInfo)} missing transactions store`);
+      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.fetchMissingTokenInfo)} missing transactions store`);
     }
 
-    const { requests } = this.stores.transactions.getTxRequests(wallet);
+    let tokenIds;
+    if (submittedTxTokenIds) {
+      tokenIds = [...submittedTxTokenIds];
+    } else {
+      const { requests } = this.stores.transactions.getTxRequests(wallet);
 
-    await requests.allRequest;
+      await requests.allRequest;
 
-    const tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
+      tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
+    }
 
     const db = this.stores.loading.getDatabase();
     if (!db) {

@@ -455,6 +455,24 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
+    // The submitted transactions may contain freshly minted assets, we need to
+    // insert the default token info entries for them otherwise there would be
+    // an exception when the submitted transactions are rendered.
+    const submittedTxTokenIds = new Set(this.getSubmittedTransactions(publicDeriver).flatMap(
+      tx => [
+        ...tx.addresses.from.flatMap(
+          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+        ),
+        ...tx.addresses.to.flatMap(
+          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+        )
+      ]
+    ));
+    this.stores.tokenInfoStore.fetchMissingTokenInfo(
+      publicDeriver,
+      submittedTxTokenIds,
+    );
+
     const limit = this.searchOptions
       ? this.searchOptions.limit
       : INITIAL_SEARCH_LIMIT;
