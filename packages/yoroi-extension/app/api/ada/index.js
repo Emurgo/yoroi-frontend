@@ -316,6 +316,7 @@ export type CardanoTxRequestMintMetadata = {|
 |};
 export type CardanoTxRequestMint = {|
   script: string, // the HEX of the policy script,
+  storeScriptOnChain?: boolean, // whether to include the script into auxiliary data
   assetName: string, // HEX
   amount?: string, // default to 1 for NFTs
   // This metadata will be wrapped into { tag: { [policyId]: { [assetName]: json } } }
