@@ -427,18 +427,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
-
-    const withUtxos = asGetAllUtxos(selectedWallet.publicDeriver);
-    if (withUtxos == null) {
-      throw new Error(`missing utxo functionality`);
-    }
-
-    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-    if (withHasUtxoChains == null) {
-      throw new Error(`missing chains functionality`);
-    }
-    // const utxos = await withHasUtxoChains.getAllUtxos();
-    console.log({utxos, signingMessage: JSON.parse(JSON.stringify(signingMessage))})
     const addressedUtxos = asAddressedUtxo(utxos);
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
