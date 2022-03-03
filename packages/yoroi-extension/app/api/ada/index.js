@@ -1292,7 +1292,7 @@ export default class AdaApi {
           // Set the new amount to the target assets
           targetAssets[assetId] = assetAmount;
           appendMintMetadata(metadata, policyId, assetName);
-          if (storeScriptOnChain) {
+          if (Boolean(storeScriptOnChain) === true) {
             nativeScripts.push(script);
           }
         }
