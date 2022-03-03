@@ -874,11 +874,11 @@ export async function connectorRecordSubmittedErgoTransaction(
     const value = new MultiToken([], defaults);
 
     value.add({
-      amount: new BigNumber(utxo.value),
+      amount: new BigNumber(utxo.amount),
       identifier: defaultToken.Identifier,
       networkId: defaultToken.NetworkId,
     });
-    for (const asset of utxo.assets) {
+    for (const asset of utxo.assets || []) {
       value.add({
         amount: new BigNumber(asset.amount),
         identifier: asset.tokenId,
@@ -912,7 +912,7 @@ export async function connectorRecordSubmittedErgoTransaction(
     }
     const address = Buffer.from(
       RustModule.SigmaRust.NetworkAddress.new(
-        chainNetworkId,
+        (chainNetworkId: any),
         RustModule.SigmaRust.Address.recreate_from_ergo_tree(
           RustModule.SigmaRust.ErgoTree.from_bytes(
             Buffer.from(output.ergoTree, 'hex')
@@ -998,7 +998,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     const value = new MultiToken([], defaults);
 
     value.add({
-      amount: new BigNumber(utxo.value),
+      amount: new BigNumber(utxo.amount),
       identifier: defaultToken.Identifier,
       networkId: defaultToken.NetworkId,
     });
