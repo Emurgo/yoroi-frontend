@@ -67,6 +67,10 @@ import {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../../app/api/localStorage';
+import {
+  getErgoBaseConfig,
+} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -831,6 +835,123 @@ export async function connectorSendTxCardano(
   });
 }
 
+export async function connectorRecordSubmittedErgoTransaction(
+  publicDeriver: PublicDeriver<>,
+  tx: SignedTx,
+  txId: string,
+) {
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (!withUtxos) {
+    throw new Error('expect to be able to get all UTXOs');
+  }
+  const allAddresses = new Set(
+    (await withUtxos.getAllUtxoAddresses())
+      .flatMap(utxoAddr => utxoAddr.addrs.map(addr => addr.Hash))
+  );
+  const utxos = (await withUtxos.getAllUtxos()).map(asAddressedUtxo);
+
+  const defaultToken = publicDeriver.getParent().defaultToken;
+  const defaults = {
+    defaultNetworkId: defaultToken.NetworkId,
+    defaultIdentifier: defaultToken.Identifier
+  };
+
+  const config = getErgoBaseConfig(
+    publicDeriver.getParent().getNetworkInfo()
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+
+  const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
+
+  const amount = new MultiToken([], defaults);
+  const fee = new MultiToken([], defaults);
+  const addresses = { from: [], to: [] };
+  let isIntraWallet = true;
+  for (const { boxId } of tx.inputs) {
+    const utxo = utxos.find(u => u.boxId === boxId);
+    if (!utxo) {
+      throw new Error('missing utxo for ' + boxId);
+    }
+    const value = new MultiToken([], defaults);
+
+    value.add({
+      amount: new BigNumber(utxo.value),
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    for (const asset of utxo.assets) {
+      value.add({
+        amount: new BigNumber(asset.amount),
+        identifier: asset.tokenId,
+        networkId: defaultToken.NetworkId,
+      });
+    }
+    addresses.from.push({
+      address: utxo.receiver,
+      value,
+    });
+    if (allAddresses.has(utxo.receiver)) {
+      amount.joinSubtractMutable(value);
+    }
+    fee.joinAddMutable(value);
+  }
+
+  for (const output of tx.outputs) {
+    const value = new MultiToken([], defaults);
+
+    value.add({
+      amount: new BigNumber(output.value),
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    for (const asset of output.assets) {
+      value.add({
+        amount: new BigNumber(asset.amount),
+        identifier: asset.tokenId,
+        networkId: defaultToken.NetworkId,
+      });
+    }
+    const address = Buffer.from(
+      RustModule.SigmaRust.NetworkAddress.new(
+        chainNetworkId,
+        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
+          RustModule.SigmaRust.ErgoTree.from_bytes(
+            Buffer.from(output.ergoTree, 'hex')
+          )
+        )
+      ).to_bytes()
+    ).toString('hex');
+    addresses.to.push({
+      address,
+      value,
+    });
+    if (allAddresses.has(address)) {
+      amount.joinAddMutable(value);
+    } else {
+      isIntraWallet = false;
+    }
+    fee.joinSubtractMutable(value);
+  }
+
+  const submittedTx = {
+    txid: txId,
+    type: isIntraWallet ? 'self' : 'expend',
+    amount,
+    fee,
+    date: new Date,
+    addresses,
+    state: TxStatusCodes.SUBMITTED,
+    errorMsg: null,
+    block: null,
+  };
+
+  const submittedTxs = loadSubmittedTransactions() || [];
+  submittedTxs.push({
+    publicDeriverId: publicDeriver.publicDeriverId,
+    transaction: submittedTx,
+  });
+  persistSubmittedTransactions(submittedTxs);
+}
+
 export async function connectorRecordSubmittedCardanoTransaction(
   publicDeriver: PublicDeriver<>,
   tx: RustModule.WalletV4.Transaction,
@@ -869,15 +990,15 @@ export async function connectorRecordSubmittedCardanoTransaction(
     const utxo = utxos.find(
       utxo => utxo.tx_hash === txHash && utxo.tx_index === index
     );
-    //fixme, update allAddresses
+
     if (!utxo) {
-      throw new Error('failed to get UTXO info');
+      throw new Error('missing UTXO');
     }
 
     const value = new MultiToken([], defaults);
 
     value.add({
-      amount: new BigNumber(utxo.amount),
+      amount: new BigNumber(utxo.value),
       identifier: defaultToken.Identifier,
       networkId: defaultToken.NetworkId,
     });

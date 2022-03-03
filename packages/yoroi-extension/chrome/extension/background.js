@@ -47,6 +47,7 @@ import {
   connectorSignCardanoTx,
   connectorSignTx,
   connectorRecordSubmittedCardanoTransaction,
+  connectorRecordSubmittedErgoTransaction,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -1208,13 +1209,11 @@ function handleInjectorConnect(port) {
                       const tx = RustModule.WalletV4.Transaction.from_bytes(
                         Buffer.from(message.params[0], 'hex'),
                       );
-                      /* fixme
                       await connectorSendTxCardano(
                         wallet,
                         tx.to_bytes(),
                         localStorageApi,
                       );
-                      */
                       id = Buffer.from(
                         RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
                       ).toString('hex');
@@ -1228,6 +1227,13 @@ function handleInjectorConnect(port) {
                     } else { // is Ergo
                       const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
                       id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                      try {
+                        await connectorRecordSubmittedErgoTransaction(
+                          wallet,
+                          tx,
+                          id,
+                        );
+                      } catch {}
                     }
                     rpcResponse({
                       ok: id
