@@ -187,7 +187,7 @@ getAccountBalance.addEventListener('click', () => {
             return res;
           }, {});
         }
-        alertSuccess(`Account Balance: ${JSON.stringify(balanceJson, null, 2)}`)
+        alertSuccess(`Account Balance: <pre>${JSON.stringify(balanceJson, null, 2)}</pre>`)
       });
     }
 })
