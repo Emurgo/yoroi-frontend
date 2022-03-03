@@ -20,14 +20,16 @@ const isEnabledBtn = document.querySelector('#is-enabled')
 const getUtxos = document.querySelector('#get-utxos')
 const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
-const createTx = document.querySelector('#create-tx')
+const showUtxos = document.querySelector('#show-utxos')
 const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
+const utxosContainer = document.querySelector('#utxos')
 
 let accessGranted = false
 let cardanoApi
 let returnType = 'cbor'
-let utxos
+let utxos;
+let selectedUtxoIdx = 0;
 let usedAddresses
 let changeAddress
 let unsignedTransactionHex
@@ -456,8 +458,101 @@ signTx.addEventListener('click', () => {
     alertWarrning('Signing tx fails')
   })
 })
+showUtxos.addEventListener('click', () => {
+  
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
 
-createTx.addEventListener('click', () => {
+  if (!utxos || utxos.length === 0) {
+    alertError('Should request utxos first');
+    return
+  }
+
+  hideAlert()
+  renderUtxo()
+})
+
+function alertError (text) {
+    toggleSpinner('hide');
+    alertEl.className = 'alert alert-danger'
+    alertEl.innerHTML = text
+}
+
+function alertSuccess(text) {
+    alertEl.className = 'alert alert-success'
+    alertEl.innerHTML = text
+}
+
+function hideAlert() {
+  alertEl.className = 'd-none'
+  alert.innerHTML = ''
+}
+
+function alertWarrning(text) {
+    alertEl.className = 'alert alert-warning'
+    alertEl.innerHTML = text
+}
+
+function toggleSpinner(status){
+    if(status === 'show') {
+        spinner.className = 'spinner-border'
+        alertEl.className = 'd-none'
+    } else {
+        spinner.className = 'd-none'
+    }
+}
+
+function toggleConnectionUI(status) {
+  if (status === 'button') {
+    connectionStatus.classList.add('d-none');
+    cardanoAccessBtnRow.classList.remove('d-none');
+  } else {
+    cardanoAccessBtnRow.classList.add('d-none');
+    connectionStatus.classList.remove('d-none');
+  }
+}
+
+function selectUtxo(e) {
+ if (!e.target.id) {
+   alertError("Invalid idx")
+   return 
+ } 
+ selectedUtxoIdx = e.target.id
+ hideAlert()
+ renderUtxo() 
+}
+
+function renderUtxo() {
+  let utxosHTML = ''
+  for(let idx in utxos) {
+    const utxo = utxos[idx]
+    utxosHTML+= `
+      <li id='${idx}' class="utxo-item list-group-item d-flex justify-content-between align-items-center ${selectedUtxoIdx == idx && 'bg-primary text-white'}" style='cursor: pointer;'>
+          <p id='${idx}' class='mb-0'>${utxo.utxo_id.slice(0, 50)}</p>
+          <span class="badge bg-primary rounded-pill">${utxo.amount}</span>
+      </li>
+    `
+  }
+
+  utxosHTML += `
+    <button id="create-tx" class="btn btn-light mt-3 w-100">[Experimental] Create Tx</button>
+  `
+  utxosContainer.innerHTML = utxosHTML
+  utxosContainer.classList.remove('d-none')
+  utxosContainer.classList.add('d-block', 'list-group', 'list-group-numbered', 'mb-5')
+  // Add select utxo handler for each list item
+  document.querySelectorAll('.utxo-item').forEach(el => {
+    el.addEventListener('click', selectUtxo)
+  })
+
+  // Add event handler for create tx button 
+  document.querySelector('#create-tx').addEventListener('click', createTxHandler)
+}
+
+
+function createTxHandler(e) {
   toggleSpinner('show');
   
   if (!accessGranted) {
@@ -475,13 +570,13 @@ createTx.addEventListener('click', () => {
     return
   }
 
-  const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
-  if (!randomUtxo) {
+  const selectedUtxo = utxos[selectedUtxoIdx];
+  if (!selectedUtxo) {
     alertError('Failed to select a random utxo from the available list!');
     return;
   }
 
-  console.log('[createTx] Including random utxo input: ', randomUtxo);
+  console.log('[createTx] Including random utxo input: ', selectedUtxo);
 
   const usedAddress = usedAddresses[0];
   const keyHash = CardanoWasm.BaseAddress.from_address(
@@ -518,18 +613,18 @@ createTx.addEventListener('click', () => {
 
   const outputHex = bytesToHex(
     CardanoWasm.TransactionOutput.new(
-      CardanoWasm.Address.from_bech32(randomUtxo.receiver),
+      CardanoWasm.Address.from_bech32(selectedUtxo.receiver),
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000000')),
     ).to_bytes()
   );
 
   const txReq = {
     validityIntervalStart: 42,
-    includeInputs: [randomUtxo.utxo_id],
+    includeInputs: [selectedUtxo.utxo_id],
     includeOutputs: [outputHex],
     includeTargets: [
       {
-        address: randomUtxo.receiver,
+        address: selectedUtxo.receiver,
         value: '2000000',
         mintRequest: [{
           script: mintScriptHex,
@@ -565,7 +660,7 @@ createTx.addEventListener('click', () => {
     console.log('[createTx] Including asset:', asset);
     txReq.includeTargets.push({
       // do not specify value, the connector will use minimum value
-      address: randomUtxo.receiver,
+      address: selectedUtxo.receiver,
       assets: {
         [asset.assetId]: '1',
       },
@@ -582,41 +677,6 @@ createTx.addEventListener('click', () => {
     toggleSpinner('hide')
     alertWarrning('Creating tx fails')
   })
-})
-
-function alertError (text) {
-    toggleSpinner('hide');
-    alertEl.className = 'alert alert-danger'
-    alertEl.innerHTML = text
-}
-
-function alertSuccess(text) {
-    alertEl.className = 'alert alert-success'
-    alertEl.innerHTML = text
-}
-
-function alertWarrning(text) {
-    alertEl.className = 'alert alert-warning'
-    alertEl.innerHTML = text
-}
-
-function toggleSpinner(status){
-    if(status === 'show') {
-        spinner.className = 'spinner-border'
-        alertEl.className = 'd-none'
-    } else {
-        spinner.className = 'd-none'
-    }
-}
-
-function toggleConnectionUI(status) {
-  if (status === 'button') {
-    connectionStatus.classList.add('d-none');
-    cardanoAccessBtnRow.classList.remove('d-none');
-  } else {
-    cardanoAccessBtnRow.classList.add('d-none');
-    connectionStatus.classList.remove('d-none');
-  }
 }
 
 const onload = window.onload;
