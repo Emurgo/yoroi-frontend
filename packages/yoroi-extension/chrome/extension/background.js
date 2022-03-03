@@ -902,15 +902,20 @@ function handleInjectorConnect(port) {
                   async (_wallet, connection) => {
                     await RustModule.load();
                     const tx = asTx(message.params[0], RustModule.SigmaRust);
-                    const resp = await confirmSign(tabId,
-                      {
-                        type: 'tx',
-                        tx,
-                        uid: message.uid
-                      },
-                      connection
-                    );
-                    rpcResponse(resp);
+                    if (connection == null) {
+                      Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                    } else {
+                      const resp = await confirmSign(tabId,
+                        {
+                          type: 'tx',
+                          tx,
+                          uid: message.uid
+                        },
+                        connection
+                      );
+                      rpcResponse(resp);
+                    }
                   },
                   db,
                   localStorageApi,
@@ -927,6 +932,12 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet, connection) => {
+                    if (connection == null) {
+                      Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                      return
+                    }
+
                     await RustModule.load();
                     const { tx, partialSign, returnTx } = message.params[0];
                     const withUtxos = asGetAllUtxos(wallet)
@@ -973,6 +984,11 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (_wallet, connection) => {
+                    if (connection == null) {
+                      Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                      return
+                    }
                     await RustModule.load();
                     const tx = asTx(message.params[0], RustModule.SigmaRust);
                     const txIndex = message.params[1];
