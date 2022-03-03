@@ -105,3 +105,17 @@
     overflow-wrap: break-word;
   }
 }
+
+
+@media (min-width: 678px) {
+  .component {
+    max-width: 600px;
+    margin: auto;
+    padding-top: 40px;
+
+    .pageTitle {
+      text-align: center;
+      padding-left: 0px;
+    }
+  }
+}

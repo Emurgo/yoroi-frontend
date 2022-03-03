@@ -124,3 +124,15 @@
   font-size: 17px;
   font-weight: 500;
 }
+
+@media (min-width: 678px) {
+  .component {
+    max-width: 600px;
+    margin: auto;
+
+    .title {
+      margin-top: 30px;
+      font-size: 30px;
+    }
+  }
+}
