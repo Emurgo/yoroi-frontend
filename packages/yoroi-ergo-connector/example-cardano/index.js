@@ -476,12 +476,12 @@ showUtxos.addEventListener('click', () => {
 
 function alertError (text) {
     toggleSpinner('hide');
-    alertEl.className = 'alert alert-danger'
+    alertEl.className = 'alert alert-danger overflow-scroll'
     alertEl.innerHTML = text
 }
 
 function alertSuccess(text) {
-    alertEl.className = 'alert alert-success'
+    alertEl.className = 'alert alert-success overflow-scroll'
     alertEl.innerHTML = text
 }
 
@@ -670,7 +670,7 @@ function createTxHandler(e) {
   
   cardanoApi.experimental.createTx(txReq, true).then(txHex => {
     toggleSpinner('hide')
-    alertSuccess('Creating tx succeeds: ' + txHex)
+    alertSuccess(`<p> Creating tx succeeds: ${txHex} <p/>`)
     unsignedTransactionHex = txHex
   }).catch(error => {
     console.error(error)
