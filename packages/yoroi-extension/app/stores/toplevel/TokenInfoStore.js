@@ -11,6 +11,7 @@ import {
   defaultAssets,
   networks,
   isCardanoHaskell,
+  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   DefaultTokenEntry,
@@ -22,6 +23,7 @@ import {
 import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read';
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
+import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
@@ -93,38 +95,61 @@ export default class TokenInfoStore<
     if (!db) {
       return;
     }
-
     const networkId = wallet.getParent().networkInfo.NetworkId;
     const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
       ({ NetworkId }) => NetworkId === networkId
     );
-    if (!network || !isCardanoHaskell(network)) {
-      return;
-    }
-    const deps =  Object.freeze({
-      ModifyToken,
-      GetToken,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(db, table));
 
-    const assetMap = await raii(
-      db,
-      depTables,
-      dbTx => (
-        genCardanoAssetMap(
-          db,
-          dbTx,
-          deps,
-          tokenIds,
-          this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
-          this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
-          network,
+    let assetMap;
+    if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+      if (!network) {
+        return;
+      }
+      const deps =  Object.freeze({
+        ModifyToken,
+        GetToken,
+      });
+      const depTables = Object
+        .keys(deps)
+        .map(key => deps[key])
+        .flatMap(table => getAllSchemaTables(db, table));
+
+      assetMap = await raii(
+        db,
+        depTables,
+        dbTx => (
+          genCardanoAssetMap(
+            db,
+            dbTx,
+            deps,
+            tokenIds,
+            this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
+            this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
+            network,
+          )
         )
-      )
-    );
+      );
+    } else if (isErgo(wallet.getParent().getNetworkInfo())) {
+      assetMap = await addErgoAssets(
+        {
+          db,
+          tokenIdentifiers: tokenIds,
+          getAssetInfo: async (req) => {
+            try {
+              return await
+                this.stores.substores.ergo.stateFetchStore.fetcher.getAssetInfo(req);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error('Aseet info request failed', e);
+              return Object.fromEntries(tokenIds.map(tokenId => [tokenId, {}]));;
+            }
+          },
+          network,
+        }
+      );
+    } else {
+      throw new Error('unexpected wallet type');
+    }
     runInAction(() => { this._updateTokenInfo([...assetMap.values()]) });
   };
 
