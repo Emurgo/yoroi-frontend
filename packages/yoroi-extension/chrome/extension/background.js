@@ -930,9 +930,15 @@ function handleInjectorConnect(port) {
                     await RustModule.load();
                     const { tx, partialSign, returnTx } = message.params[0];
                     const withUtxos = asGetAllUtxos(wallet)
+                    if (withUtxos == null) {
+                      throw new Error(`missing utxo functionality`);
+                    }
                     const withHasUtxoChains = asHasUtxoChains(withUtxos);
+                    if (withHasUtxoChains == null) {
+                      throw new Error(`missing chains functionality`);
+                    }
                     const utxos = await withHasUtxoChains.getAllUtxos();
-                    console.log({cardanoUtxos: utxos})
+
                     const resp = await confirmSign(tabId,
                       {
                         type: 'tx/cardano',
