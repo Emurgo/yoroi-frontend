@@ -3,7 +3,7 @@ import debounce from 'lodash/debounce';
 
 import { getWallets } from '../../app/api/common/index';
 import { PublicDeriver, } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetAllUtxos, asHasUtxoChains} from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetAllUtxos, asHasUtxoChains } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   CardanoTx,
   ConfirmedSignData,
@@ -1077,7 +1077,7 @@ function handleInjectorConnect(port) {
                         valueExpected,
                         tokenId,
                         paginate
-                        );
+                      );
                     }
                     if (isCardano) {
                       // $FlowFixMe[prop-missing]
