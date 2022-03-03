@@ -7,3 +7,7 @@ export function bytesToHex(bytes: *): string {
 export function hexToBytes(hex: string): Buffer {
   return Buffer.from(hex, 'hex');
 }
+
+export function hexToUtf(hex: string): string {
+  return hexToBytes(hex).toString('utf-8');
+}

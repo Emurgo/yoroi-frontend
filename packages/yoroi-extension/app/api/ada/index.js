@@ -154,7 +154,7 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import type { ISignRequest } from '../common/lib/transactions/ISignRequest';
-import { bytesToHex, hexToBytes } from '../../coreUtils';
+import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 
 // ADA specific Request / Response params
 
@@ -1201,6 +1201,7 @@ export default class AdaApi {
     const outputs = [];
     const mint = [];
     const mintMetadata = {};
+    const nativeScripts = [];
 
     function appendMintMetadata(
       metadata: ?CardanoTxRequestMintMetadata,
@@ -1209,9 +1210,11 @@ export default class AdaApi {
     ): void {
       if (metadata) {
         const tag = new BigNumber(metadata.tag).toString();
-        const tagGroup = mintMetadata[tag] = mintMetadata[tag] || {};
+        const tagGroup = mintMetadata[tag] = mintMetadata[tag] || {
+          version: '1.0',
+        };
         const policyGroup = tagGroup[policyId] = tagGroup[policyId] || {};
-        policyGroup[assetName] = JSON.parse(metadata.json);
+        policyGroup[hexToUtf(assetName)] = JSON.parse(metadata.json);
       }
     }
 
@@ -1272,7 +1275,7 @@ export default class AdaApi {
 
       if (target.mintRequest != null && target.mintRequest.length > 0) {
         for (const mintEntry of target.mintRequest) {
-          const { script, assetName, amount, metadata } = mintEntry;
+          const { script, assetName, amount, metadata, storeScriptOnChain } = mintEntry;
           const { policyId, assetId } = mintEntryToIdentifier(mintEntry);
           const assetAmountBignum = new BigNumber(targetAssets[assetId] ?? '0')
             .plus(new BigNumber(amount ?? '1'));
@@ -1289,6 +1292,9 @@ export default class AdaApi {
           // Set the new amount to the target assets
           targetAssets[assetId] = assetAmount;
           appendMintMetadata(metadata, policyId, assetName);
+          if (storeScriptOnChain) {
+            nativeScripts.push(script);
+          }
         }
       }
 
@@ -1334,10 +1340,15 @@ export default class AdaApi {
       txMetadata[String(metaTag)] = JSON.stringify(mintMetadata[metaTag]);
     }
 
+    const auxiliaryData = {
+      metadata: txMetadata,
+      nativeScripts,
+    };
+
     const unsignedTxResponse = shelleyNewAdaUnsignedTxForConnector(
       outputs,
       mint,
-      txMetadata,
+      auxiliaryData,
       changeAdaAddr,
       mustIncludeUtxos,
       coinSelectUtxos,
