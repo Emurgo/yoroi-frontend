@@ -1222,7 +1222,9 @@ function handleInjectorConnect(port) {
                           wallet,
                           tx,
                         );
-                      } catch {
+                      } catch (error) {
+                        // eslint-disable-next-line no-console
+                        console.error('error recording submitted tx', error);
                       }
                     } else { // is Ergo
                       const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
@@ -1233,7 +1235,10 @@ function handleInjectorConnect(port) {
                           tx,
                           id,
                         );
-                      } catch {}
+                      } catch (error) {
+                        // eslint-disable-next-line no-console
+                        console.error('error recording submitted tx', error);
+                      }
                     }
                     rpcResponse({
                       ok: id

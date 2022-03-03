@@ -38,39 +38,37 @@ import keyBy from 'lodash/keyBy';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
-import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import {
+  CoreAddressTypes,
+  TxStatusCodes,
+} from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
-import LocalStorageApi from '../../../app/api/localStorage/index';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+  persistSubmittedTransactions,
+} from '../../../app/api/localStorage';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
-import { asAddressedUtxo as asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+  multiTokenFromCardanoValue,
+} from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
 import {
   signTransaction as shelleySignTransaction
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import {
   getCardanoHaskellBaseConfig,
+  getErgoBaseConfig,
 } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import AdaApi from '../../../app/api/ada';
 import type CardanoTxRequest from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
-import { multiTokenFromCardanoValue } from '../../../app/api/ada/transactions/utils';
-import {
-  TxStatusCodes,
-} from '../../../app/api/ada/lib/storage/database/primitives/enums';
-import {
-  loadSubmittedTransactions,
-  persistSubmittedTransactions,
-} from '../../../app/api/localStorage';
-import {
-  getErgoBaseConfig,
-} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
-
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -987,9 +985,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     const input = txInputs.get(i);
     const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
     const index = input.index();
-    const utxo = utxos.find(
-      utxo => utxo.tx_hash === txHash && utxo.tx_index === index
-    );
+    const utxo = utxos.find(u => u.tx_hash === txHash && u.tx_index === index);
 
     if (!utxo) {
       throw new Error('missing UTXO');

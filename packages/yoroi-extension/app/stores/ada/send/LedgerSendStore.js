@@ -42,7 +42,6 @@ import {
 import { buildCheckAndCall } from '../../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type {
   Addressing,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';

@@ -3,7 +3,6 @@ import { AsyncAction, Action } from '../lib/Action';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,

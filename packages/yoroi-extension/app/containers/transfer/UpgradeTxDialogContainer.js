@@ -23,7 +23,6 @@ import Dialog from '../../components/widgets/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,

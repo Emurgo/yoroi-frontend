@@ -27,7 +27,8 @@ import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransacti
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as IFetcherErgo } from '../../api/ergo/lib/state-fetch/IFetcher';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -47,7 +48,14 @@ export default class TokenInfoStore<
     +substores: {
       +ada: {
         +stateFetchStore: {
-          +fetcher: IFetcher,
+          +fetcher: IFetcherCardano,
+          ...
+        },
+        ...
+      },
+      +ergo: {
+        +stateFetchStore: {
+          +fetcher: IFetcherErgo,
           ...
         },
         ...
@@ -99,12 +107,12 @@ export default class TokenInfoStore<
     const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
       ({ NetworkId }) => NetworkId === networkId
     );
+    if (!network) {
+      return;
+    }
 
     let assetMap;
     if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
-      if (!network) {
-        return;
-      }
       const deps =  Object.freeze({
         ModifyToken,
         GetToken,
@@ -141,7 +149,7 @@ export default class TokenInfoStore<
             } catch (e) {
               // eslint-disable-next-line no-console
               console.error('Aseet info request failed', e);
-              return Object.fromEntries(tokenIds.map(tokenId => [tokenId, {}]));;
+              return Object.fromEntries(tokenIds.map(tokenId => [tokenId, ({}: any)]));;
             }
           },
           network,
