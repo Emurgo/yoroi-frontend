@@ -525,7 +525,7 @@ createTx.addEventListener('click', () => {
 
   const txReq = {
     validityIntervalStart: 42,
-    includeInputs: ['18a6084155f88650acc00f47f0b84e7f0c59e2b8e3a96f7a17e57b46d880b47e0'],
+    includeInputs: [randomUtxo.utxo_id],
     includeOutputs: [outputHex],
     includeTargets: [
       {
