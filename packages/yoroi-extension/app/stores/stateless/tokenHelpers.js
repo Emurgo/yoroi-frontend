@@ -29,7 +29,7 @@ const ASCII_ASSET_NAME_BLACKLIST =
 
 function hexToValidAsciiOrNothing(hexString: string): void | string {
   const bytes = [...Buffer.from(hexString, 'hex')];
-  const isAscii = bytes.every(b => b > 32 && b < 127);
+  const isAscii = bytes.every(b => b >= 32 && b < 127);
   return isAscii ? String.fromCharCode(...bytes) : undefined;
 }
 

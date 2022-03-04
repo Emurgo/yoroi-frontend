@@ -266,7 +266,7 @@ class CardanoUtxoDetails extends Component<Props> {
             <div className={styles.addressToList}>
               {txData.outputs.map((address, addressIndex) => {
                 return this.renderRow({
-                  kind: 'in',
+                  kind: 'out',
                   address,
                   addressIndex,
                   transform: amount => amount.abs(),

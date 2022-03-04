@@ -313,7 +313,8 @@ class SignTxPage extends Component<Props, State> {
   }
 
   renderAddresses(): Node {
-    const addresses = this.props.txData.outputs.map(({ address }) =>  address);
+    const addresses = this.props.txData.outputs
+      .map(({ address }) =>  this.props.addressToDisplayString(address));
     return (
       <div className={styles.toAddresses}>
         <p className={styles.address}>{addresses[0]}</p>
