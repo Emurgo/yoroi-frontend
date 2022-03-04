@@ -632,6 +632,7 @@ function createTxHandler(e) {
           amount: '42',
         }, {
           script: mintScriptHex,
+          storeScriptOnChain: true,
           assetName: nftAssetNameHex,
           metadata: {
             tag: 721,
