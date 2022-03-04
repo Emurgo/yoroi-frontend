@@ -1,6 +1,6 @@
 .component {
   height: calc(100vh - 92px);
-  overflow: overlay;
+  overflow: auto;
   &.isNightly {
     height: calc(100vh - 138px);
   }
