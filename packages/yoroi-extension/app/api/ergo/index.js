@@ -669,7 +669,7 @@ export default class ErgoApi {
     txId: string,
     defaultNetworkId: number,
     defaultToken: $ReadOnly<TokenRow>,
-  ): Promise<WalletTransactionCtorData> {
+  ): Promise<ErgoTransaction> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
@@ -720,7 +720,7 @@ export default class ErgoApi {
       }
     }
 
-    return {
+    return new ErgoTransaction({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,
@@ -733,6 +733,6 @@ export default class ErgoApi {
       state: TxStatusCodes.SUBMITTED,
       errorMsg: null,
       block: null,
-    };
+    });
   }
 }

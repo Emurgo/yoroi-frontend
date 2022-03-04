@@ -2245,11 +2245,11 @@ export default class AdaApi {
 
   async createSubmittedTransactionData(
     publicDeriver: PublicDeriver<>,
-    signRequest: ISignRequest<any>,
+    signRequest: HaskellShelleyTxSignRequest,
     txId: string,
     defaultNetworkId: number,
     defaultToken: $ReadOnly<TokenRow>,
-  ): Promise<WalletTransactionCtorData> {
+  ): Promise<CardanoShelleyTransaction> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
@@ -2300,7 +2300,7 @@ export default class AdaApi {
       }
     }
 
-    return {
+    return new CardanoShelleyTransaction({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,
@@ -2313,7 +2313,14 @@ export default class AdaApi {
       state: TxStatusCodes.SUBMITTED,
       errorMsg: null,
       block: null,
-    };
+      certificates: [],
+      ttl: new BigNumber(String(signRequest.unsignedTx.build().ttl())),
+      metadata: signRequest.metadata
+        ? Buffer.from(signRequest.metadata.to_bytes()).toString('hex')
+        : null,
+      withdrawals: signRequest.withdrawals().map(({ address, amount }) => ({ address, value: amount })),
+      isValid: true,
+    });
   }
 }
 // ========== End of class AdaApi =========

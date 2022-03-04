@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
+import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
@@ -793,14 +794,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @action
   recordSubmittedTransaction: (
     PublicDeriver<>,
-    WalletTransactionCtorData,
+    WalletTransaction,
   ) => void = (
     publicDeriver,
     transaction,
   ) => {
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
-      transaction: new WalletTransaction(transaction),
+      transaction: transaction,
     });
     this._persistSubmittedTransactions();
   }
@@ -848,7 +849,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         if (transaction.block) {
           throw new Error('submitted transaction should not have block data');
         }
-        const tx =  new WalletTransaction({
+        const txCtorData = {
           txid: transaction.txid,
           block: null,
           type: transaction.type,
@@ -867,7 +868,24 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           },
           state: transaction.state,
           errorMsg: transaction.errorMsg,
-        });
+        };
+        let tx;
+        if (transaction.isValid != null) {
+          tx = new CardanoShelleyTransaction({
+            ...txCtorData,
+            certificates: transaction.certificates,
+            ttl: new BigNumber(transaction.ttl),
+            metadata: transaction.metadata,
+            withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+              address,
+              value: MultiToken.from(value)
+            })),
+            isValid: transaction.isValid,
+          });
+        } else {
+          tx = new WalletTransaction(txCtorData);
+        }
+
         return {
           publicDeriverId,
           transaction: tx,

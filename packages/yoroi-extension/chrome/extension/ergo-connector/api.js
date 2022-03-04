@@ -69,6 +69,8 @@ import AdaApi from '../../../app/api/ada';
 import type CardanoTxRequest from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import type { WalletTransactionCtorData } from '../../../app/domain/WalletTransaction';
+import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -930,7 +932,7 @@ export async function connectorRecordSubmittedErgoTransaction(
     fee.joinSubtractMutable(value);
   }
 
-  const submittedTx = {
+  const submittedTx: WalletTransactionCtorData = {
     txid: txId,
     type: isIntraWallet ? 'self' : 'expend',
     amount,
@@ -1031,7 +1033,35 @@ export async function connectorRecordSubmittedCardanoTransaction(
     fee.joinSubtractMutable(value);
   }
 
-  const submittedTx = {
+  const withdrawals = txBody.withdrawals();
+  const withdrawalsData = [];
+  if (withdrawals) {
+    const withdrawalKeys = withdrawals.keys();
+    for (let i = 0; i < withdrawalKeys.len(); i++) {
+      const key = withdrawalKeys.get(i);
+      const withdrawalAmount = withdrawals.get(key);
+      if (!withdrawalAmount) {
+        throw new Error('unexpected missing withdrawal amount');
+      }
+      withdrawalsData.push({
+        address: Buffer.from(key.to_address().to_bytes()).toString('hex'),
+        value: new MultiToken(
+          [
+            {
+              amount: new BigNumber(withdrawalAmount.to_str()),
+              identifier: defaultToken.Identifier,
+              networkId: defaultToken.NetworkId,
+            }
+          ],
+          defaults
+        )
+      });
+    }
+  }
+
+  const auxData = tx.auxiliary_data();
+
+  const submittedTx: CardanoShelleyTransactionCtorData = {
     txid: txId,
     type: isIntraWallet ? 'self' : 'expend',
     amount,
@@ -1041,6 +1071,11 @@ export async function connectorRecordSubmittedCardanoTransaction(
     state: TxStatusCodes.SUBMITTED,
     errorMsg: null,
     block: null,
+    certificates: [],
+    ttl: new BigNumber(String(txBody.ttl())),
+    metadata: auxData ? Buffer.from(auxData.to_bytes()).toString('hex') : null,
+    withdrawals: withdrawalsData,
+    isValid: true,
   };
 
   const submittedTxs = loadSubmittedTransactions() || [];
