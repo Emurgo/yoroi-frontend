@@ -29,6 +29,7 @@ import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
 import NoWalletImage from '../../assets/images/no-websites-connected.inline.svg'
+import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 const messages = defineMessages({
   subtitle: {
@@ -78,6 +79,7 @@ type Props = {|
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
   +isAppAuth: boolean,
+  +hidePasswordForm: void => void,
   +onConnect: (
     deriver: PublicDeriver<>,
     checksum: ?WalletChecksum,
@@ -134,6 +136,11 @@ class ConnectPage extends Component<Props> {
       },
     }
   );
+
+  hidePasswordForm: void => void = () => {
+    this.form.$('walletPassword').clear()
+    this.props.hidePasswordForm()
+  }
 
   submit: void => void = () => {
     this.form.submit({
@@ -233,8 +240,8 @@ class ConnectPage extends Component<Props> {
           />
         </div>
         <Stack direction="row" spacing={2} mt="15px">
-          <Button fullWidth variant="secondary" onClick={this.onCancel} sx={{ minWidth: 'auto' }}>
-            {intl.formatMessage(globalMessages.cancel)}
+          <Button fullWidth variant="secondary" onClick={this.hidePasswordForm} sx={{ minWidth: 'auto' }}>
+            {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
           <Button
             variant="primary"
@@ -260,15 +267,14 @@ class ConnectPage extends Component<Props> {
               marginTop="20px"
               paddingLeft="32px"
               fontWeight="400"
+              className={styles.pageTitle}
             >
               {intl.formatMessage(messages.connectWallet)}
             </Typography>
             <div className={styles.connectWrapper}>
-              {faviconUrl != null && faviconUrl !== '' ? (
-                <div className={styles.image}>
-                  <img src={faviconUrl} alt={`${url} favicon`} />
-                </div>
-              ) : null}
+              <div className={styles.image}>
+                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} />: <NoDappIcon />}
+              </div>
               <Box marginTop="16px">
                 <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-900)">
                   {intl.formatMessage(messages.subtitle)}{' '}

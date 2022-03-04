@@ -12,7 +12,7 @@ import {
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
-import { By } from 'selenium-webdriver';
+import { By, logging } from 'selenium-webdriver';
 import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
@@ -24,14 +24,14 @@ import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
-import { camelCase } from 'lodash';
 import { promises as fsAsync } from 'fs';
+import { selectSubmenuSettings, getComplexityLevelButton } from './general-settings-steps';
 
 const { promisify } = require('util');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-const screenshotsDir = './screenshots/';
+const testRunsDataDir = './testRunsData/';
 const snapshotsDir = './features/yoroi_snapshots/';
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
@@ -42,8 +42,8 @@ const testProgress = {
 };
 
 BeforeAll(() => {
-  rimraf.sync(screenshotsDir);
-  fs.mkdirSync(screenshotsDir);
+  rimraf.sync(testRunsDataDir);
+  fs.mkdirSync(testRunsDataDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -120,9 +120,10 @@ After(async function (scenario) {
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
+    await getConsoleLogs(this.driver, 'failedStep');
   }
   await this.driver.quit();
-});
+}); 
 
 const writeFile = promisify(fs.writeFile);
 
@@ -143,6 +144,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);
+      await getConsoleLogs(this.driver, cleanString);
     }
 
     testProgress.step += 1;
@@ -150,12 +152,17 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
   };
 });
 
+function createDirInTestRunsData(subdirectoryName) {
+  const dir = `${testRunsDataDir}/${testProgress.scenarioName}/${subdirectoryName}`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  return dir;
+}
+
 async function takeScreenshot(driver, name) {
   // path logic
-  const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
+  const dir = createDirInTestRunsData('screenshots');
   const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}.png`;
 
   const screenshot = await driver.takeScreenshot();
@@ -163,13 +170,21 @@ async function takeScreenshot(driver, name) {
 }
 
 async function takePageSnapshot(driver, name) {
-  const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
+  const dir = createDirInTestRunsData('pagesSnapshots');
   const htmlLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-dom.html`;
   const html = await driver.executeScript('return document.body.innerHTML;');
   await fsAsync.writeFile(htmlLogPath, html);
+}
+
+async function getConsoleLogs(driver, name) {
+  const dir = createDirInTestRunsData('consoleLogs');
+  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
+  const logEntries = await driver
+    .manage()
+    .logs()
+    .get(logging.Type.BROWSER);
+  const jsonLogs = logEntries.map((l) => l.toJSON());
+  await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
 
 async function inputMnemonicForWallet(
@@ -189,6 +204,15 @@ async function inputMnemonicForWallet(
 
   await customWorld.click('.confirmButton');
   await customWorld.waitUntilText('.NavPlate_name', truncateLongName(walletName));
+}
+
+export async function checkErrorByTranslationId(
+  client: Object,
+  errorSelector: string,
+  errorObject: Object,
+  method:any = By.css
+) {
+  await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000, method);
 }
 
 Then(/^I pause the test to debug$/, async function () {
@@ -270,13 +294,10 @@ Given(/^I switched to the advanced level$/, async function () {
   await waitUntilUrlEquals.call(this, '/settings/general');
   await this.waitForElement('.SettingsLayout_component');
   // Click on secondary menu "levelOfComplexity" item
-  const buttonSelector = `.SettingsMenuItem_component.${camelCase('levelOfComplexity')}`;
-  await this.click(buttonSelector);
-  await this.waitForElement(`${buttonSelector}.SettingsMenuItem_active`);
+  await selectSubmenuSettings(this, 'levelOfComplexity');
   // Select the most complex level
-  await this.waitForElement('.ComplexityLevelForm_submitButton');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
-  await levels[levels.length - 1].click(); // choose most complex level for tests
+  const cardChoseButton = await getComplexityLevelButton(this, false);
+  await cardChoseButton.click(); // choose most complex level for tests
 
   // Navigate back to the main page
   await navigateTo.call(this, '/wallets/add');
