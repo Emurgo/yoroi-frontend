@@ -9,6 +9,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { observer } from 'mobx-react';
 import { Tab } from '@mui/material';
 import environment from '../../../environment';
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 type Props = {|
   overviewContent: Node,
@@ -27,7 +28,7 @@ const messages = defineMessages({
 
 function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
-
+  const match = useMediaQuery('(min-width: 700px)')
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -48,10 +49,18 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
   return (
     <Background>
       <TabContext value={value}>
-        <Box>
+        <Box
+          sx={match && {
+            backgroundColor: 'var(--yoroi-palette-common-white)',
+            boxShadow: '0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74)'
+          }}
+        >
           <TabList
             sx={{
               '& .MuiTabs-indicator': { height: '4px' },
+              width: match ? '600px' : 'auto',
+              margin: 'auto',
+              boxShadow: 'none',
             }}
             onChange={handleChange}
             aria-label="Staking tabs"
@@ -65,7 +74,9 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
           <TabPanel
             sx={{
               height: environment.isNightly() || environment.isTest() ? 'calc(84vh - 55px)': '84vh',
-              overflow: 'overlay'
+              overflowY: 'scroll',
+              width: match ? '600px' : 'auto',
+              margin: 'auto',
             }}
             value={id}
           >
