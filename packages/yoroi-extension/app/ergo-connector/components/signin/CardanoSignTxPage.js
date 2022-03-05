@@ -296,6 +296,10 @@ class SignTxPage extends Component<Props, State> {
     const url = connectedWebsite?.url ?? '';
     const faviconUrl = connectedWebsite?.image ?? '';
 
+    const txAmountDefaultToken = txData.amount.defaults.defaultIdentifier;
+    const txAmount = txData.amount.get(txAmountDefaultToken) ?? new BigNumber('0');
+    const txFeeAmount = new BigNumber(txData.fee.amount).negated();
+    const txTotalAmount = txAmount.plus(txFeeAmount);
     return (
       <SignTxTabs
         overviewContent={
@@ -376,7 +380,7 @@ class SignTxPage extends Component<Props, State> {
                       entry: {
                         identifier: txData.fee.tokenId,
                         networkId: txData.fee.networkId,
-                        amount: new BigNumber(txData.fee.amount).negated(),
+                        amount: txFeeAmount,
                       },
                     })}
                   </Typography>
@@ -396,11 +400,9 @@ class SignTxPage extends Component<Props, State> {
                   <Typography variant="h3">
                     {this.renderAmountDisplay({
                       entry: {
-                        identifier: txData.amount.defaults.defaultIdentifier,
+                        identifier: txAmountDefaultToken,
                         networkId: txData.amount.defaults.defaultNetworkId,
-                        amount:
-                          txData.amount.get(txData.amount.defaults.defaultIdentifier) ??
-                          new BigNumber('0'),
+                        amount: txTotalAmount,
                       },
                     })}
                   </Typography>
