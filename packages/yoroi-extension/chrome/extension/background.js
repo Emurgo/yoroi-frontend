@@ -448,69 +448,79 @@ const yoroiMessageHandler = async (
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
-    const responseData = connection?.pendingSigns.get(request.uid);
-    if (connection && responseData) {
-      const password = request.pw;
-      switch (responseData.request.type) {
-        case 'tx':
-          {
-            try {
-              // We know `tx` is a `Tx` here
-              const txToSign: Tx = (request.tx: any);
-              const allIndices = [];
-              for (let i = 0; i < txToSign.inputs.length; i += 1) {
-                allIndices.push(i);
-              }
-              const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
-              responseData.resolve({ ok: signedTx });
-            } catch (error) {
-              responseData.resolve({ err: 'transaction signing failed' })
-            }
-          }
-          break;
-        case 'tx_input':
-          {
-            try {
-              const data = responseData.request;
-              const txToSign: Tx = (request.tx: any);
-              const signedTx = await signTxInputs(
-                txToSign,
-                [data.index],
-                password,
-                request.tabId
-              );
-              responseData.resolve({ ok: signedTx.inputs[data.index] });
-            } catch (error) {
-              responseData.resolve({ err: 'transaction signing failed' })
-            }
-          }
-          break;
-        case 'tx/cardano':
-          {
-            try {
-              const signedTx = await signCardanoTx(
-                // $FlowFixMe[prop-missing]
-                // $FlowFixMe[incompatible-exact]
-                (request.tx: CardanoTx),
-                password,
-                request.tabId
-              );
-              responseData.resolve({ ok: signedTx });
-            } catch (error) {
-              responseData.resolve({ err: 'transaction signing failed' })
-            }
-          }
-        break;
-        case 'data':
-          // mocked data sign
-          responseData.resolve({ err: 'Generic data signing is not implemented yet' });
-          break;
-        default:
-          // log?
-          break;
-      }
-      connection.pendingSigns.delete(request.uid);
+    if (!connection) {
+      throw new ConnectorError({
+        code: APIErrorCodes.API_INTERNAL_ERROR,
+        info: 'Connection has failed. Please retry.',
+      });
     }
+    const responseData = connection?.pendingSigns.get(request.uid);
+    if (!responseData) {
+      throw new ConnectorError({
+        code: APIErrorCodes.API_INTERNAL_ERROR,
+        info: `Sign request data is not available after confirmation (uid=${request.uid}). Please retry.`,
+      });
+    }
+    const password = request.pw;
+    switch (responseData.request.type) {
+      case 'tx':
+      {
+        try {
+          // We know `tx` is a `Tx` here
+          const txToSign: Tx = (request.tx: any);
+          const allIndices = [];
+          for (let i = 0; i < txToSign.inputs.length; i += 1) {
+            allIndices.push(i);
+          }
+          const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
+          responseData.resolve({ ok: signedTx });
+        } catch (error) {
+          responseData.resolve({ err: 'transaction signing failed' })
+        }
+      }
+        break;
+      case 'tx_input':
+      {
+        try {
+          const data = responseData.request;
+          const txToSign: Tx = (request.tx: any);
+          const signedTx = await signTxInputs(
+            txToSign,
+            [data.index],
+            password,
+            request.tabId
+          );
+          responseData.resolve({ ok: signedTx.inputs[data.index] });
+        } catch (error) {
+          responseData.resolve({ err: 'transaction signing failed' })
+        }
+      }
+        break;
+      case 'tx/cardano':
+      {
+        try {
+          const signedTx = await signCardanoTx(
+            // $FlowFixMe[prop-missing]
+            // $FlowFixMe[incompatible-exact]
+            (request.tx: CardanoTx),
+            password,
+            request.tabId
+          );
+          responseData.resolve({ ok: signedTx });
+        } catch (error) {
+          responseData.resolve({ err: 'transaction signing failed' })
+        }
+      }
+        break;
+      case 'data':
+        // mocked data sign
+        responseData.resolve({ err: 'Generic data signing is not implemented yet' });
+        break;
+      default:
+        // log?
+        break;
+    }
+    connection.pendingSigns.delete(request.uid);
   } else if (request.type === 'sign_rejected') {
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
@@ -674,16 +684,18 @@ async function confirmConnect(
     try {
       if (whitelistEntry != null) {
         // we already whitelisted this website, so no need to re-ask the user to confirm
-        connectedSites.set(tabId, {
-          url,
-          protocol,
-          appAuthID,
-          status: {
-            publicDeriverId: whitelistEntry.publicDeriverId,
-            auth: isAuthRequested ? whitelistEntry.auth : undefined,
-          },
-          pendingSigns: new Map()
-        });
+        if (connectedSites.get(tabId) == null) {
+          connectedSites.set(tabId, {
+            url,
+            protocol,
+            appAuthID,
+            status: {
+              publicDeriverId: whitelistEntry.publicDeriverId,
+              auth: isAuthRequested ? whitelistEntry.auth : undefined,
+            },
+            pendingSigns: new Map()
+          });
+        }
         resolve({
           connectedWallet: whitelistEntry.publicDeriverId,
           auth: isAuthRequested ? whitelistEntry.auth : undefined,
