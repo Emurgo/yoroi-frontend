@@ -7,13 +7,13 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import { assetNameFromIdentifier, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 
 type Props = {|
   +shouldHideBalance: boolean,
   +publicDeriver: PublicDeriverCache,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => ?$ReadOnly<TokenRow>,
 |};
 
 function constructPlate(
@@ -44,8 +44,11 @@ export default class WalletCard extends Component<Props> {
 
     const defaultEntry = this.props.publicDeriver.balance.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
+    const ticker = tokenInfo ? getTokenName(tokenInfo)
+      : assetNameFromIdentifier(defaultEntry.identifier);
+
     const { shouldHideBalance } = this.props;
 
     return (
@@ -54,7 +57,7 @@ export default class WalletCard extends Component<Props> {
         <div className={styles.name}>{this.props.publicDeriver.name}</div>
         <p className={styles.balance}>
           {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
-          <span>{getTokenName(tokenInfo)}</span>
+          <span>{ticker}</span>
         </p>
       </div>
     );

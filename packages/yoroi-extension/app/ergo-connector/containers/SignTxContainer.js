@@ -9,8 +9,12 @@ import type { Notification } from '../../types/notificationType';
 import SignTxPage from '../components/signin/SignTxPage';
 import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
-import type { SigningMessage, PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types';
-import { genLookupOrNull } from '../../stores/stateless/tokenHelpers';
+import type {
+  SigningMessage,
+  PublicDeriverCache,
+  WhitelistEntry,
+} from '../../../chrome/extension/ergo-connector/types';
+import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -86,6 +90,10 @@ export default class SignTxContainer extends Component<
       wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
     );
     if (selectedWallet == null) return this.renderLoading();
+    const whitelistEntries = this.generated.stores.connector.currentConnectorWhitelist;
+    const connectedWebsite = whitelistEntries.find(
+      cacheEntry => selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId
+    );
 
     let component = null;
     // TODO: handle other sign types
@@ -95,6 +103,9 @@ export default class SignTxContainer extends Component<
         if (txData == null) return this.renderLoading();
         component = (
           <SignTxPage
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+            connectedWebsite={connectedWebsite}
+            selectedWallet={selectedWallet}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
@@ -114,15 +125,17 @@ export default class SignTxContainer extends Component<
             }
             tx={signingMessage.sign.tx}
             txData={txData}
-            getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
             onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
             onCancel={this.onCancel}
-            addressToDisplayString={addr => addressToDisplayString(
-              addr,
-              selectedWallet.publicDeriver.getParent().getNetworkInfo()
-            )}
+            addressToDisplayString={addr =>
+              addressToDisplayString(
+                addr,
+                selectedWallet.publicDeriver.getParent().getNetworkInfo()
+              )
+            }
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             selectedExplorer={
               this.generated.stores.explorers.selectedExplorer.get(
@@ -142,6 +155,9 @@ export default class SignTxContainer extends Component<
         if (txData == null) return this.renderLoading();
         component = (
           <CardanoSignTxPage
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+            connectedWebsite={connectedWebsite}
+            selectedWallet={selectedWallet}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
@@ -166,10 +182,12 @@ export default class SignTxContainer extends Component<
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
             onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
             onCancel={this.onCancel}
-            addressToDisplayString={addr => addressToDisplayString(
-              addr,
-              selectedWallet.publicDeriver.getParent().getNetworkInfo()
-            )}
+            addressToDisplayString={addr =>
+              addressToDisplayString(
+                addr,
+                selectedWallet.publicDeriver.getParent().getNetworkInfo()
+              )
+            }
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             selectedExplorer={
               this.generated.stores.explorers.selectedExplorer.get(
@@ -211,19 +229,21 @@ export default class SignTxContainer extends Component<
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?number,
       |},
       connector: {|
         signingMessage: ?SigningMessage,
         filteredWallets: Array<PublicDeriverCache>,
         signingRequest: ?ISignRequest<any>,
         adaTransaction: ?CardanoConnectorSignRequest,
+        currentConnectorWhitelist: Array<WhitelistEntry>,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
       profile: {|
         unitOfAccount: UnitOfAccountSettingType,
+        shouldHideBalance: boolean,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -252,12 +272,14 @@ export default class SignTxContainer extends Component<
           filteredWallets: stores.connector.filteredWallets,
           signingRequest: stores.connector.signingRequest,
           adaTransaction: stores.connector.adaTransaction,
+          currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
         },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
         },
         profile: {
           unitOfAccount: stores.profile.unitOfAccount,
+          shouldHideBalance: stores.profile.shouldHideBalance,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
