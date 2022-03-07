@@ -719,7 +719,7 @@ export default class ErgoApi {
       }
     }
 
-    return new ErgoTransaction({
+    return ErgoTransaction.fromData({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,

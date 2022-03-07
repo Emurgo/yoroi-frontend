@@ -72,6 +72,11 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
   }
 
   @action
+  static fromData(data: CardanoShelleyTransactionCtorData): CardanoShelleyTransaction {
+    return new CardanoShelleyTransaction(data);
+  }
+
+  @action
   static fromAnnotatedTx(request: {|
     tx: {|
       ...CardanoShelleyTxIO,
