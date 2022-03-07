@@ -54,6 +54,7 @@ import {
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -499,6 +500,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       inputs,
       outputs,
       fee,
+      utxos,
     );
 
     runInAction(() => {
@@ -572,12 +574,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     inputs: Array<{| address: string, value: MultiToken |}>,
     outputs: Array<{| address: string, value: MultiToken |}>,
     fee: {| tokenId: string, networkId: number, amount: string |},
+    utxos: ?IGetAllUtxosResponse,
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
-    const withUtxos = asGetAllUtxos(publicDeriver);
-    if (withUtxos == null) {
-      throw new Error('wallet doesn\'t support IGetAllUtxos');
+    if(!utxos) {
+      const withUtxos = asGetAllUtxos(publicDeriver);
+      if (withUtxos == null) {
+        throw new Error('wallet doesn\'t support IGetAllUtxos');
+      }
+      utxos = await withUtxos.getAllUtxos();
     }
-    const utxos = await withUtxos.getAllUtxos();
+
     const ownAddresses = new Set([
       ...utxos.map(utxo => utxo.address),
       ...await connectorGetUsedAddresses(publicDeriver, null),
