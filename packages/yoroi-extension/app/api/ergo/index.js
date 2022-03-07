@@ -118,7 +118,6 @@ import {
 import { GetDerivationSpecific, } from '../ada/lib/storage/database/walletTypes/common/api/read';
 import { MultiToken } from '../common/lib/MultiToken';
 import { TxStatusCodes } from '../ada/lib/storage/database/primitives/enums';
-import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import { asHasLevels } from '../ada/lib/storage/models/PublicDeriver/traits';
 
 export function fixUtxoToStringValues<T>(utxo: T): T {

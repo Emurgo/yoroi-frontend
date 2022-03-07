@@ -48,7 +48,6 @@ import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiT
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';

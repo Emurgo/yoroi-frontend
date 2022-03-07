@@ -81,7 +81,7 @@ export default class TokenInfoStore<
 
   @action fetchMissingTokenInfoForWallet: (
     wallet: PublicDeriver<>,
-  ) => Promise<void> = async (wallet, submittedTxTokenIds) => {
+  ) => Promise<void> = async (wallet) => {
     // the Ergo connector doesn't have this store, but it this function won't be invoked
     if (!this.stores.transactions) {
       throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.fetchMissingTokenInfo)} missing transactions store`);

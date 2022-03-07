@@ -152,8 +152,6 @@ import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
 import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
-import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
-import type { ISignRequest } from '../common/lib/transactions/ISignRequest';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 
 // ADA specific Request / Response params
@@ -2318,7 +2316,10 @@ export default class AdaApi {
       metadata: signRequest.metadata
         ? Buffer.from(signRequest.metadata.to_bytes()).toString('hex')
         : null,
-      withdrawals: signRequest.withdrawals().map(({ address, amount }) => ({ address, value: amount })),
+      withdrawals: signRequest.withdrawals().map(withdrawal => ({
+        address: withdrawal.address,
+        value: withdrawal.amount
+      })),
       isValid: true,
     });
   }
