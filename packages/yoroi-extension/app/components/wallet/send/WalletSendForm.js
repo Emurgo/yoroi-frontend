@@ -446,7 +446,7 @@ export default class WalletSendForm extends Component<Props> {
                 }).TokenId
               }
               renderValue={value => (
-                <Box>{tokenOptions.filter(option => option.value === value)[0].label}</Box>
+                <Box>{tokenOptions.filter(option => option.value === value)[0]?.label}</Box>
               )}
             >
               <MenuItem
