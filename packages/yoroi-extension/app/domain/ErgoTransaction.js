@@ -14,8 +14,14 @@ import WalletTransaction, { toAddr } from './WalletTransaction';
 import type {
   DefaultTokenEntry,
 } from '../api/common/lib/MultiToken';
+import type { WalletTransactionCtorData } from './WalletTransaction';
 
 export default class ErgoTransaction extends WalletTransaction {
+
+  @action
+  static fromData(data: WalletTransactionCtorData): ErgoTransaction {
+    return new ErgoTransaction(data);
+  }
 
   @action
   static fromAnnotatedTx(request: {|

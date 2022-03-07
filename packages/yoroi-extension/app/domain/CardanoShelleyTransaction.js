@@ -38,6 +38,18 @@ export type CardanoShelleyTransactionFeature =
   | 'MoveInstantaneousRewards'
 ;
 
+export type CardanoShelleyTransactionCtorData = {|
+  ...WalletTransactionCtorData,
+  certificates: Array<CertificatePart>,
+  ttl: void | BigNumber,
+  metadata: null | string,
+  withdrawals: Array<{|
+    address: string,
+    value: MultiToken,
+  |}>,
+  isValid: boolean,
+|};
+
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
   @observable certificates: Array<CertificatePart>;
@@ -49,17 +61,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
   @observable metadata: null | string;
   @observable isValid: boolean;
 
-  constructor(data: {|
-    ...WalletTransactionCtorData,
-    certificates: Array<CertificatePart>,
-    ttl: void | BigNumber,
-    metadata: null | string,
-    withdrawals: Array<{|
-      address: string,
-      value: MultiToken,
-    |}>,
-    isValid: boolean,
-  |}) {
+  constructor(data: CardanoShelleyTransactionCtorData) {
     const { certificates, ttl, metadata, withdrawals, isValid, ...rest } = data;
     super(rest);
     this.certificates = certificates;
@@ -67,6 +69,11 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     this.metadata = metadata;
     this.withdrawals = withdrawals;
     this.isValid = isValid;
+  }
+
+  @action
+  static fromData(data: CardanoShelleyTransactionCtorData): CardanoShelleyTransaction {
+    return new CardanoShelleyTransaction(data);
   }
 
   @action
