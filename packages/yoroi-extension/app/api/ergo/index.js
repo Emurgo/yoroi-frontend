@@ -118,7 +118,6 @@ import {
 import { GetDerivationSpecific, } from '../ada/lib/storage/database/walletTypes/common/api/read';
 import { MultiToken } from '../common/lib/MultiToken';
 import { TxStatusCodes } from '../ada/lib/storage/database/primitives/enums';
-import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import { asHasLevels } from '../ada/lib/storage/models/PublicDeriver/traits';
 
 export function fixUtxoToStringValues<T>(utxo: T): T {
@@ -669,7 +668,7 @@ export default class ErgoApi {
     txId: string,
     defaultNetworkId: number,
     defaultToken: $ReadOnly<TokenRow>,
-  ): Promise<WalletTransactionCtorData> {
+  ): Promise<ErgoTransaction> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
@@ -720,7 +719,7 @@ export default class ErgoApi {
       }
     }
 
-    return {
+    return ErgoTransaction.fromData({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,
@@ -733,6 +732,6 @@ export default class ErgoApi {
       state: TxStatusCodes.SUBMITTED,
       errorMsg: null,
       block: null,
-    };
+    });
   }
 }

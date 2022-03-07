@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
+import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
@@ -39,13 +40,14 @@ import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
+  isErgo,
+  networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../api/common/lib/MultiToken';
 import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -53,6 +55,10 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
 import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
+import {
+  persistSubmittedTransactions,
+  loadSubmittedTransactions
+} from '../../api/localStorage';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -91,6 +97,7 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 export const SEARCH_SKIP: number = 0;
 
 type SubmittedTransactionEntry = {|
+  networkId: number,
   publicDeriverId: number,
   transaction: WalletTransaction,
 |};
@@ -108,7 +115,6 @@ function newMultiToken(
   return new MultiToken(values, defaultTokenInfo)
 }
 
-const SUBMITTED_TRANSACTIONS_KEY = 'submittedTransactions';
 const TRANSACTION_LIST_COMPUTATION_BATCH_SIZE = 60;
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
@@ -147,6 +153,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
     actions.closeDelegationBanner.listen(this._closeDelegationBanner);
     this._loadSubmittedTransactions();
+    window.chrome.runtime.onMessage.addListener((message) => {
+      if (message === 'connector-tx-submitted') {
+        runInAction(this._loadSubmittedTransactions);
+      }
+    });
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -772,14 +783,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @action
   recordSubmittedTransaction: (
     PublicDeriver<>,
-    WalletTransactionCtorData,
+    WalletTransaction,
   ) => void = (
     publicDeriver,
     transaction,
   ) => {
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
-      transaction: new WalletTransaction(transaction),
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+      transaction,
     });
     this._persistSubmittedTransactions();
   }
@@ -814,25 +826,22 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   _persistSubmittedTransactions: () => void = () => {
-    localStorage.setItem(
-      SUBMITTED_TRANSACTIONS_KEY,
-      JSON.stringify(this._submittedTransactions)
-    );
+    persistSubmittedTransactions(this._submittedTransactions);
   }
 
-  _loadSubmittedTransactions: () => void = () => {
+  _loadSubmittedTransactions: () => Promise<void> = async () => {
     try {
-      const dataStr = localStorage.getItem(SUBMITTED_TRANSACTIONS_KEY);
-      if (dataStr == null) {
+      const data = loadSubmittedTransactions();
+      if (!data) {
         return;
       }
-      const data = JSON.parse(dataStr);
-
-      const txs = data.map(({ publicDeriverId, transaction }) => {
+      // token id set in submitted transactions, grouped by the network id
+      const tokenIds: Map<number, Set<string>> = new Map();
+      const txs = data.map(({ publicDeriverId, transaction, networkId }) => {
         if (transaction.block) {
           throw new Error('submitted transaction should not have block data');
         }
-        const tx =  new WalletTransaction({
+        const txCtorData = {
           txid: transaction.txid,
           block: null,
           type: transaction.type,
@@ -851,13 +860,64 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           },
           state: transaction.state,
           errorMsg: transaction.errorMsg,
-        });
+        };
+        let tx;
+
+        const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
+          ({ NetworkId }) => NetworkId === networkId
+        );
+        if (!network) {
+          return;
+        }
+
+        if (isCardanoHaskell(network)) {
+          tx = new CardanoShelleyTransaction({
+            ...txCtorData,
+            certificates: transaction.certificates,
+            ttl: new BigNumber(transaction.ttl),
+            metadata: transaction.metadata,
+            withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+              address,
+              value: MultiToken.from(value)
+            })),
+            isValid: transaction.isValid,
+          });
+        } else if (isErgo(network)) {
+          tx = new WalletTransaction(txCtorData);
+        } else {
+          return;
+        }
+
+        let tokenIdSet = tokenIds.get(networkId);
+        if (!tokenIdSet) {
+          tokenIdSet = new Set();
+          tokenIds.set(networkId, tokenIdSet);
+        }
+
+        tx.addresses.from.flatMap(
+          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+        ).forEach(tokenId => tokenIdSet?.add(tokenId));
+        tx.addresses.to.flatMap(
+          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+        ).forEach(tokenId => tokenIdSet?.add(tokenId));
+
         return {
           publicDeriverId,
           transaction: tx,
+          networkId,
         };
+      }).filter(Boolean);
+
+      for (const [networkId, tokenIdSet] of tokenIds.entries()) {
+        await this.stores.tokenInfoStore.fetchMissingTokenInfo(
+          networkId,
+          [...tokenIdSet]
+        );
+      }
+
+      runInAction(() => {
+        this._submittedTransactions.splice(0, 0, ...txs);
       });
-      this._submittedTransactions.splice(0, 0, ...txs);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
