@@ -3,7 +3,7 @@
 import { Given, When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import languageSelection from '../support/helpers/language-selection-helpers';
+import languageSelection, { clickContinue } from '../support/helpers/language-selection-helpers';
 
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
@@ -16,7 +16,7 @@ When(/^I am on the language selection screen$/, async function () {
 });
 
 When(/^I open language selection dropdown$/, async function () {
-  await this.click(`${LANGUAGE_SELECTION_FORM} .SimpleInput_input`);
+  await this.click(`${LANGUAGE_SELECTION_FORM} .MuiInputBase-input`);
 });
 
 When(/^I select Japanese language$/, async function () {
@@ -24,7 +24,7 @@ When(/^I select Japanese language$/, async function () {
 });
 
 When(/^I submit the language selection form$/, async function () {
-  await this.click('.LanguageSelectionForm_submitButton');
+  await clickContinue(this);
 });
 
 Then(/^I should not see the language selection screen anymore$/, async function () {

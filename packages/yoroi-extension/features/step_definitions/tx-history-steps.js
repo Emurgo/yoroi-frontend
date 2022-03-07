@@ -67,15 +67,16 @@ Then(
   /^I should see ([^"]*) ([^"]*) transactions$/,
   async function (txsNumber, txExpectedStatus) {
     const txsAmount = parseInt(txsNumber, 10);
+    const showMoreLocator = '.WalletTransactionsList_component .MuiButton-primary';
 
     await this.driver.sleep(500);
     // press the show more transaction button until all transactions are visible
     for (let i = 1; i < txsAmount; i++) {
-      const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
-      if (webElements.length === 0) {
+      const buttonShowMoreExists = await this.checkIfExists(By.css(showMoreLocator));
+      if (!buttonShowMoreExists) {
         break;
       }
-      await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+      await this.click(showMoreLocator);
       await this.driver.sleep(500);
     }
 
@@ -186,11 +187,11 @@ const displayInfo = {
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'HIGH',
     txFrom: [
-      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.820000 ADA'],
+      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.82 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...iLjTnt34Aj', 'BYRON - EXTERNAL', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.650000 ADA'],
+      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.65 ADA'],
     ],
     txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
     txConfirmations: 'High. 104 confirmations.',
@@ -202,7 +203,7 @@ const displayInfo = {
     txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
     txFrom: [
-      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1.000000 ADA'],
+      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...sTrQfTxPVX', 'PROCESSING...', '+0.000001 ADA']
@@ -212,15 +213,15 @@ const displayInfo = {
   },
   'failed-single-tx': {
     txType: 'ADA sent',
-    txAmount: '-0.180000',
+    txAmount: '-0.18',
     txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
     txFrom: [
-      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1.000000 ADA'],
+      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...xJPmFzi6G2', 'ADDRESS BOOK', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.820000 ADA'],
+      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.82 ADA'],
     ],
     txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',
     txFee: '0.179999',
