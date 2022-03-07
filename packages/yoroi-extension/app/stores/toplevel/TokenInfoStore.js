@@ -74,36 +74,38 @@ export default class TokenInfoStore<
     // the Ergo connector doesn't have this action
     if (this.actions.wallets?.setActiveWallet) {
       this.actions.wallets.setActiveWallet.listen(
-        ({ wallet }) => { this.fetchMissingTokenInfo(wallet) }
+        ({ wallet }) => { this.fetchMissingTokenInfoForWallet(wallet) }
       );
     }
   }
 
-  @action fetchMissingTokenInfo: (
+  @action fetchMissingTokenInfoForWallet: (
     wallet: PublicDeriver<>,
-    submittedTxTokenIds?: ?Set<string>,
   ) => Promise<void> = async (wallet, submittedTxTokenIds) => {
     // the Ergo connector doesn't have this store, but it this function won't be invoked
     if (!this.stores.transactions) {
       throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.fetchMissingTokenInfo)} missing transactions store`);
     }
 
-    let tokenIds;
-    if (submittedTxTokenIds) {
-      tokenIds = [...submittedTxTokenIds];
-    } else {
-      const { requests } = this.stores.transactions.getTxRequests(wallet);
+    const { requests } = this.stores.transactions.getTxRequests(wallet);
 
-      await requests.allRequest;
+    await requests.allRequest;
 
-      tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
-    }
+    const  tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
 
+    const networkId = wallet.getParent().networkInfo.NetworkId;
+
+    await this.fetchMissingTokenInfo(networkId, tokenIds);
+  };
+
+  fetchMissingTokenInfo: (number, Array<string>) => Promise<void> = async (
+    networkId,
+    tokenIds
+  ) => {
     const db = this.stores.loading.getDatabase();
     if (!db) {
       return;
     }
-    const networkId = wallet.getParent().networkInfo.NetworkId;
     const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
       ({ NetworkId }) => NetworkId === networkId
     );
@@ -112,15 +114,15 @@ export default class TokenInfoStore<
     }
 
     let assetMap;
-    if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+    if (isCardanoHaskell(network)) {
       const deps =  Object.freeze({
         ModifyToken,
         GetToken,
       });
       const depTables = Object
-        .keys(deps)
-        .map(key => deps[key])
-        .flatMap(table => getAllSchemaTables(db, table));
+            .keys(deps)
+            .map(key => deps[key])
+            .flatMap(table => getAllSchemaTables(db, table));
 
       assetMap = await raii(
         db,
@@ -137,7 +139,7 @@ export default class TokenInfoStore<
           )
         )
       );
-    } else if (isErgo(wallet.getParent().getNetworkInfo())) {
+    } else if (isErgo(network)) {
       assetMap = await addErgoAssets(
         {
           db,
@@ -145,7 +147,7 @@ export default class TokenInfoStore<
           getAssetInfo: async (req) => {
             try {
               return await
-                this.stores.substores.ergo.stateFetchStore.fetcher.getAssetInfo(req);
+              this.stores.substores.ergo.stateFetchStore.fetcher.getAssetInfo(req);
             } catch (e) {
               // eslint-disable-next-line no-console
               console.error('Aseet info request failed', e);
@@ -159,7 +161,7 @@ export default class TokenInfoStore<
       throw new Error('unexpected wallet type');
     }
     runInAction(() => { this._updateTokenInfo([...assetMap.values()]) });
-  };
+  }
 
   refreshTokenInfo: void => Promise<void> = async () => {
     const db = this.stores.loading.getDatabase();

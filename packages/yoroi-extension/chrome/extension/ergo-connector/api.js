@@ -948,6 +948,7 @@ export async function connectorRecordSubmittedErgoTransaction(
   submittedTxs.push({
     publicDeriverId: publicDeriver.publicDeriverId,
     transaction: submittedTx,
+    networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
   });
   persistSubmittedTransactions(submittedTxs);
 }
@@ -1082,6 +1083,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   submittedTxs.push({
     publicDeriverId: publicDeriver.publicDeriverId,
     transaction: submittedTx,
+    networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
   });
   persistSubmittedTransactions(submittedTxs);
 }

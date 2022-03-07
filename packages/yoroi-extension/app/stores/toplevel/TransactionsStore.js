@@ -40,6 +40,8 @@ import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
+  isErgo,
+  networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../api/common/lib/MultiToken';
 import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiToken';
@@ -96,6 +98,7 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 export const SEARCH_SKIP: number = 0;
 
 type SubmittedTransactionEntry = {|
+  networkId: number,
   publicDeriverId: number,
   transaction: WalletTransaction,
 |};
@@ -151,6 +154,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
     actions.closeDelegationBanner.listen(this._closeDelegationBanner);
     this._loadSubmittedTransactions();
+    window.chrome.runtime.onMessage.addListener((message) => {
+      if (message === 'connector-tx-submitted') {
+        runInAction(this._loadSubmittedTransactions);
+      }
+    });
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -456,24 +464,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    // The submitted transactions may contain freshly minted assets, we need to
-    // insert the default token info entries for them otherwise there would be
-    // an exception when the submitted transactions are rendered.
-    const submittedTxTokenIds = new Set(this.getSubmittedTransactions(publicDeriver).flatMap(
-      tx => [
-        ...tx.addresses.from.flatMap(
-          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-        ),
-        ...tx.addresses.to.flatMap(
-          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-        )
-      ]
-    ));
-    this.stores.tokenInfoStore.fetchMissingTokenInfo(
-      publicDeriver,
-      submittedTxTokenIds,
-    );
-
     const limit = this.searchOptions
       ? this.searchOptions.limit
       : INITIAL_SEARCH_LIMIT;
@@ -801,7 +791,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => {
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
-      transaction: transaction,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+      transaction,
     });
     this._persistSubmittedTransactions();
   }
@@ -839,13 +830,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     persistSubmittedTransactions(this._submittedTransactions);
   }
 
-  _loadSubmittedTransactions: () => void = () => {
+  _loadSubmittedTransactions: () => Promise<void> = async () => {
     try {
       const data = loadSubmittedTransactions();
       if (!data) {
         return;
       }
-      const txs = data.map(({ publicDeriverId, transaction }) => {
+      // token id set in submitted transactions, grouped by the network id
+      const tokenIds: Map<number, Set<string>> = new Map();
+      const txs = data.map(({ publicDeriverId, transaction, networkId }) => {
         if (transaction.block) {
           throw new Error('submitted transaction should not have block data');
         }
@@ -870,7 +863,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           errorMsg: transaction.errorMsg,
         };
         let tx;
-        if (transaction.isValid != null) {
+
+        const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
+          ({ NetworkId }) => NetworkId === networkId
+        );
+        if (!network) {
+          return;
+        }
+
+        if (isCardanoHaskell(network)) {
           tx = new CardanoShelleyTransaction({
             ...txCtorData,
             certificates: transaction.certificates,
@@ -882,16 +883,42 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             })),
             isValid: transaction.isValid,
           });
-        } else {
+        } else if (isErgo(network)) {
           tx = new WalletTransaction(txCtorData);
+        } else {
+          return;
         }
+
+        let tokenIdSet = tokenIds.get(networkId);
+        if (!tokenIdSet) {
+          tokenIdSet = new Set();
+          tokenIds.set(networkId, tokenIdSet);
+        }
+
+        tx.addresses.from.flatMap(
+          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+        ).forEach(tokenId => tokenIdSet?.add(tokenId));
+        tx.addresses.to.flatMap(
+          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+        ).forEach(tokenId => tokenIdSet?.add(tokenId));
 
         return {
           publicDeriverId,
           transaction: tx,
+          networkId,
         };
+      }).filter(Boolean);
+
+      for (const [networkId, tokenIdSet] of tokenIds.entries()) {
+        await this.stores.tokenInfoStore.fetchMissingTokenInfo(
+          networkId,
+          [...tokenIdSet]
+        );
+      }
+
+      runInAction(() => {
+        this._submittedTransactions.splice(0, 0, ...txs);
       });
-      this._submittedTransactions.splice(0, 0, ...txs);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);

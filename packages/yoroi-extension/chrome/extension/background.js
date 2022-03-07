@@ -1240,6 +1240,7 @@ function handleInjectorConnect(port) {
                         console.error('error recording submitted tx', error);
                       }
                     }
+                    chrome.runtime.sendMessage('connector-tx-submitted');
                     rpcResponse({
                       ok: id
                     });
