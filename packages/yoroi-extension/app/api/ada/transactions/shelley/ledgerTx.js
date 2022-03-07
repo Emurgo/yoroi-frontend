@@ -102,6 +102,15 @@ export async function createLedgerSignTxPayload(request: {|
         nonce,
       }
     };
+  } else if (request.signRequest.metadata != null) {
+    auxiliaryData = {
+      type: TxAuxiliaryDataType.ARBITRARY_HASH,
+      params: {
+        hashHex: Buffer.from(
+          RustModule.WalletV4.hash_auxiliary_data(request.signRequest.metadata).to_bytes()
+        ).toString('hex'),
+      },
+    };
   }
 
   return {
