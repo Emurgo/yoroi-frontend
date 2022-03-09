@@ -38,6 +38,7 @@ import {
   cardanoValueFromMultiToken,
   parseTokenList,
 } from '../utils';
+import { hexToBytes } from '../../../../coreUtils';
 import { classifyUtxoForValues } from './coinSelection';
 import type { UtxoDescriptor } from './coinSelection';
 
@@ -58,6 +59,11 @@ type TxMint = {|
   assetName: string, // HEX
   amount: string,
 |};
+
+type TxAuxiliaryData = {|
+  metadata: ?TxMetadata,
+  nativeScripts: ?Array<string>,
+|}
 
 type TxMetadata = {
   [tag: string]: string,
@@ -391,7 +397,7 @@ export function newAdaUnsignedTx(
 export function newAdaUnsignedTxForConnector(
   outputs: Array<TxOutput>,
   mint: Array<TxMint>,
-  metadata: TxMetadata,
+  auxiliaryData: TxAuxiliaryData,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<CardanoAddressedUtxo>,
   coinSelectUtxos: Array<CardanoAddressedUtxo>,
@@ -425,7 +431,7 @@ export function newAdaUnsignedTxForConnector(
   const unsignedTxResponse = newAdaUnsignedTxFromUtxoForConnector(
     outputs,
     mint,
-    metadata,
+    auxiliaryData,
     changeAdaAddr,
     Array.from(addressingMapForMustIncludeUtxos.keys()),
     Array.from(addressingMapForCoinSelectUtxos.keys()),
@@ -880,7 +886,7 @@ function _newAdaUnsignedTxFromUtxo(
 function newAdaUnsignedTxFromUtxoForConnector(
   outputs: Array<TxOutput>,
   mint: Array<TxMint>,
-  metadata: TxMetadata,
+  auxiliaryData: TxAuxiliaryData,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   mustIncludeUtxos: Array<RemoteUnspentOutput>,
   coinSelectUtxos: Array<RemoteUnspentOutput>,
@@ -982,11 +988,25 @@ function newAdaUnsignedTxFromUtxoForConnector(
     }
   }
   {
+    const metadata = auxiliaryData.metadata ?? {};
     for (const tag of Object.keys(metadata)) {
       txBuilder.add_json_metadatum(
         RustModule.WalletV4.BigNum.from_str(String(tag)),
         metadata[tag],
       )
+    }
+    const nativeScripts = auxiliaryData.nativeScripts ?? [];
+    if (nativeScripts.length > 0) {
+      const wasmAuxiliaryData = txBuilder.get_auxiliary_data()
+        ?? RustModule.WalletV4.AuxiliaryData.new();
+      const wasmNativeScripts = wasmAuxiliaryData.native_scripts()
+        ?? RustModule.WalletV4.NativeScripts.new();
+      for (const scriptHex of nativeScripts) {
+        const wasmNativeScript = RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(scriptHex));
+        wasmNativeScripts.add(wasmNativeScript);
+      }
+      wasmAuxiliaryData.set_native_scripts(wasmNativeScripts);
+      txBuilder.set_auxiliary_data(wasmAuxiliaryData);
     }
   }
 

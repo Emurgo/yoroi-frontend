@@ -5,8 +5,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import styles from './SignTxPage.scss';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -15,7 +14,6 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import ProgressBar from '../ProgressBar';
 import type {
   DefaultTokenEntry,
   TokenLookupKey,
@@ -29,12 +27,15 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
-import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
+import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
-import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
+import SignTxTabs from './SignTxTabs';
+import { Box } from '@mui/system';
+import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
+import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +tx: Tx,
@@ -43,16 +44,19 @@ type Props = {|
   +onCancel: () => void,
   +onConfirm: string => Promise<void>,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?number,
+  +shouldHideBalance: boolean,
+  +selectedWallet: PublicDeriverCache,
+  +connectedWebsite: ?WhitelistEntry,
 |};
 
-const messages = defineMessages({
+export const signTxMessages: Object = defineMessages({
   title: {
     id: 'connector.signin.title',
     defaultMessage: '!!!Sign transaction',
@@ -60,6 +64,22 @@ const messages = defineMessages({
   txDetails: {
     id: 'connector.signin.txDetails',
     defaultMessage: '!!!Transaction Details',
+  },
+  totals: {
+    id: 'connector.signin.totals',
+    defaultMessage: '!!!Totals',
+  },
+  connectedTo: {
+    id: 'connector.signin.connectedTo',
+    defaultMessage: '!!!Connected To',
+  },
+  transactionFee: {
+    id: 'connector.signin.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
+  },
+  totalAmount: {
+    id: 'connector.signin.totalAmount',
+    defaultMessage: '!!!Total Amount',
   },
   receiver: {
     id: 'connector.signin.receiver',
@@ -76,7 +96,6 @@ const messages = defineMessages({
 });
 
 type State = {|
-  showUtxoDetails: boolean,
   isSubmitting: boolean,
 |}
 
@@ -87,7 +106,6 @@ class SignTxPage extends Component<Props, State> {
   };
 
   state: State = {
-    showUtxoDetails: false,
     isSubmitting: false,
   }
 
@@ -133,7 +151,7 @@ class SignTxPage extends Component<Props, State> {
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
-              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+              this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
             )
           } else {
             throw error;
@@ -145,31 +163,31 @@ class SignTxPage extends Component<Props, State> {
     });
   }
 
-  getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
+  getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
-    return fingerprint !== undefined
-      ? (
-        <ExplorableHashContainer
-          selectedExplorer={this.props.selectedExplorer}
-          hash={fingerprint}
-          light
-          linkType="token"
-        >
-          <span className={styles.rowData}>{truncateToken(getTokenName(tokenInfo))}</span>
-        </ExplorableHashContainer>
-      )
-      : truncateToken(getTokenName(tokenInfo))
+    return fingerprint !== undefined ? (
+      <ExplorableHashContainer
+        selectedExplorer={this.props.selectedExplorer}
+        hash={fingerprint}
+        light
+        linkType="token"
+      >
+        <span>{truncateToken(getTokenName(tokenInfo))}</span>
+      </ExplorableHashContainer>
+    ) : (
+      truncateToken(getTokenName(tokenInfo))
+    );
   };
 
-  getFingerprint: $ReadOnly<TokenRow> => string | void = tokenInfo => {
+  getFingerprint: ($ReadOnly<TokenRow>) => string | void = tokenInfo => {
     if (tokenInfo.Metadata.type === 'Cardano') {
       return getTokenIdentifierIfExists(tokenInfo);
     }
     return undefined;
-  }
+  };
 
   // Tokens can be minted inside the transaction so we have to look it up there first
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null  = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null = tokenEntry => {
     const { tx } = this.props;
     const mintedTokens = mintedTokenInfo(tx, Logger.info);
     const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
@@ -178,45 +196,33 @@ class SignTxPage extends Component<Props, State> {
     }
 
     return this.props.getTokenInfo(tokenEntry);
-  }
+  };
 
-  displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
+  displayUnAvailableToken: TokenEntry => Node = tokenEntry => {
     return (
       <>
-        <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
-        {' '}
-        <span>
-          {truncateAddressShort(
-           tokenEntry.identifier
-          )}
-        </span>
+        <span>+{tokenEntry.amount.toString()}</span>{' '}
+        <span>{truncateAddressShort(tokenEntry.identifier)}</span>
       </>
-    )
-  }
+    );
+  };
 
-  renderAmountDisplay: {|
+  renderAmountDisplay: ({|
     entry: TokenEntry,
-  |} => Node = (request) => {
+  |}) => Node = request => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
 
-    if (tokenInfo == null) return this.displayUnAvailableToken(request.entry)
-    const shiftedAmount = request.entry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    if (tokenInfo == null) return this.displayUnAvailableToken(request.entry);
+    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(
-        request.entry.identifier,
-        currency
-      );
+      const price = this.props.getCurrentPrice(request.entry.identifier, currency);
       if (price != null) {
         return (
           <>
-            <span className={styles.amountRegular}>
-              {calculateAndFormatValue(shiftedAmount, price)}
-            </span>
-            {' '}{currency}
-            <div className={styles.amountRegular}>
+            <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
+            <div>
               {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
             </div>
           </>
@@ -235,141 +241,184 @@ class SignTxPage extends Component<Props, State> {
 
     return (
       <>
-        <span className={styles.amountRegular}>
-          {adjustedBefore}{afterDecimalRewards}
-        </span> {this.getTicker(tokenInfo)}
+        <span>
+          {adjustedBefore}
+          {afterDecimalRewards}
+        </span>{' '}
+        {this.getTicker(tokenInfo)}
       </>
     );
-  }
-
-  renderAddresses(): Node {
-    const addresses = this.props.txData.outputs().map(({ address }) =>  address )
-
-    return (
-      <div className={styles.toAddresses}>
-        <p className={styles.address}>{addresses[0]}</p>
-        {addresses.length >= 2 && (
-          <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
-            {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
-          </button>)}
-      </div>
-    )
-  }
-
-  toggleUtxoDetails: boolean => void = (newState) => {
-    this.setState({ showUtxoDetails: newState })
-  }
+  };
 
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
+
     const { isSubmitting } = this.state;
 
     const { intl } = this.context;
-    const { txData, onCancel, } = this.props;
-    const { showUtxoDetails } = this.state
+    const { txData, onCancel, connectedWebsite } = this.props;
+
     const totalInput = txData.totalInput();
-    const fee = txData.fee()
-    const amount = totalInput.joinSubtractCopy(fee)
+    const fee = txData.fee();
+    const amount = totalInput.joinSubtractCopy(fee);
+
+    const url = connectedWebsite?.url ?? '';
+    const faviconUrl = connectedWebsite?.image ?? '';
+
     return (
-      <div className={styles.component}>
-        <ProgressBar step={2} />
-        <div>
-          {
-         !showUtxoDetails ? (
-           <div
-             className={styles.signTx}
-           >
-             <div>
-               <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
-             </div>
-             <div className={styles.transactionWrapper}>
-               <p className={styles.transactionId}>
-                 {intl.formatMessage(messages.receiver)}
-               </p>
-               <p className={styles.hash}>{this.renderAddresses()}</p>
-               <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
-                 <p>{intl.formatMessage(messages.txDetails)}</p>
-                 <ArrowRight />
-               </button>
-             </div>
-             <div className={styles.info}>
-               <div className={styles.infoRaw}>
-                 <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
-                 <p className={styles.labelValue}>
-                   {this.renderAmountDisplay({
-                        entry: {
-                          ...amount.getDefaultEntry(),
-                          amount: amount.getDefaultEntry().amount.abs().negated(),
-                        },
-                      }
-                    )}
-                 </p>
-               </div>
-               <div className={styles.infoRaw}>
-                 <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
-                 <p className={styles.labelValue}>
-                   {this.renderAmountDisplay({
-                        entry: {
-                          ...txData.fee().getDefaultEntry(),
-                          amount: txData.fee().getDefaultEntry().amount.abs().negated(),
-                        },
-                      })}
-                 </p>
-               </div>
-               <div className={styles.totalAmoundCard}>
-                 <p className={styles.totalAmoundLable}>
-                   {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-                 </p>
-                 <p className={styles.totalAmound}>
-                   {this.renderAmountDisplay({
-                        entry: {
-                          ...totalInput.getDefaultEntry(),
-                          amount: totalInput.getDefaultEntry().amount.abs().negated(),
-                        },
-                      }
-                     )}
-                 </p>
-               </div>
-             </div>
-             <div className={styles.passwordInput}>
-               <TextField
-                 type="password"
-                 className={styles.walletPassword}
-                 {...walletPasswordField.bind()}
-                 error={walletPasswordField.error}
-               />
-             </div>
-             <div className={styles.wrapperBtn}>
-               <Button fullWidth variant="secondary" onClick={onCancel}>
-                 {intl.formatMessage(globalMessages.cancel)}
-               </Button>
-               <LoadingButton
-                 variant="primary"
-                 fullWidth
-                 disabled={!walletPasswordField.isValid}
-                 onClick={this.submit.bind(this)}
-                 loading={isSubmitting}
-               >
-                 {intl.formatMessage(globalMessages.confirm)}
-               </LoadingButton>
-             </div>
-           </div>
-         ): <UtxoDetails
-           txData={txData}
-           onCopyAddressTooltip={this.props.onCopyAddressTooltip}
-           addressToDisplayString={this.props.addressToDisplayString}
-           getCurrentPrice={this.props.getCurrentPrice}
-           getTokenInfo={this.props.getTokenInfo}
-           notification={this.props.notification}
-           selectedExplorer={this.props.selectedExplorer}
-           tx={this.props.tx}
-           unitOfAccountSetting={this.props.unitOfAccountSetting}
-           toggleUtxoDetails={this.toggleUtxoDetails}
-         />
+      <SignTxTabs
+        overviewContent={
+          <Box paddingTop="8px" overflowWrap="break-word">
+            <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+              {intl.formatMessage(signTxMessages.connectedTo)}
+            </Typography>
+            <Box
+              display="flex"
+              alignItems="center"
+              px="28px"
+              py="20px"
+              border="1px solid var(--yoroi-palette-gray-100)"
+              borderRadius="6px"
+              minHeight="88px"
+              mb="8px"
+            >
+              <Box
+                sx={{
+                  marginRight: '12px',
+                  width: '32px',
+                  height: '32px',
+                  border: '1px solid #a7afc0',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f8f8',
+                  img: {
+                    width: '20px',
+                  },
+                }}
+              >
+                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
+              </Box>
+              <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
+                {url}
+              </Typography>
+            </Box>
+            <Box
+              display="flex"
+              alignItems="center"
+              px="28px"
+              py="20px"
+              border="1px solid var(--yoroi-palette-gray-100)"
+              borderRadius="6px"
+              minHeight="88px"
+            >
+              <WalletCard
+                shouldHideBalance={this.props.shouldHideBalance}
+                publicDeriver={this.props.selectedWallet}
+                getTokenInfo={this.props.getTokenInfo}
+              />
+            </Box>
+            <Box pt="32px">
+              <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+                {intl.formatMessage(signTxMessages.totals)}
+              </Typography>
+              <Box
+                width="100%"
+                px="12px"
+                py="20px"
+                pb="12px"
+                border="1px solid var(--yoroi-palette-gray-100)"
+                borderRadius="6px"
+              >
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  color="var(--yoroi-palette-gray-600)"
+                  py="6px"
+                  px="10px"
+                >
+                  <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
+                  <Typography>
+                    {this.renderAmountDisplay({
+                      entry: {
+                        ...txData.fee().getDefaultEntry(),
+                        amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                      },
+                    })}
+                  </Typography>
+                </Box>
+                <Box
+                  px="12px"
+                  py="23px"
+                  mt="10px"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  borderRadius="6px"
+                  backgroundColor="var(--yoroi-palette-primary-300)"
+                  color="var(--yoroi-palette-common-white)"
+                >
+                  <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
+                  <Typography variant="h3">
+                    {this.renderAmountDisplay({
+                      entry: {
+                        ...amount.getDefaultEntry(),
+                        amount: amount.getDefaultEntry().amount.abs().negated(),
+                      },
+                    })}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            <Box mt="46px">
+              <TextField
+                type="password"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
+              />
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gridGap: '15px',
+                }}
+              >
+                <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
+                  {intl.formatMessage(globalMessages.cancel)}
+                </Button>
+                <LoadingButton
+                  variant="primary"
+                  fullWidth
+                  disabled={!walletPasswordField.isValid}
+                  onClick={this.submit.bind(this)}
+                  loading={isSubmitting}
+                >
+                  {intl.formatMessage(globalMessages.confirm)}
+                </LoadingButton>
+              </Box>
+            </Box>
+          </Box>
         }
-        </div>
-      </div>
+        utxoAddressContent={
+          <Box>
+            <UtxoDetails
+              txData={txData}
+              onCopyAddressTooltip={this.props.onCopyAddressTooltip}
+              addressToDisplayString={this.props.addressToDisplayString}
+              getCurrentPrice={this.props.getCurrentPrice}
+              getTokenInfo={this.props.getTokenInfo}
+              notification={this.props.notification}
+              selectedExplorer={this.props.selectedExplorer}
+              tx={this.props.tx}
+              unitOfAccountSetting={this.props.unitOfAccountSetting}
+            />
+          </Box>
+        }
+      />
     );
   }
 }

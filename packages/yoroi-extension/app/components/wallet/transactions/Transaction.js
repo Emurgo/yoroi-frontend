@@ -36,7 +36,11 @@ import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName,
+  getTokenIdentifierIfExists,
+  assetNameFromIdentifier
+} from '../../../stores/stateless/tokenHelpers';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
   parseMetadata,
@@ -221,7 +225,7 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +addressToDisplayString: string => string,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
 |};
 
@@ -327,17 +331,20 @@ export default class Transaction extends Component<Props, State> {
       return <span>{hiddenAmount}</span>;
     }
     const tokenInfo = this.props.getTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(request.entry.identifier, currency);
       if (price != null) {
+        const tokenName = tokenInfo != null ? getTokenName(tokenInfo)
+          : assetNameFromIdentifier(request.entry.identifier);
         return (
           <>
             {calculateAndFormatValue(shiftedAmount, price) + ' ' + currency}
             <div className={styles.amountSmall}>
-              {shiftedAmount.toString()} {getTokenName(tokenInfo)}
+              {shiftedAmount.toString()} {tokenName}
             </div>
           </>
         );
@@ -345,7 +352,7 @@ export default class Transaction extends Component<Props, State> {
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -370,17 +377,20 @@ export default class Transaction extends Component<Props, State> {
     }
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(defaultEntry.identifier, currency);
       if (price != null) {
+        const tokenName = tokenInfo != null ? getTokenName(tokenInfo)
+          : assetNameFromIdentifier(defaultEntry.identifier);
         return (
           <>
             {calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency}
             <div className={styles.amountSmall}>
-              {shiftedAmount.abs().toString()} {getTokenName(tokenInfo)}
+              {shiftedAmount.abs().toString()} {tokenName}
             </div>
           </>
         );
@@ -391,7 +401,7 @@ export default class Transaction extends Component<Props, State> {
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount.abs(),
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals
     );
 
     return (
@@ -407,12 +417,13 @@ export default class Transaction extends Component<Props, State> {
       return this.props.unitOfAccountSetting.currency;
     }
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    return truncateToken(getTokenName(tokenInfo));
+    return tokenInfo != null ? truncateToken(getTokenName(tokenInfo))
+      : assetNameFromIdentifier(tokenEntry.identifier);
   };
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    if (tokenInfo.Metadata.type === 'Cardano') {
+    if (tokenInfo?.Metadata.type === 'Cardano') {
       return getTokenIdentifierIfExists(tokenInfo);
     }
     return undefined;

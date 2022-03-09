@@ -45,7 +45,9 @@ import {
   connectorSendTx,
   connectorSendTxCardano,
   connectorSignCardanoTx,
-  connectorSignTx
+  connectorSignTx,
+  connectorRecordSubmittedCardanoTransaction,
+  connectorRecordSubmittedErgoTransaction,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -342,6 +344,7 @@ async function withSelectedWallet<T>(
   continuation: (PublicDeriver<>, ?ConnectedSite) => Promise<T>,
   db: lf$Database,
   localStorageApi: LocalStorageApi,
+  shouldSyncWallet: boolean = true,
 ): Promise<T> {
   const wallets = await getWallets({ db });
   return await withSelectedSiteConnection(tabId, async connected => {
@@ -355,7 +358,9 @@ async function withSelectedWallet<T>(
       await removeWallet(tabId, publicDeriverId, localStorageApi);
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
-    await syncWallet(selectedWallet, localStorageApi);
+    if (shouldSyncWallet) {
+      await syncWallet(selectedWallet, localStorageApi);
+    }
 
     // we need to make sure this runs within the withDb call
     // since the publicDeriver contains a DB reference inside it
@@ -448,69 +453,79 @@ const yoroiMessageHandler = async (
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
-    const responseData = connection?.pendingSigns.get(request.uid);
-    if (connection && responseData) {
-      const password = request.pw;
-      switch (responseData.request.type) {
-        case 'tx':
-          {
-            try {
-              // We know `tx` is a `Tx` here
-              const txToSign: Tx = (request.tx: any);
-              const allIndices = [];
-              for (let i = 0; i < txToSign.inputs.length; i += 1) {
-                allIndices.push(i);
-              }
-              const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
-              responseData.resolve({ ok: signedTx });
-            } catch (error) {
-              responseData.resolve({ err: 'transaction signing failed' })
-            }
-          }
-          break;
-        case 'tx_input':
-          {
-            try {
-              const data = responseData.request;
-              const txToSign: Tx = (request.tx: any);
-              const signedTx = await signTxInputs(
-                txToSign,
-                [data.index],
-                password,
-                request.tabId
-              );
-              responseData.resolve({ ok: signedTx.inputs[data.index] });
-            } catch (error) {
-              responseData.resolve({ err: 'transaction signing failed' })
-            }
-          }
-          break;
-        case 'tx/cardano':
-          {
-            try {
-              const signedTx = await signCardanoTx(
-                // $FlowFixMe[prop-missing]
-                // $FlowFixMe[incompatible-exact]
-                (request.tx: CardanoTx),
-                password,
-                request.tabId
-              );
-              responseData.resolve({ ok: signedTx });
-            } catch (error) {
-              responseData.resolve({ err: 'transaction signing failed' })
-            }
-          }
-        break;
-        case 'data':
-          // mocked data sign
-          responseData.resolve({ err: 'Generic data signing is not implemented yet' });
-          break;
-        default:
-          // log?
-          break;
-      }
-      connection.pendingSigns.delete(request.uid);
+    if (!connection) {
+      throw new ConnectorError({
+        code: APIErrorCodes.API_INTERNAL_ERROR,
+        info: 'Connection has failed. Please retry.',
+      });
     }
+    const responseData = connection?.pendingSigns.get(request.uid);
+    if (!responseData) {
+      throw new ConnectorError({
+        code: APIErrorCodes.API_INTERNAL_ERROR,
+        info: `Sign request data is not available after confirmation (uid=${request.uid}). Please retry.`,
+      });
+    }
+    const password = request.pw;
+    switch (responseData.request.type) {
+      case 'tx':
+      {
+        try {
+          // We know `tx` is a `Tx` here
+          const txToSign: Tx = (request.tx: any);
+          const allIndices = [];
+          for (let i = 0; i < txToSign.inputs.length; i += 1) {
+            allIndices.push(i);
+          }
+          const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
+          responseData.resolve({ ok: signedTx });
+        } catch (error) {
+          responseData.resolve({ err: 'transaction signing failed' })
+        }
+      }
+        break;
+      case 'tx_input':
+      {
+        try {
+          const data = responseData.request;
+          const txToSign: Tx = (request.tx: any);
+          const signedTx = await signTxInputs(
+            txToSign,
+            [data.index],
+            password,
+            request.tabId
+          );
+          responseData.resolve({ ok: signedTx.inputs[data.index] });
+        } catch (error) {
+          responseData.resolve({ err: 'transaction signing failed' })
+        }
+      }
+        break;
+      case 'tx/cardano':
+      {
+        try {
+          const signedTx = await signCardanoTx(
+            // $FlowFixMe[prop-missing]
+            // $FlowFixMe[incompatible-exact]
+            (request.tx: CardanoTx),
+            password,
+            request.tabId
+          );
+          responseData.resolve({ ok: signedTx });
+        } catch (error) {
+          responseData.resolve({ err: 'transaction signing failed' })
+        }
+      }
+        break;
+      case 'data':
+        // mocked data sign
+        responseData.resolve({ err: 'Generic data signing is not implemented yet' });
+        break;
+      default:
+        // log?
+        break;
+    }
+    connection.pendingSigns.delete(request.uid);
   } else if (request.type === 'sign_rejected') {
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
@@ -674,16 +689,18 @@ async function confirmConnect(
     try {
       if (whitelistEntry != null) {
         // we already whitelisted this website, so no need to re-ask the user to confirm
-        connectedSites.set(tabId, {
-          url,
-          protocol,
-          appAuthID,
-          status: {
-            publicDeriverId: whitelistEntry.publicDeriverId,
-            auth: isAuthRequested ? whitelistEntry.auth : undefined,
-          },
-          pendingSigns: new Map()
-        });
+        if (connectedSites.get(tabId) == null) {
+          connectedSites.set(tabId, {
+            url,
+            protocol,
+            appAuthID,
+            status: {
+              publicDeriverId: whitelistEntry.publicDeriverId,
+              auth: isAuthRequested ? whitelistEntry.auth : undefined,
+            },
+            pendingSigns: new Map()
+          });
+        }
         resolve({
           connectedWallet: whitelistEntry.publicDeriverId,
           auth: isAuthRequested ? whitelistEntry.auth : undefined,
@@ -1212,16 +1229,37 @@ function handleInjectorConnect(port) {
                       id = Buffer.from(
                         RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
                       ).toString('hex');
+                      try {
+                        await connectorRecordSubmittedCardanoTransaction(
+                          wallet,
+                          tx,
+                        );
+                      } catch (error) {
+                        // eslint-disable-next-line no-console
+                        console.error('error recording submitted tx', error);
+                      }
                     } else { // is Ergo
                       const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
                       id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                      try {
+                        await connectorRecordSubmittedErgoTransaction(
+                          wallet,
+                          tx,
+                          id,
+                        );
+                      } catch (error) {
+                        // eslint-disable-next-line no-console
+                        console.error('error recording submitted tx', error);
+                      }
                     }
+                    chrome.runtime.sendMessage('connector-tx-submitted');
                     rpcResponse({
                       ok: id
                     });
                   },
                   db,
                   localStorageApi,
+                  false,
                 )
               });
             } catch (e) {
