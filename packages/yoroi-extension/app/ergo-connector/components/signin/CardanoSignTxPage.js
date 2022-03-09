@@ -4,11 +4,10 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Alert } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import { autorun } from 'mobx';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -33,8 +32,6 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type {
-  Tx,
-  CardanoTx,
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../../chrome/extension/ergo-connector/types';
@@ -42,9 +39,7 @@ import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType
 } from '../../types';
-import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
-import type CardanoTxRequest from '../../../api/ada';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import SignTxTabs from './SignTxTabs';
@@ -85,10 +80,6 @@ const messages = defineMessages({
   reorgMessage: {
     id: 'connector.signin.reorg.message',
     defaultMessage: '!!!<span>Collateral is a guarantee that prevents smart contract transaction failings and scams. It means you should make a 0 ADA transaction to generate collateral. <a>Learn more</a> about collateral.</span>'
-  },
-  incorrectWalletPasswordError: {
-    id: 'connector.signin.error.incorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
@@ -136,23 +127,12 @@ class SignTxPage extends Component<Props, State> {
         validateOnChange: true,
         validateOnBlur: false,
         validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-        validateOnBlur: false,
       },
       plugins: {
         vjf: vjf(),
       },
     }
   );
-
-  componentDidMount() {
-    autorun(() => {
-      if (this.props.submissionError === 'WRONG_PASSWORD') {
-        this.form.$('walletPassword').invalidate(
-          this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
-        )
-      }
-    });
-  }
 
   submit(): void {
     this.form.submit({
@@ -167,7 +147,8 @@ class SignTxPage extends Component<Props, State> {
           } else {
             throw error;
           }
-          this.setState({ isSubmitting: false })
+        }).finally(() => {
+          this.setState({ isSubmitting: false });
         });
       },
       onError: () => {},
@@ -318,15 +299,17 @@ class SignTxPage extends Component<Props, State> {
   };
 
   render(): Node {
-    if (this.props.isReorg) {
-      return this.renderReorg();
-    }
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-
-    const { txData, onCancel, connectedWebsite } = this.props;
+    const {
+      txData,
+      onCancel,
+      connectedWebsite,
+      isReorg,
+      submissionError,
+    } = this.props;
 
     const { isSubmitting } = this.state;
 
@@ -341,6 +324,16 @@ class SignTxPage extends Component<Props, State> {
       <SignTxTabs
         overviewContent={
           <Box paddingTop="8px" overflowWrap="break-word">
+            {isReorg && (
+              <>
+                <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+                  {intl.formatMessage(messages.reorgTitle)}
+                </Typography>
+                <Typography>
+                  <FormattedHTMLMessage {...messages.reorgMessage} />
+                </Typography>
+              </>
+            )}
             <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
               {intl.formatMessage(signTxMessages.connectedTo)}
             </Typography>
@@ -453,6 +446,11 @@ class SignTxPage extends Component<Props, State> {
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
               />
+              {isReorg && (submissionError === 'SEND_TX_ERROR') && (
+                <Alert severity="error">
+                  {intl.formatMessage(messages.sendError)}
+                </Alert>
+              )}
               <Box
                 sx={{
                   display: 'grid',
@@ -491,75 +489,6 @@ class SignTxPage extends Component<Props, State> {
           </Box>
         }
       />
-    );
-  }
-
-  renderReorg(): Node {
-    const { form } = this;
-    const walletPasswordField = form.$('walletPassword');
-
-    const { intl } = this.context;
-    const { txData, onCancel, } = this.props;
-
-    return (
-      <>
-        <ProgressBar step={2} />
-        <div>
-          <div className={styles.component}>
-            <div>
-              <h1 className={styles.title}>{intl.formatMessage(messages.reorgTitle)}</h1>
-            </div>
-            <div className={styles.message}>
-              <p><FormattedHTMLMessage {...messages.reorgMessage} /></p>
-            </div>
-            <div className={styles.info}>
-              <div className={styles.infoRaw}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.feeLabel)}
-                </p>
-                <div className={styles.labelValue}>
-                  {this.renderAmountDisplay({
-                    entry: {
-                      identifier: txData.fee.tokenId,
-                      networkId: txData.fee.networkId,
-                      amount: new BigNumber(txData.fee.amount),
-                    },
-                  })}
-                </div>
-              </div>
-            </div>
-            <div className={styles.passwordInput}>
-              <TextField
-                type="password"
-                className={styles.walletPassword}
-                {...walletPasswordField.bind()}
-                error={walletPasswordField.error}
-              />
-            </div>
-            <div className={styles.errorMessage}>
-              {this.props.submissionError === 'SEND_TX_ERROR' && (
-                intl.formatMessage(messages.sendError)
-              )}
-            </div>
-            <div className={styles.wrapperBtn}>
-              <Button
-                variant="secondary"
-                className="secondary"
-                onClick={onCancel}
-              >
-                {intl.formatMessage(globalMessages.cancel)}
-              </Button>
-              <Button
-                variant="primary"
-                disabled={!walletPasswordField.isValid}
-                onClick={this.submit.bind(this)}
-              >
-                {intl.formatMessage(globalMessages.confirm)}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </>
     );
   }
 }

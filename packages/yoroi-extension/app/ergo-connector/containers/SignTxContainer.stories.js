@@ -132,7 +132,7 @@ const genBaseProps: {|
             }
           }],
         adaTransaction: null,
-        currentConnectorWhitelist: []
+        currentConnectorWhitelist: [],
         submissionError: null,
       },
       coinPriceStore: {

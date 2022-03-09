@@ -1,4 +1,4 @@
-// // @flow
+// @flow
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';

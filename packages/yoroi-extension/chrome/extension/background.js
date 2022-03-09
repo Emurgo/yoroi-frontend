@@ -503,23 +503,11 @@ const yoroiMessageHandler = async (
         }
       }
         break;
-      case 'data':
-        // mocked data sign
-        responseData.resolve({ err: 'Generic data signing is not implemented yet' });
-        break;
-      case 'tx-reorg/cardano':
-      {
-          const utxos = (request.tx: any);
-          responseData.resolve({ ok: utxos });
-      }
-        break;
       case 'tx/cardano':
       {
         try {
           const signedTx = await signCardanoTx(
-            // $FlowFixMe[prop-missing]
-            // $FlowFixMe[incompatible-exact]
-            (request.tx: CardanoTx),
+            (request.tx: any),
             password,
             request.tabId
           );
@@ -528,13 +516,14 @@ const yoroiMessageHandler = async (
           responseData.resolve({ err: 'transaction signing failed' })
         }
       }
+        break;
       case 'data':
         // mocked data sign
         responseData.resolve({ err: 'Generic data signing is not implemented yet' });
         break;
       case 'tx-reorg/cardano':
       {
-        const utxos = request.utxos;
+        const utxos = (request.tx: any);
         responseData.resolve({ ok: utxos });
       }
         break;
@@ -1362,7 +1351,7 @@ function handleInjectorConnect(port) {
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {
-                        rpcResponse({ error: 'not enough UTXOs'});
+                        rpcResponse({ error: 'not enough UTXOs' });
                         return;
                       }
                       throw error;
@@ -1375,7 +1364,7 @@ function handleInjectorConnect(port) {
                       rpcResponse(undefined); // shouldn't happen
                       return;
                     }
-                      
+
                     const resp = await confirmSign(
                       tabId,
                       {
