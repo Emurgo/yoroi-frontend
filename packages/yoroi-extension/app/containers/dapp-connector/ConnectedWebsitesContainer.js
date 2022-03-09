@@ -17,17 +17,21 @@ import SidebarContainer from '../SidebarContainer'
 import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage'
 import DappConnectorNavbar from '../../components/dapp-connector/Layout/DappConnectorNavbar'
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers'
-import LoadingSpinner from '../../components/widgets/LoadingSpinner'
-import { LoadingWalletStates } from '../../ergo-connector/types'
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
+import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
+import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment'
 import { ROUTES } from '../../routes-config'
+import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
+import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
+import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { MultiToken } from '../../api/common/lib/MultiToken'
+
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
@@ -50,77 +54,65 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         route: ROUTES.MY_WALLETS,
       })
     }
-    this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.refreshActiveSites.trigger();
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
-  onRemoveWallet: ?string => void = url => {
-    if (url == null) {
-      throw new Error(`Removing a wallet from whitelist but there's no url`);
+  onRemoveWallet: {| url: ?string, protocol: ?string |} => void = ({ url, protocol }) => {
+    if (url == null || protocol == null) {
+      throw new Error(`Removing a wallet from whitelist but there's no url or protocol`);
     }
-    this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
+    this.generated.actions.connector.removeWalletFromWhitelist.trigger({
+      url,
+      protocol,
+    });
   };
-  getConceptualWallet(publicDeriverId: number): ConceptualWalletSettingsCache | null {
-    const wallets = this.generated.stores.wallets.publicDerivers;
-    const wallet = wallets.find(
-      publicDeriver => publicDeriver.getPublicDeriverId() === publicDeriverId
-    )
 
-    if(!wallet) return null
+  getConceptualWallet(publicDeriver: PublicDeriver<>): ConceptualWalletSettingsCache {
     const settingsCache = this.generated.stores.walletSettings
-    .getConceptualWalletSettingsCache(wallet.getParent());
+    .getConceptualWalletSettingsCache(publicDeriver.getParent());
 
     return settingsCache
   }
 
+  getWalletInfo(
+    publicDeriver: PublicDeriver<>
+    ): {| balance: null | MultiToken, plate: null | WalletChecksum |} {
+    const txRequests: TxRequests = this.generated.stores.transactions
+    .getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate = withPubKey == null
+      ? null
+      : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+    return {
+      balance,
+      plate
+    }
+  }
+
   render (): Node {
-    const { stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
-    const wallets = stores.connector.allWallets;
-    const loadingWallets = stores.connector.loadingWallets;
-    const error = stores.connector.errorWallets;
-    const isLoading = (
-      loadingWallets === LoadingWalletStates.IDLE || loadingWallets === LoadingWalletStates.PENDING
-    );
-    const isSuccess = loadingWallets === LoadingWalletStates.SUCCESS;
-    const isError = loadingWallets === LoadingWalletStates.REJECTED;
-
-    let componentToRender;
-    if (isLoading) {
-      componentToRender =  (
-        <FullscreenLayout bottomPadding={0}>
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        </FullscreenLayout>
-      );
-    }
-    if (isError) {
-      componentToRender = <p>{error}</p>
-    }
-    if (isSuccess) {
-      componentToRender =  (
-        <ConnectedWebsitesPage
-          whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-          wallets={wallets}
-          onRemoveWallet={this.onRemoveWallet}
-          activeSites={this.generated.stores.connector.activeSites.sites}
-          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-          getConceptualWallet={this.getConceptualWallet.bind(this)}
-        />)
-    }
-
+    const wallets = this.generated.stores.wallets.publicDerivers;
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
         navbar={<DappConnectorNavbar />}
       >
-        {/* {componentToRender} */}
         <FullscreenLayout bottomPadding={0}>
-          {componentToRender}
+          <ConnectedWebsitesPage
+            whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+            wallets={wallets}
+            onRemoveWallet={this.onRemoveWallet}
+            activeSites={this.generated.stores.connector.activeSites.sites}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+            getConceptualWallet={this.getConceptualWallet.bind(this)}
+            getWalletInfo={this.getWalletInfo.bind(this)}
+          />)
         </FullscreenLayout>
       </TopBarLayout>
     );
@@ -139,7 +131,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           trigger: (params: void) => Promise<void>,
         |},
         removeWalletFromWhitelist: {|
-          trigger: (params: string) => Promise<void>,
+          trigger: (params: {| url: string, protocol: string |}) => Promise<void>,
         |},
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
@@ -160,10 +152,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         shouldHideBalance: boolean,
       |},
       connector: {|
-        allWallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
-        errorWallets: string,
-        loadingWallets: $Values<typeof LoadingWalletStates>,
         activeSites: {| sites: Array<string> |},
       |},
       walletSettings: {|
@@ -173,8 +162,12 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         tokenInfo: TokenInfoMap,
       |},
       wallets: {|
-        publicDerivers: Array<PublicDeriver<>>,
-      |}
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+        publicDerivers: Array<PublicDeriver<>>
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests
+      |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
     |} {
@@ -198,12 +191,13 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
         },
         connector: {
-          allWallets: stores.connector.allWallets,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
-          loadingWallets: stores.connector.loadingWallets,
-          errorWallets: stores.connector.errorWallets,
           activeSites: stores.connector.activeSites,
         },
         tokenInfoStore: {

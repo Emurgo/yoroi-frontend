@@ -26,6 +26,8 @@
 .addressLabel {
   font-weight: 400;
   margin-bottom: 10px;
+  overflow-wrap: break-word;
+  text-align: left;
 }
 
 .postCopyMargin {
@@ -53,6 +55,6 @@
 
 :global(.YoroiModern) .dialog {
   // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1052
-  min-width: 680px;
-  max-width: 680px;
+  min-width: 740px;
+  max-width: 740px;
 }

@@ -67,6 +67,7 @@ function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
     unconfirmedAmount: null,
     remoteTransactionIds: new Set(),
     timestamps: [],
+    assetIds: [],
   }));
   const getBalanceRequest = new CachedRequest(request => request.getBalance());
   const getAssetDepositRequest = new CachedRequest(request => request.getBalance());
@@ -323,15 +324,7 @@ export const genTentativeShelleyTx = (
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
     assets: [],
   };
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    RustModule.WalletV4.LinearFee.new(
-      RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-      RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-    ),
-    RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
-    RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-    RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-  );
+  const txBuilder = RustModule.WalletV4TxBuilderFromConfig(config);
   txBuilder.add_key_input(
     RustModule.WalletV4.Ed25519KeyHash.from_bytes(
       Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')
@@ -405,15 +398,7 @@ export const genWithdrawalTx = (
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
     assets: [],
   };
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    RustModule.WalletV4.LinearFee.new(
-      RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-      RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-    ),
-    RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
-    RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-    RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-  );
+  const txBuilder = RustModule.WalletV4TxBuilderFromConfig(config);
   txBuilder.add_key_input(
     RustModule.WalletV4.Ed25519KeyHash.from_bytes(
       Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')
@@ -526,15 +511,7 @@ export const genVotingShelleyTx = (
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
     assets: [],
   };
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    RustModule.WalletV4.LinearFee.new(
-      RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-      RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-    ),
-    RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
-    RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-    RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-  );
+  const txBuilder = RustModule.WalletV4TxBuilderFromConfig(config);
   txBuilder.add_key_input(
     RustModule.WalletV4.Ed25519KeyHash.from_bytes(
       Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')

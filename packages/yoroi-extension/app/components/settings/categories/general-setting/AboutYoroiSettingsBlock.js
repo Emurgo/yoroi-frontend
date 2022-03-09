@@ -16,9 +16,11 @@ import mediumSvg from '../../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
+import { isTestnet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
+import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -61,6 +63,14 @@ const messages = defineMessages({
   networkLabel: {
     id: 'settings.general.aboutYoroi.networkLabel',
     defaultMessage: '!!!Network:',
+  },
+  mainnet: {
+    id: 'settings.general.aboutYoroi.network.mainnet',
+    defaultMessage: '!!!mainnet',
+  },
+  testnet: {
+    id: 'settings.general.aboutYoroi.network.testnet',
+    defaultMessage: '!!!testnet',
   },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
@@ -105,23 +115,35 @@ const socialMediaLinks = [{
 
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
+type Props = {|
+  wallet: null | PublicDeriver<>
+|}
+
 @observer
-export default class AboutYoroiSettingsBlock extends Component<{||}> {
+export default class AboutYoroiSettingsBlock extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
+    const { wallet } = this.props;
+    let network;
+
+    if (wallet) {
+      const result = isTestnet(wallet.getParent().getNetworkInfo())
+      network = result === true ? 'testnet' : 'mainnet'
+    }
 
     return (
       <div className={styles.component}>
         <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
 
+        {network && (
         <p className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
-          {environment.getNetworkName()}
-        </p>
+          {intl.formatMessage(messages[network])}
+        </p>)}
         <div className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
           <ExplorableHash

@@ -4,10 +4,7 @@ import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect, assert } from 'chai';
-
-async function checkErrorByTranslationId(client, errorSelector, error) {
-  await client.waitUntilText(errorSelector, await client.intl(error.message));
-}
+import { checkErrorByTranslationId } from './common-steps';
 
 When(/^I click the create button$/, async function () {
   await this.click('.WalletAdd_btnCreateWallet');
@@ -43,20 +40,24 @@ When(/^I click the "Create personal wallet" button$/, async function () {
 
 Then(/^I should see the invalid password error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.walletPassword .FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
+  const errorSelector = '//p[starts-with(@id, "walletPassword") and contains(@id, "-helper-text")]';
+  await checkErrorByTranslationId(this, errorSelector, error, By.xpath);
 });
 
 Then(/^I see the submit button is disabled$/, async function () {
-  const disabledButton = await this.driver.findElement(By.xpath("//div[@class='Dialog_actions']//button[contains(@class, 'SimpleButton_root') and contains(@class, 'disabled')]"));
-  const pageUrl = await this.driver.getCurrentUrl();
-  disabledButton.click();
-  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
+  const dialogElement = await this.driver.findElement(By.xpath('//div[contains(@class, "Dialog")]'));
+  const disabledButton = await dialogElement.findElement(By.xpath('.//button[contains(@class, "primary")]'));
+  const buttonState = await disabledButton.isEnabled();
+  expect(buttonState).to.be.false;
 });
 
 When(/^I accept the creation terms$/, async function () {
-  await this.click('.SimpleCheckbox_check');
-  await this.click('.WalletBackupPrivacyWarningDialog .primary');
+  const privacyDlg = await this.driver.findElement(
+    By.xpath('//div[contains(@class,"WalletBackupPrivacyWarningDialog_component")]')
+  );
+  const privacyChkbox = privacyDlg.findElement(By.xpath('//input[@type="checkbox"]'));
+  privacyChkbox.click();
+  await this.click('//button[text()="Continue"]', By.xpath);
 });
 
 When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
@@ -73,25 +74,33 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
     // same word can occur many times, so we look for any copy of the desired word still unselected
     await this.click(
-      "(//button[contains(@class, 'SimpleButton_root') " + // any word
-      "and not(contains(@class, 'MnemonicWord_disabled'))" + // unselected word
-      ` and @label = '${word}'])[1]`, By.xpath // correct word
+      "(//button[contains(@class,'MnemonicWord_component') " + // any word
+        ` and (text() = '${word}')])`,
+      By.xpath // correct word
     );
   }
-  const checkboxes = await this.driver.findElements(By.css('.SimpleCheckbox_check'));
-  checkboxes.forEach((box) => box.click());
-  await this.click('.WalletRecoveryPhraseEntryDialog .primary');
+  const checkboxes = await this.driver.findElements(
+    By.xpath("//input[contains(@class,'PrivateSwitchBase-input')]")
+  );
+  checkboxes.forEach(box => box.click());
+  await this.click('//button[text()="Confirm"]', By.xpath);
 });
 
 When(/^I enter random mnemonic phrase$/, async function () {
   await this.click('.WalletRecoveryPhraseDisplayDialog .primary');
-  for (let i = 1; i < 16; i++) {
-    await this.click(`//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`, By.xpath);
+  for (let i = 15; i > 1; i--) {
+    await this.click(
+      `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`,
+      By.xpath
+    );
   }
-  const words = await this.driver.findElement(By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_component']"));
-  words.getText().then(text => (
-    expect(text).to.not.equal('')
-  )).catch(err => assert.fail(err.message));
+  const words = await this.driver.findElement(
+    By.xpath("//div[@class='WalletRecoveryPhraseMnemonic_component']")
+  );
+  words
+    .getText()
+    .then(text => expect(text).to.not.equal(''))
+    .catch(err => assert.fail(err.message));
 });
 
 Then(/^I click Clear button$/, async function () {
@@ -104,14 +113,17 @@ Then(/^I see All selected words are cleared$/, async function () {
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
   const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.create.dialog.title' });
-  await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
+  await this.waitUntilText('.dialog__title', createMessage.toUpperCase(), 2000);
 });
 
-Then(/^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/, async function (data) {
-  const error = data.hashes()[0];
-  const errorSelector = '.FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
-});
+Then(
+  /^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/,
+  async function (data) {
+    const error = data.hashes()[0];
+    const errorSelector = '.walletName .MuiFormHelperText-root';
+    await checkErrorByTranslationId(this, errorSelector, error);
+  }
+);
 
 Then(/^I should see "Invalid Password" error message:$/, async function (data) {
   const error = data.hashes()[0];
@@ -121,10 +133,10 @@ Then(/^I should see "Invalid Password" error message:$/, async function (data) {
 
 Then(/^I see the security warning prior:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleCheckbox_label';
+  const errorSelector = '.MuiFormControlLabel-root';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
 Then(/^I click to add an additional wallet$/, async function () {
-  await this.click(`//div[@class='TopBarLayout_navbar']//button[contains(@class, 'NavBarAddButton_button')]`, By.xpath);
+  await this.click(`.NavBar_navbar .NavBar_content .MuiButton-primary`);
 });

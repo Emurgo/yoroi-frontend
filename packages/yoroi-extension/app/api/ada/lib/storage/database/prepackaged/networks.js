@@ -55,6 +55,7 @@ export const networks = Object.freeze({
           constant: '155381',
         },
         MinimumUtxoVal: '1000000',
+        CoinsPerUtxoWord: '34482',
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',
       })
@@ -150,6 +151,7 @@ export const networks = Object.freeze({
           coefficient: '44',
           constant: '155381',
         },
+        CoinsPerUtxoWord: '34482',
         MinimumUtxoVal: '1000000',
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',
@@ -189,6 +191,7 @@ export const networks = Object.freeze({
           coefficient: '44',
           constant: '155381',
         },
+        CoinsPerUtxoWord: '34482',
         MinimumUtxoVal: '1000000',
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',

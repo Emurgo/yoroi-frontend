@@ -83,9 +83,8 @@ class StakingPage extends Component<AllProps> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
-      publicDeriver
-    );
+    const adaDelegationRequests = this.generated.stores.substores.ada.delegation
+      .getDelegationRequests(publicDeriver);
     if (adaDelegationRequests == null) return undefined;
     return adaDelegationRequests.getRegistrationHistory.result?.current;
   };
@@ -262,12 +261,11 @@ class StakingPage extends Component<AllProps> {
           currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
             ? async () => {
                 this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
-                  {
+                await this.generated.actions.jormungandr
+                  .delegationTransaction.createTransaction.trigger({
                     publicDeriver,
                     poolRequest: undefined,
-                  }
-                );
+                  });
               }
             : undefined
         }
@@ -389,12 +387,12 @@ class StakingPage extends Component<AllProps> {
               {...this.generated.DeregisterDialogContainerProps}
               alwaysShowDeregister
               onNext={() => {
-                // note: purposely don't await since the next dialog will properly render the spinner
-                this.generated.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger(
-                  {
-                    publicDeriver,
-                  }
-                );
+                // note: purposely don't await
+                // since the next dialog will properly render the spinner
+                this.generated.actions.ada.delegationTransaction
+                  .createWithdrawalTxForWallet.trigger({
+                      publicDeriver,
+                  });
                 this.generated.actions.dialogs.open.trigger({
                   dialog: WithdrawalTxDialogContainer,
                 });

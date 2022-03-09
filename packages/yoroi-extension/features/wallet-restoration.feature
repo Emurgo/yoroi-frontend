@@ -144,7 +144,7 @@ Feature: Restore Wallet
     And I click the restore button for cardano
     Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
+    And I can't enter more then 15 words from the recovery phrase:
     | recoveryPhrase   |
     | <recoveryPhrase> |
     Then I don't see last word of <recoveryPhrase> in recovery phrase field
@@ -181,14 +181,15 @@ Feature: Restore Wallet
     And I enter the recovery phrase:
     | recoveryPhrase   |
     | <recoveryPhrase> |
-    Then I should see an "X words left" error message:
-    | message                                                 |
+    Then I should see an "1 words left" error message:
+    | message                                               |
     | wallet.restore.dialog.form.errors.shortRecoveryPhrase |
-    Examples:
-    | recoveryPhrase                                                                                           |                    |
-    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow         | 14-words phrase    |
 
-  @it-92
+    Examples:
+    | recoveryPhrase                                                                                   |                    |
+    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow | 14-words phrase    |
+
+  @it-92 @ignore
   Scenario: Create & delete (3 wallets) (IT-92)
     # wallet 1
     When I click the restore button for cardano
@@ -219,8 +220,9 @@ Feature: Restore Wallet
     | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
     Then I should see a plate ZKTZ-4614
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet (copy)"
+    Then I should see the wallet already exist window
+    Then I click the Open wallet button
+    Then I should see the opened wallet with name "many-tx-wallet"
     # add wallet prep
     Then I unselect the wallet
     And I click to add an additional wallet
@@ -251,55 +253,6 @@ Feature: Restore Wallet
     # check removing didn't affect other wallets
     Then I compare to DB state snapshot
     And I am on the my wallets screen
-
-  @it-93
-  Scenario: Create & delete (2 wallets) (IT-93)
-    # wallet 1
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "many-tx-wallet"
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                                   |
-    | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
-    And I enter the restored wallet password:
-    | password   | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate ZKTZ-4614
-    Then I click the next button
-    Then I should see the opened wallet with name "many-tx-wallet"
-    # give some time for the wallet to fully sync
-    Given I sleep for 2500
-    # add wallet prop
-    Then I unselect the wallet
-    And I click to add an additional wallet
-    # copy the DB
-    Given I capture DB state snapshot
-    # wallet 2 (same as wallet 1)
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet (copy)"
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                                   |
-    | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
-    And I enter the restored wallet password:
-    | password   | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate ZKTZ-4614
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet (copy)"
-    # remove wallet #2
-    Then I navigate to the general settings screen
-    And I click on secondary menu "wallet" item
-    When I click on remove wallet
-    Then I click on the checkbox
-    And I click the next button
-    # wait for page to reload
-    Given I sleep for 5000
-    # check removing didn't affect other wallets
-    Then I compare to DB state snapshot excluding sync time
-    And I should see the opened wallet with name "many-tx-wallet"
 
   @it-95
   Scenario: Create & delete (1 wallet) (IT-95)

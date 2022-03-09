@@ -13,7 +13,10 @@ export default class ConnectorActions {
   updateConnectorWhitelist: AsyncAction<{|
     whitelist: Array<WhitelistEntry>,
   |}> = new AsyncAction();
-  removeWalletFromWhitelist: AsyncAction<string> = new AsyncAction();
+  removeWalletFromWhitelist: AsyncAction<{|
+    url: string,
+    protocol: string,
+  |}> = new AsyncAction();
   confirmSignInTx: Action<string> = new Action();
   cancelSignInTx: Action<void> = new Action();
 }

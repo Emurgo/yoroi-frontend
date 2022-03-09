@@ -37,7 +37,7 @@ beforeAll(async () => {
 function getProtocolParams(): {|
   keyDeposit: RustModule.WalletV4.BigNum,
   linearFee: RustModule.WalletV4.LinearFee,
-  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
   |} {
@@ -49,7 +49,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
     ),
-    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.MinimumUtxoVal),
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(baseConfig.CoinsPerUtxoWord),
     poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
     networkId: network.NetworkId,
   };
@@ -109,7 +109,7 @@ describe('Byron era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    const expectedFee = new BigNumber('167789');
+    const expectedFee = new BigNumber('167833');
     expect(transferInfo.fee.getDefault().toString()).toBe(expectedFee.toString());
     expect(transferInfo.recoveredBalance.getDefault().toString()).toBe(inputAmount.toString());
     expect(transferInfo.senders).toEqual([address]);
@@ -135,7 +135,8 @@ describe('Byron era tx format tests', () => {
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
-    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b584041e0aa0169c8217af8f8b9c47af12b83a9b7c541390dd30c8428a73d2fdfac447e3f428c3479ee1ad12904ed665cdcc924b22762c1b551833f837f308838f706582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
+    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex'))
+      .toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b5840b1e666dba4c4b805f14e8fbb85d2138070fa110308abe5a141ddc3653b5ab40513c4b3bf0d5b26c3c9829a20262844fa110325e85fc38aa6ff594e6283ca1d0f582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
   });
 
   test('Daedalus transfer fails from too small UTXO', async () => {
@@ -213,7 +214,7 @@ describe('Byron era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    const expectedFee = new BigNumber('327993');
+    const expectedFee = new BigNumber('328037');
     expect(transferInfo.fee.getDefault().toString()).toBe(expectedFee.toString());
     expect(
       transferInfo.recoveredBalance.getDefault().toString()
@@ -241,6 +242,7 @@ describe('Byron era tx format tests', () => {
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
-    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b584055b3ee37d50f4475f58e191bd721bd763d1ba419b091f16925f2a3e69e158c0741848f838e156ed52778604081243a9baa3d69193c64fb1e568f806ef73d9d0c582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
+    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex'))
+      .toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b584083125cc8bdab8298013357fc5b0fdb51142135eed27a2070f0052b592ef7f303639eed31bc3f5e8807117b1be688551f6928e64cfc05fc4d20e6efd22284730d582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
   });
 });

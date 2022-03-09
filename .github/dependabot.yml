@@ -3,58 +3,22 @@ updates:
 - package-ecosystem: npm
   directory: "/packages/yoroi-extension"
   schedule:
-    interval: monthly
-    timezone: PST8PDT
-  open-pull-requests-limit: 99
-  ignore:
-  - dependency-name: "@storybook/source-loader"
-    versions:
-    - 6.0.21
-    - 6.1.15
-  - dependency-name: "@babel/plugin-transform-runtime"
-    versions:
-    - 7.12.10
-  - dependency-name: "@storybook/addon-knobs"
-    versions:
-    - 6.0.22
-    - 6.1.15
-  - dependency-name: style-loader
-    versions:
-    - 2.0.0
-  - dependency-name: postcss-loader
-    versions:
-    - 4.2.0
-  - dependency-name: react-intl
-    versions:
-    - 5.10.10
-  - dependency-name: node-sass
-    versions:
-    - 5.0.0
-  - dependency-name: trezor-connect
-    versions:
-    - 8.1.19
-  - dependency-name: "@storybook/addon-actions"
-    versions:
-    - 6.1.9
-  - dependency-name: css-loader
-    versions:
-    - 5.0.1
-  - dependency-name: "@storybook/addons"
-    versions:
-    - 6.0.22
-  - dependency-name: "@storybook/addon-links"
-    versions:
-    - 6.0.22
-  - dependency-name: "@storybook/addon-viewport"
-    versions:
-    - 6.0.21
-  - dependency-name: jspdf
-    versions:
-    - 2.1.0
-  - dependency-name: "@storybook/react"
-    versions:
-    - 6.0.21
-  - dependency-name: "@storybook/addon-notes"
-    versions:
-    - 5.3.21
+    interval: weekly
+    day: monday
+    time: 03:00
+    timezone: UTC
+  open-pull-requests-limit: 10
+  allow:
+    - dependency-name: "@cardano-foundation/ledgerjs-hw-app-cardano"
+    - dependency-name: "@emurgo/*"
+    - dependency-name: "cardano-*"
+    - dependency-name: "ergo-*"
+    - dependency-name: "lodash"
+    - dependency-name: "mobx*"
+    - dependency-name: "react*"
+    - dependency-name: "trezor-connect"
+    - dependency-name: "chromedriver"
+  assignees:
+    - "vsubhuman"
+    - "javimaravillas"
   rebase-strategy: disabled

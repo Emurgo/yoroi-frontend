@@ -1,4 +1,4 @@
-# Yoroi-Ergo dApp Connector
+# Yoroi dApp Connector
 
 This experimental extension is the first in a modular design to interface the [Yoroi frontend extension](https://github.com/Emurgo/yoroi-frontend) with dApps. It targets the [Ergo](https://ergoplatform.org/en/) cryptocurrency.
 
