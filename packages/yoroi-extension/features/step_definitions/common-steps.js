@@ -25,7 +25,11 @@ import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
-import { selectSubmenuSettings, getComplexityLevelButton } from './general-settings-steps';
+import {
+  selectSubmenuSettings,
+  getComplexityLevelButton,
+  goToSettings,
+} from './general-settings-steps';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -123,7 +127,7 @@ After(async function (scenario) {
     await getConsoleLogs(this.driver, 'failedStep');
   }
   await this.driver.quit();
-}); 
+});
 
 const writeFile = promisify(fs.writeFile);
 
@@ -179,11 +183,8 @@ async function takePageSnapshot(driver, name) {
 async function getConsoleLogs(driver, name) {
   const dir = createDirInTestRunsData('consoleLogs');
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
-  const logEntries = await driver
-    .manage()
-    .logs()
-    .get(logging.Type.BROWSER);
-  const jsonLogs = logEntries.map((l) => l.toJSON());
+  const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
+  const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
 
@@ -210,7 +211,7 @@ export async function checkErrorByTranslationId(
   client: Object,
   errorSelector: string,
   errorObject: Object,
-  method:any = By.css
+  method: any = By.css
 ) {
   await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000, method);
 }
@@ -285,6 +286,7 @@ Given(/^I have completed the basic setup$/, async function () {
   // uri prompt page
   await acceptUriPrompt(this);
   await this.waitForElement('.WalletAdd_component');
+  await takeScreenshot(this.driver, 'I-have-completed-the-basic-setup');
 });
 
 Given(/^I switched to the advanced level$/, async function () {
@@ -516,6 +518,16 @@ Given(/^I capture DB state snapshot$/, async function () {
 Then(/^I compare to DB state snapshot$/, async function () {
   await compareToCapturedDbState(this, false);
 });
+
 Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
   await compareToCapturedDbState(this, true);
+});
+
+Then(/^I switch to revamp version$/, async function () {
+  await goToSettings(this);
+  await selectSubmenuSettings(this, 'general');
+  const revampButton = await this.driver.findElement(By.id('switchToRevampButton'));
+  await revampButton.click();
+  await takeScreenshot(this.driver, 'I switch to revamp version');
+  await getConsoleLogs(this.driver, 'I switch to revamp version');
 });

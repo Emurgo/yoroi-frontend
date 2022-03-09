@@ -6,12 +6,13 @@ Feature: Generate Addresses
   @it-106
   Scenario: Latest address should be displayed at the top (IT-106)
     Given There is a Byron wallet stored named small-single-tx
-    And I go to the receive screen
-    Then I should see my latest address "Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS" at the top
-    And I should see the addresses exactly list them
-    | address                                                     |
-    | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
-    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
+    Then I switch to revamp version
+#    And I go to the receive screen
+#    Then I should see my latest address "Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS" at the top
+#    And I should see the addresses exactly list them
+#    | address                                                     |
+#    | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
+#    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
   @it-17
   Scenario: Generate a new receive address (IT-17)

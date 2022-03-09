@@ -15,6 +15,14 @@ export async function selectSubmenuSettings(customWorld: Object, buttonName: str
   );
 }
 
+export async function goToSettings(customWorld: Object) {
+  await navigateTo.call(customWorld, '/settings');
+  await navigateTo.call(customWorld, '/settings/general');
+
+  await waitUntilUrlEquals.call(customWorld, '/settings/general');
+  await customWorld.waitForElement('.SettingsLayout_component');
+}
+
 export async function getComplexityLevelButton(
   customWorld: Object,
   isLow: boolean = true
@@ -31,11 +39,7 @@ export async function getComplexityLevelButton(
 }
 
 When(/^I navigate to the general settings screen$/, async function () {
-  await navigateTo.call(this, '/settings');
-  await navigateTo.call(this, '/settings/general');
-
-  await waitUntilUrlEquals.call(this, '/settings/general');
-  await this.waitForElement('.SettingsLayout_component');
+  await goToSettings(this);
 });
 
 When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
