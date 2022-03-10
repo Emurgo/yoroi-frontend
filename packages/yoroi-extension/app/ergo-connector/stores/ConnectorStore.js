@@ -112,6 +112,23 @@ export function getProtocol(): Promise<?Protocol> {
   });
 }
 
+export function getLatestUtxos(tabId): Promise<?Protocol> {
+  return new Promise((resolve, reject) => {
+      window.chrome.runtime.sendMessage(
+        ({ type: 'get_utxos/cardano', tabId }),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: get_utxos/cardano ');
+          }
+
+          resolve(response);
+        }
+      );
+  });
+}
+
+
 export function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
@@ -421,13 +438,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/* , partialSign */, utxos } = signingMessage.sign.tx;
+    const { tx/* , partialSign */, tabId } = signingMessage.sign.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
+    const { utxos } = await getLatestUtxos(tabId)
 
     if (!utxos) {
       throw new Error('Missgin utxos for signing tx')

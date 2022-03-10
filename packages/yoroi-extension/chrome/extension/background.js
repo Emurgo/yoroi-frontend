@@ -591,6 +591,36 @@ const yoroiMessageHandler = async (
     }: ConnectedSites));
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
+  } else if (request.type === 'get_utxos/cardano') {
+    try {
+      await withDb(async (db, localStorageApi) => {
+        await withSelectedWallet(
+          request.tabId,
+          async (wallet, connection) => {
+            if (connection == null) {
+              Logger.error(`ERR - sign_tx could not find connection with tabId = ${request.tabId}`);
+              sendResponse({ utxos: null })
+              return
+            }
+            const withUtxos = asGetAllUtxos(wallet)
+
+            if (withUtxos == null) {
+              throw new Error(`missing utxo functionality`);
+            }
+            const withHasUtxoChains = asHasUtxoChains(withUtxos);
+            if (withHasUtxoChains == null) {
+              throw new Error(`missing chains functionality`);
+            }
+            const utxos = await withHasUtxoChains.getAllUtxos();
+            sendResponse({ utxos })
+          },
+          db,
+          localStorageApi,
+        )
+      });
+    } catch (error) {
+      Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
+    }
   }
 };
 
@@ -939,51 +969,33 @@ function handleInjectorConnect(port) {
           case 'sign_tx/cardano':
             try {
               checkParamCount(1);
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet, connection) => {
-                    if (connection == null) {
-                      Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                      rpcResponse(undefined); // shouldn't happen
-                      return
-                    }
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+                return
+              }
+              await RustModule.load();
+              const { tx, partialSign, returnTx } = message.params[0];
 
-                    await RustModule.load();
-                    const { tx, partialSign, returnTx } = message.params[0];
-                    const withUtxos = asGetAllUtxos(wallet)
-                    if (withUtxos == null) {
-                      throw new Error(`missing utxo functionality`);
-                    }
-                    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-                    if (withHasUtxoChains == null) {
-                      throw new Error(`missing chains functionality`);
-                    }
-                    const utxos = await withHasUtxoChains.getAllUtxos();
-
-                    const resp = await confirmSign(tabId,
-                      {
-                        type: 'tx/cardano',
-                        tx: { tx, partialSign, utxos },
-                        uid: message.uid
-                      },
-                      connection
-                    );
-                    if (!returnTx && resp?.ok != null) {
-                      const witnessSetResp = Buffer.from(
-                        RustModule.WalletV4.Transaction.from_bytes(
-                          Buffer.from(resp.ok, 'hex'),
-                        ).witness_set().to_bytes()
-                      ).toString('hex');
-                      rpcResponse({ ok: witnessSetResp });
-                    } else {
-                      rpcResponse(resp);
-                    }
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
+              const resp = await confirmSign(tabId,
+                {
+                  type: 'tx/cardano',
+                  tx: { tx, partialSign, tabId },
+                  uid: message.uid
+                },
+                connection
+              );
+              if (!returnTx && resp?.ok != null) {
+                const witnessSetResp = Buffer.from(
+                  RustModule.WalletV4.Transaction.from_bytes(
+                    Buffer.from(resp.ok, 'hex'),
+                  ).witness_set().to_bytes()
+                ).toString('hex');
+                rpcResponse({ ok: witnessSetResp });
+              } else {
+                rpcResponse(resp);
+              }
             } catch (e) {
               handleError(e);
             }
