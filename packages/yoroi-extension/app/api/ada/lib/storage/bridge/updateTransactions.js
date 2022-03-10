@@ -1973,6 +1973,8 @@ export async function getTokenMintMetadata(
   return tokensMintMetadata;
 };
 
+const TOKEN_INFO_CACHE_TIME = 1 * 60 * 60 * 1000;
+
 export async function genCardanoAssetMap(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -1989,49 +1991,70 @@ export async function genCardanoAssetMap(
     db, dbTx,
     tokenIds
   )).filter(row => row.NetworkId === network.NetworkId);
-
   const existingRowsMap = new Map<string, $ReadOnly<TokenRow>>(
     existingDbRows.map(row => [row.Identifier, row])
   );
 
-  const existingTokens = new Set<string>(
-    existingDbRows.filter(
-      // only tokens with lastUpdateAt are considered existing, except for default
-      // asset rows, because they are never updated from network
-      row => (row.Metadata.lastUpdatedAt != null) || row.IsDefault
-    ).map(row => row.Identifier)
+  const noNeedForUpdateTokens = new Set<string>(
+    existingDbRows.filter(row => {
+      // default token rows are never updated from the network
+      if (row.IsDefault) {
+        return true;
+      }
+      // tokens rows that have never been queried from the network
+      const { lastUpdatedAt } = row.Metadata;
+      if (lastUpdatedAt == null) {
+        return false;
+      }
+      // fresh enough, no need for updating this time
+      if (Date.now() - Date.parse(lastUpdatedAt) < TOKEN_INFO_CACHE_TIME) {
+        return true;
+      }
+      return false;
+    }).map(row => row.Identifier)
   );
 
-  const missingTokenIds = tokenIds.filter(token => !existingTokens.has(token));
+  const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
   let tokenInfoResponse;
   try {
     tokenInfoResponse = await getTokenInfo({
       network,
-      tokenIds: missingTokenIds.map(id => id.split('.').join(''))
+      tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
     });
   } catch {
     tokenInfoResponse = {};
   }
-
   const metadata = await getTokenMintMetadata(tokenIds, getMultiAssetMetadata, network);
 
-  const databaseInsert = missingTokenIds
+  const databaseInsert = updatingTokenIds
     .map(tokenId => {
-      // If fetched token metadata from network, store in db; otherwise store a
-      // placeholder row. The field `lastUpdateAt` differentiates the two cases.
+      const id = tokenId.split('.').join('');
+
       let numberOfDecimals;
       let ticker;
       let lastUpdatedAt;
       let longName;
 
-      const tokenInfo = tokenInfoResponse[tokenId.split('.').join('')];
+      const tokenInfo = tokenInfoResponse[id];
       if (tokenInfo) {
         numberOfDecimals = tokenInfo.decimals ?? 0;
         ticker = tokenInfo.ticker ?? null;
         lastUpdatedAt = new Date().toISOString();
         longName = tokenInfo.name ?? null;
+      } else if (tokenInfo === null) {
+        // the token is not registered
+        numberOfDecimals = 0;
+        ticker = null;
+        lastUpdatedAt = new Date().toISOString();
+        longName = null;
       } else {
+        // failed to fetch token info
+        if (existingRowsMap.has(tokenId)) {
+          // the token entry exists, do not update
+          return null;
+        }
+        // the token entry doesn't exists, insert a placeholder row
         numberOfDecimals = 0;
         ticker = null;
         lastUpdatedAt = null;
@@ -2083,7 +2106,7 @@ export async function genCardanoAssetMap(
           assetMintMetadata
         },
       };
-    });
+    }).filter(Boolean);
 
   const newDbRows = await deps.ModifyToken.upsert(
     db, dbTx,
@@ -2581,9 +2604,20 @@ async function certificateToDb(
         const owners = RustModule.WalletV4.Ed25519KeyHashes.new();
         for (let j = 0; j < cert.poolParams.poolOwners.length; j++) {
           const owner = cert.poolParams.poolOwners[j];
-          const ownerKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-            Buffer.from(owner, 'hex')
-          );
+          // The owners property of the pool parameter is a set of stake key hashes
+          // of the owners. But the values returned from the backend are a set of
+          // stake addresses which are "a single header byte identifying their type
+          // and the network, followed by 28 bytes of payload identifying either a
+          // stake key hash or a script hash" (CIP19). So we convert the stake
+          // address to a key hash (equivalent to removing the header byte).
+          const ownerKey = RustModule.WalletV4.RewardAddress.from_address(
+            RustModule.WalletV4.Address.from_bytes(
+              Buffer.from(owner, 'hex')
+            )
+          )?.payment_cred().to_keyhash();
+          if (!ownerKey) {
+            throw new Error(`${nameof(certificateToDb)} expect the pool owner to be a key hash`);
+          }
           owners.add(ownerKey);
           const ownerId = await tryGetKey(
             RustModule.WalletV4.StakeCredential.from_keyhash(ownerKey)

@@ -2,14 +2,13 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import YoroiLogo from '../../assets/images/yoroi_logo.inline.svg';
-import MenuIcon from '../../assets/images/menu_icon.inline.svg';
 import styles from './Layout.scss';
 import { observer } from 'mobx-react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../../routes-config';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
+import DappConnectorIcon from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import environment from '../../../environment';
 
 type Props = {|
   children: Node,
@@ -18,7 +17,7 @@ type Props = {|
 const messages = defineMessages({
   yoroiDappConnector: {
     id: 'global.connector.yoroiDappConnector',
-    defaultMessage: '!!!Yoroi Dapp Connector',
+    defaultMessage: '!!!Yoroi DApp Connector',
   },
 });
 @observer
@@ -32,16 +31,14 @@ export default class Layout extends Component<Props> {
 
     return (
       <div className={styles.layout}>
-        <TestnetWarningBanner isTestnet={false} />
+        <TestnetWarningBanner isTestnet={environment.isTest()} />
         <div className={styles.header}>
-          <Link to={ROUTES.SETTINGS.GENERAL} className={styles.menuIcon}>
-            <MenuIcon />
-          </Link>
           <div className={styles.menu}>
             <YoroiLogo />
             <div className={styles.logo}>
               <h3>{intl.formatMessage(messages.yoroiDappConnector)}</h3>
             </div>
+            <DappConnectorIcon style={{ marginLeft: 10 }} />
           </div>
         </div>
         <div className={styles.content}>{this.props.children}</div>

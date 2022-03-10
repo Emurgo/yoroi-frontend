@@ -151,10 +151,14 @@ export type GetTransactionsDataResponse = {|
   unconfirmedAmount: ?UnconfirmedAmount,
   remoteTransactionIds: Set<string>,
   timestamps: Array<number>,
+  assetIds: Array<string>,
 |};
 
 export type GetTransactionsDataFunc = (
-  request: BaseGetTransactionsRequest
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+    isLocalRequest: boolean,
+  |}
 ) => Promise<GetTransactionsDataResponse>;
 
 export type ExportTransactionsRequest = {|

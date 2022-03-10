@@ -95,7 +95,6 @@ export default class UserPasswordDialog extends Component<Props> {
         value: this.props.dialogData.repeatedPasswordValue,
         validators: [({ field, form }) => {
           const paperPassword = form.$('paperPassword').value;
-          if (paperPassword.length === 0) return [true];
           return [
             isValidRepeatPassword(paperPassword, field.value),
             this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)

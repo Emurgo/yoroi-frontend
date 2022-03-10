@@ -93,7 +93,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable firstSync: boolean = false
+  @observable firstSync: ?number;
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -201,7 +201,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const selectedPublicDeriverId = this.selected?.publicDeriverId;
     if (selectedPublicDeriverId != null) {
       const selectedCache: ?PublicKeyCache = this.publicKeyCache
-        // $FlowFixMe
+        // $FlowFixMe[prop-missing]
         .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
       return selectedCache == null ? null : selectedCache.plate;
     }
@@ -228,7 +228,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       const wallet = await getCurrentWalletFromLS(publicDeriver);
       if (!wallet || !wallet.isSynced) {
         runInAction(() => {
-          this.firstSync = true
+          this.firstSync = publicDeriver.getPublicDeriverId()
         })
       }
 
@@ -239,9 +239,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
 
       await updateSyncedWallets(publicDeriver)
-       if (this.firstSync) {
+       if (typeof this.firstSync === 'number') {
         runInAction(() => {
-          this.firstSync = false
+          this.firstSync = null
         })
       }
 

@@ -31,6 +31,7 @@ const storageKeys = {
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
   SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
+  SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
@@ -202,7 +203,9 @@ export default class LocalStorageApi {
   getWhitelist: void => Promise<?Array<WhitelistEntry>> = async () => {
     const result = await getLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST);
     if (result === undefined || result === null) return undefined;
-    return JSON.parse(result);
+    const filteredWhitelist = JSON.parse(result).filter(e => e.protocol != null);
+    this.setWhitelist(filteredWhitelist);
+    return filteredWhitelist;
   }
 
   setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
@@ -315,4 +318,21 @@ export default class LocalStorageApi {
     });
   };
 
+}
+
+export function persistSubmittedTransactions(
+  submittedTransactions: any,
+): void {
+  localStorage.setItem(
+    storageKeys.SUBMITTED_TRANSACTIONS,
+    JSON.stringify(submittedTransactions)
+  );
+}
+
+export function loadSubmittedTransactions(): any {
+  const dataStr = localStorage.getItem(storageKeys.SUBMITTED_TRANSACTIONS);
+  if (dataStr == null) {
+    return null;
+  }
+  return JSON.parse(dataStr);
 }

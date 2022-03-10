@@ -1,5 +1,6 @@
 // @flow
 
+const fs = require('fs');
 const shell = require('shelljs');
 const tasks = require('./tasks');
 const argv = require('minimist')(process.argv.slice(2));
@@ -16,13 +17,27 @@ process.env.NODE_CONFIG_ENV = argv.env;
 const isNightly = argv.nightly != null;
 const shouldInjectConnector = argv.dontInjectConnector === undefined;
 
-const buildAndCopyInjector = (destDir: string) => {
+const buildAndCopyInjector = (destDir: string, buildType: string) => {
   console.log('[Build injector]');
   console.log('-'.repeat(80));
   shell.pushd('../yoroi-ergo-connector')
   exec('npm run prod:custom -- --yoroiExtensionId=self');
   shell.popd();
-  shell.cp('../yoroi-ergo-connector/build/inject.js', destDir);
+  let injectScript: string;
+  try {
+    const data = fs.readFileSync('../yoroi-ergo-connector/build/inject.js');
+    injectScript = Buffer.from(data).toString('utf-8');
+  } catch (e) {
+    console.error('Failed to read the connector inject script!', e);
+    throw e;
+  }
+  try {
+    const fixedInjectScript = injectScript.replace('$YOROI_BUILD_TYPE_ENV$', buildType);
+    fs.writeFileSync(`${destDir}/inject.js`, fixedInjectScript);
+  } catch (e) {
+    console.error('Failed to write the fixed connector inject script!', e);
+    throw e;
+  }
 };
 
 export function buildProd(env: string) {
@@ -40,7 +55,7 @@ export function buildProd(env: string) {
   exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()}`);
 
   if (shouldInjectConnector) {
-    buildAndCopyInjector('build/js');
+    buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');
   }
 }
 
@@ -52,7 +67,6 @@ export function buildDev(env: string) {
   const webpackHotMiddleware = require('webpack-hot-middleware');
 
   const path = require('path');
-  const fs = require('fs');
 
   const config = require(`../webpack/devConfig`);
 
@@ -65,7 +79,7 @@ export function buildDev(env: string) {
   tasks.copyAssets('dev', env);
 
   if (shouldInjectConnector) {
-    buildAndCopyInjector('dev/js');
+    buildAndCopyInjector('dev/js', 'dev');
   }
 
   console.log('[Webpack Dev]');

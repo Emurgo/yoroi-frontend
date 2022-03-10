@@ -63,7 +63,6 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
                 amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-                // $FlowFixMe[prop-missing]
                 nftMetadata: token.info.Metadata.assetMintMetadata
                   && token.info.Metadata.assetMintMetadata.length > 0
                   && token.info.Metadata.assetMintMetadata[0]['721']

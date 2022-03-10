@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
-
 import { injectIntl } from 'react-intl';
 import styles from './AssetsList.scss';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -18,7 +17,7 @@ import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import globalMessages from '../../../i18n/global-messages';
 import { hiddenAmount } from '../../../utils/strings';
-import { assetsMessage } from './AssetsList';
+import { assetsMessage, compareNumbers, compareStrings } from './AssetsList';
 import {
   Avatar,
   ButtonBase,
@@ -96,15 +95,12 @@ function TokenList({
       newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
-    setState(prev => ({ ...prev, sortingDirection: newSortDirection }));
 
-    if (a[field] < b[field]) {
-      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+    if (field === 'amount') {
+      return compareNumbers(a[field], b[field], newSortDirection)
     }
-    if (a[field] > b[field]) {
-      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-    }
-    return 0;
+    // Other fields
+    return compareStrings(a[field], b[field], newSortDirection)
   };
 
   const sortAssets: (field: string) => void = (field: string) => {

@@ -17,7 +17,7 @@ Then(/^I see the stakepool ticker "([^"]*)"$/, async function (ticker) {
 });
 
 When(/^I click on the next button in the delegation by id$/, async function () {
-  await this.click('.DelegationSendForm_nextButton');
+  await this.click('.DelegationSendForm_component .MuiButton-primary');
 });
 
 When(/^I see the delegation confirmation dialog$/, async function () {
@@ -25,8 +25,8 @@ When(/^I see the delegation confirmation dialog$/, async function () {
 });
 
 Given(/^I click on see dashboard$/, async function () {
-  await this.waitForElement('.DelegationSendForm_nextButton');
-  await this.click("//button[contains(@label, 'Dashboard page')]", By.xpath);
+  await this.waitForElement('.SuccessPage_component');
+  await this.click("//button[contains(text(), 'Dashboard page')]", By.xpath);
 });
 
 When(/^I should see the dashboard screen$/, async function () {

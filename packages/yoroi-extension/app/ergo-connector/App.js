@@ -71,6 +71,10 @@ class App extends Component<Props, State> {
     Logger.error(errorInfo.componentStack);
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('unload', () => {});
+  }
+
   render(): Node {
     const { stores } = this.props;
     const locale = stores.profile.currentLocale;

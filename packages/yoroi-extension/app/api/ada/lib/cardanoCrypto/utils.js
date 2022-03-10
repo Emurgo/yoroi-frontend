@@ -78,8 +78,8 @@ export async function isWalletExist(
   mode: 'bip44' | 'cip1852',
   recoveryPhrase: string,
   accountIndex: number,
-  selectedNetwork: $ReadOnly<NetworkRow> 
-  ): Promise<PublicDeriver<> | void> {
+  selectedNetwork: $ReadOnly<NetworkRow>
+): Promise<PublicDeriver<> | void> {
 
   if ((mode !== 'bip44') && (mode !== 'cip1852')) {
     throw new Error(`${nameof(isWalletExist)} unknown restoration mode`);

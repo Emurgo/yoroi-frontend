@@ -43,18 +43,23 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
         this.loadPersistentDbRequest.execute().promise
       ])
       .then(async () => {
+        Logger.debug(`[yoroi] closing other instances`);
         await closeOtherInstances(this.getTabIdKey.bind(this)());
+        Logger.debug(`[yoroi] loading persistent db`);
         const persistentDb = this.loadPersistentDbRequest.result;
         if (persistentDb == null) throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.load)} load db was not loaded. Should never happen`);
+        Logger.debug(`[yoroi] check migrations`);
         await this.migrationRequest.execute({
           localStorageApi: this.api.localStorage,
           persistentDb,
           currVersion: environment.getVersion(),
         }).promise;
+        Logger.debug(`[yoroi][preLoadingScreenEnd]`);
         await this.preLoadingScreenEnd.bind(this)();
         runInAction(() => {
           this.error = null;
           this._loading = false;
+          Logger.debug(`[yoroi] loading ended`);
         });
         return undefined;
       }).catch((error) => {

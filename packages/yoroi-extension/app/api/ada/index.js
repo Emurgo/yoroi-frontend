@@ -2,209 +2,157 @@
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
-import {
-  Logger,
-  stringifyError,
-  stringifyData
-} from '../../utils/logging';
+import { Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import {
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-  CoinTypes,
   ChainDerivations,
+  CoinTypes,
+  HARD_DERIVATION_START,
   STAKING_KEY_INDEX,
+  WalletTypePurpose,
 } from '../../config/numbersConfig';
-import type {
-  Network,
-} from '../../../config/config-types';
+import type { Network, } from '../../../config/config-types';
+import { createHardwareWallet, createStandardBip44Wallet, } from './lib/storage/bridge/walletBuilder/byron';
+import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import {
-  createStandardBip44Wallet, createHardwareWallet,
-} from './lib/storage/bridge/walletBuilder/byron';
-import {
-  createStandardCip1852Wallet, createHardwareCip1852Wallet,
-} from './lib/storage/bridge/walletBuilder/shelley';
-import {
-  getPendingTransactions,
   getAllTransactions,
-  updateTransactions,
-  removeAllTransactions,
   getForeignAddresses,
+  getPendingTransactions,
+  removeAllTransactions,
+  updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
+  addrContainsAccountKey,
   createCertificate,
   filterAddressesByStakingKey,
-  addrContainsAccountKey,
 } from './lib/storage/bridge/delegationUtils';
 
-import {
-  createMetadata
-} from './lib/storage/bridge/metadataUtils';
+import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
+import { createMetadata } from './lib/storage/bridge/metadataUtils';
 
-import {
-  Bip44Wallet,
-} from './lib/storage/models/Bip44Wallet/wrapper';
-import {
-  Cip1852Wallet,
-} from './lib/storage/models/Cip1852Wallet/wrapper';
+import { Bip44Wallet, } from './lib/storage/models/Bip44Wallet/wrapper';
+import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
-import {
-  flattenInsertTree,
-  Bip44DerivationLevels,
-} from './lib/storage/database/walletTypes/bip44/api/utils';
+import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
+import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primitives/enums';
+import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
-import {
-  PublicDeriver,
-} from './lib/storage/models/PublicDeriver/index';
-import {
-  asDisplayCutoff,
-  asHasLevels,
-} from './lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
+import { asDisplayCutoff, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
-  IPublicDeriver,
+  Address,
+  Addressing,
+  AddressType,
+  IDisplayCutoff,
   IGetAllUtxos,
+  IGetAllUtxosResponse,
   IGetPublic,
   IGetSigningKey,
   IGetStakingKey,
-  IDisplayCutoff,
-  IGetAllUtxosResponse,
-  IHasUtxoChains, IHasUtxoChainsRequest,
-  Address, Addressing, UsedStatus, Value, AddressType,
+  IHasUtxoChains,
+  IHasUtxoChainsRequest,
+  IPublicDeriver,
+  UsedStatus,
+  Value,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
-  GetTransactionsResponse,
+  GetForeignAddressesRequest,
+  GetForeignAddressesResponse,
   GetTransactionsRequestOptions,
-  RefreshPendingTransactionsRequest, RefreshPendingTransactionsResponse,
-  RemoveAllTransactionsRequest, RemoveAllTransactionsResponse,
-  GetForeignAddressesRequest, GetForeignAddressesResponse,
+  GetTransactionsResponse,
+  RefreshPendingTransactionsRequest,
+  RefreshPendingTransactionsResponse,
+  RemoveAllTransactionsRequest,
+  RemoveAllTransactionsResponse,
 } from '../common/index';
+import { builtSendTokenList, hasSendAllDefault } from '../common/index';
 import {
-  sendAllUnsignedTx as shelleySendAllUnsignedTx,
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
-  signTransaction as shelleySignTransaction,
   newAdaUnsignedTxForConnector as shelleyNewAdaUnsignedTxForConnector,
+  sendAllUnsignedTx as shelleySendAllUnsignedTx,
+  signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
-import {
-  generateWalletRootKey,
-  generateAdaMnemonic,
-} from './lib/cardanoCrypto/cryptoWallet';
-import {
-  v4PublicToV2,
-  derivePublicByAddressing,
-  derivePrivateByAddressing,
-} from './lib/cardanoCrypto/utils';
-import {
-  isValidBip39Mnemonic,
-} from '../common/lib/crypto/wallet';
+import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
+import { derivePrivateByAddressing, derivePublicByAddressing, v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { isValidBip39Mnemonic, } from '../common/lib/crypto/wallet';
 import { generateByronPlate } from './lib/cardanoCrypto/plate';
 import {
-  scramblePaperAdaMnemonic,
   isValidEnglishAdaPaperMnemonic,
+  scramblePaperAdaMnemonic,
   unscramblePaperAdaMnemonic,
 } from './lib/cardanoCrypto/paperWallet';
 import Notice from '../../domain/Notice';
 import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
-import {
-  createTrezorSignTxPayload,
-} from './transactions/shelley/trezorTx';
-import {
-  createLedgerSignTxPayload,
-} from './transactions/shelley/ledgerTx';
+import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
+import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
-  WalletAlreadyRestoredError,
   InvalidWitnessError,
   NotEnoughMoneyToSendError,
   RewardAddressEmptyError,
+  WalletAlreadyRestoredError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import { scanShelleyCip1852Account } from './restoration/shelley/scan';
-import type {
-  V4UnsignedTxAddressedUtxoResponse,
-  CardanoAddressedUtxo,
-} from './transactions/types';
+import type { CardanoAddressedUtxo, V4UnsignedTxAddressedUtxoResponse, } from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 import type {
-  HistoryFunc,
-  SendFunc,
-  SignedResponse,
-  BestBlockFunc,
-  SignedRequest,
   AccountStateFunc,
   AddressUtxoFunc,
-  TokenInfoFunc,
-  MultiAssetMintMetadataFunc
+  BestBlockFunc,
+  HistoryFunc,
+  MultiAssetMintMetadataFunc,
+  SendFunc,
+  SignedRequest,
+  SignedResponse,
+  TokenInfoFunc
 } from './lib/state-fetch/types';
-import type {
-  FilterFunc,
-} from '../common/lib/state-fetch/currencySpecificTypes';
+import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
+import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
+import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
 import {
-  getChainAddressesForDisplay,
-} from './lib/storage/models/utils';
-import {
-  getAllAddressesForDisplay,
-  rawGetAddressRowsForWallet,
-} from './lib/storage/bridge/traitUtils';
-import {
+  asAddressedUtxo,
+  cardanoValueFromMultiToken,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
-  asAddressedUtxo,
   multiTokenFromRemote,
-  cardanoValueFromMultiToken,
 } from './transactions/utils';
-import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
+import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type {
+  CreateWalletRequest,
+  CreateWalletResponse,
   IsValidMnemonicRequest,
   IsValidMnemonicResponse,
-  RestoreWalletRequest, RestoreWalletResponse,
-  CreateWalletRequest, CreateWalletResponse,
+  RestoreWalletRequest,
+  RestoreWalletResponse,
   SendTokenList,
 } from '../common/types';
-import {
-  CoreAddressTypes,
-  TxStatusCodes,
-} from './lib/storage/database/primitives/enums';
-import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
-import {
-  getCardanoHaskellBaseConfig,
-} from './lib/storage/database/prepackaged/networks';
-import {
-  toSenderUtxos,
-} from './transactions/transfer/utils';
-import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
-import { MultiToken } from '../common/lib/MultiToken';
+import { getCardanoHaskellBaseConfig, } from './lib/storage/database/prepackaged/networks';
+import { toSenderUtxos, } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
-import { hasSendAllDefault, builtSendTokenList } from '../common/index';
+import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import {
-  GetPathWithSpecific,
-  GetAddress,
-} from './lib/storage/database/primitives/api/read';
-import {
-  getAllSchemaTables,
-  raii,
-  mapToTables,
-} from './lib/storage/database/utils';
+import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primitives/api/read';
+import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
-import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
-import type { ISignRequest } from '../common/lib/transactions/ISignRequest';
+import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 
 // ADA specific Request / Response params
 
@@ -360,16 +308,33 @@ export type CreateUnsignedTxRequest = {|
   tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
 |};
+export type CardanoTxRequestMintMetadata = {|
+  tag: number | string, // the metadata tag, e.g. 721 for NFTs
+  json: string, // JSON string with the metadata
+|};
+export type CardanoTxRequestMint = {|
+  script: string, // the HEX of the policy script,
+  storeScriptOnChain?: boolean, // whether to include the script into auxiliary data
+  assetName: string, // HEX
+  amount?: string, // default to 1 for NFTs
+  // This metadata will be wrapped into { tag: { [policyId]: { [assetName]: json } } }
+  metadata?: CardanoTxRequestMintMetadata,
+|};
 export type CardanoTxRequest = {|
-  includeInputs?: Array<string>,
-  includeOutputs?: Array<string>,
+  includeInputs?: Array<string>, // Array of UTxO IDs
+  includeOutputs?: Array<string>, // HEX of WASM TransactionOutput values
   includeTargets?: Array<{|
     address: string,
     value?: string,
     assets?: {| [assetId: string]: string |},
+    dataHash?: string,
+    mintRequest?: Array<CardanoTxRequestMint>, // this mint is sent directly to the target
     ensureRequiredMinimalValue?: boolean,
   |}>,
+  mintRequest?: Array<CardanoTxRequestMint>, // this ming must be manually set to the outputs
   onlyInputsIntended?: boolean,
+  validityIntervalStart?: number,
+  ttl?: number,
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
@@ -1016,7 +981,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.network.NetworkId,
       };
@@ -1161,7 +1126,10 @@ export default class AdaApi {
       includeInputs,
       includeOutputs,
       includeTargets,
+      mintRequest,
       onlyInputsIntended,
+      validityIntervalStart,
+      ttl,
     } = request.cardanoTxRequest;
     const noneOrEmpty = a => {
       if (a != null && !Array.isArray(a)) {
@@ -1175,7 +1143,7 @@ export default class AdaApi {
       if (noInputs) {
         throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
       }
-      if (!onlyInputsIntended) {
+      if (Boolean(onlyInputsIntended) === false) {
         throw new Error('No outputs is specified and intended inputs flag is false');
       }
     }
@@ -1222,7 +1190,7 @@ export default class AdaApi {
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
       ),
-      minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       networkId: network.NetworkId,
     };
@@ -1230,19 +1198,53 @@ export default class AdaApi {
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const outputs = [];
-    for (const outputHex of (includeOutputs ?? [])) {
-      const output = RustModule.WalletV4.TransactionOutput.from_bytes(
-          Buffer.from(outputHex, 'hex')
-      )
-      outputs.push(
-        {
-          address: Buffer.from(output.address().to_bytes()).toString('hex'),
-          amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
-        }
+    const mint = [];
+    const mintMetadata = {};
+    const nativeScripts = [];
+
+    function appendMintMetadata(
+      metadata: ?CardanoTxRequestMintMetadata,
+      policyId: string,
+      assetName: string,
+    ): void {
+      if (metadata) {
+        const tag = new BigNumber(metadata.tag).toString();
+        const tagGroup = mintMetadata[tag] = mintMetadata[tag] || {
+          version: '1.0',
+        };
+        const policyGroup = tagGroup[policyId] = tagGroup[policyId] || {};
+        policyGroup[hexToUtf(assetName)] = JSON.parse(metadata.json);
+      }
+    }
+
+    function mintEntryToIdentifier(mintEntry: CardanoTxRequestMint): {|
+      policyId: string, assetId: string,
+    |} {
+      const { script, assetName } = mintEntry;
+      const policyId = bytesToHex(
+        RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(script))
+          .hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
       );
+      const assetId = `${policyId}.${assetName}`;
+      return { policyId, assetId };
+    }
+
+    for (const outputHex of (includeOutputs ?? [])) {
+      const output = RustModule.WalletV4.TransactionOutput.from_bytes(hexToBytes(outputHex))
+      const newOutput = {
+        address: bytesToHex(output.address().to_bytes()),
+        amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
+      };
+      const outputDataHash = output.data_hash();
+      if (outputDataHash != null) {
+        // $FlowFixMe[prop-missing]
+        newOutput.dataHash = bytesToHex(outputDataHash.to_bytes());
+      }
+      outputs.push(newOutput);
     }
 
     for (const target of (includeTargets ?? [])) {
+      const targetAssets = { ...(target.assets || {}) };
       const makeMultiToken = (adaValue: string) => {
         const values = [
           {
@@ -1251,12 +1253,13 @@ export default class AdaApi {
             amount: new BigNumber(adaValue),
           },
         ];
-        if (target.assets) {
-          for (const assetId of Object.keys(target.assets)) {
+        for (const assetId of Object.keys(targetAssets)) {
+          const assetValue = targetAssets[assetId];
+          if (assetValue != null) {
             values.push({
               identifier: assetId,
               networkId: protocolParams.networkId,
-              amount: new BigNumber(target.assets[assetId]),
+              amount: new BigNumber(assetValue),
             });
           }
         }
@@ -1268,35 +1271,89 @@ export default class AdaApi {
           },
         );
       };
-      let amount = makeMultiToken(target.value ?? '0');
 
-      if (target.ensureRequiredMinimalValue === false) {
+      if (target.mintRequest != null && target.mintRequest.length > 0) {
+        for (const mintEntry of target.mintRequest) {
+          const { script, assetName, amount, metadata, storeScriptOnChain } = mintEntry;
+          const { policyId, assetId } = mintEntryToIdentifier(mintEntry);
+          const assetAmountBignum = new BigNumber(targetAssets[assetId] ?? '0')
+            .plus(new BigNumber(amount ?? '1'));
+          if (!assetAmountBignum.isPositive()) {
+            throw new Error('Target mint cannot sum to a non-positive amount! Use root mint-request for burning!')
+          }
+          const assetAmount = assetAmountBignum.toString();
+          // Adding minting request
+          mint.push({
+            policyScript: script,
+            assetName,
+            amount: assetAmount,
+          });
+          // Set the new amount to the target assets
+          targetAssets[assetId] = assetAmount;
+          appendMintMetadata(metadata, policyId, assetName);
+          if (Boolean(storeScriptOnChain) === true) {
+            nativeScripts.push(script);
+          }
+        }
+      }
+
+      let amount = makeMultiToken(target.value ?? '0');
+      const dataHash = target.dataHash;
+      const ensureMinValue = target.ensureRequiredMinimalValue;
+      if (ensureMinValue == null || ensureMinValue === false) {
         if (target.value === undefined) {
           throw new Error('Value is required for a valid tx output');
         }
-      } else { // ensureRequiredMinimalValue is not defined or true
+      } else {
+        // ensureRequiredMinimalValue is true
         const minAmount = RustModule.WalletV4.min_ada_required(
           cardanoValueFromMultiToken(amount),
-          protocolParams.minimumUtxoVal,
+          dataHash != null,
+          protocolParams.coinsPerUtxoWord,
         );
         if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
           amount = makeMultiToken(minAmount.to_str());
         }
       }
-      outputs.push(
-        {
-          address: target.address,
-          amount,
-        }
-      );
+      outputs.push({
+        address: target.address,
+        amount,
+        dataHash,
+      });
     }
+
+    for (const mintEntry of (mintRequest || [])) {
+      const { script, assetName, amount, metadata } = mintEntry;
+      const { policyId } = mintEntryToIdentifier(mintEntry);
+      // Adding minting request
+      mint.push({
+        policyScript: script,
+        assetName,
+        amount: amount ?? '1',
+      });
+      appendMintMetadata(metadata, policyId, assetName);
+    }
+
+    const txMetadata = {};
+    for (const metaTag of Object.keys(mintMetadata)) {
+      txMetadata[String(metaTag)] = JSON.stringify(mintMetadata[metaTag]);
+    }
+
+    const auxiliaryData = {
+      metadata: txMetadata,
+      nativeScripts,
+    };
 
     const unsignedTxResponse = shelleyNewAdaUnsignedTxForConnector(
       outputs,
+      mint,
+      auxiliaryData,
       changeAdaAddr,
       mustIncludeUtxos,
       coinSelectUtxos,
       request.absSlotNumber,
+      validityIntervalStart,
+      ttl,
       protocolParams,
     );
 
@@ -1334,7 +1391,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
@@ -1456,7 +1513,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
@@ -1619,7 +1676,7 @@ export default class AdaApi {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
@@ -1786,7 +1843,8 @@ export default class AdaApi {
           request.db,
           wallet.bip44WrapperRow,
         );
-        console.log({mode: request.mode, request, wallet, bip44Wallet})
+        // eslint-disable-next-line no-console
+        console.log({ mode: request.mode, request, wallet, bip44Wallet })
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
             pubDeriver.publicDeriverResult,
@@ -2185,11 +2243,11 @@ export default class AdaApi {
 
   async createSubmittedTransactionData(
     publicDeriver: PublicDeriver<>,
-    signRequest: ISignRequest<any>,
+    signRequest: HaskellShelleyTxSignRequest,
     txId: string,
     defaultNetworkId: number,
     defaultToken: $ReadOnly<TokenRow>,
-  ): Promise<WalletTransactionCtorData> {
+  ): Promise<CardanoShelleyTransaction> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
@@ -2240,7 +2298,7 @@ export default class AdaApi {
       }
     }
 
-    return {
+    return CardanoShelleyTransaction.fromData({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,
@@ -2253,7 +2311,17 @@ export default class AdaApi {
       state: TxStatusCodes.SUBMITTED,
       errorMsg: null,
       block: null,
-    };
+      certificates: [],
+      ttl: new BigNumber(String(signRequest.unsignedTx.build().ttl())),
+      metadata: signRequest.metadata
+        ? Buffer.from(signRequest.metadata.to_bytes()).toString('hex')
+        : null,
+      withdrawals: signRequest.withdrawals().map(withdrawal => ({
+        address: withdrawal.address,
+        value: withdrawal.amount
+      })),
+      isValid: true,
+    });
   }
 }
 // ========== End of class AdaApi =========

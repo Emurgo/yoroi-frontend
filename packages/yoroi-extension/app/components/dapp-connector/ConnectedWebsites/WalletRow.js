@@ -3,19 +3,19 @@
 import { Component } from 'react'
 import type { Node } from 'react';
 import styles from './WalletRow.scss'
-import WalletAccountIcon from '../../topbar/WalletAccountIcon';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
-import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
 import NoDappImage from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import WalletType from '../../widgets/WalletType';
+import NavPlate from '../../topbar/NavPlate'
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { splitAmount, truncateToken } from '../../../utils/formatters';
 
 const messages = defineMessages({
   active: {
@@ -26,35 +26,21 @@ const messages = defineMessages({
 
 type Props = {|
     +url: ?string,
+    +protocol: ?string,
     +isActiveSite: boolean,
-    +wallet: PublicDeriverCache,
     +shouldHideBalance: boolean,
-    +onRemoveWallet: ?string => void,
+    +onRemoveWallet: {| url: ?string, protocol: ?string |} => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-    +settingsCache: ConceptualWalletSettingsCache | null,
+    +settingsCache: ConceptualWalletSettingsCache,
     +websiteIcon: string,
+    +balance: MultiToken | null,
+    +plate: WalletChecksum,
 |};
 
 type State = {|
   showDeleteIcon: boolean,
 |}
 
-function constructPlate(
-    plate: WalletChecksum,
-    saturationFactor: number,
-    divClass: string
-  ): [string, React$Element<'div'>] {
-    return [
-      plate.TextPart,
-      <div className={divClass}>
-        <WalletAccountIcon
-          iconSeed={plate.ImagePart}
-          saturationFactor={saturationFactor}
-          scalePx={6}
-        />
-      </div>,
-    ];
-}
 
 export default class WalletRow extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -73,47 +59,77 @@ export default class WalletRow extends Component<Props, State> {
     this.setState({ showDeleteIcon: false })
   }
 
+  renderAmountDisplay: {|
+    shouldHideBalance: boolean,
+    amount: ?MultiToken,
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return <div className={styles.isLoading} />;
+    }
+
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    let balanceDisplay;
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>{hiddenAmount}</span>);
+    } else {
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
+      );
+
+      balanceDisplay = (
+        <>
+          {beforeDecimalRewards}
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+      );
+    }
+
+    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
+  }
+
   render(): Node {
       const {
       isActiveSite,
       url,
-      wallet,
+      protocol,
+      plate,
       onRemoveWallet,
+      balance,
       shouldHideBalance,
-      getTokenInfo,
       settingsCache,
       websiteIcon
       } = this.props;
       const { showDeleteIcon } = this.state
       const { intl } = this.context;
-      // eslint-disable-next-line no-unused-vars
-      const [_, iconComponent] = wallet.checksum
-      ? constructPlate(wallet.checksum, 0, styles.icon)
-      : [];
-
-      const defaultEntry = wallet.balance.getDefaultEntry();
-      const tokenInfo = getTokenInfo(defaultEntry);
-      const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
       return (
         <div>
           <div
-            onMouseEnter={this.showDeleteIcon}
+            onMouseOver={this.showDeleteIcon}
+            onFocus={this.showDeleteIcon}
             onMouseLeave={this.hideDeleteIcon}
             className={styles.component}
           >
             <p className={styles.name}>
-              {wallet.name}
+              {settingsCache.conceptualWalletName}
               {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>}
             </p>
             <div className={styles.rowWrapper}>
               <div>
                 <div className={styles.card}>
-                  <div className={styles.avatar}>{iconComponent}</div>
+                  <div className={styles.avatar}>
+                    <NavPlate plate={plate} wallet={settingsCache} />
+                  </div>
                   <p className={styles.balance}>
-                    {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
-                    <span>{getTokenName(tokenInfo)}</span>
+                    {this.renderAmountDisplay({
+                      shouldHideBalance,
+                      amount: balance,
+                    })}
                   </p>
                 </div>
               </div>
@@ -134,7 +150,7 @@ export default class WalletRow extends Component<Props, State> {
               </div>
               <div className={styles.delete}>
                 {showDeleteIcon &&
-                <button onClick={() => onRemoveWallet(url)} type='button'>
+                <button onClick={() => onRemoveWallet({ url, protocol })} type='button'>
                   <DeleteIcon />
                 </button>}
               </div>

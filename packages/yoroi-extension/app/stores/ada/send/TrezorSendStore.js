@@ -162,20 +162,20 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         },
       };
 
+      let stakingKey;
       const withStakingKey = asGetStakingKey(request.publicDeriver);
-      if (!withStakingKey) {
-        // noinspection ExceptionCaughtLocallyJS
-        throw new Error(`${nameof(this.signAndBroadcast)} can't get staking key`);
-      }
-      const stakingKeyResp = await withStakingKey.getStakingKey();
+      // Byron wallets have no staking key
+      if (withStakingKey) {
+        const stakingKeyResp = await withStakingKey.getStakingKey();
 
-      const stakingKey = derivePublicByAddressing({
-        addressing: stakingKeyResp.addressing,
-        startingFrom: {
-          level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
-          key: publicKeyInfo.key,
-        }
-      });
+        stakingKey = derivePublicByAddressing({
+          addressing: stakingKeyResp.addressing,
+          startingFrom: {
+            level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
+            key: publicKeyInfo.key,
+          }
+        });
+      }
 
       let metadata;
 
@@ -235,7 +235,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         RustModule.WalletV4.hash_transaction(txBody).to_bytes()
       ).toString('hex');
 
-      return await this.api.ada.broadcastTrezorSignedTx({
+      await this.api.ada.broadcastTrezorSignedTx({
         signedTxRequest: {
           network,
           id: txId,
@@ -243,6 +243,12 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         },
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       });
+      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
+        request.publicDeriver,
+        request.params.signRequest,
+        txId,
+      );
+      return { txId };
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

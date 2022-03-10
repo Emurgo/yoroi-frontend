@@ -1,7 +1,7 @@
 {
   "name": "test-ergo-dapp",
   "version": "0.1.0",
-  "description": "test dApp to interact with the Yoroi Ergo dApp Connector",
+  "description": "test dApp to interact with the Yoroi dApp Connector",
   "main": "index.js",
   "bin": {
     "test-ergo-dapp": ".bin/test-ergo-dapp.js"
@@ -11,13 +11,15 @@
     "start": "webpack-dev-server"
   },
   "devDependencies": {
-    "@emurgo/cardano-serialization-lib-browser": "9.1.0",
+    "@emurgo/cardano-serialization-lib-browser": "10.0.3",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",
     "copy-webpack-plugin": "^5.0.0"
   },
   "dependencies": {
+    "@emurgo/cip4-js": "1.0.6",
+    "@download/blockies": "1.0.3",
     "bignumber.js": "^9.0.1"
   }
 }
