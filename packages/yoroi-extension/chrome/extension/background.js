@@ -426,7 +426,6 @@ const yoroiMessageHandler = async (
     });
   }
 
-  // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     if (request.tabId == null) return;
     const { tabId } = request;
