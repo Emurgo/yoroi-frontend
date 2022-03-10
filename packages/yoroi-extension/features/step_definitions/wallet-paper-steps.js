@@ -9,15 +9,15 @@ import { enterRecoveryPhrase } from './wallet-restoration-steps';
 // ========== Paper wallet ==========
 
 Then(/^I open Number of Adddresses selection dropdown$/, async function () {
-  await this.click('.WalletPaperDialog_component .MuiSelect-select');
+  await this.click({ locator: '.WalletPaperDialog_component .MuiSelect-select', method: 'css' });
 });
 
 Then(/^I select 2 addresses$/, async function () {
-  return this.click('//li[contains(text(), "2")]', By.xpath);
+  return this.click({ locator: '//li[contains(text(), "2")]', method: 'xpath' });
 });
 
 Then(/^I click the create paper wallet button$/, async function () {
-  await this.click('.primary');
+  await this.click({ locator: '.primary', method: 'css' });
 });
 
 const fakeAddresses = [

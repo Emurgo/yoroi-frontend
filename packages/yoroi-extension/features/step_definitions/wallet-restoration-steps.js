@@ -7,44 +7,44 @@ import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
-  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click(`.PickCurrencyOptionDialog_${currency}`);
+  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
+  await this.click({ locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' });
 
-  await this.waitForElement('.WalletRestoreOptionDialog');
+  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 });
 
 Then(/^I select Byron-era 15-word wallet$/, async function () {
-  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
-  await this.click('.WalletEraOptionDialog_bgByronMainnet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
+  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 });
 Then(/^I select Shelley-era 15-word wallet$/, async function () {
-  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
-  await this.click('.WalletEraOptionDialog_bgShelleyMainnet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
+  await this.click({ locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 });
 Then(/^I select Shelley-era 24-word wallet$/, async function () {
-  await this.click('.WalletRestoreOptionDialog_normal24WordWallet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_normal24WordWallet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 });
 
 Then(/^I select bip44 15-word wallet$/, async function () {
-  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 });
 
 When(/^I click the restore paper wallet button$/, async function () {
-  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click('.PickCurrencyOptionDialog_cardano');
+  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
+  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
 
-  await this.waitForElement('.WalletRestoreOptionDialog');
+  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
-  await this.click('.WalletRestoreOptionDialog_restorePaperWallet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restorePaperWallet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
@@ -81,7 +81,7 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string): Pro
 
 When(/^I enter the master key:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input('input[name="masterKey"]', fields.masterKey);
+  await this.input({ locator: 'input[name="masterKey"]', method: 'css' }, fields.masterKey);
 });
 
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
@@ -102,29 +102,29 @@ When(/^I enter one more word to the recovery phrase field:$/, async function (ta
 });
 
 When(/^I clear the recovery phrase$/, async function () {
-  await this.clearInputUpdatingForm('.AutocompleteOverridesClassic_autocompleteWrapper input', 15);
+  await this.clearInputUpdatingForm({ locator: '.AutocompleteOverridesClassic_autocompleteWrapper input', method: 'css' }, 15);
 });
 
 When(/^I enter the restored wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input("input[name='walletPassword']", fields.password);
-  await this.input("input[name='repeatPassword']", fields.repeatedPassword);
+  await this.input({ locator: "input[name='walletPassword']", method: 'css' }, fields.password);
+  await this.input({ locator: "input[name='repeatPassword']", method: 'css' }, fields.repeatedPassword);
 });
 
 Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
-  await this.input("input[name='repeatPassword']", password);
+  await this.input({ locator: "input[name='repeatPassword']", method: 'css' }, password);
 });
 
 When(/^I enter the paper wallet password "([^"]*)"$/, async function (password) {
-  await this.input("input[name='paperPassword']", password);
+  await this.input({ locator: "input[name='paperPassword']", method: 'css' }, password);
 });
 
 When(/^I clear the restored wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm("input[name='walletPassword']", password.length);
+  await this.clearInputUpdatingForm({ locator: "input[name='walletPassword']", method: 'css' }, password.length);
 });
 
 When(/^I click the "Restore Wallet" button$/, async function () {
-  await this.click('.WalletRestoreDialog .primary');
+  await this.click({ locator: '.WalletRestoreDialog .primary', method: 'css' });
 });
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
@@ -168,13 +168,13 @@ Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, {
     id: 'wallet.restore.dialog.title.label',
   });
-  await this.waitUntilText('.dialog__title', restoreMessage.toUpperCase(), 2000);
+  await this.waitUntilText({ locator: '.dialog__title', method: 'css' }, restoreMessage.toUpperCase(), 2000);
 });
 
 Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
   const webElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
   for (let i = 0; i < webElements.length; i++) {
-    await this.click(`(//span[contains(text(), '×')])[1]`, By.xpath);
+    await this.click({ locator: `(//span[contains(text(), '×')])[1]`, method: 'xpath' });
   }
   const expectedElements = await this.driver.findElements(
     By.xpath(`//span[contains(text(), '×')]`)
@@ -185,17 +185,19 @@ Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
   const expectedError = data.hashes()[0];
-  const errorSelector = '//p[starts-with(@id, "recoveryPhrase--")]';
-  await checkErrorByTranslationId(this, errorSelector, expectedError, By.xpath);
+  await checkErrorByTranslationId(
+    this,
+    { locator: '//p[starts-with(@id, "recoveryPhrase--")]', method: 'xpath' },
+    expectedError);
 });
 
 Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
   const words = table.split(' ');
   const lastWord = words[words.length - 1];
-  await this.waitForElementNotPresent(
-    `//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`,
-    By.xpath
-  );
+  await this.waitForElementNotPresent({
+    locator: `//span[contains(@class, 'SimpleAutocomplete') and contains(text(), "${lastWord}")]`,
+    method: 'xpath'
+  });
 });
 
 // eslint-disable-next-line no-unused-vars
@@ -207,13 +209,16 @@ Then(/^I should see an "(\d{1,2}) words left" error message:$/, async function (
     values: { number: Number(number) },
   });
   const errorSelector = '//p[starts-with(@id, "recoveryPhrase--")]';
-  await this.waitUntilText(errorSelector, errorMessage, 15000, By.xpath);
+  await this.waitUntilText(
+    { locator: errorSelector, method: 'xpath' },
+    errorMessage,
+    15000);
 });
 
 Then(/^I should see the wallet already exist window$/, async function () {
-  await this.waitForElement('.WalletAlreadyExistDialog_component');
+  await this.waitForElement({ locator: '.WalletAlreadyExistDialog_component', method: 'css' });
 });
 
 When(/^I click the Open wallet button$/, async function () {
-  await this.click('.confirmButton');
+  await this.click({ locator: '.confirmButton', method: 'css' });
 });
