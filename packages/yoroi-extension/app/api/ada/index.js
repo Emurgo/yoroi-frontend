@@ -153,6 +153,8 @@ import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primiti
 import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
+import type { PersistedSubmittedTransaction } from '../localStorage';
+import type { RemoteUnspentOutput } from './lib/state-fetch/types';
 
 // ADA specific Request / Response params
 
@@ -2247,7 +2249,10 @@ export default class AdaApi {
     txId: string,
     defaultNetworkId: number,
     defaultToken: $ReadOnly<TokenRow>,
-  ): Promise<CardanoShelleyTransaction> {
+  ): Promise<{|
+    transaction: CardanoShelleyTransaction,
+    usedUtxos: Array<{| txHash: string, index: number |}>
+  |}> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
@@ -2297,8 +2302,10 @@ export default class AdaApi {
         isIntraWallet = false;
       }
     }
-
-    return CardanoShelleyTransaction.fromData({
+    const usedUtxos = signRequest.senderUtxos.map(utxo => (
+      { txHash: utxo.tx_hash, index: utxo.tx_index }
+    ));
+    const transaction = CardanoShelleyTransaction.fromData({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,
@@ -2322,6 +2329,50 @@ export default class AdaApi {
       })),
       isValid: true,
     });
+    return { usedUtxos, transaction };
+  }
+
+  utxosWithSubmittedTxs(
+    originalUtxos: Array<RemoteUnspentOutput>,
+    publicDeriverId: number,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+  ): Array<RemoteUnspentOutput> {
+    const filteredSubmittedTxs = submittedTxs.filter(
+      submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
+    );
+    const usedUtxoIds = new Set(
+      filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
+    );
+    // take out UTxOs consumed by submitted transactions
+    const utxos = originalUtxos.filter(({ utxo_id }) => !usedUtxoIds.has(utxo_id));
+    // put in UTxOs produced by submitted transactions
+    for (const { transaction } of filteredSubmittedTxs) {
+      for (const [index, {address, value}] of transaction.addresses.to.entries()) {
+        const amount =  value.values.find(
+          ({ identifier }) => identifier === value.defaults.defaultIdentifier
+        )?.amount || '0';
+        const assets = value.values
+          .filter(({ identifier }) => identifier !== value.defaults.defaultIdentifier)
+          .map(({ identifier, amount }) => {
+            const [policyId, name = ''] = identifier.split('.');
+            return {
+              policyId,
+              name,
+              amount,
+              assetIf: identifier,
+            };
+          });
+        utxos.push({
+          utxo_id: `${transaction.txid}${index}`,
+          tx_hash: transaction.txid,
+          tx_index: index,
+          receiver: address,
+          amount,
+          assets,
+        });
+      }
+    }
+    return utxos;
   }
 }
 // ========== End of class AdaApi =========

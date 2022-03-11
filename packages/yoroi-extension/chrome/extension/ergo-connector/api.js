@@ -215,11 +215,18 @@ export async function connectorGetUtxosCardano(
   }
   const utxos = await withUtxos.getAllUtxos();
   const utxosToUse = []
-  const formattedUtxos = asAddressedUtxoCardano(utxos).map(u => {
-    // eslint-disable-next-line no-unused-vars
-    const { addressing, ...rest } = u
-    return rest
-  })
+  const submittedTxs = loadSubmittedTransactions() || [];
+  const adaApi = new AdaApi();
+  const formattedUtxos = adaApi.utxosWithSubmittedTxs(
+    asAddressedUtxoCardano(utxos).map(u => {
+      // eslint-disable-next-line no-unused-vars
+      const { addressing, ...rest } = u
+      return rest
+    }),
+    wallet.publicDeriverId,
+    submittedTxs,
+  );
+
   let valueAcc = new BigNumber(0);
   for(const formatted of formattedUtxos){
     if (tokenId === 'ADA' || tokenId === 'TADA') {
@@ -968,7 +975,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
   const utxos = asAddressedUtxoCardano(
     await withUtxos.getAllUtxos()
   );
-
   const txId = Buffer.from(
     RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
   ).toString('hex');
@@ -984,6 +990,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   let isIntraWallet = true;
   const txBody = tx.body();
   const txInputs = txBody.inputs();
+  const usedUtxos = [];
   for (let i = 0; i < txInputs.len(); i++) {
     const input = txInputs.get(i);
     const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
@@ -993,6 +1000,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     if (!utxo) {
       throw new Error('missing UTXO');
     }
+    usedUtxos.push({ txHash, index });
 
     const value = new MultiToken([], defaults);
 
@@ -1084,6 +1092,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     publicDeriverId: publicDeriver.publicDeriverId,
     transaction: submittedTx,
     networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    usedUtxos,
   });
   persistSubmittedTransactions(submittedTxs);
 }

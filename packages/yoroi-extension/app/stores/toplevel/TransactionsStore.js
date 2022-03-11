@@ -100,6 +100,7 @@ type SubmittedTransactionEntry = {|
   networkId: number,
   publicDeriverId: number,
   transaction: WalletTransaction,
+  usedUtxos: Array<{| txHash: string, index: number |}>,
 |};
 
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
@@ -784,14 +785,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   recordSubmittedTransaction: (
     PublicDeriver<>,
     WalletTransaction,
+    Array<{| txHash: string, index: number |}>,
   ) => void = (
     publicDeriver,
     transaction,
+    usedUtxos,
   ) => {
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
       networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       transaction,
+      usedUtxos,
     });
     this._persistSubmittedTransactions();
   }
