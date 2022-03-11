@@ -18,6 +18,7 @@ import type {
   Tx,
   TxSignWindowRetrieveData,
   WhitelistEntry,
+  GetUtxosRequest,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -112,10 +113,10 @@ export function getProtocol(): Promise<?Protocol> {
   });
 }
 
-export function getLatestUtxos(tabId): Promise<?Protocol> {
+export function getLatestUtxos(tabId: number): Promise<{| utxos: ?IGetAllUtxosResponse |}> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
-        ({ type: 'get_utxos/cardano', tabId }),
+        ({ type: 'get_utxos/cardano', tabId }: GetUtxosRequest),
         response => {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors

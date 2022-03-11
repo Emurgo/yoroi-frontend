@@ -23,6 +23,7 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
+  GetUtxosRequest,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -374,6 +375,7 @@ const yoroiMessageHandler = async (
     | RemoveWalletFromWhitelistData
     | GetConnectedSitesData
     | GetConnectionProtocolData
+    | GetUtxosRequest
   ),
   sender,
   sendResponse

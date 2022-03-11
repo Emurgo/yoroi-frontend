@@ -5,7 +5,6 @@ import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDer
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type CardanoTxRequest from '../../../app/api/ada';
-import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -295,7 +294,7 @@ export type Tx = {|
 export type CardanoTx = {|
   tx: string,
   partialSign: boolean,
-  utxos: ?IGetAllUtxosResponse,
+  tabId: number,
 |};
 
 export function asTx(
@@ -489,6 +488,11 @@ export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: false,
   tabId: ?number,
+|}
+
+export type GetUtxosRequest = {|
+  type: 'get_utxos/cardano',
+  tabId: number,
 |}
 
 export type TxSignWindowRetrieveData = {|
