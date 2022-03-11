@@ -4,7 +4,9 @@ import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import { Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
-import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
+import CardanoShelleyTransaction, {
+  CardanoShelleyTransactionCtorData
+} from '../../domain/CardanoShelleyTransaction';
 import {
   ChainDerivations,
   CoinTypes,
@@ -2247,7 +2249,7 @@ export default class AdaApi {
     txId: string,
     defaultNetworkId: number,
     defaultToken: $ReadOnly<TokenRow>,
-  ): Promise<CardanoShelleyTransaction> {
+  ): Promise<CardanoShelleyTransactionCtorData> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
@@ -2298,7 +2300,7 @@ export default class AdaApi {
       }
     }
 
-    return CardanoShelleyTransaction.fromData({
+    return new CardanoShelleyTransaction({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
       amount,
