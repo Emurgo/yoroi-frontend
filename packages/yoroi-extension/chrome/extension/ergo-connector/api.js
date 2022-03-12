@@ -313,15 +313,39 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     .then(arr => arr.map(a => a.base58));
 }
 
+function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
+  const submittedTxs = loadSubmittedTransactions() || [];
+  return submittedTxs
+    .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
+    .flatMap(({ transaction }) => {
+      return transaction.addresses.to.map(({ address }) => address);
+    });
+}
+
 export async function connectorGetUsedAddresses(
   wallet: PublicDeriver<>,
   paginate: ?Paginate
 ): Promise<Address[]> {
-  return getAllAddresses(wallet, true).then(addresses => paginateResults(addresses, paginate));
+  const usedAddresses = await getAllAddresses(wallet, true);
+
+  const outputAddressesInSubmittedTxs = new Set(
+    getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
+  );
+  const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
+        .filter(address => outputAddressesInSubmittedTxs.has(address));
+
+  return paginateResults(
+    [...usedAddresses, ...usedInSubmittedTxs],
+    paginate
+  );
 }
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
-  return getAllAddresses(wallet, false);
+  const result = await getAllAddresses(wallet, false);
+  const outputAddressesInSubmittedTxs = new Set(
+    getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
+  );
+  return result.filter(address => !outputAddressesInSubmittedTxs.has(address));
 }
 
 export async function connectorGetCardanoRewardAddresses(
