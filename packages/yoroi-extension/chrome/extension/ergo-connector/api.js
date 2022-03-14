@@ -756,11 +756,14 @@ export async function connectorCreateCardanoTx(
     time: new Date(),
   }).slot);
 
+  const submittedTxs = loadSubmittedTransactions() || [];
+
   const adaApi = new AdaApi();
   const signRequest = await adaApi.createUnsignedTxForConnector(({
     publicDeriver: withHasUtxoChains,
     absSlotNumber,
     cardanoTxRequest,
+    submittedTxs,
   }: any));
 
   if (password == null) {

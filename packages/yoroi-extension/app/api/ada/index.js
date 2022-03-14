@@ -40,7 +40,11 @@ import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primiti
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
-import { asDisplayCutoff, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
+import {
+  asDisplayCutoff,
+  asHasLevels,
+  asGetAllUtxos,
+} from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
@@ -340,8 +344,9 @@ export type CardanoTxRequest = {|
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  publicDeriver: PublicDeriver<>,
   absSlotNumber: BigNumber,
+  submittedTxs: Array<PersistedSubmittedTransaction>,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
@@ -1149,9 +1154,14 @@ export default class AdaApi {
         throw new Error('No outputs is specified and intended inputs flag is false');
       }
     }
-
-    const utxos = asAddressedUtxo(
-      await request.publicDeriver.getAllUtxos()
+    const withUtxos = asGetAllUtxos(request.publicDeriver);
+    if (!withUtxos) {
+      throw new Error('unable to get UTxO addresses from public deriver');
+    }
+    const utxos = await this.addressedUtxosWithSubmittedTxs(
+      asAddressedUtxo(await withUtxos.getAllUtxos()),
+      request.publicDeriver,
+      request.submittedTxs
     );
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
     const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {
@@ -2359,7 +2369,7 @@ export default class AdaApi {
               policyId,
               name,
               amount,
-              assetIf: identifier,
+              assetId: identifier,
             };
           });
         utxos.push({
@@ -2370,6 +2380,68 @@ export default class AdaApi {
           amount,
           assets,
         });
+      }
+    }
+    return utxos;
+  }
+
+  async addressedUtxosWithSubmittedTxs(
+    originalUtxos: Array<CardanoAddressedUtxo>,
+    publicDeriver: PublicDeriver<>,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+  ): Promise<Array<CardanoAddressedUtxo>> {
+    const filteredSubmittedTxs = submittedTxs.filter(
+      submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriver.publicDeriverId
+    );
+    const usedUtxoIds = new Set(
+      filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
+    );
+    // take out UTxOs consumed by submitted transactions
+    const utxos = originalUtxos.filter(({ utxo_id }) => !usedUtxoIds.has(utxo_id));
+    // put in UTxOs produced by submitted transactions
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (!withUtxos) {
+      throw new Error('unable to get UTxO addresses from public deriver');
+    }
+    const allAddresses = await withUtxos.getAllUtxoAddresses();
+
+    for (const { transaction } of filteredSubmittedTxs) {
+      for (const [index, {address, value}] of transaction.addresses.to.entries()) {
+        const amount =  value.values.find(
+          ({ identifier }) => identifier === value.defaults.defaultIdentifier
+        )?.amount || '0';
+        const assets = value.values
+          .filter(({ identifier }) => identifier !== value.defaults.defaultIdentifier)
+          .map(({ identifier, amount }) => {
+            const [policyId, name = ''] = identifier.split('.');
+            return {
+              policyId,
+              name,
+              amount,
+              assetId: identifier,
+            };
+          });
+        const findAddressing = () => {
+          for (const { addrs, addressing } of allAddresses) {
+            for (const { Hash } of addrs) {
+              if (Hash === address) {
+                return addressing;
+              }
+            }
+          }
+        };
+        const addressing = findAddressing();
+        if (addressing) {
+          utxos.push({
+            utxo_id: `${transaction.txid}${index}`,
+            tx_hash: transaction.txid,
+            tx_index: index,
+            receiver: address,
+            amount,
+            assets,
+            addressing,
+          });
+        } // else { should not happen }
       }
     }
     return utxos;

@@ -548,6 +548,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: withHasUtxoChains,
         absSlotNumber,
         cardanoTxRequest: (signingMessage.sign: any).tx,
+        submittedTxs: [],
       });
       const fee = {
         tokenId: result.fee().getDefaultEntry().identifier,
