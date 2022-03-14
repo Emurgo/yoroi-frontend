@@ -6,7 +6,9 @@ export const checkIfElementsInArrayAreUnique = function (arr: Array<string>): bo
   return new Set(arr).size === arr.length;
 };
 
-export const getMethod = function (locatorMethod: string) {
+export function getMethod(
+  locatorMethod: string
+): function {
   switch (locatorMethod) {
     case 'id': {
       return By.id;
@@ -36,4 +38,4 @@ export const getMethod = function (locatorMethod: string) {
       return By.css;
     }
   }
-};
+}

@@ -30,7 +30,7 @@ import {
   getComplexityLevelButton,
   goToSettings,
 } from './general-settings-steps';
-import { LocatorObject } from '../support/webdriver';
+import type { LocatorObject } from '../support/webdriver';
 import { walletButton } from '../pages/sidebarPage';
 import { getWalletButtonByPlate } from '../pages/walletsListPage';
 

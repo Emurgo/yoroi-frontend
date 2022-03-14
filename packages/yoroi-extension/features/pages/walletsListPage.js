@@ -1,6 +1,8 @@
 // @flow
-// Revamped wallets list elements
+
+import { WebElement } from 'selenium-webdriver';
 import { getMethod } from '../support/helpers/helpers';
+import { NoSuchElementError } from 'selenium-webdriver/lib/error';
 
 const walletRow = { locator: '.WalletRow_content', method: 'css' };
 const walletPlateNumber = {
@@ -13,7 +15,10 @@ const walletButton = {
   method: 'xpath',
 };
 
-export const getWalletButtonByPlate = async (customWorld: Object, walletWantedPlate: string) => {
+export async function getWalletButtonByPlate(
+  customWorld: Object,
+  walletWantedPlate: string
+): Promise<WebElement> {
   const allRows = await customWorld.driver.findElements(
     getMethod(walletRow.method)(walletRow.locator)
   );
@@ -27,4 +32,6 @@ export const getWalletButtonByPlate = async (customWorld: Object, walletWantedPl
       );
     }
   }
-};
+
+  throw new NoSuchElementError(`A wallet with the plate ${walletWantedPlate} is not found`);
+}
