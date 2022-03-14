@@ -6,6 +6,8 @@ import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type CardanoTxRequest from '../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
+import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
 // the as* conversion functions do structural verification/sanitation on
@@ -468,6 +470,7 @@ export type PendingSignData = {|
   tx: {|
     usedUtxoIds: Array<string>,
     reorgTargetAmount: string,
+   utxos: IGetAllUtxosResponse,
   |},
 |};
 

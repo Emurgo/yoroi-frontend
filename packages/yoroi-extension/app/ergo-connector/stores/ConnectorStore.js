@@ -653,6 +653,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: withHasUtxoChains,
         absSlotNumber,
         cardanoTxRequest: (signingMessage.sign: any).tx,
+        utxos: [],
       });
       const fee = {
         tokenId: result.fee().getDefaultEntry().identifier,
@@ -664,6 +665,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         result.inputs(),
         result.outputs(),
         fee,
+        [],
       );
       runInAction(() => {
         this.adaTransaction = {
@@ -690,12 +692,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (signingMessage.sign.type !== 'tx-reorg/cardano') {
       throw new Error('unexpected signing data type');
     }
-    const { usedUtxoIds, reorgTargetAmount } = signingMessage.sign.tx;
+    const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       selectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
+      []//fixme
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating
@@ -714,6 +717,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       unsignedTx.inputs(),
       unsignedTx.outputs(),
       fee,
+      utxos,
     );
     runInAction(() => {
       this.adaTransaction = {
@@ -791,16 +795,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     inputs: Array<{| address: string, value: MultiToken |}>,
     outputs: Array<{| address: string, value: MultiToken |}>,
     fee: {| tokenId: string, networkId: number, amount: string |},
-    utxos: ?IGetAllUtxosResponse,
+    utxos: IGetAllUtxosResponse,
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
-    if(!utxos) {
-      const withUtxos = asGetAllUtxos(publicDeriver);
-      if (withUtxos == null) {
-        throw new Error('wallet doesn\'t support IGetAllUtxos');
-      }
-      utxos = await withUtxos.getAllUtxos();
-    }
-
     const ownAddresses = new Set([
       ...utxos.map(utxo => utxo.address),
       ...await connectorGetUsedAddresses(publicDeriver, null),

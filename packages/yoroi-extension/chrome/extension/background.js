@@ -73,6 +73,9 @@ import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepack
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+} from '../../app/api/ada/transactions/utils';
 
 /*::
 declare var chrome;
@@ -1366,6 +1369,13 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet) => {
                     // try to get enough collaterals from existing UTXOs
+                    const withUtxos = asGetAllUtxos(wallet)
+                    if (withUtxos == null) {
+                      throw new Error('wallet doesn\'t support IGetAllUtxos');
+                    }
+                    const walletUtxos = await withUtxos.getAllUtxos();
+                    const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
+
                     const {
                       utxosToUse,
                       reorgTargetAmount
@@ -1373,6 +1383,11 @@ function handleInjectorConnect(port) {
                       wallet,
                       pendingTxs,
                       requiredAmount,
+                      addressedUtxos.map(u => {
+                        // eslint-disable-next-line no-unused-vars
+                        const { addressing, ...rest } = u;
+                        return rest;
+                      }),
                     );
                     // do have enough
                     if (!reorgTargetAmount) {
@@ -1395,7 +1410,8 @@ function handleInjectorConnect(port) {
                       await connectorGenerateReorgTx(
                         wallet,
                         usedUtxoIds,
-                        reorgTargetAmount
+                        reorgTargetAmount,
+                        addressedUtxos,
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {
@@ -1419,7 +1435,8 @@ function handleInjectorConnect(port) {
                         type: 'tx-reorg/cardano',
                         tx: {
                           usedUtxoIds,
-                          reorgTargetAmount
+                          reorgTargetAmount,
+                          utxos: walletUtxos,
                         },
                         uid: message.uid,
                       },

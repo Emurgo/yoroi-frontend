@@ -340,7 +340,7 @@ export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
   absSlotNumber: BigNumber,
-  dontUseUtxoIds?: Set<string>,
+  utxos: Array<CardanoAddressedUtxo>,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
@@ -1149,13 +1149,7 @@ export default class AdaApi {
       }
     }
 
-    let utxos = asAddressedUtxo(
-      await request.publicDeriver.getAllUtxos()
-    );
-    const { dontUseUtxoIds } = request;
-    if (dontUseUtxoIds) {
-      utxos = utxos.filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id))
-    }
+    const { utxos } = request;
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
     const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {
       if (!allUtxoIds.has(utxoId)) {
