@@ -54,6 +54,7 @@ import {
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { loadSubmittedTransactions } from '../../api/localStorage';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -438,7 +439,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`missing chains functionality`);
     }
     const utxos = await withHasUtxoChains.getAllUtxos();
-    const addressedUtxos = asAddressedUtxo(utxos);
+
+    const submittedTxs = loadSubmittedTransactions() || [];
+    const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
+      asAddressedUtxo(utxos),
+      selectedWallet.publicDeriver,
+      submittedTxs,
+    );
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       network.NetworkId
