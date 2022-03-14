@@ -139,7 +139,9 @@ class SignTxPage extends Component<Props, State> {
       onSuccess: form => {
         const { walletPassword } = form.values();
         this.setState({ isSubmitting: true })
-        this.props.onConfirm(walletPassword).catch(error => {
+        this.props.onConfirm(walletPassword).finally(() => {
+          this.setState({ isSubmitting: false });
+        }).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
               this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
@@ -147,8 +149,6 @@ class SignTxPage extends Component<Props, State> {
           } else {
             throw error;
           }
-        }).finally(() => {
-          this.setState({ isSubmitting: false });
         });
       },
       onError: () => {},
