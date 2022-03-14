@@ -999,8 +999,14 @@ export async function connectorRecordSubmittedCardanoTransaction(
     (await withUtxos.getAllUtxoAddresses())
       .flatMap(utxoAddr => utxoAddr.addrs.map(addr => addr.Hash))
   );
-  const utxos = asAddressedUtxoCardano(
-    await withUtxos.getAllUtxos()
+  const submittedTxs = loadSubmittedTransactions() || [];
+  const adaApi = new AdaApi();
+  const utxos = await adaApi.addressedUtxosWithSubmittedTxs(
+    asAddressedUtxoCardano(
+      await withUtxos.getAllUtxos()
+    ),
+    publicDeriver,
+    submittedTxs,
   );
   const txId = Buffer.from(
     RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
@@ -1114,7 +1120,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     isValid: true,
   };
 
-  const submittedTxs = loadSubmittedTransactions() || [];
   submittedTxs.push({
     publicDeriverId: publicDeriver.publicDeriverId,
     transaction: submittedTx,
