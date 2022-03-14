@@ -1,12 +1,13 @@
 // @flow
 
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import { Builder, By, Key, until, error, promise, WebElement } from 'selenium-webdriver';
+import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { getMethod } from './helpers/helpers';
 
 const fs = require('fs');
 
@@ -101,38 +102,6 @@ export type LocatorObject = {|
     | 'partialLinkText'
     | 'tagName',
 |};
-
-function getMethod(locatorMethod: string) {
-  switch (locatorMethod) {
-    case 'id': {
-      return By.id;
-    }
-    case 'xpath': {
-      return By.xpath;
-    }
-    case 'name': {
-      return By.name
-    }
-    case 'className': {
-      return By.className
-    }
-    case 'linkText': {
-      return By.linkText
-    }
-    case 'js': {
-      return By.js
-    }
-    case 'partialLinkText': {
-      return By.partialLinkText
-    }
-    case 'tagName': {
-      return By.tagName
-    }
-    default: {
-      return By.css;
-    }
-  }
-}
 
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {

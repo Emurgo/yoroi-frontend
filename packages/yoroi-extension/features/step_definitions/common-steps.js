@@ -31,6 +31,8 @@ import {
   goToSettings,
 } from './general-settings-steps';
 import { LocatorObject } from '../support/webdriver';
+import { walletButton } from '../pages/sidebarPage';
+import { getWalletButtonByPlate } from '../pages/walletsListPage';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -522,11 +524,17 @@ Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
   await compareToCapturedDbState(this, true);
 });
 
-Then(/^I switch to revamp version$/, async function () {
+Then(/^Revamp. I switch to revamp version$/, async function () {
   await goToSettings(this);
   await selectSubmenuSettings(this, 'general');
   const revampButton = await this.driver.findElement(By.id('switchToRevampButton'));
   await revampButton.click();
-  await takeScreenshot(this.driver, 'I switch to revamp version');
-  await getConsoleLogs(this.driver, 'I switch to revamp version');
+});
+
+Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
+  await this.click(walletButton);
+
+  const restoreInfo = testWallets[walletName];
+  const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
+  await walletButtonInRow.click();
 });

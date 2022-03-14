@@ -8,6 +8,11 @@ import {
   checkIfElementsInArrayAreUnique,
 } from '../support/helpers/helpers';
 import { truncateAddress, truncateAddressShort } from '../../app/utils/formatters';
+import { receiveTab } from '../pages/walletPage';
+
+Given(/^Revamp. I go to the receive screen$/, async function () {
+  await this.click(receiveTab);
+});
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click({ locator: '.receive', method: 'css' });
