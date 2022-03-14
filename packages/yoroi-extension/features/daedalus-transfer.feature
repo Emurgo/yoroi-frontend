@@ -4,10 +4,12 @@ Feature: Transfer Daedalus Wallet funds
     Given I have opened the extension
     And I have completed the basic setup
     Given There is a Byron wallet stored named empty-wallet
+    Then Revamp. I switch to revamp version
+    Then Revamp. I go to the wallet empty-wallet
 
   @it-99
   Scenario: Daedalus transfer fails when user type invalid mnemonic phrase (IT-99)
-    And I am on the transfer start screen
+    And Revamp. I go to the claim/transfer page
     When I click on the byron button on the transfer screen
     When I select the 12-word option
     And I enter the recovery phrase:
@@ -17,7 +19,7 @@ Feature: Transfer Daedalus Wallet funds
   
   @it-84
   Scenario: Daedalus transfer should fail to recover wallet if connection was lost (IT-84)
-    And I am on the transfer start screen
+    And Revamp. I go to the claim/transfer page
     When I click on the byron button on the transfer screen
     When I select the 12-word option
     And I enter the recovery phrase:
@@ -29,7 +31,7 @@ Feature: Transfer Daedalus Wallet funds
 
   @it-35
   Scenario: Ensure user can not add more than 12 words to the Daedalus recovery phrase (IT-35)
-    And I am on the transfer start screen
+    And Revamp. I go to the claim/transfer page
     When I click on the byron button on the transfer screen
     When I select the 12-word option
     And I enter the recovery phrase:
@@ -42,7 +44,7 @@ Feature: Transfer Daedalus Wallet funds
   @withWebSocketConnection @it-45
   Scenario: User can transfer Daedalus funds to Yoroi using 12-word mnemonic phrase (IT-45)
     And My Daedalus wallet has funds
-    And I am on the transfer start screen
+    And Revamp. I go to the claim/transfer page
     When I click on the byron button on the transfer screen
     When I select the 12-word option
     And I enter the recovery phrase:
@@ -55,12 +57,12 @@ Feature: Transfer Daedalus Wallet funds
     |       |         | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm |
     Given The expected transaction is "hKQAgoJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CgGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAOlV7AhoAArOFAxoR/pTNoQKChFggYl7pBU3amzE1pil1r1ST2mJ5DvV9yGTU4Y1ChQ9DVOZYQJz5L4DQc6wUYd82mWgqW6cZRFYGQbG3+aIyv/JdePVLTrPq1Nn+l0K30gt2yLq/ZwW6QUPnOAGY38Eiczl8LgBYIFmMawkFtjRm2CxVuEFZJ57SV8Pxo/rmi1W73FTfMNSOWCKhAVgeWBypg7XhsgcTZ7wcnJCT4Ge537janRgFqjmR+aGyhFgg8yfLKHBscpfqq7TpUh4rWj5tSofEZ3UgHmA4yo4dCExYQPNs1ZwnMJEPt2G8VrrjWH3drtHrprAaCNLw0osKzHFe7RQu6opHlFBJxaL1YktVrCSs2ODNRyaRFbOwJu0AQwVYIHS37xxfMSPsLLV88sfVa4xwz+PdhlDaPoXmQM6TX7OqWCKhAVgeWBypg7XhsgcTNtAHZpBr3/PspPxn2cLst4Q2lh9t9fY="
     Then I confirm Daedalus transfer funds
-    Then I should see the summary screen
+    Then Revamp. I should see the summary screen
     
   @withWebSocketConnection @it-80
   Scenario: Daedalus transfer should fail if the 12-words mnemonics corresponds to an empty Daedalus wallet (IT-80)
     And My Daedalus wallet has no funds
-    And I am on the transfer start screen
+    And Revamp. I go to the claim/transfer page
     When I click on the byron button on the transfer screen
     When I select the 12-word option
     And I enter the recovery phrase:
@@ -88,4 +90,4 @@ Feature: Transfer Daedalus Wallet funds
       |       |         | DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm |
     Given The expected transaction is "hKQAgoJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CgGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAOlV7AhoAArOFAxoR/pTNoQKChFggYl7pBU3amzE1pil1r1ST2mJ5DvV9yGTU4Y1ChQ9DVOZYQJz5L4DQc6wUYd82mWgqW6cZRFYGQbG3+aIyv/JdePVLTrPq1Nn+l0K30gt2yLq/ZwW6QUPnOAGY38Eiczl8LgBYIFmMawkFtjRm2CxVuEFZJ57SV8Pxo/rmi1W73FTfMNSOWCKhAVgeWBypg7XhsgcTZ7wcnJCT4Ge537janRgFqjmR+aGyhFgg8yfLKHBscpfqq7TpUh4rWj5tSofEZ3UgHmA4yo4dCExYQPNs1ZwnMJEPt2G8VrrjWH3drtHrprAaCNLw0osKzHFe7RQu6opHlFBJxaL1YktVrCSs2ODNRyaRFbOwJu0AQwVYIHS37xxfMSPsLLV88sfVa4xwz+PdhlDaPoXmQM6TX7OqWCKhAVgeWBypg7XhsgcTNtAHZpBr3/PspPxn2cLst4Q2lh9t9fY="
     When I confirm Daedalus transfer funds
-    Then I should see the summary screen
+    Then Revamp. I should see the summary screen

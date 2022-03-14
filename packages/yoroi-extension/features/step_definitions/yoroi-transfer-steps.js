@@ -12,6 +12,7 @@ import {
   checkFinalBalanceIsCorrect,
   checkWithdrawalAddressesRecoveredAreCorrect,
 } from '../support/helpers/transfer-helpers';
+import { claimTransferTab } from '../pages/walletPage';
 
 async function confirmAttentionScreen(customWorld: Object){
   // Attention screen
@@ -25,6 +26,10 @@ async function confirmAttentionScreen(customWorld: Object){
 Given(/^I am on the transfer start screen$/, async function () {
   await navigateTo.call(this, '/transfer');
   await waitUntilUrlEquals.call(this, '/transfer');
+});
+
+Given(/^Revamp. I go to the claim\/transfer page$/, async function () {
+  await this.click(claimTransferTab);
 });
 
 When(/^I click skip the transfer$/, async function () {
