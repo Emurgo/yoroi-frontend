@@ -602,7 +602,7 @@ function getScriptRequiredSigningKeys(
 }
 
 export async function connectorSignCardanoTx(
-  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  publicDeriver: PublicDeriver<>,
   password: string,
   tx: CardanoTx,
 ): Promise<string> {
@@ -692,7 +692,13 @@ export async function connectorSignCardanoTx(
     }
   }
 
-  const addressedUtxos = asAddressedUtxoCardano(utxos);
+  const submittedTxs = loadSubmittedTransactions() || [];
+  const adaApi = new AdaApi();
+  const addressedUtxos = await adaApi.addressedUtxosWithSubmittedTxs(
+    asAddressedUtxoCardano(utxos),
+    publicDeriver,
+    submittedTxs
+  );
 
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   if (!withLevels) {
