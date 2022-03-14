@@ -3,7 +3,7 @@ Feature: Generate Addresses
     Given I have opened the extension
     And I have completed the basic setup
 
-  @it-106 @revamp
+  @it-106
   Scenario: Latest address should be displayed at the top (IT-106)
     Given There is a Byron wallet stored named small-single-tx
     Then Revamp. I switch to revamp version

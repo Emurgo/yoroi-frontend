@@ -16,6 +16,10 @@ import {
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
 import { checkErrorByTranslationId } from './common-steps';
+import { daedalusMasterKeyButton, twelveWordOption } from '../pages/claimTransferPage';
+import { proceedRecoveryButton } from '../pages/restoreWalletPage';
+import { errorMessage, errorPageTitle } from '../pages/errorPage';
+import { amountField, feeField, totalAmountField } from '../pages/confirmTransactionPage';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
@@ -44,15 +48,16 @@ Given(/^My Daedalus wallet has no funds/, () => {
 });
 
 Then(/^I select the 12-word option$/, async function () {
-  await this.click({ locator: '.fromDaedalusWallet12Word_legacyDaedalus', method: 'css' });
+  await this.click(twelveWordOption);
 });
 
 When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
-  await this.click({ locator: '.fromDaedalusMasterKey_masterKey', method: 'css' });
+  await this.click(daedalusMasterKeyButton);
 });
 
 When(/^I proceed with the recovery$/, async function () {
-  await this.click({ locator: '.proceedTransferButtonClasses', method: 'css' });
+  const button = await this.findElement(proceedRecoveryButton);
+  await button.click();
 });
 
 When(/^I click next button on the Daedalus transfer page$/, async function () {
@@ -86,21 +91,21 @@ Then(/^I should see the Receive screen$/, async function () {
 });
 
 Then(/^I should see an Error screen$/, async function () {
-  const errorPageTitle = await i18n.formatMessage(this.driver,
+  const errorPageTitleString = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.errorPage.title.label' });
-  await this.waitUntilText({ locator: '.ErrorPage_title', method: 'css' }, errorPageTitle);
+  await this.waitUntilText(errorPageTitle, errorPageTitleString);
 });
 
 Then(/^I should see 'Connection lost' error message$/, async function () {
   const errorDescription = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.error.webSocketRestoreError' });
-  await this.waitUntilText({ locator: '.ErrorPage_error', method: 'css' }, errorDescription);
+  await this.waitUntilText(errorMessage, errorDescription);
 });
 
 Then(/^I should see 'Daedalus wallet without funds' error message$/, async function () {
   const errorDescription = await i18n.formatMessage(this.driver,
     { id: 'api.errors.noInputsError' });
-  await this.waitUntilText({ locator: '.ErrorPage_error', method: 'css' }, errorDescription);
+  await this.waitUntilText(errorMessage, errorDescription);
 });
 
 Then(/^I should wait until funds are recovered:$/, async function (table) {
@@ -114,7 +119,7 @@ When(/^I see transfer CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = rows[0];
   const totalRecoveredBalance = parseFloat(fields.amount) - parseFloat(fields.fee);
   await checkAddressesRecoveredAreCorrect(rows, this);
-  await this.waitUntilContainsText({ locator: '.TransferSummaryPage_fees', method: 'css' }, fields.fee);
-  await this.waitUntilContainsText({ locator: '.TransferSummaryPage_amount', method: 'css' }, fields.amount);
-  await this.waitUntilContainsText({ locator: '.TransferSummaryPage_totalAmount', method: 'css' }, totalRecoveredBalance);
+  await this.waitUntilContainsText(feeField, fields.fee);
+  await this.waitUntilContainsText(amountField, fields.amount);
+  await this.waitUntilContainsText(totalAmountField, totalRecoveredBalance);
 })

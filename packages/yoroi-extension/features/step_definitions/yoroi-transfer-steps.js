@@ -13,6 +13,7 @@ import {
   checkWithdrawalAddressesRecoveredAreCorrect,
 } from '../support/helpers/transfer-helpers';
 import { claimTransferTab } from '../pages/walletPage';
+import { byronButton } from '../pages/claimTransferPage';
 
 async function confirmAttentionScreen(customWorld: Object){
   // Attention screen
@@ -39,7 +40,7 @@ When(/^I click on the shelley button on the transfer screen$/, async function ()
   await this.click({ locator: '.TransferCards_shelleyEra', method: 'css' });
 });
 When(/^I click on the byron button on the transfer screen$/, async function () {
-  await this.click({ locator: '.TransferCards_byronEra', method: 'css' });
+  await this.click(byronButton);
 });
 Then(/^I click on the icarus tab$/, async function () {
   await this.click({ locator: '.IcarusTab', method: 'css' });

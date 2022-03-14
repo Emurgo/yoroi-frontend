@@ -304,6 +304,20 @@ function CustomWorld(cmdInput: WorldInput) {
       element
     );
   };
+
+  this.isDisplayed = async (locator: LocatorObject) => {
+    const element = await this.driver.findElement(
+      getMethod(locator.method)(locator.locator)
+    );
+
+    return await element.isDisplayed();
+  }
+
+  this.findElement = async (locator: LocatorObject) =>
+    await this.driver.findElement(getMethod(locator.method)(locator.locator));
+
+  this.findElements = async (locator: LocatorObject) =>
+    await this.driver.findElements(getMethod(locator.method)(locator.locator));
 }
 
 // no need to await

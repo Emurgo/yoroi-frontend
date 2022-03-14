@@ -75,7 +75,7 @@ Feature: Transfer Daedalus Wallet funds
   @withWebSocketConnection @it-19
   Scenario: User can transfer Daedalus funds to Yoroi using master key (IT-19)
     And My Daedalus wallet has funds
-    And I am on the transfer start screen
+    And Revamp. I go to the claim/transfer page
     When I click on the byron button on the transfer screen
     When I click on the transfer funds from Daedalus master key button
     # enter private key for following mnemonic
