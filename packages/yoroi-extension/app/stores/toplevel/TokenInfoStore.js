@@ -11,6 +11,7 @@ import {
   defaultAssets,
   networks,
   isCardanoHaskell,
+  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   DefaultTokenEntry,
@@ -22,10 +23,12 @@ import {
 import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read';
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
+import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as IFetcherErgo } from '../../api/ergo/lib/state-fetch/IFetcher';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -45,7 +48,14 @@ export default class TokenInfoStore<
     +substores: {
       +ada: {
         +stateFetchStore: {
-          +fetcher: IFetcher,
+          +fetcher: IFetcherCardano,
+          ...
+        },
+        ...
+      },
+      +ergo: {
+        +stateFetchStore: {
+          +fetcher: IFetcherErgo,
           ...
         },
         ...
@@ -64,64 +74,94 @@ export default class TokenInfoStore<
     // the Ergo connector doesn't have this action
     if (this.actions.wallets?.setActiveWallet) {
       this.actions.wallets.setActiveWallet.listen(
-        wallet => { this._fetchMissingTokenInfo(wallet) }
+        ({ wallet }) => { this.fetchMissingTokenInfoForWallet(wallet) }
       );
     }
   }
 
-  @action _fetchMissingTokenInfo
-    : ({| wallet: PublicDeriver<> |}) => Promise<void>
-  = async ({ wallet }) => {
-
+  @action fetchMissingTokenInfoForWallet: (
+    wallet: PublicDeriver<>,
+  ) => Promise<void> = async (wallet) => {
     // the Ergo connector doesn't have this store, but it this function won't be invoked
     if (!this.stores.transactions) {
-      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this._fetchMissingTokenInfo)} missing transactions store`);
+      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.fetchMissingTokenInfo)} missing transactions store`);
     }
 
     const { requests } = this.stores.transactions.getTxRequests(wallet);
 
     await requests.allRequest;
 
-    const tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
+    const  tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
 
+    const networkId = wallet.getParent().networkInfo.NetworkId;
+
+    await this.fetchMissingTokenInfo(networkId, tokenIds);
+  };
+
+  fetchMissingTokenInfo: (number, Array<string>) => Promise<void> = async (
+    networkId,
+    tokenIds
+  ) => {
     const db = this.stores.loading.getDatabase();
     if (!db) {
       return;
     }
-
-    const networkId = wallet.getParent().networkInfo.NetworkId;
     const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
       ({ NetworkId }) => NetworkId === networkId
     );
-    if (!network || !isCardanoHaskell(network)) {
+    if (!network) {
       return;
     }
-    const deps =  Object.freeze({
-      ModifyToken,
-      GetToken,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(db, table));
 
-    const assetMap = await raii(
-      db,
-      depTables,
-      dbTx => (
-        genCardanoAssetMap(
-          db,
-          dbTx,
-          deps,
-          tokenIds,
-          this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
-          this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
-          network,
+    let assetMap;
+    if (isCardanoHaskell(network)) {
+      const deps =  Object.freeze({
+        ModifyToken,
+        GetToken,
+      });
+      const depTables = Object
+            .keys(deps)
+            .map(key => deps[key])
+            .flatMap(table => getAllSchemaTables(db, table));
+
+      assetMap = await raii(
+        db,
+        depTables,
+        dbTx => (
+          genCardanoAssetMap(
+            db,
+            dbTx,
+            deps,
+            tokenIds,
+            this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
+            this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
+            network,
+          )
         )
-      )
-    );
+      );
+    } else if (isErgo(network)) {
+      assetMap = await addErgoAssets(
+        {
+          db,
+          tokenIdentifiers: tokenIds,
+          getAssetInfo: async (req) => {
+            try {
+              return await
+              this.stores.substores.ergo.stateFetchStore.fetcher.getAssetInfo(req);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error('Aseet info request failed', e);
+              return Object.fromEntries(tokenIds.map(tokenId => [tokenId, ({}: any)]));;
+            }
+          },
+          network,
+        }
+      );
+    } else {
+      throw new Error('unexpected wallet type');
+    }
     runInAction(() => { this._updateTokenInfo([...assetMap.values()]) });
-  };
+  }
 
   refreshTokenInfo: void => Promise<void> = async () => {
     const db = this.stores.loading.getDatabase();

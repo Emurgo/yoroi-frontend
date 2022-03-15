@@ -12,7 +12,9 @@ import type { StoresMap } from '../index';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import {
+  HaskellShelleyTxSignRequest,
+} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
 
@@ -37,7 +39,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
 
   recordSubmittedTransaction: (
     PublicDeriver<>,
-    ISignRequest<any>,
+    HaskellShelleyTxSignRequest,
     string,
   ) => Promise<void> = async (
     publicDeriver,
