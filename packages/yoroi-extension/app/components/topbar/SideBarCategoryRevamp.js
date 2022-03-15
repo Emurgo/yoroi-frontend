@@ -32,14 +32,28 @@ export default class SideBarCategoryRevamp extends Component<Props> {
     const isInternalLink = route.startsWith('/') || route.startsWith('#');
 
     return isInternalLink ? (
-      <button type="button" className={componentStyles} onClick={onClick} disabled={active}>
+      <button
+        type="button"
+        className={componentStyles}
+        // $FlowExpectedError[incompatible-use]
+        id={label.id}
+        onClick={onClick}
+        disabled={active}
+      >
         <span className={styles.icon}>
           <SvgElem />
         </span>
         {label ? <span className={styles.label}>{intl.formatMessage(label)}</span> : null}
       </button>
     ) : (
-      <a href={route} className={componentStyles} target="_blank" rel="noopener noreferrer">
+      <a
+        href={route}
+        className={componentStyles}
+        // $FlowExpectedError[incompatible-use]
+        id={label.id}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <span className={styles.icon}>
           <SvgElem />
         </span>

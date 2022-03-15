@@ -18,6 +18,7 @@ import type {
   Tx,
   TxSignWindowRetrieveData,
   WhitelistEntry,
+  GetUtxosRequest,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -55,6 +56,7 @@ import {
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { loadSubmittedTransactions } from '../../api/localStorage';
+import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -111,6 +113,23 @@ export function getProtocol(): Promise<?Protocol> {
       );
   });
 }
+
+export function getLatestUtxos(tabId: number): Promise<{| utxos: ?IGetAllUtxosResponse |}> {
+  return new Promise((resolve, reject) => {
+      window.chrome.runtime.sendMessage(
+        ({ type: 'get_utxos/cardano', tabId }: GetUtxosRequest),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: get_utxos/cardano ');
+          }
+
+          resolve(response);
+        }
+      );
+  });
+}
+
 
 export function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
@@ -421,24 +440,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/* , partialSign */ } = signingMessage.sign.tx;
+    const { tx/* , partialSign */, tabId } = signingMessage.sign.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
+    const { utxos } = await getLatestUtxos(tabId)
 
-    const withUtxos = asGetAllUtxos(selectedWallet.publicDeriver);
-    if (withUtxos == null) {
-      throw new Error(`missing utxo functionality`);
+    if (!utxos) {
+      throw new Error('Missgin utxos for signing tx')
     }
-
-    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-    if (withHasUtxoChains == null) {
-      throw new Error(`missing chains functionality`);
-    }
-    const utxos = await withHasUtxoChains.getAllUtxos();
 
     const submittedTxs = loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
@@ -513,6 +526,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       inputs,
       outputs,
       fee,
+      utxos,
     );
 
     runInAction(() => {
@@ -587,12 +601,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     inputs: Array<{| address: string, value: MultiToken |}>,
     outputs: Array<{| address: string, value: MultiToken |}>,
     fee: {| tokenId: string, networkId: number, amount: string |},
+    utxos: ?IGetAllUtxosResponse,
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
-    const withUtxos = asGetAllUtxos(publicDeriver);
-    if (withUtxos == null) {
-      throw new Error('wallet doesn\'t support IGetAllUtxos');
+    if(!utxos) {
+      const withUtxos = asGetAllUtxos(publicDeriver);
+      if (withUtxos == null) {
+        throw new Error('wallet doesn\'t support IGetAllUtxos');
+      }
+      utxos = await withUtxos.getAllUtxos();
     }
-    const utxos = await withUtxos.getAllUtxos();
+
     const ownAddresses = new Set([
       ...utxos.map(utxo => utxo.address),
       ...await connectorGetUsedAddresses(publicDeriver, null),

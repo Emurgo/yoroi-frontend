@@ -1,12 +1,13 @@
 // @flow
 
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import { Builder, By, Key, until, error, promise, WebElement } from 'selenium-webdriver';
+import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { getMethod } from './helpers/helpers';
 
 const fs = require('fs');
 
@@ -88,6 +89,20 @@ function getFirefoxBuilder() {
 
 type WorldInput = {| parameters: {| browser: 'brave' | 'chrome' | 'firefox' |} |};
 
+export type LocatorObject = {|
+  locator: string,
+  method:
+    | 'css'
+    | 'id'
+    | 'xpath'
+    | 'name'
+    | 'className'
+    | 'linkText'
+    | 'js'
+    | 'partialLinkText'
+    | 'tagName',
+|};
+
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
   switch (cmdInput.parameters.browser) {
@@ -122,32 +137,35 @@ function CustomWorld(cmdInput: WorldInput) {
     return `moz-extension://${firefoxExtensionId}/main_window.html`;
   };
 
-  this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
+  this.getElementBy = (locator: LocatorObject) =>
+    this.driver.findElement(getMethod(locator.method)(locator.locator));
 
-  this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
+  this.getElementsBy = (locator: LocatorObject) =>
+    this.driver.findElements(getMethod(locator.method)(locator.locator));
 
-  this.getText = (locator, method = By.css) => this.getElementBy(locator, method).getText();
+  this.getText = (locator: LocatorObject) => this.getElementBy(locator).getText();
+
   // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
-  this.getValue = this.driver.getValue = async locator =>
+  this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
-  this.waitForElementLocated = (locator, method = By.css) => {
-    const isLocated = until.elementLocated(method(locator));
+  this.waitForElementLocated = (locator: LocatorObject) => {
+    const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
     return this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
   // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
-  this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
-    await this.waitForElementLocated(locator, method);
-    const element = await this.getElementBy(locator, method);
+  this.waitForElement = this.driver.waitForElement = async (locator: LocatorObject) => {
+    await this.waitForElementLocated(locator);
+    const element = await this.getElementBy(locator);
     const condition = until.elementIsVisible(element);
     return this.driver.wait(condition);
   };
 
-  this.waitElementTextMatches = async (regex, locator, method = By.css) => {
-    await this.waitForElement(locator, method);
-    const element = await this.getElementBy(locator, method);
+  this.waitElementTextMatches = async (regex, locator: LocatorObject) => {
+    await this.waitForElement(locator);
+    const element = await this.getElementBy(locator);
     const condition = until.elementTextMatches(element, regex);
     await this.driver.wait(condition);
     return element;
@@ -155,31 +173,30 @@ function CustomWorld(cmdInput: WorldInput) {
 
   // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (
-    locator,
-    method = By.css
+    locator: LocatorObject
   ) => {
     await this.driver.wait(async () => {
-      const elements = await this.getElementsBy(locator, method);
+      const elements = await this.getElementsBy(locator);
       return elements.length === 0;
     });
   };
 
-  this.waitEnable = async (locator, method = By.css) => {
-    const element = await this.getElementBy(locator, method);
+  this.waitEnable = async (locator: LocatorObject) => {
+    const element = await this.getElementBy(locator);
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
-  this.waitDisable = async (locator, method = By.css) => {
-    const element = await this.getElementBy(locator, method);
+  this.waitDisable = async (locator: LocatorObject) => {
+    const element = await this.getElementBy(locator);
     const condition = until.elementIsDisabled(element);
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator, text, timeout = 75000, method = By.css) => {
+  this.waitUntilText = async (locator: LocatorObject, text, timeout = 75000) => {
     await this.driver.wait(async () => {
       try {
-        const value = await this.getText(locator, method);
+        const value = await this.getText(locator);
         return value === text;
       } catch (err) {
         return false;
@@ -187,7 +204,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator, text, timeout = 15000) => {
+  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = 15000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -198,24 +215,24 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.click = async (locator, method = By.css) => {
-    await this.waitForElement(locator, method);
-    await this.waitEnable(locator, method);
-    const clickable = await this.getElementBy(locator, method);
+  this.click = async (locator: LocatorObject) => {
+    await this.waitForElement(locator);
+    await this.waitEnable(locator);
+    const clickable = await this.getElementBy(locator);
     await clickable.click();
   };
 
-  this.input = async (locator, value) => {
+  this.input = async (locator: LocatorObject, value) => {
     const input = await this.getElementBy(locator);
     await input.sendKeys(value);
   };
 
-  this.clearInput = async locator => {
+  this.clearInput = async (locator: LocatorObject) => {
     const input = await this.getElementBy(locator);
     await input.clear();
   };
 
-  this.clearInputUpdatingForm = async (locator, textLength) => {
+  this.clearInputUpdatingForm = async (locator: LocatorObject, textLength) => {
     const input = await this.getElementBy(locator);
     for (let i = 0; i < textLength; i++) {
       // eslint-disable-next-line no-await-in-loop
@@ -223,10 +240,10 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = script =>
+  this.executeLocalStorageScript = (script) =>
     this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
 
-  this.getFromLocalStorage = async key => {
+  this.getFromLocalStorage = async (key) => {
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
     return JSON.parse(result);
   };
@@ -239,7 +256,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
-  this.saveLastReceiveAddressIndex = index => {
+  this.saveLastReceiveAddressIndex = (index) => {
     this.driver.executeScript(i => {
       const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
@@ -250,12 +267,12 @@ function CustomWorld(cmdInput: WorldInput) {
     }, index);
   };
 
-  this.clickElementByQuery = async query => {
+  this.clickElementByQuery = async (query) => {
     await this.driver.executeScript(`document.querySelector('${query}').click()`);
   };
 
-  this.checkIfExists = async locator => {
-    return await this.driver.findElement(locator).then(
+  this.checkIfExists = async (locator: LocatorObject) => {
+    return await this.driver.findElement(getMethod(locator.method)(locator.locator)).then(
       () => true,
       err => {
         if (err instanceof error.NoSuchElementError) {
@@ -273,18 +290,20 @@ function CustomWorld(cmdInput: WorldInput) {
   ) => {
     const endTime = Date.now() + timeout;
 
-    while(endTime >= Date.now()){
+    while (endTime >= Date.now()) {
       if (condition()) return true;
       await this.driver.sleep(repeatPeriod);
     }
     return false;
   };
 
+  // The method is for debugging
   this.highlightElement = async (element: WebElement) => {
     await this.driver.executeScript(
       "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');",
-      element);
-  }
+      element
+    );
+  };
 }
 
 // no need to await

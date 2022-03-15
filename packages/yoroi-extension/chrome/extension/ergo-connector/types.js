@@ -294,6 +294,7 @@ export type Tx = {|
 export type CardanoTx = {|
   tx: string,
   partialSign: boolean,
+  tabId: number,
 |};
 
 export function asTx(
@@ -487,6 +488,11 @@ export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: false,
   tabId: ?number,
+|}
+
+export type GetUtxosRequest = {|
+  type: 'get_utxos/cardano',
+  tabId: number,
 |}
 
 export type TxSignWindowRetrieveData = {|
