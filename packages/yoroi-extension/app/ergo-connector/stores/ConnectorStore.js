@@ -698,7 +698,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       selectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
-      []//fixme
+      asAddressedUtxo(utxos),
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating
