@@ -714,12 +714,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected signing data type');
     }
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
+    const submittedTxs = loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       selectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
       asAddressedUtxo(utxos),
+      submittedTxs,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating

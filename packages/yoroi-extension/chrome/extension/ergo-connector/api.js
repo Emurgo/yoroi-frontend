@@ -75,6 +75,7 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
+import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -264,12 +265,18 @@ export async function connectorGetCollateralUtxos(
   pendingTxs: PendingTransaction[],
   requiredAmount: Value,
   utxos: Array<RemoteUnspentOutput>,
+  submittedTxs: Array<PersistedSubmittedTransaction>,
 ): Promise<GetCollateralUtxosRespose> {
   const required = new BigNumber(requiredAmount)
   if (required.gt(MAX_COLLATERAL)) {
     throw new Error('requested collateral amount is beyond the allowed limits')
   }
-  const utxosToConsider = utxos.filter(
+  const adaApi = new AdaApi();
+  const utxosToConsider = (await adaApi.utxosWithSubmittedTxs(
+    utxos,
+    wallet.publicDeriverId,
+    submittedTxs,
+  )).filter(
     utxo => utxo.assets.length === 0 &&
       new BigNumber(utxo.amount).lt(required.plus(MAX_PER_UTXO_SURPLUS))
   )
@@ -1211,6 +1218,7 @@ export async function connectorGenerateReorgTx(
   usedUtxoIds: Array<string>,
   reorgTargetAmount: string,
   utxos: Array<CardanoAddressedUtxo>,
+  submittedTxs: Array<PersistedSubmittedTransaction>,
 ): Promise<{|
   unsignedTx: HaskellShelleyTxSignRequest,
   collateralOutputAddressSet: Set<string>,
@@ -1260,6 +1268,7 @@ export async function connectorGenerateReorgTx(
       includeTargets,
     },
     utxos: utxos.filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+    submittedTxs,
   });
   return { unsignedTx, collateralOutputAddressSet };
 }
