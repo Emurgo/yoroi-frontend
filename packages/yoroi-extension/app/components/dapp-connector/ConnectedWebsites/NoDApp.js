@@ -6,6 +6,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { connectorMessages } from '../../../i18n/global-messages';
+import { DAPPS } from './dapps'
 
 const messages = defineMessages({
     noWebsitesConnected: {
@@ -22,6 +23,7 @@ export default class NoDApp extends Component {
 
     render(): Node {
         const { intl } = this.context
+        console.log({DAPPS})
         return (
           <div>
             <div>
