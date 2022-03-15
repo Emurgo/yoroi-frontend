@@ -470,7 +470,7 @@ export type PendingSignData = {|
   tx: {|
     usedUtxoIds: Array<string>,
     reorgTargetAmount: string,
-   utxos: IGetAllUtxosResponse,
+    utxos: IGetAllUtxosResponse,
   |},
 |};
 

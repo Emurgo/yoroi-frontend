@@ -59,6 +59,7 @@ import {
   connectorGetChangeAddress,
   connectorSendTxCardano,
   connectorGenerateReorgTx,
+  connectorRecordSubmittedCardanoTransaction,
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -355,6 +356,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.submissionError = 'SEND_TX_ERROR';
         });
         return;
+      }
+      try {
+        if (signingMessage.sign.type !== 'tx-reorg/cardano') {
+          throw new Error('unexpected signing data type');
+        }
+        await connectorRecordSubmittedCardanoTransaction(
+          wallet.publicDeriver,
+          signedTx,
+          asAddressedUtxo(signingMessage.sign.tx.utxos),
+        );
+      } catch {
+        // ignore
       }
       const utxos = this.getUtxosAfterReorg(
         Buffer.from(

@@ -1014,6 +1014,7 @@ export async function connectorRecordSubmittedErgoTransaction(
 export async function connectorRecordSubmittedCardanoTransaction(
   publicDeriver: PublicDeriver<>,
   tx: RustModule.WalletV4.Transaction,
+  addressedUtxos?: Array<CardanoAddressedUtxo>,
 ) {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (!withUtxos) {
@@ -1023,9 +1024,14 @@ export async function connectorRecordSubmittedCardanoTransaction(
     (await withUtxos.getAllUtxoAddresses())
       .flatMap(utxoAddr => utxoAddr.addrs.map(addr => addr.Hash))
   );
-  const utxos = asAddressedUtxoCardano(
-    await withUtxos.getAllUtxos()
-  );
+  let utxos;
+  if (addressedUtxos) {
+    utxos = addressedUtxos;
+  } else {
+    utxos = asAddressedUtxoCardano(
+      await withUtxos.getAllUtxos()
+    );
+  }
 
   const txId = Buffer.from(
     RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
