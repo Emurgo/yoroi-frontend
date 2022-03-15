@@ -28,79 +28,75 @@ type Props = {|
 
 @observer
 export default class ConnectedWebsitesPage extends Component<Props> {
-    static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-      intl: intlShape.isRequired,
-    };
+  render(): Node {
+      const { whitelistEntries, wallets } = this.props;
+      if (whitelistEntries == null
+        || whitelistEntries.length === 0
+        || wallets == null
+        || wallets.length === 0
+      ) {
+          return <NoDApp />
+      }
 
-    render(): Node {
-        const { whitelistEntries, wallets } = this.props;
-        if (whitelistEntries == null
-          || whitelistEntries.length === 0
-          || wallets == null
-          || wallets.length === 0
-        ) {
-           return <NoDApp />
+      const { ergoNodes, cardanoNodes } = whitelistEntries.map((
+        { url, protocol, publicDeriverId, image }
+      ) => {
+        const wallet = wallets.find( cacheEntry =>
+          cacheEntry.getPublicDeriverId() === publicDeriverId
+        )
+        if (wallet == null) {
+          return [null, null]
         }
-
-        const { ergoNodes, cardanoNodes } = whitelistEntries.map((
-          { url, protocol, publicDeriverId, image }
-        ) => {
-          const wallet = wallets.find( cacheEntry =>
-            cacheEntry.getPublicDeriverId() === publicDeriverId
-          )
-          if (wallet == null) {
-            return [null, null]
-          }
-          const { balance, plate } = this.props.getWalletInfo(wallet)
-          return [isErgo(wallet.getParent().getNetworkInfo()), (
-            <WalletRow
-              key={url}
-              url={url}
-              protocol={protocol}
-              websiteIcon={image}
-              isActiveSite={this.props.activeSites.includes(url)}
-              onRemoveWallet={this.props.onRemoveWallet}
-              balance={balance}
-              plate={plate}
-              shouldHideBalance={this.props.shouldHideBalance}
-              getTokenInfo={this.props.getTokenInfo}
-              settingsCache={this.props.getConceptualWallet(wallet)}
-            />
-          )]
-        }).reduce((acc, [isWalletErgo, node]) => {
-          if (node != null) {
-            acc[isWalletErgo === true ? 'ergoNodes' : 'cardanoNodes'].push(node);
-          }
-          return acc;
-        }, { ergoNodes: [], cardanoNodes: [] });
+        const { balance, plate } = this.props.getWalletInfo(wallet)
+        return [isErgo(wallet.getParent().getNetworkInfo()), (
+          <WalletRow
+            key={url}
+            url={url}
+            protocol={protocol}
+            websiteIcon={image}
+            isActiveSite={this.props.activeSites.includes(url)}
+            onRemoveWallet={this.props.onRemoveWallet}
+            balance={balance}
+            plate={plate}
+            shouldHideBalance={this.props.shouldHideBalance}
+            getTokenInfo={this.props.getTokenInfo}
+            settingsCache={this.props.getConceptualWallet(wallet)}
+          />
+        )]
+      }).reduce((acc, [isWalletErgo, node]) => {
+        if (node != null) {
+          acc[isWalletErgo === true ? 'ergoNodes' : 'cardanoNodes'].push(node);
+        }
+        return acc;
+      }, { ergoNodes: [], cardanoNodes: [] });
 
 
 
-        return (
-          <div className={styles.component}>
-            <div className={styles.container}>
-              <div className={styles.header}>
-                <p>Wallets</p>
-                <p>Dapps</p>
-              </div>
-              <div>
-                {cardanoNodes.length > 0 &&
-                <div className={styles.chain}>
-                  <h1>Cardano, ADA</h1>
-                  {cardanoNodes}
-                  <div className={styles.line}>
-                    <div />
-                  </div>
+      return (
+        <div className={styles.component}>
+          <div className={styles.container}>
+            <div className={styles.header}>
+              <p>Wallets</p>
+              <p>Dapps</p>
+            </div>
+            <div>
+              {cardanoNodes.length > 0 &&
+              <div className={styles.chain}>
+                <h1>Cardano, ADA</h1>
+                {cardanoNodes}
+                <div className={styles.line}>
+                  <div />
                 </div>
-                }
-                {ergoNodes.length > 0 &&
-                <div className={styles.chain}>
-                  <h1>Ergo, ERG</h1>
-                  {ergoNodes}
-                </div>}
               </div>
+              }
+              {ergoNodes.length > 0 &&
+              <div className={styles.chain}>
+                <h1>Ergo, ERG</h1>
+                {ergoNodes}
+              </div>}
             </div>
           </div>
-        )
-    }
+        </div>
+      )
+  }
 }
