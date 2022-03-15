@@ -112,7 +112,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
             getConceptualWallet={this.getConceptualWallet.bind(this)}
             getWalletInfo={this.getWalletInfo.bind(this)}
-          />)
+          />
         </FullscreenLayout>
       </TopBarLayout>
     );

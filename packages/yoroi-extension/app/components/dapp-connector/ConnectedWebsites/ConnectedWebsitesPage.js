@@ -15,6 +15,7 @@ import type { TokenLookupKey, MultiToken } from '../../../api/common/lib/MultiTo
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver'
+import NoDApp from './NoDApp';
 
 type WalletInfo = {| balance: null | MultiToken, plate: WalletChecksum |}
 type Props = {|
@@ -63,7 +64,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           || wallets == null
           || wallets.length === 0
         ) {
-           return genNoResult();
+           return <NoDApp />
         }
 
         const { ergoNodes, cardanoNodes } = whitelistEntries.map((
@@ -111,9 +112,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                 {cardanoNodes.length > 0 &&
                 <div className={styles.chain}>
                   <h1>Cardano, ADA</h1>
-                  {
-                    cardanoNodes
-                  }
+                  {cardanoNodes}
                   <div className={styles.line}>
                     <div />
                   </div>
@@ -122,9 +121,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                 {ergoNodes.length > 0 &&
                 <div className={styles.chain}>
                   <h1>Ergo, ERG</h1>
-                  {
-                    ergoNodes
-                  }
+                  {ergoNodes}
                 </div>}
               </div>
             </div>
