@@ -4,10 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
 import styles from './ConnectedWebsitesPage.scss'
-import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
-import { connectorMessages } from '../../../i18n/global-messages';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WalletRow from './WalletRow';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -29,17 +26,6 @@ type Props = {|
     +getWalletInfo: (PublicDeriver<>) => WalletInfo
 |};
 
-const messages = defineMessages({
-    connectedWallets: {
-      id: 'connector.connect.connectedWallets',
-      defaultMessage: '!!!Connected Wallets',
-    },
-    noWebsitesConnected: {
-      id: 'connector.connect.noWebsitesConnected',
-      defaultMessage: `!!!You don't have any websites connected yet`,
-    },
-});
-
 @observer
 export default class ConnectedWebsitesPage extends Component<Props> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -47,17 +33,6 @@ export default class ConnectedWebsitesPage extends Component<Props> {
     };
 
     render(): Node {
-        const { intl } = this.context;
-        const genNoResult = () => (
-          <div className={styles.component}>
-            <div className={styles.noItems}>
-              <NoItemsFoundImg />
-              <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
-              <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
-            </div>
-          </div>
-          );
-
         const { whitelistEntries, wallets } = this.props;
         if (whitelistEntries == null
           || whitelistEntries.length === 0
