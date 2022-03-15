@@ -7,28 +7,28 @@ import { hiddenAmount } from '../../app/utils/strings';
 import { truncateAddress, } from '../../app/utils/formatters';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
-  await this.waitUntilText('.NavWalletDetails_amount', number);
+  await this.waitUntilText({ locator: '.NavWalletDetails_amount', method: 'css' }, number);
 });
 
 Then(/^I should see send transaction screen$/, async function () {
-  await this.waitForElement("input[name='receiver']");
-  await this.waitForElement("input[name='amount']");
+  await this.waitForElement({ locator: "input[name='receiver']", method: 'css' });
+  await this.waitForElement({ locator: "input[name='amount']", method: 'css' });
 });
 
 Then(/^I go to the transaction history screen$/, async function () {
-  await this.click(`//span[contains(text(), "Transactions")]`, By.xpath);
+  await this.click({ locator: `//span[contains(text(), "Transactions")]`, method: 'xpath' });
 });
 
 When(/^I go to the main screen$/, async function () {
-  await this.click(`//div[@class='Sidebar_categories']//button[1]`, By.xpath);
+  await this.click({ locator: `//div[@class='Sidebar_categories']//button[1]`, method: 'xpath' });
 });
 
 Then(/^I should see the transactions screen$/, async function () {
-  await this.waitForElement("//div[@class='WalletSummary_component']", By.xpath);
+  await this.waitForElement({ locator: "//div[@class='WalletSummary_component']", method: 'xpath' });
 });
 
 Then(/^I click on "copy to clipboard" button$/, async function () {
-  await this.click('.CopyableAddress_copyIconBig');
+  await this.click({ locator: '.CopyableAddress_copyIconBig', method: 'css' });
 });
 
 Then(/^I should see "copied" tooltip message:$/, async function (data) {
@@ -47,28 +47,28 @@ Then(/^I see transactions buttons are disabled$/, async function () {
 });
 
 Then(/^I should see the networkError banner$/, async function () {
-  await this.waitForElement('.ServerErrorBanner_serverError');
+  await this.waitForElement({ locator: '.ServerErrorBanner_serverError', method: 'css' });
 });
 
 Then(/^I should see the serverError banner$/, async function () {
-  await this.waitForElement('.ServerErrorBanner_serverError');
+  await this.waitForElement({ locator: '.ServerErrorBanner_serverError', method: 'css' });
 });
 
 Then(/^I should see the app maintenance page$/, async function () {
-  await this.waitForElement('.Maintenance_body');
+  await this.waitForElement({ locator: '.Maintenance_body', method: 'css' });
 });
 
 Then(/^I click on hide balance button$/, async function () {
-  await this.click('.NavWalletDetails_toggleButton');
+  await this.click({ locator: '.NavWalletDetails_toggleButton', method: 'css' });
 });
 
 Then(/^I should see my balance hidden$/, async function () {
-  await this.waitForElement('.NavWalletDetails_amount');
-  await this.waitUntilContainsText('.NavWalletDetails_amount', hiddenAmount);
+  await this.waitForElement({ locator: '.NavWalletDetails_amount', method: 'css' });
+  await this.waitUntilContainsText({ locator: '.NavWalletDetails_amount', method: 'css' }, hiddenAmount);
 });
 
 Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
-  await this.click('.NavDropdown_toggle');
+  await this.click({ locator: '.NavDropdown_toggle', method: 'css' });
   const wallets = await this.driver.findElements(By.xpath("//button[contains(@class, 'NavDropdownRow_head')]"));
   for (const wallet of wallets) {
     const nameElem = await wallet.findElement(By.css('.NavPlate_name'));
@@ -82,10 +82,10 @@ Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
 });
 
 Then(/^I select buy-sell from the dropdown$/, async function () {
-  await this.click('.NavDropdown_toggle');
-  await this.click('.NavDropdownContent_buyButton');
+  await this.click({ locator: '.NavDropdown_toggle', method: 'css' });
+  await this.click({ locator: '.NavDropdownContent_buyButton', method: 'css' });
 });
 
 Then(/^I should see the pre-filled address "([^"]*)"$/, async function (address) {
-  await this.waitUntilContainsText('.BuySellDialog_address', truncateAddress(address));
+  await this.waitUntilContainsText({ locator: '.BuySellDialog_address', method: 'css' }, truncateAddress(address));
 });

@@ -11,9 +11,9 @@ const languageSelection = {
     { isHidden }: {| isHidden: boolean, |} = {}
   ): Promise<void> => {
     if (isHidden) {
-      return client.waitForElementNotPresent(LANGUAGE_SELECTION_FORM);
+      return client.waitForElementNotPresent({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
     }
-    return client.waitForElement(LANGUAGE_SELECTION_FORM);
+    return client.waitForElement({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
   },
   ensureLanguageIsSelected: async (
     client: any,
