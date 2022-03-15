@@ -21,6 +21,7 @@ const getUtxos = document.querySelector('#get-utxos')
 const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
 const createTx = document.querySelector('#create-tx')
+const getCollateralUtxos = document.querySelector('#get-collateral-utxos')
 const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
@@ -582,6 +583,31 @@ createTx.addEventListener('click', () => {
     console.error(error)
     toggleSpinner('hide')
     alertWarrning('Creating tx fails')
+  })
+})
+
+getCollateralUtxos.addEventListener('click', () => {
+  toggleSpinner('show');
+  
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+  const amount = '2100000';
+
+  cardanoApi.getCollateralUtxos(
+    Buffer.from(
+      CardanoWasm.Value.new(
+        CardanoWasm.BigNum.from_str(amount)
+      ).to_bytes()
+    ).toString('hex')
+  ).then(utxos => {
+    toggleSpinner('hide')
+    alertSuccess('Getting collateral UTXOs succeeds: ' + utxos)
+  }).catch(error => {
+    console.error(error)
+    toggleSpinner('hide')
+    alertWarrning('Getting collateral UTXOs tx fails')
   })
 })
 

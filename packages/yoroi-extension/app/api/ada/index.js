@@ -347,6 +347,7 @@ export type CreateUnsignedTxForConnectorRequest = {|
   publicDeriver: PublicDeriver<>,
   absSlotNumber: BigNumber,
   submittedTxs: Array<PersistedSubmittedTransaction>,
+  utxos: Array<CardanoAddressedUtxo>,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
@@ -1154,15 +1155,13 @@ export default class AdaApi {
         throw new Error('No outputs is specified and intended inputs flag is false');
       }
     }
-    const withUtxos = asGetAllUtxos(request.publicDeriver);
-    if (!withUtxos) {
-      throw new Error('unable to get UTxO addresses from public deriver');
-    }
+
     const utxos = await this.addressedUtxosWithSubmittedTxs(
-      asAddressedUtxo(await withUtxos.getAllUtxos()),
+      request.utxos,
       request.publicDeriver,
       request.submittedTxs
     );
+
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
     const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {
       if (!allUtxoIds.has(utxoId)) {

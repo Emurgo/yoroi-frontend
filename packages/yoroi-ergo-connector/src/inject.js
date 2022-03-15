@@ -258,6 +258,10 @@ class CardanoAPI {
       // TODO
       throw new Error('Not implemented yet');
     }
+
+    getCollateralUtxos(requiredAmount) {
+      return this._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
+    }
 }
 `
 
