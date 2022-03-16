@@ -1267,8 +1267,14 @@ export async function connectorGenerateReorgTx(
     cardanoTxRequest: {
       includeTargets,
     },
-    utxos: utxos.filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-    submittedTxs,
+    utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
+      utxos,
+      publicDeriver,
+      submittedTxs,
+    )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+    // we already factored in submitted transactions above, no need to handle it
+    // any more, so just use an empty array here
+    submittedTxs: [],
   });
   return { unsignedTx, collateralOutputAddressSet };
 }
