@@ -121,6 +121,7 @@ import type {
   SignedRequest,
   SignedResponse,
   TokenInfoFunc
+  RemoteUnspentOutput,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -158,7 +159,6 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
-import type { RemoteUnspentOutput } from './lib/state-fetch/types';
 
 // ADA specific Request / Response params
 
@@ -2353,10 +2353,10 @@ export default class AdaApi {
       filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
     );
     // take out UTxOs consumed by submitted transactions
-    const utxos = originalUtxos.filter(({ utxo_id }) => !usedUtxoIds.has(utxo_id));
+    const utxos = originalUtxos.filter(utxo => !usedUtxoIds.has(utxo.utxo_id));
     // put in UTxOs produced by submitted transactions
     for (const { transaction } of filteredSubmittedTxs) {
-      for (const [index, {address, value}] of transaction.addresses.to.entries()) {
+      for (const [index, { address, value }] of transaction.addresses.to.entries()) {
         if (utxos.find(utxo => utxo.utxo_id === `${transaction.txid}${index}`)) {
           // this output is already included
           continue;
@@ -2367,13 +2367,13 @@ export default class AdaApi {
         )?.amount || '0';
         const assets = value.values
           .filter(({ identifier }) => identifier !== value.defaults.defaultIdentifier)
-          .map(({ identifier, amount }) => {
-            const [policyId, name = ''] = identifier.split('.');
+          .map(v => {
+            const [policyId, name = ''] = v.identifier.split('.');
             return {
               policyId,
               name,
-              amount,
-              assetId: identifier,
+              amount: v.amount,
+              assetId: v.identifier,
             };
           });
         utxos.push({
@@ -2401,7 +2401,7 @@ export default class AdaApi {
       filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
     );
     // take out UTxOs consumed by submitted transactions
-    const utxos = originalUtxos.filter(({ utxo_id }) => !usedUtxoIds.has(utxo_id));
+    const utxos = originalUtxos.filter(utxo => !usedUtxoIds.has(utxo.utxo_id));
     // put in UTxOs produced by submitted transactions
     const withUtxos = asGetAllUtxos(publicDeriver);
     if (!withUtxos) {
@@ -2410,7 +2410,7 @@ export default class AdaApi {
     const allAddresses = await withUtxos.getAllUtxoAddresses();
 
     for (const { transaction } of filteredSubmittedTxs) {
-      for (const [index, {address, value}] of transaction.addresses.to.entries()) {
+      for (const [index, { address, value }] of transaction.addresses.to.entries()) {
         if (utxos.find(utxo => utxo.utxo_id === `${transaction.txid}${index}`)) {
           // this output is already included
           continue;
@@ -2421,13 +2421,13 @@ export default class AdaApi {
         )?.amount || '0';
         const assets = value.values
           .filter(({ identifier }) => identifier !== value.defaults.defaultIdentifier)
-          .map(({ identifier, amount }) => {
-            const [policyId, name = ''] = identifier.split('.');
+          .map(v => {
+            const [policyId, name = ''] = v.identifier.split('.');
             return {
               policyId,
               name,
-              amount,
-              assetId: identifier,
+              amount: v.amount,
+              assetId: v.identifier,
             };
           });
         const findAddressing = () => {
