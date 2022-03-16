@@ -2357,6 +2357,11 @@ export default class AdaApi {
     // put in UTxOs produced by submitted transactions
     for (const { transaction } of filteredSubmittedTxs) {
       for (const [index, {address, value}] of transaction.addresses.to.entries()) {
+        if (utxos.find(utxo => utxo.utxo_id === `${transaction.txid}${index}`)) {
+          // this output is already included
+          continue;
+        }
+
         const amount =  value.values.find(
           ({ identifier }) => identifier === value.defaults.defaultIdentifier
         )?.amount || '0';
@@ -2406,6 +2411,11 @@ export default class AdaApi {
 
     for (const { transaction } of filteredSubmittedTxs) {
       for (const [index, {address, value}] of transaction.addresses.to.entries()) {
+        if (utxos.find(utxo => utxo.utxo_id === `${transaction.txid}${index}`)) {
+          // this output is already included
+          continue;
+        }
+
         const amount =  value.values.find(
           ({ identifier }) => identifier === value.defaults.defaultIdentifier
         )?.amount || '0';
