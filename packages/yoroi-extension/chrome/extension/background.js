@@ -628,6 +628,40 @@ const yoroiMessageHandler = async (
     } catch (error) {
       Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
     }
+  } else if (request.type === 'get_addresses') {
+    try {
+      await withDb(async (db, localStorageApi) => {
+        await withSelectedWallet(
+          request.tabId,
+          async (wallet, connection) => {
+            if (connection == null) {
+              const error = `ERR - get_addresses could not find connection with tabId = ${request.tabId}`
+              Logger.error(error);
+              sendResponse({ error })
+            } else {
+              const addressesMap = {
+                used: async () => await connectorGetUsedAddresses(wallet, null),
+                unused: async () => await connectorGetUnusedAddresses(wallet),
+                change: async () => await connectorGetChangeAddress(wallet),
+              }
+
+              const addresses = {}
+
+              for(const key of request.select) {
+                addresses[key] = await addressesMap[key]()
+              }
+
+              sendResponse({ addresses })
+            }
+
+          },
+          db,
+          localStorageApi,
+        )
+      });
+    } catch (error) {
+      Logger.error(`Get addresses faild for tabId = ${request.tabId}`);
+    }
   }
 };
 
