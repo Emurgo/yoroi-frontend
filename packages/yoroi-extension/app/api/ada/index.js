@@ -120,7 +120,7 @@ import type {
   SendFunc,
   SignedRequest,
   SignedResponse,
-  TokenInfoFunc
+  TokenInfoFunc,
   RemoteUnspentOutput,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
