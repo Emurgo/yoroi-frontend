@@ -113,22 +113,6 @@ export function getProtocol(): Promise<?Protocol> {
   });
 }
 
-function getAddresses(select: string[], tabId: number) {
-  return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(
-      ({ type: 'get_addresses', select, tabId }),
-      response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject('Could not establish connection: get_addresses ');
-        }
-
-        resolve(response);
-      }
-    );
-});
-}
-
 export function getUtxosAndAddresses(
   tabId: number,
   select: string[]
