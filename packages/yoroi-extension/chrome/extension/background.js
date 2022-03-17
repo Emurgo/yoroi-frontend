@@ -598,7 +598,7 @@ const yoroiMessageHandler = async (
     }: ConnectedSites));
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
-  } else if (request.type === 'get_utxos/cardano') {
+  } else if (request.type === 'get_utxos/addresses') {
     try {
       await withDb(async (db, localStorageApi) => {
         await withSelectedWallet(
@@ -618,8 +618,21 @@ const yoroiMessageHandler = async (
             if (withHasUtxoChains == null) {
               throw new Error(`missing chains functionality`);
             }
-            const utxos = await withHasUtxoChains.getAllUtxos();
-            sendResponse({ utxos })
+
+            const addressesMap = {
+              used: async () => await connectorGetUsedAddresses(wallet, null),
+              unused: async () => await connectorGetUnusedAddresses(wallet),
+              change: async () => await connectorGetChangeAddress(wallet),
+              utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
+            }
+
+            const response = {}
+
+            for(const key of request.select) {
+              response[key] = await addressesMap[key]()
+            }
+
+            sendResponse(response)
           },
           db,
           localStorageApi,
@@ -627,40 +640,6 @@ const yoroiMessageHandler = async (
       });
     } catch (error) {
       Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
-    }
-  } else if (request.type === 'get_addresses') {
-    try {
-      await withDb(async (db, localStorageApi) => {
-        await withSelectedWallet(
-          request.tabId,
-          async (wallet, connection) => {
-            if (connection == null) {
-              const error = `ERR - get_addresses could not find connection with tabId = ${request.tabId}`
-              Logger.error(error);
-              sendResponse({ error })
-            } else {
-              const addressesMap = {
-                used: async () => await connectorGetUsedAddresses(wallet, null),
-                unused: async () => await connectorGetUnusedAddresses(wallet),
-                change: async () => await connectorGetChangeAddress(wallet),
-              }
-
-              const addresses = {}
-
-              for(const key of request.select) {
-                addresses[key] = await addressesMap[key]()
-              }
-
-              sendResponse({ addresses })
-            }
-
-          },
-          db,
-          localStorageApi,
-        )
-      });
-    } catch (error) {
-      Logger.error(`Get addresses faild for tabId = ${request.tabId}`);
     }
   }
 };
