@@ -116,7 +116,12 @@ export function getProtocol(): Promise<?Protocol> {
 export function getUtxosAndAddresses(
   tabId: number,
   select: string[]
-  ): Promise<{| utxos: ?IGetAllUtxosResponse |}> {
+  ): Promise<{|
+    utxos: IGetAllUtxosResponse,
+    usedAddresses: string[],
+    unusedAddresses: string[],
+    changeAddress: string,
+  |}> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
         ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
@@ -604,7 +609,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     outputs: Array<{| address: string, value: MultiToken |}>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: ?IGetAllUtxosResponse,
-    ownAddresses: string[],
+    ownAddresses: ?Set<string>,
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
     if(!utxos) {
       const withUtxos = asGetAllUtxos(publicDeriver);
