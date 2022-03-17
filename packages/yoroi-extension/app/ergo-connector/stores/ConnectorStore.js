@@ -448,7 +448,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
-    const response = await getUtxosAndAddresses(tabId, ['utxos', 'used', 'unused', 'change'])
+    const response = await getUtxosAndAddresses(tabId, ['utxos', 'usedAddresses', 'unusedAddresses', 'changeAddress'])
 
     if (!response.utxos) {
       throw new Error('Missgin utxos for signing tx')
@@ -518,9 +518,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const ownAddresses = new Set([
       ...response.utxos.map(utxo => utxo.address),
-      ...response.used,
-      ...response.unused,
-      response.change
+      ...response.usedAddresses,
+      ...response.unusedAddresses,
+      response.changeAddress
     ])
 
     const { amount, total } = await this._calculateAmountAndTotal(

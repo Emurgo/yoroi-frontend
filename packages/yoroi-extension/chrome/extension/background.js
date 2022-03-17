@@ -620,9 +620,9 @@ const yoroiMessageHandler = async (
             }
 
             const addressesMap = {
-              used: async () => await connectorGetUsedAddresses(wallet, null),
-              unused: async () => await connectorGetUnusedAddresses(wallet),
-              change: async () => await connectorGetChangeAddress(wallet),
+              usedAddresses: async () => await connectorGetUsedAddresses(wallet, null),
+              unusedAddresses: async () => await connectorGetUnusedAddresses(wallet),
+              changeAddress: async () => await connectorGetChangeAddress(wallet),
               utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
             }
 
