@@ -245,7 +245,7 @@ export async function connectorGetUtxosCardano(
 
 const MAX_COLLATERAL = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
-const MAX_PER_UTXO_SURPLUS = new BigNumber('100000');
+const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
