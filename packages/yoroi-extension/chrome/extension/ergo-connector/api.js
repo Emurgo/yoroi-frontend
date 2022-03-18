@@ -280,8 +280,18 @@ export async function connectorGetCollateralUtxos(
       break
     }
   }
-
   if (enough) {
+    for (;;) {
+      const smallestUtxo = utxosToUse[0];
+      const potentialSum = sum.minus(smallestUtxo.amount);
+      if (potentialSum.gte(required)) {
+        // First utxo can be removed and still will be enough.
+        utxosToUse.shift();
+        sum = potentialSum;
+      } else {
+        break;
+      }
+    }
     return { utxosToUse, reorgTargetAmount: null };
   }
 
