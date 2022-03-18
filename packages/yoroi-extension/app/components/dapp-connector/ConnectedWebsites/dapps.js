@@ -1,8 +1,8 @@
 // @flow
 import { defineMessages } from 'react-intl'
 import FiboLogo from '../../../assets/images/dapp-connector/fibo-logo-black.inline.svg'
-import SundaeSwapLogo from '../../../assets/images/dapp-connector/sundae-swap-logo-dark.inline.png'
 import AstarterLogo from '../../../assets/images/dapp-connector/a-starter-logo.inline.svg'
+// import SundaeSwapLogo from '../../../assets/images/dapp-connector/sundae-swap-logo-dark.inline.png'
 
 const messages = defineMessages({
     fibo: {
@@ -46,14 +46,14 @@ export const BRANDED_DAPPS = [
         description: messages.sundaeswapDescription,
         url: 'https://exchange.sundaeswap.finance/',
         bgColor: '#EDD9FF',
-        logo: <SundaeSwapLogo />
+        logo: <FiboLogo />
     },
     {
         id: 3,
         name: messages.astarter,
         description: messages.astarterDescription,
         url: 'https://astarter.io/',
-        bgColor: '##F0F3F5',
-        logo: <AstarterLogo />
+        bgColor: '#F0F3F5',
+        logo: <FiboLogo />
     },
 ]

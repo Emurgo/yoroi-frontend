@@ -4,9 +4,10 @@ import { observer } from 'mobx-react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { connectorMessages } from '../../../i18n/global-messages';
-import { Button, Stack, styled, Typography } from '@mui/material';
+import { Button, Link } from '@mui/material';
+import { Box } from '@mui/system'
+import styles from './DApp.scss'
 
 @observer
 export default class DApp extends Component {
@@ -18,18 +19,32 @@ export default class DApp extends Component {
         const { intl } = this.context
         const { dapp } = this.props
         return (
-          <div>
-            <div>
+          <div className={styles.component}>
+            <div className={styles.logo} style={{ backgroundColor: dapp.bgColor }}>
               {dapp.logo}
             </div>
             <div>
-              <p>{intl.formatMessage(dapp.name)}</p>
-              <p>{intl.formatMessage(dapp.description)}</p>
+              <p className={styles.name}>{intl.formatMessage(dapp.name)}</p>
+              <p className={styles.description}>{intl.formatMessage(dapp.description)}</p>
             </div>
 
-            <Button>{intl.formatMessage(connectorMessages.connect)}</Button>
+            <Link
+              variant="secondary"
+              sx={{
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  color: 'var(--yoroi-palette-secondary-300)',
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  marginTop: '32px'
+                }}
+              href={dapp.url}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {intl.formatMessage(connectorMessages.connect)}
+            </Link>
           </div>
         )
     }
 }
-

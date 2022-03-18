@@ -7,7 +7,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { connectorMessages } from '../../../i18n/global-messages';
 import { BRANDED_DAPPS } from './dapps'
-import { Box } from '@mui/system';
+import { Box, styled } from '@mui/system';
 import DApp from './DApp';
 
 const messages = defineMessages({
@@ -26,10 +26,10 @@ export default class NoDApp extends Component {
     render(): Node {
         const { intl } = this.context
         return (
-          <Box>
-            <Box marginTop='40px' display='flex'>
+          <Box width='100%'>
+            <DappsWrapper>
               {BRANDED_DAPPS.map(dapp => <DApp key={dapp.id} dapp={dapp} />)}
-            </Box>
+            </DappsWrapper>
             <div>
               <div>
                 <NoItemsFoundImg />
@@ -41,4 +41,11 @@ export default class NoDApp extends Component {
         )
     }
 }
+
+const DappsWrapper = styled('Box')({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: '40px'
+});
 

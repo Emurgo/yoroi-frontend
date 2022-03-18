@@ -1,0 +1,36 @@
+.component {
+    width: 400px;
+    padding: 17px;
+    border-radius: 8px;
+    border-right: 1px solid var(--yoroi-palette-gray-100);
+
+    .logo {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+        border-radius: 8px;
+
+        svg {
+            height: 30px;
+        }
+    }
+
+    .name {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        color: #242838;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+    }
+
+    .description {
+        margin-bottom: 8px;
+        color: #6B7384;
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 22px;
+    }
+}
