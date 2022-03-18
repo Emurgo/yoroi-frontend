@@ -26,7 +26,11 @@ export default class NoDApp extends Component {
     render(): Node {
         const { intl } = this.context
         return (
-          <Box width='100%'>
+          <Box
+            sx={{
+             height: '100%',
+            }}
+          >
             <DappsWrapper>
               {BRANDED_DAPPS.map(dapp => <DApp key={dapp.id} dapp={dapp} />)}
             </DappsWrapper>

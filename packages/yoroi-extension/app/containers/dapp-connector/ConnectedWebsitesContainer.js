@@ -101,6 +101,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
         navbar={<DappConnectorNavbar />}
+        backgroundColor='var(--yoroi-palette-gray-50)'
       >
         <FullscreenLayout bottomPadding={0}>
           <ConnectedWebsitesPage

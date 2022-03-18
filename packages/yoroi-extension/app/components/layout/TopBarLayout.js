@@ -30,6 +30,7 @@ function TopBarLayout({
   showInContainer,
   showAsCard,
   isRevampLayout,
+  backgroundColor
 }: Props & InjectedProps) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
@@ -165,7 +166,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            background: showInContainer === true && 'var(--yoroi-palette-gray-50)',
+            background: backgroundColor ? backgroundColor :  showInContainer === true && 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}

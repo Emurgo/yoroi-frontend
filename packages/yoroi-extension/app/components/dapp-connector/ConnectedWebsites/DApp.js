@@ -5,8 +5,7 @@ import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
-import { Button, Link } from '@mui/material';
-import { Box } from '@mui/system'
+import { Link } from '@mui/material';
 import styles from './DApp.scss'
 
 @observer
