@@ -1,7 +1,7 @@
 // @flow
 import { defineMessages } from 'react-intl'
 import FiboLogo from '../../../assets/images/dapp-connector/fibo-logo-black.inline.svg'
-import AstarterLogo from '../../../assets/images/dapp-connector/a-starter-logo.inline.svg'
+// import AstarterLogo from '../../../assets/images/dapp-connector/a-starter-logo.inline.svg'
 // import SundaeSwapLogo from '../../../assets/images/dapp-connector/sundae-swap-logo-dark.inline.png'
 
 const messages = defineMessages({

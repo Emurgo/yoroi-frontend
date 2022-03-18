@@ -9,6 +9,7 @@ import { connectorMessages } from '../../../i18n/global-messages';
 import { BRANDED_DAPPS } from './dapps'
 import { Box, styled } from '@mui/system';
 import DApp from './DApp';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
     noWebsitesConnected: {
@@ -32,15 +33,43 @@ export default class NoDApp extends Component {
             }}
           >
             <DappsWrapper>
-              {BRANDED_DAPPS.map(dapp => <DApp key={dapp.id} dapp={dapp} />)}
+              <Box
+                sx={{
+                  backgroundColor: 'var(--yoroi-palette-common-white)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderRadius: '8px',
+                }}
+              >
+                {BRANDED_DAPPS.map(dapp => <DApp key={dapp.id} dapp={dapp} />)}
+              </Box>
             </DappsWrapper>
-            <div>
-              <div>
-                <NoItemsFoundImg />
-                <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
-                <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
-              </div>
-            </div>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '65px'
+              }}
+            >
+              <NoItemsFoundImg />
+              <Typography
+                variant='h4'
+                color='#242838'
+                marginTop='32px'
+                fontSize='24px'
+                fontWeight='400'
+              >{intl.formatMessage(messages.noWebsitesConnected)}
+              </Typography>
+              <Typography
+                variant='p'
+                color='#6B7384'
+                marginTop='8px'
+                fontSize='16px'
+              >{intl.formatMessage(connectorMessages.messageReadOnly)}
+              </Typography>
+            </Box>
           </Box>
         )
     }
@@ -50,6 +79,6 @@ const DappsWrapper = styled('Box')({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginTop: '40px'
+  marginTop: '40px',
 });
 

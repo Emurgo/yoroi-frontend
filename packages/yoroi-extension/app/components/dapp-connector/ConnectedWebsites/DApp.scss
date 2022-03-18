@@ -1,15 +1,14 @@
 .component {
     width: 400px;
     padding: 17px;
-    border-radius: 8px;
-    border-right: 1px solid var(--yoroi-palette-gray-100);
+    border: 1px solid var(--yoroi-palette-gray-100);
 
     .logo {
         height: 50px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 8px;
+        margin-bottom: 16px;
         border-radius: 8px;
 
         svg {

@@ -35,7 +35,8 @@ export default class DApp extends Component {
                   color: 'var(--yoroi-palette-secondary-300)',
                   fontWeight: '500',
                   fontSize: '16px',
-                  marginTop: '32px'
+                  marginTop: '23px',
+                  display: 'inline-block',
                 }}
               href={dapp.url}
               target="_blank"
