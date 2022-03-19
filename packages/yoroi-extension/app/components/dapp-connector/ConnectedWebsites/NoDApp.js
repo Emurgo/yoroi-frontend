@@ -37,8 +37,11 @@ export default class NoDApp extends Component {
                 sx={{
                   backgroundColor: 'var(--yoroi-palette-common-white)',
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'stretch',
                   borderRadius: '8px',
+                  minWidth: '600px',
+                  overflowY: 'auto',
+                  marginX: '16px',
                 }}
               >
                 {BRANDED_DAPPS.map(dapp => <DApp key={dapp.id} dapp={dapp} />)}

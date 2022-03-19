@@ -1,10 +1,11 @@
 .component {
     width: 400px;
-    padding: 17px;
+    padding: 19px 20px;
     border: 1px solid var(--yoroi-palette-gray-100);
 
     .logo {
         height: 50px;
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
