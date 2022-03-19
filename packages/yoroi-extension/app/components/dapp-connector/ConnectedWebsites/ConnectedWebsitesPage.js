@@ -12,6 +12,9 @@ import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/Wal
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver'
 import NoDApp from './NoDApp';
+import { Box } from '@mui/system';
+import { BRANDED_DAPPS } from './dapps';
+import DApp from './DApp';
 
 type WalletInfo = {| balance: null | MultiToken, plate: WalletChecksum |}
 type Props = {|
@@ -95,6 +98,20 @@ export default class ConnectedWebsitesPage extends Component<Props> {
               </div>}
             </div>
           </div>
+          <Box
+            sx={{
+              backgroundColor: 'var(--yoroi-palette-common-white)',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: '8px',
+              height: '600px',
+              overflowY: 'auto',
+              marginTop: '40px',
+              marginLeft: '40px',
+            }}
+          >
+            {BRANDED_DAPPS.map(dapp => <DApp key={dapp.id} dapp={dapp} />)}
+          </Box>
         </div>
       )
   }
