@@ -35,17 +35,17 @@ const messages = defineMessages({
     id: 'connector.connectedwebsites.table.wallets',
     defaultMessage: `!!!Wallets`,
   },
-  dApps: {
+  dapps: {
     id: 'connector.connectedwebsites.table.dapps',
     defaultMessage: `!!!DApps`,
   },
   cardano: {
     id: 'connector.connectedwebsites.table.cardano',
-    defaultMessage: 'Cardano, ADA'
+    defaultMessage: '!!!Cardano, ADA'
   },
   ergo: {
     id: 'connector.connectedwebsites.table.ergo',
-    defaultMessage: 'Ergo, ERG'
+    defaultMessage: '!!!Ergo, ERG'
   }
 });
 
