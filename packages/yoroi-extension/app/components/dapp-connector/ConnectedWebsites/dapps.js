@@ -2,7 +2,7 @@
 import { defineMessages } from 'react-intl'
 import FiboLogo from '../../../assets/images/dapp-connector/fibo-logo-black.inline.svg'
 // import AstarterLogo from '../../../assets/images/dapp-connector/a-starter-logo.inline.svg'
-// import SundaeSwapLogo from '../../../assets/images/dapp-connector/sundae-swap-logo-dark.inline.png'
+import SundaeSwapLogo from '../../../assets/images/dapp-connector/sundae-swap-black.inline.svg'
 
 const messages = defineMessages({
     fibo: {
@@ -46,7 +46,7 @@ export const BRANDED_DAPPS = [
         description: messages.sundaeswapDescription,
         url: 'https://exchange.sundaeswap.finance/',
         bgColor: '#EDD9FF',
-        logo: <FiboLogo />
+        logo: <SundaeSwapLogo />
     },
     {
         id: 3,
