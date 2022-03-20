@@ -59,6 +59,7 @@
   "connector.appName": "Dapp Connector",
   "connector.connect.connectedWallets": "Connected Wallets",
   "connector.connect.connectedWallets.active": "Active",
+  "connector.connect.connectedWallets.disconnect": "Disconnect",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
   "connector.settings.signTransaction": "Sign transaction",
   "connector.settings.connect": "Connect",

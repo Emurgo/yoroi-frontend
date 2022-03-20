@@ -16,11 +16,16 @@ import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
+import { Tooltip, Typography } from '@mui/material';
 
 const messages = defineMessages({
   active: {
     id: 'connector.connect.connectedWallets.active',
     defaultMessage: '!!!Active',
+  },
+  disconnect: {
+    id: 'connector.connect.connectedWallets.disconnect',
+    defaultMessage: '!!!Disconnect',
   }
 });
 
@@ -149,10 +154,21 @@ export default class WalletRow extends Component<Props, State> {
                 </div>
               </div>
               <div className={styles.delete}>
-                {showDeleteIcon &&
-                <button onClick={() => onRemoveWallet({ url, protocol })} type='button'>
-                  <DeleteIcon />
-                </button>}
+                {
+                  showDeleteIcon && (
+                    <Tooltip
+                      title={
+                        <Typography variant="body3">
+                          {intl.formatMessage(messages.disconnect)}
+                        </Typography>
+                      }
+                    >
+                      <button onClick={() => onRemoveWallet({ url, protocol })} type='button'>
+                        <DeleteIcon />
+                      </button>
+                    </Tooltip>
+                  )
+                }
               </div>
             </div>
           </div>
