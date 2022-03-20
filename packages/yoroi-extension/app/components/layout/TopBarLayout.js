@@ -167,7 +167,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            background: backgroundColor === undefined ? backgroundColor :  showInContainer === true && 'var(--yoroi-palette-gray-50)',
+            background: backgroundColor !== undefined ? backgroundColor :  showInContainer === true && 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}

@@ -1,20 +1,20 @@
 // @flow
-import type { Node } from 'react';
 import { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 import { Link } from '@mui/material';
 import styles from './DApp.scss'
 import type { BrandedDapp } from './dapps'
 
 type Props = {|
-  +dapp: BrandedDapp
+  +dapp: BrandedDapp,
 |}
 
 @observer
-export default class DApp extends Component<Props> {
+export default class Dapp extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
