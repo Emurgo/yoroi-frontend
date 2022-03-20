@@ -5,6 +5,8 @@ import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDer
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type CardanoTxRequest from '../../../app/api/ada';
+import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
+import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -462,11 +464,19 @@ export type PendingSignData = {|
   type: 'tx-create-req/cardano',
   uid: RpcUid,
   tx: CardanoTxRequest,
+|} | {|
+  type: 'tx-reorg/cardano',
+  uid: RpcUid,
+  tx: {|
+    usedUtxoIds: Array<string>,
+    reorgTargetAmount: string,
+    utxos: IGetAllUtxosResponse,
+  |},
 |};
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx | CardanoTx | CardanoTxRequest,
+  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput>,
   uid: RpcUid,
   tabId: number,
   pw: string,

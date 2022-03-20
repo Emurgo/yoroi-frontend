@@ -21,6 +21,7 @@ const getUtxos = document.querySelector('#get-utxos')
 const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
 const createTx = document.querySelector('#create-tx')
+const getCollateralUtxos = document.querySelector('#get-collateral-utxos')
 const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
@@ -267,6 +268,28 @@ getRewardAddresses.addEventListener('click', () => {
     }
 })
 
+function mapCborUtxos(cborUtxos) {
+  return cborUtxos.map(hex => {
+    const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex))
+    const input = u.input();
+    const output = u.output();
+    const txHash = bytesToHex(input.transaction_id().to_bytes());
+    const txIndex = input.index();
+    const value = output.amount();
+    return {
+      utxo_id: `${txHash}${txIndex}`,
+      tx_hash: txHash,
+      tx_index: txIndex,
+      receiver: output.address().to_bech32(),
+      amount: value.coin().to_str(),
+      assets: reduceWasmMultiasset(value.multiasset(), (res, asset) => {
+        res.push(asset);
+        return res;
+      }, []),
+    }
+  });
+}
+
 getUtxos.addEventListener('click', () => {
     if(!accessGranted) {
         alertError('Should request access first')
@@ -278,31 +301,8 @@ getUtxos.addEventListener('click', () => {
       if(utxosResponse.length === 0){
         alertWarrning('NO UTXOS')
       } else {
-        if (isCBOR()) {
-          utxos = utxosResponse.map(hex => {
-            const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex))
-            const input = u.input();
-            const output = u.output();
-            const txHash = bytesToHex(input.transaction_id().to_bytes());
-            const txIndex = input.index();
-            const value = output.amount();
-            return {
-              utxo_id: `${txHash}${txIndex}`,
-              tx_hash: txHash,
-              tx_index: txIndex,
-              receiver: output.address().to_bech32(),
-              amount: value.coin().to_str(),
-              assets: reduceWasmMultiasset(value.multiasset(), (res, asset) => {
-                res.push(asset);
-                return res;
-              }, []),
-            }
-          })
-        } else {
-          utxos = utxosResponse
-        }
-        alertSuccess(`Check the console`)
-        alertEl.innerHTML = `<h2>UTxO (${utxos.length}):</h2><pre>` + JSON.stringify(utxos, undefined, 2) + '</pre>'
+        utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
+        alertSuccess(`<h2>UTxO (${utxos.length}):</h2><pre>` + JSON.stringify(utxos, undefined, 2) + '</pre>')
       }
     })
 })
@@ -582,6 +582,31 @@ createTx.addEventListener('click', () => {
     console.error(error)
     toggleSpinner('hide')
     alertWarrning('Creating tx fails')
+  })
+})
+
+getCollateralUtxos.addEventListener('click', () => {
+  toggleSpinner('show');
+  
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+  const amount = '4900000';
+  cardanoApi.getCollateralUtxos(
+    Buffer.from(
+      CardanoWasm.Value.new(
+        CardanoWasm.BigNum.from_str(amount)
+      ).to_bytes()
+    ).toString('hex')
+  ).then(utxosResponse => {
+    toggleSpinner('hide')
+    let utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
+    alertSuccess(`<h2>Collateral UTxO (${utxos.length}):</h2><pre>` + JSON.stringify(utxos, undefined, 2) + '</pre>')
+  }).catch(error => {
+    console.error(error)
+    toggleSpinner('hide')
+    alertWarrning(`Getting collateral UTXOs tx fails: ${JSON.stringify(error)}`)
   })
 })
 

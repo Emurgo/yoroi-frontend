@@ -2,9 +2,9 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Alert } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -32,14 +32,14 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type {
-  Tx,
-  CardanoTx,
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../../chrome/extension/ergo-connector/types';
-import type { CardanoConnectorSignRequest } from '../../types';
+import type {
+  CardanoConnectorSignRequest,
+  SignSubmissionErrorType
+} from '../../types';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
-import type CardanoTxRequest from '../../../api/ada';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import SignTxTabs from './SignTxTabs';
@@ -49,7 +49,6 @@ import { LoadingButton } from '@mui/lab';
 import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
-  +tx: Tx | CardanoTx | CardanoTxRequest,
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
@@ -65,12 +64,26 @@ type Props = {|
   +shouldHideBalance: boolean,
   +selectedWallet: PublicDeriverCache,
   +connectedWebsite: ?WhitelistEntry,
+  +isReorg: boolean,
+  +submissionError: ?SignSubmissionErrorType,
 |};
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
     defaultMessage: '!!!Incorrect wallet password.',
+  },
+  reorgTitle: {
+    id: 'connector.signin.reorg.title',
+    defaultMessage: '!!!Add Collateral',
+  },
+  reorgMessage: {
+    id: 'connector.signin.reorg.message',
+    defaultMessage: '!!!<span>Collateral is a guarantee that prevents smart contract transaction failings and scams. It means you should make a 0 ADA transaction to generate collateral. <a>Learn more</a> about collateral.</span>'
+  },
+  sendError: {
+    id: 'connector.signin.error.sendError',
+    defaultMessage: '!!!An error occured when sending the transaction.',
   },
 });
 
@@ -126,7 +139,9 @@ class SignTxPage extends Component<Props, State> {
       onSuccess: form => {
         const { walletPassword } = form.values();
         this.setState({ isSubmitting: true })
-        this.props.onConfirm(walletPassword).catch(error => {
+        this.props.onConfirm(walletPassword).finally(() => {
+          this.setState({ isSubmitting: false });
+        }).catch(error => {
           if (error instanceof WrongPassphraseError) {
             this.form.$('walletPassword').invalidate(
               this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
@@ -134,7 +149,6 @@ class SignTxPage extends Component<Props, State> {
           } else {
             throw error;
           }
-          this.setState({ isSubmitting: false })
         });
       },
       onError: () => {},
@@ -289,7 +303,13 @@ class SignTxPage extends Component<Props, State> {
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const { txData, onCancel, connectedWebsite } = this.props;
+    const {
+      txData,
+      onCancel,
+      connectedWebsite,
+      isReorg,
+      submissionError,
+    } = this.props;
 
     const { isSubmitting } = this.state;
 
@@ -304,6 +324,16 @@ class SignTxPage extends Component<Props, State> {
       <SignTxTabs
         overviewContent={
           <Box paddingTop="8px" overflowWrap="break-word">
+            {isReorg && (
+              <>
+                <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+                  {intl.formatMessage(messages.reorgTitle)}
+                </Typography>
+                <Typography>
+                  <FormattedHTMLMessage {...messages.reorgMessage} />
+                </Typography>
+              </>
+            )}
             <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
               {intl.formatMessage(signTxMessages.connectedTo)}
             </Typography>
@@ -416,6 +446,11 @@ class SignTxPage extends Component<Props, State> {
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
               />
+              {isReorg && (submissionError === 'SEND_TX_ERROR') && (
+                <Alert severity="error">
+                  {intl.formatMessage(messages.sendError)}
+                </Alert>
+              )}
               <Box
                 sx={{
                   display: 'grid',
