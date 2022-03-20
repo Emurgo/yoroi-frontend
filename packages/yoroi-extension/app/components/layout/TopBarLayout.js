@@ -15,6 +15,7 @@ type Props = {|
   +languageSelectionBackground?: boolean,
   +showInContainer?: boolean,
   +showAsCard?: boolean,
+  +backgroundColor?: string,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -166,7 +167,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            background: backgroundColor ? backgroundColor :  showInContainer === true && 'var(--yoroi-palette-gray-50)',
+            background: backgroundColor === undefined ? backgroundColor :  showInContainer === true && 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}
@@ -189,4 +190,5 @@ TopBarLayout.defaultProps = {
   languageSelectionBackground: false,
   showInContainer: false,
   showAsCard: false,
+  backgroundColor: undefined,
 };

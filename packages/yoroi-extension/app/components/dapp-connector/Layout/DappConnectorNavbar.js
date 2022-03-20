@@ -4,9 +4,7 @@ import { observer } from 'mobx-react';
 import styles from './DappConnectorNavbar.scss'
 import type { Node } from 'react';
 
-type Props = {|
-
-|}
+type Props = {||}
 
 @observer
 export default class DappConnectorNavbar extends Component<Props> {

@@ -18,8 +18,9 @@ const messages = defineMessages({
     },
 });
 
+type Props = {||}
 @observer
-export default class NoDApp extends Component {
+export default class NoDApp extends Component<Props> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
         intl: intlShape.isRequired,
     };
