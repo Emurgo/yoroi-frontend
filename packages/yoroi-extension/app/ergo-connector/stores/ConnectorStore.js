@@ -320,9 +320,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
     }
     const { signingMessage } = this;
-    if (signingMessage.sign.tx == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
-    }
     const wallet = this.wallets.find(w =>
       w.publicDeriver.getPublicDeriverId() === this.signingMessage?.publicDeriverId
     );
@@ -390,6 +387,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       sendData = {
         type: 'sign_confirmed',
         tx: toJS(signingMessage.sign.tx),
+        uid: signingMessage.sign.uid,
+        tabId: signingMessage.tabId,
+        pw: password,
+      };
+    } else if (signingMessage.sign.type === 'data') {
+      sendData = {
+        type: 'sign_confirmed',
+        tx: null,
         uid: signingMessage.sign.uid,
         tabId: signingMessage.tabId,
         pw: password,
