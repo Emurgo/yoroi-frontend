@@ -462,7 +462,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 </div>
 
                 <div className={styles.usd}>
-                  <p>$ 0</p>
+                  <p>$0</p>
                 </div>
               </div>
 

@@ -192,7 +192,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
     return unitOfAccountSetting.enabled
       ? (
         <>
-          <div className={styles.fees}>+
+          <div className={styles.fees}>
             {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
             <span className={styles.currencySymbol}>
               &nbsp;{unitOfAccountSetting.currency}
@@ -210,7 +210,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
         </>
       ) : (
         <div className={styles.fees}>
-          +{formatValue(entry)}
+          {formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
             truncateToken(getTokenName(this.props.getTokenInfo(
               entry
