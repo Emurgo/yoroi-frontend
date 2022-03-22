@@ -428,7 +428,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
           onChange={this.onChange}
           onBlur={this.onBlur}
           value={inputValue}
-          placeholder='0'
+          placeholder='0.0'
           // $FlowFixMe
           disabled={rest.disabled}
         />

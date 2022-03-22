@@ -77,102 +77,98 @@
 
         .amountStep {
             padding-top: 30px;
-        }
+            font-family: Rubik;
 
-        .amountInput {
-            position: relative;
-            border: 1px solid #A7AFC0;
-            border-radius: 8px;
-            padding: 15px 16px 26px 16px;
-
-            .label {
+            .amountInput {
                 position: relative;
-                top: -25px;
-                left: -8px;
-                background-color: #ffffff;
-                padding: 0px 4px;
-                color: rgba(0,0,0,0.87);
+                border: 1px solid #A7AFC0;
+                border-radius: 8px;
+
+                .label {
+                    position: relative;
+                    top: -25px;
+                    left: -8px;
+                    background-color: #ffffff;
+                    padding: 0px 4px;
+                    color: rgba(0,0,0,0.87);
+                    font-size: 12px;
+                    letter-spacing: 0.4px;
+                }
+
+
+                .labelDisabled {
+                    color: var(--yoroi-comp-input-text-disabled);
+                }
+
+                .amountInputGrid {
+                    margin-top: 5px;
+                    padding: 0px 16px 16px 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: 1px solid var(--yoroi-comp-input-text-disabled);
+
+                    input {
+                        padding: 0px;
+                        &:disabled {
+                            cursor: not-allowed;
+                        }
+                    }
+
+                }
+
+                .defaultCoin {
+                    color: #6B7384;
+                    font-size: 14px;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    line-height: 22px;
+                    margin-right: 12px;
+                }
+
+                .max {
+                    height: 30px;
+                    width: 56px;
+                    border-radius: 8px;
+                    background-color: #F0F3F5;
+                    color: #6B7384;
+                    font-size: 14px;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    line-height: 22px;              
+                }
+
+                .usd {
+                    margin: 16px;
+                    color: #A7AFC0;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                }
+            }
+
+            .amountInputError {
+                border: 1px solid #FF1351;
+            }
+
+            .disabled {
+                border: 1px solid var(--yoroi-comp-input-text-disabled);
+            }
+
+            .amountError {
+                color: #FF1351;
                 font-family: Rubik;
                 font-size: 12px;
                 letter-spacing: 0.4px;
+                line-height: 16px;
+                margin-left: 16px;
+                margin-top: 4px;
             }
 
-
-            .labelDisabled {
-                color: var(--yoroi-comp-input-text-disabled);
+            .emptyError {
+                margin-top: 4px;
+                width: 100%;
+                height: 16px;
             }
-
-            .amountInputGrid {
-                margin-top: -5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-bottom: 1px solid var(--yoroi-comp-input-text-disabled);
-                padding-bottom: 12px;
-
-                input {
-                    padding: 0px;
-                    &:disabled {
-                        cursor: not-allowed;
-                    }
-                }
-
-            }
-
-            .defaultCoin {
-                color: #6B7384;
-                font-family: Rubik;
-                font-size: 14px;
-                font-weight: 500;
-                letter-spacing: 0.5px;
-                line-height: 22px;
-                margin-right: 12px;
-            }
-
-            .max {
-                height: 30px;
-                width: 56px;
-                border-radius: 8px;
-                background-color: #F0F3F5;
-                color: #6B7384;
-                font-family: Rubik;
-                font-size: 14px;
-                font-weight: 500;
-                letter-spacing: 0.5px;
-                line-height: 22px;              
-            }
-
-            .usd {
-                margin-top: 15px;
-                color: #A7AFC0;
-                font-family: Rubik;
-                font-size: 16px;
-                letter-spacing: 0;
-            }
-        }
-
-        .amountInputError {
-            border: 1px solid #FF1351;
-        }
-
-        .disabled {
-            border: 1px solid var(--yoroi-comp-input-text-disabled);
-        }
-
-        .amountError {
-            color: #FF1351;
-            font-family: Rubik;
-            font-size: 12px;
-            letter-spacing: 0.4px;
-            line-height: 16px;
-            margin-left: 16px;
-            margin-top: 4px;
-        }
-
-        .emptyError {
-            margin-top: 4px;
-            width: 100%;
-            height: 16px;
         }
 
         // Preview Step styles 

@@ -1,5 +1,4 @@
 .component {
-  display: block;
   width: 100%;
   input {
     border: none;
@@ -17,7 +16,6 @@
 
     &::placeholder {
         color: #A7AFC0;
-        font-family: Rubik;
         font-size: 24px;
         letter-spacing: 0;
         line-height: 32px;
