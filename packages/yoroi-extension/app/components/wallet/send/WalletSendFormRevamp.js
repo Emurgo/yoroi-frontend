@@ -389,7 +389,7 @@ export default class WalletSendForm extends Component<Props, State> {
           <div>
             <div className={styles.receiverInput}>
               <TextField
-                className="receiver"
+                className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
                 done={receiverField.isValid}
