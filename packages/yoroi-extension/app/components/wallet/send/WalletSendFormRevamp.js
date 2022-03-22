@@ -376,7 +376,7 @@ export default class WalletSendForm extends Component<Props, State> {
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
-          <div>
+          <div className={styles.receiverStep}>
             <div className={styles.receiverInput}>
               <TextField
                 className="send_form_receiver"

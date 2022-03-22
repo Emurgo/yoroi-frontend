@@ -13,15 +13,13 @@ import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './WalletSendPreviewStep.scss';
 import config from '../../../../config';
-import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
-import RawHash from '../../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import WarningBox from '../../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
-  truncateAddress, truncateToken,
+  truncateToken,
 } from '../../../../utils/formatters';
 import {
   MultiToken,
@@ -257,7 +255,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
       amount,
       receivers,
       isSubmitting,
-      error,
     } = this.props;
     const staleTxWarning = (
       <div className={styles.warningBox}>
@@ -346,20 +343,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
           />
         </div>
 
-        {error
-          ? (
-            <p className={styles.error}>
-              {intl.formatMessage(error, error.values)}
-            </p>
-          )
-          : null
-        }
-
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
           disabled={!walletPasswordField.isValid || isSubmitting}
-          sx={{ display: 'block', padding: '0px' }}
+          sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
           {isSubmitting ?
             <LoadingSpinner light /> :

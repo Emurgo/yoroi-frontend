@@ -1,17 +1,19 @@
 .component {
     display: flex;
     justify-content: center;
+
     .wrapper {
         width: 756px;
         height: 600px;
-        overflow-y: scroll;
     }
 
     .formBody {
-        padding-top: 40px;
-        padding-right: 40px;
-        padding-bottom: 20px;
-        padding-left: 40px;
+        .receiverStep {
+            padding-top: 40px;
+            padding-right: 40px;
+            padding-bottom: 20px;
+            padding-left: 40px;
+        }
 
         .receiverInput {
             position: relative;
@@ -78,6 +80,10 @@
         .amountStep {
             padding-top: 30px;
             font-family: Rubik;
+            padding-top: 40px;
+            padding-right: 40px;
+            padding-bottom: 20px;
+            padding-left: 40px;
 
             .amountInput {
                 position: relative;
