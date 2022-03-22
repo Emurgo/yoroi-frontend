@@ -1,6 +1,8 @@
 // sets up RPC communication with the connector + access check/request functions
 const WALLET_NAME = 'yoroi';
-const API_VERSION = '0.2.0';
+const API_VERSION = '0.3.0';
+const YOROI_TYPE = '$YOROI_BUILD_TYPE_ENV$';
+const INJECTED_TYPE_TAG_ID = '__yoroi_connector_api_injected_type'
 
 const initialInject = `
 (() => {
@@ -68,10 +70,11 @@ const initialInject = `
       window.postMessage({
         type: "connector_rpc_request",
         protocol: "cardano",
+        url: location.hostname,
         uid: cardanoRpcUid,
         function: func,
         params,
-        returnType,
+        returnType: returnType || "cbor",
       }, location.origin);
       console.debug("cardanoRpcUid = " + cardanoRpcUid);
       cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
@@ -90,7 +93,11 @@ const initialInject = `
       connectRequests.push({
         protocol: 'cardano',
         resolve: (auth) => {
-            resolve(Object.freeze(new CardanoAPI(auth, cardano_rpc_call)));
+            const authWrapper = auth == null ? null : Object.freeze({
+              walletId: auth.walletId,
+              pubkey: auth.pubkey,
+            });
+            resolve(Object.freeze(new CardanoAPI(authWrapper, cardano_rpc_call)));
         },
         reject: reject
       });
@@ -98,11 +105,7 @@ const initialInject = `
   }
 
   function cardano_check_read_access() {
-    if (typeof cardano !== "undefined") {
-      return cardano._cardano_rpc_call("ping", []);
-    } else {
-      return Promise.resolve(false);
-    }
+    return cardano_rpc_call("is_enabled/cardano", []);
   }
   
   window.cardano = {
@@ -161,7 +164,7 @@ class CardanoAPI {
     constructor(auth, rpc) {
       const self = this;
       function rpcWrapper(func, params) {
-        return rpc(func, params, self._returnType[0] || "cbor");
+        return rpc(func, params, self._returnType[0]);
       }
       this._auth = new CardanoAuth(auth, rpcWrapper);
       this._cardano_rpc_call = rpcWrapper;
@@ -175,20 +178,35 @@ class CardanoAPI {
       });
     }
     
-    setReturnType(returnType) {
-      if (returnType !== 'cbor' && returnType !== 'json') {
-        throw new Error('Possible return type values are: "cbor" or "json"');
-      }
-      this._returnType[0] = returnType;
-    } 
+    experimental = Object.freeze({
+    
+      setReturnType: (returnType) => {
+        if (returnType !== 'cbor' && returnType !== 'json') {
+          throw new Error('Possible return type values are: "cbor" or "json"');
+        }
+        this._returnType[0] = returnType;
+      },
+      
+      auth: () => {
+        return this._auth;
+      },
+      
+      createTx: (req) => {
+        return this._cardano_rpc_call("create_tx/cardano", [req]);
+      },
+      
+      onDisconnect: (callback) => {
+        if (this._disconnection[0]) {
+          throw new Error('Cardano API instance is already disconnected!');
+        }
+        this._disconnection.push(callback);
+      },
+      
+    }) 
     
     getNetworkId() {
       // TODO
       throw new Error('Not implemented yet');
-    }
-    
-    auth() {
-      return this._auth;
     }
     
     getBalance(token_id = '*') {
@@ -219,24 +237,30 @@ class CardanoAPI {
       return this._cardano_rpc_call('submit_tx', [tx]);
     }
     
-    signTx(tx, partialSign = false) {
-      return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign }]);
+    signTx(param, _partialSign = false) {
+      if (param == null) {
+        throw new Error('.signTx argument cannot be null!');
+      }
+      let tx = param;
+      let partialSign = _partialSign;
+      let returnTx = false;
+      if (typeof param === 'object') {
+        tx = param.tx;
+        partialSign = param.partialSign;
+        returnTx = param.returnTx;
+      } else if (typeof param !== 'string') {
+        throw new Error('.signTx argument is expected to be an object or a string!')
+      }
+      return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign, returnTx }]);
     }
     
     signData(address, sigStructure) {
       // TODO
       throw new Error('Not implemented yet');
     }
-    
-    createTx(req) {
-      return this._cardano_rpc_call("create_tx/cardano", [req]);
-    }
-    
-    onDisconnect(callback) {
-      if (this._disconnection[0]) {
-        throw new Error('Cardano API instance is already disconnected!');
-      }
-      this._disconnection.push(callback);
+
+    getCollateralUtxos(requiredAmount) {
+      return this._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
     }
 }
 `
@@ -323,6 +347,19 @@ const ergo = Object.freeze(new ErgoAPI());
 const API_INTERNAL_ERROR = -2;
 const API_REFUSED = -3;
 
+function checkInjectionInDocument() {
+    const el = document.getElementById(INJECTED_TYPE_TAG_ID);
+    return el ? el.value : 'nothing';
+}
+
+function markInjectionInDocument(container) {
+    const inp = document.createElement('input');
+    inp.setAttribute('type', 'hidden');
+    inp.setAttribute('id', INJECTED_TYPE_TAG_ID);
+    inp.setAttribute('value', YOROI_TYPE);
+    container.appendChild(inp);
+}
+
 function injectIntoPage(code) {
     try {
         const container = document.head || document.documentElement;
@@ -331,11 +368,21 @@ function injectIntoPage(code) {
         scriptTag.textContent = code;
         container.insertBefore(scriptTag, container.children[0]);
         container.removeChild(scriptTag);
-        console.log("injection succeeded");
+        console.log(`[yoroi/${YOROI_TYPE}] dapp-connector is successfully injected into ${location.hostname}`);
+        markInjectionInDocument(container);
         return true;
     } catch (e) {
-        console.log("injection failed: " + e);
+        console.error(`[yoroi/${YOROI_TYPE}] injection failed!`, e);
         return false;
+    }
+}
+
+function buildTypePrecedence(buildType) {
+    switch (buildType) {
+        case 'dev': return 2;
+        case 'nightly': return 1;
+        case 'prod': return 0;
+        default: return -1;
     }
 }
 
@@ -344,7 +391,15 @@ function shouldInject() {
     const docElemCheck = documentElement ? documentElement.toLowerCase() === 'html' : true;
     const { docType } = window.document;
     const docTypeCheck = docType ? docType.name === 'html' : true;
-    return docElemCheck && docTypeCheck;
+    if (docElemCheck && docTypeCheck) {
+        console.debug(`[yoroi/${YOROI_TYPE}] checking if should inject dapp-connector api`);
+        const existingBuildType = checkInjectionInDocument();
+        if (buildTypePrecedence(YOROI_TYPE) >= buildTypePrecedence(existingBuildType)) {
+            console.debug(`[yoroi/${YOROI_TYPE}] injecting over '${existingBuildType}'`);
+            return true
+        }
+    }
+    return false;
 }
 
 /**
@@ -445,77 +500,88 @@ function createYoroiPort() {
     });
 }
 
-if (shouldInject()) {
-    console.log(`content script injected into ${location.hostname}`);
-    injectIntoPage(initialInject);
-
-    // events from page (injected code)
-    window.addEventListener("message", function(event) {
-        const dataType = event.data.type;
-        if (dataType === "connector_rpc_request") {
-            console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-            if (yoroiPort) {
-                try {
-                    yoroiPort.postMessage(event.data);
-                    return;
-                } catch (e) {
-                    console.error(`Could not send RPC to Yoroi: ${e}`);
-                    window.postMessage({
-                        type: "connector_rpc_response",
-                        uid: event.data.uid,
-                        return: {
-                            err: {
-                                code: API_INTERNAL_ERROR,
-                                info: `Could not send RPC to Yoroi: ${e}`
-                            }
-                        }
-                    }, location.origin);
-                }
-            } else {
-                window.postMessage({
-                    type: "connector_rpc_response",
-                    uid: event.data.uid,
-                    return: {
-                        err: {
-                            code: API_REFUSED,
-                            info: 'Wallet disconnected'
-                        }
-                    }
-                }, location.origin);
-            }
-        } else if (dataType === "connector_connect_request/ergo" || dataType === 'connector_connect_request/cardano') {
-            const requestIdentification = event.data.requestIdentification;
-            if ((ergoApiInjected || (cardanoApiInjected && !requestIdentification)) && yoroiPort) {
-                // we can skip communication - API injected + hasn't been disconnected
-                console.log('you are already connected')
-                window.postMessage({
-                    type: "connector_connected",
-                    success: true
-                }, location.origin);
-            } else {
-                if (yoroiPort == null) {
-                    createYoroiPort();
-                }
-                // note: content scripts are subject to the same CORS policy as the website they are embedded in
-                // but since we are querying the website this script is injected into, it should be fine
-                const protocol = dataType.split('/')[1];
-                convertImgToBase64(location.origin, getFavicons(location.origin))
-                    .then(imgBase64Url => {
-                        const message = {
-                            imgBase64Url,
-                            type: `yoroi_connect_request/${protocol}`,
-                            connectParameters: {
-                                url: location.hostname,
-                                requestIdentification,
-                                onlySilent: event.data.onlySilent,
-                            },
-                            protocol,
-                        };
-                        yoroiPort.postMessage(message);
-                    });
-            }
+function handleConnectorConnectRequest(event, protocol) {
+    const requestIdentification = event.data.requestIdentification;
+    if ((ergoApiInjected || (cardanoApiInjected && !requestIdentification)) && yoroiPort) {
+        // we can skip communication - API injected + hasn't been disconnected
+        window.postMessage({
+            type: "connector_connected",
+            success: true
+        }, location.origin);
+    } else {
+        if (yoroiPort == null) {
+            createYoroiPort();
         }
-    });
+        // note: content scripts are subject to the same CORS policy as the website they are embedded in
+        // but since we are querying the website this script is injected into, it should be fine
+        convertImgToBase64(location.origin, getFavicons(location.origin))
+          .then(imgBase64Url => {
+              const message = {
+                  imgBase64Url,
+                  type: `yoroi_connect_request/${protocol}`,
+                  connectParameters: {
+                      url: location.hostname,
+                      requestIdentification,
+                      onlySilent: event.data.onlySilent,
+                  },
+                  protocol,
+              };
+              yoroiPort.postMessage(message);
+          });
+    }
+}
+
+function handleConnectorRpcRequest(event) {
+    console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+    if (event.data.function === 'is_enabled/cardano' && yoroiPort == null) {
+      createYoroiPort();
+    }
+    if (!yoroiPort) {
+        // No active wallet connection
+        window.postMessage({
+            type: "connector_rpc_response",
+            uid: event.data.uid,
+            return: {
+                err: {
+                    code: API_REFUSED,
+                    info: 'Wallet disconnected'
+                }
+            }
+        }, location.origin);
+        return;
+    }
+    try {
+        yoroiPort.postMessage(event.data);
+    } catch (e) {
+        console.error(`Could not send RPC to Yoroi: ${e}`);
+        window.postMessage({
+            type: "connector_rpc_response",
+            uid: event.data.uid,
+            return: {
+                err: {
+                    code: API_INTERNAL_ERROR,
+                    info: `Could not send RPC to Yoroi: ${e}`
+                }
+            }
+        }, location.origin);
+    }
+}
+
+function connectorEventListener(event) {
+    const dataType = event.data.type;
+    if (dataType === "connector_rpc_request") {
+        handleConnectorRpcRequest(event);
+    } else if (dataType === "connector_connect_request/ergo" || dataType === 'connector_connect_request/cardano') {
+        const protocol = dataType.split('/')[1];
+        handleConnectorConnectRequest(event, protocol);
+    }
+}
+
+if (shouldInject()) {
+    if (injectIntoPage(initialInject)) {
+        // events from page (injected code)
+        window.addEventListener("message", connectorEventListener);
+    }
 }
 
 /**
@@ -535,7 +601,7 @@ async function convertImgToBase64(origin, urls) {
                 continue;
             }
             console.error(`[yoroi-connector] Failed to fetch favicon at '${url}'`, e);
-            throw e;
+            // throw e;
         }
     }
     if (!response) {

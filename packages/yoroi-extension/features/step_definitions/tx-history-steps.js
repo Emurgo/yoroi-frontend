@@ -41,7 +41,7 @@ When(/^I see the transactions summary$/, async function () {
   // sometimes this UI twitches on load when it starts fetching data from the server
   // sleep to avoid the twitch breaking the test
   await this.driver.sleep(500);
-  await this.waitForElement('.WalletSummary_numberOfTransactions');
+  await this.waitForElement({ locator: '.WalletSummary_numberOfTransactions', method: 'css' });
 });
 
 Then(
@@ -50,7 +50,7 @@ Then(
     const txsNumberMessage = await i18n.formatMessage(this.driver,
       { id: 'wallet.summary.page.transactionsLabel' });
     await this.waitUntilText(
-      '.WalletSummary_numberOfTransactions',
+      { locator: '.WalletSummary_numberOfTransactions', method: 'css' },
       txsNumberMessage + ': ' + expectedTxsNumber
     );
   }
@@ -58,8 +58,8 @@ Then(
 
 
 Then(/^I should see no transactions$/, async function () {
-  await this.waitForElement('.WalletNoTransactions_component');
-  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  await this.waitForElement({ locator: '.WalletNoTransactions_component', method: 'css' });
+  const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
   chai.expect(actualTxsList.length).to.equal(0);
 });
 
@@ -67,21 +67,22 @@ Then(
   /^I should see ([^"]*) ([^"]*) transactions$/,
   async function (txsNumber, txExpectedStatus) {
     const txsAmount = parseInt(txsNumber, 10);
+    const showMoreLocator = '.WalletTransactionsList_component .MuiButton-primary';
 
     await this.driver.sleep(500);
     // press the show more transaction button until all transactions are visible
     for (let i = 1; i < txsAmount; i++) {
-      const webElements = await this.driver.findElements(By.xpath(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`));
-      if (webElements.length === 0) {
+      const buttonShowMoreExists = await this.checkIfExists({ locator: showMoreLocator, method: 'css' });
+      if (!buttonShowMoreExists) {
         break;
       }
-      await this.click(`//button[contains(@class, 'primary WalletTransactionsList_showMoreTransactionsButton')]`, By.xpath);
+      await this.click({ locator: showMoreLocator, method: 'css' });
       await this.driver.sleep(500);
     }
 
-    const allTxsList = await this.getElementsBy('.Transaction_component');
-    const pendingTxsList = await this.getElementsBy('.Transaction_pendingLabel');
-    const failedTxsList = await this.getElementsBy('.Transaction_failedLabel');
+    const allTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+    const pendingTxsList = await this.getElementsBy({ locator: '.Transaction_pendingLabel', method: 'css' });
+    const failedTxsList = await this.getElementsBy({ locator: '.Transaction_failedLabel', method: 'css' });
     if (txExpectedStatus === 'pending') {
       chai.expect(pendingTxsList.length).to.equal(txsAmount);
       return;
@@ -98,8 +99,8 @@ Then(
 When(
   /^I expand the top transaction$/,
   async function () {
-    await this.waitForElement('.Transaction_component');
-    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
     const topTx = actualTxsList[0];
 
     await topTx.click();
@@ -122,8 +123,8 @@ async function parseTxInfo(addressList) {
 Then(
   /^I verify top transaction content ([^"]*)$/,
   async function (walletName) {
-    await this.waitForElement('.Transaction_component');
-    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
     const topTx = actualTxsList[0];
 
     let status = 'successful';
@@ -170,8 +171,8 @@ Then(
 Then(
   /^The number of confirmations of the top tx is ([^"]*)$/,
   async function (count) {
-    await this.waitForElement('.Transaction_component');
-    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
     const topTx = actualTxsList[0];
     const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
     const confirmationCount = await assuranceElem[0].getText();
@@ -186,11 +187,11 @@ const displayInfo = {
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'HIGH',
     txFrom: [
-      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.820000 ADA'],
+      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.82 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...iLjTnt34Aj', 'BYRON - EXTERNAL', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.650000 ADA'],
+      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.65 ADA'],
     ],
     txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
     txConfirmations: 'High. 104 confirmations.',
@@ -202,7 +203,7 @@ const displayInfo = {
     txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
     txFrom: [
-      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1.000000 ADA'],
+      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...sTrQfTxPVX', 'PROCESSING...', '+0.000001 ADA']
@@ -212,15 +213,15 @@ const displayInfo = {
   },
   'failed-single-tx': {
     txType: 'ADA sent',
-    txAmount: '-0.180000',
+    txAmount: '-0.18',
     txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
     txFrom: [
-      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1.000000 ADA'],
+      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1 ADA'],
     ],
     txTo: [
       ['Ae2tdPwUPE...xJPmFzi6G2', 'ADDRESS BOOK', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.820000 ADA'],
+      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.82 ADA'],
     ],
     txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',
     txFee: '0.179999',
@@ -228,5 +229,5 @@ const displayInfo = {
 };
 
 When(/^I go to the tx history screen$/, async function () {
-  await this.click('.summary ');
+  await this.click({ locator: '.summary ', method: 'css' });
 });

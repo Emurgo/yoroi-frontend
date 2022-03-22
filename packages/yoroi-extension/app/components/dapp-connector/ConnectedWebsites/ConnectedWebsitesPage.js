@@ -93,7 +93,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           )]
         }).reduce((acc, [isWalletErgo, node]) => {
           if (node != null) {
-            acc[isWalletErgo ? 'ergoNodes' : 'cardanoNodes'].push(node);
+            acc[isWalletErgo === true ? 'ergoNodes' : 'cardanoNodes'].push(node);
           }
           return acc;
         }, { ergoNodes: [], cardanoNodes: [] });

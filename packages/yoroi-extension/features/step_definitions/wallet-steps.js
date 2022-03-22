@@ -1,30 +1,29 @@
 // @flow
 
 import { When, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
-import { truncateLongName, } from '../../app/utils/formatters';
+import { truncateLongName } from '../../app/utils/formatters';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
-  await this.input("input[name='walletName']", walletName);
+  await this.input({ locator: "input[name='walletName']", method: 'css' }, walletName);
 });
 
 When(/^I clear the name "([^"]*)"$/, async function (walletName) {
-  await this.clearInputUpdatingForm("input[name='walletName']", walletName.length);
+  await this.clearInputUpdatingForm({ locator: "input[name='walletName']", method: 'css' }, walletName.length);
 });
 
 When(/^I navigate to wallet sidebar category$/, async function () {
-  await this.click(`//div[@class='Sidebar_categories']//button[1]`, By.xpath);
-  await this.waitForElement('.NavPlate_name');
+  await this.click({ locator: `//div[@class='Sidebar_categories']//button[1]`, method: 'xpath' });
+  await this.waitForElement({ locator: '.NavPlate_name', method: 'css' });
 });
 
 Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
+  await this.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
 });
 
 Then(/^I unselect the wallet$/, async function () {
-  await this.click(`//div[@class='TopBarLayout_navbar']//button[@class='NavBarBack_backButton']`, By.xpath);
+  await this.click({ locator: '.NavBar_navbar .NavBar_title .NavBarBack_backButton', method: 'css' });
 });
 
 When(/^I am on the my wallets screen$/, async function () {
-  await this.waitForElement('.MyWallets_page');
+  await this.waitForElement({ locator: '.MyWallets_page', method: 'css' });
 });

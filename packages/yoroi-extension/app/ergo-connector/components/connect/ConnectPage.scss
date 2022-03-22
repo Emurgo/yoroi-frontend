@@ -1,14 +1,13 @@
 .component {
   height: calc(100vh - 92px);
-  display: flex;
-  flex-direction: column;
+  overflow: auto;
   &.isNightly {
     height: calc(100vh - 138px);
   }
 }
 .connectWrapper {
-  padding-top: 44px;
-  padding-bottom: 64px;
+  padding-top: 47px;
+  padding-bottom: 78px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,27 +29,48 @@
     margin-top: 8px;
     font-size: 18px;
     font-weight: 500;
-    h2 {
-      margin-bottom: 6px;
-    }
-    p {
-      color: #3154cb;
+  }
+
+}
+.noWallets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 60px;
+  letter-spacing: 0;
+
+  .noWalletsImage {
+    margin-bottom: 33px;
+  }
+
+  .noWalletsText {
+    color: #242838;
+    font-size: 24px;
+    letter-spacing: 0;
+    line-height: 32px;
+    margin-bottom: 16px;
+  }
+
+  .createWallet {
+    color: #17D1AA;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+
+    &::first-letter {
+      text-transform: uppercase;
     }
   }
 }
 
 .list {
-  flex: 1;
-  padding: 0 32px 17px;
-  border-bottom: 1px solid #dce0e9;
   & .listItem {
     padding-top: 15px;
     padding-bottom: 15px;
     & > div {
       width: 100%;
-    }
-    & + li {
-      border-top: 1px solid #dce0e9;
     }
     label {
       width: 100%;
@@ -61,7 +81,6 @@
 }
 
 .bottom {
-  padding-top: 23px;
   padding-left: 32px;
   padding-right: 32px;
 
@@ -84,5 +103,19 @@
   p {
     margin-top: 10px;
     overflow-wrap: break-word;
+  }
+}
+
+
+@media (min-width: 678px) {
+  .component {
+    max-width: 600px;
+    margin: auto;
+    padding-top: 40px;
+
+    .pageTitle {
+      text-align: center;
+      padding-left: 0px;
+    }
   }
 }

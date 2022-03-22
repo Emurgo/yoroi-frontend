@@ -39,7 +39,7 @@ Feature: Main UI
     Then I should see the Receive screen
     When I click on "copy to clipboard" button
     Then I should see "copied" tooltip message:
-    | message                                            |
+    | message                   |
     | global.copyTooltipMessage |
 
   @serverDown @it-31

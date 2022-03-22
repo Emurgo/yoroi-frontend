@@ -32,7 +32,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       title: pageTitle,
     }),
     new HtmlWebpackPlugin({
-      filename: path.join(__dirname, `../${folder}/main_window_ergo.html`),
+      filename: path.join(__dirname, `../${folder}/main_window_connector.html`),
       template: path.join(__dirname, '../chrome/views/ergo-connector/main_window.html'),
       chunks: ['ergo'],
       alwaysWriteToDisk: true,

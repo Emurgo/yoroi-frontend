@@ -252,7 +252,9 @@ export default class UserSummary extends Component<Props, State> {
           <div className={styles.cardContent}>
             <div>
               <div className={styles.delegatedHeader}>
-                <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalDelegated)}:</h3>
+                <h3 className={styles.label}>
+                  {intl.formatMessage(globalMessages.totalDelegated)}:
+                </h3>
                 <div className={styles.mangledSection}>
                   {mangledWarningIcon}
                 </div>

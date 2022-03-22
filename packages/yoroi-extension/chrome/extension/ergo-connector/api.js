@@ -11,7 +11,7 @@ import type {
   Value,
   CardanoTx, AccountBalance,
 } from './types';
-import { ConnectorError } from './types';
+import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   IGetAllUtxosResponse,
@@ -38,25 +38,43 @@ import keyBy from 'lodash/keyBy';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
-import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import {
+  CoreAddressTypes,
+  TxStatusCodes,
+} from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
-import LocalStorageApi from '../../../app/api/localStorage/index';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+  persistSubmittedTransactions,
+} from '../../../app/api/localStorage';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
-import { asAddressedUtxo as asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+  multiTokenFromCardanoValue,
+} from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
 import {
   signTransaction as shelleySignTransaction
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import {
   getCardanoHaskellBaseConfig,
+  getErgoBaseConfig,
 } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import AdaApi from '../../../app/api/ada';
 import type CardanoTxRequest from '../../../app/api/ada';
+import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
+import { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import type { WalletTransactionCtorData } from '../../../app/domain/WalletTransaction';
+import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
+import type {
+  HaskellShelleyTxSignRequest
+} from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -223,6 +241,64 @@ export async function connectorGetUtxosCardano(
   }
 
   return Promise.resolve(paginateResults(formattedUtxos, paginate))
+}
+
+const MAX_COLLATERAL = new BigNumber('5000000');
+// only consider UTXO value <= (${requiredAmount} + 1 ADA)
+const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
+
+type GetCollateralUtxosRespose = {|
+  utxosToUse: Array<RemoteUnspentOutput>,
+  reorgTargetAmount: ?string,
+|};
+
+export async function connectorGetCollateralUtxos(
+  wallet: PublicDeriver<>,
+  pendingTxs: PendingTransaction[],
+  requiredAmount: Value,
+  utxos: Array<RemoteUnspentOutput>,
+): Promise<GetCollateralUtxosRespose> {
+  const required = new BigNumber(requiredAmount)
+  if (required.gt(MAX_COLLATERAL)) {
+    throw new Error('requested collateral amount is beyond the allowed limits')
+  }
+  const utxosToConsider = utxos.filter(
+    utxo => utxo.assets.length === 0 &&
+      new BigNumber(utxo.amount).lt(required.plus(MAX_PER_UTXO_SURPLUS))
+  )
+  utxosToConsider.sort(
+    (utxo1, utxo2) => (new BigNumber(utxo1.amount)).comparedTo(utxo2.amount)
+  )
+  const utxosToUse = []
+  let sum = new BigNumber('0')
+  let enough = false
+  for (const utxo of utxosToConsider) {
+    utxosToUse.push(utxo)
+    sum = sum.plus(utxo.amount)
+    if (sum.gte(required)) {
+      enough = true
+      break
+    }
+  }
+  if (enough) {
+    for (;;) {
+      const smallestUtxo = utxosToUse[0];
+      const potentialSum = sum.minus(smallestUtxo.amount);
+      if (potentialSum.gte(required)) {
+        // First utxo can be removed and still will be enough.
+        utxosToUse.shift();
+        sum = potentialSum;
+      } else {
+        break;
+      }
+    }
+    return { utxosToUse, reorgTargetAmount: null };
+  }
+
+  return {
+    utxosToUse,
+    reorgTargetAmount: required.minus(sum).toString(),
+  };
 }
 
 export type FullAddressPayloadWithBase58 = {|
@@ -538,6 +614,24 @@ export async function connectorSignTx(
   };
 }
 
+function getScriptRequiredSigningKeys(
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
+): Set<string> {
+  const set = new Set<string>();
+  const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
+  if (nativeScripts != null && nativeScripts.len() > 0) {
+    for (let i = 0; i < nativeScripts.len(); i++) {
+      const ns = nativeScripts.get(i);
+      const scriptRequiredSigners = ns.get_required_signers();
+      for (let j = 0; j < scriptRequiredSigners.len(); j++) {
+        const requiredKeyHash = scriptRequiredSigners.get(j);
+        set.add(bytesToHex(requiredKeyHash.to_bytes()));
+      }
+    }
+  }
+  return set;
+}
+
 export async function connectorSignCardanoTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
@@ -546,10 +640,15 @@ export async function connectorSignCardanoTx(
   // eslint-disable-next-line no-unused-vars
   const { tx: txHex, partialSign } = tx;
 
-  let txBody;
+  let txBody: RustModule.WalletV4.TransactionBody;
+  let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
+  let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
   const bytes = Buffer.from(txHex, 'hex');
   try {
-    txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+    const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
+    txBody = fullTx.body();
+    witnessSet = fullTx.witness_set();
+    auxiliaryData = fullTx.auxiliary_data();
   } catch (originalErr) {
     try {
       // Try parsing as body for backward compatibility
@@ -568,7 +667,62 @@ export async function connectorSignCardanoTx(
   if (withHasUtxoChains == null) {
     throw new Error(`missing chains functionality`);
   }
-  const utxos = await withHasUtxoChains.getAllUtxos();
+
+  const requiredScriptSignAddresses = new Set<string>();
+  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet);
+  const scriptSignaturesRequired = requiredScriptSignKeys.size > 0;
+  const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
+    if (scriptSignaturesRequired) {
+      return getAllAddressesForDisplay({
+        publicDeriver,
+        type: CoreAddressTypes.CARDANO_BASE,
+      });
+    }
+    return Promise.resolve([]);
+  }
+
+  const [utxos, allBaseAddresses] = await Promise.all([
+    withHasUtxoChains.getAllUtxos(),
+    queryAllBaseAddresses(),
+  ]);
+
+  const otherRequiredSigners = [];
+
+  if (scriptSignaturesRequired) {
+    if (allBaseAddresses.length === 0) {
+      throw new Error('Cannot sign transaction script - no base addresses are available in the wallet!');
+    }
+    const parsedBaseAddr = RustModule.WalletV4.Address
+      .from_bytes(hexToBytes(allBaseAddresses[0].address));
+    const parsedNetworkId = parsedBaseAddr.network_id();
+    const parsedStakingCred = RustModule.WalletV4.BaseAddress
+      .from_address(parsedBaseAddr)?.stake_cred();
+    if (parsedStakingCred == null) {
+      throw new Error('Cannot sign transaction script - failed to parse the base address staking cred!');
+    }
+    for (const scriptKeyHash of requiredScriptSignKeys) {
+      const requiredKeyHash = RustModule.WalletV4.Ed25519KeyHash
+        .from_bytes(hexToBytes(scriptKeyHash));
+      const requiredPaymentCred = RustModule.WalletV4.StakeCredential
+        .from_keyhash(requiredKeyHash);
+      const requiredAddressBytes = RustModule.WalletV4.BaseAddress.new(
+        parsedNetworkId,
+        requiredPaymentCred,
+        parsedStakingCred,
+      ).to_address().to_bytes();
+      requiredScriptSignAddresses.add(bytesToHex(requiredAddressBytes))
+    }
+    for (const baseAddress of allBaseAddresses) {
+      const { address, addressing } = baseAddress;
+      if (requiredScriptSignAddresses.delete(address)) {
+        otherRequiredSigners.push({ address, addressing });
+      }
+      if (requiredScriptSignAddresses.size === 0) {
+        break;
+      }
+    }
+  }
+
   const addressedUtxos = asAddressedUtxoCardano(utxos);
 
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
@@ -594,6 +748,7 @@ export async function connectorSignCardanoTx(
   const usedUtxos = addressedUtxos.filter(utxo =>
     utxoIdSet.has(utxo.utxo_id)
   );
+
   const signedTx = shelleySignTransaction(
     usedUtxos,
     txBody,
@@ -602,15 +757,17 @@ export async function connectorSignCardanoTx(
       Buffer.from(normalizedKey.prvKeyHex, 'hex')
     ),
     new Set(), // stakingKeyWits
-    undefined, // metadata
+    auxiliaryData, // metadata
+    witnessSet,
+    otherRequiredSigners,
   );
 
-  return Buffer.from(signedTx.witness_set().to_bytes()).toString('hex');
+  return Buffer.from(signedTx.to_bytes()).toString('hex');
 }
 
 export async function connectorCreateCardanoTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
-  password: string,
+  password: ?string,
   cardanoTxRequest: CardanoTxRequest,
 ): Promise<string> {
   const withUtxos = asGetAllUtxos(publicDeriver);
@@ -630,12 +787,24 @@ export async function connectorCreateCardanoTx(
     time: new Date(),
   }).slot);
 
+  const utxos = asAddressedUtxoCardano(
+    await withUtxos.getAllUtxos()
+  );
+
   const adaApi = new AdaApi();
-  const signRequest = await adaApi.createUnsignedTxForConnector(({
+  const signRequest = await adaApi.createUnsignedTxForConnector({
     publicDeriver: withHasUtxoChains,
     absSlotNumber,
+    // $FlowFixMe[incompatible-exact]
     cardanoTxRequest,
-  }: any));
+    utxos,
+  });
+
+  if (password == null) {
+    return Buffer.from(
+      signRequest.unsignedTx.build_tx().to_bytes()
+    ).toString('hex');
+  }
 
   const withSigningKey = asGetSigningKey(publicDeriver);
   if (!withSigningKey) {
@@ -725,9 +894,332 @@ export async function connectorSendTxCardano(
     }
   ).then(_response => {
     return Promise.resolve();
-  }).catch((_error) => {
-    throw new SendTransactionApiError();
+  }).catch((error) => {
+    const code = error.response?.status === 400
+      ? TxSendErrorCodes.REFUSED : TxSendErrorCodes.FAILURE;
+    const info = error.response?.data
+      ?? `Failed to submit transaction: ${String(error)}`;
+    throw new ConnectorError({ code, info });
   });
 }
 
+export async function connectorRecordSubmittedErgoTransaction(
+  publicDeriver: PublicDeriver<>,
+  tx: SignedTx,
+  txId: string,
+) {
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (!withUtxos) {
+    throw new Error('expect to be able to get all UTXOs');
+  }
+  const allAddresses = new Set(
+    (await withUtxos.getAllUtxoAddresses())
+      .flatMap(utxoAddr => utxoAddr.addrs.map(addr => addr.Hash))
+  );
+  const utxos = (await withUtxos.getAllUtxos()).map(asAddressedUtxo);
+
+  const defaultToken = publicDeriver.getParent().defaultToken;
+  const defaults = {
+    defaultNetworkId: defaultToken.NetworkId,
+    defaultIdentifier: defaultToken.Identifier
+  };
+
+  const config = getErgoBaseConfig(
+    publicDeriver.getParent().getNetworkInfo()
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+
+  const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
+
+  const amount = new MultiToken([], defaults);
+  const fee = new MultiToken([], defaults);
+  const addresses = { from: [], to: [] };
+  let isIntraWallet = true;
+  for (const { boxId } of tx.inputs) {
+    const utxo = utxos.find(u => u.boxId === boxId);
+    if (!utxo) {
+      throw new Error('missing utxo for ' + boxId);
+    }
+    const value = new MultiToken([], defaults);
+
+    value.add({
+      amount: new BigNumber(utxo.amount),
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    for (const asset of utxo.assets || []) {
+      value.add({
+        amount: new BigNumber(asset.amount),
+        identifier: asset.tokenId,
+        networkId: defaultToken.NetworkId,
+      });
+    }
+    addresses.from.push({
+      address: utxo.receiver,
+      value,
+    });
+    if (allAddresses.has(utxo.receiver)) {
+      amount.joinSubtractMutable(value);
+    }
+    fee.joinAddMutable(value);
+  }
+
+  for (const output of tx.outputs) {
+    const value = new MultiToken([], defaults);
+
+    value.add({
+      amount: new BigNumber(output.value),
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    for (const asset of output.assets) {
+      value.add({
+        amount: new BigNumber(asset.amount),
+        identifier: asset.tokenId,
+        networkId: defaultToken.NetworkId,
+      });
+    }
+    const address = Buffer.from(
+      RustModule.SigmaRust.NetworkAddress.new(
+        (chainNetworkId: any),
+        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
+          RustModule.SigmaRust.ErgoTree.from_bytes(
+            Buffer.from(output.ergoTree, 'hex')
+          )
+        )
+      ).to_bytes()
+    ).toString('hex');
+    addresses.to.push({
+      address,
+      value,
+    });
+    if (allAddresses.has(address)) {
+      amount.joinAddMutable(value);
+    } else {
+      isIntraWallet = false;
+    }
+    fee.joinSubtractMutable(value);
+  }
+
+  const submittedTx: WalletTransactionCtorData = {
+    txid: txId,
+    type: isIntraWallet ? 'self' : 'expend',
+    amount,
+    fee,
+    date: new Date,
+    addresses,
+    state: TxStatusCodes.SUBMITTED,
+    errorMsg: null,
+    block: null,
+  };
+
+  const submittedTxs = loadSubmittedTransactions() || [];
+  submittedTxs.push({
+    publicDeriverId: publicDeriver.publicDeriverId,
+    transaction: submittedTx,
+    networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  persistSubmittedTransactions(submittedTxs);
+}
+
+export async function connectorRecordSubmittedCardanoTransaction(
+  publicDeriver: PublicDeriver<>,
+  tx: RustModule.WalletV4.Transaction,
+  addressedUtxos?: Array<CardanoAddressedUtxo>,
+) {
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (!withUtxos) {
+    throw new Error('expect to be able to get all UTXOs');
+  }
+  const allAddresses = new Set(
+    (await withUtxos.getAllUtxoAddresses())
+      .flatMap(utxoAddr => utxoAddr.addrs.map(addr => addr.Hash))
+  );
+  let utxos;
+  if (addressedUtxos) {
+    utxos = addressedUtxos;
+  } else {
+    utxos = asAddressedUtxoCardano(
+      await withUtxos.getAllUtxos()
+    );
+  }
+
+  const txId = Buffer.from(
+    RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
+  ).toString('hex');
+  const defaultToken = publicDeriver.getParent().defaultToken;
+  const defaults = {
+    defaultNetworkId: defaultToken.NetworkId,
+    defaultIdentifier: defaultToken.Identifier
+  };
+
+  const amount = new MultiToken([], defaults);
+  const fee = new MultiToken([], defaults);
+  const addresses = { from: [], to: [] };
+  let isIntraWallet = true;
+  const txBody = tx.body();
+  const txInputs = txBody.inputs();
+  for (let i = 0; i < txInputs.len(); i++) {
+    const input = txInputs.get(i);
+    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    const index = input.index();
+    const utxo = utxos.find(u => u.tx_hash === txHash && u.tx_index === index);
+
+    if (!utxo) {
+      throw new Error('missing UTXO');
+    }
+
+    const value = new MultiToken([], defaults);
+
+    value.add({
+      amount: new BigNumber(utxo.amount),
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    for (const asset of utxo.assets) {
+      value.add({
+        amount: new BigNumber(asset.amount),
+        identifier: asset.assetId,
+        networkId: defaultToken.NetworkId,
+      });
+    }
+    addresses.from.push({
+      address: utxo.receiver,
+      value,
+    });
+    if (allAddresses.has(utxo.receiver)) {
+      amount.joinSubtractMutable(value);
+    }
+    fee.joinAddMutable(value);
+  }
+  const txOutputs = txBody.outputs();
+  for (let i = 0; i < txOutputs.len(); i++) {
+    const output = txOutputs.get(i);
+    const value = multiTokenFromCardanoValue(output.amount(), defaults);
+    const address = Buffer.from(output.address().to_bytes()).toString('hex');
+    addresses.to.push({
+      address,
+      value,
+    });
+    if (allAddresses.has(address)) {
+      amount.joinAddMutable(value);
+    } else {
+      isIntraWallet = false;
+    }
+    fee.joinSubtractMutable(value);
+  }
+
+  const withdrawals = txBody.withdrawals();
+  const withdrawalsData = [];
+  if (withdrawals) {
+    const withdrawalKeys = withdrawals.keys();
+    for (let i = 0; i < withdrawalKeys.len(); i++) {
+      const key = withdrawalKeys.get(i);
+      const withdrawalAmount = withdrawals.get(key);
+      if (!withdrawalAmount) {
+        throw new Error('unexpected missing withdrawal amount');
+      }
+      withdrawalsData.push({
+        address: Buffer.from(key.to_address().to_bytes()).toString('hex'),
+        value: new MultiToken(
+          [
+            {
+              amount: new BigNumber(withdrawalAmount.to_str()),
+              identifier: defaultToken.Identifier,
+              networkId: defaultToken.NetworkId,
+            }
+          ],
+          defaults
+        )
+      });
+    }
+  }
+
+  const auxData = tx.auxiliary_data();
+
+  const submittedTx: CardanoShelleyTransactionCtorData = {
+    txid: txId,
+    type: isIntraWallet ? 'self' : 'expend',
+    amount,
+    fee,
+    date: new Date,
+    addresses,
+    state: TxStatusCodes.SUBMITTED,
+    errorMsg: null,
+    block: null,
+    certificates: [],
+    ttl: new BigNumber(String(txBody.ttl())),
+    metadata: auxData ? Buffer.from(auxData.to_bytes()).toString('hex') : null,
+    withdrawals: withdrawalsData,
+    isValid: true,
+  };
+
+  const submittedTxs = loadSubmittedTransactions() || [];
+  submittedTxs.push({
+    publicDeriverId: publicDeriver.publicDeriverId,
+    transaction: submittedTx,
+    networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  persistSubmittedTransactions(submittedTxs);
+}
+
 // TODO: generic data sign
+
+const REORG_OUTPUT_AMOUNT  = '1000000';
+
+export async function connectorGenerateReorgTx(
+  publicDeriver: PublicDeriver<>,
+  usedUtxoIds: Array<string>,
+  reorgTargetAmount: string,
+  utxos: Array<CardanoAddressedUtxo>,
+): Promise<{|
+  unsignedTx: HaskellShelleyTxSignRequest,
+  collateralOutputAddressSet: Set<string>,
+|}> {
+  const network = publicDeriver.getParent().getNetworkInfo();
+
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (withUtxos == null) {
+    throw new Error(`missing utxo functionality`);
+  }
+
+  const withHasUtxoChains = asHasUtxoChains(withUtxos);
+  if (withHasUtxoChains == null) {
+    throw new Error(`missing chains functionality`);
+  }
+
+  const fullConfig = getCardanoHaskellBaseConfig(network);
+  const timeToSlot = await genTimeToSlot(fullConfig);
+  const absSlotNumber = new BigNumber(timeToSlot({
+    time: new Date(),
+  }).slot);
+  const unusedAddresses = await connectorGetUnusedAddresses(
+    publicDeriver
+  );
+  const includeTargets = [];
+  const collateralOutputAddressSet = new Set<string>();
+  const reorgOutputCount = (new BigNumber(reorgTargetAmount))
+        .div(REORG_OUTPUT_AMOUNT)
+        .integerValue(BigNumber.ROUND_CEIL)
+        .toNumber();
+  if (reorgOutputCount > unusedAddresses.length) {
+    throw new Error('unexpected: too many collaterals required');
+  }
+  for (let i = 0; i < reorgOutputCount; i++) {
+    includeTargets.push({
+      address: unusedAddresses[i],
+      value: REORG_OUTPUT_AMOUNT,
+    });
+    collateralOutputAddressSet.add(unusedAddresses[i]);
+  }
+  const dontUseUtxoIds = new Set(usedUtxoIds);
+  const adaApi = new AdaApi();
+  const unsignedTx = await adaApi.createUnsignedTxForConnector({
+    publicDeriver: withHasUtxoChains,
+    absSlotNumber,
+    cardanoTxRequest: {
+      includeTargets,
+    },
+    utxos: utxos.filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+  });
+  return { unsignedTx, collateralOutputAddressSet };
+}

@@ -132,6 +132,8 @@ const genBaseProps: {|
             }
           }],
         adaTransaction: null,
+        currentConnectorWhitelist: [],
+        submissionError: null,
       },
       coinPriceStore: {
         getCurrentPrice: (_from, _to) => 5,
@@ -141,6 +143,7 @@ const genBaseProps: {|
       },
       profile: {
         unitOfAccount: genUnitOfAccount(),
+        shouldHideBalance: false,
       },
       uiNotifications: {
         getTooltipActiveNotification: (_id) => undefined,

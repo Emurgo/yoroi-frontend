@@ -446,7 +446,7 @@ export default class WalletSendForm extends Component<Props> {
                 }).TokenId
               }
               renderValue={value => (
-                <Box>{tokenOptions.filter(option => option.value === value)[0].label}</Box>
+                <Box>{tokenOptions.filter(option => option.value === value)[0]?.label}</Box>
               )}
             >
               <MenuItem
@@ -510,7 +510,7 @@ export default class WalletSendForm extends Component<Props> {
             labelId="amount-options-select"
             renderValue={value => (
               <Typography sx={{ textTransform: 'uppercase' }}>
-                {sendAmountOptions.filter(item => item.value === value)[0].label}
+                {sendAmountOptions.find(item => item.value === value)?.label ?? '-'}
               </Typography>
             )}
             onChange={value => {

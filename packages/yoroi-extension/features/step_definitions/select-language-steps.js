@@ -1,9 +1,8 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import languageSelection from '../support/helpers/language-selection-helpers';
+import languageSelection, { clickContinue } from '../support/helpers/language-selection-helpers';
 
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
@@ -12,23 +11,26 @@ Given(/^I have selected English language$/, async function () {
 });
 
 When(/^I am on the language selection screen$/, async function () {
-  await this.waitForElement(LANGUAGE_SELECTION_FORM);
+  await this.waitForElement({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
 });
 
 When(/^I open language selection dropdown$/, async function () {
-  await this.click(`${LANGUAGE_SELECTION_FORM} .SimpleInput_input`);
+  await this.click({ locator: `${LANGUAGE_SELECTION_FORM} .MuiInputBase-input`, method: 'css' });
 });
 
 When(/^I select Japanese language$/, async function () {
-  return this.click('//span[contains(text(), "日本語")]', By.xpath);
+  return this.click({ locator: '//span[contains(text(), "日本語")]', method: 'xpath' });
 });
 
 When(/^I submit the language selection form$/, async function () {
-  await this.click('.LanguageSelectionForm_submitButton');
+  await clickContinue(this);
 });
 
 Then(/^I should not see the language selection screen anymore$/, async function () {
-  await this.waitForElementNotPresent(LANGUAGE_SELECTION_FORM);
+  await this.waitForElementNotPresent({
+    locator: LANGUAGE_SELECTION_FORM,
+    method: 'css'
+  });
 });
 
 Then(/^I should have Japanese language set$/, async function () {

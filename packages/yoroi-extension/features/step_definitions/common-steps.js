@@ -1,43 +1,56 @@
 // @flow
 
-import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
+import {
+  Before,
+  BeforeAll,
+  Given,
+  Then,
+  After,
+  AfterAll,
+  setDefinitionFunctionWrapper,
+  setDefaultTimeout,
+} from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
-import { By } from 'selenium-webdriver';
+import { By, logging } from 'selenium-webdriver';
 import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import { expect } from 'chai';
-import {
-  satisfies,
-} from 'semver';
-import { truncateLongName, } from '../../app/utils/formatters';
+import { satisfies } from 'semver';
+// eslint-disable-next-line import/named
+import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
+import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
+import { promises as fsAsync } from 'fs';
 import {
-  waitUntilUrlEquals,
-  navigateTo,
-} from '../support/helpers/route-helpers';
-import { camelCase } from 'lodash';
+  selectSubmenuSettings,
+  getComplexityLevelButton,
+  goToSettings,
+} from './general-settings-steps';
+import type { LocatorObject } from '../support/webdriver';
+import { walletButton } from '../pages/sidebarPage';
+import { getWalletButtonByPlate } from '../pages/walletsListPage';
 
 const { promisify } = require('util');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-const screenshotsDir = './screenshots/';
+const testRunsDataDir = './testRunsData/';
 const snapshotsDir = './features/yoroi_snapshots/';
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
   scenarioName: '',
   lineNum: 0, // we need this to differentiate scenarios with multiple "examples"
-  step: 0
+  step: 0,
 };
 
 BeforeAll(() => {
-  rimraf.sync(screenshotsDir);
-  fs.mkdirSync(screenshotsDir);
+  rimraf.sync(testRunsDataDir);
+  fs.mkdirSync(testRunsDataDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -49,7 +62,12 @@ AfterAll(() => {
   ErgoServer.closeMockServer();
 });
 
-Before((scenario) => {
+Before(scenario => {
+  const pathItems = scenario.sourceLocation.uri.split('/');
+  // eslint-disable-next-line no-console
+  console.log(
+    `\n### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`
+  );
   CardanoServer.setExpectedTx(undefined);
   ErgoServer.setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly
@@ -94,9 +112,9 @@ Before({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({
     signedTransaction: (req, res) => {
       res.status(400).jsonp({
-        message: 'Invalid witness'
+        message: 'Invalid witness',
       });
-    }
+    },
   });
 });
 
@@ -105,9 +123,11 @@ After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({});
 });
 
-After( async function (scenario) {
-  if(scenario.result.status === 'failed'){
+After(async function (scenario) {
+  if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
+    await takePageSnapshot(this.driver, 'failedStep');
+    await getConsoleLogs(this.driver, 'failedStep');
   }
   await this.driver.quit();
 });
@@ -115,12 +135,7 @@ After( async function (scenario) {
 const writeFile = promisify(fs.writeFile);
 
 // Steps that contain these patterns will trigger screenshots:
-const SCREENSHOT_STEP_PATTERNS = [
-  'I should see',
-  'I see',
-  'I click',
-  'by clicking',
-];
+const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
 
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
@@ -133,8 +148,10 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-   if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
+    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
+      await takePageSnapshot(this.driver, cleanString);
+      await getConsoleLogs(this.driver, cleanString);
     }
 
     testProgress.step += 1;
@@ -142,146 +159,154 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
   };
 });
 
+function createDirInTestRunsData(subdirectoryName) {
+  const dir = `${testRunsDataDir}/${testProgress.scenarioName}/${subdirectoryName}`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  return dir;
+}
+
 async function takeScreenshot(driver, name) {
   // path logic
-  const dir = `${screenshotsDir}/${testProgress.scenarioName}`;
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
+  const dir = createDirInTestRunsData('screenshots');
   const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}.png`;
 
   const screenshot = await driver.takeScreenshot();
   await writeFile(path, screenshot, 'base64');
 }
 
+async function takePageSnapshot(driver, name) {
+  const dir = createDirInTestRunsData('pagesSnapshots');
+  const htmlLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-dom.html`;
+  const html = await driver.executeScript('return document.body.innerHTML;');
+  await fsAsync.writeFile(htmlLogPath, html);
+}
+
+async function getConsoleLogs(driver, name) {
+  const dir = createDirInTestRunsData('consoleLogs');
+  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
+  const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
+  const jsonLogs = logEntries.map(l => l.toJSON());
+  await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
+}
+
 async function inputMnemonicForWallet(
   customWorld: any,
   walletName: string,
-  restoreInfo: RestorationInput,
+  restoreInfo: RestorationInput
 ): Promise<void> {
-  await customWorld.input("input[name='walletName']", restoreInfo.name);
-  await enterRecoveryPhrase(
-    customWorld,
-    restoreInfo.mnemonic,
-  );
-  await customWorld.input("input[name='walletPassword']", restoreInfo.password);
-  await customWorld.input("input[name='repeatPassword']", restoreInfo.password);
-  await customWorld.click('.WalletRestoreDialog .primary');
+  await customWorld.input({ locator: "input[name='walletName']", method: 'css' }, restoreInfo.name);
+  await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
+  await customWorld.input({ locator: "input[name='walletPassword']", method: 'css' }, restoreInfo.password);
+  await customWorld.input({ locator: "input[name='repeatPassword']", method: 'css' }, restoreInfo.password);
+  await customWorld.click({ locator: '.WalletRestoreDialog .primary', method: 'css' });
 
   const plateElements = await getPlates(customWorld);
   const plateText = await plateElements[0].getText();
   expect(plateText).to.be.equal(restoreInfo.plate);
 
-  await customWorld.click('.confirmButton');
-  await customWorld.waitUntilText('.NavPlate_name', truncateLongName(walletName));
+  await customWorld.click({ locator: '.confirmButton', method: 'css' });
+  await customWorld.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+}
+
+export async function checkErrorByTranslationId(
+  client: Object,
+  errorSelector: LocatorObject,
+  errorObject: Object,
+) {
+  await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000);
 }
 
 Then(/^I pause the test to debug$/, async function () {
-  await this.waitForElement('.element_that_does_not_exist');
+  await this.waitForElement({ locator: '.element_that_does_not_exist', method: 'css' });
 });
 
 Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click('.PickCurrencyOptionDialog_ergo');
+  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
+  await this.click({ locator: '.PickCurrencyOptionDialog_ergo', method: 'css' });
 
-  await this.waitForElement('.WalletRestoreOptionDialog');
+  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
-  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 
-  await inputMnemonicForWallet(
-    this,
-    walletName,
-    restoreInfo,
-  );
+  await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click('.PickCurrencyOptionDialog_cardano');
+  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
+  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
 
-  await this.waitForElement('.WalletRestoreOptionDialog');
+  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
-  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
-  await this.click('.WalletEraOptionDialog_bgShelleyMainnet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
+  await this.click({ locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 
-  await inputMnemonicForWallet(
-    this,
-    walletName,
-    restoreInfo,
-  );
+  await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
 
 Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click('.WalletAdd_btnRestoreWallet');
+  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click('.PickCurrencyOptionDialog_cardano');
+  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
+  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
 
-  await this.waitForElement('.WalletRestoreOptionDialog');
+  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
-  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
-  await this.click('.WalletEraOptionDialog_bgByronMainnet');
-  await this.waitForElement('.WalletRestoreDialog');
+  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
+  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
+  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 
-  await inputMnemonicForWallet(
-    this,
-    walletName,
-    restoreInfo,
-  );
+  await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
 
 Given(/^I have completed the basic setup$/, async function () {
   // language select page
-  await this.waitForElement('.LanguageSelectionForm_component');
-  await this.click('//button[text()="Continue"]', By.xpath);
+  await this.waitForElement({ locator: '.LanguageSelectionForm_component', method: 'css' });
+  await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
   // ToS page
-  await this.waitForElement('.TermsOfUseForm_component');
+  await this.waitForElement({ locator: '.TermsOfUseForm_component', method: 'css' });
   const tosClassElement = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
   const checkbox = await tosClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
   await checkbox.click();
-  await this.click('//button[text()="Continue"]', By.xpath);
+  await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
   // uri prompt page
   await acceptUriPrompt(this);
-  await this.waitForElement('.WalletAdd_component');
+  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
-Given(/^I switched to the advanced level$/, async function(){
+Given(/^I switched to the advanced level$/, async function () {
   // Navigate to the general settings screen
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
   await waitUntilUrlEquals.call(this, '/settings/general');
-  await this.waitForElement('.SettingsLayout_component');
+  await this.waitForElement({ locator: '.SettingsLayout_component', method: 'css' });
   // Click on secondary menu "levelOfComplexity" item
-  const buttonSelector = `.SettingsMenuItem_component.${camelCase('levelOfComplexity')}`;
-  await this.click(buttonSelector);
-  await this.waitForElement(
-    `${buttonSelector}.SettingsMenuItem_active`
-  );
+  await selectSubmenuSettings(this, 'levelOfComplexity');
   // Select the most complex level
-  await this.waitForElement('.ComplexityLevelForm_submitButton');
-  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
-  await levels[levels.length - 1].click(); // choose most complex level for tests
+  const cardChoseButton = await getComplexityLevelButton(this, false);
+  await cardChoseButton.click(); // choose most complex level for tests
 
   // Navigate back to the main page
   await navigateTo.call(this, '/wallets/add');
   await waitUntilUrlEquals.call(this, '/wallets/add');
-  await this.waitForElement('.WalletAdd_component');
-})
+  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
+});
 
 Then(/^I accept uri registration$/, async function () {
   await acceptUriPrompt(this);
@@ -289,10 +314,10 @@ Then(/^I accept uri registration$/, async function () {
 
 async function acceptUriPrompt(world: any) {
   if (world.getBrowser() !== 'firefox') {
-    await world.waitForElement('.UriPromptForm_component');
-    await world.click('.allowButton');
-    await world.waitForElement('.UriAccept_component');
-    await world.click('.finishButton');
+    await world.waitForElement({ locator: '.UriPromptForm_component', method: 'css' });
+    await world.click({ locator: '.allowButton', method: 'css' });
+    await world.waitForElement({ locator: '.UriAccept_component', method: 'css' });
+    await world.click({ locator: '.finishButton', method: 'css' });
   }
 }
 
@@ -304,7 +329,7 @@ Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(500);
-  await this.waitForElement('.YoroiClassic');
+  await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -312,16 +337,16 @@ Given(/^I restart the browser$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(500);
-  await this.waitForElement('.YoroiClassic');
+  await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
 });
 
 Given(/^There is no wallet stored$/, async function () {
   await restoreWalletsFromStorage(this);
-  await this.waitForElement('.WalletAdd_component');
+  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {
-  await this.click(`//button[contains(text(), ${buttonName})]`, By.xpath);
+  await this.click({ locator: `//button[contains(text(), ${buttonName})]`, method: 'xpath' });
 });
 
 Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
@@ -335,12 +360,13 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(1500);
-  await this.waitForElement('.YoroiClassic');
+  await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
 });
 
 async function setLedgerWallet(client, serial) {
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.substores.ada.ledgerConnect.setSelectedMockWallet(data)
+    window.yoroi.stores.substores.ada.ledgerConnect
+      .setSelectedMockWallet(data)
       .then(done)
       .catch(err => done(err));
   }, serial);
@@ -351,7 +377,8 @@ Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
 
 async function setTrezorWallet(client, deviceId) {
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.substores.ada.trezorConnect.setSelectedMockWallet(data)
+    window.yoroi.stores.substores.ada.trezorConnect
+      .setSelectedMockWallet(data)
       .then(done)
       .catch(err => done(err));
   }, deviceId);
@@ -361,8 +388,9 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
 });
 
 async function restoreWalletsFromStorage(client) {
-  await client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.wallets.restoreWalletsFromStorage()
+  await client.driver.executeAsyncScript(done => {
+    window.yoroi.stores.wallets
+      .restoreWalletsFromStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -378,8 +406,9 @@ async function exportYoroiSnapshot(client, exportDir: string) {
 
 async function exportLocalStorage(client, exportDir: string) {
   const localStoragePath = `${exportDir}/localStorage.json`;
-  const localStorage = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.localStorage.getStorage()
+  const localStorage = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.localStorage
+      .getStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -388,10 +417,9 @@ async function exportLocalStorage(client, exportDir: string) {
 
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
-  const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.common.exportLocalDatabase(
-      window.yoroi.stores.loading.getDatabase(),
-    )
+  const indexedDB = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.common
+      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
@@ -413,8 +441,9 @@ async function importLocalStorage(client, importDir: string) {
   const version: string = storage['test-LAST-LAUNCH-VER'] || '0.0.0';
 
   // Clear anything in memory to effectively override it with the snapshot
-  await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.localStorage.clear()
+  await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.localStorage
+      .clear()
       .then(done)
       .catch(err => done(err));
   });
@@ -431,7 +460,8 @@ async function importLocalStorage(client, importDir: string) {
     }, storage);
   } else {
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.localStorage.setStorage(data)
+      window.yoroi.api.localStorage
+        .setStorage(data)
         .then(done)
         .catch(err => done(err));
     }, storage);
@@ -449,9 +479,8 @@ async function importIndexedDB(client, importDir: string) {
     return;
   }
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.loading.importOldDatabase(
-      data
-    )
+    window.yoroi.stores.loading
+      .importOldDatabase(data)
       .then(done)
       .catch(err => done(err));
   }, JSON.parse(indexedDBData));
@@ -459,10 +488,9 @@ async function importIndexedDB(client, importDir: string) {
 
 let capturedDbState = undefined;
 async function captureDbStae(client) {
-  const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.common.exportLocalDatabase(
-      window.yoroi.stores.loading.getDatabase(),
-    )
+  const rawDb = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.common
+      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
@@ -470,10 +498,9 @@ async function captureDbStae(client) {
 }
 async function compareToCapturedDbState(client, excludeSyncTime) {
   if (capturedDbState == null) throw new Error('Db state was never captured');
-  const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.common.exportLocalDatabase(
-      window.yoroi.stores.loading.getDatabase(),
-    )
+  const rawDb = await client.driver.executeAsyncScript(done => {
+    window.yoroi.api.common
+      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
@@ -492,6 +519,22 @@ Given(/^I capture DB state snapshot$/, async function () {
 Then(/^I compare to DB state snapshot$/, async function () {
   await compareToCapturedDbState(this, false);
 });
+
 Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
   await compareToCapturedDbState(this, true);
+});
+
+Then(/^Revamp. I switch to revamp version$/, async function () {
+  await goToSettings(this);
+  await selectSubmenuSettings(this, 'general');
+  const revampButton = await this.driver.findElement(By.id('switchToRevampButton'));
+  await revampButton.click();
+});
+
+Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
+  await this.click(walletButton);
+
+  const restoreInfo = testWallets[walletName];
+  const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
+  await walletButtonInRow.click();
 });

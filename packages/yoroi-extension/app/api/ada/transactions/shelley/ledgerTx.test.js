@@ -33,7 +33,7 @@ const network = networks.CardanoMainnet;
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
-  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   keyDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
@@ -43,7 +43,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str('2'),
       RustModule.WalletV4.BigNum.from_str('500'),
     ),
-    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
     poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     networkId: network.NetworkId,
@@ -248,12 +248,7 @@ test('Create Ledger transaction', async () => {
     assets: [],
   }];
   const protocolParams = getProtocolParams();
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    protocolParams.linearFee,
-    protocolParams.minimumUtxoVal,
-    protocolParams.poolDeposit,
-    protocolParams.keyDeposit,
-  );
+  const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
   for (const utxo of senderUtxos) {
     const wasmAddr = normalizeToAddress(utxo.receiver);
     if (wasmAddr == null) throw new Error(`Unknown address ${utxo.receiver}`);

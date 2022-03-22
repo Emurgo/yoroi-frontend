@@ -202,7 +202,12 @@ class SeizaFetcher extends Component<AllProps> {
     return 'chrome&chromeId=' + location.host;
   }
 
-  _prepareStakingURL(urlTemplate: string, locale: string, bias: string, totalAda: ?number): null | string {
+  _prepareStakingURL(
+    urlTemplate: string,
+    locale: string,
+    bias: string,
+    totalAda: ?number,
+  ): null | string {
     let finalURL = urlTemplate
       .replace(
         '$$BROWSER$$',

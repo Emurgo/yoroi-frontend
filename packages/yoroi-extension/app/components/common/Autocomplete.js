@@ -48,11 +48,11 @@ function Autocomplete({
   placeholder,
   chipProps,
 }: Props): Node {
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<?string>('');
   const inputRef = useRef();
-  const isInputPresent = inputValue.length > 0;
+  const isInputPresent = (inputValue?.length ?? 0) > 0;
   const filteredList = isInputPresent
-    ? options.filter(w => w.toLowerCase().startsWith(inputValue.toLowerCase()))
+    ? options.filter(w => w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? ''))
     : options;
   const sliceArrayItems = slice(filteredList, 0, maxVisibleOptions);
 
