@@ -95,7 +95,7 @@ function TextField({
             </InputAdornment>
           ),
           disableUnderline: revamp,
-          placeholder: revamp && '0.0',
+          placeholder: revamp ? '0.0' : '',
       }}
       {...props}
     />

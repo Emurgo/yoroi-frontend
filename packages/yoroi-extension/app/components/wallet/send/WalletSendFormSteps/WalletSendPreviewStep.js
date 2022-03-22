@@ -330,9 +330,9 @@ export default class WalletSendPreviewStep extends Component<Props> {
                 </div>
               )}
 
-              <p className={styles.totalAmountValue}>
+              <div className={styles.totalAmountValue}>
                 {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
-              </p>
+              </div>
             </div>
           </div>
 
