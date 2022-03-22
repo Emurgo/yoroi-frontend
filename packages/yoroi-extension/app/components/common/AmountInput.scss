@@ -1,5 +1,11 @@
 .component {
   width: 100%;
+
+  & > div {
+    padding: 0px;
+    margin: 0px;
+  }
+
   input {
     border: none;
     outline: none;

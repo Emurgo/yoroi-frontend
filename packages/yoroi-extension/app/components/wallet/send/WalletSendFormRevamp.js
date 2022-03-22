@@ -142,8 +142,6 @@ type State = {|
   currentStep: number,
 |}
 
-const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
-
 @observer
 export default class WalletSendForm extends Component<Props, State> {
 
@@ -295,14 +293,6 @@ export default class WalletSendForm extends Component<Props, State> {
           identifier: this.props.defaultToken.Identifier,
           networkId: this.props.defaultToken.NetworkId,
         }).TokenId,
-      },
-      selectedAmount: {
-        label: this.context.intl.formatMessage(messages.selectedAmountLable),
-        value: this.props.shouldSendAll ?
-          this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-          identifier: this.props.defaultToken.Identifier,
-          networkId: this.props.defaultToken.NetworkId,
-        }).TokenId : CUSTOM_AMOUNT
       },
       memo: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
@@ -496,7 +486,7 @@ export default class WalletSendForm extends Component<Props, State> {
         case SEND_FORM_STEP.PREVIEW:
             return this.props.previewStep()
         default:
-          throw Error(`${step} is not a valid step number`)
+          throw Error(`${step} is not a valid step`)
     }
   }
 
@@ -511,7 +501,7 @@ export default class WalletSendForm extends Component<Props, State> {
           />
 
           <div className={styles.formBody}>
-            {this.renderCurrentStep(currentStep)}
+            {this.renderCurrentStep(2)}
           </div>
         </div>
       </div>

@@ -21,6 +21,8 @@ type Props = {|
   onBlur?: Function,
   autoFocus?: boolean,
   inputRef?: ?{| current: null | ElementRef<'input'> |},
+  revamp?: boolean,
+  placeholder?: string,
 |};
 
 function TextField({
@@ -36,6 +38,7 @@ function TextField({
   onBlur,
   onChange,
   autoFocus,
+  revamp,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -51,7 +54,7 @@ function TextField({
     <TextFieldBase
       className={className}
       error={Boolean(error)}
-      label={label}
+      label={!revamp && label}
       value={value}
       disabled={disabled}
       autoFocus={autoFocus}
@@ -60,6 +63,7 @@ function TextField({
       onBlur={onBlur}
       onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
+      variant={revamp ? 'standard' : 'outlined'}
       /*
         In order to show placeholders for classic theme we dont' need to override
         'shrink' and 'notched' prop status so we pass an empty object
@@ -90,6 +94,8 @@ function TextField({
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
             </InputAdornment>
           ),
+          disableUnderline: revamp,
+          placeholder: revamp && '0.0',
       }}
       {...props}
     />
@@ -107,6 +113,7 @@ TextField.defaultProps = {
   onBlur: null,
   type: 'text',
   autoFocus: false,
+  revamp: false,
 };
 
 export default TextField;
