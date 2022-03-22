@@ -273,28 +273,13 @@ export default class WalletSendPreviewStep extends Component<Props> {
         <div className={styles.staleTxWarning}>
           {this.props.staleTx && staleTxWarning}
         </div>
-        <div className={styles.wrapper}>
-          <div>
-            <div className={styles.addressToLabel}>
-              {intl.formatMessage(globalMessages.receiverLabel)}
-            </div>
-            {receivers.map((receiver, i) => (
-              <ExplorableHashContainer
-                key={receiver + i} // eslint-disable-line react/no-array-index-key
-                selectedExplorer={this.props.selectedExplorer}
-                hash={this.props.addressToDisplayString(receiver)}
-                light
-                linkType="address"
-              >
-                <RawHash light>
-                  <span className={styles.addressTo}>
-                    {truncateAddress(this.props.addressToDisplayString(receiver))}
-                  </span>
-                </RawHash>
-              </ExplorableHashContainer>
-            ))}
+        <div>
+          <div className={styles.addressToLabel}>
+            {intl.formatMessage(globalMessages.receiverLabel)}
           </div>
-
+          <p className={styles.receiverAddress}>{receivers[0]}</p>
+        </div>
+        <div className={styles.wrapper}>
           {this.props.transactionSize != null ? (
             <div className={styles.addressToLabelWrapper}>
               <div className={styles.addressToLabel}>

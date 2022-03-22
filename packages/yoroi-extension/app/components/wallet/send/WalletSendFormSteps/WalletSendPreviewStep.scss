@@ -1,20 +1,29 @@
 .component {
     padding-top: 15px;
     overflow-y: scroll;
+
+    .staleTxWarning {
+        margin-bottom: 20px;
+    }
+
     .wrapper {
         width: 65%;
         height: 100%;
-
-        .staleTxWarning {
-            margin-bottom: 20px;
-        }
     }
 
     .addressToLabel {
         font-size: 16px;
         letter-spacing: 0;
         color: #6B7384;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
+    }
+
+    .receiverAddress {
+        overflow-wrap: break-word;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+        color: var(--yoroi-palette-gray-900);
     }
 
     .amountWrapper {
