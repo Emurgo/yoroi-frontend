@@ -462,7 +462,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 </div>
 
                 <div className={styles.usd}>
-                  <p>$ 10</p>
+                  <p>$ 0</p>
                 </div>
               </div>
 
@@ -501,7 +501,7 @@ export default class WalletSendForm extends Component<Props, State> {
           />
 
           <div className={styles.formBody}>
-            {this.renderCurrentStep(2)}
+            {this.renderCurrentStep(currentStep)}
           </div>
         </div>
       </div>
