@@ -197,7 +197,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
             </span>
           </div>
           <div className={styles.feesSmall}>
-            +{formatValue(entry)}
+            {formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
               truncateToken(getTokenName(this.props.getTokenInfo(
                 entry
@@ -274,7 +274,9 @@ export default class WalletSendPreviewStep extends Component<Props> {
           <div className={styles.addressToLabel}>
             {intl.formatMessage(globalMessages.receiverLabel)}
           </div>
-          <p className={styles.receiverAddress}>{receivers[0]}</p>
+          <p className={styles.receiverAddress}>
+            {this.props.addressToDisplayString(receivers[0])}
+          </p>
         </div>
         <div className={styles.wrapper}>
           {this.props.transactionSize != null ? (
