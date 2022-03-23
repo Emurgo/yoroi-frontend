@@ -105,7 +105,10 @@ function onApiConnectied(api) {
       messageJson,
       messageHex,
     }))
+    const start = performance.now();
     auth.signHexPayload(messageHex).then(sig => {
+      const elapsed = performance.now() - start;
+      console.log(`Signature created in ${elapsed} ms`);
       console.log('Signature received: ', sig);
       console.log('Verifying signature against the message');
       auth.checkHexPayload(messageHex, sig).then(r => {
