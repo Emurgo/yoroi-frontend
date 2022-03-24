@@ -3,7 +3,7 @@ import debounce from 'lodash/debounce';
 
 import { getWallets } from '../../app/api/common/index';
 import { PublicDeriver, } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetAllUtxos, } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetAllUtxos, asHasUtxoChains } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   CardanoTx,
   ConfirmedSignData,
@@ -23,6 +23,7 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
+  GetUtxosRequest,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -48,6 +49,8 @@ import {
   connectorSignTx,
   connectorRecordSubmittedCardanoTransaction,
   connectorRecordSubmittedErgoTransaction,
+  connectorGetCollateralUtxos,
+  connectorGenerateReorgTx,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -69,7 +72,10 @@ import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
-
+import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+} from '../../app/api/ada/transactions/utils';
 
 /*::
 declare var chrome;
@@ -379,6 +385,7 @@ const yoroiMessageHandler = async (
     | RemoveWalletFromWhitelistData
     | GetConnectedSitesData
     | GetConnectionProtocolData
+    | GetUtxosRequest
   ),
   sender,
   sendResponse
@@ -431,7 +438,6 @@ const yoroiMessageHandler = async (
     });
   }
 
-  // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     if (request.tabId == null) return;
     const { tabId } = request;
@@ -505,9 +511,7 @@ const yoroiMessageHandler = async (
       {
         try {
           const signedTx = await signCardanoTx(
-            // $FlowFixMe[prop-missing]
-            // $FlowFixMe[incompatible-exact]
-            (request.tx: CardanoTx),
+            (request.tx: any),
             password,
             request.tabId
           );
@@ -520,6 +524,12 @@ const yoroiMessageHandler = async (
       case 'data':
         // mocked data sign
         responseData.resolve({ err: 'Generic data signing is not implemented yet' });
+        break;
+      case 'tx-reorg/cardano':
+      {
+        const utxos = (request.tx: any);
+        responseData.resolve({ ok: utxos });
+      }
         break;
       default:
         // log?
@@ -597,6 +607,49 @@ const yoroiMessageHandler = async (
     }: ConnectedSites));
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
+  } else if (request.type === 'get_utxos/addresses') {
+    try {
+      await withDb(async (db, localStorageApi) => {
+        await withSelectedWallet(
+          request.tabId,
+          async (wallet, connection) => {
+            if (connection == null) {
+              Logger.error(`ERR - sign_tx could not find connection with tabId = ${request.tabId}`);
+              sendResponse({ utxos: null })
+              return
+            }
+            const withUtxos = asGetAllUtxos(wallet)
+
+            if (withUtxos == null) {
+              throw new Error(`missing utxo functionality`);
+            }
+            const withHasUtxoChains = asHasUtxoChains(withUtxos);
+            if (withHasUtxoChains == null) {
+              throw new Error(`missing chains functionality`);
+            }
+
+            const addressesMap = {
+              usedAddresses: async () => await connectorGetUsedAddresses(wallet, null),
+              unusedAddresses: async () => await connectorGetUnusedAddresses(wallet),
+              changeAddress: async () => await connectorGetChangeAddress(wallet),
+              utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
+            }
+
+            const response = {}
+
+            for(const key of request.select) {
+              response[key] = await addressesMap[key]()
+            }
+
+            sendResponse(response)
+          },
+          db,
+          localStorageApi,
+        )
+      });
+    } catch (error) {
+      Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
+    }
   }
 };
 
@@ -628,7 +681,7 @@ async function confirmSign(
   tabId: number,
   request: PendingSignData,
   connectedSite: ConnectedSite,
-): Promise<void | ({| ok: any |} | {| err: any |})> {
+): Promise<({| ok: any |} | {| err: any |})> {
   const bounds = await getBoundsForTabWindow(tabId);
   return new Promise(resolve => {
     connectedSite.pendingSigns.set(request.uid, {
@@ -821,27 +874,6 @@ function handleInjectorConnect(port) {
           ).to_bech32()
         );
       }
-      function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
-        const groupedAssets = jsonAssets.reduce((res, a) => {
-          (res[a.policyId] = (res[a.policyId]||[])).push(a);
-          return res;
-        }, {})
-        const W4 = RustModule.WalletV4;
-        const multiasset = W4.MultiAsset.new();
-        for (const policyHex of Object.keys(groupedAssets)) {
-          const assetGroup = groupedAssets[policyHex];
-          const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
-          const assets = RustModule.WalletV4.Assets.new();
-          for (const asset of assetGroup) {
-            assets.insert(
-              W4.AssetName.new(Buffer.from(asset.name, 'hex')),
-              W4.BigNum.from_str(asset.amount),
-            );
-          }
-          multiasset.insert(policyId, assets);
-        }
-        return multiasset;
-      }
       const connectParameters = () => ({
         protocol: message.protocol,
         ...message.connectParameters,
@@ -913,23 +945,31 @@ function handleInjectorConnect(port) {
           case 'sign_tx':
             try {
               checkParamCount(1);
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx',
-                    tx,
-                    uid: message.uid
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (_wallet, connection) => {
+                    await RustModule.load();
+                    const tx = asTx(message.params[0], RustModule.SigmaRust);
+                    if (connection == null) {
+                      Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                    } else {
+                      const resp = await confirmSign(tabId,
+                        {
+                          type: 'tx',
+                          tx,
+                          uid: message.uid
+                        },
+                        connection
+                      );
+                      rpcResponse(resp);
+                    }
                   },
-                  connection
-                );
-                rpcResponse(resp);
-              }
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
@@ -937,31 +977,32 @@ function handleInjectorConnect(port) {
           case 'sign_tx/cardano':
             try {
               checkParamCount(1);
-              await RustModule.load();
               const connection = connectedSites.get(tabId);
               if (connection == null) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
+                return
+              }
+              await RustModule.load();
+              const { tx, partialSign, returnTx } = message.params[0];
+
+              const resp = await confirmSign(tabId,
+                {
+                  type: 'tx/cardano',
+                  tx: { tx, partialSign, tabId },
+                  uid: message.uid
+                },
+                connection
+              );
+              if (!returnTx && resp?.ok != null) {
+                const witnessSetResp = Buffer.from(
+                  RustModule.WalletV4.Transaction.from_bytes(
+                    Buffer.from(resp.ok, 'hex'),
+                  ).witness_set().to_bytes()
+                ).toString('hex');
+                rpcResponse({ ok: witnessSetResp });
               } else {
-                const { tx, partialSign, returnTx } = message.params[0];
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx/cardano',
-                    tx: { tx, partialSign },
-                    uid: message.uid
-                  },
-                  connection
-                );
-                if (!returnTx && resp?.ok != null) {
-                  const witnessSetResp = Buffer.from(
-                    RustModule.WalletV4.Transaction.from_bytes(
-                      Buffer.from(resp.ok, 'hex'),
-                    ).witness_set().to_bytes()
-                  ).toString('hex');
-                  rpcResponse({ ok: witnessSetResp });
-                } else {
-                  rpcResponse(resp);
-                }
+                rpcResponse(resp);
               }
             } catch (e) {
               handleError(e);
@@ -970,28 +1011,36 @@ function handleInjectorConnect(port) {
           case 'sign_tx_input':
             try {
               checkParamCount(2);
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const txIndex = message.params[1];
-              if (typeof txIndex !== 'number') {
-                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
-              }
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx_input',
-                    tx,
-                    index: txIndex,
-                    uid: message.uid
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (_wallet, connection) => {
+                    if (connection == null) {
+                      Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                      return
+                    }
+                    await RustModule.load();
+                    const tx = asTx(message.params[0], RustModule.SigmaRust);
+                    const txIndex = message.params[1];
+                    if (typeof txIndex !== 'number') {
+                      throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
+                    }
+                    const resp = await confirmSign(tabId,
+                      {
+                        type: 'tx_input',
+                        tx,
+                        index: txIndex,
+                        uid: message.uid
+                      },
+                      connection
+                    );
+                    rpcResponse(resp);
                   },
-                  connection
-                );
-                rpcResponse(resp);
-              }
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
@@ -1068,6 +1117,7 @@ function handleInjectorConnect(port) {
                         tokenId,
                         paginate
                       );
+                      utxos = await transformCardanoUtxos(utxos, isCBOR);
                     } else {
                       utxos = await connectorGetUtxosErgo(
                         wallet,
@@ -1075,43 +1125,7 @@ function handleInjectorConnect(port) {
                         valueExpected,
                         tokenId,
                         paginate
-                        );
-                    }
-                    if (isCardano) {
-                      // $FlowFixMe[prop-missing]
-                      const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
-                      await RustModule.load();
-                      const W4 = RustModule.WalletV4;
-                      if (isCBOR) {
-                        utxos = cardanoUtxos.map(u => {
-                          const input = W4.TransactionInput.new(
-                            W4.TransactionHash.from_bytes(
-                              Buffer.from(u.tx_hash, 'hex')
-                            ),
-                            u.tx_index,
-                          );
-                          const value = W4.Value.new(W4.BigNum.from_str(u.amount));
-                          if ((u.assets || []).length > 0) {
-                            value.set_multiasset(assetToRustMultiasset(u.assets));
-                          }
-                          const output = W4.TransactionOutput.new(
-                            W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
-                            value,
-                          );
-                          return Buffer.from(
-                            W4.TransactionUnspentOutput.new(input, output).to_bytes(),
-                          ).toString('hex');
-                        })
-                      } else {
-                        utxos = cardanoUtxos.map(u => {
-                          return {
-                            ...u,
-                            receiver: W4.Address.from_bytes(
-                              Buffer.from(u.receiver, 'hex'),
-                            ).to_bech32(),
-                          };
-                        });
-                      }
+                      );
                     }
                     rpcResponse({ ok: utxos });
                   },
@@ -1326,6 +1340,7 @@ function handleInjectorConnect(port) {
                   },
                   db,
                   localStorageApi,
+                  false,
                 )
               });
             } catch (e) {
@@ -1356,6 +1371,109 @@ function handleInjectorConnect(port) {
               handleError(e);
             }
           break;
+          case 'get_collateral_utxos':
+            try {
+              checkParamCount(1);
+              await RustModule.load();
+              const requiredAmount = RustModule.WalletV4.Value.from_bytes(
+                Buffer.from(message.params[0], 'hex')
+              ).coin().to_str();
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    // try to get enough collaterals from existing UTXOs
+                    const withUtxos = asGetAllUtxos(wallet)
+                    if (withUtxos == null) {
+                      throw new Error('wallet doesn\'t support IGetAllUtxos');
+                    }
+                    const walletUtxos = await withUtxos.getAllUtxos();
+                    const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
+
+                    const {
+                      utxosToUse,
+                      reorgTargetAmount
+                    } = await connectorGetCollateralUtxos(
+                      wallet,
+                      pendingTxs,
+                      requiredAmount,
+                      addressedUtxos.map(u => {
+                        // eslint-disable-next-line no-unused-vars
+                        const { addressing, ...rest } = u;
+                        return rest;
+                      }),
+                    );
+                    // do have enough
+                    if (!reorgTargetAmount) {
+                      const utxos = await transformCardanoUtxos(
+                        utxosToUse,
+                        isCBOR
+                      );
+                      rpcResponse({
+                        ok: utxos,
+                      });
+                      return;
+                    }
+
+                    // not enough suitable UTXOs for collateral
+                    // see if we can re-organize the UTXOs
+                    // `utxosToUse` are UTXOs that are already picked
+                    // `reorgTargetAmount` is the amount still needed
+                    const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
+                    try {
+                      await connectorGenerateReorgTx(
+                        wallet,
+                        usedUtxoIds,
+                        reorgTargetAmount,
+                        addressedUtxos,
+                      );
+                    } catch (error) {
+                      if (error instanceof NotEnoughMoneyToSendError) {
+                        rpcResponse({ error: 'not enough UTXOs' });
+                        return;
+                      }
+                      throw error;
+                    }
+                    // we can get enough collaterals after re-organization
+                    // pop-up the UI
+                    const connection = connectedSites.get(tabId);
+                    if (connection == null) {
+                      Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
+                      rpcResponse(undefined); // shouldn't happen
+                      return;
+                    }
+
+                    const resp = await confirmSign(
+                      tabId,
+                      {
+                        type: 'tx-reorg/cardano',
+                        tx: {
+                          usedUtxoIds,
+                          reorgTargetAmount,
+                          utxos: walletUtxos,
+                        },
+                        uid: message.uid,
+                      },
+                      connection,
+                    );
+                    if (!resp.ok) {
+                      rpcResponse({ error: 'sign failed' });
+                      return;
+                    }
+                    const utxos = await transformCardanoUtxos(
+                      [...utxosToUse, ...resp.ok],
+                      isCBOR
+                    );
+                    rpcResponse({ ok: utxos });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           default:
             rpcResponse({
               err: {
@@ -1366,5 +1484,67 @@ function handleInjectorConnect(port) {
             break;
       }
     }
+  });
+}
+
+function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
+  const groupedAssets = jsonAssets.reduce((res, a) => {
+    (res[a.policyId] = (res[a.policyId]||[])).push(a);
+    return res;
+  }, {})
+  const W4 = RustModule.WalletV4;
+  const multiasset = W4.MultiAsset.new();
+  for (const policyHex of Object.keys(groupedAssets)) {
+    const assetGroup = groupedAssets[policyHex];
+    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const assets = RustModule.WalletV4.Assets.new();
+    for (const asset of assetGroup) {
+      assets.insert(
+        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.BigNum.from_str(asset.amount),
+      );
+    }
+    multiasset.insert(policyId, assets);
+  }
+  return multiasset;
+}
+
+async function transformCardanoUtxos(
+  utxos: Array<RemoteUnspentOutput>,
+  isCBOR: boolean,
+) {
+  // $FlowFixMe[prop-missing]
+  const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
+  await RustModule.load();
+  const W4 = RustModule.WalletV4;
+  if (isCBOR) {
+    return cardanoUtxos.map(u => {
+      const input = W4.TransactionInput.new(
+        W4.TransactionHash.from_bytes(
+          Buffer.from(u.tx_hash, 'hex')
+        ),
+        u.tx_index,
+      );
+      const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+      if ((u.assets || []).length > 0) {
+        value.set_multiasset(assetToRustMultiasset(u.assets));
+      }
+      const output = W4.TransactionOutput.new(
+        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+        value,
+      );
+      return Buffer.from(
+        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
+      ).toString('hex');
+    })
+  }
+
+  return cardanoUtxos.map(u => {
+    return {
+        ...u,
+      receiver: W4.Address.from_bytes(
+        Buffer.from(u.receiver, 'hex'),
+      ).to_bech32(),
+    };
   });
 }
