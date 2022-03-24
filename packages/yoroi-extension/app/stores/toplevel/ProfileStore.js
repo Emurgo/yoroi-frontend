@@ -246,7 +246,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   };
 
   // ========== Sort wallets - Revamp ========== //
-  @computed get currentSortedWallets(): (Array<number> | void) {
+  @computed get currentSortedWallets(): Array<number> {
     let { result } = this.getSortedWalletsRequest;
     if (result == null) {
       result = this.getSortedWalletsRequest.execute().result;

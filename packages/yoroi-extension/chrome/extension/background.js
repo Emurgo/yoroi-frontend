@@ -607,7 +607,7 @@ const yoroiMessageHandler = async (
     }: ConnectedSites));
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
-  } else if (request.type === 'get_utxos/cardano') {
+  } else if (request.type === 'get_utxos/addresses') {
     try {
       await withDb(async (db, localStorageApi) => {
         await withSelectedWallet(
@@ -627,8 +627,21 @@ const yoroiMessageHandler = async (
             if (withHasUtxoChains == null) {
               throw new Error(`missing chains functionality`);
             }
-            const utxos = await withHasUtxoChains.getAllUtxos();
-            sendResponse({ utxos })
+
+            const addressesMap = {
+              usedAddresses: async () => await connectorGetUsedAddresses(wallet, null),
+              unusedAddresses: async () => await connectorGetUnusedAddresses(wallet),
+              changeAddress: async () => await connectorGetChangeAddress(wallet),
+              utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
+            }
+
+            const response = {}
+
+            for(const key of request.select) {
+              response[key] = await addressesMap[key]()
+            }
+
+            sendResponse(response)
           },
           db,
           localStorageApi,
@@ -1327,6 +1340,7 @@ function handleInjectorConnect(port) {
                   },
                   db,
                   localStorageApi,
+                  false,
                 )
               });
             } catch (e) {
