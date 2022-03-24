@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  token: {
+    id: 'global.labels.token',
+    defaultMessage: '!!!Token',
+  },
   nft: {
     id: 'global.labels.nft',
     defaultMessage: '!!!NFT',
