@@ -162,7 +162,7 @@ export default class AddNFTDialog extends Component<Props, State> {
 
                       return (
                         <div className={styles.nftCard}>
-                          <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" />
+                          {image && <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" />}
                           <p className={styles.nftName}>{nft.name }</p>
                         </div>
                       )
