@@ -476,7 +476,11 @@ export default class WalletSendForm extends Component<Props, State> {
                 {amountInputError}
               </p>
 
-              <div>
+              <div className={styles.addButtonsWrapper}>
+                <button type='button' onClick={() => this.props.openDialog(AddNFTDialog)}>
+                  <PlusIcon />
+                  <p>{intl.formatMessage(globalMessages.token)}</p>
+                </button>
                 <button type='button' onClick={() => this.props.openDialog(AddNFTDialog)}>
                   <PlusIcon />
                   <p>{intl.formatMessage(globalMessages.nft)}</p>
