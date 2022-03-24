@@ -13,15 +13,13 @@ import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './WalletSendPreviewStep.scss';
 import config from '../../../../config';
-import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
-import RawHash from '../../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import WarningBox from '../../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
-  truncateAddress, truncateToken,
+  truncateToken,
 } from '../../../../utils/formatters';
 import {
   MultiToken,
@@ -192,14 +190,14 @@ export default class WalletSendPreviewStep extends Component<Props> {
     return unitOfAccountSetting.enabled
       ? (
         <>
-          <div className={styles.fees}>+
+          <div className={styles.fees}>
             {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
             <span className={styles.currencySymbol}>
               &nbsp;{unitOfAccountSetting.currency}
             </span>
           </div>
           <div className={styles.feesSmall}>
-            +{formatValue(entry)}
+            {formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
               truncateToken(getTokenName(this.props.getTokenInfo(
                 entry
@@ -210,7 +208,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
         </>
       ) : (
         <div className={styles.fees}>
-          +{formatValue(entry)}
+          {formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
             truncateToken(getTokenName(this.props.getTokenInfo(
               entry
@@ -257,7 +255,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
       amount,
       receivers,
       isSubmitting,
-      error,
     } = this.props;
     const staleTxWarning = (
       <div className={styles.warningBox}>
@@ -273,28 +270,15 @@ export default class WalletSendPreviewStep extends Component<Props> {
         <div className={styles.staleTxWarning}>
           {this.props.staleTx && staleTxWarning}
         </div>
-        <div className={styles.wrapper}>
-          <div>
-            <div className={styles.addressToLabel}>
-              {intl.formatMessage(globalMessages.receiverLabel)}
-            </div>
-            {receivers.map((receiver, i) => (
-              <ExplorableHashContainer
-                key={receiver + i} // eslint-disable-line react/no-array-index-key
-                selectedExplorer={this.props.selectedExplorer}
-                hash={this.props.addressToDisplayString(receiver)}
-                light
-                linkType="address"
-              >
-                <RawHash light>
-                  <span className={styles.addressTo}>
-                    {truncateAddress(this.props.addressToDisplayString(receiver))}
-                  </span>
-                </RawHash>
-              </ExplorableHashContainer>
-            ))}
+        <div>
+          <div className={styles.addressToLabel}>
+            {intl.formatMessage(globalMessages.receiverLabel)}
           </div>
-
+          <p className={styles.receiverAddress}>
+            {this.props.addressToDisplayString(receivers[0])}
+          </p>
+        </div>
+        <div className={styles.wrapper}>
           {this.props.transactionSize != null ? (
             <div className={styles.addressToLabelWrapper}>
               <div className={styles.addressToLabel}>
@@ -346,9 +330,9 @@ export default class WalletSendPreviewStep extends Component<Props> {
                 </div>
               )}
 
-              <p className={styles.totalAmountValue}>
+              <div className={styles.totalAmountValue}>
                 {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
-              </p>
+              </div>
             </div>
           </div>
 
@@ -361,20 +345,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
           />
         </div>
 
-        {error
-          ? (
-            <p className={styles.error}>
-              {intl.formatMessage(error, error.values)}
-            </p>
-          )
-          : null
-        }
-
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
           disabled={!walletPasswordField.isValid || isSubmitting}
-          sx={{ display: 'block', padding: '0px' }}
+          sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
           {isSubmitting ?
             <LoadingSpinner light /> :

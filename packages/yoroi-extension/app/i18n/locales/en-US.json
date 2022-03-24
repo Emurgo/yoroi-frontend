@@ -726,6 +726,7 @@
   "wallet.send.form.errors.tooSmallUtxo": "Cannot send less than {minUtxo} {ticker}.",
   "wallet.send.form.receiver.hint": "Wallet Address",
   "wallet.send.form.receiver.label": "Receiver",
+  "wallet.send.form.preview.label": "Preview",
   "wallet.send.form.sendAll.allTokens": " + all tokens",
   "wallet.send.form.sendAll.customAmount": "Custom Amount",
   "wallet.send.form.sendAll.dropdownAmountLabel": "Send all {currency}",

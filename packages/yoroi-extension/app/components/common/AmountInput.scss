@@ -1,6 +1,11 @@
 .component {
-  display: block;
   width: 100%;
+
+  & > div {
+    padding: 0px;
+    margin: 0px;
+  }
+
   input {
     border: none;
     outline: none;
@@ -17,7 +22,6 @@
 
     &::placeholder {
         color: #A7AFC0;
-        font-family: Rubik;
         font-size: 24px;
         letter-spacing: 0;
         line-height: 32px;
