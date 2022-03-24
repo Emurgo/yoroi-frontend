@@ -39,10 +39,3 @@ export const selectWallet = async (wallets: Array<WebElement>, index: number) =>
   );
   await walletButton.click();
 };
-
-// await (
-//   await this.getElementBy({
-//     locator: '//Button[text()="Connect"]',
-//     method: 'xpath',
-//   })
-// ).click();
