@@ -1,0 +1,63 @@
+.component {
+    margin-top: 35px;
+
+    .header {
+        width: 100%;
+        padding: 4px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Rubik;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+
+        .title {
+            color: #6B7384;
+        }
+
+        .headerRight {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .count {
+                color: #242838;
+                margin-right: 8px;
+            }
+        }
+    }
+
+    .assetsList {
+        margin-top: 16px;
+        .assetRow {
+            border: 1px solid #F0F3F5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+
+            .left {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+
+                .assetLogo {
+                    height: 32px;
+                    width: 32px;
+                    margin-right: 12px;
+                    display: inline-block;
+                }
+
+                .name {
+                    color: #242838;
+                }
+
+                .amount {
+                    color: #242838;
+                }
+            }
+        }
+    }
+}
