@@ -132,10 +132,18 @@ export function getProtocol(): Promise<?Protocol> {
   });
 }
 
-export function getLatestUtxos(tabId: number): Promise<{| utxos: ?IGetAllUtxosResponse |}> {
+export function getUtxosAndAddresses(
+  tabId: number,
+  select: string[]
+  ): Promise<{|
+    utxos: IGetAllUtxosResponse,
+    usedAddresses: string[],
+    unusedAddresses: string[],
+    changeAddress: string,
+  |}> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
-        ({ type: 'get_utxos/cardano', tabId }: GetUtxosRequest),
+        ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
         response => {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
@@ -147,7 +155,6 @@ export function getLatestUtxos(tabId: number): Promise<{| utxos: ?IGetAllUtxosRe
       );
   });
 }
-
 
 export function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
@@ -550,12 +557,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
-    const { utxos } = await getLatestUtxos(tabId)
+    const response = await getUtxosAndAddresses(tabId, ['utxos', 'usedAddresses', 'unusedAddresses', 'changeAddress'])
 
-    if (!utxos) {
+    if (!response.utxos) {
       throw new Error('Missgin utxos for signing tx')
     }
-    const addressedUtxos = asAddressedUtxo(utxos);
+    const addressedUtxos = asAddressedUtxo(response.utxos);
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       network.NetworkId
@@ -618,12 +625,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       amount: txBody.fee().to_str(),
     };
 
+    const ownAddresses = new Set([
+      ...response.utxos.map(utxo => utxo.address),
+      ...response.usedAddresses,
+      ...response.unusedAddresses,
+      response.changeAddress
+    ])
+
     const { amount, total } = await this._calculateAmountAndTotal(
       selectedWallet.publicDeriver,
       inputs,
       outputs,
       fee,
-      utxos,
+      response.utxos,
+      ownAddresses,
     );
 
     runInAction(() => {
@@ -809,13 +824,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     outputs: Array<{| address: string, value: MultiToken |}>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: IGetAllUtxosResponse,
+    ownAddresses: ?Set<string>,
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
-    const ownAddresses = new Set([
-      ...utxos.map(utxo => utxo.address),
-      ...await connectorGetUsedAddresses(publicDeriver, null),
-      ...await connectorGetUnusedAddresses(publicDeriver),
-      await connectorGetChangeAddress(publicDeriver),
-    ]);
+
+    if (!ownAddresses) {
+      ownAddresses = new Set([
+        ...utxos.map(utxo => utxo.address),
+        ...await connectorGetUsedAddresses(publicDeriver, null),
+        ...await connectorGetUnusedAddresses(publicDeriver),
+        await connectorGetChangeAddress(publicDeriver),
+      ]);
+    }
+
     const { defaultNetworkId, defaultIdentifier } =
           publicDeriver.getParent().getDefaultToken();
 

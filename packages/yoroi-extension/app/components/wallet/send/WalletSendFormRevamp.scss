@@ -1,0 +1,268 @@
+.component {
+    display: flex;
+    justify-content: center;
+
+    .wrapper {
+        width: 756px;
+        height: 600px;
+    }
+
+    .formBody {
+        .receiverStep {
+            padding-top: 40px;
+            padding-right: 40px;
+            padding-bottom: 20px;
+            padding-left: 40px;
+        }
+
+        .receiverInput {
+            position: relative;
+            margin-top: 20px;
+        
+            :global {
+              .SimpleInput_input {
+                font-family: 'RobotoMono';
+                font-weight: 300;
+                letter-spacing: 0;
+              }
+            }
+        }
+
+        .memo {
+            margin-top: 20px;
+            .memoInput {
+                border-bottom: 1px solid #A7AFC0;
+                input {
+                    outline: none;
+                    border: none;
+                    padding: 10px 0px;
+                    padding-bottom: 8px;
+                    color: #242838;
+                    font-family: Rubik;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 24px;
+                    width: 100%;
+                }
+
+                input::placeholder {
+                    color: #A7AFC0;
+                    font-family: Rubik;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 24px;
+                }
+            }
+
+            .memoWarning {
+                margin-top: 8px;
+                color: #6B7384;
+                font-family: Rubik;
+                font-size: 12px;
+                letter-spacing: 0;
+                line-height: 18px;
+            }
+
+            .hide {
+                visibility: hidden;
+            }
+
+            .memoError {
+                margin-top: 8px;
+                color: var(--yoroi-palette-error-100);
+                font-family: Rubik;
+                font-size: 12px;
+                letter-spacing: 0;
+                line-height: 18px;
+            }
+        }
+
+        .amountStep {
+            padding-top: 30px;
+            font-family: Rubik;
+            padding-top: 40px;
+            padding-right: 40px;
+            padding-bottom: 20px;
+            padding-left: 40px;
+
+            .amountInput {
+                position: relative;
+                border: 1px solid #A7AFC0;
+                border-radius: 8px;
+
+                .label {
+                    position: relative;
+                    top: -10px;
+                    left: 6px;
+                    background-color: #ffffff;
+                    padding: 0px 4px;
+                    color: rgba(0,0,0,0.87);
+                    font-size: 12px;
+                    letter-spacing: 0.4px;
+                }
+
+
+                .labelDisabled {
+                    color: var(--yoroi-comp-input-text-disabled);
+                }
+
+                .amountInputGrid {
+                    margin-top: 5px;
+                    padding: 0px 16px 16px 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: 1px solid var(--yoroi-comp-input-text-disabled);
+
+                    input {
+                        padding: 0px;
+                        &:disabled {
+                            cursor: not-allowed;
+                        }
+                    }
+
+                }
+
+                .defaultCoin {
+                    color: #6B7384;
+                    font-size: 14px;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    line-height: 22px;
+                    margin-right: 12px;
+                }
+
+                .max {
+                    height: 30px;
+                    width: 56px;
+                    border-radius: 8px;
+                    background-color: #F0F3F5;
+                    color: #6B7384;
+                    font-size: 14px;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    line-height: 22px;              
+                }
+
+                .usd {
+                    margin: 16px;
+                    color: #A7AFC0;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                }
+            }
+
+            .amountInputError {
+                border: 1px solid #FF1351;
+            }
+
+            .disabled {
+                border: 1px solid var(--yoroi-comp-input-text-disabled);
+            }
+
+            .amountError {
+                color: #FF1351;
+                font-family: Rubik;
+                font-size: 12px;
+                letter-spacing: 0.4px;
+                line-height: 16px;
+                margin-left: 16px;
+                margin-top: 4px;
+            }
+
+            .emptyError {
+                margin-top: 4px;
+                width: 100%;
+                height: 16px;
+            }
+        }
+
+        // Preview Step styles 
+        .receiver {
+            padding-top: 10px;
+            font-family: Rubik;
+            font-size: 16px;
+            letter-spacing: 0;
+            line-height: 24px;
+            .receiverLabel {
+                color: #6B7384;
+            }
+            .receiverAddress {
+                color: #242838;
+            }
+        }
+
+        .infoWrapper {
+            padding: 40px 0px;
+            width: 60%;
+            .infoBlock {
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-family: Rubik;
+                font-size: 16px;
+                letter-spacing: 0;
+                line-height: 24px;
+
+                .infoLabel {
+                    color: #6B7384;
+                }
+
+                .infoAmount {
+                    color: #242838;
+                }
+            }
+
+            .totalCard {
+                margin-top: 23px;
+                border-radius: 8px;
+                background-color: #3154CB;
+                padding: 29px 24px;
+                display: flex;
+                justify-content: space-between;
+                color: #FFFFFF;
+
+                .totalValues {
+                    font-size: 20px;
+                    font-weight: 500;
+                    letter-spacing: 0;
+                    line-height: 28px;
+                    text-align: right;
+                }
+
+                .label {
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 22px;
+                }
+
+                .usd {
+                    color: #FFFFFF;
+                    font-family: Rubik;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 22px;
+                    text-align: right;
+                }
+            }
+        }
+
+    }
+}
+  
+:global(.YoroiRevamp) .component {
+    .wrapper {
+        background: var(--yoroi-palette-common-white);
+        border-radius: 8px;
+    }
+}
+
+:global(.YoroiModern) .component {
+    padding: 30px;
+
+    .receiverInput {
+        letter-spacing: 0;
+    }
+}
+  
