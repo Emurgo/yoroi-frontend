@@ -47,6 +47,7 @@ import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirm
 import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
+import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -110,6 +111,13 @@ class WalletSendPage extends Component<AllProps> {
     this.showMemo = !this.showMemo;
     this.generated.actions.memos.closeMemoDialog.trigger();
   };
+
+  openDialog: Node => void = (dialog) => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger()
+    this.generated.actions.dialogs.push.trigger({
+      dialog,
+    });
+  }
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -195,6 +203,7 @@ class WalletSendPage extends Component<AllProps> {
             onAddToken={txBuilderActions.updateToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
+            openDialog={this.openDialog}
           />
           {this.renderDialog()}
         </>
@@ -262,6 +271,11 @@ class WalletSendPage extends Component<AllProps> {
         classicTheme={this.generated.stores.profile.isClassicTheme}
       />)
     }
+
+    if (uiDialogs.isOpen(AddNFTDialog)) {
+      return this.renderNFTDialog()
+    }
+
     return '';
   }
 
@@ -446,6 +460,40 @@ class WalletSendPage extends Component<AllProps> {
         this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
       }}
     />);
+  }
+
+  renderNFTDialog: void => void = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    const { txBuilderActions } = this.generated.actions;
+
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+
+    return (
+      <AddNFTDialog
+        onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+        uriParams={this.generated.stores.loading.uriParams}
+        selectedToken={transactionBuilderStore.selectedToken}
+        validateAmount={(amount) => validateAmount(
+          amount,
+          transactionBuilderStore.selectedToken ?? defaultToken,
+          getMinimumValue(
+            publicDeriver.getParent().getNetworkInfo(),
+            transactionBuilderStore.selectedToken?.IsDefault ?? true
+          ),
+          this.context.intl,
+        )}
+        defaultToken={defaultToken}
+      />
+    )
   }
 
   @computed get generated(): {|

@@ -40,6 +40,8 @@ import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import PlusIcon from '../../../assets/images/plus.inline.svg'
+import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -473,6 +475,13 @@ export default class WalletSendForm extends Component<Props, State> {
               >
                 {amountInputError}
               </p>
+
+              <div>
+                <button type='button' onClick={() => this.props.openDialog(AddNFTDialog)}>
+                  <PlusIcon />
+                  <p>{intl.formatMessage(globalMessages.nft)}</p>
+                </button>
+              </div>
 
               {this._nextStepButton(
                !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),
