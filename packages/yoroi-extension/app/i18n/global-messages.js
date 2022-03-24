@@ -8,9 +8,17 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  receiverLabel: {
+    id: 'wallet.send.form.receiver.label',
+    defaultMessage: '!!!Receiver',
+  },
   standardWallet: {
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',
+  },
+  transactionFee: {
+    id: 'wallet.send.preview.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
   },
   paperWallet: {
     id: 'wallet.nav.type.paper',
@@ -83,6 +91,10 @@ const globalMessages: * = defineMessages({
   amount: {
     id: 'global.labels.amount',
     defaultMessage: '!!!Amount',
+  },
+  amountWithMinADA: {
+    id: 'global.labels.amountWithMinADA',
+    defaultMessage: '!!!Amount (includes min-ADA)',
   },
   id: {
     id: 'global.labels.id',
@@ -903,6 +915,10 @@ export const memoMessages: * = defineMessages({
   optionalMemo: {
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
+  },
+  memoWarning: {
+    id: 'wallet.send.form.memoWarning',
+    defaultMessage: '!!!Memos are stored localy only'
   }
 });
 export const connectorMessages: * = defineMessages({
