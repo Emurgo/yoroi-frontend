@@ -473,10 +473,10 @@ export default class WalletSendForm extends Component<Props, State> {
                 {amountInputError}
               </p>
 
-              <TokensAmountPreview
+              {/* <TokensAmountPreview
                 spendableBalance={this.props.spendableBalance}
                 getTokenInfo={this.props.getTokenInfo}
-              />
+              /> */}
 
               <div className={styles.buttonsWrappers}>
                 <button type='button' onClick={() => this.props.openDialog(AddTokenDialog)}>
