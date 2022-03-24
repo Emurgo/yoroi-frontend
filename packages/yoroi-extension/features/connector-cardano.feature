@@ -6,7 +6,7 @@ Feature: dApp connector data signing
     Then I should see the Create wallet screen
     Given There is a Shelley wallet stored named shelley-simple-15
     Then I open the mock dApp
-    And I request access to Yoroi
+    And I request anonymous access to Yoroi
     Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
