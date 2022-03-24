@@ -53,6 +53,7 @@ Then(/^I should see the connector popup$/, async function () {
       break;
     }
   }
+  // $FlowFixMe[incompatible-use]
   const popupWindowHandleArr = newWindowHandles.filter(
     handle => !oldWindowHandles.includes(handle)
   );
@@ -76,9 +77,11 @@ Then(
     const balance = await getWalletBalance(wallets, 0);
     const match = balance.match(/^[0-9\.]+/);
     expect(match, 'Can not get wallet balance').to.not.be.null;
-    expect(match[0]).to.equal(
+    // $FlowFixMe[incompatible-use]
+    const balanceMatch = match[0];
+    expect(balanceMatch).to.equal(
       expectedBalance,
-      `expect wallet balance ${expectedBalance} but get ${match[0]}`
+      `expect wallet balance ${expectedBalance} but get ${balanceMatch}`
     );
     await selectWallet(wallets, 0);
     await this.driver.sleep(1000);

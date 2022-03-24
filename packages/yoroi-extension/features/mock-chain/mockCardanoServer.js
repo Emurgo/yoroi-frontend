@@ -184,7 +184,9 @@ export function getMockServer(
       req,
       res: { send(arg: ServerStatusResponse): any, ... }
     ): void => {
+      // $FlowFixMe[prop-missing]
       res.header('content-type', 'text/html');
+      // $FlowFixMe[incompatible-call]
       res.send(`
                <!doctype html>
                <html>
