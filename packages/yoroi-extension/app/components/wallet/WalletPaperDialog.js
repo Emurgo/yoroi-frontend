@@ -10,7 +10,6 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletPaperDialog.scss';
 import ReactMarkdown from 'react-markdown';
-import CheckboxLabel from '../common/CheckboxLabel';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -19,10 +18,6 @@ const messages = defineMessages({
   numAddressesSelectLabel: {
     id: 'settings.paperWallet.numAddressesSelect.label',
     defaultMessage: '!!!Number of addresses',
-  },
-  printIdentificationSelectLabel: {
-    id: 'settings.paperWallet.printIdentificationCheckbox.label',
-    defaultMessage: '!!!Print Paper Wallet account checksum',
   },
   printIdentificationMessage: {
     id: 'settings.paperWallet.printIdentificationCheckbox.description',
@@ -35,7 +30,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCreatePaper: ({| numAddresses: number, printAccountPlate: boolean |}) => void,
+  +onCreatePaper: ({| numAddresses: number |}) => void,
   +onCancel: void => void,
   +paperWalletsIntroText: string,
   +error?: ?LocalizableError,
@@ -52,10 +47,9 @@ export default class PaperWalletDialog extends Component<Props> {
   };
 
   createPaper: (() => void) = () => {
-    const { numAddresses, printPaperWalletIdentification } = this.form.values();
+    const { numAddresses } = this.form.values();
     this.props.onCreatePaper({
       numAddresses: parseInt(numAddresses, 10),
-      printAccountPlate: printPaperWalletIdentification,
     });
   };
 
@@ -65,10 +59,6 @@ export default class PaperWalletDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.numAddressesSelectLabel),
         value: '1',
       },
-      printPaperWalletIdentification: {
-        label: this.context.intl.formatMessage(messages.printIdentificationSelectLabel),
-        value: true,
-      },
     },
   });
 
@@ -76,7 +66,6 @@ export default class PaperWalletDialog extends Component<Props> {
     const { intl } = this.context;
     const { error, paperWalletsIntroText, onCancel } = this.props;
     const numAddresses = this.form.$('numAddresses');
-    const printPaperWalletIdentification = this.form.$('printPaperWalletIdentification');
     const numAddressOptions = [...Array(5).keys()].map(x => ({
       value: `${x + 1}`,
       label: `${x + 1}`,
@@ -131,13 +120,6 @@ export default class PaperWalletDialog extends Component<Props> {
             </MenuItem>
           ))}
         </Select>
-
-        <CheckboxLabel
-          checked={printPaperWalletIdentification.value}
-          onChange={printPaperWalletIdentification.onChange}
-          label={this.context.intl.formatMessage(messages.printIdentificationSelectLabel)}
-          description={this.context.intl.formatMessage(messages.printIdentificationMessage)}
-        />
 
         {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
       </Dialog>

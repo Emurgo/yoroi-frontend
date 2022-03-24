@@ -1,3 +1,5 @@
+@import '../../../themes/mixins/loading-spinner';
+
 .component {
     padding: 15px 12px 20px 12px;
     border: 1px solid #ffff;
@@ -45,6 +47,9 @@
 
         & .balance {
           font-weight: 500;
+          .isLoading {
+              @include loading-spinner('../../../assets/images/spinner-dark.svg', 20);
+          }
         }
     }
 
@@ -104,4 +109,9 @@
     }
 }
 
-  
+.isLoading {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    margin-bottom: 4px;
+}

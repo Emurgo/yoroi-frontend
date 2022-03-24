@@ -102,6 +102,15 @@ export async function createLedgerSignTxPayload(request: {|
         nonce,
       }
     };
+  } else if (request.signRequest.metadata != null) {
+    auxiliaryData = {
+      type: TxAuxiliaryDataType.ARBITRARY_HASH,
+      params: {
+        hashHex: Buffer.from(
+          RustModule.WalletV4.hash_auxiliary_data(request.signRequest.metadata).to_bytes()
+        ).toString('hex'),
+      },
+    };
   }
 
   return {
@@ -161,12 +170,44 @@ function toLedgerTokenBundle(
         assetNameHex: Buffer.from(assetName.name()).toString('hex'),
       });
     }
+    // sort by asset name to the order specified by rfc7049
+    tokens.sort(
+      (token1, token2) => compareCborKey(token1.assetNameHex, token2.assetNameHex)
+    );
     assetGroup.push({
       policyIdHex: Buffer.from(policyId.to_bytes()).toString('hex'),
       tokens,
     });
   }
+  // sort by policy id to the order specified by rfc7049
+  assetGroup.sort(
+    (asset1, asset2) => compareCborKey(asset1.policyIdHex, asset2.policyIdHex)
+  );
   return assetGroup;
+}
+
+/*
+ Compare two hex string keys according to the key order specified by RFC 7049:
+  *  If two keys have different lengths, the shorter one sorts
+     earlier;
+
+  *  If two keys have the same length, the one with the lower value
+     in (byte-wise) lexical order sorts earlier.
+*/
+function compareCborKey(hex1: string, hex2: string): number {
+  if (hex1.length < hex2.length) {
+    return -1;
+  }
+  if (hex1.length > hex2.length) {
+    return 1;
+  }
+  if (hex1 < hex2) {
+    return -1;
+  }
+  if (hex1 > hex2) {
+    return 1;
+  }
+  return 0;
 }
 
 function _transformToLedgerOutputs(request: {|

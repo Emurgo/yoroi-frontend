@@ -47,7 +47,7 @@ import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/state
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -187,7 +187,7 @@ class WalletSummaryPage extends Component<AllProps> {
             }
             unitOfAccountSetting={profile.unitOfAccount}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               publicDeriver,
               intl,

@@ -303,7 +303,7 @@ export type RewardTuple = {|
   reward: string,
   poolHash: string,
 |};
-export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ... };
+export type RewardHistoryResponse = { [address: string]: ?Array<RewardTuple>, ... };
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
 export type PoolInfoRequest = {|

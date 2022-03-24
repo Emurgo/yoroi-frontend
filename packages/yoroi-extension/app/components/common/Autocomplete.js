@@ -48,11 +48,11 @@ function Autocomplete({
   placeholder,
   chipProps,
 }: Props): Node {
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<?string>('');
   const inputRef = useRef();
-  const isInputPresent = inputValue.length > 0;
+  const isInputPresent = (inputValue?.length ?? 0) > 0;
   const filteredList = isInputPresent
-    ? options.filter(w => w.toLowerCase().startsWith(inputValue.toLowerCase()))
+    ? options.filter(w => w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? ''))
     : options;
   const sliceArrayItems = slice(filteredList, 0, maxVisibleOptions);
 
@@ -75,7 +75,7 @@ function Autocomplete({
     getComboboxProps,
     highlightedIndex,
     getItemProps,
-    openMenu,
+    closeMenu,
   } = useCombobox({
     inputValue,
     defaultHighlightedIndex: 0,
@@ -99,6 +99,9 @@ function Autocomplete({
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
+          if (inputValue.length === 0) {
+            closeMenu();
+          }
           setInputValue(inputValue);
           break;
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
@@ -108,6 +111,8 @@ function Autocomplete({
           if (selectedItem && value.length < maxSelections) {
             setInputValue('');
             addSelectedItem(selectedItem);
+            closeMenu();
+            inputRef.current?.focus();
           }
           break;
         default:
@@ -133,7 +138,6 @@ function Autocomplete({
         onClick={() => {
           if (!isOpen) {
             inputRef.current?.focus();
-            openMenu();
           }
         }}
         error={error}

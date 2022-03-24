@@ -285,7 +285,7 @@ async function _batchHistoryByTransaction(
   const transactions = previousTxs.concat(history);
 
   // If we reached the API limit, call API again to get more results
-  if (history.length === config.wallets.TRANSACTION_REQUEST_SIZE) {
+  if (history.length === config.wallets.ERGO_TRANSACTION_REQUEST_SIZE) {
     const newBest = getLatestTransaction(history);
     if (newBest === undefined) {
       // if we don't have a single tx in a block

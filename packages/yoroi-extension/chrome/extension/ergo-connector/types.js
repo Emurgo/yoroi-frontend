@@ -5,6 +5,8 @@ import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDer
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type CardanoTxRequest from '../../../app/api/ada';
+import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
+import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -294,6 +296,7 @@ export type Tx = {|
 export type CardanoTx = {|
   tx: string,
   partialSign: boolean,
+  tabId: number,
 |};
 
 export function asTx(
@@ -327,6 +330,16 @@ export function asTxId(input: any): TxId {
 }
 
 export type Value = string;
+
+export type AccountBalance = {|
+  default: string,
+  networkId: number,
+  assets: Array<{|
+    identifier: string,
+    networkId: number,
+    amount: string,
+  |}>
+|};
 
 export function asValue(input: any): Value {
   if (typeof input === 'string') {
@@ -393,9 +406,28 @@ export type PublicDeriverCache = {|
   checksum: void | WalletChecksum,
 |}
 
-export type WhitelistEntry = {| url: string, publicDeriverId: number, image: string |};
+export type WalletAuthEntry = {|
+  walletId: string,
+  pubkey: string,
+  privkey: string,
+|};
 
-export type ConnectingMessage = {| tabId: number, url: string, imgBase64Url: string |};
+export type WhitelistEntry = {|
+  url: string,
+  protocol: 'ergo' | 'cardano',
+  publicDeriverId: number,
+  appAuthID: ?string,
+  auth: ?WalletAuthEntry,
+  image: string,
+|};
+
+export type ConnectingMessage = {|
+  tabId: number,
+  url: string,
+  appAuthID?: string,
+  imgBase64Url: string,
+  protocol: 'ergo' | 'cardano',
+|};
 export type SigningMessage = {|
   publicDeriverId: number,
   sign: PendingSignData,
@@ -432,11 +464,19 @@ export type PendingSignData = {|
   type: 'tx-create-req/cardano',
   uid: RpcUid,
   tx: CardanoTxRequest,
+|} | {|
+  type: 'tx-reorg/cardano',
+  uid: RpcUid,
+  tx: {|
+    usedUtxoIds: Array<string>,
+    reorgTargetAmount: string,
+    utxos: IGetAllUtxosResponse,
+  |},
 |};
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx | CardanoTx | CardanoTxRequest,
+  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput>,
   uid: RpcUid,
   tabId: number,
   pw: string,
@@ -452,11 +492,18 @@ export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: true,
   publicDeriverId: number,
+  auth: ?WalletAuthEntry,
   tabId: ?number,
 |} | {|
   type: 'connect_response',
   accepted: false,
   tabId: ?number,
+|}
+
+export type GetUtxosRequest = {|
+  type: 'get_utxos/addresses',
+  tabId: number,
+  select: string[],
 |}
 
 export type TxSignWindowRetrieveData = {|

@@ -11,8 +11,21 @@
         <h1 class="display-4 text-center">Cardano dApp Example</h1>
       </div>
       <div class="row">
-        <div class="col-12 text-center my-3">
-          <button id="request-access" class="btn btn-primary">Request access to yoroi</button>
+        <div class="w-100 d-flex justify-content-center my-2">
+          <div class="d-none" id="spinner" role="status"></div>
+        </div>
+        <div id="request-button-row" class="col-12 text-center my-3 d-none">
+          <input type="checkbox" id="check-identification">&nbsp;Request identification</input><br/><br/>
+          <button id="request-access" class="btn btn-primary">Request access to Yoroi</button>
+        </div>
+        <div id="connection-status" class="col-12 text-center my-3 d-none">
+          <span style="display: block">Connected to: <b id="wallet-plate">ABCD-1234</b></span>
+          <span style="display: block" id="wallet-icon"></span>
+        </div>
+        <div class="col-12 text-center my-3" id="connected-row" role="alert">
+        </div>
+        <div class="col-6 mb-4">
+          <button id="is-enabled"  class="btn btn-light w-100" >Is Enabled</button>
         </div>
         <div class="col-6 mb-4">
           <button id="get-balance"  class="btn btn-light w-100" >Get Account Balance</button>
@@ -27,20 +40,26 @@
           <button id="get-change-address" class="btn btn-light w-100" >Get Change Address</button>
         </div>
         <div class="col-6 mb-4">
+          <button id="get-reward-addresses" class="btn btn-light w-100" >Get Reward Addresses</button>
+        </div>
+        <div class="col-6 mb-4">
           <button id="get-utxos" class="btn btn-light w-100" >Get Utxos</button>
         </div>
         <div class="col-6 mb-4">
-          <button id="submit-tx" class="btn btn-light w-100">Submit Tx</button>
+          <button id="create-tx" class="btn btn-light w-100">[Experimental] Create Tx</button>
         </div>
         <div class="col-6 mb-4">
           <button id="sign-tx" class="btn btn-light w-100">Sign Tx</button>
         </div>
         <div class="col-6 mb-4">
-          <button id="create-tx" class="btn btn-light w-100">Create Tx</button>
+          <button id="submit-tx" class="btn btn-light w-100">Submit Tx</button>
         </div>
-      </div>
-      <div class="w-100 d-flex justify-content-center my-2">
-        <div class="d-none" id="spinner" role="status"></div>
+        <div class="col-6 mb-4">
+          <button id="get-collateral-utxos" class="btn btn-light w-100">Get collateral UTXOS</button>
+        </div>
+        <div class="col-6 mb-4">
+          <a href="/subpage.html">Go to a subpage</a>
+        </div>
       </div>
       <div class="d-none" id="alert" role="alert"></div>
     </div>

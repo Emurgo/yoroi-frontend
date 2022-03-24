@@ -63,6 +63,7 @@ type Props = {|
   +exportTheme: void => PossiblyAsync<void>,
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
+  +switchToFirstWallet: void => void,
 |};
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
@@ -126,9 +127,8 @@ class ThemeSettingsBlock extends Component<AllProps> {
       </>
     );
 
-    // <TODO:REVAMP_BUTTON> need to enable nightly
     const shouldDisplayRevampButton = environment.isDev()
-      // || environment.isNightly()
+      || environment.isNightly()
       || environment.isTest();
 
     const themeBlockClassicComponent = (
@@ -205,7 +205,9 @@ class ThemeSettingsBlock extends Component<AllProps> {
               }}
               onClick={() => {
                 selectTheme({ theme: THEMES.YOROI_REVAMP });
+                this.props.switchToFirstWallet();
               }}
+              id='switchToRevampButton'
             >
               {intl.formatMessage(messages.tryYoroiRevamp)}
             </Button>

@@ -29,7 +29,7 @@ const ASCII_ASSET_NAME_BLACKLIST =
 
 function hexToValidAsciiOrNothing(hexString: string): void | string {
   const bytes = [...Buffer.from(hexString, 'hex')];
-  const isAscii = bytes.every(b => b > 32 && b < 127);
+  const isAscii = bytes.every(b => b >= 32 && b < 127);
   return isAscii ? String.fromCharCode(...bytes) : undefined;
 }
 
@@ -39,6 +39,11 @@ function decodeAssetNameIfASCII(assetName: ?string): void | string {
   }
   const asciiName = hexToValidAsciiOrNothing(assetName);
   return ASCII_ASSET_NAME_BLACKLIST.has(asciiName) ? undefined : asciiName;
+}
+
+export function assetNameFromIdentifier(identifier: string): string {
+  const [, name ] = identifier.split('.');
+  return decodeAssetNameIfASCII(name) || name;
 }
 
 export function getTokenStrictName(

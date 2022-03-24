@@ -212,6 +212,14 @@ const globalMessages: * = defineMessages({
     id: 'global.language.italian',
     defaultMessage: '!!!Italiano',
   },
+  languageCzech: {
+    id: 'global.language.czech',
+    defaultMessage: '!!!Czech',
+  },
+  languageSlovak: {
+    id: 'global.language.slovak',
+    defaultMessage: '!!!Slovak',
+  },
   addressLabel: {
     id: 'wallet.receive.confirmationDialog.addressLabel',
     defaultMessage: '!!!Address',
@@ -605,6 +613,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.settings',
     defaultMessage: '!!!Settings',
   },
+  experimental: {
+    id: 'sidebar.experimental',
+    defaultMessage: '!!!Experimental',
+  },
   sidebarTransfer: {
     id: 'sidebar.transfer',
     defaultMessage: '!!!Claim or transfer wallet',
@@ -941,6 +953,14 @@ export const connectorMessages: * = defineMessages({
   about: {
     id: 'connector.settings.about',
     defaultMessage: '!!!About',
+  },
+  signTransaction: {
+    id: 'connector.settings.signTransaction',
+    defaultMessage: '!!!Sign transaction'
+  },
+  connect: {
+    id: 'connector.settings.connect',
+    defaultMessage: '!!!Connect'
   },
   dappConnector: {
     id: 'connector.appName',

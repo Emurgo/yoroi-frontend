@@ -8,6 +8,7 @@ import type { NetworkRow } from '../database/primitives/tables';
 import { isJormungandr, isCardanoHaskell, isErgo } from '../database/prepackaged/networks';
 import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
+import { bech32 as bech32Module } from 'bech32';
 
 export function tryAddressToKind(
   address: string,
@@ -208,28 +209,135 @@ export function normalizeToBase58(
   return undefined;
 }
 
+// this implementation was copied from the convert function of the bech32 package.
+const convertBase32ToBase16 = (data: any[]) => {
+  const inBits = 5;
+  const outBits = 8;
+  let value = 0;
+  let bits = 0;
+  const maxV = (1 << outBits) - 1;
+  const result = [];
+  for (let i = 0; i < data.length; ++i) {
+      value = (value << inBits) | data[i];
+      bits += inBits;
+      while (bits >= outBits) {
+          bits -= outBits;
+          result.push((value >> bits) & maxV);
+      }
+  }
+
+  if (bits >= inBits)
+      return 'Excess padding';
+  if ((value << (outBits - bits)) & maxV)
+      return 'Non-zero padding';
+
+  return result;
+};
+
+/* eslint-disable */
+const bigIntToBase58 = (n) => {
+  const base58Alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+  const o = [];
+  let x = n;
+  while (x > 0) {
+    // $FlowFixMe[cannot-resolve-name]
+    const divisionResult = x / BigInt(58);
+    const remainder = x % BigInt(58);
+    x = divisionResult;
+
+    o.push(base58Alphabet[remainder]);
+  }
+
+  return o.reverse().join('');
+};
+/* eslint-enable */
+
+// length of the address excluding prefixes and other info added in the pointer addresses
+const baseAddrLength = 28;
+const hexAddressConfig: any = [
+  {
+    // base
+    validate: (addr: string) => Buffer.from(addr, 'hex').length === 1 + baseAddrLength * 2,
+    header: /^[0-3]/
+  },
+  {
+    // pointer
+    validate: (addr: string) => Buffer.from(addr, 'hex').length >= 1 + baseAddrLength + 3,
+    header: /^[4-5]/
+  },
+  {
+    // enterprise
+    validate: (addr: string) => Buffer.from(addr, 'hex').length === 1 + baseAddrLength,
+    header: /^[6-7]/
+  },
+  {
+    // byron
+    parse: (addr: string) => {
+      /* eslint-disable */
+      // $FlowFixMe[cannot-resolve-name]
+      const base58 = bigIntToBase58(BigInt(`0x${addr}`));
+      if (RustModule.WalletV4.ByronAddress.is_valid(base58)) {
+        return RustModule.WalletV4.ByronAddress.from_base58(base58).to_address();
+      }
+      /* eslint-enable */
+    },
+    header: /^[8]/
+  },
+  {
+    // reward
+    validate: (addr: string) => Buffer.from(addr, 'hex').length === 1 + baseAddrLength,
+    header: /^[e-f]|[E-F]/
+  },
+];
+
 export function normalizeToAddress(
   addr: string
 ): void | RustModule.WalletV4.Address {
   // in Shelley, addresses can be base16, bech32 or base58
   // this function, we try parsing in all encodings possible
 
-  // 1) Try converting from base58
+  // 1) If RustModule can validate addr is a Byron address, simply parse from base58
   if (RustModule.WalletV4.ByronAddress.is_valid(addr)) {
     return RustModule.WalletV4.ByronAddress.from_base58(addr).to_address();
   }
 
-  // 2) If already base16, simply return
-  try {
-    return RustModule.WalletV4.Address.from_bytes(
-      Buffer.from(addr, 'hex')
-    );
-  } catch (_e) {} // eslint-disable-line no-empty
+  const parseHexAddress = (hexAddr: string) => {
+    // 2.1) check if addr starts with any of the supported headers
+    const config = hexAddressConfig.find(c => c.header.test(hexAddr));
+    if (config) {
+      // 2.2) if there's a parse function defined in the config, use it...
+      if (config.parse) {
+        return config.parse(hexAddr);
+      }
 
-  // 3) Try converting from base32
-  try {
-    return RustModule.WalletV4.Address.from_bech32(addr);
-  } catch (_e) {} // eslint-disable-line no-empty
+      // 2.3) ...otherwise, validate the address with the validation function defined in the config
+      if (config.validate(hexAddr)) {
+        try {
+          return RustModule.WalletV4.Address.from_bytes(
+            Buffer.from(hexAddr, 'hex')
+          );
+        } catch {} // eslint-disable-line no-empty
+      }
+    }
+
+    // if we got to this point, addr is a hex which cannot be parsed into an address
+    return undefined;
+  };
+
+  // 2) If addr is in hex format...
+  const isHex = /^[a-fA-F0-9]+$/;
+  if (isHex.test(addr)) {
+    return parseHexAddress(addr);
+  }
+
+  // 3) Try decoding bech32...
+  const bech32Decoded = bech32Module.decodeUnsafe(addr, addr.length);
+  if (bech32Decoded) {
+    // 3.1) if successfull, convert the decoded bech32 to base16 and try parsing the hex
+    const base16Decoded = convertBase32ToBase16(bech32Decoded.words);
+    return parseHexAddress(Buffer.from(base16Decoded).toString('hex'));
+  }
 
   return undefined;
 }

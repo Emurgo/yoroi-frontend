@@ -9,6 +9,12 @@ import type {
 } from '../../api/common';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  HaskellShelleyTxSignRequest,
+} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
 
@@ -29,5 +35,32 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
 
   refreshPendingTransactions: RefreshPendingTransactionsFunc = (request) => {
     return this.api.ada.refreshPendingTransactions(request);
+  }
+
+  recordSubmittedTransaction: (
+    PublicDeriver<>,
+    HaskellShelleyTxSignRequest,
+    string,
+  ) => Promise<void> = async (
+    publicDeriver,
+    signRequest,
+    txId,
+  ) => {
+    const defaultNetworkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
+      defaultNetworkId,
+    );
+    const transaction = await this.api.ada.createSubmittedTransactionData(
+      publicDeriver,
+      signRequest,
+      txId,
+      defaultNetworkId,
+      defaultToken,
+    );
+
+    this.stores.transactions.recordSubmittedTransaction(
+      publicDeriver,
+      transaction,
+    );
   }
 }

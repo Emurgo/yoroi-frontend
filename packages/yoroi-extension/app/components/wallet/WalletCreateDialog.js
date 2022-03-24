@@ -18,7 +18,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.create.dialog.title',
-    defaultMessage: '!!!Create a new wallet',
+    defaultMessage: '!!!Create wallet',
   },
   walletName: {
     id: 'wallet.create.dialog.name.label',
@@ -108,7 +108,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
-          if (walletPassword.length === 0) return [true];
           return [
             isValidRepeatPassword(walletPassword, field.value),
             this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
