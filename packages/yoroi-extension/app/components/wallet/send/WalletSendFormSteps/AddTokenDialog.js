@@ -180,6 +180,19 @@ export default class AddTokenDialog extends Component<Props, State> {
     });
   }
 
+  addOrRemoveToken(tokenId: string, status: boolean): void {
+      /**
+       * Temp solution for UI purposes
+       * Normal this should be the store
+       */
+
+      this.setState(prevState => ({
+          ...prevState,
+          tokensList: prevState.tokensList.map(
+              token => ({ ...token, included: tokenId === token.id ? status: token.included  }))
+        }))
+  }
+
   render(): Node {
     const { intl } = this.context;
     const { onClose } = this.props
@@ -250,6 +263,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                       validateAmount={this.props.validateAmount}
                       defaultToken={this.props.defaultToken}
                       getTokenInfo={this.props.getTokenInfo}
+                      addOrRemoveToken={this.addOrRemoveToken.bind(this)}
                     />
                   ))
                 }

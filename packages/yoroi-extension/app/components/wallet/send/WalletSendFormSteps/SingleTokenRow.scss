@@ -2,6 +2,8 @@
     margin-bottom: 16px;
     margin-right: 10px;
     .token {
+        cursor: pointer;
+        width: 100%;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         align-items: center;
