@@ -1,6 +1,7 @@
 .component {
     margin-bottom: 16px;
     margin-right: 10px;
+    
     .token {
         cursor: pointer;
         width: 100%;
@@ -92,6 +93,10 @@
             justify-content: center;
             top: -10px;
             right: -10px;
+        }
+
+        .close:hover {
+            background-color: lighten($color: #F0F3F5, $amount: 0.90);
         }
     }
 }
