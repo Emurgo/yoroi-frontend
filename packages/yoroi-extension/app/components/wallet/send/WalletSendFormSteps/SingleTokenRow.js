@@ -9,7 +9,7 @@ import { genFormatTokenAmount, getTokenName } from '../../../../stores/stateless
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import config from '../../../../config';
 import BigNumber from 'bignumber.js';
-import { intlShape } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
 import {
   MultiToken,
@@ -20,6 +20,12 @@ type Props = {|
     token: string, // @todo update the type
 |}
 
+const messages = defineMessages({
+    calculatingFee: {
+        id: 'wallet.send.form.calculatingFee',
+        defaultMessage: '!!!Calculating fee...',
+    },
+})
 export default class SingleTokenRow extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
@@ -129,41 +135,44 @@ export default class SingleTokenRow extends Component<Props> {
     const amountInputError = transactionFeeError || amountField.error
     return (
       <div className={styles.component}>
-        <div className={styles.token}>
-          <div className={styles.name}>
-            <div className={styles.logo}><NoAssetLogo /></div>
-            <p className={styles.label}>{token.label}</p>
+        {!token.included ? (
+          <div className={styles.token}>
+            <div className={styles.name}>
+              <div className={styles.logo}><NoAssetLogo /></div>
+              <p className={styles.label}>{token.label}</p>
+            </div>
+            <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
+            <p className={styles.amount}>{token.amount}</p>
           </div>
-          <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
-          <p className={styles.amount}>{token.amount}</p>
-        </div>
-        <div className={styles.amountWrapper}>
-          <div className={styles.amountTokenName}>
-            <div className={styles.logo}><NoAssetLogo /></div>
-            <p className={styles.label}>{token.label}</p>
-          </div>
-          <div className={styles.amountInput}>
-            <AmountInputRevamp
-              {...amountFieldProps}
-              value={amountFieldProps.value === ''
+        ): (
+          <div className={styles.amountWrapper}>
+            <div className={styles.amountTokenName}>
+              <div className={styles.logo}><NoAssetLogo /></div>
+              <p className={styles.label}>{token.label}</p>
+            </div>
+            <div className={styles.amountInput}>
+              <AmountInputRevamp
+                {...amountFieldProps}
+                value={amountFieldProps.value === ''
               ? null
               : formattedAmountToBigNumber(amountFieldProps.value)
               }
-              className="tokenAmount"
-              label={intl.formatMessage(globalMessages.amountLabel)}
-              decimalPlaces={this.getNumDecimals()}
-              error={amountInputError}
-              currency={truncateToken(
+                className="tokenAmount"
+                label={intl.formatMessage(globalMessages.amountLabel)}
+                decimalPlaces={this.getNumDecimals()}
+                error={amountInputError}
+                currency={truncateToken(
               getTokenName(this.props.selectedToken ?? this.props.defaultToken)
               )}
-              fees={formatValue(transactionFee.getDefaultEntry())}
-              total={formatValue(this.getTokenEntry(totalAmount))}
-              allowSigns={false}
-              amountFieldRevamp
-            />
+                fees={formatValue(transactionFee.getDefaultEntry())}
+                total={formatValue(this.getTokenEntry(totalAmount))}
+                allowSigns={false}
+                amountFieldRevamp
+              />
+            </div>
+            <button type='button' className={styles.close}> <CloseIcon /> </button>
           </div>
-          <button type='button' className={styles.close}> <CloseIcon /> </button>
-        </div>
+           )}
       </div>
     )
   }
