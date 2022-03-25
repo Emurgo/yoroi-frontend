@@ -42,6 +42,7 @@ import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
+import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -477,7 +478,7 @@ export default class WalletSendForm extends Component<Props, State> {
               </p>
 
               <div className={styles.addButtonsWrapper}>
-                <button type='button' onClick={() => this.props.openDialog(AddNFTDialog)}>
+                <button type='button' onClick={() => this.props.openDialog(AddTokenDialog)}>
                   <PlusIcon />
                   <p>{intl.formatMessage(globalMessages.token)}</p>
                 </button>
