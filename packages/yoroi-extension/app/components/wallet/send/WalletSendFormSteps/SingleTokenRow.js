@@ -136,14 +136,14 @@ export default class SingleTokenRow extends Component<Props> {
     return (
       <div className={styles.component}>
         {!token.included ? (
-          <div className={styles.token}>
+          <button type='button' className={styles.token} onClick={() => this.props.addOrRemoveToken(token.id, true)}>
             <div className={styles.name}>
               <div className={styles.logo}><NoAssetLogo /></div>
               <p className={styles.label}>{token.label}</p>
             </div>
             <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
             <p className={styles.amount}>{token.amount}</p>
-          </div>
+          </button>
         ): (
           <div className={styles.amountWrapper}>
             <div className={styles.amountTokenName}>
