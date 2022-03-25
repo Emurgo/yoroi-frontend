@@ -160,24 +160,24 @@ export default class AddTokenDialog extends Component<Props, State> {
   }
 
   genTokensList: void => void = () => {
-      if (this.props.spendableBalance == null) return [];
-      const { spendableBalance } = this.props;
-      return [
-        ...spendableBalance.nonDefaultEntries(),
-      ].map(entry => ({
-        entry,
-        info: this.props.getTokenInfo(entry),
-      })).filter(token => !token.info.IsNFT).map(token => {
-        const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
-        return {
-          value: token.info.TokenId,
-          info: token.info,
-          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: Number(amount),
-          included: false,
-        }
-      });
+    if (this.props.spendableBalance == null) return [];
+    const { spendableBalance } = this.props;
+    return [
+    ...spendableBalance.nonDefaultEntries(),
+    ].map(entry => ({
+    entry,
+    info: this.props.getTokenInfo(entry),
+    })).filter(token => !token.info.IsNFT).map(token => {
+    const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+    return {
+        value: token.info.TokenId,
+        info: token.info,
+        label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+        amount: Number(amount),
+        included: false,
+    }
+    });
   }
 
   render(): Node {
