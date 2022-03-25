@@ -16,7 +16,7 @@ import {
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
 import { checkErrorByTranslationId } from './common-steps';
-import { daedalusMasterKeyButton, twelveWordOption } from '../pages/claimTransferPage';
+import { daedalusMasterKeyButton, twelveWordOption } from '../pages/walletClaimTransferPage';
 import { proceedRecoveryButton } from '../pages/restoreWalletPage';
 import { errorMessage, errorPageTitle } from '../pages/errorPage';
 import { amountField, feeField, totalAmountField } from '../pages/confirmTransactionPage';

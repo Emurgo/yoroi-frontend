@@ -11,7 +11,7 @@ import {
   networks,
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { walletSummaryBox } from '../pages/transactionsPage';
+import { walletSummaryBox } from '../pages/walletTransactionsPage';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(

@@ -13,7 +13,7 @@ import {
   checkWithdrawalAddressesRecoveredAreCorrect,
 } from '../support/helpers/transfer-helpers';
 import { claimTransferTab } from '../pages/walletPage';
-import { byronButton } from '../pages/claimTransferPage';
+import { byronButton } from '../pages/walletClaimTransferPage';
 
 async function confirmAttentionScreen(customWorld: Object){
   // Attention screen

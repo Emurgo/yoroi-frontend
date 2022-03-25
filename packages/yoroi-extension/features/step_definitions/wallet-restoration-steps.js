@@ -15,7 +15,7 @@ import {
   repeatPasswordInput,
   walletPasswordInput,
 } from '../pages/restoreWalletPage';
-import { masterKeyInput } from '../pages/claimTransferPage';
+import { masterKeyInput } from '../pages/walletClaimTransferPage';
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
