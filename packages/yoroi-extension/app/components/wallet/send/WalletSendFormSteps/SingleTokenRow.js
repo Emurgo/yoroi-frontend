@@ -154,23 +154,23 @@ export default class SingleTokenRow extends Component<Props> {
               <AmountInputRevamp
                 {...amountFieldProps}
                 value={amountFieldProps.value === ''
-              ? null
-              : formattedAmountToBigNumber(amountFieldProps.value)
-              }
+                ? null
+                : formattedAmountToBigNumber(amountFieldProps.value)
+                }
                 className="tokenAmount"
                 label={intl.formatMessage(globalMessages.amountLabel)}
                 decimalPlaces={this.getNumDecimals()}
                 error={amountInputError}
                 currency={truncateToken(
-              getTokenName(this.props.selectedToken ?? this.props.defaultToken)
-              )}
+                getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+                )}
                 fees={formatValue(transactionFee.getDefaultEntry())}
                 total={formatValue(this.getTokenEntry(totalAmount))}
                 allowSigns={false}
                 amountFieldRevamp
               />
             </div>
-            <button type='button' className={styles.close}> <CloseIcon /> </button>
+            <button type='button' onClick={() => this.props.addOrRemoveToken(token.id, false)} className={styles.close}> <CloseIcon /> </button>
           </div>
            )}
       </div>
