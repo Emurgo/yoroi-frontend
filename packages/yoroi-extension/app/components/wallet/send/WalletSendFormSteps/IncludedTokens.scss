@@ -1,0 +1,59 @@
+.component {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+
+    .header {
+        color: var(--var-yoroi-gray-900);
+        font-size: 12px;
+        line-height: 18px;    
+        margin-bottom: 8px;  
+    }
+
+    .tokenRow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+
+        .token {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 270px;
+            height: 55px;
+            color: #242838;
+            line-height: 24px;
+            border: 1.5px solid #F0F3F5;
+            border-radius: 8px;
+            padding: 12px 16px;
+
+            .label {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+
+                & > p {
+                    font-size: 16px;
+                    margin-left: 12px;
+                }
+            }
+        }
+
+        .remove {
+            height: 32px;
+            width: 32px;
+            background-color: #F0F3F5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: -10px;
+            right: -10px;
+        }
+
+        .remove:hover {
+            background-color: lighten($color: #F0F3F5, $amount: 0.90);
+        }
+    }
+}

@@ -157,7 +157,7 @@
   "global.labels.next": "Next",
   "global.labels.note": "Note:",
   "global.labels.optionalMemo": "Memo (optional)",
-  "global.labels.nft": "NFT",
+  "global.labels.nft": "NFTs",
   "global.labels.token": "token",
   "wallet.send.form.memoWarning": "Memos are stored localy only",
   "wallet.send.form.max": "MAX",
