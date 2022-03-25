@@ -48,6 +48,7 @@ import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
+import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -276,6 +277,10 @@ class WalletSendPage extends Component<AllProps> {
       return this.renderNFTDialog()
     }
 
+    if (uiDialogs.isOpen(AddTokenDialog)) {
+      return this.renderAddTokenDialog()
+    }
+
     return '';
   }
 
@@ -475,6 +480,40 @@ class WalletSendPage extends Component<AllProps> {
 
     return (
       <AddNFTDialog
+        onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+        uriParams={this.generated.stores.loading.uriParams}
+        selectedToken={transactionBuilderStore.selectedToken}
+        validateAmount={(amount) => validateAmount(
+          amount,
+          transactionBuilderStore.selectedToken ?? defaultToken,
+          getMinimumValue(
+            publicDeriver.getParent().getNetworkInfo(),
+            transactionBuilderStore.selectedToken?.IsDefault ?? true
+          ),
+          this.context.intl,
+        )}
+        defaultToken={defaultToken}
+      />
+    )
+  }
+
+  renderAddTokenDialog: void => void = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    const { txBuilderActions } = this.generated.actions;
+
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+
+    return (
+      <AddTokenDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
         spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
