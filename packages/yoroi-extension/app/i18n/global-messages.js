@@ -12,9 +12,9 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
   },
-  nft: {
+  nfts: {
     id: 'global.labels.nft',
-    defaultMessage: '!!!NFT',
+    defaultMessage: '!!!NFTs',
   },
   receiverLabel: {
     id: 'wallet.send.form.receiver.label',
