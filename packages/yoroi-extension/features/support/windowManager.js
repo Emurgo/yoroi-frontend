@@ -11,6 +11,7 @@ class WindowManagerError extends Error {}
 
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
+  driver: WebDriver;
 
   constructor(driver: WebDriver) {
     this.driver = driver;
@@ -18,37 +19,37 @@ export class WindowManager {
   }
 
   async init() {
-    const mainWindowHandle = await this.#getCurrentWindowHandle();
+    const mainWindowHandle = await this.privateGetCurrentWindowHandle();
     this.windowHandles.push({ title: 'main', handle: mainWindowHandle });
   }
 
-  #getHandleByTitle(title: string): Array<CustomWindowHandle> {
+  privateGetHandleByTitle(title: string): Array<CustomWindowHandle> {
     return this.windowHandles.filter(customHandle => customHandle.title === title);
   }
 
-  async #getCurrentWindowHandle() {
+  async privateGetCurrentWindowHandle(): Promise<string> {
     return await this.driver.getWindowHandle();
   }
 
-  async getAllWindowHandles() {
+  async getAllWindowHandles(): Promise<Array<string>> {
     return await this.driver.getAllWindowHandles();
   }
 
-  async #openNew(type: WindowType, windowName: string): Promise<CustomWindowHandle> {
+  async privateOpenNew(type: WindowType, windowName: string): Promise<CustomWindowHandle> {
     await this.driver.switchTo().newWindow(type);
-    const currentWindowHandle = await this.#getCurrentWindowHandle();
+    const currentWindowHandle = await this.privateGetCurrentWindowHandle();
 
     return { title: windowName, handle: currentWindowHandle };
   }
 
-  async #openNewWithCheck(
+  async privateOpenNewWithCheck(
     type: WindowType,
     windowName: string,
     url: string
   ): Promise<CustomWindowHandle> {
-    const checkTitle = this.#getHandleByTitle(windowName);
+    const checkTitle = this.privateGetHandleByTitle(windowName);
     if (!checkTitle.length) {
-      const handle = await this.#openNew(type, windowName);
+      const handle = await this.privateOpenNew(type, windowName);
       await this.driver.get(url);
       this.windowHandles.push(handle);
       return handle;
@@ -56,16 +57,16 @@ export class WindowManager {
     throw new WindowManagerError(`The handle with the title ${windowName} already exists`);
   }
 
-  async openNewTab(tabTitle: string, url: string) {
-    return await this.#openNewWithCheck('tab', tabTitle, url);
+  async openNewTab(tabTitle: string, url: string): Promise<CustomWindowHandle> {
+    return await this.privateOpenNewWithCheck('tab', tabTitle, url);
   }
 
-  async openNewWindow(windowTitle: string, url: string) {
-    return await this.#openNewWithCheck('window', windowTitle, url);
+  async openNewWindow(windowTitle: string, url: string): Promise<CustomWindowHandle> {
+    return await this.privateOpenNewWithCheck('window', windowTitle, url);
   }
 
-  async switchTo(title: string) {
-    const searchHandle = this.#getHandleByTitle(title);
+  async switchTo(title: string): Promise<void> {
+    const searchHandle = this.privateGetHandleByTitle(title);
     if (searchHandle.length !== 1) {
       throw new WindowManagerError(
         `Unable to switch to the window ${title} because found ${searchHandle.length} handles for the title`
@@ -74,8 +75,8 @@ export class WindowManager {
     await this.driver.switchTo().window(searchHandle[0].handle);
   }
 
-  async findNewWindowAndSwitchTo(newWindowTitle: string) {
-    let newWindowHandles;
+  async findNewWindowAndSwitchTo(newWindowTitle: string): Promise<CustomWindowHandle> {
+    let newWindowHandles: Array<string> = [];
     for (;;) {
       await new Promise(resolve => setTimeout(resolve, 100));
       newWindowHandles = await this.getAllWindowHandles();

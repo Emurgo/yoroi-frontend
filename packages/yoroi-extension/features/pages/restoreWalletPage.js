@@ -1,5 +1,7 @@
 // @flow
 
+import type { LocatorObject } from '../support/webdriver';
+
 export const errorInvalidRecoveryPhrase = {
   locator: '//p[contains(@class, "-error") and contains(@id, "recoveryPhrase")]',
   method: 'xpath'
@@ -20,7 +22,7 @@ export const cleanRecoverInput = {
   method: 'css'
 };
 
-export const getWords = (word: string) => {
+export const getWords = (word: string): LocatorObject => {
   return { locator: `//span[contains(text(), '${word}')]`, method: 'xpath' }
 };
 

@@ -912,6 +912,7 @@ declare class webdriver$TargetLocator {
   frame(nameOrIndex: string): webdriver$Promise<void>;
   frame(nameOrIndex: number): webdriver$Promise<void>;
   window(nameOrHandle: string): webdriver$Promise<void>;
+  newWindow(type: string): webdriver$Promise<void>;
   //alert(): webdriver$AlertPromise;
 }
 
