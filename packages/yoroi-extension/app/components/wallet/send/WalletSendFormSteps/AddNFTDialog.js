@@ -42,7 +42,7 @@ type Props = {|
 |};
 
 type State = {|
-  nftsList: FormattedNFTDisplay,
+  nftsList: FormattedNFTDisplay[],
 |}
 
 
@@ -113,7 +113,7 @@ export default class AddNFTDialog extends Component<Props, State> {
       this.setState({ nftsList: filteredNftsList })
     };
 
-  genNftsList: void => void = () => {
+  genNftsList: void => FormattedNFTDisplay[] = () => {
       if (this.props.spendableBalance == null) return [];
       const { spendableBalance } = this.props;
       return [
@@ -136,6 +136,7 @@ export default class AddNFTDialog extends Component<Props, State> {
       .map(item => ({
         name: item.name,
         image: item.nftMetadata?.image,
+        id: item.id,
       }));
   }
 

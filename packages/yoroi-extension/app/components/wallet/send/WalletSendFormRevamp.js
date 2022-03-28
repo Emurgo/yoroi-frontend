@@ -137,7 +137,7 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
-  +openDialog: Node => void,
+  +openDialog: any => void,
 |};
 
 type State = {|
@@ -500,8 +500,7 @@ export default class WalletSendForm extends Component<Props, State> {
                () => {
                 this.props.onSubmit()
                 this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
-               }
-              )}
+               })}
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
