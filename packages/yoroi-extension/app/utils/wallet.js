@@ -12,12 +12,12 @@ export type FormattedTokenDisplay = {|
 |}
 
 export type FormattedNFTDisplay = {|
-    name: string,
     id: string,
-    image?: string,
+    image: string,
+    name: string,
 |}
 
-export const getTokens: FormattedTokenDisplay = (spendableBalance, getTokenInfo) => {
+export const getTokens: FormattedTokenDisplay[] = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
             ...spendableBalance.nonDefaultEntries(),
@@ -37,7 +37,7 @@ export const getTokens: FormattedTokenDisplay = (spendableBalance, getTokenInfo)
         });
 }
 
-export const getNFTs: FormattedNFTDisplay = (spendableBalance, getTokenInfo) => {
+export const getNFTs: FormattedNFTDisplay[] = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
     ...spendableBalance.nonDefaultEntries(),

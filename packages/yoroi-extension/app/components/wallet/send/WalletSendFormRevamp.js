@@ -137,6 +137,7 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
+  +openDialog: Node => void,
 |};
 
 type State = {|
