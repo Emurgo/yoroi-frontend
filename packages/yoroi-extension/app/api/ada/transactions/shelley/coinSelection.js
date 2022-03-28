@@ -3,7 +3,11 @@
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { cardanoValueFromRemoteFormat } from '../utils';
+import {
+  cardanoValueFromRemoteFormat,
+  cardanoValueFromMultiToken,
+  multiTokenFromRemote,
+} from '../utils';
 import { MultiToken } from '../../../common/lib/MultiToken';
 
 export type UtxoDescriptor = {|
@@ -38,6 +42,8 @@ function describeUtxoAssets(
     countExtraAssets: 0,
   });
 }
+
+const ONE_ADA_LOVELACES = 1_000_000;
 
 export function describeUtxos(
   utxos: Array<RemoteUnspentOutput>,
@@ -77,7 +83,7 @@ export function describeUtxos(
       isPure: false,
       hasRequiredAssets,
       countExtraAssets,
-      spendableValue: Math.floor(spendable / 1_000_000) * 1_000_000,
+      spendableValue: Math.floor(spendable / ONE_ADA_LOVELACES) * ONE_ADA_LOVELACES,
       collateralCompatibleIndex: null,
     }
   });
@@ -155,13 +161,24 @@ export function coinSelectionForValues(
   utxos: Array<RemoteUnspentOutput>,
   requiredValues: Array<MultiToken>,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  networkId: number,
 ): Array<RemoteUnspentOutput> {
+  if (utxos.length === 0) {
+    throw new Error('Cannot coin-select for empty utxos!')
+  }
   if (requiredValues.length === 0) {
     throw new Error('Cannot coin-select for empty required value!')
   }
   const totalRequiredValue = requiredValues
-    .reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2))
-
+    .reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2));
+  const totalRequiredWasmValue: RustModule.WalletV4.Value =
+    cardanoValueFromMultiToken(totalRequiredValue);
+  const totalRequiredDefaultAssetAmount = totalRequiredValue.getDefault();
+  // Desired ADA amount is twice the required amount or at least the required plus 1 ADA
+  const totalDesiredDefaultAssetAmount = BigNumber.max(
+    totalRequiredDefaultAssetAmount.multipliedBy(2),
+    totalRequiredDefaultAssetAmount.plus(ONE_ADA_LOVELACES),
+  );
   const {
     withOnlyRequiredAssets,
     withRequiredAssets,
@@ -173,7 +190,6 @@ export function coinSelectionForValues(
     requiredValues,
     coinsPerUtxoWord,
   );
-
   // prioritize inputs
   const sortedUtxos: Array<RemoteUnspentOutput> = [
     ...withOnlyRequiredAssets,
@@ -182,4 +198,25 @@ export function coinSelectionForValues(
     ...dirty,
     ...collateralReserve,
   ].map((u: UtxoDescriptor) => u.utxo);
+  const resultUtxos: Array<RemoteUnspentOutput> = [];
+  let aggregatedValue: ?MultiToken = null;
+  let aggregatedWasmValue: RustModule.WalletV4.Value = RustModule.WalletV4.Value.zero();
+  let remainingRequiredValue: MultiToken = MultiToken.from(totalRequiredValue);
+  let requiredSatisfied = false;
+  for (const utxo of sortedUtxos) {
+    resultUtxos.push(utxo);
+    const utxoValue: MultiToken = multiTokenFromRemote(utxo, networkId);
+    aggregatedValue = aggregatedValue == null ? utxoValue
+      : aggregatedValue.joinAddCopy(utxoValue);
+    aggregatedWasmValue = aggregatedWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
+    const excessiveWasmValue = totalRequiredWasmValue.clamped_sub(aggregatedWasmValue);
+    const minRequiredExcessiveWasmAdaValue: RustModule.WalletV4.BigNum =
+      RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
+    if (!requiredSatisfied) {
+      remainingRequiredValue = remainingRequiredValue
+        .joinSubtractMutableWithLimitZero(utxoValue);
+      requiredSatisfied = remainingRequiredValue.isEmpty();
+    }
+  }
+  return resultUtxos;
 }

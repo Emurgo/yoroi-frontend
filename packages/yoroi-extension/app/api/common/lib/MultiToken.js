@@ -243,6 +243,6 @@ export class MultiToken {
   size: void => number = () => this.values.length;
 
   isEmpty: void => boolean = () => {
-    return this.values.filter(token => token.amount.gt(0)).length === 0;
+    return this.values.some(token => token.amount.gt(0)) === false;
   }
 }
