@@ -17,7 +17,7 @@ import { genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, }
 import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
 import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { truncateToken } from '../../../../utils/formatters';
-
+import NoNFT from '../../../../assets/images/nft-no.inline.svg'
 
 type Props = {|
   +onClose: void => void,
@@ -162,7 +162,7 @@ export default class AddNFTDialog extends Component<Props, State> {
 
                       return (
                         <div className={styles.nftCard}>
-                          {image && <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" />}
+                          {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT /> }
                           <p className={styles.nftName}>{nft.name }</p>
                         </div>
                       )
