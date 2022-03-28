@@ -1,9 +1,23 @@
 // @flow
-
 import { genFormatTokenAmount, getTokenIdentifierIfExists, getTokenStrictName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
 
-export const getTokens = (spendableBalance, getTokenInfo) => {
+export type FormattedTokenDisplay = {|
+    value: string,
+    info: {||},
+    label: string,
+    id: string,
+    amount: string,
+    include: boolean,
+|}
+
+export type FormattedNFTDisplay = {|
+    name: string,
+    id: string,
+    image?: string,
+|}
+
+export const getTokens: FormattedTokenDisplay = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
             ...spendableBalance.nonDefaultEntries(),
@@ -17,13 +31,13 @@ export const getTokens = (spendableBalance, getTokenInfo) => {
                 info: token.info,
                 label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
                 id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-                amount: Number(amount),
+                amount,
                 included: false,
             }
         });
 }
 
-export const getNFTs = (spendableBalance, getTokenInfo) => {
+export const getNFTs: FormattedNFTDisplay = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
     ...spendableBalance.nonDefaultEntries(),
@@ -45,5 +59,6 @@ export const getNFTs = (spendableBalance, getTokenInfo) => {
     .map(item => ({
         name: item.name,
         image: item.nftMetadata?.image,
+        id: item.id,
     }));
 }
