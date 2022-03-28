@@ -2,21 +2,24 @@
 import type { Node } from 'react'
 import { Component } from 'react';
 import { getTokens, getNFTs } from '../../../../utils/wallet'
-import styles from './IncludedTokens.scss'
+import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
+import styles from './IncludedTokens.scss';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import RemoveIcon from '../../../../assets/images/forms/close.inline.svg';
-import NoNFT from '../../../../assets/images/nft-no.inline.svg'
+import NoNFT from '../../../../assets/images/nft-no.inline.svg';
 
-export default class IncludedTokens extends Component {
+type Props = {|
+|}
+export default class IncludedTokens extends Component<Props> {
 
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,
     };
 
-    renderTokens(tokens): Node {
+    renderTokens(tokens: FormattedTokenDisplay): Node {
         return (
           tokens.map(token => (
             <div className={styles.tokenRow} key={token.id}>
@@ -36,7 +39,7 @@ export default class IncludedTokens extends Component {
         )
     }
 
-    renderNfts(nfts): Node {
+    renderNfts(nfts: FormattedNFTDisplay): Node {
         return (
             nfts.map(nft => {
               const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';

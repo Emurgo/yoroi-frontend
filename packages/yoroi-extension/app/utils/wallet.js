@@ -1,19 +1,23 @@
 // @flow
 import { genFormatTokenAmount, getTokenIdentifierIfExists, getTokenStrictName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
+import type {
+    TokenLookupKey,
+  } from '../api/common/lib/MultiToken';
+  import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 
 export type FormattedTokenDisplay = {|
-    value: string,
-    info: {||},
+    value: number,
+    info: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     label: string,
     id: string,
     amount: string,
-    include: boolean,
+    included: boolean,
 |}
 
 export type FormattedNFTDisplay = {|
     id: string,
-    image: string,
+    image?: string,
     name: string,
 |}
 

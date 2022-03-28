@@ -31,6 +31,7 @@ import type {
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { UriParams } from '../../../../utils/URIHandling';
 import BigNumber from 'bignumber.js';
+import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 
 type Props = {|
   +onClose: void => void,
@@ -49,7 +50,7 @@ type Props = {|
 |};
 
 type State = {|
-  tokensList: Asset[],
+  tokensList: FormattedTokenDisplay[],
   sortingDirection: null | 'UP' | 'DOWN',
   sortingColumn: string
 |}
@@ -175,7 +176,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     return <ArrowsList />;
   }
 
-  genTokensList: void => void = () => {
+  genTokensList: void => FormattedTokenDisplay[] = () => {
     if (this.props.spendableBalance == null) return [];
     const { spendableBalance } = this.props;
     return [

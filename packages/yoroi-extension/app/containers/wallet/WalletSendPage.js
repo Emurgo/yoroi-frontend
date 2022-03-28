@@ -113,7 +113,7 @@ class WalletSendPage extends Component<AllProps> {
     this.generated.actions.memos.closeMemoDialog.trigger();
   };
 
-  openDialog: Node => void = (dialog) => {
+  openDialog: any => void = (dialog) => {
     this.generated.actions.dialogs.closeActiveDialog.trigger()
     this.generated.actions.dialogs.push.trigger({
       dialog,
