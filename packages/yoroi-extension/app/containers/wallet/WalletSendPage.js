@@ -532,6 +532,9 @@ class WalletSendPage extends Component<AllProps> {
         )}
         defaultToken={defaultToken}
         fee={transactionBuilderStore.fee}
+        totalInput={transactionBuilderStore.totalInput}
+        isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+        error={transactionBuilderStore.createUnsignedTx.error}
       />
     )
   }

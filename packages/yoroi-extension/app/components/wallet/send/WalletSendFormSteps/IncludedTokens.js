@@ -10,8 +10,15 @@ import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.s
 import globalMessages from '../../../../i18n/global-messages';
 import RemoveIcon from '../../../../assets/images/forms/close.inline.svg';
 import NoNFT from '../../../../assets/images/nft-no.inline.svg';
+import type {
+  TokenLookupKey,
+  MultiToken
+} from '../../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
+  +spendableBalance: ?MultiToken,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |}
 export default class IncludedTokens extends Component<Props> {
 
@@ -19,7 +26,7 @@ export default class IncludedTokens extends Component<Props> {
         intl: intlShape.isRequired,
     };
 
-    renderTokens(tokens: FormattedTokenDisplay): Node {
+    renderTokens(tokens: FormattedTokenDisplay[]): Node {
         return (
           tokens.map(token => (
             <div className={styles.tokenRow} key={token.id}>
@@ -39,7 +46,7 @@ export default class IncludedTokens extends Component<Props> {
         )
     }
 
-    renderNfts(nfts: FormattedNFTDisplay): Node {
+    renderNfts(nfts: FormattedNFTDisplay[]): Node {
         return (
             nfts.map(nft => {
               const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';

@@ -32,6 +32,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { UriParams } from '../../../../utils/URIHandling';
 import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
+import LocalizableError from '../../../../i18n/LocalizableError';
 
 type Props = {|
   +onClose: void => void,
@@ -47,6 +48,9 @@ type Props = {|
   ) => Promise<[boolean, void | string]>,
   +defaultToken: $ReadOnly<TokenRow>,
   +fee: ?MultiToken,
+  +totalInput: ?MultiToken,
+  +isCalculatingFee: boolean,
+  +error: ?LocalizableError,
 |};
 
 type State = {|
@@ -187,14 +191,13 @@ export default class AddTokenDialog extends Component<Props, State> {
     })).filter(token => !token.info.IsNFT).map(token => {
     const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
     return {
-        value: token.info.TokenId,
-        info: token.info,
-        label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-        amount,
-        included: false,
-    }
-    });
+      value: token.info.TokenId,
+      info: token.info,
+      label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+      id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+      amount,
+      included: false,
+    }});
   }
 
   addOrRemoveToken(tokenId: string, status: boolean): void {
@@ -282,6 +285,9 @@ export default class AddTokenDialog extends Component<Props, State> {
                       getTokenInfo={this.props.getTokenInfo}
                       addOrRemoveToken={this.addOrRemoveToken.bind(this)}
                       fee={this.props.fee}
+                      error={this.props.error}
+                      isCalculatingFee={this.props.isCalculatingFee}
+                      totalInput={this.props.totalInput}
                     />
                   ))
                 }

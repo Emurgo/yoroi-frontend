@@ -1,5 +1,6 @@
 // @flow
 import { Component } from 'react';
+import type { Node } from 'react'
 import styles from './SingleTokenRow.scss'
 import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import { formattedAmountToBigNumber, formattedAmountToNaturalUnits, truncateAddressShort, truncateToken } from '../../../../utils/formatters';
@@ -18,10 +19,12 @@ import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import type {
   TokenLookupKey,
+  TokenEntry
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { UriParams } from '../../../../utils/URIHandling';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
 type Props = {|
     +token: FormattedTokenDisplay,
@@ -37,6 +40,9 @@ type Props = {|
     +defaultToken: $ReadOnly<TokenRow>,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +fee: ?MultiToken,
+    +isCalculatingFee: boolean,
+    +error: ?LocalizableError,
+    +totalInput: ?MultiToken,
 |}
 
 const messages = defineMessages({
@@ -117,7 +123,7 @@ export default class SingleTokenRow extends Component<Props> {
     },
   });
 
-  render() {
+  render(): Node {
     const { form } = this
     const { intl } = this.context;
     const { token } = this.props
