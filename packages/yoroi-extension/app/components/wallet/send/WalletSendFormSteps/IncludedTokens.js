@@ -8,6 +8,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import RemoveIcon from '../../../../assets/images/forms/close.inline.svg';
+import NoNFT from '../../../../assets/images/nft-no.inline.svg'
 
 export default class IncludedTokens extends Component {
 
@@ -37,12 +38,28 @@ export default class IncludedTokens extends Component {
 
     renderNfts(nfts): Node {
         return (
-            nfts.map(nft => (
-              <div>
-                {/* <img src={} alt="" />
-                <h1>Hello</h1> */}
-              </div>
-            ))
+            nfts.map(nft => {
+              const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
+
+              return (
+                // <div className={styles.nftCard}>
+                //   {image && <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" />}
+                //   <p className={styles.nftName}>{nft.name}</p>
+                // </div>
+                <div className={styles.nftRow} key={nft.name}>
+                  <div className={styles.nft}>
+                    <div className={styles.nftImg}>
+                      {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT />}
+                    </div>
+                    <p className={styles.name}>{nft.name}{nft.name}</p>
+                  </div>
+
+                  <div>
+                    <button type='button' className={styles.remove}> <RemoveIcon /> </button>
+                  </div>
+                </div>
+              )
+            })
         )
     }
 
