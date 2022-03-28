@@ -1,14 +1,15 @@
 // @flow
 import { genFormatTokenAmount, getTokenIdentifierIfExists, getTokenStrictName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
+import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import type {
     TokenLookupKey,
-  } from '../api/common/lib/MultiToken';
-  import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
+    MultiToken
+} from '../api/common/lib/MultiToken';
 
 export type FormattedTokenDisplay = {|
     value: number,
-    info: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+    info: $ReadOnly<TokenRow>,
     label: string,
     id: string,
     amount: string,
@@ -21,7 +22,10 @@ export type FormattedNFTDisplay = {|
     name: string,
 |}
 
-export const getTokens: FormattedTokenDisplay[] = (spendableBalance, getTokenInfo) => {
+export const getTokens: (
+    spendableBalance: ?MultiToken,
+    getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
+    ) => FormattedTokenDisplay[] = ( spendableBalance, getTokenInfo ) => {
     if (spendableBalance == null) return [];
     return [
             ...spendableBalance.nonDefaultEntries(),
@@ -41,7 +45,10 @@ export const getTokens: FormattedTokenDisplay[] = (spendableBalance, getTokenInf
         });
 }
 
-export const getNFTs: FormattedNFTDisplay[] = (spendableBalance, getTokenInfo) => {
+export const getNFTs: (
+    spendableBalance: ?MultiToken,
+    getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
+    ) => FormattedNFTDisplay[] = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
     ...spendableBalance.nonDefaultEntries(),
