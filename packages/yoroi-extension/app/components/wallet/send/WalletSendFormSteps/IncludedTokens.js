@@ -42,10 +42,6 @@ export default class IncludedTokens extends Component {
               const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
 
               return (
-                // <div className={styles.nftCard}>
-                //   {image && <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" />}
-                //   <p className={styles.nftName}>{nft.name}</p>
-                // </div>
                 <div className={styles.nftRow} key={nft.name}>
                   <div className={styles.nft}>
                     <div className={styles.nftImg}>
