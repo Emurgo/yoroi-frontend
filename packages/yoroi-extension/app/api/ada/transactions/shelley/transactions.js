@@ -1315,12 +1315,17 @@ export function signTransaction(
   witnessSet = witnessSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
-
-  return RustModule.WalletV4.Transaction.new(
+  if (metadata) {
+    return RustModule.WalletV4.Transaction.new(
+      txBody,
+      witnessSet,
+      // clone the metadata
+      RustModule.WalletV4.AuxiliaryData.from_bytes(metadata.to_bytes()),
+    );
+  }
+  return  RustModule.WalletV4.Transaction.new(
     txBody,
     witnessSet,
-    // $FlowFixMe[incompatible-call]
-    metadata,
   );
 }
 
