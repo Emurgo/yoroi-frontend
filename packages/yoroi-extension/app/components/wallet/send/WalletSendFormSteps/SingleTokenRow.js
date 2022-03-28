@@ -15,9 +15,28 @@ import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
 import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
+import type { FormattedTokenDisplay } from '../../../../utils/wallet'
+import type {
+  TokenLookupKey,
+} from '../../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { UriParams } from '../../../../utils/URIHandling';
+
 
 type Props = {|
-    token: string, // @todo update the type
+    +token: FormattedTokenDisplay,
+    +addOrRemoveToken: (tokenId: string, status: boolean) => void,
+    +classicTheme: boolean,
+    +updateAmount: (?BigNumber) => void,
+    +uriParams: ?UriParams,
+    +selectedToken: void | $ReadOnly<TokenRow>,
+    +validateAmount: (
+      amountInNaturalUnits: BigNumber,
+      tokenRow: $ReadOnly<TokenRow>,
+    ) => Promise<[boolean, void | string]>,
+    +defaultToken: $ReadOnly<TokenRow>,
+    +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+    +fee: ?MultiToken,
 |}
 
 const messages = defineMessages({

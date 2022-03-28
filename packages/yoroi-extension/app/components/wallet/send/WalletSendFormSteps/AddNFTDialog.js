@@ -18,14 +18,31 @@ import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg'
 import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { truncateToken } from '../../../../utils/formatters';
 import NoNFT from '../../../../assets/images/nft-no.inline.svg'
+import type { FormattedNFTDisplay } from '../../../../utils/wallet'
+import BigNumber from 'bignumber.js'
+import type {
+  TokenLookupKey,
+} from '../../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { UriParams } from '../../../../utils/URIHandling';
 
 type Props = {|
   +onClose: void => void,
   +spendableBalance: ?MultiToken,
+  +classicTheme: boolean,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +updateAmount: (?BigNumber) => void,
+  +uriParams: ?UriParams,
+  +selectedToken: void | $ReadOnly<TokenRow>,
+  +validateAmount: (
+    amountInNaturalUnits: BigNumber,
+    tokenRow: $ReadOnly<TokenRow>,
+  ) => Promise<[boolean, void | string]>,
+  +defaultToken: $ReadOnly<TokenRow>,
 |};
 
 type State = {|
-  nftsList: Asset[],
+  nftsList: FormattedNFTDisplay,
 |}
 
 

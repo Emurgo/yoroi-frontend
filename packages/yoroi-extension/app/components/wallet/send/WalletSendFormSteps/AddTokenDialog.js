@@ -25,12 +25,27 @@ import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline
 import SingleTokenRow from './SingleTokenRow';
 import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { Button } from '@mui/material';
-
-
+import type {
+  TokenLookupKey,
+} from '../../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { UriParams } from '../../../../utils/URIHandling';
+import BigNumber from 'bignumber.js';
 
 type Props = {|
   +onClose: void => void,
   +spendableBalance: ?MultiToken,
+  +classicTheme: boolean,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +updateAmount: (?BigNumber) => void,
+  +uriParams: ?UriParams,
+  +selectedToken: void | $ReadOnly<TokenRow>,
+  +validateAmount: (
+    amountInNaturalUnits: BigNumber,
+    tokenRow: $ReadOnly<TokenRow>,
+  ) => Promise<[boolean, void | string]>,
+  +defaultToken: $ReadOnly<TokenRow>,
+  +fee: ?MultiToken,
 |};
 
 type State = {|
@@ -175,7 +190,7 @@ export default class AddTokenDialog extends Component<Props, State> {
         info: token.info,
         label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
         id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-        amount: Number(amount),
+        amount,
         included: false,
     }
     });
@@ -265,6 +280,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                       defaultToken={this.props.defaultToken}
                       getTokenInfo={this.props.getTokenInfo}
                       addOrRemoveToken={this.addOrRemoveToken.bind(this)}
+                      fee={this.props.fee}
                     />
                   ))
                 }

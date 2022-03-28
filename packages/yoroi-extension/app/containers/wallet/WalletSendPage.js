@@ -467,9 +467,9 @@ class WalletSendPage extends Component<AllProps> {
     />);
   }
 
-  renderNFTDialog: void => void = () => {
+  renderNFTDialog: void => Node = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
 
     const { transactionBuilderStore } = this.generated.stores;
     const { txBuilderActions } = this.generated.actions;
@@ -501,7 +501,7 @@ class WalletSendPage extends Component<AllProps> {
     )
   }
 
-  renderAddTokenDialog: void => void = () => {
+  renderAddTokenDialog: void => Node = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
 
@@ -531,6 +531,7 @@ class WalletSendPage extends Component<AllProps> {
           this.context.intl,
         )}
         defaultToken={defaultToken}
+        fee={transactionBuilderStore.fee}
       />
     )
   }
