@@ -1315,17 +1315,18 @@ export function signTransaction(
   witnessSet = witnessSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
-  if (metadata) {
-    return RustModule.WalletV4.Transaction.new(
-      txBody,
-      witnessSet,
-      // clone the metadata
-      RustModule.WalletV4.AuxiliaryData.from_bytes(metadata.to_bytes()),
-    );
-  }
-  return  RustModule.WalletV4.Transaction.new(
+
+  // Have to do this, because `Transaction.new` receives by value instead of reference
+  // <TODO:SERLIB_REFERENCE_CALL_FIX>
+  const metadataClone = metadata == null ? null
+    : RustModule.WalletV4.AuxiliaryData
+      .from_bytes(Buffer.from(metadata.to_bytes()));
+
+  return RustModule.WalletV4.Transaction.new(
     txBody,
     witnessSet,
+    // $FlowFixMe[incompatible-call]
+    metadataClone,
   );
 }
 
