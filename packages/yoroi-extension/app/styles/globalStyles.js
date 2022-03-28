@@ -12,7 +12,7 @@ const getColorPath = (
     for (const entery of Object.entries(themePalette)) {
       const [key, value] = entery
       if (typeof value === 'object') {
-        //$FlowFixMe
+        // $FlowFixMe[incompatible-call]
         for (const valueEntery of Object.entries(value)) {
           if (valueEntery[1] === color) {
             path.push(key, valueEntery[0])

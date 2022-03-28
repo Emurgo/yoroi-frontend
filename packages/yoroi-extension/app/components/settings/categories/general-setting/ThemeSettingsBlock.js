@@ -207,6 +207,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
                 selectTheme({ theme: THEMES.YOROI_REVAMP });
                 this.props.switchToFirstWallet();
               }}
+              id='switchToRevampButton'
             >
               {intl.formatMessage(messages.tryYoroiRevamp)}
             </Button>
