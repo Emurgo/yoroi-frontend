@@ -12,6 +12,8 @@ import {
   checkFinalBalanceIsCorrect,
   checkWithdrawalAddressesRecoveredAreCorrect,
 } from '../support/helpers/transfer-helpers';
+import { claimTransferTab } from '../pages/walletPage';
+import { byronButton } from '../pages/walletClaimTransferPage';
 
 async function confirmAttentionScreen(customWorld: Object){
   // Attention screen
@@ -27,6 +29,10 @@ Given(/^I am on the transfer start screen$/, async function () {
   await waitUntilUrlEquals.call(this, '/transfer');
 });
 
+Given(/^Revamp. I go to the claim\/transfer page$/, async function () {
+  await this.click(claimTransferTab);
+});
+
 When(/^I click skip the transfer$/, async function () {
   await this.click({ locator: '.cancelTransferButton', method: 'css' });
 });
@@ -34,7 +40,7 @@ When(/^I click on the shelley button on the transfer screen$/, async function ()
   await this.click({ locator: '.TransferCards_shelleyEra', method: 'css' });
 });
 When(/^I click on the byron button on the transfer screen$/, async function () {
-  await this.click({ locator: '.TransferCards_byronEra', method: 'css' });
+  await this.click(byronButton);
 });
 Then(/^I click on the icarus tab$/, async function () {
   await this.click({ locator: '.IcarusTab', method: 'css' });

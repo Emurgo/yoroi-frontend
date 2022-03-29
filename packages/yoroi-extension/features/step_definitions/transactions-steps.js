@@ -11,6 +11,7 @@ import {
   networks,
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { walletSummaryBox } from '../pages/walletTransactionsPage';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(
@@ -134,6 +135,10 @@ Then(/^I click the transaction page button$/, async function () {
 Then(/^I should see the summary screen$/, async function () {
   await this.waitForElement({ locator: '.WalletSummary_component', method: 'css' });
 });
+
+Then(/^Revamp. I should see the summary screen$/, async function () {
+  await this.waitForElement(walletSummaryBox);
+})
 
 Then(/^I should see an invalid address error$/, async function () {
   await this.waitForElement({ locator: '.receiver .SimpleInput_errored', method: 'css' });
