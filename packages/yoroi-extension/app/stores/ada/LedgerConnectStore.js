@@ -65,7 +65,7 @@ import type {
   GetExtendedPublicKeyResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-const CONNECTOR_URL = 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/multisig/#/v4.1';
+const CONNECTOR_URL = 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/ledgerjs5/#/v5';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
@@ -319,7 +319,7 @@ export default class LedgerConnectStore
       hwFeatures: {
         Vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
         Model: '', // Ledger does not provide device model info up till now
-        DeviceId: resp.deriveSerial.serial,
+        DeviceId: resp.deriveSerial.serialHex,
       },
       defaultName: '',
     };
