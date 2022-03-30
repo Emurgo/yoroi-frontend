@@ -85,6 +85,7 @@ export function describeUtxos(
       isPure: false,
       hasRequiredAssets,
       countExtraAssets,
+      isCollateralReserve: false,
       spendableValue: Math.floor(spendable / ONE_ADA_LOVELACES) * ONE_ADA_LOVELACES,
     }
   });
