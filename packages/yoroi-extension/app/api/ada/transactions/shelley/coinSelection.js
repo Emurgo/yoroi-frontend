@@ -9,6 +9,7 @@ import {
   multiTokenFromRemote,
 } from '../utils';
 import { MultiToken } from '../../../common/lib/MultiToken';
+import { NotEnoughMoneyToSendError } from '../../../common/errors';
 
 export type UtxoDescriptor = {|
   utxo: RemoteUnspentOutput,
@@ -59,6 +60,7 @@ export function describeUtxos(
         utxo: u,
         isPure: true,
         hasRequiredAssets: false,
+        countExtraAssets: 0,
         spendableValue: parseInt(amount.to_str(), 10),
         isCollateralReserve: isCollateralCompatibleValue && ((collateralCompatibleCount++) < 5),
       }
@@ -84,7 +86,6 @@ export function describeUtxos(
       hasRequiredAssets,
       countExtraAssets,
       spendableValue: Math.floor(spendable / ONE_ADA_LOVELACES) * ONE_ADA_LOVELACES,
-      collateralCompatibleIndex: null,
     }
   });
 }
@@ -201,9 +202,10 @@ export function coinSelectionForValues(
   const resultUtxos: Array<RemoteUnspentOutput> = [];
   let aggregatedValue: ?MultiToken = null;
   let aggregatedWasmValue: RustModule.WalletV4.Value = RustModule.WalletV4.Value.zero();
-  let remainingRequiredValue: MultiToken = MultiToken.from(totalRequiredValue);
   let requiredSatisfied = false;
-  for (const utxo of sortedUtxos) {
+  let utxoIndex = 0;
+  for (; utxoIndex < sortedUtxos.length; utxoIndex++) {
+    const utxo = sortedUtxos[utxoIndex];
     resultUtxos.push(utxo);
     const utxoValue: MultiToken = multiTokenFromRemote(utxo, networkId);
     aggregatedValue = aggregatedValue == null ? utxoValue
@@ -211,12 +213,20 @@ export function coinSelectionForValues(
     aggregatedWasmValue = aggregatedWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
     const excessiveWasmValue = totalRequiredWasmValue.clamped_sub(aggregatedWasmValue);
     const minRequiredExcessiveWasmAdaValue: RustModule.WalletV4.BigNum =
-      RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
+      excessiveWasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
+        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
     if (!requiredSatisfied) {
-      remainingRequiredValue = remainingRequiredValue
-        .joinSubtractMutableWithLimitZero(utxoValue);
+      const remainingRequiredValue = totalRequiredValue
+        .joinAddCopy(minRequiredExcessiveWasmAdaValue)
+        .joinSubtractCopyWithLimitZero(aggregatedValue)
       requiredSatisfied = remainingRequiredValue.isEmpty();
+      if (requiredSatisfied) {
+        break;
+      }
     }
+  }
+  if (!requiredSatisfied) {
+    throw new NotEnoughMoneyToSendError();
   }
   return resultUtxos;
 }
