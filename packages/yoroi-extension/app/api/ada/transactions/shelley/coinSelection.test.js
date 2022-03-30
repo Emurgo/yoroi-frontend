@@ -2,6 +2,10 @@
 
 import * as CoinSelection from './coinSelection'
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { MultiToken } from '../../../common/lib/MultiToken';
+import { createMultiToken } from '../utils';
+import { UtxoDescriptor } from './coinSelection';
+import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 
 const POLICY_ID_1 = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26';
 
@@ -12,6 +16,10 @@ function withMockRandom<T>(r: number, f: () => T): T {
   } finally {
     jest.spyOn(global.Math, 'random').mockRestore();
   }
+}
+
+function multiToken(amount: number | string, assets: Array<{ assetId: string, amount: string }> = []): MultiToken {
+  return createMultiToken(String(amount), assets || [], 0);
 }
 
 beforeAll(async () => {
@@ -309,5 +317,36 @@ describe('classifyUtxoDescriptors', () => {
     // Pure utxos are ordered randomly
     expect(classification1.pure).toEqual([descriptors[3], descriptors[1]]);
     expect(classification2.pure).toEqual([descriptors[1], descriptors[3]]);
+  });
+});
+
+describe('classifyUtxoForValues', () => {
+
+  it('ADA value does not matter', () => {
+    /*
+     * Classification only uses asset information from the required values
+     * ADA amounts change absolutely nothing.
+     */
+    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
+      = RustModule.WalletV4.BigNum.from_str('500');
+    const classification1 = CoinSelection.classifyUtxoForValues(
+      utxos,
+      [multiToken(3_000_000)],
+      coinsPerUtxoWord,
+    );
+    const classification2 = CoinSelection.classifyUtxoForValues(
+      utxos,
+      [multiToken(30_000_000), multiToken(330_000_000)],
+      coinsPerUtxoWord,
+    );
+    const toUtxos = (ds: Array<UtxoDescriptor>): Array<RemoteUnspentOutput> => ds.map(d => d.utxo);
+    expect(classification1.withRequiredAssets).toEqual([]);
+    expect(classification2.withRequiredAssets).toEqual([]);
+    expect(classification1.withOnlyRequiredAssets).toEqual([]);
+    expect(classification2.withOnlyRequiredAssets).toEqual([]);
+    expect(toUtxos(classification1.dirty)).toEqual([utxos[3], utxos[2]]);
+    expect(toUtxos(classification2.dirty)).toEqual([utxos[3], utxos[2]]);
+    expect(toUtxos(classification1.pure)).toEqual([utxos[1]]);
+    expect(toUtxos(classification2.pure)).toEqual([utxos[1]]);
   });
 });

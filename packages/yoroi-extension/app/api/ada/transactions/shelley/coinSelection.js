@@ -46,6 +46,10 @@ function describeUtxoAssets(
 
 const ONE_ADA_LOVELACES = 1_000_000;
 
+/**
+ * The passed utxos are mapped and wrapped each into the `UtxoDescriptor` object
+ * which contains the utxo itself and also fields describing the important properties of that utxo.
+ */
 export function describeUtxos(
   utxos: Array<RemoteUnspentOutput>,
   requiredAssetIds: Set<string>,
@@ -107,6 +111,11 @@ export type UtxoDescriptorClassification = {|
   collateralReserve: Array<UtxoDescriptor>,
 |};
 
+/**
+ * Function accepts a collection of utxo DESCRIPTORS (see `describeUtxos` function)
+ * and returns a single classification object that sorts
+ * and separates the utxos into multiple separate specialized collections.
+ */
 export function classifyUtxoDescriptors(
   descriptors: Array<UtxoDescriptor>,
 ): UtxoDescriptorClassification {
@@ -139,6 +148,11 @@ export function classifyUtxoDescriptors(
   }
 }
 
+/**
+ * Accepts a collection of utxos and the required total value.
+ * Produces the classification of these utxos, according to the requirement.
+ * Protocol parameter `coins_per_utxo_word` is also required as the third parameter.
+ */
 export function classifyUtxoForValues(
   utxos: Array<RemoteUnspentOutput>,
   requiredValues: Array<MultiToken>,
