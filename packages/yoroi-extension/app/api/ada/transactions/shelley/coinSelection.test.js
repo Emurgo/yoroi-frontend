@@ -18,8 +18,17 @@ function withMockRandom<T>(r: number, f: () => T): T {
   }
 }
 
-function multiToken(amount: number | string, assets: Array<{ assetId: string, amount: string }> = []): MultiToken {
+function multiToken(
+  amount: number | string,
+  assets: Array<{ assetId: string, amount: string }> = [],
+): MultiToken {
   return createMultiToken(String(amount), assets || [], 0);
+}
+
+function utxosFromDescriptors(
+  ds: Array<UtxoDescriptor>,
+): Array<RemoteUnspentOutput> {
+  return ds.map(d => d.utxo);
 }
 
 beforeAll(async () => {
@@ -339,14 +348,73 @@ describe('classifyUtxoForValues', () => {
       [multiToken(30_000_000), multiToken(330_000_000)],
       coinsPerUtxoWord,
     );
-    const toUtxos = (ds: Array<UtxoDescriptor>): Array<RemoteUnspentOutput> => ds.map(d => d.utxo);
     expect(classification1.withRequiredAssets).toEqual([]);
     expect(classification2.withRequiredAssets).toEqual([]);
     expect(classification1.withOnlyRequiredAssets).toEqual([]);
     expect(classification2.withOnlyRequiredAssets).toEqual([]);
-    expect(toUtxos(classification1.dirty)).toEqual([utxos[3], utxos[2]]);
-    expect(toUtxos(classification2.dirty)).toEqual([utxos[3], utxos[2]]);
-    expect(toUtxos(classification1.pure)).toEqual([utxos[1]]);
-    expect(toUtxos(classification2.pure)).toEqual([utxos[1]]);
+    expect(utxosFromDescriptors(classification1.dirty)).toEqual([utxos[3], utxos[2]]);
+    expect(utxosFromDescriptors(classification2.dirty)).toEqual([utxos[3], utxos[2]]);
+    expect(utxosFromDescriptors(classification1.pure)).toEqual([utxos[1]]);
+    expect(utxosFromDescriptors(classification2.pure)).toEqual([utxos[1]]);
+    expect(utxosFromDescriptors(classification1.collateralReserve)).toEqual([utxos[0]]);
+    expect(utxosFromDescriptors(classification2.collateralReserve)).toEqual([utxos[0]]);
+  });
+
+  it('Multiple values with same assets', () => {
+    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
+      = RustModule.WalletV4.BigNum.from_str('500');
+    const classification = CoinSelection.classifyUtxoForValues(
+      utxos,
+      [
+        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd3`, amount: '1' }]),
+        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd3`, amount: '2' }]),
+      ],
+      coinsPerUtxoWord,
+    );
+    expect(utxosFromDescriptors(classification.withRequiredAssets)).toEqual([utxos[3]]);
+    expect(utxosFromDescriptors(classification.withOnlyRequiredAssets)).toEqual([]);
+    expect(utxosFromDescriptors(classification.dirty)).toEqual([utxos[2]]);
+    expect(utxosFromDescriptors(classification.pure)).toEqual([utxos[1]]);
+    expect(utxosFromDescriptors(classification.collateralReserve)).toEqual([utxos[0]]);
+  });
+
+  it('Multiple values with assets', () => {
+    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
+      = RustModule.WalletV4.BigNum.from_str('500');
+    // First classification is for two values, one real asset each
+    const classification1 = CoinSelection.classifyUtxoForValues(
+      utxos,
+      [
+        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }]),
+        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd2`, amount: '1' }]),
+      ],
+      coinsPerUtxoWord,
+    );
+    // Second classification is for two values, first with two same real assets,
+    // and the second one with a single non-existing asset, and different asset amounts
+    const classification2 = CoinSelection.classifyUtxoForValues(
+      utxos,
+      [
+        multiToken(0, [
+          { assetId: `${POLICY_ID_1}.abcd1`, amount: '2' },
+          { assetId: `${POLICY_ID_1}.abcd2`, amount: '2' },
+        ]),
+        multiToken(0, [
+          { assetId: `${POLICY_ID_1}.abcd9999`, amount: '2' },
+        ]),
+      ],
+      coinsPerUtxoWord,
+    );
+    // The point is that the classification results are same
+    expect(utxosFromDescriptors(classification1.withRequiredAssets)).toEqual([utxos[3]]);
+    expect(utxosFromDescriptors(classification2.withRequiredAssets)).toEqual([utxos[3]]);
+    expect(utxosFromDescriptors(classification1.withOnlyRequiredAssets)).toEqual([utxos[2]]);
+    expect(utxosFromDescriptors(classification2.withOnlyRequiredAssets)).toEqual([utxos[2]]);
+    expect(utxosFromDescriptors(classification1.dirty)).toEqual([]);
+    expect(utxosFromDescriptors(classification2.dirty)).toEqual([]);
+    expect(utxosFromDescriptors(classification1.pure)).toEqual([utxos[1]]);
+    expect(utxosFromDescriptors(classification2.pure)).toEqual([utxos[1]]);
+    expect(utxosFromDescriptors(classification1.collateralReserve)).toEqual([utxos[0]]);
+    expect(utxosFromDescriptors(classification2.collateralReserve)).toEqual([utxos[0]]);
   });
 });
