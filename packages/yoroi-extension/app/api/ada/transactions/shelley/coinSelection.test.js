@@ -5,6 +5,15 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 const POLICY_ID_1 = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26';
 
+function withMockRandom<T>(r: number, f: () => T): T {
+  try {
+    jest.spyOn(global.Math, 'random').mockReturnValue(r);
+    return f();
+  } finally {
+    jest.spyOn(global.Math, 'random').mockRestore();
+  }
+}
+
 beforeAll(async () => {
   await RustModule.load();
 });
@@ -282,17 +291,11 @@ describe('classifyUtxoDescriptors', () => {
     const descriptors = CoinSelection
       .describeUtxos(pureUtxos, new Set(), coinsPerUtxoWord);
 
-    jest.spyOn(global.Math, 'random').mockReturnValue(0.1);
+    const classification1 = withMockRandom(0.1,
+      () => CoinSelection.classifyUtxoDescriptors(descriptors));
 
-    const classification1 =
-      CoinSelection.classifyUtxoDescriptors(descriptors);
-
-    jest.spyOn(global.Math, 'random').mockReturnValue(0.9);
-
-    const classification2 =
-      CoinSelection.classifyUtxoDescriptors(descriptors);
-
-    jest.spyOn(global.Math, 'random').mockRestore();
+    const classification2 = withMockRandom(0.9,
+      () => CoinSelection.classifyUtxoDescriptors(descriptors));
 
     expect(classification1.withRequiredAssets).toEqual([]);
     expect(classification2.withRequiredAssets).toEqual([]);
