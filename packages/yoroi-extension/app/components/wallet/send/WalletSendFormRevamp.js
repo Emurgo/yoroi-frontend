@@ -44,6 +44,7 @@ import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
+import QrScaner from './WalletSendFormSteps/QrScaner';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -389,6 +390,8 @@ export default class WalletSendForm extends Component<Props, State> {
                 error={receiverField.error}
                 done={receiverField.isValid}
               />
+
+              <QrScaner />
             </div>
             <div className={styles.memo}>
               <div className={styles.memoInput}>
