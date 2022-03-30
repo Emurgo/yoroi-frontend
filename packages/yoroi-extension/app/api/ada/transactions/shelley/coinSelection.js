@@ -173,6 +173,58 @@ export function classifyUtxoForValues(
   return classifyUtxoDescriptors(utxoDescriptors);
 }
 
+function joinSumMultiTokens(mts: Array<MultiToken>): MultiToken {
+  if (mts == null || mts.length === 0) {
+    throw new Error('Cannot process empty required values!')
+  }
+  return mts.length === 1 ? mts[0]
+    : mts.reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2));
+}
+
+export function takeUtxosForValues(
+  utxos: Array<RemoteUnspentOutput>,
+  requiredValues: Array<MultiToken>,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  networkId: number,
+): {
+  utxoTaken: Array<RemoteUnspentOutput>,
+  utxoRemaining: Array<RemoteUnspentOutput>,
+} {
+  const totalRequiredValue = joinSumMultiTokens(requiredValues);
+  const totalRequiredWasmValue: RustModule.WalletV4.Value =
+    cardanoValueFromMultiToken(totalRequiredValue);
+  let aggregatedValue: ?MultiToken = null;
+  let aggregatedWasmValue: RustModule.WalletV4.Value = RustModule.WalletV4.Value.zero();
+  let requiredSatisfied = false;
+  let utxoIndex = 0;
+  const utxoTaken: Array<RemoteUnspentOutput> = [];
+  for (; utxoIndex < utxos.length; utxoIndex++) {
+    const utxo = utxos[utxoIndex];
+    utxoTaken.push(utxo);
+    const utxoValue: MultiToken = multiTokenFromRemote(utxo, networkId);
+    aggregatedValue = aggregatedValue == null ? utxoValue
+      : aggregatedValue.joinAddCopy(utxoValue);
+    aggregatedWasmValue = aggregatedWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
+    const excessiveWasmValue = totalRequiredWasmValue.clamped_sub(aggregatedWasmValue);
+    const minRequiredExcessiveWasmAdaValue: RustModule.WalletV4.BigNum =
+      excessiveWasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
+        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
+    if (!requiredSatisfied) {
+      const remainingRequiredValue = totalRequiredValue
+        .joinAddCopy(minRequiredExcessiveWasmAdaValue)
+        .joinSubtractCopyWithLimitZero(aggregatedValue)
+      requiredSatisfied = remainingRequiredValue.isEmpty();
+      if (requiredSatisfied) {
+        break;
+      }
+    }
+  }
+  if (!requiredSatisfied) {
+    throw new NotEnoughMoneyToSendError();
+  }
+  return { utxoTaken, utxoRemaining: utxos.slice(utxoIndex + 1) };
+}
+
 export function coinSelectionForValues(
   utxos: Array<RemoteUnspentOutput>,
   requiredValues: Array<MultiToken>,
@@ -185,10 +237,7 @@ export function coinSelectionForValues(
   if (requiredValues.length === 0) {
     throw new Error('Cannot coin-select for empty required value!')
   }
-  const totalRequiredValue = requiredValues
-    .reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2));
-  const totalRequiredWasmValue: RustModule.WalletV4.Value =
-    cardanoValueFromMultiToken(totalRequiredValue);
+  const totalRequiredValue = joinSumMultiTokens(requiredValues);
   const totalRequiredDefaultAssetAmount = totalRequiredValue.getDefault();
   // Desired ADA amount is twice the required amount or at least the required plus 1 ADA
   const totalDesiredDefaultAssetAmount = BigNumber.max(
@@ -214,34 +263,11 @@ export function coinSelectionForValues(
     ...dirty,
     ...collateralReserve,
   ].map((u: UtxoDescriptor) => u.utxo);
-  const resultUtxos: Array<RemoteUnspentOutput> = [];
-  let aggregatedValue: ?MultiToken = null;
-  let aggregatedWasmValue: RustModule.WalletV4.Value = RustModule.WalletV4.Value.zero();
-  let requiredSatisfied = false;
-  let utxoIndex = 0;
-  for (; utxoIndex < sortedUtxos.length; utxoIndex++) {
-    const utxo = sortedUtxos[utxoIndex];
-    resultUtxos.push(utxo);
-    const utxoValue: MultiToken = multiTokenFromRemote(utxo, networkId);
-    aggregatedValue = aggregatedValue == null ? utxoValue
-      : aggregatedValue.joinAddCopy(utxoValue);
-    aggregatedWasmValue = aggregatedWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
-    const excessiveWasmValue = totalRequiredWasmValue.clamped_sub(aggregatedWasmValue);
-    const minRequiredExcessiveWasmAdaValue: RustModule.WalletV4.BigNum =
-      excessiveWasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
-        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
-    if (!requiredSatisfied) {
-      const remainingRequiredValue = totalRequiredValue
-        .joinAddCopy(minRequiredExcessiveWasmAdaValue)
-        .joinSubtractCopyWithLimitZero(aggregatedValue)
-      requiredSatisfied = remainingRequiredValue.isEmpty();
-      if (requiredSatisfied) {
-        break;
-      }
-    }
-  }
-  if (!requiredSatisfied) {
-    throw new NotEnoughMoneyToSendError();
-  }
-  return resultUtxos;
+  const { utxoTaken, utxoRemaining } = takeUtxosForValues(
+    sortedUtxos,
+    [totalRequiredValue],
+    coinsPerUtxoWord,
+    networkId,
+  )
+  return utxoTaken;
 }
