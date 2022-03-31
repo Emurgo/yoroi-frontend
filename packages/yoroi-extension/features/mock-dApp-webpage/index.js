@@ -12,6 +12,8 @@ type AccessCallBack = {|
 |};
 
 export class MockDAppWebpage {
+  driver: WebDriver;
+
   constructor(driver: WebDriver) {
     this.driver = driver;
   }
