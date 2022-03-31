@@ -1,7 +1,5 @@
 // @flow
 import { Then } from 'cucumber';
-// eslint-disable-next-line import/named
-import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
@@ -24,13 +22,11 @@ Then(/^I open the mock dApp$/, async function () {
 });
 
 Then(/^I request anonymous access to Yoroi$/, async function () {
-  await this.driver.executeScript('window.accessRequestPromise = cardano.yoroi.enable()');
+  await this.mockDAppPage.requestNonAuthAccess();
 });
 
 Then(/^I request access to Yoroi$/, async function () {
-  await this.driver.executeScript(
-    'window.accessRequestPromise = cardano.yoroi.enable({requestIdentification: true})'
-  );
+  await this.mockDAppPage.requestAuthAccess();
 });
 
 Then(/^I should see the connector popup$/, async function () {
@@ -73,40 +69,16 @@ Then(/^The popup window should be closed$/, async function () {
   await this.windowManager.switchTo(mockDAppName);
 });
 
-Then(/^The access request should succeed$/, async function () {
-  const ret = await this.driver.executeAsyncScript((...args) => {
-    const callback = args[args.length - 1];
-    window.accessRequestPromise
-      // eslint-disable-next-line promise/always-return
-      .then(api => {
-        window.api = api;
-        callback({ success: true });
-      })
-      .catch(error => {
-        callback({ success: false, errMsg: error.message });
-      });
-  });
-
-  if (!ret.success) {
-    throw new Error(`request access failed: ${ret.errMsg}`);
-  }
+Then(/^The access request should be succeed$/, async function () {
+  const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
+  expect(
+    requestAccessResult.success,
+    `Request access failed: ${requestAccessResult.errMsg}`
+  ).to.be.true;
 });
 
 Then(/^The dApp should see balance (\d+)$/, async function (expectedBalance) {
-  const balanceCborHex = await this.driver.executeAsyncScript((...args) => {
-    const callback = args[args.length - 1];
-    window.api
-      .getBalance()
-      // eslint-disable-next-line promise/always-return
-      .then(balance => {
-        callback(balance);
-      })
-      .catch(error => {
-        throw new Error(JSON.stringify(error));
-      });
-  });
-  const value = RustModule.WalletV4.Value.from_bytes(Buffer.from(balanceCborHex, 'hex'));
-  const balance = value.coin().to_str();
+  const balance = await this.mockDAppPage.getBalance();
   expect(balance).to.equal(
     String(expectedBalance),
     `expect balance ${expectedBalance} get balance ${balance}`
