@@ -9,6 +9,8 @@ import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import { NotEnoughMoneyToSendError } from '../../../common/errors';
 
 const POLICY_ID_1 = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26';
+const POLICY_ID_2 = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb27';
+const POLICY_ID_3 = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb28';
 
 function withMockRandom<T>(r: number, f: () => T): T {
   try {
@@ -79,13 +81,13 @@ const utxos = [{
     name: 'abcd1',
   }, {
     amount: '53',
-    assetId: `${POLICY_ID_1}.abcd2`,
-    policyId: POLICY_ID_1,
+    assetId: `${POLICY_ID_2}.abcd2`,
+    policyId: POLICY_ID_2,
     name: 'abcd2',
   }, {
     amount: '54',
-    assetId: `${POLICY_ID_1}.abcd3`,
-    policyId: POLICY_ID_1,
+    assetId: `${POLICY_ID_3}.abcd3`,
+    policyId: POLICY_ID_3,
     name: 'abcd3',
   }],
 }];
@@ -132,7 +134,7 @@ describe('describeUtxos', () => {
     const coinsPerUtxoWord: RustModule.WalletV4.BigNum
       = RustModule.WalletV4.BigNum.from_str('500');
     const descriptors = CoinSelection
-      .describeUtxos(utxos, new Set([`${POLICY_ID_1}.abcd2`]), coinsPerUtxoWord);
+      .describeUtxos(utxos, new Set([`${POLICY_ID_2}.abcd2`]), coinsPerUtxoWord);
     expect(descriptors).toEqual([{
       utxo: utxos[0],
       isPure: true,
@@ -206,7 +208,7 @@ describe('describeUtxos', () => {
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([
         `${POLICY_ID_1}.abcd1`,
-        `${POLICY_ID_1}.abcd2`,
+        `${POLICY_ID_2}.abcd2`,
         `${POLICY_ID_1}.abcd9999`, // non-existing
       ]), coinsPerUtxoWord);
     expect(descriptors).toEqual([{
@@ -260,7 +262,7 @@ describe('classifyUtxoDescriptors', () => {
   it('classify with one required asset contained in one utxo', () => {
     const coinsPerUtxoWord = coinsPerUtxoWork();
     const descriptors = CoinSelection
-      .describeUtxos(utxos, new Set([`${POLICY_ID_1}.abcd2`]), coinsPerUtxoWord);
+      .describeUtxos(utxos, new Set([`${POLICY_ID_2}.abcd2`]), coinsPerUtxoWord);
     const classification =
       CoinSelection.classifyUtxoDescriptors(descriptors);
     expect(classification.withRequiredAssets).toEqual([descriptors[3]]);
@@ -288,8 +290,8 @@ describe('classifyUtxoDescriptors', () => {
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([
         `${POLICY_ID_1}.abcd1`,
-        `${POLICY_ID_1}.abcd2`,
-        `${POLICY_ID_1}.abcd3`,
+        `${POLICY_ID_2}.abcd2`,
+        `${POLICY_ID_3}.abcd3`,
         `${POLICY_ID_1}.abcd9999`, // non-existing
       ]), coinsPerUtxoWord);
     const classification =
@@ -364,8 +366,8 @@ describe('classifyUtxoForValues', () => {
     const classification = CoinSelection.classifyUtxoForValues(
       utxos,
       [
-        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd3`, amount: '1' }]),
-        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd3`, amount: '2' }]),
+        multiToken(0, [{ assetId: `${POLICY_ID_3}.abcd3`, amount: '1' }]),
+        multiToken(0, [{ assetId: `${POLICY_ID_3}.abcd3`, amount: '2' }]),
       ],
       coinsPerUtxoWord,
     );
@@ -383,7 +385,7 @@ describe('classifyUtxoForValues', () => {
       utxos,
       [
         multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }]),
-        multiToken(0, [{ assetId: `${POLICY_ID_1}.abcd2`, amount: '1' }]),
+        multiToken(0, [{ assetId: `${POLICY_ID_2}.abcd2`, amount: '1' }]),
       ],
       coinsPerUtxoWord,
     );
@@ -394,7 +396,7 @@ describe('classifyUtxoForValues', () => {
       [
         multiToken(0, [
           { assetId: `${POLICY_ID_1}.abcd1`, amount: '2' },
-          { assetId: `${POLICY_ID_1}.abcd2`, amount: '2' },
+          { assetId: `${POLICY_ID_2}.abcd2`, amount: '2' },
         ]),
         multiToken(0, [
           { assetId: `${POLICY_ID_1}.abcd9999`, amount: '2' },
@@ -474,7 +476,7 @@ describe('takeUtxosForValues', () => {
   it('taking until specific asset, when required', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
-      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd2`, amount: '1' }])],
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_2}.abcd2`, amount: '1' }])],
       coinsPerUtxoWork(),
       0,
     );
@@ -494,13 +496,61 @@ describe('takeUtxosForValues', () => {
   });
 
   it('taking more utxos when already taken satisfy the ADA value but have extra assets', () => {
-    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+
+    // In this case the first utxo is enough to satisfy the ADA, but there are excessive assets
+    // The remaining ADA plus the second utxo is enough for min required ADA to store assets
+    const take1 = CoinSelection.takeUtxosForValues(
       [utxos[2], utxos[0], utxos[1]],
       [multiToken(1_500_000)],
       coinsPerUtxoWork(30_000),
       0,
     );
-    expect(utxoTaken).toEqual([utxos[2], utxos[0]]);
-    expect(utxoRemaining).toEqual([utxos[1]]);
+    expect(take1.utxoTaken).toEqual([utxos[2], utxos[0]]);
+    expect(take1.utxoRemaining).toEqual([utxos[1]]);
+
+    // In this case the remaining ADA from first utxo is lower
+    // So even plus the second utxo is not enough for min required ADA
+    // The third utxo is taken then
+    const take2 = CoinSelection.takeUtxosForValues(
+      [utxos[2], utxos[0], utxos[1]],
+      [multiToken(1_990_000)],
+      coinsPerUtxoWork(30_000),
+      0,
+    );
+    expect(take2.utxoTaken).toEqual([utxos[2], utxos[0], utxos[1]]);
+    expect(take2.utxoRemaining).toEqual([]);
+  });
+
+  it('taking more utxos when added utxo adds more excessive assets', () => {
+
+    // In this case the first utxo contains excessive asset
+    // and the second utxo is enough to cover the min required ADA for it
+    const mappedUtxos1 = [utxos[2], utxos[0], { ...utxos[3], amount: '1000000' }, utxos[1]];
+
+    // In this case the second utxo itself contains even more excessive assets
+    // The third utxo is enough so together they cover the min required ADA
+    const mappedUtxos2 = [utxos[2], { ...utxos[3], amount: '1000000' }, utxos[0], utxos[1]];
+
+    // In first case it takes only first two utxos
+    const take1 = CoinSelection.takeUtxosForValues(
+      mappedUtxos1,
+      [multiToken(1_830_000)],
+      coinsPerUtxoWork(30_000),
+      0,
+    );
+    expect(take1.utxoTaken).toEqual([mappedUtxos1[0], mappedUtxos1[1]]);
+    expect(take1.utxoRemaining).toEqual(mappedUtxos1.slice(2));
+
+    // In second case it takes three utxos for same required value
+    // Even tho the ADA value of the second utxo is same in both cases
+    // In this case it does not cover the total required ADA of excessive assets
+    const take2 = CoinSelection.takeUtxosForValues(
+      mappedUtxos2,
+      [multiToken(1_830_000)],
+      coinsPerUtxoWork(30_000),
+      0,
+    );
+    expect(take2.utxoTaken).toEqual([mappedUtxos2[0], mappedUtxos2[1], mappedUtxos2[2]]);
+    expect(take2.utxoRemaining).toEqual(mappedUtxos2.slice(3));
   });
 });
