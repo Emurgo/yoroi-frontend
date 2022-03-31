@@ -10,7 +10,7 @@ Feature: dApp connector data signing
     Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
-    And The access request should succeed
+    And The access request should be succeed
 
 @it-1000
   Scenario: dApp can get balance (IT-1000)
