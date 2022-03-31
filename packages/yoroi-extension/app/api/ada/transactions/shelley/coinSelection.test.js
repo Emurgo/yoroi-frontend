@@ -6,6 +6,7 @@ import { MultiToken } from '../../../common/lib/MultiToken';
 import { createMultiToken } from '../utils';
 import { UtxoDescriptor } from './coinSelection';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
+import { NotEnoughMoneyToSendError } from '../../../common/errors';
 
 const POLICY_ID_1 = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26';
 
@@ -29,6 +30,10 @@ function utxosFromDescriptors(
   ds: Array<UtxoDescriptor>,
 ): Array<RemoteUnspentOutput> {
   return ds.map(d => d.utxo);
+}
+
+function coinsPerUtxoWork(v: number | string = 500): RustModule.WalletV4.BigNum {
+  return RustModule.WalletV4.BigNum.from_str(String(v));
 }
 
 beforeAll(async () => {
@@ -239,8 +244,7 @@ describe('describeUtxos', () => {
 describe('classifyUtxoDescriptors', () => {
 
   it('classify with no required assets', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set(), coinsPerUtxoWord);
     const classification =
@@ -254,8 +258,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with one required asset contained in one utxo', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([`${POLICY_ID_1}.abcd2`]), coinsPerUtxoWord);
     const classification =
@@ -268,8 +271,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with one required asset contained in multiple utxos', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([`${POLICY_ID_1}.abcd1`]), coinsPerUtxoWord);
     const classification =
@@ -282,8 +284,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with multiple required assets', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([
         `${POLICY_ID_1}.abcd1`,
@@ -302,8 +303,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with multiple pure utxos', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const pureUtxos = utxos.map(u => ({ ...u, assets: [] }));
     const descriptors = CoinSelection
       .describeUtxos(pureUtxos, new Set(), coinsPerUtxoWord);
@@ -336,8 +336,7 @@ describe('classifyUtxoForValues', () => {
      * Classification only uses asset information from the required values
      * ADA amounts change absolutely nothing.
      */
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const classification1 = CoinSelection.classifyUtxoForValues(
       utxos,
       [multiToken(3_000_000)],
@@ -361,8 +360,7 @@ describe('classifyUtxoForValues', () => {
   });
 
   it('Multiple values with same assets', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     const classification = CoinSelection.classifyUtxoForValues(
       utxos,
       [
@@ -379,8 +377,7 @@ describe('classifyUtxoForValues', () => {
   });
 
   it('Multiple values with assets', () => {
-    const coinsPerUtxoWord: RustModule.WalletV4.BigNum
-      = RustModule.WalletV4.BigNum.from_str('500');
+    const coinsPerUtxoWord = coinsPerUtxoWork();
     // First classification is for two values, one real asset each
     const classification1 = CoinSelection.classifyUtxoForValues(
       utxos,
@@ -416,5 +413,94 @@ describe('classifyUtxoForValues', () => {
     expect(utxosFromDescriptors(classification2.pure)).toEqual([utxos[1]]);
     expect(utxosFromDescriptors(classification1.collateralReserve)).toEqual([utxos[0]]);
     expect(utxosFromDescriptors(classification2.collateralReserve)).toEqual([utxos[0]]);
+  });
+});
+
+describe('takeUtxosForValues', () => {
+
+  it('always takes at least one utxo, even for zero required value', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      utxos,
+      [multiToken(0)],
+      coinsPerUtxoWork(),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[0]]);
+    expect(utxoRemaining).toEqual(utxos.slice(1));
+  });
+
+  it('fails in case of no utxos as not enough funds', () => {
+    expect(() => CoinSelection.takeUtxosForValues(
+      [],
+      [multiToken(0)],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('taking single utxo when enough', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      utxos,
+      [multiToken(1_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[0]]);
+    expect(utxoRemaining).toEqual(utxos.slice(1));
+  });
+
+  it('taking first two utxos when enough', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      utxos,
+      [multiToken(2_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[0], utxos[1]]);
+    expect(utxoRemaining).toEqual(utxos.slice(2));
+  });
+
+  it('taking until asset, when required', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      utxos,
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }])],
+      coinsPerUtxoWork(),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[0], utxos[1], utxos[2]]);
+    expect(utxoRemaining).toEqual(utxos.slice(3));
+  });
+
+  it('taking until specific asset, when required', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      utxos,
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd2`, amount: '1' }])],
+      coinsPerUtxoWork(),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[0], utxos[1], utxos[2], utxos[3]]);
+    expect(utxoRemaining).toEqual([]);
+  });
+
+  it('taking until asset amount is satisfied, when required', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      utxos,
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '70' }])],
+      coinsPerUtxoWork(),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[0], utxos[1], utxos[2], utxos[3]]);
+    expect(utxoRemaining).toEqual([]);
+  });
+
+  it('taking more utxos when already taken satisfy the ADA value but have extra assets', () => {
+    const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
+      [utxos[2], utxos[0], utxos[1]],
+      [multiToken(1_500_000)],
+      coinsPerUtxoWork(30_000),
+      0,
+    );
+    expect(utxoTaken).toEqual([utxos[2], utxos[0]]);
+    expect(utxoRemaining).toEqual([utxos[1]]);
   });
 });

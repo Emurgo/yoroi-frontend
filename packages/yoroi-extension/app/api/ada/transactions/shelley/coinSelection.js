@@ -7,6 +7,7 @@ import {
   cardanoValueFromRemoteFormat,
   cardanoValueFromMultiToken,
   multiTokenFromRemote,
+  createMultiToken,
 } from '../utils';
 import { MultiToken } from '../../../common/lib/MultiToken';
 import { NotEnoughMoneyToSendError } from '../../../common/errors';
@@ -205,13 +206,17 @@ export function takeUtxosForValues(
     aggregatedValue = aggregatedValue == null ? utxoValue
       : aggregatedValue.joinAddCopy(utxoValue);
     aggregatedWasmValue = aggregatedWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
-    const excessiveWasmValue = totalRequiredWasmValue.clamped_sub(aggregatedWasmValue);
-    const minRequiredExcessiveWasmAdaValue: RustModule.WalletV4.BigNum =
+    const excessiveWasmValue = aggregatedWasmValue.clamped_sub(totalRequiredWasmValue);
+    const minRequiredExcessiveWasmAda: RustModule.WalletV4.BigNum =
       excessiveWasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
         : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
     if (!requiredSatisfied) {
       const remainingRequiredValue = totalRequiredValue
-        .joinAddCopy(minRequiredExcessiveWasmAdaValue)
+        .joinAddCopy(createMultiToken(
+          minRequiredExcessiveWasmAda.to_str(),
+          [],
+          networkId,
+        ))
         .joinSubtractCopyWithLimitZero(aggregatedValue)
       requiredSatisfied = remainingRequiredValue.isEmpty();
       if (requiredSatisfied) {

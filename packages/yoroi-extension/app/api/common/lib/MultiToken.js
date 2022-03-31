@@ -47,13 +47,17 @@ export class MultiToken {
     this.values = [];
 
     // things are just easier if we enforce the default entry to be part of the list of tokens
-    this.defaults = defaults;
+    this.defaults = Object.freeze(defaults);
     this.add({
       identifier: defaults.defaultIdentifier,
       networkId: defaults.defaultNetworkId,
       amount: new BigNumber(0),
     });
     values.forEach(value => this.add(value));
+  }
+
+  getDefaults(): DefaultTokenEntry {
+    return this.defaults;
   }
 
   _checkNetworkId: number => void = (networkId) => {
