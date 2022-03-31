@@ -566,4 +566,78 @@ describe('takeUtxosForValues', () => {
       0,
     )).toThrow(NotEnoughMoneyToSendError);
   });
+
+  it('failing on not enough funds when not enough ADA', () => {
+
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[0]],
+      [multiToken(15_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[0], utxos[1]],
+      [multiToken(15_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[0], utxos[1], utxos[2]],
+      [multiToken(15_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[0], utxos[1], utxos[2], utxos[3]],
+      [multiToken(15_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('failing on not enough funds when requiring a missing asset', () => {
+
+    // Asking only for ADA in a pure utxo, so successful
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[0]],
+      [multiToken(1_000_000)],
+      coinsPerUtxoWork(),
+      0,
+    )).not.toThrow();
+
+    // Asking for a non-existing asset in a pure utxo fails
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[0]],
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }])],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+
+    // Asking for an access that does exist in dirty utxo works
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[2]],
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }])],
+      coinsPerUtxoWork(),
+      0,
+    )).not.toThrow();
+
+    // Asking for more of the existing asset than exists in dirty utxo fails
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[2]],
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '100' }])],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+
+    // Asking for a non-existing asset in a dirty utxo fails
+    expect(() => CoinSelection.takeUtxosForValues(
+      [utxos[2]],
+      [multiToken(1_000_000, [{ assetId: `${POLICY_ID_2}.abcd2`, amount: '1' }])],
+      coinsPerUtxoWork(),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
+  });
 });
