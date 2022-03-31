@@ -531,6 +531,9 @@ describe('takeUtxosForValues', () => {
     // The third utxo is enough so together they cover the min required ADA
     const mappedUtxos2 = [utxos[2], { ...utxos[3], amount: '1000000' }, utxos[0], utxos[1]];
 
+    // In this case both utxos together are not enough to cover the min required ADA
+    const mappedUtxos3 = [utxos[2], { ...utxos[3], amount: '1000000' }];
+
     // In first case it takes only first two utxos
     const take1 = CoinSelection.takeUtxosForValues(
       mappedUtxos1,
@@ -552,5 +555,15 @@ describe('takeUtxosForValues', () => {
     );
     expect(take2.utxoTaken).toEqual([mappedUtxos2[0], mappedUtxos2[1], mappedUtxos2[2]]);
     expect(take2.utxoRemaining).toEqual(mappedUtxos2.slice(3));
+
+    // In the third case there ADA value of available utxos is enough to cover the required amount
+    // But there's not enough to cover the min required ADA for the excessive assets
+    // So the non-enough error is expected
+    expect(() => CoinSelection.takeUtxosForValues(
+      mappedUtxos3,
+      [multiToken(1_830_000)],
+      coinsPerUtxoWork(30_000),
+      0,
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 });
