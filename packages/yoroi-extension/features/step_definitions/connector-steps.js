@@ -69,7 +69,7 @@ Then(/^The popup window should be closed$/, async function () {
   await this.windowManager.switchTo(mockDAppName);
 });
 
-Then(/^The access request should be succeed$/, async function () {
+Then(/^The access request should succeed$/, async function () {
   const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
   expect(
     requestAccessResult.success,
