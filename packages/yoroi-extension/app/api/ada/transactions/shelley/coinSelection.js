@@ -230,6 +230,37 @@ export function takeUtxosForValues(
   return { utxoTaken, utxoRemaining: utxos.slice(utxoIndex + 1) };
 }
 
+export function improveTakeUtxos(
+  classification: UtxoDescriptorClassification,
+  requiredValues: Array<MultiToken>,
+  takenUtxo: Array<RemoteUnspentOutput>,
+): Array<RemoteUnspentOutput> {
+  const {
+    withOnlyRequiredAssets,
+    withRequiredAssets,
+    pure,
+    dirty,
+    collateralReserve,
+  } = classification;
+  const totalRequiredValue = joinSumMultiTokens(requiredValues);
+  const totalRequiredADA = totalRequiredValue.getDefault();
+  const newDesiredCollateralsCount = Math.max(5 - collateralReserve.length, 0);
+  const newDesiredCollateralsADA = newDesiredCollateralsCount * ONE_ADA_LOVELACES;
+  // Desired input ADA amount is: at least the required amount plus two ADA
+  // or the required amount multiplied by two, whichever is greater,
+  // plus the desired new collateral ADA
+  const totalDesiredADA = BigNumber.max(
+    totalRequiredADA.multipliedBy(2),
+    totalRequiredADA.plus(2 * ONE_ADA_LOVELACES),
+  ).plus(newDesiredCollateralsADA);
+  const takenUtxoIdSet = new Set<string>(
+    takenUtxo.map(u => u.utxo_id),
+  );
+  for (const utxo of [...withOnlyRequiredAssets, ...pure]) {
+
+  }
+}
+
 export function coinSelectionForValues(
   utxos: Array<RemoteUnspentOutput>,
   requiredValues: Array<MultiToken>,
@@ -243,11 +274,10 @@ export function coinSelectionForValues(
     throw new Error('Cannot coin-select for empty required value!')
   }
   const totalRequiredValue = joinSumMultiTokens(requiredValues);
-  const totalRequiredDefaultAssetAmount = totalRequiredValue.getDefault();
-  // Desired ADA amount is twice the required amount or at least the required plus 1 ADA
-  const totalDesiredDefaultAssetAmount = BigNumber.max(
-    totalRequiredDefaultAssetAmount.multipliedBy(2),
-    totalRequiredDefaultAssetAmount.plus(ONE_ADA_LOVELACES),
+  const classification = classifyUtxoForValues(
+    utxos,
+    requiredValues,
+    coinsPerUtxoWord,
   );
   const {
     withOnlyRequiredAssets,
@@ -255,11 +285,7 @@ export function coinSelectionForValues(
     pure,
     dirty,
     collateralReserve,
-  } = classifyUtxoForValues(
-    utxos,
-    requiredValues,
-    coinsPerUtxoWord,
-  );
+  } = classification;
   // prioritize inputs
   const sortedUtxos: Array<RemoteUnspentOutput> = [
     ...withOnlyRequiredAssets,
@@ -268,11 +294,16 @@ export function coinSelectionForValues(
     ...dirty,
     ...collateralReserve,
   ].map((u: UtxoDescriptor) => u.utxo);
-  const { utxoTaken, utxoRemaining } = takeUtxosForValues(
+  const { utxoTaken } = takeUtxosForValues(
     sortedUtxos,
     [totalRequiredValue],
     coinsPerUtxoWord,
     networkId,
+  );
+  const improvingUtxos = improveTakeUtxos(
+    classification,
+    [totalRequiredValue],
+    utxoTaken,
   )
   return utxoTaken;
 }
