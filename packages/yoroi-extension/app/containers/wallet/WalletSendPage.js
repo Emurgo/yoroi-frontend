@@ -205,6 +205,8 @@ class WalletSendPage extends Component<AllProps> {
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}
+            closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+            isOpen={uiDialogs.isOpen}
           />
           {this.renderDialog()}
         </>
