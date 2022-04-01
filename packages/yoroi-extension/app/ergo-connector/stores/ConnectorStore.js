@@ -18,10 +18,14 @@ import type {
   Tx,
   TxSignWindowRetrieveData,
   WhitelistEntry,
+  GetUtxosRequest,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import type { CardanoConnectorSignRequest } from '../types';
+import type {
+  CardanoConnectorSignRequest,
+  SignSubmissionErrorType,
+} from '../types';
 import { LoadingWalletStates } from '../types';
 import { getWallets } from '../../api/common/index';
 import {
@@ -35,6 +39,8 @@ import {
   asGetBalance,
   asGetPublicKey,
   asHasUtxoChains,
+  asGetSigningKey,
+  asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
@@ -51,9 +57,24 @@ import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
   connectorGetChangeAddress,
+  connectorSendTxCardano,
+  connectorGenerateReorgTx,
+  connectorRecordSubmittedCardanoTransaction,
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  signTransaction as shelleySignTransaction
+} from '../../api/ada/transactions/shelley/transactions';
+import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import type {
+  HaskellShelleyTxSignRequest
+} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -103,6 +124,30 @@ export function getProtocol(): Promise<?Protocol> {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: get_protocol ');
+          }
+
+          resolve(response);
+        }
+      );
+  });
+}
+
+export function getUtxosAndAddresses(
+  tabId: number,
+  select: string[]
+  ): Promise<{|
+    utxos: IGetAllUtxosResponse,
+    usedAddresses: string[],
+    unusedAddresses: string[],
+    changeAddress: string,
+  |}> {
+  return new Promise((resolve, reject) => {
+      window.chrome.runtime.sendMessage(
+        ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: get_utxos/cardano ');
           }
 
           resolve(response);
@@ -177,7 +222,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
-    this.api.localStorage.getWhitelist
+     this.api.localStorage.getWhitelist
   );
   @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<
     SetWhitelistFunc
@@ -193,13 +238,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @observable adaTransaction: ?CardanoConnectorSignRequest = null;
 
+  reorgTxSignRequest: ?HaskellShelleyTxSignRequest = null;
+  collateralOutputAddressSet: ?Set<string> = null;
+  @observable submissionError: ?SignSubmissionErrorType = null;
+
   setup(): void {
     super.setup();
     this.actions.connector.getResponse.listen(this._getConnectingMsg);
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
+    this.actions.connector.confirmSignInTx.listen((password) => {
+      this._confirmSignInTx(password);
+    });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
@@ -257,6 +308,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           if (response.sign.type === 'tx-create-req/cardano') {
             this.generateAdaTransaction();
           }
+          if (response.sign.type === 'tx-reorg/cardano') {
+            this.generateReorgTransaction();
+          }
         }
       })
       // eslint-disable-next-line no-console
@@ -264,7 +318,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action
-  _confirmSignInTx: string => void = password => {
+  _confirmSignInTx: string => Promise<void> = async (password) => {
+    runInAction(() => {
+      this.submissionError = null;
+    });
+
     if (this.signingMessage == null) {
       throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
     }
@@ -272,13 +330,81 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (signingMessage.sign.tx == null) {
       throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
     }
-    const sendData: ConfirmedSignData = {
-      type: 'sign_confirmed',
-      tx: toJS(signingMessage.sign.tx),
-      uid: signingMessage.sign.uid,
-      tabId: signingMessage.tabId,
-      pw: password,
-    };
+    const wallet = this.wallets.find(w =>
+      w.publicDeriver.getPublicDeriverId() === this.signingMessage?.publicDeriverId
+    );
+    if (!wallet) {
+      throw new Error('unexpected nullish wallet');
+    }
+
+    let sendData: ConfirmedSignData;
+    if (signingMessage.sign.type === 'tx-reorg/cardano') {
+      // sign and send the tx
+      let signedTx;
+      try {
+        signedTx = await this.signReorgTx(wallet.publicDeriver, password);
+      } catch (error) {
+        if (error instanceof WrongPassphraseError) {
+          runInAction(() => {
+            this.submissionError = 'WRONG_PASSWORD';
+          });
+          return;
+        }
+        throw error;
+      }
+      try {
+        await connectorSendTxCardano(
+          wallet.publicDeriver,
+          signedTx.to_bytes(),
+          this.api.localStorage,
+        );
+      } catch {
+        runInAction(() => {
+          this.submissionError = 'SEND_TX_ERROR';
+        });
+        return;
+      }
+      try {
+        if (signingMessage.sign.type !== 'tx-reorg/cardano') {
+          throw new Error('unexpected signing data type');
+        }
+        await connectorRecordSubmittedCardanoTransaction(
+          wallet.publicDeriver,
+          signedTx,
+          asAddressedUtxo(signingMessage.sign.tx.utxos),
+        );
+      } catch {
+        // ignore
+      }
+      const utxos = this.getUtxosAfterReorg(
+        Buffer.from(
+          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+        ).toString('hex')
+      );
+      sendData = {
+        type: 'sign_confirmed',
+        tx: utxos,
+        uid: signingMessage.sign.uid,
+        tabId: signingMessage.tabId,
+        pw: password,
+      };
+    } else if (
+      signingMessage.sign.type === 'tx' ||
+        signingMessage.sign.type === 'tx_input' ||
+        signingMessage.sign.type === 'tx/cardano' ||
+        signingMessage.sign.type === 'tx-create-req/cardano'
+    ) {
+      sendData = {
+        type: 'sign_confirmed',
+        tx: toJS(signingMessage.sign.tx),
+        uid: signingMessage.sign.uid,
+        tabId: signingMessage.tabId,
+        pw: password,
+      };
+    } else {
+      throw new Error(`unkown sign data type ${signingMessage.sign.type}`);
+    }
+
     window.chrome.runtime.sendMessage(sendData);
     this._closeWindow();
   };
@@ -327,7 +453,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
       if (
         this.signingMessage?.sign.type !== 'tx/cardano' &&
-          this.signingMessage?.sign.type !== 'tx-create-req/cardano'
+          this.signingMessage?.sign.type !== 'tx-create-req/cardano' &&
+          this.signingMessage?.sign.type !== 'tx-reorg/cardano'
       ) {
         await this._getTxAssets(filteredWallets);
       }
@@ -348,6 +475,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
       if (this.signingMessage?.sign.type === 'tx-create-req/cardano') {
         this.generateAdaTransaction();
+      }
+      if (this.signingMessage?.sign.type === 'tx-reorg/cardano') {
+        this.generateReorgTransaction();
       }
     } catch (err) {
       runInAction(() => {
@@ -420,25 +550,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/* , partialSign */ } = signingMessage.sign.tx;
+    const { tx/* , partialSign */, tabId } = signingMessage.sign.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
+    const response = await getUtxosAndAddresses(tabId, ['utxos', 'usedAddresses', 'unusedAddresses', 'changeAddress'])
 
-    const withUtxos = asGetAllUtxos(selectedWallet.publicDeriver);
-    if (withUtxos == null) {
-      throw new Error(`missing utxo functionality`);
+    if (!response.utxos) {
+      throw new Error('Missgin utxos for signing tx')
     }
-
-    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-    if (withHasUtxoChains == null) {
-      throw new Error(`missing chains functionality`);
-    }
-    const utxos = await withHasUtxoChains.getAllUtxos();
-    const addressedUtxos = asAddressedUtxo(utxos);
+    const addressedUtxos = asAddressedUtxo(response.utxos);
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       network.NetworkId
@@ -501,11 +625,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       amount: txBody.fee().to_str(),
     };
 
+    const ownAddresses = new Set([
+      ...response.utxos.map(utxo => utxo.address),
+      ...response.usedAddresses,
+      ...response.unusedAddresses,
+      response.changeAddress
+    ])
+
     const { amount, total } = await this._calculateAmountAndTotal(
       selectedWallet.publicDeriver,
       inputs,
       outputs,
       fee,
+      response.utxos,
+      ownAddresses,
     );
 
     runInAction(() => {
@@ -548,6 +681,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: withHasUtxoChains,
         absSlotNumber,
         cardanoTxRequest: (signingMessage.sign: any).tx,
+        utxos: [],
       });
       const fee = {
         tokenId: result.fee().getDefaultEntry().identifier,
@@ -559,6 +693,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         result.inputs(),
         result.outputs(),
         fee,
+        [],
       );
       runInAction(() => {
         this.adaTransaction = {
@@ -574,23 +709,133 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
+  generateReorgTransaction: void => Promise<void> = async () => {
+    if (this.signingMessage == null) return;
+    const { signingMessage } = this;
+    const selectedWallet = this.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+
+    if (selectedWallet == null) return undefined;
+    if (signingMessage.sign.type !== 'tx-reorg/cardano') {
+      throw new Error('unexpected signing data type');
+    }
+    const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
+
+    const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
+      selectedWallet.publicDeriver,
+      usedUtxoIds,
+      reorgTargetAmount,
+      asAddressedUtxo(utxos),
+    );
+    // record the unsigned tx, so that after the user's approval, we can sign
+    // it without re-generating
+    this.reorgTxSignRequest = unsignedTx;
+    // record which addresses are used for collaterals, so that we can compute the
+    // collateral UTXOs without waiting for the re-organization tx to be confirmed
+    this.collateralOutputAddressSet = collateralOutputAddressSet;
+
+    const fee = {
+      tokenId: unsignedTx.fee().getDefaultEntry().identifier,
+      networkId: unsignedTx.fee().getDefaultEntry().networkId,
+      amount: unsignedTx.fee().getDefaultEntry().amount.toString(),
+    };
+    const { amount, total } = await this._calculateAmountAndTotal(
+      selectedWallet.publicDeriver,
+      unsignedTx.inputs(),
+      unsignedTx.outputs(),
+      fee,
+      utxos,
+    );
+    runInAction(() => {
+      this.adaTransaction = {
+        inputs: unsignedTx.inputs(),
+        outputs: unsignedTx.outputs(),
+        fee,
+        amount,
+        total,
+      };
+    });
+  }
+  signReorgTx: (PublicDeriver<>, string) => Promise<RustModule.WalletV4.Transaction> = async (
+    publicDeriver,
+    password
+  ) => {
+    const signRequest = this.reorgTxSignRequest;
+
+    if (!signRequest) {
+      throw new Error('unexpected nullish sign request');
+    }
+
+    const withSigningKey = asGetSigningKey(publicDeriver);
+    if (!withSigningKey) {
+      throw new Error('expect to be able to get signing key');
+    }
+    const signingKey = await withSigningKey.getSigningKey();
+    const normalizedKey = await withSigningKey.normalizeKey({
+      ...signingKey,
+      password,
+    });
+
+    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!withLevels) {
+      throw new Error(`can't get level`);
+    }
+
+    return shelleySignTransaction(
+      signRequest.senderUtxos,
+      signRequest.unsignedTx,
+      withLevels.getParent().getPublicDeriverLevel(),
+      RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+        Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      ),
+      signRequest.neededStakingKeyHashes.wits,
+      signRequest.metadata,
+    );
+  }
+  getUtxosAfterReorg: (string) => Array<RemoteUnspentOutput> = (txId) => {
+    const allOutputs = this.adaTransaction?.outputs;
+    if (!allOutputs) {
+      throw new Error('unexpected nullish transaction');
+    }
+    if (!this.collateralOutputAddressSet) {
+      throw new Error('unexpected nullish collateral address set');
+    }
+    const collateralOutputs = [];
+    for (let i = 0; i < allOutputs.length; i++) {
+      if (this.collateralOutputAddressSet.has(allOutputs[i].address)) {
+        collateralOutputs.push({
+          utxo_id: txId + String(i),
+          tx_hash: txId,
+          tx_index: i,
+          receiver: allOutputs[i].address,
+          amount: allOutputs[i].value.getDefault().toString(),
+          assets: [],
+        });
+      }
+    }
+
+    return collateralOutputs;
+  }
+
   async _calculateAmountAndTotal(
     publicDeriver: PublicDeriver<>,
     inputs: Array<{| address: string, value: MultiToken |}>,
     outputs: Array<{| address: string, value: MultiToken |}>,
     fee: {| tokenId: string, networkId: number, amount: string |},
+    utxos: IGetAllUtxosResponse,
+    ownAddresses: ?Set<string>,
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
-    const withUtxos = asGetAllUtxos(publicDeriver);
-    if (withUtxos == null) {
-      throw new Error('wallet doesn\'t support IGetAllUtxos');
+
+    if (!ownAddresses) {
+      ownAddresses = new Set([
+        ...utxos.map(utxo => utxo.address),
+        ...await connectorGetUsedAddresses(publicDeriver, null),
+        ...await connectorGetUnusedAddresses(publicDeriver),
+        await connectorGetChangeAddress(publicDeriver),
+      ]);
     }
-    const utxos = await withUtxos.getAllUtxos();
-    const ownAddresses = new Set([
-      ...utxos.map(utxo => utxo.address),
-      ...await connectorGetUsedAddresses(publicDeriver, null),
-      ...await connectorGetUnusedAddresses(publicDeriver),
-      await connectorGetChangeAddress(publicDeriver),
-    ]);
+
     const { defaultNetworkId, defaultIdentifier } =
           publicDeriver.getParent().getDefaultToken();
 

@@ -6,21 +6,21 @@ import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
 
 When(/^I click on "generate payment URL" button$/, async function () {
-  await this.click('.WalletReceive_generateURIIcon');
-  await this.waitForElement('.URIGenerateDialog');
+  await this.click({ locator: '.WalletReceive_generateURIIcon', method: 'css' });
+  await this.waitForElement({ locator: '.URIGenerateDialog', method: 'css' });
 });
 
 Then(/^I generate a URI for ([0-9]+) ADA$/, async function (amount) {
-  await this.input("input[name='amount']", amount);
-  await this.click('.URIGenerateDialog_component .MuiButton-primary');
+  await this.input({ locator: "input[name='amount']", method: 'css' }, amount);
+  await this.click({ locator: '.URIGenerateDialog_component .MuiButton-primary', method: 'css' });
 });
 
 Then(/^I should see the URI displayed in a new dialog$/, async function () {
-  await this.waitForElement('.URIDisplayDialog');
+  await this.waitForElement({ locator: '.URIDisplayDialog', method: 'css' });
 });
 
 Then(/^I click on the copy to clipboard icon$/, async function () {
-  await this.click('.URIDisplayDialog_uriDisplay .CopyableAddress_copyIconBig');
+  await this.click({ locator: '.URIDisplayDialog_uriDisplay .CopyableAddress_copyIconBig', method: 'css' });
 });
 
 When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async function (address, amount) {
@@ -32,19 +32,19 @@ When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async func
 });
 
 Then(/^I should see and accept a warning dialog$/, async function () {
-  await this.waitForElement('.URILandingDialog');
-  await this.click('.URILandingDialog .MuiButton-primary');
+  await this.waitForElement({ locator: '.URILandingDialog', method: 'css' });
+  await this.click({ locator: '.URILandingDialog .MuiButton-primary', method: 'css' });
 });
 
 Then(/^I should see a dialog with the transaction details$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.waitForElement('.URIVerifyDialog');
-  await this.waitUntilContainsText('.URIVerifyDialog_address', truncateAddress(fields.address));
-  await this.waitUntilContainsText('.URIVerifyDialog_amount', fields.amount);
+  await this.waitForElement({ locator: '.URIVerifyDialog', method: 'css' });
+  await this.waitUntilContainsText({ locator: '.URIVerifyDialog_address', method: 'css' }, truncateAddress(fields.address));
+  await this.waitUntilContainsText({ locator: '.URIVerifyDialog_amount', method: 'css' }, fields.amount);
 });
 
 When(/^I confirm the URI transaction details$/, async function () {
-  await this.click('.URIVerifyDialog .primary');
+  await this.click({ locator: '.URIVerifyDialog .primary', method: 'css' });
 });
 
 Then(/^I should land on send wallet screen with prefilled parameters$/, async function (table) {
@@ -64,5 +64,5 @@ When(/^I open an invalid cardano URI$/, async function () {
 });
 
 Then(/^I should see an "invalid URI" dialog$/, async function () {
-  await this.waitForElement('.URIInvalidDialog');
+  await this.waitForElement({ locator: '.URIInvalidDialog', method: 'css' });
 });
