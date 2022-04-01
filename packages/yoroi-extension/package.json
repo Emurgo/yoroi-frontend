@@ -162,7 +162,7 @@
     "ws": "7.4.3"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "4.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "5.0.0",
     "@download/blockies": "1.0.3",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
