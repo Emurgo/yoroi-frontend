@@ -9,6 +9,7 @@ import path from 'path';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod } from './helpers/helpers';
 import { WindowManager } from './windowManager';
+import { MockDAppWebpage } from '../mock-dApp-webpage';
 
 const fs = require('fs');
 
@@ -112,6 +113,7 @@ function CustomWorld(cmdInput: WorldInput) {
       this.driver = braveBuilder.build();
       this.windowManager = new WindowManager(this.driver);
       this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     case 'firefox': {
@@ -119,6 +121,7 @@ function CustomWorld(cmdInput: WorldInput) {
       this.driver = firefoxBuilder.build();
       this.windowManager = new WindowManager(this.driver);
       this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     default: {
@@ -126,6 +129,7 @@ function CustomWorld(cmdInput: WorldInput) {
       this.driver = chromeBuilder.build();
       this.windowManager = new WindowManager(this.driver);
       this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
   }
