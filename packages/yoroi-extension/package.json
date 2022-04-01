@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.11.411",
+  "version": "4.11.501",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -162,7 +162,7 @@
     "ws": "7.4.3"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "4.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "5.0.0",
     "@download/blockies": "1.0.3",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
@@ -171,7 +171,7 @@
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
-    "@emurgo/ledger-connect-handler": "6.0.0",
+    "@emurgo/ledger-connect-handler": "7.0.1",
     "@mui/lab": "^5.0.0-alpha.51",
     "@mui/material": "^5.0.4",
     "@svgr/webpack": "5.5.0",
