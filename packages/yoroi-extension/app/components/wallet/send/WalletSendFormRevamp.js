@@ -26,7 +26,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   getTokenName, genFormatTokenAmount,
-  // getTokenStrictName, getTokenIdentifierIfExists,
 } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
@@ -44,7 +43,7 @@ import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
-import QrScaner from './WalletSendFormSteps/QrScaner';
+import QrScanner from './WalletSendFormSteps/QRScannerDialog';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -391,7 +390,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 done={receiverField.isValid}
               />
 
-              <QrScaner />
+              <QrScanner />
             </div>
             <div className={styles.memo}>
               <div className={styles.memoInput}>
