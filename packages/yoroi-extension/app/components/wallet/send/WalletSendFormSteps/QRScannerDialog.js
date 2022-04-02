@@ -6,12 +6,16 @@ import Scanner from 'react-webcam-qr-scanner';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './QRScannerDialog.scss'
-import { isValidReceiveAddress } from '../../../../api/ada/lib/storage/bridge/utils';
+
 
 const messages: Object = defineMessages({
   title: {
     id: 'wallet.send.form.qrDialog.title',
     defaultMessage: '!!!Scan QR code',
+  },
+  noDevices: {
+    id: 'wallet.send.form.qrDialog.noDevices',
+    defaultMessage: '!!!Webcam not found or permission is not given',
   }
 });
 
@@ -30,14 +34,35 @@ export default class QrScanner extends Component<Props, State> {
   }
 
   handleDecode = (result) => {
-    console.log(result)
     this.props.onUpdate(result.data)
     this.props.onClose()
   }
 
-  handleScannerLoad = (mode) => {
-    console.log({mode})
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
+    if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        let isEnabled = false
+        devices.forEach(d => {
+          if (d.kind === 'videoinput' && d.deviceId) {
+            isEnabled = true
+          }
+        })
+
+        if(!isEnabled) {
+          throw new Error(this.context.intl.formatMessage(messages.noDevices))
+        }
+
+
+        return ''
+      }).catch(err => {
+        this.setState({ error: err.message })
+      })
+    }
   }
+
+
 
   render(): Node {
     const { intl } = this.context;
@@ -53,19 +78,19 @@ export default class QrScanner extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
       >
         <div className={styles.component}>
-          <p className={styles.error}>{error}</p>
-          <Scanner
-            className={styles.scanner}
-            onDecode={this.handleDecode}
-            onScannerLoad={this.handleScannerLoad}
-            constraints={{
+          {error ? <p className={styles.error}>{error}</p> : (
+            <Scanner
+              className={styles.scanner}
+              onDecode={this.handleDecode}
+              constraints={{
               audio: false,
                 video: {
                   facingMode: 'environment'
                 }
               }}
-            captureSize={{ width: 300, height: 300 }}
-          />
+              captureSize={{ width: 300, height: 300 }}
+            />
+          )}
         </div>
       </Dialog>
     );

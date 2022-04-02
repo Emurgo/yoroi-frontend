@@ -391,9 +391,6 @@ export default class WalletSendForm extends Component<Props, State> {
                 done={receiverField.isValid}
                 QRHandler={() => this.props.openDialog(QRScannerDialog)}
               />
-              <button type='button' onClick={() => this.props.openDialog(QRScannerDialog)}>
-                <QRLogo />
-              </button>
             </div>
             <div className={styles.memo}>
               <div className={styles.memoInput}>
