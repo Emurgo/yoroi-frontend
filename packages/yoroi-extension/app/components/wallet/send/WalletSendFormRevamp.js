@@ -44,7 +44,7 @@ import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
-import QRLogo from '../../../assets/images/qr-code.inline.svg'
+import QRLogo from '../../../assets/images/qr-code.inline.svg';
 
 const messages = defineMessages({
   receiverLabel: {

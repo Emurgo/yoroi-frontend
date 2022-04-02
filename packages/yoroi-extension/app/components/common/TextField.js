@@ -6,6 +6,7 @@ import ErrorIcon from '../../assets/images/forms/error.inline.svg';
 import DoneIcon from '../../assets/images/forms/done.inline.svg';
 import EyeIcon from '../../assets/images/forms/password-eye-close.inline.svg';
 import CloseEyeIcon from '../../assets/images/forms/password-eye.inline.svg';
+import QRLogo from '../../assets/images/qr-code.inline.svg';
 import React from 'react';
 
 type Props = {|
@@ -23,6 +24,7 @@ type Props = {|
   inputRef?: ?{| current: null | ElementRef<'input'> |},
   revamp?: boolean,
   placeholder?: string,
+  handleQR?: Function,
 |};
 
 function TextField({
@@ -39,6 +41,7 @@ function TextField({
   onChange,
   autoFocus,
   revamp,
+  handleQR,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -89,6 +92,21 @@ function TextField({
                 {showPassword ? <EyeIcon /> : <CloseEyeIcon />}
               </IconButton>
             </InputAdornment>
+          ) : handleQR ? (
+            <InputAdornment
+              position="end"
+              sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
+            >
+              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                <QRLogo />
+              </IconButton>
+            </InputAdornment>
           ) : (
             <InputAdornment position="end">
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
@@ -114,6 +132,7 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
   revamp: false,
+  handleQR: null,
 };
 
 export default TextField;
