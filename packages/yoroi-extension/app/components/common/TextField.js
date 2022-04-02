@@ -24,7 +24,7 @@ type Props = {|
   inputRef?: ?{| current: null | ElementRef<'input'> |},
   revamp?: boolean,
   placeholder?: string,
-  handleQR?: Function,
+  QRHandler?: Function,
 |};
 
 function TextField({
@@ -41,7 +41,7 @@ function TextField({
   onChange,
   autoFocus,
   revamp,
-  handleQR,
+  QRHandler,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -92,16 +92,15 @@ function TextField({
                 {showPassword ? <EyeIcon /> : <CloseEyeIcon />}
               </IconButton>
             </InputAdornment>
-          ) : handleQR ? (
+          ) : QRHandler ? (
             <InputAdornment
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
               <IconButton
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
+                aria-label="QR Code Scanner"
+                onClick={QRHandler}
                 edge="end"
               >
                 <QRLogo />
@@ -132,7 +131,7 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
   revamp: false,
-  handleQR: null,
+  QRHandler: null,
 };
 
 export default TextField;
