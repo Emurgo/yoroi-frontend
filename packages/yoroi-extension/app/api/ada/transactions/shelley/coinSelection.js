@@ -4,13 +4,16 @@ import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
-  cardanoValueFromRemoteFormat,
   cardanoValueFromMultiToken,
-  multiTokenFromRemote,
+  cardanoValueFromRemoteFormat,
   createMultiToken,
+  multiTokenFromRemote,
 } from '../utils';
 import { MultiToken } from '../../../common/lib/MultiToken';
 import { NotEnoughMoneyToSendError } from '../../../common/errors';
+
+// Not gonna be adding over 50 inputs in order to improve the tx ADA value
+const TX_IMPROVING_INPUT_LIMIT = 50;
 
 export type UtxoDescriptor = {|
   utxo: RemoteUnspentOutput,
@@ -234,6 +237,8 @@ export function improveTakeUtxos(
   classification: UtxoDescriptorClassification,
   requiredValues: Array<MultiToken>,
   takenUtxo: Array<RemoteUnspentOutput>,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  networkId: number,
 ): Array<RemoteUnspentOutput> {
   const {
     withOnlyRequiredAssets,
@@ -243,22 +248,52 @@ export function improveTakeUtxos(
     collateralReserve,
   } = classification;
   const totalRequiredValue = joinSumMultiTokens(requiredValues);
+  const totalRequiredWasmValue: RustModule.WalletV4.Value =
+    cardanoValueFromMultiToken(totalRequiredValue);
   const totalRequiredADA = totalRequiredValue.getDefault();
   const newDesiredCollateralsCount = Math.max(5 - collateralReserve.length, 0);
-  const newDesiredCollateralsADA = newDesiredCollateralsCount * ONE_ADA_LOVELACES;
-  // Desired input ADA amount is: at least the required amount plus two ADA
-  // or the required amount multiplied by two, whichever is greater,
-  // plus the desired new collateral ADA
-  const totalDesiredADA = BigNumber.max(
-    totalRequiredADA.multipliedBy(2),
-    totalRequiredADA.plus(2 * ONE_ADA_LOVELACES),
-  ).plus(newDesiredCollateralsADA);
+  // Desired total ADA input is:
+  const totalDesiredADA = totalRequiredADA
+    .multipliedBy(2) // the required amount multiplied by two to create a similar pure utxo
+    .plus(2 * ONE_ADA_LOVELACES) // plus 2 ada to make sure we cover fees
+    .plus(newDesiredCollateralsCount * ONE_ADA_LOVELACES); // plus the required new collaterals
   const takenUtxoIdSet = new Set<string>(
     takenUtxo.map(u => u.utxo_id),
   );
-  for (const utxo of [...withOnlyRequiredAssets, ...pure]) {
-
+  const improvingUtxo = [];
+  function isManyUtxosAlready(): boolean {
+    return (takenUtxo.length + improvingUtxo.length) >= TX_IMPROVING_INPUT_LIMIT;
   }
+  let totalTakenWasmValue: RustModule.WalletV4.Value = cardanoValueFromMultiToken(
+    joinSumMultiTokens(
+      takenUtxo.map(u => multiTokenFromRemote(u, networkId)),
+    ),
+  );
+  // Use utxos with only required assets and pure utxos first
+  // To not add excessive assets while improving the ADA value
+  // And utxos with only required assets are prioritised to be spent
+  for (const { utxo } of [...withOnlyRequiredAssets, ...pure]) {
+    if (takenUtxoIdSet.has(utxo.utxo_id)) {
+      // skip utxo if already taken
+      continue;
+    } else {
+      // take and mark as taken otherwise
+      improvingUtxo.push(utxo);
+      takenUtxoIdSet.add(utxo.utxo_id);
+    }
+    totalTakenWasmValue = totalTakenWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
+    const excessiveWasmValue = totalTakenWasmValue.clamped_sub(totalRequiredWasmValue);
+    // TODO: Can be extracted from the loop
+    const minRequiredExcessiveWasmAda: RustModule.WalletV4.BigNum =
+      excessiveWasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
+        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
+    const totalTakenADA = new BigNumber(totalTakenWasmValue.coin().to_str())
+      .minus(minRequiredExcessiveWasmAda.to_str());
+    if (totalTakenADA.gte(totalDesiredADA) || isManyUtxosAlready()) {
+      return improvingUtxo;
+    }
+  }
+  return improvingUtxo;
 }
 
 export function coinSelectionForValues(
