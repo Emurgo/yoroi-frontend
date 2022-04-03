@@ -269,6 +269,21 @@ export function improveTakeUtxos(
       takenUtxo.map(u => multiTokenFromRemote(u, networkId)),
     ),
   );
+  let minRequiredExcessiveAda: ?BigNumber;
+  function updateTotalTakenValueAndReturnADA(
+    utxo: RemoteUnspentOutput,
+    canSkipRequiredMinCalculation: boolean = false,
+  ): BigNumber {
+    totalTakenWasmValue = totalTakenWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
+    if (minRequiredExcessiveAda == null || !canSkipRequiredMinCalculation) {
+      const excessiveWasmValue = totalTakenWasmValue.clamped_sub(totalRequiredWasmValue);
+      const minRequiredExcessiveWasmAda = excessiveWasmValue.is_zero()
+        ? RustModule.WalletV4.BigNum.zero()
+        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
+      minRequiredExcessiveAda = new BigNumber(minRequiredExcessiveWasmAda.to_str())
+    }
+    return new BigNumber(totalTakenWasmValue.coin().to_str()).minus(minRequiredExcessiveAda);
+  }
   // Use utxos with only required assets and pure utxos first
   // To not add excessive assets while improving the ADA value
   // And utxos with only required assets are prioritised to be spent
@@ -281,14 +296,11 @@ export function improveTakeUtxos(
       improvingUtxo.push(utxo);
       takenUtxoIdSet.add(utxo.utxo_id);
     }
-    totalTakenWasmValue = totalTakenWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
-    const excessiveWasmValue = totalTakenWasmValue.clamped_sub(totalRequiredWasmValue);
-    // TODO: Can be extracted from the loop
-    const minRequiredExcessiveWasmAda: RustModule.WalletV4.BigNum =
-      excessiveWasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
-        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
-    const totalTakenADA = new BigNumber(totalTakenWasmValue.coin().to_str())
-      .minus(minRequiredExcessiveWasmAda.to_str());
+    // Can skip required min calculation here, because we know we only use pure utxos
+    // or utxos with only required assets here, so they will NOT increase the required min ada
+    const canSkipRequiredMinCalculation = true;
+    const totalTakenADA: BigNumber =
+      updateTotalTakenValueAndReturnADA(utxo, canSkipRequiredMinCalculation);
     if (totalTakenADA.gte(totalDesiredADA) || isManyUtxosAlready()) {
       return improvingUtxo;
     }
