@@ -42,55 +42,43 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
-const utxos = [{
-  utxo_id: 'abcd0',
-  tx_hash: 'abcd',
-  tx_index: 0,
-  receiver: 'addr1abcd',
-  amount: '1000000',
-  assets: [],
-}, {
-  utxo_id: 'abcd1',
-  tx_hash: 'abcd',
-  tx_index: 1,
-  receiver: 'addr1abcd',
-  amount: '3500000',
-  assets: [],
-}, {
-  utxo_id: 'abcd2',
-  tx_hash: 'abcd',
-  tx_index: 2,
-  receiver: 'addr1abcd',
-  amount: '2000000',
-  assets: [{
-    amount: '42',
-    assetId: `${POLICY_ID_1}.abcd1`,
-    policyId: POLICY_ID_1,
-    name: 'abcd1',
-  }],
-}, {
-  utxo_id: 'abcd3',
-  tx_hash: 'abcd',
-  tx_index: 3,
-  receiver: 'addr1abcd',
-  amount: '5000000',
-  assets: [{
-    amount: '52',
-    assetId: `${POLICY_ID_1}.abcd1`,
-    policyId: POLICY_ID_1,
-    name: 'abcd1',
-  }, {
-    amount: '53',
-    assetId: `${POLICY_ID_2}.abcd2`,
-    policyId: POLICY_ID_2,
-    name: 'abcd2',
-  }, {
-    amount: '54',
-    assetId: `${POLICY_ID_3}.abcd3`,
-    policyId: POLICY_ID_3,
-    name: 'abcd3',
-  }],
-}];
+function mockUtxo(
+  index: number,
+  amount: number | string,
+  assets: Array<{
+    policy: string,
+    name: string,
+    amount: number | string,
+  }> = [],
+): RemoteUnspentOutput {
+  const txHash = 'abcd';
+  return{
+    utxo_id: `${txHash}${index}`,
+    tx_hash: txHash,
+    tx_index: index,
+    receiver: 'addr1abcd',
+    amount: String(amount),
+    assets: assets.map(a => ({
+      amount: String(a.amount),
+      assetId: `${a.policy}.${a.name}`,
+      policyId: a.policy,
+      name: a.name,
+    })),
+  };
+}
+
+const utxos = [
+  mockUtxo(0, 1_000_000),
+  mockUtxo(1, 3_500_000),
+  mockUtxo(2, 2_000_000, [
+    { policy: POLICY_ID_1, name: 'abcd1', amount: 42 },
+  ]),
+  mockUtxo(3, 5_000_000, [
+    { policy: POLICY_ID_1, name: 'abcd1', amount: 52 },
+    { policy: POLICY_ID_2, name: 'abcd2', amount: 53 },
+    { policy: POLICY_ID_3, name: 'abcd3', amount: 54 },
+  ]),
+];
 
 describe('describeUtxos', () => {
 
@@ -677,6 +665,31 @@ describe('improveTakeUtxos', () => {
     expect(() => CoinSelection.improveTakenUtxos(
       classification,
       [multiToken(1)],
+      takenUtxo,
+      createCoinsPerUtxoWord(),
+      0,
+    )).toThrow('Cannot process empty required values!');
+  });
+
+  it('', () => {
+
+    // Pure required, no required assets, much smaller than
+    const requiredValues = [multiToken(500)];
+
+    const classification = CoinSelection.classifyUtxoForValues(
+      utxos,
+      requiredValues,
+      createCoinsPerUtxoWord(),
+    );
+
+    // As if no utxos have been taken before trying to improve
+    // This is not a valid situation, because "improve" is only
+    // expected to be called to improve an already existing selection
+    const takenUtxo = [];
+
+    expect(() => CoinSelection.improveTakenUtxos(
+      classification,
+      requiredValues,
       takenUtxo,
       createCoinsPerUtxoWord(),
       0,

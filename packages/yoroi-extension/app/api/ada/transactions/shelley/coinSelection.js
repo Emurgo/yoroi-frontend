@@ -271,10 +271,12 @@ export function improveTakenUtxos(
   );
   let minRequiredExcessiveAda: ?BigNumber;
   function updateTotalTakenValueAndReturnADA(
-    utxo: RemoteUnspentOutput,
+    utxo: ?RemoteUnspentOutput,
     canSkipRequiredMinCalculation: boolean = false,
   ): BigNumber {
-    totalTakenWasmValue = totalTakenWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
+    if (utxo != null) {
+      totalTakenWasmValue = totalTakenWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
+    }
     if (minRequiredExcessiveAda == null || !canSkipRequiredMinCalculation) {
       const excessiveWasmValue = totalTakenWasmValue.clamped_sub(totalRequiredWasmValue);
       const minRequiredExcessiveWasmAda = excessiveWasmValue.is_zero()
@@ -283,6 +285,13 @@ export function improveTakenUtxos(
       minRequiredExcessiveAda = new BigNumber(minRequiredExcessiveWasmAda.to_str())
     }
     return new BigNumber(totalTakenWasmValue.coin().to_str()).minus(minRequiredExcessiveAda);
+  }
+  {
+    // Calculate total taken before making any changes and return in case already enough
+    const totalTakenADA: BigNumber = updateTotalTakenValueAndReturnADA(null);
+    if (totalTakenADA.gte(totalDesiredADA) || isManyUtxosAlready()) {
+      return improvedTakenUtxo;
+    }
   }
   // Use utxos with only required assets and pure utxos first
   // To not add excessive assets while improving the ADA value
