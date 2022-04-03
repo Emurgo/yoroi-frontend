@@ -233,7 +233,7 @@ export function takeUtxosForValues(
   return { utxoTaken, utxoRemaining: utxos.slice(utxoIndex + 1) };
 }
 
-export function improveTakeUtxos(
+export function improveTakenUtxos(
   classification: UtxoDescriptorClassification,
   requiredValues: Array<MultiToken>,
   takenUtxo: Array<RemoteUnspentOutput>,
@@ -242,9 +242,9 @@ export function improveTakeUtxos(
 ): Array<RemoteUnspentOutput> {
   const {
     withOnlyRequiredAssets,
-    withRequiredAssets,
+    // withRequiredAssets,
     pure,
-    dirty,
+    // dirty,
     collateralReserve,
   } = classification;
   const totalRequiredValue = joinSumMultiTokens(requiredValues);
@@ -260,9 +260,9 @@ export function improveTakeUtxos(
   const takenUtxoIdSet = new Set<string>(
     takenUtxo.map(u => u.utxo_id),
   );
-  const improvingUtxo = [];
+  const improvedTakenUtxo = [...takenUtxo];
   function isManyUtxosAlready(): boolean {
-    return (takenUtxo.length + improvingUtxo.length) >= TX_IMPROVING_INPUT_LIMIT;
+    return improvedTakenUtxo.length >= TX_IMPROVING_INPUT_LIMIT;
   }
   let totalTakenWasmValue: RustModule.WalletV4.Value = cardanoValueFromMultiToken(
     joinSumMultiTokens(
@@ -293,7 +293,7 @@ export function improveTakeUtxos(
       continue;
     } else {
       // take and mark as taken otherwise
-      improvingUtxo.push(utxo);
+      improvedTakenUtxo.push(utxo);
       takenUtxoIdSet.add(utxo.utxo_id);
     }
     // Can skip required min calculation here, because we know we only use pure utxos
@@ -302,10 +302,10 @@ export function improveTakeUtxos(
     const totalTakenADA: BigNumber =
       updateTotalTakenValueAndReturnADA(utxo, canSkipRequiredMinCalculation);
     if (totalTakenADA.gte(totalDesiredADA) || isManyUtxosAlready()) {
-      return improvingUtxo;
+      return improvedTakenUtxo;
     }
   }
-  return improvingUtxo;
+  return improvedTakenUtxo;
 }
 
 export function coinSelectionForValues(
@@ -347,7 +347,7 @@ export function coinSelectionForValues(
     coinsPerUtxoWord,
     networkId,
   );
-  const improvingUtxos = improveTakeUtxos(
+  const improvingUtxos = improveTakenUtxos(
     classification,
     [totalRequiredValue],
     utxoTaken,

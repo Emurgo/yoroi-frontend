@@ -34,7 +34,7 @@ function utxosFromDescriptors(
   return ds.map(d => d.utxo);
 }
 
-function coinsPerUtxoWork(v: number | string = 500): RustModule.WalletV4.BigNum {
+function coinsPerUtxoWord(v: number | string = 500): RustModule.WalletV4.BigNum {
   return RustModule.WalletV4.BigNum.from_str(String(v));
 }
 
@@ -246,7 +246,7 @@ describe('describeUtxos', () => {
 describe('classifyUtxoDescriptors', () => {
 
   it('classify with no required assets', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set(), coinsPerUtxoWord);
     const classification =
@@ -260,7 +260,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with one required asset contained in one utxo', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([`${POLICY_ID_2}.abcd2`]), coinsPerUtxoWord);
     const classification =
@@ -273,7 +273,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with one required asset contained in multiple utxos', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([`${POLICY_ID_1}.abcd1`]), coinsPerUtxoWord);
     const classification =
@@ -286,7 +286,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with multiple required assets', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const descriptors = CoinSelection
       .describeUtxos(utxos, new Set([
         `${POLICY_ID_1}.abcd1`,
@@ -305,7 +305,7 @@ describe('classifyUtxoDescriptors', () => {
   });
 
   it('classify with multiple pure utxos', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const pureUtxos = utxos.map(u => ({ ...u, assets: [] }));
     const descriptors = CoinSelection
       .describeUtxos(pureUtxos, new Set(), coinsPerUtxoWord);
@@ -338,7 +338,7 @@ describe('classifyUtxoForValues', () => {
      * Classification only uses asset information from the required values
      * ADA amounts change absolutely nothing.
      */
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const classification1 = CoinSelection.classifyUtxoForValues(
       utxos,
       [multiToken(3_000_000)],
@@ -362,7 +362,7 @@ describe('classifyUtxoForValues', () => {
   });
 
   it('Multiple values with same assets', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     const classification = CoinSelection.classifyUtxoForValues(
       utxos,
       [
@@ -379,7 +379,7 @@ describe('classifyUtxoForValues', () => {
   });
 
   it('Multiple values with assets', () => {
-    const coinsPerUtxoWord = coinsPerUtxoWork();
+    const coinsPerUtxoWord = coinsPerUtxoWord();
     // First classification is for two values, one real asset each
     const classification1 = CoinSelection.classifyUtxoForValues(
       utxos,
@@ -424,7 +424,7 @@ describe('takeUtxosForValues', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
       [multiToken(0)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     );
     expect(utxoTaken).toEqual([utxos[0]]);
@@ -435,7 +435,7 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [],
       [multiToken(0)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
   });
@@ -444,7 +444,7 @@ describe('takeUtxosForValues', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
       [multiToken(1_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     );
     expect(utxoTaken).toEqual([utxos[0]]);
@@ -455,7 +455,7 @@ describe('takeUtxosForValues', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
       [multiToken(2_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     );
     expect(utxoTaken).toEqual([utxos[0], utxos[1]]);
@@ -466,7 +466,7 @@ describe('takeUtxosForValues', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     );
     expect(utxoTaken).toEqual([utxos[0], utxos[1], utxos[2]]);
@@ -477,7 +477,7 @@ describe('takeUtxosForValues', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_2}.abcd2`, amount: '1' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     );
     expect(utxoTaken).toEqual([utxos[0], utxos[1], utxos[2], utxos[3]]);
@@ -488,7 +488,7 @@ describe('takeUtxosForValues', () => {
     const { utxoTaken, utxoRemaining } = CoinSelection.takeUtxosForValues(
       utxos,
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '70' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     );
     expect(utxoTaken).toEqual([utxos[0], utxos[1], utxos[2], utxos[3]]);
@@ -502,7 +502,7 @@ describe('takeUtxosForValues', () => {
     const take1 = CoinSelection.takeUtxosForValues(
       [utxos[2], utxos[0], utxos[1]],
       [multiToken(1_500_000)],
-      coinsPerUtxoWork(30_000),
+      coinsPerUtxoWord(30_000),
       0,
     );
     expect(take1.utxoTaken).toEqual([utxos[2], utxos[0]]);
@@ -514,7 +514,7 @@ describe('takeUtxosForValues', () => {
     const take2 = CoinSelection.takeUtxosForValues(
       [utxos[2], utxos[0], utxos[1]],
       [multiToken(1_990_000)],
-      coinsPerUtxoWork(30_000),
+      coinsPerUtxoWord(30_000),
       0,
     );
     expect(take2.utxoTaken).toEqual([utxos[2], utxos[0], utxos[1]]);
@@ -538,7 +538,7 @@ describe('takeUtxosForValues', () => {
     const take1 = CoinSelection.takeUtxosForValues(
       mappedUtxos1,
       [multiToken(1_830_000)],
-      coinsPerUtxoWork(30_000),
+      coinsPerUtxoWord(30_000),
       0,
     );
     expect(take1.utxoTaken).toEqual([mappedUtxos1[0], mappedUtxos1[1]]);
@@ -550,7 +550,7 @@ describe('takeUtxosForValues', () => {
     const take2 = CoinSelection.takeUtxosForValues(
       mappedUtxos2,
       [multiToken(1_830_000)],
-      coinsPerUtxoWork(30_000),
+      coinsPerUtxoWord(30_000),
       0,
     );
     expect(take2.utxoTaken).toEqual([mappedUtxos2[0], mappedUtxos2[1], mappedUtxos2[2]]);
@@ -562,7 +562,7 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       mappedUtxos3,
       [multiToken(1_830_000)],
-      coinsPerUtxoWork(30_000),
+      coinsPerUtxoWord(30_000),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
   });
@@ -572,28 +572,28 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[0]],
       [multiToken(15_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
 
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[0], utxos[1]],
       [multiToken(15_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
 
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[0], utxos[1], utxos[2]],
       [multiToken(15_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
 
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[0], utxos[1], utxos[2], utxos[3]],
       [multiToken(15_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
   });
@@ -604,7 +604,7 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[0]],
       [multiToken(1_000_000)],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).not.toThrow();
 
@@ -612,7 +612,7 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[0]],
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
 
@@ -620,7 +620,7 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[2]],
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '1' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).not.toThrow();
 
@@ -628,7 +628,7 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[2]],
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_1}.abcd1`, amount: '100' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
 
@@ -636,8 +636,56 @@ describe('takeUtxosForValues', () => {
     expect(() => CoinSelection.takeUtxosForValues(
       [utxos[2]],
       [multiToken(1_000_000, [{ assetId: `${POLICY_ID_2}.abcd2`, amount: '1' }])],
-      coinsPerUtxoWork(),
+      coinsPerUtxoWord(),
       0,
     )).toThrow(NotEnoughMoneyToSendError);
+  });
+});
+
+describe('improveTakeUtxos', () => {
+
+  it('Returns same taken utxos when empty classification', () => {
+
+    const classification = CoinSelection.classifyUtxoForValues(
+      [],
+      [multiToken(1)],
+      coinsPerUtxoWord(),
+    );
+
+    // Utxos taken before calling to improve
+    const takenUtxo = [utxos[0]];
+
+    const improvingUtxos = CoinSelection.improveTakenUtxos(
+      classification,
+      [multiToken(1)],
+      takenUtxo,
+      coinsPerUtxoWord(),
+      0,
+    );
+
+    // The result must be the same exact taken utxo without changes
+    expect(improvingUtxos).toEqual(takenUtxo);
+  });
+
+  it('Fails on no taken utxos', () => {
+
+    const classification = CoinSelection.classifyUtxoForValues(
+      [],
+      [multiToken(1)],
+      coinsPerUtxoWord(),
+    );
+
+    // As if no utxos have been taken before trying to improve
+    // This is not a valid situation, because "improve" is only
+    // expected to be called to improve an already existing selection
+    const takenUtxo = [];
+
+    expect(() => CoinSelection.improveTakenUtxos(
+      classification,
+      [multiToken(1)],
+      takenUtxo,
+      coinsPerUtxoWord(),
+      0,
+    )).toThrow('Cannot process empty required values!');
   });
 });
