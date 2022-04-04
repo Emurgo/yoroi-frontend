@@ -209,7 +209,16 @@ export default class BaseCoinPriceStore
       )
     ).filter(ticker => ticker.To === currency);
 
-    this.currentPriceTickers.splice(0, this.currentPriceTickers.length, ...tickers);
+    for (const ticker of tickers) {
+      const index = this.currentPriceTickers.findIndex(
+        ({ From, To }) => From === ticker.From && To === ticker.To
+      );
+      if (index === -1) {
+        this.currentPriceTickers.push(ticker);
+      } else {
+        this.currentPriceTickers[index].Price = ticker.Price;
+      }
+    }
     this.lastUpdateTimestamp = response.ticker.timestamp;
   }
 
