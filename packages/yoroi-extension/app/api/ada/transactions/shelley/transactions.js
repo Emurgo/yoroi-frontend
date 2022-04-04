@@ -39,8 +39,7 @@ import {
   parseTokenList,
 } from '../utils';
 import { hexToBytes } from '../../../../coreUtils';
-import { classifyUtxoForValues } from './coinSelection';
-import type { UtxoDescriptor } from './coinSelection';
+import { coinSelectionForValues } from './coinSelection';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -531,20 +530,13 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const { withOnlyRequiredAssets, withRequiredAssets, pure, dirty, collateralReserve } = classifyUtxoForValues(
+  // <TODO:USE recommendedPureChange>
+  const { selectedUtxo, recommendedPureChange } = coinSelectionForValues(
     utxos,
     outputs.map(o => o.amount),
     protocolParams.coinsPerUtxoWord,
-  )
-
-  // prioritize inputs
-  const sortedUtxos: Array<RemoteUnspentOutput> = [
-    ...withOnlyRequiredAssets,
-    ...withRequiredAssets,
-    ...pure,
-    ...dirty,
-    ...collateralReserve,
-  ].map((u: UtxoDescriptor) => u.utxo);
+    protocolParams.networkId,
+  );
 
   /*
     This is an ad-hoc optimization for one specific senario:
@@ -558,7 +550,7 @@ export function newAdaUnsignedTxFromUtxo(
   const result = _newAdaUnsignedTxFromUtxo(
     outputs,
     changeAdaAddr,
-    sortedUtxos,
+    selectedUtxo,
     absSlotNumber,
     protocolParams,
     certificates,
@@ -572,7 +564,7 @@ export function newAdaUnsignedTxFromUtxo(
   const resultWithOneExtraInput = _newAdaUnsignedTxFromUtxo(
     outputs,
     changeAdaAddr,
-    sortedUtxos,
+    selectedUtxo,
     absSlotNumber,
     protocolParams,
     certificates,
