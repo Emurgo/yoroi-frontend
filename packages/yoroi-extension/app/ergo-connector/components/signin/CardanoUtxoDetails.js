@@ -84,6 +84,10 @@ class CardanoUtxoDetails extends Component<Props> {
     entry: TokenEntry,
   |}) => Node = request => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
+    if (!tokenInfo) {
+      throw new Error('missing token info');
+    }
+
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
     const ticker = tokenInfo ? this.getTicker(tokenInfo)

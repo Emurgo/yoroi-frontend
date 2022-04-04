@@ -369,6 +369,10 @@ export default class Transaction extends Component<Props, State> {
       }
 
       const tokenInfo = this.props.getTokenInfo(request.entry);
+      if (!tokenInfo) {
+        throw new Error('missing token info');
+      }
+
       const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
       const ticker = tokenInfo.Metadata.ticker;
       if (ticker == null) {
@@ -439,6 +443,10 @@ export default class Transaction extends Component<Props, State> {
 
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    if (!tokenInfo) {
+      throw new Error('missing token info');
+    }
+
     const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
 
