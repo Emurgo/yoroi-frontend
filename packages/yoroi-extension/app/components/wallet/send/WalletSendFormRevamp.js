@@ -44,7 +44,6 @@ import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
-import QRLogo from '../../../assets/images/qr-code.inline.svg';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -139,6 +138,8 @@ type Props = {|
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
   +openDialog: any => void,
+  +isOpen: any => boolean,
+  +closeDialog: void => void,
 |};
 
 type State = {|
@@ -538,7 +539,7 @@ export default class WalletSendForm extends Component<Props, State> {
       return (
         <QRScannerDialog
           onClose={this.props.closeDialog}
-          onUpdate={(address) => { receiverField.value = address }}
+          onReadQR={(address) => { receiverField.value = address }}
         />
       )
     }

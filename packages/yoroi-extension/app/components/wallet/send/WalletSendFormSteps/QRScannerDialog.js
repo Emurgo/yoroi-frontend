@@ -1,5 +1,6 @@
 // @flow
 import Dialog from '../../../widgets/Dialog';
+import type { Node } from 'react'
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import { Component } from 'react';
 import Scanner from 'react-webcam-qr-scanner';
@@ -19,7 +20,10 @@ const messages: Object = defineMessages({
   }
 });
 
-type Props = {||}
+type Props = {|
+  onClose: void => void,
+  onReadQR: string => void,
+|}
 type State = {|
   error: string,
 |}
@@ -33,8 +37,8 @@ export default class QrScanner extends Component<Props, State> {
     error: ''
   }
 
-  handleDecode = (result) => {
-    this.props.onUpdate(result.data)
+  handleDecode: (result: {| data: string |}) => void = (result) => {
+    this.props.onReadQR(result.data)
     this.props.onClose()
   }
 
