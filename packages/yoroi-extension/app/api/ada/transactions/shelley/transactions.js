@@ -531,7 +531,7 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const { withRequiredAssets, pure, dirty, collateralReserve } = classifyUtxoForValues(
+  const { withOnlyRequiredAssets, withRequiredAssets, pure, dirty, collateralReserve } = classifyUtxoForValues(
     utxos,
     outputs.map(o => o.amount),
     protocolParams.coinsPerUtxoWord,
@@ -539,6 +539,7 @@ export function newAdaUnsignedTxFromUtxo(
 
   // prioritize inputs
   const sortedUtxos: Array<RemoteUnspentOutput> = [
+    ...withOnlyRequiredAssets,
     ...withRequiredAssets,
     ...pure,
     ...dirty,
