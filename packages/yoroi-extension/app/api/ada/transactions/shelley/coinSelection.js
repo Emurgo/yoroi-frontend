@@ -185,6 +185,17 @@ function joinSumMultiTokens(mts: Array<MultiToken>): MultiToken {
     : mts.reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2));
 }
 
+function calculateMinRequiredAda(
+  value: MultiToken,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+): BigNumber {
+  const wasmValue = cardanoValueFromMultiToken(value);
+  const minRequiredWasmAda: RustModule.WalletV4.BigNum =
+    wasmValue.is_zero() ? RustModule.WalletV4.BigNum.zero()
+      : RustModule.WalletV4.min_ada_required(wasmValue, false, coinsPerUtxoWord);
+  return new BigNumber(minRequiredWasmAda.to_str());
+}
+
 export function takeUtxosForValues(
   utxos: Array<RemoteUnspentOutput>,
   requiredValues: Array<MultiToken>,
@@ -317,7 +328,10 @@ export function coinSelectionForValues(
   requiredValues: Array<MultiToken>,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   networkId: number,
-): Array<RemoteUnspentOutput> {
+): {
+  selectedUtxo: Array<RemoteUnspentOutput>,
+  recommendedPureChange: Array<number>,
+} {
   if (utxos.length === 0) {
     throw new Error('Cannot coin-select for empty utxos!')
   }
@@ -351,10 +365,37 @@ export function coinSelectionForValues(
     coinsPerUtxoWord,
     networkId,
   );
-  const improvingUtxos = improveTakenUtxos(
+  const improvedTakenUtxo = improveTakenUtxos(
     classification,
     [totalRequiredValue],
     utxoTaken,
   )
-  return utxoTaken;
+  const totalExtraValue = joinSumMultiTokens(
+    improvedTakenUtxo.map(u => multiTokenFromRemote(u, networkId)),
+  ).joinSubtractCopyWithLimitZero(totalRequiredValue);
+  const minRequiredAda =
+    calculateMinRequiredAda(totalExtraValue, coinsPerUtxoWord);
+  let availableExtraAda =
+    totalExtraValue.getDefault().minus(minRequiredAda);
+  const recommendedPureChange = [];
+  {
+    // Adding recommended collaterals
+    const missingCollaterals = 5 - collateralReserve.length;
+    for (let i = 0; i < missingCollaterals; i++) {
+      if (availableExtraAda.isGreaterThan(ONE_ADA_LOVELACES)) {
+        recommendedPureChange.push(ONE_ADA_LOVELACES);
+        availableExtraAda = availableExtraAda.minus(ONE_ADA_LOVELACES);
+      }
+    }
+  }
+  {
+    const requiredAda = totalRequiredValue.getDefault();
+    if (availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5))) {
+      recommendedPureChange.push(requiredAda);
+    }
+  }
+  return {
+    selectedUtxo: improvedTakenUtxo,
+    recommendedPureChange,
+  };
 }
