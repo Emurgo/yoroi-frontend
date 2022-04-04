@@ -5,10 +5,6 @@ import * as CardanoWasm from '@emurgo/cardano-serialization-lib-browser';
 // // eslint-disable-next-line import/named
 import { bytesToHex, getTtl, hexToBytes } from '../support/helpers/dapp-helpers';
 
-const AMOUNT_TO_SEND = '1000000';
-const SEND_TO_ADDRESS =
-  'addr_test1qz8xh9w6f2vdnp89xzqlxnusldhz6kdm4rp970gl8swwjjkr3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0q4lztj0';
-
 class MockDAppWebpageError extends Error {}
 
 type AccessCallBack = {|
@@ -185,7 +181,7 @@ export class MockDAppWebpage {
     return value.coin().to_str();
   }
 
-  async signTx() {
+  async requestSigningTx(amount: string, toAddress: string) {
     const UTXOs = await this._getUTXOs();
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
@@ -204,15 +200,14 @@ export class MockDAppWebpage {
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
     );
 
-    const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS);
-    // error is here
+    const shelleyOutputAddress = CardanoWasm.Address.from_bech32(toAddress);
     const shelleyChangeAddress = CardanoWasm.Address.from_bech32(changeAddress);
 
     // add output to the tx
     txBuilder.add_output(
       CardanoWasm.TransactionOutput.new(
         shelleyOutputAddress,
-        CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(AMOUNT_TO_SEND))
+        CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount))
       )
     );
     const ttl = getTtl();
@@ -222,13 +217,14 @@ export class MockDAppWebpage {
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
 
-    await this.driver.executeAsyncScript((unsignedTxHex, ...args) => {
+    await this.driver.executeScript((unsignedTxHex, ...args) => {
       const callback = args[args.length - 1];
       window.api
         .signTx({ tx: unsignedTxHex })
         // eslint-disable-next-line promise/always-return
-        .then(responseHex => {
-          callback(responseHex);
+        .then((responseHex) => {
+          const signedTx = CardanoWasm.Transaction.from_bytes(hexToBytes(responseHex));
+          callback(signedTx);
         })
         .catch(error => {
           throw new MockDAppWebpageError(JSON.stringify(error));
