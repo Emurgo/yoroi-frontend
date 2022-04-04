@@ -351,7 +351,28 @@ export function coinSelectionForValues(
     dirty,
     collateralReserve,
   } = classification;
-  // prioritize inputs
+  /**
+   * Classified utxo categories are organised to force the order of utxo taking.
+   *
+   * - Utxos with only required assets are spent first for obvious reasons,
+   *   they are the best choice, when sending some assets. If the entire required amount can be
+   *   satisfied by only this category - that is the perfect outcome.
+   *
+   * - Utxos with SOME required assets are spent as second priority. This is our own
+   *   choice and the reasoning is that adding at least SOME of the required assets to the mix,
+   *   even at the cost of adding some unrequired dirt, is better than spending precious pure utxos.
+   *   It will give at least some side-effect improvement of grouping required assets together.
+   *
+   * - Pure utxos are spent after that, because it's the lowest cost addition out of what is left.
+   *
+   * - Dirty utxos that don't contain any of the required assets are added after that.
+   *   This is a bad option, because it mixes in unrequired dirt into the transaction,
+   *   without making any improvements, apart from the ADA value itself. Which is why
+   *   this is the lowest priority non-critical category.
+   *
+   * - Collateral reserve is used as the last critical resort, this is the worst option,
+   *   as the collateral reserve should normally never be spent at all.
+   */
   const sortedUtxos: Array<RemoteUnspentOutput> = [
     ...withOnlyRequiredAssets,
     ...withRequiredAssets,
