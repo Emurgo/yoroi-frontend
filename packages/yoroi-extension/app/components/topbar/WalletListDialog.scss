@@ -1,3 +1,5 @@
+@import '../../themes/mixins/loading-spinner';
+
 .component {
   font-size: 16px;
   min-width: 673px !important;
@@ -52,5 +54,12 @@
       text-transform: uppercase;
       color: var(--yoroi-palette-secondary-300);
     }
+  }
+  .isLoading {
+    position: relative;
+    display: inline-block;
+    margin-left: 9px;
+    margin-bottom: 6px;
+    @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
   }
 }

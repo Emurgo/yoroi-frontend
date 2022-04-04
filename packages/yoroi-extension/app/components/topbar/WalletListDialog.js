@@ -1,5 +1,5 @@
 // @flow
-
+import { BigNumber } from 'bignumber.js';
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -10,8 +10,6 @@ import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import { splitAmount, truncateToken } from '../../utils/formatters';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -19,7 +17,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
-import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import { formatValue } from '../../utils/unit-of-account';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
@@ -93,49 +91,11 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   }
 
-  renderAmountDisplay: ({|
+  renderWalletSum: {|
     shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
-
-  renderAmountWithUnitOfAccount: {|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken
+    walletAmounts: Array<?MultiToken>,
+    rewards: Array<?MultiToken>,
   |} => Node = (request) => {
-    if (request.amount == null) {
-      return null;
-    }
     const { currency } = this.props.unitOfAccountSetting;
     if (!currency) {
       throw new Error(`unexpected unit of account ${String(currency)}`);
@@ -148,26 +108,28 @@ export default class WalletListDialog extends Component<Props, State> {
         </>
       );
     }
+    let totalAmount = new BigNumber('0');
 
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
-          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    const ticker = tokenInfo.Metadata.ticker;
-    if (ticker == null) {
-      throw new Error('unexpected main token type');
+    for (const amount of [...request.walletAmounts, ...request.rewards]) {
+      if (!amount) {
+        return <div className={styles.isLoading} />;
+      }
+      const defaultEntry = amount.getDefaultEntry();
+      const tokenInfo = this.props.getTokenInfo(defaultEntry);
+      const shiftedAmount = defaultEntry.amount
+            .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getCurrentPrice(ticker, currency);
+      if (price != null) {
+        totalAmount = totalAmount.plus(shiftedAmount.multipliedBy(price));
+      } else {
+        return '- ' + currency;
+      }
     }
-    const price = this.props.getCurrentPrice(ticker, currency);
-
-    let balanceDisplay;
-    if (price != null) {
-      balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
-    } else {
-      balanceDisplay = '-';
-    }
-
-    return balanceDisplay + ' ' + currency;
+    return formatValue(totalAmount) + ' ' + currency;
   }
 
   onDragEnd: Object => any = async result => {
@@ -200,7 +162,6 @@ export default class WalletListDialog extends Component<Props, State> {
     const {
       shouldHideBalance,
       onAddWallet,
-      walletAmount,
       onUpdateHideBalance,
       wallets,
     } = this.props;
@@ -215,23 +176,18 @@ export default class WalletListDialog extends Component<Props, State> {
       >
         <div className={styles.header}>
           <div className={styles.totalInfo}>
-            <div className={styles.amount}>
-              <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-              <p className={styles.value}>
-                {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: walletAmount,
-                })}
-              </p>
-              {this.props.unitOfAccountSetting.enabled && (
+            {this.props.unitOfAccountSetting.enabled && (
+              <div className={styles.amount}>
+                <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
                 <p className={styles.fixedAmount}>
-                  {this.renderAmountWithUnitOfAccount({
+                  {this.renderWalletSum({
                     shouldHideBalance,
-                    amount: walletAmount,
+                    walletAmounts: wallets.map(wallet => wallet.walletAmount),
+                    rewards: wallets.map(wallet => wallet.rewards),
                   })}
                 </p>
-              )}
-            </div>
+              </div>
+            )}
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
