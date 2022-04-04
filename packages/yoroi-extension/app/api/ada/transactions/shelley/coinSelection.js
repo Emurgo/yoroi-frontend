@@ -242,9 +242,9 @@ export function improveTakenUtxos(
 ): Array<RemoteUnspentOutput> {
   const {
     withOnlyRequiredAssets,
-    // withRequiredAssets,
+    withRequiredAssets,
     pure,
-    // dirty,
+    dirty,
     collateralReserve,
   } = classification;
   const totalRequiredValue = joinSumMultiTokens(requiredValues);
@@ -272,18 +272,15 @@ export function improveTakenUtxos(
   let minRequiredExcessiveAda: ?BigNumber;
   function updateTotalTakenValueAndReturnADA(
     utxo: ?RemoteUnspentOutput,
-    canSkipRequiredMinCalculation: boolean = false,
   ): BigNumber {
     if (utxo != null) {
       totalTakenWasmValue = totalTakenWasmValue.checked_add(cardanoValueFromRemoteFormat(utxo));
     }
-    if (minRequiredExcessiveAda == null || !canSkipRequiredMinCalculation) {
-      const excessiveWasmValue = totalTakenWasmValue.clamped_sub(totalRequiredWasmValue);
-      const minRequiredExcessiveWasmAda = excessiveWasmValue.is_zero()
-        ? RustModule.WalletV4.BigNum.zero()
-        : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
-      minRequiredExcessiveAda = new BigNumber(minRequiredExcessiveWasmAda.to_str())
-    }
+    const excessiveWasmValue = totalTakenWasmValue.clamped_sub(totalRequiredWasmValue);
+    const minRequiredExcessiveWasmAda = excessiveWasmValue.is_zero()
+      ? RustModule.WalletV4.BigNum.zero()
+      : RustModule.WalletV4.min_ada_required(excessiveWasmValue, false, coinsPerUtxoWord);
+    minRequiredExcessiveAda = new BigNumber(minRequiredExcessiveWasmAda.to_str())
     return new BigNumber(totalTakenWasmValue.coin().to_str()).minus(minRequiredExcessiveAda);
   }
   {
@@ -293,10 +290,12 @@ export function improveTakenUtxos(
       return improvedTakenUtxo;
     }
   }
-  // Use utxos with only required assets and pure utxos first
-  // To not add excessive assets while improving the ADA value
-  // And utxos with only required assets are prioritised to be spent
-  for (const { utxo } of [...withOnlyRequiredAssets, ...pure]) {
+  for (const { utxo } of [
+    ...withOnlyRequiredAssets,
+    ...pure,
+    ...withRequiredAssets,
+    ...dirty,
+  ]) {
     if (takenUtxoIdSet.has(utxo.utxo_id)) {
       // skip utxo if already taken
       continue;
@@ -305,11 +304,7 @@ export function improveTakenUtxos(
       improvedTakenUtxo.push(utxo);
       takenUtxoIdSet.add(utxo.utxo_id);
     }
-    // Can skip required min calculation here, because we know we only use pure utxos
-    // or utxos with only required assets here, so they will NOT increase the required min ada
-    const canSkipRequiredMinCalculation = true;
-    const totalTakenADA: BigNumber =
-      updateTotalTakenValueAndReturnADA(utxo, canSkipRequiredMinCalculation);
+    const totalTakenADA: BigNumber = updateTotalTakenValueAndReturnADA(utxo);
     if (totalTakenADA.gte(totalDesiredADA) || isManyUtxosAlready()) {
       return improvedTakenUtxo;
     }
