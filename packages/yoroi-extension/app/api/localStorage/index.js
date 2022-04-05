@@ -283,7 +283,7 @@ export default class LocalStorageApi {
   };
 
   setSortedWallets: (Array<number>) => Promise<void> = value =>
-    setLocalItem(storageKeys.SORTED_WALLETS, JSON.stringify(value ?? []));
+    setLocalItem(storageKeys.SORTED_WALLETS, JSON.stringify(value));
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();

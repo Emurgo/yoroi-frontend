@@ -76,7 +76,6 @@ export default class WalletListDialog extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
   state: State = {
-    walletListIdx: [],
     ergoWalletsIdx: [],
     cardanoWalletsIdx: [],
   };
@@ -97,7 +96,10 @@ export default class WalletListDialog extends Component<Props, State> {
         cardanoWalletsIdx: cardanoWalletsId,
       },
       async () => {
-        // await this.props.updateSortedWalletList({ sortedWallets: generatedWalletIds });
+        await this.props.updateSortedWalletList({
+          ergo: ergoWalletsId,
+          cardano: cardanoWalletsId,
+        });
       }
     );
   }
@@ -157,7 +159,10 @@ export default class WalletListDialog extends Component<Props, State> {
         };
       },
       async function () {
-        // await this.props.updateSortedWalletList({ sortedWallets: this.state.walletListIdx });
+        await this.props.updateSortedWalletList({
+          ergo: this.state.ergoWalletsIdx,
+          cardano: this.state.cardanoWalletsIdx
+        });
       }
     );
   };

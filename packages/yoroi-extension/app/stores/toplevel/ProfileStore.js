@@ -138,9 +138,9 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   >(this.api.localStorage.getSortedWallets);
 
   @observable setSortedWalletsRequest: Request<
-    ({| sortedWallets: Array<number> |}) => Promise<void>
-  > = new Request<({| sortedWallets: Array<number> |}) => Promise<void>>(
-    ({ sortedWallets }) => this.api.localStorage.setSortedWallets(sortedWallets)
+    ({| wallets: Array<number> |}) => Promise<void>
+  > = new Request<({| wallets: Array<number> |}) => Promise<void>>(
+    (wallets) => this.api.localStorage.setSortedWallets(wallets)
   );
 
   setup(): void {
@@ -256,10 +256,8 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   _getSortedWalletList: void => Promise<void> = async () => {
     await this.getSortedWalletsRequest.execute();
   };
-  _updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void> = async ({
-    sortedWallets,
-  }) => {
-    await this.setSortedWalletsRequest.execute({ sortedWallets });
+  _updateSortedWalletList: ({| wallets: Array<number> |}) => Promise<void> = async (wallets) => {
+    await this.setSortedWalletsRequest.execute(wallets);
     await this.getSortedWalletsRequest.execute();
   };
 }
