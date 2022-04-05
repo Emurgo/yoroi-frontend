@@ -22,9 +22,8 @@ import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import {
   cardanoValueFromMultiToken,
-  cardanoValueFromRemoteFormat, createMultiToken,
+  cardanoValueFromRemoteFormat,
   multiTokenFromCardanoValue,
-  parseTokenList,
 } from '../utils';
 import { hexToBytes } from '../../../../coreUtils';
 import { coinSelectionForValues } from './coinSelection';
@@ -574,8 +573,6 @@ function _newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const emptyAsset = RustModule.WalletV4.MultiAsset.new();
-
   const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
   if (certificates.length > 0) {
     const certsWasm = certificates.reduce(
@@ -626,89 +623,19 @@ function _newAdaUnsignedTxFromUtxo(
   // output excluding fee
   const targetOutput = txBuilder.get_total_output();
 
-  // pick inputs
-  const usedUtxos: Array<RemoteUnspentOutput> = [];
-  {
-    // add utxos until we have enough to send the transaction
-    for (let i = 0; i < utxos.length; i++) {
-      const utxo = utxos[i];
-      const currentInputSum = txBuilder.get_total_input();
-      const neededInput = targetOutput
-        .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
-      const excessiveInputAssets = currentInputSum.multiasset()
-        ?.sub(neededInput.multiasset() ?? emptyAsset);
-
-      const remainingNeeded = neededInput.clamped_sub(currentInputSum);
-
-      // stop if we've added all the assets we needed
-      const isNonEmptyInputs = usedUtxos.length > 0;
-      {
-        const remainingAssets = remainingNeeded.multiasset();
-        const isRemainingNeededCoinZero = isBigNumZero(remainingNeeded.coin());
-        const isRemainingNeededAssetZero = (remainingAssets?.len() ?? 0) === 0;
-        if (isRemainingNeededCoinZero && isRemainingNeededAssetZero && isNonEmptyInputs) {
-          const changeTokenIdSet = new Set(
-            parseTokenList(excessiveInputAssets).map(r => r.assetId)
-          );
-          let packed = false;
-          for (let j = i; j < utxos.length; j++) {
-            const packCandidate = utxos[j];
-            if (
-              packCandidate.assets.length >= 1 &&
-                packCandidate.assets.every(({ assetId }) => changeTokenIdSet.has(assetId))
-            ) {
-              if (
-                addUtxoInput(
-                  txBuilder,
-                  undefined,
-                  packCandidate,
-                  false,
-                  { networkId: protocolParams.networkId }
-                ) === AddInputResult.VALID
-              ) {
-                usedUtxos.push(packCandidate);
-
-                packed = true;
-                break;
-              }
-            }
-          }
-          break;
-        }
-      }
-
-      const added = addUtxoInput(
-        txBuilder,
-        {
-          value: remainingNeeded,
-          hasInput: isNonEmptyInputs,
-        },
-        utxo,
-        true,
-        { networkId: protocolParams.networkId },
-      );
-      if (added !== AddInputResult.VALID) continue;
-
-      usedUtxos.push(utxo);
+  // add inputs
+  for (const utxo of utxos) {
+    const wasmAddr = normalizeToAddress(utxo.receiver);
+    if (wasmAddr == null) {
+      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} input not a valid Shelley address`);
     }
-    if (usedUtxos.length === 0) {
-      throw new NotEnoughMoneyToSendError();
-    }
-    // check to see if we have enough balance in the wallet to cover the transaction
-    {
-       const currentInputSum = txBuilder.get_total_input();
-
-      // need to recalculate each time because fee changes
-      const output = targetOutput
-          .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
-
-      const compare = currentInputSum.compare(output);
-      const enoughInput = compare != null && compare >= 0;
-
-      if (!enoughInput) {
-        throw new NotEnoughMoneyToSendError();
-      }
-    }
+    const txInput = utxoToTxInput(utxo);
+    const wasmAmount = cardanoValueFromRemoteFormat(utxo);
+    txBuilder.add_input(
+      wasmAddr,
+      txInput,
+      wasmAmount,
+    );
   }
 
   const changeAddr = (() => {
@@ -760,7 +687,7 @@ function _newAdaUnsignedTxFromUtxo(
   })();
 
   return {
-    senderUtxos: usedUtxos,
+    senderUtxos: utxos,
     txBuilder,
     changeAddr,
   };
@@ -1247,7 +1174,7 @@ export function genFilterSmallUtxo(request: {|
   return (utxo) => {
     const wasmAddr = normalizeToAddress(utxo.receiver);
     if (wasmAddr == null) {
-      throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
+      throw new Error(`${nameof(genFilterSmallUtxo)} input not a valid Shelley address`);
     }
     const wasmAmount = cardanoValueFromRemoteFormat(utxo);
     const feeForInput = new BigNumber(
