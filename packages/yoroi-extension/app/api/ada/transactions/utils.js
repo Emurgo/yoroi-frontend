@@ -168,10 +168,10 @@ export function cardanoValueFromRemoteFormat(
   return value;
 }
 export function createMultiToken(
-  amount: string,
+  amount: number | string,
   assets: Array<{
     assetId: string,
-    amount: string,
+    amount: number | string,
   }>,
   networkId: number,
 ): MultiToken {

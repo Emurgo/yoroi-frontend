@@ -326,6 +326,7 @@ export function improveTakenUtxos(
 export function coinSelectionForValues(
   utxos: Array<RemoteUnspentOutput>,
   requiredValues: Array<MultiToken>,
+  mustForceChange: boolean,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   networkId: number,
 ): {
@@ -335,13 +336,18 @@ export function coinSelectionForValues(
   if (utxos.length === 0) {
     throw new Error('Cannot coin-select for empty utxos!')
   }
-  if (requiredValues.length === 0) {
+  if (requiredValues.length === 0 && !mustForceChange) {
     throw new Error('Cannot coin-select for empty required value!')
   }
-  const totalRequiredValue = joinSumMultiTokens(requiredValues);
+  const totalRequiredValue = joinSumMultiTokens([
+    ...requiredValues,
+    ...(mustForceChange ? [
+      createMultiToken(ONE_ADA_LOVELACES, [], networkId),
+    ] : []),
+  ]);
   const classification = classifyUtxoForValues(
     utxos,
-    requiredValues,
+    [totalRequiredValue],
     coinsPerUtxoWord,
   );
   const {

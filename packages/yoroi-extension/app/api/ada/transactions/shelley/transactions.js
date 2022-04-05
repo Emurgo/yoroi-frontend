@@ -518,10 +518,18 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
+  const isNoOutputs = outputs.length === 0;
+  const mustForceChange = isNoOutputs && !allowNoOutputs;
+  if (mustForceChange && changeAdaAddr == null) {
+    // cannot force change with no change address
+    throw new NoOutputsError();
+  }
+
   // <TODO:USE recommendedPureChange>
   const { selectedUtxo, recommendedPureChange } = coinSelectionForValues(
     utxos,
     outputs.map(o => o.amount),
+    mustForceChange,
     protocolParams.coinsPerUtxoWord,
     protocolParams.networkId,
   );
@@ -534,7 +542,6 @@ export function newAdaUnsignedTxFromUtxo(
     protocolParams,
     certificates,
     withdrawals,
-    allowNoOutputs,
     metadata,
   );
 }
@@ -556,37 +563,10 @@ function _newAdaUnsignedTxFromUtxo(
     address: RustModule.WalletV4.RewardAddress,
     amount: RustModule.WalletV4.BigNum,
   |}>,
-  allowNoOutputs: boolean,
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
-  /**
-   * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
-   * This is can happen in the following:
-   * - if you have a 3ADA UTXO and you register a staking key, there will be 0 outputs
-   * However, if there is no output, there is no way to tell the network of the transaction
-   * This allows for replay attacks of 0-output transactions on testnets that use a mainnet snapshot
-   * To protect against this, we can choose to force that there is always even one output
-   * by simply enforcing a change address if no outputs are specified for the transaction
-   * This is use to be enforced by hardware wallets (will error on 0 outputs) but may no longer be
-   *
-   * Additionally, it's not possible to burn tokens as fees at the moment
-   * but this functionality may come at a later date
-   */
-  const shouldForceChange = (
-    assetsForChange: RustModule.WalletV4.MultiAsset | void
-  ): boolean => {
-    const noOutputDisallowed = !allowNoOutputs && outputs.length === 0;
-    if (noOutputDisallowed && changeAdaAddr == null) {
-      throw new NoOutputsError();
-    }
-    if (assetsForChange != null && assetsForChange.len() > 0) {
-      return true;
-    }
-    return noOutputDisallowed;
 
-  };
   const emptyAsset = RustModule.WalletV4.MultiAsset.new();
-  shouldForceChange(undefined);
 
   const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
   if (certificates.length > 0) {
@@ -651,21 +631,6 @@ function _newAdaUnsignedTxFromUtxo(
         ?.sub(neededInput.multiasset() ?? emptyAsset);
 
       const remainingNeeded = neededInput.clamped_sub(currentInputSum);
-      // update amount required to make sure we have ADA required for change UTXO entry
-      if (shouldForceChange(excessiveInputAssets)) {
-        if (changeAdaAddr == null) throw new NoOutputsError();
-        const difference = currentInputSum.clamped_sub(neededInput);
-        const minimumNeededForChange = minRequiredForChange(
-          txBuilder,
-          changeAdaAddr,
-          difference,
-          protocolParams,
-        );
-        const adaNeededLeftForChange = minimumNeededForChange.clamped_sub(difference.coin());
-        if (remainingNeeded.coin().compare(adaNeededLeftForChange) < 0) {
-          remainingNeeded.set_coin(adaNeededLeftForChange);
-        }
-      }
 
       // stop if we've added all the assets we needed
       const isNonEmptyInputs = usedUtxos.length > 0;
@@ -732,26 +697,7 @@ function _newAdaUnsignedTxFromUtxo(
       const compare = currentInputSum.compare(output);
       const enoughInput = compare != null && compare >= 0;
 
-      const forceChange = shouldForceChange(
-        currentInputSum.multiasset()?.sub(output.multiasset() ?? emptyAsset)
-      );
-      if (forceChange) {
-        if (changeAdaAddr == null) throw new NoOutputsError();
-        if (!enoughInput) {
-          throw new NotEnoughMoneyToSendError();
-        }
-        const difference = currentInputSum.checked_sub(output);
-        const minimumNeededForChange = minRequiredForChange(
-          txBuilder,
-          changeAdaAddr,
-          difference,
-          protocolParams,
-        );
-        if (difference.coin().compare(minimumNeededForChange) < 0) {
-          throw new NotEnoughMoneyToSendError();
-        }
-      }
-      if (!forceChange && !enoughInput) {
+      if (!enoughInput) {
         throw new NotEnoughMoneyToSendError();
       }
     }
@@ -761,11 +707,7 @@ function _newAdaUnsignedTxFromUtxo(
     const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
     const difference = totalInput.checked_sub(targetOutput);
 
-    const forceChange = shouldForceChange(difference.multiasset() ?? emptyAsset);
     if (changeAdaAddr == null) {
-      if (forceChange) {
-        throw new NoOutputsError();
-      }
       const minFee = txBuilder.min_fee();
       if (difference.coin().compare(minFee) < 0) {
         throw new NotEnoughMoneyToSendError();
@@ -791,10 +733,6 @@ function _newAdaUnsignedTxFromUtxo(
       // eslint-disable-next-line no-console
       console.error('Failed to construct tx change!', e);
       throw e;
-    }
-    if (forceChange && !changeWasAdded) {
-      // note: this should never happened since it should have been handled by earlier code
-      throw new Error(`No change added even though it should be forced`);
     }
     const output = multiTokenFromCardanoValue(
       // since the change is added as an output
