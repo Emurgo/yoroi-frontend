@@ -345,6 +345,9 @@ export function coinSelectionForValues(
       createMultiToken(ONE_ADA_LOVELACES, [], networkId),
     ] : []),
   ]);
+  if (totalRequiredValue.isEmpty() && !mustForceChange) {
+    throw new Error('Cannot coin-select for empty required value!')
+  }
   const classification = classifyUtxoForValues(
     utxos,
     [totalRequiredValue],
