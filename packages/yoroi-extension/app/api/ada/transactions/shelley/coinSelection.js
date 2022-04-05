@@ -10,7 +10,7 @@ import {
   multiTokenFromRemote,
 } from '../utils';
 import { MultiToken } from '../../../common/lib/MultiToken';
-import { NotEnoughMoneyToSendError } from '../../../common/errors';
+import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError } from '../../../common/errors';
 
 // Not gonna be adding over 50 inputs in order to improve the tx ADA value
 const TX_IMPROVING_INPUT_LIMIT = 50;
@@ -346,7 +346,7 @@ export function coinSelectionForValues(
     ] : []),
   ]);
   if (totalRequiredValue.isEmpty() && !mustForceChange) {
-    throw new Error('Cannot coin-select for empty required value!')
+    throw new CannotSendBelowMinimumValueError();
   }
   const classification = classifyUtxoForValues(
     utxos,
