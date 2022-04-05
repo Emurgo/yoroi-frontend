@@ -331,7 +331,7 @@ export function coinSelectionForValues(
   networkId: number,
 ): {
   selectedUtxo: Array<RemoteUnspentOutput>,
-  recommendedPureChange: Array<number>,
+  recommendedChange: Array<MultiToken>,
 } {
   if (utxos.length === 0) {
     throw new Error('Cannot coin-select for empty utxos!')
@@ -404,13 +404,13 @@ export function coinSelectionForValues(
     calculateMinRequiredAda(totalExtraValue, coinsPerUtxoWord);
   let availableExtraAda =
     totalExtraValue.getDefault().minus(minRequiredAda);
-  const recommendedPureChange = [];
+  const recommendedChange = [];
   {
     // Adding recommended collaterals
     const missingCollaterals = 5 - collateralReserve.length;
     for (let i = 0; i < missingCollaterals; i++) {
       if (availableExtraAda.isGreaterThan(ONE_ADA_LOVELACES)) {
-        recommendedPureChange.push(ONE_ADA_LOVELACES);
+        recommendedChange.push(createMultiToken(ONE_ADA_LOVELACES, [], networkId));
         availableExtraAda = availableExtraAda.minus(ONE_ADA_LOVELACES);
       }
     }
@@ -418,11 +418,11 @@ export function coinSelectionForValues(
   {
     const requiredAda = totalRequiredValue.getDefault();
     if (availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5))) {
-      recommendedPureChange.push(requiredAda);
+      recommendedChange.push(createMultiToken(requiredAda, [], networkId));
     }
   }
   return {
     selectedUtxo: improvedTakenUtxo,
-    recommendedPureChange,
+    recommendedChange,
   };
 }

@@ -22,7 +22,7 @@ import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import {
   cardanoValueFromMultiToken,
-  cardanoValueFromRemoteFormat,
+  cardanoValueFromRemoteFormat, createMultiToken,
   multiTokenFromCardanoValue,
   parseTokenList,
 } from '../utils';
@@ -525,8 +525,7 @@ export function newAdaUnsignedTxFromUtxo(
     throw new NoOutputsError();
   }
 
-  // <TODO:USE recommendedPureChange>
-  const { selectedUtxo, recommendedPureChange } = coinSelectionForValues(
+  const { selectedUtxo, recommendedChange } = coinSelectionForValues(
     utxos,
     outputs.map(o => o.amount),
     mustForceChange,
@@ -534,8 +533,17 @@ export function newAdaUnsignedTxFromUtxo(
     protocolParams.networkId,
   );
 
+  const fixedOutputs: Array<TxOutput> = [...outputs];
+  if (changeAdaAddr != null) {
+    // Can produce recommended pure change
+    const address = changeAdaAddr.address;
+    for (const amount of recommendedChange) {
+      fixedOutputs.push({ address, amount });
+    }
+  }
+
   return _newAdaUnsignedTxFromUtxo(
-    outputs,
+    fixedOutputs,
     changeAdaAddr,
     selectedUtxo,
     absSlotNumber,
