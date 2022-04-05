@@ -52,6 +52,24 @@ const reorder = (list, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed);
   return result;
 };
+
+const getGeneratedWalletIds = (sortedWalletListIdx, currentWalletIdx) => {
+  let generatedWalletIds;
+  if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
+    const newWalletIds = currentWalletIdx.filter(id => {
+      const index = sortedWalletListIdx.indexOf(id);
+      if (index === -1) {
+        return true;
+      }
+      return false;
+    });
+    generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
+  } else {
+    generatedWalletIds = currentWalletIdx;
+  }
+
+  return generatedWalletIds
+}
 @observer
 export default class WalletListDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -59,32 +77,27 @@ export default class WalletListDialog extends Component<Props, State> {
   };
   state: State = {
     walletListIdx: [],
+    ergoWalletsIdx: [],
+    cardanoWalletsIdx: [],
   };
 
   async componentDidMount(): Promise<void> {
-    const sortedWalletListIdx = this.props.currentSortedWallets;
-    const currentWalletIdx = this.props.wallets.map(wallet => wallet.walletId);
-
-    let generatedWalletIds;
-    if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
-      const newWalletIds = currentWalletIdx.filter(id => {
-        const index = sortedWalletListIdx.indexOf(id);
-        if (index === -1) {
-          return true;
-        }
-        return false;
-      });
-      generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
-    } else {
-      generatedWalletIds = currentWalletIdx;
-    }
+    const cardanoWalletsId = getGeneratedWalletIds(
+      this.props.currentSortedWallets.cardano,
+      this.props.cardanoWallets.map(wallet => wallet.walletId)
+    )
+    const ergoWalletsId = getGeneratedWalletIds(
+      this.props.currentSortedWallets.ergo,
+      this.props.ergoWallets.map(wallet => wallet.walletId)
+    )
 
     this.setState(
       {
-        walletListIdx: generatedWalletIds,
+        ergoWalletsIdx: ergoWalletsId,
+        cardanoWalletsIdx: cardanoWalletsId,
       },
       async () => {
-        await this.props.updateSortedWalletList({ sortedWallets: generatedWalletIds });
+        // await this.props.updateSortedWalletList({ sortedWallets: generatedWalletIds });
       }
     );
   }
@@ -130,7 +143,7 @@ export default class WalletListDialog extends Component<Props, State> {
     if (!destination || destination.index === source.index) {
       return;
     }
-
+    console.log({ result })
     this.setState(
       prev => {
         const walletListIdx = reorder(
@@ -150,7 +163,7 @@ export default class WalletListDialog extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { walletListIdx } = this.state;
+    const { ergoWalletsIdx, cardanoWalletsIdx } = this.state;
 
     const {
       shouldHideBalance,
@@ -190,14 +203,27 @@ export default class WalletListDialog extends Component<Props, State> {
           <Droppable droppableId="wallet-list-droppable">
             {provided => (
               <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                {walletListIdx.length > 0 &&
-                  walletListIdx.map((walletId, idx) => {
-                    const wallet = this.props.wallets.find(w => w.walletId === walletId);
-                    // Previously, after a wallet was deleted, the sorted wallet list was not
-                    // updated to remove the deleted wallet, so `wallet` might be null.
-                    // This should no longer happen but we keep filtering out the null
-                    // value (instead of throwing an error) just in case some users
-                    // have already deleted wallets before the fix.
+                {cardanoWalletsIdx.length > 0 &&
+                  cardanoWalletsIdx.map((walletId, idx) => {
+                    const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
+                    if (!wallet) {
+                      return null;
+                    }
+                    return <WalletCard key={walletId} idx={idx} {...wallet} />;
+                  }).filter(Boolean)}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+        <h1>Ergo, ERG</h1>
+        <DragDropContext onDragEnd={this.onDragEnd}>
+          <Droppable droppableId="wallet-list-droppable">
+            {provided => (
+              <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
+                {ergoWalletsIdx.length > 0 &&
+                  ergoWalletsIdx.map((walletId, idx) => {
+                    const wallet = this.props.ergoWallets.find(w => w.walletId === walletId);
                     if (!wallet) {
                       return null;
                     }

@@ -25,7 +25,7 @@ import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp'
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import NoWalletsAccessList from '../components/topbar/NoWalletsAccessList';
 import WalletListDialog from '../components/topbar/WalletListDialog';
-import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
 
@@ -153,6 +153,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
       balance = txRequests.requests.getBalanceRequest.result;
     }
 
+    let ergoWallets = []
+    let cardanoWallets = []
+
     const walletsMap = wallets.map(wallet => {
       const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
       const walletBalance = walletTxRequests.requests.getBalanceRequest.result || null;
@@ -167,7 +170,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           ? null
           : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
-      return {
+      const walletMap = {
         walletId: wallet.getPublicDeriverId(),
         rewards: this.getRewardBalance(wallet),
         walletAmount: walletBalance,
@@ -178,12 +181,19 @@ export default class NavBarContainerRevamp extends Component<Props> {
         onSelect: () => this.switchToNewWallet(wallet),
         isCurrentWallet: wallet === this.generated.stores.wallets.selected,
       };
+
+      if(isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap)
+      else cardanoWallets.push(walletMap)
+
+      return walletMap
     });
 
     if (this.generated.stores.uiDialogs.isOpen(WalletListDialog)) {
       return (
         <WalletListDialog
           wallets={walletsMap}
+          cardanoWallets={cardanoWallets}
+          ergoWallets={ergoWallets}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
@@ -194,7 +204,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
             this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
           }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
-          currentSortedWallets={this.generated.stores.profile.currentSortedWallets ?? []}
+          currentSortedWallets={this.generated.stores.profile.currentSortedWallets}
         />
       );
     }

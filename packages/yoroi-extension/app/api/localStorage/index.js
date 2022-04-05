@@ -270,9 +270,16 @@ export default class LocalStorageApi {
 
   // ========== Sort wallets - Revamp ========== //
   getSortedWallets: void => Promise<?Array<number>> = async () => {
-    const result = await getLocalItem(storageKeys.SORTED_WALLETS);
+    let result = await getLocalItem(storageKeys.SORTED_WALLETS);
     if (result === undefined || result === null) return undefined;
-    return JSON.parse(result);
+    result = JSON.parse(result);
+    // Added for backward compatibility
+    if(Array.isArray(result)) return {
+      cardano: [],
+      ergo: [],
+    }
+
+    return result
   };
 
   setSortedWallets: (Array<number>) => Promise<void> = value =>
