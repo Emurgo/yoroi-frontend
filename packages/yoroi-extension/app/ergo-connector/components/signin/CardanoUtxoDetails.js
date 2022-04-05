@@ -112,9 +112,9 @@ class CardanoUtxoDetails extends Component<Props> {
         }
         fiatAmountDisplay = (
           <>
-            <span className={styles.amountRegular}>{beforeDecimalSigned}</span>
+            <span>{beforeDecimalSigned}</span>
             {afterDecimal && (
-              <span className={styles.afterDecimal}>.{afterDecimal}</span>
+              <span>.{afterDecimal}</span>
             )}
             {' '}{currency}
           </>
@@ -141,10 +141,10 @@ class CardanoUtxoDetails extends Component<Props> {
     if (fiatAmountDisplay) {
       return (
         <>
-          <div className={styles.amountRegular}>
+          <div>
             {fiatAmountDisplay}
           </div>
-          <div className={styles.amountSmall}>
+          <div>
             {cryptoAmountDisplay}
           </div>
         </>
@@ -152,7 +152,7 @@ class CardanoUtxoDetails extends Component<Props> {
     }
     return (
       <>
-        <div className={styles.amountRegular}>
+        <div>
           {cryptoAmountDisplay}
         </div>
       </>

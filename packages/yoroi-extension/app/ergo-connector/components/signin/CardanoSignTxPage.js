@@ -228,9 +228,9 @@ class SignTxPage extends Component<Props, State> {
         }
         fiatAmountDisplay = (
           <>
-            <span className={styles.amountRegular}>{beforeDecimalSigned}</span>
+            <span>{beforeDecimalSigned}</span>
             {afterDecimal && (
-              <span className={styles.afterDecimal}>.{afterDecimal}</span>
+              <span>.{afterDecimal}</span>
             )}
             {' '}{currency}
           </>
@@ -257,10 +257,10 @@ class SignTxPage extends Component<Props, State> {
     if (fiatAmountDisplay) {
       return (
         <>
-          <div className={styles.amountRegular}>
+          <div>
             {fiatAmountDisplay}
           </div>
-          <div className={styles.amountSmall}>
+          <div>
             {cryptoAmountDisplay}
           </div>
         </>
@@ -268,7 +268,7 @@ class SignTxPage extends Component<Props, State> {
     }
     return (
       <>
-        <div className={styles.amountRegular}>
+        <div>
           {cryptoAmountDisplay}
         </div>
       </>
