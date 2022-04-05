@@ -80,6 +80,10 @@
   min-width: 80px;
   opacity: 0;
   transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
   svg {
     max-width: 24px;
     max-height: 24px;
