@@ -396,6 +396,8 @@ export function coinSelectionForValues(
     classification,
     [totalRequiredValue],
     utxoTaken,
+    coinsPerUtxoWord,
+    networkId,
   )
   const totalExtraValue = joinSumMultiTokens(
     improvedTakenUtxo.map(u => multiTokenFromRemote(u, networkId)),
