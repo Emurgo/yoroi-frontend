@@ -1,7 +1,5 @@
 // @flow
 import { Then } from 'cucumber';
-// eslint-disable-next-line import/named
-import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
@@ -13,55 +11,26 @@ import {
   spendingPasswordField,
 } from '../pages/connector-connectWalletPage';
 
-let extensionWindowHandle;
-let dappWindowHandle;
-let popupWindowHandle;
+const mockDAppName = 'mockDAppTab';
+const popupConnectorName = 'popupConnectorWindow';
 
 Then(/^I open the mock dApp$/, async function () {
-  const oldHandles = await this.driver.getAllWindowHandles();
-  expect(oldHandles.length).to.equal(1, 'Expect only the extension window handle');
-  extensionWindowHandle = oldHandles[0];
-
-  await this.driver.switchTo().newWindow('tab');
-  await this.driver.get(`http://localhost:${Ports.DevBackendServe}/mock-dapp`);
-
-  const newHandles = (await this.driver.getAllWindowHandles()).filter(
-    handle => !oldHandles.includes(handle)
+  await this.windowManager.openNewTab(
+    mockDAppName,
+    `http://localhost:${Ports.DevBackendServe}/mock-dapp`
   );
-  expect(newHandles.length).to.equal(1, 'Expect 1 new window handle after opening the dApp');
-  dappWindowHandle = newHandles[0];
 });
 
 Then(/^I request anonymous access to Yoroi$/, async function () {
-  await this.driver.executeScript('window.accessRequestPromise = cardano.yoroi.enable()');
+  await this.mockDAppPage.requestNonAuthAccess();
 });
 
 Then(/^I request access to Yoroi$/, async function () {
-  await this.driver.executeScript(
-    'window.accessRequestPromise = cardano.yoroi.enable({requestIdentification: true})'
-  );
+  await this.mockDAppPage.requestAuthAccess();
 });
 
 Then(/^I should see the connector popup$/, async function () {
-  // find and switch to the popup window
-  const oldWindowHandles = [extensionWindowHandle, dappWindowHandle];
-  let newWindowHandles;
-  for (;;) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    newWindowHandles = await this.driver.getAllWindowHandles();
-    if (newWindowHandles.length > oldWindowHandles.length) {
-      break;
-    }
-  }
-  // $FlowFixMe[incompatible-use]
-  const popupWindowHandleArr = newWindowHandles.filter(
-    handle => !oldWindowHandles.includes(handle)
-  );
-  if (popupWindowHandleArr.length !== 1) {
-    throw new Error('Can not find the popup window');
-  }
-  popupWindowHandle = popupWindowHandleArr[0];
-  await this.driver.switchTo().window(popupWindowHandle);
+  await this.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
 });
 
 Then(
@@ -95,59 +64,23 @@ Then(/^I enter the spending password (.+) and click confirm$/, async function (s
 });
 
 Then(/^The popup window should be closed$/, async function () {
-  for (;;) {
-    const windowHandles = await this.driver.getAllWindowHandles();
-    if (windowHandles.length !== 2) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      continue;
-    }
-    if (
-      !(
-        (windowHandles[0] === extensionWindowHandle && windowHandles[1] === dappWindowHandle) ||
-        (windowHandles[0] === dappWindowHandle && windowHandles[1] === extensionWindowHandle)
-      )
-    ) {
-      throw new Error('Expected only the extension window and the dApp window to be open');
-    }
-    break;
-  }
-  await this.driver.switchTo().window(dappWindowHandle);
+  const result = await this.windowManager.isClosed(popupConnectorName);
+  expect(result, 'The window|tab is still opened').to.be.true;
+  await this.windowManager.switchTo(mockDAppName);
 });
 
 Then(/^The access request should succeed$/, async function () {
-  const ret = await this.driver.executeAsyncScript((...args) => {
-    const callback = args[args.length - 1];
-    window.accessRequestPromise
-      // eslint-disable-next-line promise/always-return
-      .then(api => {
-        window.api = api;
-        callback({ success: true });
-      })
-      .catch(error => {
-        callback({ success: false, errMsg: error.message });
-      });
-  });
-
-  if (!ret.success) {
-    throw new Error(`request access failed: ${ret.errMsg}`);
-  }
+  const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
+  expect(
+    requestAccessResult.success,
+    `Request access failed: ${requestAccessResult.errMsg}`
+  ).to.be.true;
 });
 
 Then(/^The dApp should see balance (\d+)$/, async function (expectedBalance) {
-  const balanceCborHex = await this.driver.executeAsyncScript((...args) => {
-    const callback = args[args.length - 1];
-    window.api.getBalance()
-      // eslint-disable-next-line promise/always-return
-      .then(balance => {
-        callback(balance);
-      })
-      .catch(error => {
-        throw new Error(JSON.stringify(error));
-      });
-  });
-  const value = RustModule.WalletV4.Value.from_bytes(Buffer.from(balanceCborHex, 'hex'));
-  const balance = value.coin().to_str();
-  if (balance !== String(expectedBalance)) {
-    throw new Error(`expect balance ${expectedBalance} get balance ${balance}`);
-  }
+  const balance = await this.mockDAppPage.getBalance();
+  expect(balance).to.equal(
+    String(expectedBalance),
+    `expect balance ${expectedBalance} get balance ${balance}`
+  );
 });
