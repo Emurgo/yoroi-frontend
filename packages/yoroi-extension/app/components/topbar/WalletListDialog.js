@@ -138,25 +138,26 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   };
 
-  onDragEnd: Object => any = async result => {
+  onDragEnd: Object => any = async (network, result) => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
       return;
     }
-    console.log({ result })
+
     this.setState(
       prev => {
         const walletListIdx = reorder(
-          prev.walletListIdx,
+          network === 'ergo' ? prev.ergoWalletsIdx : prev.cardanoWalletsIdx,
           result.source.index,
           result.destination.index
         );
         return {
-          walletListIdx,
+          ergoWalletsIdx: network === 'ergo' ? walletListIdx : prev.ergoWalletsIdx,
+          cardanoWalletsIdx: network === 'cardano' ? walletListIdx: prev.cardanoWalletsIdx
         };
       },
       async function () {
-        await this.props.updateSortedWalletList({ sortedWallets: this.state.walletListIdx });
+        // await this.props.updateSortedWalletList({ sortedWallets: this.state.walletListIdx });
       }
     );
   };
@@ -199,8 +200,8 @@ export default class WalletListDialog extends Component<Props, State> {
             </button>
           </div>
         </div>}
-        <DragDropContext onDragEnd={this.onDragEnd}>
-          <Droppable droppableId="wallet-list-droppable">
+        <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
+          <Droppable droppableId="cardano-list-droppable">
             {provided => (
               <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
                 {cardanoWalletsIdx.length > 0 &&
@@ -217,8 +218,8 @@ export default class WalletListDialog extends Component<Props, State> {
           </Droppable>
         </DragDropContext>
         <h1>Ergo, ERG</h1>
-        <DragDropContext onDragEnd={this.onDragEnd}>
-          <Droppable droppableId="wallet-list-droppable">
+        <DragDropContext onDragEnd={(result) => this.onDragEnd('ergo', result)}>
+          <Droppable droppableId="ergo-list-droppable">
             {provided => (
               <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
                 {ergoWalletsIdx.length > 0 &&
