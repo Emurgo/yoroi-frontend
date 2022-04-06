@@ -27,13 +27,20 @@ import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import DragIcon from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import StarIcon from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
+import StaredIcon from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
+
 import { Draggable } from 'react-beautiful-dnd';
+import { Tooltip, Typography } from '@mui/material';
 
 const messages = defineMessages({
   tokenTypes: {
     id: 'wallet.topbar.dialog.tokenTypes',
     defaultMessage: '!!!Token types',
   },
+  quickAccessTooltip: {
+    id: 'wallet.topbar.dialog.quickAccess',
+    defaultMessage: '!!!Add to quick acceess wallets list',
+  }
 });
 
 type Props = {|
@@ -204,10 +211,28 @@ export default class WalletCard extends Component<Props, State> {
               <div {...provided.dragHandleProps}>
                 <DragIcon />
               </div>
-              <button type="button" onClick={() => {}}>
-                <StarIcon />
-              </button>
+              {!this.props.isInQuickAccess &&
+                <Tooltip
+                  title={
+                    <Typography variant="body3">
+                      {intl.formatMessage(messages.quickAccessTooltip)}
+                    </Typography>
+                  }
+                  placement="bottom-end"
+                >
+                  <button type="button" onClick={() => this.props.toggleQuickAccess(this.props.walletId)}>
+                    <StarIcon />
+                  </button>
+                </Tooltip>}
             </div>
+            {this.props.isInQuickAccess &&
+            <button
+              className={styles.quickAccessToggle}
+              onClick={() => this.props.toggleQuickAccess(this.props.walletId)}
+              type='button'
+            >
+              <StaredIcon />
+            </button>}
           </div>
         )}
       </Draggable>

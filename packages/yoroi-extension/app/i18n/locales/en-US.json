@@ -806,6 +806,7 @@
   "wallet.topbar.dialog.totalBalance": "Total Balance",
   "wallet.topbar.dialog.ergo": "Ergo, ERG",
   "wallet.topbar.dialog.cardano": "Cardano, ADA",
+  "wallet.topbar.dialog.quickAccess": "Add to quick acceess wallets list",
   "wallet.transaction.address.from": "From address",
   "wallet.transaction.address.to": "To address",
   "wallet.transaction.address.type": "Address Type",

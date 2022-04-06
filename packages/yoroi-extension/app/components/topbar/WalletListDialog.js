@@ -113,6 +113,25 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   }
 
+  toggleQuickAccess = async (walletId: number) => {
+
+    if(!walletId || typeof walletId !== 'number') throw new Error('Invalid wallet id.')
+    const currentQuickAccessList = this.props.walletsNavigation.quickAccess
+    let updatedQuickAccessList = [...currentQuickAccessList];
+    // Remove wallet
+    if(currentQuickAccessList.indexOf(walletId) !== -1) {
+      updatedQuickAccessList =  updatedQuickAccessList.filter(id => id !== walletId)
+    } else {
+      // Add wallet
+      updatedQuickAccessList.push(walletId)
+    }
+
+    await this.props.updateSortedWalletList({
+      ...this.props.walletsNavigation,
+      quickAccess: updatedQuickAccessList
+    });
+  }
+
   renderAmountDisplay: ({|
     shouldHideBalance: boolean,
     amount: ?MultiToken,
@@ -189,6 +208,8 @@ export default class WalletListDialog extends Component<Props, State> {
       wallets,
     } = this.props;
 
+    const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
+
     return (
       <Dialog
         className={styles.component}
@@ -229,7 +250,14 @@ export default class WalletListDialog extends Component<Props, State> {
                     if (!wallet) {
                       return null;
                     }
-                    return <WalletCard key={walletId} idx={idx} {...wallet} />;
+                    return (
+                      <WalletCard
+                        key={walletId}
+                        idx={idx}
+                        toggleQuickAccess={this.toggleQuickAccess}
+                        isInQuickAccess={quickAccessList.has(walletId)}
+                        {...wallet}
+                      />);
                   }).filter(Boolean)}
                 {provided.placeholder}
               </div>
@@ -250,7 +278,15 @@ export default class WalletListDialog extends Component<Props, State> {
                     if (!wallet) {
                       return null;
                     }
-                    return <WalletCard key={walletId} idx={idx} {...wallet} />;
+                    return (
+                      <WalletCard
+                        key={walletId}
+                        idx={idx}
+                        toggleQuickAccess={this.toggleQuickAccess}
+                        isInQuickAccess={quickAccessList.has(walletId)}
+                        {...wallet}
+                      />
+                    );
                   }).filter(Boolean)}
                 {provided.placeholder}
               </div>
