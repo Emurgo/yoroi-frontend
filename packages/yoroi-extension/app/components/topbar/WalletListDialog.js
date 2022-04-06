@@ -29,6 +29,14 @@ const messages = defineMessages({
     id: 'wallet.topbar.dialog.totalBalance',
     defaultMessage: '!!!Total Balance',
   },
+  ergo: {
+    id: 'wallet.topbar.dialog.ergo',
+    defaultMessage: '!!!Ergo, ERG',
+  },
+  cardano: {
+    id: 'wallet.topbar.dialog.cardano',
+    defaultMessage: '!!!Cardano, ADA',
+  },
 });
 
 type Props = {|
@@ -205,6 +213,9 @@ export default class WalletListDialog extends Component<Props, State> {
             </button>
           </div>
         </div>}
+        <div className={styles.sectionHeader}>
+          <h1>{intl.formatMessage(messages.cardano)}</h1>
+        </div>
         <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
           <Droppable droppableId="cardano-list-droppable">
             {provided => (
@@ -222,7 +233,9 @@ export default class WalletListDialog extends Component<Props, State> {
             )}
           </Droppable>
         </DragDropContext>
-        <h1>Ergo, ERG</h1>
+        <div className={styles.sectionHeader}>
+          <h1>{intl.formatMessage(messages.ergo)}</h1>
+        </div>
         <DragDropContext onDragEnd={(result) => this.onDragEnd('ergo', result)}>
           <Droppable droppableId="ergo-list-droppable">
             {provided => (
