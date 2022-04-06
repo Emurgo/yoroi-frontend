@@ -72,20 +72,13 @@ class NavBarRevamp extends Component<Props> {
                 sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
               >
                 {children}
+                {this.props.buyButton != null && (
+                  <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
+                )}
                 {this.props.walletDetails != null && (
                   <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
                     {walletDetails}
                   </Box>
-                )}
-                <IconButton
-                  sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '15px' }}
-                  type="button"
-                  onClick={this.props.goToNotifications}
-                >
-                  <NoticeBoardIcon />
-                </IconButton>
-                {this.props.buyButton != null && (
-                  <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
                 )}
               </Box>
             </Box>

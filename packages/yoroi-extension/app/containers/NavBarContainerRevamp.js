@@ -127,11 +127,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
           title={this.props.title}
           menu={this.props.menu}
           walletDetails={<DropdownComponent />}
-          goToNotifications={() =>
-            this.generated.actions.router.goToRoute.trigger({
-              route: ROUTES.NOTICE_BOARD.ROOT,
-            })
-          }
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() =>

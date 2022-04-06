@@ -97,24 +97,29 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
         <div className={styles.outerWrapper}>
           <div className={classnames([styles.currency])}>{iconComponent}</div>
           <div className={styles.content}>
-            <div
-              className={classnames([
-                styles.amount,
-                highlightTitle !== null && highlightTitle === true && styles.highlightAmount,
-              ])}
-            >
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}
+            <div>
+              <p>Ergo</p>
+              <p>Type</p>
             </div>
-            <div className={styles.fixedAmount}>
-              {/* TODO: fix value to USD */}
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}{' '}
-              USD
+            <div className={styles.balance}>
+              <div
+                className={classnames([
+                  styles.amount,
+                  highlightTitle !== null && highlightTitle === true && styles.highlightAmount,
+                ])}
+              >
+                {this.renderAmountDisplay({
+                  shouldHideBalance,
+                  amount: totalAmount,
+                })}
+              </div>
+              <div className={styles.fixedAmount}>
+                {/* TODO: fix value to USD */}
+                {this.renderAmountDisplay({
+                  shouldHideBalance,
+                  amount: totalAmount,
+                })}
+              </div>
             </div>
           </div>
           {totalAmount != null && showEyeIconSafe && (

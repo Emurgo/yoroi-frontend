@@ -48,17 +48,10 @@ export default class NavDropdownRevamp extends Component<Props, State> {
 
     return (
       <div
-        className={classnames([styles.wrapper, isExpanded && styles.wrapperHovered])}
+        className={styles.wrapper}
         onMouseEnter={this.toggleExpansion}
         onMouseLeave={this.toggleExpansion}
       >
-        <div className={styles.icon}>
-          {isExpanded ? (
-            <button className={styles.toggle} type="button">
-              <ArrowDown />
-            </button>
-          ) : null}
-        </div>
         <div className={styles.component}>{headerComponent}</div>
         {isExpanded ? (
           <NavDropdownContentRevamp
