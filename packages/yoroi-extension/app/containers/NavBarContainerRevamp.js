@@ -153,8 +153,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
       balance = txRequests.requests.getBalanceRequest.result;
     }
 
-    let ergoWallets = []
-    let cardanoWallets = []
+    const ergoWallets = []
+    const cardanoWallets = []
 
     const walletsMap = wallets.map(wallet => {
       const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);

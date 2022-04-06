@@ -133,14 +133,14 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     (boolean) => Promise<void>
   >(this.api.localStorage.setToggleSidebar);
 
-  @observable getSortedWalletsRequest: Request<(void) => Promise<?Array<number>>> = new Request<
+  @observable getWalletsNavigationRequest: Request<(void) => Promise<?Array<number>>> = new Request<
     (void) => Promise<?Array<number>>
-  >(this.api.localStorage.getSortedWallets);
+  >(this.api.localStorage.getWalletsNavigation);
 
-  @observable setSortedWalletsRequest: Request<
+  @observable setWalletsNavigationRequest: Request<
     ({| wallets: Array<number> |}) => Promise<void>
   > = new Request<({| wallets: Array<number> |}) => Promise<void>>(
-    (wallets) => this.api.localStorage.setSortedWallets(wallets)
+    (wallets) => this.api.localStorage.setWalletsNavigation(wallets)
   );
 
   setup(): void {
@@ -247,18 +247,18 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
 
   // ========== Sort wallets - Revamp ========== //
   @computed get currentSortedWallets(): Array<number> {
-    let { result } = this.getSortedWalletsRequest;
+    let { result } = this.getWalletsNavigationRequest;
     if (result == null) {
-      result = this.getSortedWalletsRequest.execute().result;
+      result = this.getWalletsNavigationRequest.execute().result;
     }
     return result ?? { ergo: [], cardano: [] };
   }
   _getSortedWalletList: void => Promise<void> = async () => {
-    await this.getSortedWalletsRequest.execute();
+    await this.getWalletsNavigationRequest.execute();
   };
   _updateSortedWalletList: ({| wallets: Array<number> |}) => Promise<void> = async (wallets) => {
-    await this.setSortedWalletsRequest.execute(wallets);
-    await this.getSortedWalletsRequest.execute();
+    await this.setWalletsNavigationRequest.execute(wallets);
+    await this.getWalletsNavigationRequest.execute();
   };
 }
 

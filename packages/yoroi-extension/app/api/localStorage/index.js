@@ -30,7 +30,7 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
-  SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
+  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -269,21 +269,22 @@ export default class LocalStorageApi {
 
 
   // ========== Sort wallets - Revamp ========== //
-  getSortedWallets: void => Promise<?Array<number>> = async () => {
-    let result = await getLocalItem(storageKeys.SORTED_WALLETS);
+  getWalletsNavigation: void => Promise<?Array<number>> = async () => {
+    let result = await getLocalItem(storageKeys.WALLETS_NAVIGATION);
     if (result === undefined || result === null) return undefined;
     result = JSON.parse(result);
     // Added for backward compatibility
     if(Array.isArray(result)) return {
       cardano: [],
       ergo: [],
+      quickAccess: [],
     }
 
     return result
   };
 
-  setSortedWallets: (Array<number>) => Promise<void> = value =>
-    setLocalItem(storageKeys.SORTED_WALLETS, JSON.stringify(value));
+  setWalletsNavigation: (Array<number>) => Promise<void> = value =>
+    setLocalItem(storageKeys.WALLETS_NAVIGATION, JSON.stringify(value));
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
