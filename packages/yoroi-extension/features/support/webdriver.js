@@ -8,6 +8,8 @@ import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod } from './helpers/helpers';
+import { WindowManager } from './windowManager';
+import { MockDAppWebpage } from '../mock-dApp-webpage';
 
 const fs = require('fs');
 
@@ -109,16 +111,25 @@ function CustomWorld(cmdInput: WorldInput) {
     case 'brave': {
       const braveBuilder = getBraveBuilder();
       this.driver = braveBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     case 'firefox': {
       const firefoxBuilder = getFirefoxBuilder();
       this.driver = firefoxBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     default: {
       const chromeBuilder = getChromeBuilder();
       this.driver = chromeBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
   }
