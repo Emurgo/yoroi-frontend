@@ -30,6 +30,7 @@ import {
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { removeWalletFromLS } from '../../utils/localStorage';
+import { isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type PublicDeriverSettingsCache = {|
   publicDeriver: PublicDeriver<>,
@@ -48,6 +49,10 @@ export type WarningList = {|
   publicDeriver: PublicDeriver<>,
   dialogs: Array<void => Node>,
 |};
+
+export const getWalletType = (publicDeriver) => {
+  return isErgo(publicDeriver.getParent().getNetworkInfo()) ? 'ergo': 'cardano'
+}
 
 export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
@@ -234,10 +239,15 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     await removeWalletFromLS(request.publicDeriver)
 
     // remove this wallet from wallet sort list
-    const sortedWallets = this.stores.profile.currentSortedWallets.filter(
-      id => id !== request.publicDeriver.publicDeriverId
-    );
-    this.actions.profile.updateSortedWalletList.trigger({ sortedWallets });
+    const walletType = getWalletType(request.publicDeriver)
+    const walletsNavigation = this.stores.profile.walletsNavigation
+    const newWalletsNavigation = {
+      ...walletsNavigation,
+      [walletType]: walletsNavigation[walletType].filter(
+        walletId => walletId !== request.publicDeriver.publicDeriverId)
+    }
+
+    await this.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
 
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver,

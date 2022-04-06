@@ -204,7 +204,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
             this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
           }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
-          currentSortedWallets={this.generated.stores.profile.currentSortedWallets}
+          walletsNavigation={this.generated.stores.profile.walletsNavigation}
         />
       );
     }
@@ -323,7 +323,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       |},
       profile: {|
         shouldHideBalance: boolean,
-        currentSortedWallets: ?Array<number>,
+        walletsNavigation: ?Array<number>,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -373,7 +373,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
-          currentSortedWallets: stores.profile.currentSortedWallets,
+          walletsNavigation: stores.profile.walletsNavigation,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,

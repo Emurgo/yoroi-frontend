@@ -47,7 +47,7 @@ type Props = {|
   +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
   +wallets: Array<Object>,
-  +currentSortedWallets: Array<number> | void,
+  +walletsNavigation: Array<number> | void,
   +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
 |};
 type State = {|
@@ -90,11 +90,11 @@ export default class WalletListDialog extends Component<Props, State> {
 
   async componentDidMount(): Promise<void> {
     const cardanoWalletsId = getGeneratedWalletIds(
-      this.props.currentSortedWallets.cardano,
+      this.props.walletsNavigation.cardano,
       this.props.cardanoWallets.map(wallet => wallet.walletId)
     )
     const ergoWalletsId = getGeneratedWalletIds(
-      this.props.currentSortedWallets.ergo,
+      this.props.walletsNavigation.ergo,
       this.props.ergoWallets.map(wallet => wallet.walletId)
     )
 
@@ -107,6 +107,7 @@ export default class WalletListDialog extends Component<Props, State> {
         await this.props.updateSortedWalletList({
           ergo: ergoWalletsId,
           cardano: cardanoWalletsId,
+          quickAccess: this.props.walletsNavigation.quickAccess || [],
         });
       }
     );
@@ -169,7 +170,8 @@ export default class WalletListDialog extends Component<Props, State> {
       async function () {
         await this.props.updateSortedWalletList({
           ergo: this.state.ergoWalletsIdx,
-          cardano: this.state.cardanoWalletsIdx
+          cardano: this.state.cardanoWalletsIdx,
+          quickAccess: this.props.walletsNavigation.quickAccess || [],
         });
       }
     );

@@ -246,12 +246,12 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   };
 
   // ========== Sort wallets - Revamp ========== //
-  @computed get currentSortedWallets(): Array<number> {
+  @computed get walletsNavigation(): Array<number> {
     let { result } = this.getWalletsNavigationRequest;
     if (result == null) {
       result = this.getWalletsNavigationRequest.execute().result;
     }
-    return result ?? { ergo: [], cardano: [] };
+    return result ?? { ergo: [], cardano: [], quickAccess: [] };
   }
   _getSortedWalletList: void => Promise<void> = async () => {
     await this.getWalletsNavigationRequest.execute();
