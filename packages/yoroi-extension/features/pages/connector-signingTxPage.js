@@ -3,17 +3,27 @@
 import { By, WebElement } from 'selenium-webdriver';
 import type { LocatorObject } from '../support/webdriver';
 
+type AddressWithAmount = {|
+  address: string,
+  amount: number,
+|};
+
+type AddressesWithAmount = {|
+  fromAddresses: Array<AddressWithAmount>,
+  toAddresses: Array<AddressWithAmount>,
+|};
+
 const overview = 'Overview';
 const utxoAddresses = 'UTXO addresses';
 const getTabButton = (tabName: string) =>
   `//div[@role="tablist"]/button[contains(text(), "${tabName}")]`;
 
-const transactionFeeTitle: LocatorObject = {
+export const transactionFeeTitle: LocatorObject = {
   locator: '//p[contains(text(), "Transaction Fee")]',
   method: 'xpath',
 };
 
-const transactionTotalAmountField: LocatorObject = {
+export const transactionTotalAmountField: LocatorObject = {
   locator: '//p[contains(text(), "Total Amount")]',
   method: 'xpath',
 };
@@ -42,12 +52,13 @@ const getAddressFromRow = async (addressRow: WebElement) => {
   return await addressElement.getText();
 };
 
+// should be improved in case of several outputs
 const getAmountFromRow = async (addressRow: WebElement) => {
   const amountElement = await addressRow.findElement(By.xpath('./div[2]'));
   return (await amountElement.getText()).split(' ')[0];
 };
 
-const getAddresses = async (addressesPart: WebElement) => {
+const getAddresses = async (addressesPart: WebElement): Promise<Array<AddressWithAmount>> => {
   const result = [];
   const fromAddressesRows = await getAddressesRows(addressesPart);
   for (const fromAddressesRow of fromAddressesRows) {
@@ -62,12 +73,12 @@ const getAddresses = async (addressesPart: WebElement) => {
   return result;
 };
 
-const getFromAddresses = async (customWorld: Object) => {
+const getFromAddresses = async (customWorld: Object): Promise<Array<AddressWithAmount>> => {
   const fromAddressesPart = await getFromAddressesPanel(customWorld);
   return await getAddresses(fromAddressesPart);
 };
 
-const getToAddresses = async (customWorld: Object) => {
+const getToAddresses = async (customWorld: Object): Promise<Array<AddressWithAmount>> => {
   const toAddressesPart = await getToAddressesPanel(customWorld);
   return await getAddresses(toAddressesPart);
 };
@@ -103,10 +114,10 @@ export const spendingPasswordInput: LocatorObject = {
   method: 'xpath',
 };
 
-export const confirmButton = { locator: '.MuiButton-primary', method: 'css' };
-export const cancelButton = { locator: '.MuiButton-secondary', method: 'css' };
+export const confirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
+export const cancelButton: LocatorObject = { locator: '.MuiButton-secondary', method: 'css' };
 
-export const getUTXOAddresses = async (customWorld: Object) => {
+export const getUTXOAddresses = async (customWorld: Object): Promise<AddressesWithAmount> => {
   const fromAddresses = await getFromAddresses(customWorld);
   const toAddresses = await getToAddresses(customWorld);
   return {
