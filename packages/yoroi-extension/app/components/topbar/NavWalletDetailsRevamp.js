@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import { splitAmount, truncateToken } from '../../utils/formatters';
+import { splitAmount, truncateLongName, truncateToken } from '../../utils/formatters';
 
 import styles from './NavWalletDetailsRevamp.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
@@ -18,6 +18,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -90,43 +91,52 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
 
-    const [, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
-
+    const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
-          <div className={classnames([styles.currency])}>{iconComponent}</div>
-          <div className={styles.content}>
-            <div>
-              <p>Ergo</p>
-              <p>Type</p>
-            </div>
-            <div className={styles.balance}>
-              <div
-                className={classnames([
-                  styles.amount,
-                  highlightTitle !== null && highlightTitle === true && styles.highlightAmount,
-                ])}
-              >
-                {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: totalAmount,
-                })}
+          <div className={styles.contentWrapper}>
+            <div className={classnames([styles.currency])}>{iconComponent}</div>
+            <div className={styles.content}>
+              <div className={styles.walletInfo}>
+                <p className={styles.name}>
+                  {truncateLongName(this.props.wallet.conceptualWalletName)}
+                </p>
+                <p className={styles.plateId}>{accountPlateId}</p>
               </div>
-              <div className={styles.fixedAmount}>
-                {/* TODO: fix value to USD */}
-                {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: totalAmount,
-                })}
-              </div>
+              {
+                totalAmount ? (
+                  <div className={styles.balance}>
+                    <div
+                      className={classnames([
+                        styles.amount,
+                        highlightTitle !== null && highlightTitle === true
+                        && styles.highlightAmount,
+                      ])}
+                    >
+                      {this.renderAmountDisplay({
+                        shouldHideBalance,
+                        amount: totalAmount,
+                      })}
+                    </div>
+                    <div className={styles.fixedAmount}>
+                      {/* TODO: fix value to USD */}
+                      {this.renderAmountDisplay({
+                        shouldHideBalance,
+                        amount: totalAmount,
+                      })}
+                    </div>
+                  </div>)
+                : (
+                  <div className={styles.isLoading}>
+                    <LoadingSpinner />
+                  </div>)
+              }
             </div>
           </div>
-          {totalAmount != null && showEyeIconSafe && (
-            <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-              {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-            </button>
-          )}
+          <button disabled={totalAmount === null && !showEyeIconSafe} type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
+            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+          </button>
         </div>
       </div>
     );

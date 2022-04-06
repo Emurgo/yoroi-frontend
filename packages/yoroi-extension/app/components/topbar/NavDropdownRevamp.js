@@ -1,10 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import classnames from 'classnames';
 import type { Node, ElementRef } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdownRevamp.scss';
-import ArrowDown from '../../assets/images/my-wallets/arrow_down.inline.svg';
 
 import NavDropdownContentRevamp from './NavDropdownContentRevamp';
 
