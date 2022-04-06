@@ -217,7 +217,7 @@ export class MockDAppWebpage {
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
 
-    this.driver.executeScript((unsignedTxHex) => {
+    this.driver.executeScript(unsignedTxHex => {
       window.signTxPromise = window.api.signTx({ tx: unsignedTxHex });
     }, unsignedTransactionHex);
   }
@@ -225,9 +225,7 @@ export class MockDAppWebpage {
   async getSigningTxResult() {
     return await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      this.window.signTxPromise
-        .then(callback)
-        .catch(callback);
+      this.window.signTxPromise.then(callback).catch(callback);
     });
   }
 }
