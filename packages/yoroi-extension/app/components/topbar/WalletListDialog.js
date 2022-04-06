@@ -213,9 +213,10 @@ export default class WalletListDialog extends Component<Props, State> {
             </button>
           </div>
         </div>}
+        {cardanoWalletsIdx.length > 0 &&
         <div className={styles.sectionHeader}>
           <h1>{intl.formatMessage(messages.cardano)}</h1>
-        </div>
+        </div>}
         <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
           <Droppable droppableId="cardano-list-droppable">
             {provided => (
@@ -233,9 +234,10 @@ export default class WalletListDialog extends Component<Props, State> {
             )}
           </Droppable>
         </DragDropContext>
+        {cardanoWalletsIdx.length > 0 &&
         <div className={styles.sectionHeader}>
           <h1>{intl.formatMessage(messages.ergo)}</h1>
-        </div>
+        </div>}
         <DragDropContext onDragEnd={(result) => this.onDragEnd('ergo', result)}>
           <Droppable droppableId="ergo-list-droppable">
             {provided => (
