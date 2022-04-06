@@ -38,7 +38,7 @@ export function getTtl() {
   const timeToSlot = genTimeToSlot(fullConfig);
   const absSlotNumber = new BigNumber(
     timeToSlot({
-      time: new Date(),
+      time: new Date(1649261533360)
     }).slot
   );
 

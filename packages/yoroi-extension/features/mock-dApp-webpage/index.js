@@ -217,18 +217,17 @@ export class MockDAppWebpage {
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
 
-    await this.driver.executeScript((unsignedTxHex, ...args) => {
-      const callback = args[args.length - 1];
-      window.api
-        .signTx({ tx: unsignedTxHex })
-        // eslint-disable-next-line promise/always-return
-        .then((responseHex) => {
-          const signedTx = CardanoWasm.Transaction.from_bytes(hexToBytes(responseHex));
-          callback(signedTx);
-        })
-        .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
-        });
+    this.driver.executeScript((unsignedTxHex) => {
+      window.signTxPromise = window.api.signTx({ tx: unsignedTxHex });
     }, unsignedTransactionHex);
+  }
+
+  async getSigningTxResult() {
+    return await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      this.window.signTxPromise
+        .then(callback)
+        .catch(callback);
+    });
   }
 }

@@ -150,3 +150,8 @@ Then(/^I should see the transaction addresses info:$/, async function (table) {
   await this.click(overviewTabButton);
   await this.waitForElement(transactionFeeTitle);
 });
+
+Then(/^The signing transaction API should return (.+)$/, async function (txHex) {
+  const result = await this.mockDAppPage.getSigningTxResult();
+  expect(result).to.equal(txHex);
+});
