@@ -44,7 +44,7 @@ class NavBarRevamp extends Component<Props> {
             maxWidth: 'calc(1366px - 90px)',
             position: 'relative',
             zIndex: 100,
-            height: menu != null ? '115px' : '90px',
+            height: menu != null ? '125px' : '90px',
             margin: 'auto',
           }}
         >
