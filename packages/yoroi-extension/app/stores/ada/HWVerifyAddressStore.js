@@ -127,7 +127,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     try {
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/multisig/#/v4.1',
+        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/ledgerjs5/#/v5',
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
