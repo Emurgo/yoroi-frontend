@@ -36,7 +36,7 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onUpdateHideBalance: void => Promise<void>,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +walletAmount: MultiToken | null,
+  +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
   +wallets: Array<Object>,
   +currentSortedWallets: Array<number> | void,
@@ -168,6 +168,7 @@ export default class WalletListDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
       >
+        {walletAmount &&
         <div className={styles.header}>
           <div className={styles.totalInfo}>
             <div className={styles.amount}>
@@ -184,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
           </div>
-        </div>
+        </div>}
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="wallet-list-droppable">
             {provided => (

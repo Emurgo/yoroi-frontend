@@ -146,17 +146,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   getDialog: void => Node = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) {
-      // TODO: Remove style since for now, we don't have a selected wallet by default
-      return (
-        <div style={{ marginRight: '100px' }}>
-          <NoWalletsDropdown />
-        </div>
-      );
-    }
     const wallets = this.generated.stores.wallets.publicDerivers;
-    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result || null;
+    let balance;
+    if (publicDeriver) {
+      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+      balance = txRequests.requests.getBalanceRequest.result;
+    }
 
     const walletsMap = wallets.map(wallet => {
       const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
