@@ -1,6 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import type { TimeToAbsoluteSlotFunc, TimeToAbsoluteSlotRequest } from '../../../app/api/common/lib/storage/bridge/timeUtils';
 
 export function bytesToHex(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString('hex');
@@ -46,15 +47,15 @@ export function getTtl(): number {
 }
 
 function genTimeToSlot(
-  config: any /*: $ReadOnlyArray<$ReadOnly<{
+  config /*: $ReadOnlyArray<$ReadOnly<{
     StartAt?: number,
     GenesisDate?: string,
     SlotsPerEpoch?: number,
     SlotDuration?: number,
     ...,
   }>> */
-): any /*: TimeToAbsoluteSlotFunc */ {
-  return (request: any /*: TimeToAbsoluteSlotRequest */) => {
+): TimeToAbsoluteSlotFunc {
+  return (request: TimeToAbsoluteSlotRequest) => {
     const { GenesisDate } = config[0];
     if (GenesisDate == null) throw new Error(`${nameof(genTimeToSlot)} missing genesis params`);
     let SlotDuration = config[0].SlotDuration;
