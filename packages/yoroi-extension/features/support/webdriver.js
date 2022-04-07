@@ -160,9 +160,9 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
-  this.waitForElementLocated = (locator: LocatorObject) => {
+  this.waitForElementLocated = async (locator: LocatorObject) => {
     const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
-    return this.driver.wait(isLocated);
+    return await this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
