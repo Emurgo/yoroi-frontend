@@ -1,15 +1,33 @@
 // @flow
 
 import { WebDriver } from 'selenium-webdriver';
-import * as CardanoWasm from '@emurgo/cardano-serialization-lib-browser';
-// // eslint-disable-next-line import/named
+import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { bytesToHex, getTtl, hexToBytes } from '../support/helpers/dapp-helpers';
+import { MultiAsset, TransactionBuilder } from '@emurgo/cardano-serialization-lib-nodejs';
 
 class MockDAppWebpageError extends Error {}
 
 type AccessCallBack = {|
   success: boolean,
   errMsg?: string,
+|};
+
+type ReducedAsset = {|
+  policyId: any | string,
+  name: any | string,
+  amount: string,
+  assetId: string,
+|};
+
+type Utxo = {|
+  utxo_id: string, // concat tx_hash and tx_index
+  tx_hash: string,
+  tx_index: number,
+  block_num?: number, // NOTE: not slot_no
+  receiver: string,
+  amount: string,
+  dataHash?: string,
+  assets: Array<ReducedAsset | any>,
 |};
 
 export class MockDAppWebpage {
@@ -19,7 +37,7 @@ export class MockDAppWebpage {
     this.driver = driver;
   }
 
-  _transactionBuilder() {
+  _transactionBuilder(): TransactionBuilder {
     return CardanoWasm.TransactionBuilder.new(
       CardanoWasm.TransactionBuilderConfigBuilder.new()
         // all of these are taken from the mainnet genesis settings
@@ -46,36 +64,42 @@ export class MockDAppWebpage {
     await this.driver.executeScript(scriptString);
   }
 
-  _addressesFromCborIfNeeded(addresses) {
+  _addressesFromCborIfNeeded(addresses: Array<string>): Array<string> {
     return addresses.map(a => CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32());
   }
 
-  _reduceWasmMultiasset(multiasset, reducer, initValue) {
+  _reduceWasmMultiAsset(
+    multiAsset: MultiAsset | void,
+    reducer: any,
+    initValue: Array<any>
+  ): Array<ReducedAsset | any> {
     let result = initValue;
-    if (multiasset) {
-      const policyIds = multiasset.keys();
+    if (multiAsset) {
+      const policyIds = multiAsset.keys();
       for (let i = 0; i < policyIds.len(); i++) {
         const policyId = policyIds.get(i);
-        const assets = multiasset.get(policyId);
-        const assetNames = assets.keys();
-        for (let j = 0; j < assetNames.len(); j++) {
-          const name = assetNames.get(j);
-          const amount = assets.get(name);
-          const policyIdHex = bytesToHex(policyId.to_bytes());
-          const encodedName = bytesToHex(name.name());
-          result = reducer(result, {
-            policyId: policyIdHex,
-            name: encodedName,
-            amount: amount.to_str(),
-            assetId: `${policyIdHex}.${encodedName}`,
-          });
+        const assets = multiAsset.get(policyId);
+        if (assets) {
+          const assetNames = assets.keys();
+          for (let j = 0; j < assetNames.len(); j++) {
+            const name = assetNames.get(j);
+            const amount = assets.get(name);
+            const policyIdHex = bytesToHex(policyId.to_bytes());
+            const encodedName = bytesToHex(name.name());
+            result = reducer(result, {
+              policyId: policyIdHex,
+              name: encodedName,
+              amount: amount?.to_str(),
+              assetId: `${policyIdHex}.${encodedName}`,
+            });
+          }
         }
       }
     }
     return result;
   }
 
-  _mapCborUtxos(cborUtxos) {
+  _mapCborUtxos(cborUtxos: Array<string>): Array<Utxo> {
     return cborUtxos.map(hex => {
       const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex));
       const input = u.input();
@@ -89,7 +113,7 @@ export class MockDAppWebpage {
         tx_index: txIndex,
         receiver: output.address().to_bech32(),
         amount: value.coin().to_str(),
-        assets: this._reduceWasmMultiasset(
+        assets: this._reduceWasmMultiAsset(
           value.multiasset(),
           (res, asset) => {
             res.push(asset);
@@ -101,7 +125,7 @@ export class MockDAppWebpage {
     });
   }
 
-  async _getChangeAddress() {
+  async _getChangeAddress(): Promise<string> {
     const changeAddresses = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -120,7 +144,7 @@ export class MockDAppWebpage {
     return this._addressesFromCborIfNeeded([changeAddresses])[0];
   }
 
-  async _getUTXOs() {
+  async _getUTXOs(): Promise<Array<Utxo>> {
     const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -189,7 +213,13 @@ export class MockDAppWebpage {
 
     const addr = CardanoWasm.Address.from_bech32(utxo.receiver);
     const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
+    if (!baseAddr){
+      throw new MockDAppWebpageError('No baseAddr');
+    }
     const keyHash = baseAddr.payment_cred().to_keyhash();
+    if (!keyHash){
+      throw new MockDAppWebpageError('No keyHash');
+    }
 
     txBuilder.add_key_input(
       keyHash,
@@ -222,10 +252,10 @@ export class MockDAppWebpage {
     }, unsignedTransactionHex);
   }
 
-  async getSigningTxResult() {
+  async getSigningTxResult(): Promise<string> {
     return await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      this.window.signTxPromise.then(callback).catch(callback);
+      window.signTxPromise.then(callback).catch(callback);
     });
   }
 }

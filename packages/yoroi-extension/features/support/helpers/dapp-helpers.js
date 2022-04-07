@@ -2,15 +2,15 @@
 
 import BigNumber from 'bignumber.js';
 
-export function bytesToHex(bytes) {
+export function bytesToHex(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString('hex');
 }
 
-export function hexToBytes(hex) {
+export function hexToBytes(hex: string): Uint8Array {
   return Buffer.from(hex, 'hex');
 }
 
-export function getTtl() {
+export function getTtl(): number {
   const fullConfig = [
     {
       StartAt: 0,
@@ -46,15 +46,15 @@ export function getTtl() {
 }
 
 function genTimeToSlot(
-  config /*: $ReadOnlyArray<$ReadOnly<{
+  config: any /*: $ReadOnlyArray<$ReadOnly<{
     StartAt?: number,
     GenesisDate?: string,
     SlotsPerEpoch?: number,
     SlotDuration?: number,
     ...,
   }>> */
-) /*: TimeToAbsoluteSlotFunc */ {
-  return (request /*: TimeToAbsoluteSlotRequest */) => {
+): any /*: TimeToAbsoluteSlotFunc */ {
+  return (request: any /*: TimeToAbsoluteSlotRequest */) => {
     const { GenesisDate } = config[0];
     if (GenesisDate == null) throw new Error(`${nameof(genTimeToSlot)} missing genesis params`);
     let SlotDuration = config[0].SlotDuration;

@@ -33,19 +33,19 @@ const addressesPanel: LocatorObject = {
   method: 'xpath',
 };
 
-const getToAddressesPanel = async (customWorld: Object) => {
+const getToAddressesPanel = async (customWorld: Object): Promise<WebElement> => {
   return (await customWorld.findElements(addressesPanel))[1];
 };
 
-const getFromAddressesPanel = async (customWorld: Object) => {
+const getFromAddressesPanel = async (customWorld: Object): Promise<WebElement> => {
   return (await customWorld.findElements(addressesPanel))[0];
 };
 
-const getAddressesRows = async (addressPart: WebElement) => {
+const getAddressesRows = async (addressPart: WebElement): Promise<Array<WebElement>> => {
   return await addressPart.findElements(By.xpath('./div[2]/div'));
 };
 
-const getAddressFromRow = async (addressRow: WebElement) => {
+const getAddressFromRow = async (addressRow: WebElement): Promise<string> => {
   const addressElement = await addressRow.findElement(
     By.xpath('./div[@class="CopyableAddress_component"]')
   );
@@ -53,7 +53,7 @@ const getAddressFromRow = async (addressRow: WebElement) => {
 };
 
 // should be improved in case of several outputs
-const getAmountFromRow = async (addressRow: WebElement) => {
+const getAmountFromRow = async (addressRow: WebElement): Promise<string> => {
   const amountElement = await addressRow.findElement(By.xpath('./div[2]'));
   return (await amountElement.getText()).split(' ')[0];
 };
