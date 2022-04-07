@@ -6,6 +6,8 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import QuickAccessListheader from './QuickAccessListHeader';
 import styles from './QuickAccessWalletsList.scss'
+import { getType } from '../../utils/walletInfo';
+import QuickAccessWalletCard from './QuickAccessWalletCard';
 
 // Todo: remove quick access wallet from LS when the wallet got deleted
 
@@ -14,12 +16,14 @@ export default class QuickAccessWalletsList extends Component<{||}> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
         intl: intlShape.isRequired,
     };
-
     render(): Node {
         const { intl } = this.context;
         return (
           <div className={styles.component}>
             <QuickAccessListheader />
+            <div>
+              {this.props.wallets.map(wallet => <QuickAccessWalletCard wallet={wallet} />)}
+            </div>
           </div>
         )
     }

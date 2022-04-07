@@ -110,11 +110,34 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
     const QuickAccessList = () => {
       const quickAccessWallets = this.generated.stores.profile.walletsNavigation.quickAccess
-
       if (!quickAccessWallets || quickAccessWallets.length === 0) return <NoWalletsAccessList />
 
+      const wallets = this.generated.stores.wallets.publicDerivers;
+      const walletsMap = []
+      wallets.forEach(wallet => {
+        const parent = wallet.getParent();
+        const id = wallet.getPublicDeriverId()
+        if (quickAccessWallets.indexOf(id) === -1) return
+        const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
+        const balance = walletTxRequests.requests.getBalanceRequest.result || null;
+        const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+          parent
+        );
+        const withPubKey = asGetPublicKey(wallet);
+        const plate =
+          withPubKey == null
+            ? null
+            : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+        walletsMap.push({
+          balance,
+          wallet: settingsCache,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          plate
+        })
+      })
+
       return (
-        <QuickAccessWalletsList />
+        <QuickAccessWalletsList wallets={walletsMap} />
       )
     }
 
