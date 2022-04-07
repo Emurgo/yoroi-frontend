@@ -532,17 +532,18 @@ export function newAdaUnsignedTxFromUtxo(
     protocolParams.networkId,
   );
 
-  const fixedOutputs: Array<TxOutput> = [...outputs];
+  const changeOutputs: Array<TxOutput> = [];
   if (changeAdaAddr != null) {
     // Can produce recommended pure change
     const address = changeAdaAddr.address;
     for (const amount of recommendedChange) {
-      fixedOutputs.push({ address, amount });
+      changeOutputs.push({ address, amount });
     }
   }
 
   return _newAdaUnsignedTxFromUtxo(
-    fixedOutputs,
+    outputs,
+    changeOutputs,
     changeAdaAddr,
     selectedUtxo,
     absSlotNumber,
@@ -555,6 +556,7 @@ export function newAdaUnsignedTxFromUtxo(
 
 function _newAdaUnsignedTxFromUtxo(
   outputs: Array<TxOutput>,
+  changeOutputs: Array<TxOutput>,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   utxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
@@ -598,29 +600,32 @@ function _newAdaUnsignedTxFromUtxo(
     txBuilder.set_withdrawals(withdrawalWasm);
   }
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
-  {
-    for (const output of outputs) {
-      const wasmReceiver = normalizeToAddress(output.address);
-      if (wasmReceiver == null) {
-        throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
+
+  function addOutput(output: TxOutput): void {
+    const wasmReceiver = normalizeToAddress(output.address);
+    if (wasmReceiver == null) {
+      throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
+    }
+    try {
+      txBuilder.add_output(
+        RustModule.WalletV4.TransactionOutput.new(
+          wasmReceiver,
+          cardanoValueFromMultiToken(output.amount),
+        )
+      );
+    } catch (e) {
+      if (String(e).includes('less than the minimum UTXO value')) {
+        throw new CannotSendBelowMinimumValueError();
       }
-      try {
-        txBuilder.add_output(
-          RustModule.WalletV4.TransactionOutput.new(
-            wasmReceiver,
-            cardanoValueFromMultiToken(output.amount),
-          )
-        );
-      } catch (e) {
-        if (String(e).includes('less than the minimum UTXO value')) {
-          throw new CannotSendBelowMinimumValueError();
-        }
-        throw e;
-      }
+      throw e;
     }
   }
 
-  // output excluding fee
+  for (const output of outputs) {
+    addOutput(output);
+  }
+
+  // output excluding fee and change
   const targetOutput = txBuilder.get_total_output();
 
   // add inputs
@@ -658,9 +663,15 @@ function _newAdaUnsignedTxFromUtxo(
     if (wasmChange == null) {
       throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} change not a valid Shelley address`);
     }
-    let changeWasAdded: boolean;
+    let changeWasAdded: boolean = false;
     try {
-      changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
+      for (const output of changeOutputs) {
+        addOutput(output);
+        changeWasAdded = true;
+      }
+      if (txBuilder.add_change_if_needed(wasmChange)) {
+        changeWasAdded = true;
+      }
     } catch (e) {
       if (String(e).includes('Not enough ADA')) {
         throw new NotEnoughMoneyToSendError();
