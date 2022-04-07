@@ -5,14 +5,9 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './NoWalletsAccessList.scss';
-import StarIcon from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
 import QuickAccessListheader from './QuickAccessListHeader';
 
 const messages = defineMessages({
-  quickAccess: {
-    id: 'wallet.nav.noWalletsAccessList.quickAccess',
-    defaultMessage: '!!!Quick access wallets',
-  },
   noWallets: {
     id: 'wallet.nav.noWalletsAccessList.noWallets',
     defaultMessage: '!!!No wallets added to this list yet',
