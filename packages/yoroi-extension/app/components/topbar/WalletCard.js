@@ -160,14 +160,18 @@ export default class WalletCard extends Component<Props, State> {
               this.props.isCurrentWallet === true && styles.currentCardWrapper,
               snapshot.isDragging === true && styles.isDragging
             )}
-            onClick={this.props.onSelect}
-            onKeyDown={this.props.onSelect}
             onMouseEnter={this.showActions}
             onMouseLeave={this.hideActions}
             {...provided.draggableProps}
             ref={provided.innerRef}
           >
-            <div className={styles.main}>
+            <div
+              className={styles.main}
+              role="button"
+              tabIndex="0"
+              onClick={this.props.onSelect}
+              onKeyDown={this.props.onSelect}
+            >
               <div className={styles.header}>
                 <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
                 {' ·  '}

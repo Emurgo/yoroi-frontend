@@ -28,6 +28,7 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
+import QuickAccessWalletsList from '../components/topbar/QuickAccessWalletsList'
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -107,11 +108,21 @@ export default class NavBarContainerRevamp extends Component<Props> {
       );
     };
 
+    const QuickAccessList = () => {
+      const quickAccessWallets = this.generated.stores.profile.walletsNavigation.quickAccess
+
+      if (!quickAccessWallets || quickAccessWallets.length === 0) return <NoWalletsAccessList />
+
+      return (
+        <QuickAccessWalletsList />
+      )
+    }
+
     const DropdownComponent = () => {
       return (
         <NavDropdownRevamp
           headerComponent={<DropdownHead />}
-          contentComponents={<NoWalletsAccessList />}
+          contentComponents={<QuickAccessList />}
           walletsCount={wallets.length}
           openWalletInfoDialog={() => {
             this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });

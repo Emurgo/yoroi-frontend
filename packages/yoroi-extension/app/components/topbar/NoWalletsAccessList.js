@@ -6,6 +6,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './NoWalletsAccessList.scss';
 import StarIcon from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
+import QuickAccessListheader from './QuickAccessListHeader';
 
 const messages = defineMessages({
   quickAccess: {
@@ -35,10 +36,7 @@ export default class NoWalletsAccessList extends Component<Props> {
 
     return (
       <div className={styles.wrapper}>
-        <div className={styles.header}>
-          <StarIcon />
-          <h3>{intl.formatMessage(messages.quickAccess)}</h3>
-        </div>
+        <QuickAccessListheader />
         <div className={styles.content}>
           <p className={styles.noWallets}>{intl.formatMessage(messages.noWallets)}</p>
           <p className={styles.goToWallets}>{intl.formatMessage(messages.goToWallets)}</p>
