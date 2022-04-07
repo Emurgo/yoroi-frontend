@@ -2,8 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import NoticeBoardIcon from '../../assets/images/top-bar/notification.inline.svg';
-import { Box, IconButton } from '@mui/material';
+import { Box } from '@mui/material';
 
 type Props = {|
   +children?: ?Node,
