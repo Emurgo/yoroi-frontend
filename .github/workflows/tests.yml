@@ -100,8 +100,9 @@ jobs:
           touch ./reports/cucumberReports.json
       - name: Run dapp connector tests
         uses: GabrielBB/xvfb-action@v1
-        working-directory: ./packages/yoroi-extension
-        run: npm run test:run:e2e:dApp:chrome
+        with:
+          working-directory: ./packages/yoroi-extension
+          run: npm run test:run:e2e:dApp:chrome
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v1
