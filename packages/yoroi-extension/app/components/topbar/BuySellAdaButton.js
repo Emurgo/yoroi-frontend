@@ -42,7 +42,7 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
         sx={{
           height: '56px',
           width: '173px',
-          border: '2px solid var(--yoroi-palette-primary-300)'
+          border: '1px solid var(--yoroi-palette-primary-300)'
         }}
         variant="outlined"
         onClick={() => this.props.onBuySellClick()}

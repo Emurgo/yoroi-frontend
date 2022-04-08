@@ -18,7 +18,6 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
-import LoadingSpinner from '../widgets/LoadingSpinner';
 import AmountDisplay from '../common/AmountDisplay';
 
 type Props = {|
@@ -83,7 +82,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     const {
       shouldHideBalance,
       onUpdateHideBalance,
-      highlightTitle,
       showEyeIcon,
       plate,
     } = this.props;
@@ -147,41 +145,5 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       return null;
     }
     return this.props.rewards.joinAddCopy(this.props.walletAmount);
-  };
-
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
   };
 }
