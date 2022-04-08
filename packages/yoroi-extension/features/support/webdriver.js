@@ -42,10 +42,11 @@ function getBraveBuilder() {
     new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments(
-        '--start-maximized',
+        // '--start-maximized',
         '--disable-setuid-sandbox',
         '--no-sandbox',
-        '--disable-dev-shm-usage'
+        '--disable-dev-shm-usage',
+        '--headless',
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
   );
@@ -58,10 +59,11 @@ function getChromeBuilder() {
       new chrome.Options()
         .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
         .addArguments(
-          '--start-maximized',
+          // '--start-maximized',
           '--disable-setuid-sandbox',
           '--no-sandbox',
-          '--disable-dev-shm-usage'
+          '--disable-dev-shm-usage',
+          '--headless',
         )
     );
 }
