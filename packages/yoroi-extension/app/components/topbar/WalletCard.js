@@ -31,6 +31,7 @@ import StaredIcon from '../../assets/images/add-wallet/wallet-list/stared.inline
 
 import { Draggable } from 'react-beautiful-dnd';
 import { Tooltip, Typography } from '@mui/material';
+import AmountDisplay from '../common/AmountDisplay';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -181,18 +182,19 @@ export default class WalletCard extends Component<Props, State> {
                 <div>{iconComponent}</div>
                 <div className={styles.content}>
                   <div className={styles.amount}>
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}
+                    <AmountDisplay
+                      shouldHideBalance={shouldHideBalance}
+                      amount={totalAmount}
+                      getTokenInfo={this.props.getTokenInfo}
+                    />
                   </div>
                   <div className={styles.fixedAmount}>
                     {/* TODO: fix value to USD */}
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}{' '}
-                    USD
+                    <AmountDisplay
+                      shouldHideBalance={shouldHideBalance}
+                      amount={totalAmount}
+                      getTokenInfo={this.props.getTokenInfo}
+                    />
                   </div>
                 </div>
                 <div className={styles.extraInfo}>

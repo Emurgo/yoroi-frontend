@@ -8,10 +8,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './QuickAccessWalletCard.scss'
 import { getType } from '../../utils/walletInfo';
 import { constructPlate } from './WalletCard';
-import { splitAmount, truncateToken } from '../../utils/formatters';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { hiddenAmount } from '../../utils/strings';
 import AmountDisplay from '../common/AmountDisplay';
 
 @observer
@@ -63,42 +60,6 @@ export default class QuickAccessWalletCard extends Component<{||}> {
       </div>
     )
   }
-
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
 
   getTotalAmount: void => null | MultiToken = () => {
     if (this.props.rewards === undefined) {
