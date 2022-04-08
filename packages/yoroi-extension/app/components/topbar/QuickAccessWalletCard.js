@@ -33,7 +33,6 @@ export default class QuickAccessWalletCard extends Component<{||}> {
       .join(' - ');
     const totalAmount = this.getTotalAmount();
 
-
     return (
       <div className={styles.component}>
         <div className={styles.header}>

@@ -42,6 +42,11 @@
 .walletInfo {
   max-width: 100px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: start;
   margin-right: auto;
   .name { 
     font-size: 14px;
