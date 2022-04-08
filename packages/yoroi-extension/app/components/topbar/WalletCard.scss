@@ -1,13 +1,12 @@
 @import '../../themes/mixins/loading-spinner';
 
-.main {
-  flex: 1;
-  canvas {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 50%;
-  }
+
+.icon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50%;
 }
+
 .header {
   display: flex;
   color: var(--yoroi-palette-gray-900);

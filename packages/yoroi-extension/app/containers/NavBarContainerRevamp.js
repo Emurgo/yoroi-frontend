@@ -112,9 +112,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const quickAccessWallets = this.generated.stores.profile.walletsNavigation.quickAccess
       if (!quickAccessWallets || quickAccessWallets.length === 0) return <NoWalletsAccessList />
 
-      const wallets = this.generated.stores.wallets.publicDerivers;
+      const publicDerivers = this.generated.stores.wallets.publicDerivers;
       const walletsMap = []
-      wallets.forEach(wallet => {
+      publicDerivers.forEach(wallet => {
         const parent = wallet.getParent();
         const id = wallet.getPublicDeriverId()
         if (quickAccessWallets.indexOf(id) === -1) return
@@ -129,10 +129,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
             ? null
             : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
         walletsMap.push({
-          balance,
+          walletAmount: balance,
+          getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
           wallet: settingsCache,
           shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
-          plate
+          plate,
+          rewards: this.getRewardBalance(wallet),
         })
       })
 

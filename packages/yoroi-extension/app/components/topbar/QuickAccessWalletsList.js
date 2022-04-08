@@ -17,12 +17,11 @@ export default class QuickAccessWalletsList extends Component<{||}> {
         intl: intlShape.isRequired,
     };
     render(): Node {
-        const { intl } = this.context;
         return (
           <div className={styles.component}>
             <QuickAccessListheader />
-            <div>
-              {this.props.wallets.map(wallet => <QuickAccessWalletCard wallet={wallet} />)}
+            <div className={styles.walletsList}>
+              {this.props.wallets.map(wallet => <QuickAccessWalletCard {...wallet} />)}
             </div>
           </div>
         )

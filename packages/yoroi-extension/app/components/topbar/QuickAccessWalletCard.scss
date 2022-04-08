@@ -1,3 +1,36 @@
+@import '../../themes/mixins/loading-spinner';
+
 .component {
-    
+    .header {
+        display: flex;
+        color: var(--yoroi-palette-gray-900);
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 22px;
+        margin-bottom: 8px;
+    }
+
+    .body {
+        display: flex;
+        align-items: center;
+
+        .amount {
+            font-weight: 500;
+            flex: 1;
+            .isLoading {
+              margin-left: 9px;
+              margin-bottom: 6px;
+              @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
+            }
+        }
+    }
+}
+
+.main {
+    flex: 1;
+    canvas {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 50%;
+    }
 }

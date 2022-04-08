@@ -30,7 +30,8 @@ export default class QuickAccessListheader extends Component<Props> {
       <Box sx={{
           display: 'flex',
           alignItems: 'center',
-          width: '100%',
+          textAlign: 'center',
+          justifyContent: 'center',
           '& > svg': { marginRight: '8px' }
       }}
       >
