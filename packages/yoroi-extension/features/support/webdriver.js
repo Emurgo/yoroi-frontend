@@ -43,7 +43,7 @@ function getBraveBuilder() {
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments(
         '--no-sandbox',
-        '--disable-gpu',
+        // '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
         '--start-maximized',
