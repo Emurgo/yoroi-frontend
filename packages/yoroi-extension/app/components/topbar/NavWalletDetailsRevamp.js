@@ -19,6 +19,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
 import LoadingSpinner from '../widgets/LoadingSpinner';
+import AmountDisplay from '../common/AmountDisplay';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -104,34 +105,30 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                 </p>
                 <p className={styles.plateId}>{accountPlateId}</p>
               </div>
-              {
-                totalAmount ? (
-                  <div className={styles.balance}>
-                    <div
-                      className={classnames([
-                        styles.amount,
-                        highlightTitle !== null && highlightTitle === true
-                        && styles.highlightAmount,
-                      ])}
-                    >
-                      {this.renderAmountDisplay({
-                        shouldHideBalance,
-                        amount: totalAmount,
-                      })}
-                    </div>
-                    <div className={styles.fixedAmount}>
-                      {/* TODO: fix value to USD */}
-                      {this.renderAmountDisplay({
-                        shouldHideBalance,
-                        amount: totalAmount,
-                      })}
-                    </div>
-                  </div>)
-                : (
-                  <div className={styles.isLoading}>
-                    <LoadingSpinner />
-                  </div>)
-              }
+              <div className={styles.balance}>
+                <div
+                  className={classnames([
+                    totalAmount ? styles.amount : styles.spinnerWrapper,
+                  ])}
+                >
+                  <AmountDisplay
+                    shouldHideBalance={shouldHideBalance}
+                    amount={totalAmount}
+                    getTokenInfo={this.props.getTokenInfo}
+                  />
+                </div>
+                <div
+                  className={classnames([
+                  totalAmount ? styles.fixedAmount : styles.spinnerWrapper,
+                ])}
+                >
+                  <AmountDisplay
+                    shouldHideBalance={shouldHideBalance}
+                    amount={totalAmount}
+                    getTokenInfo={this.props.getTokenInfo}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <button disabled={totalAmount === null && !showEyeIconSafe} type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
