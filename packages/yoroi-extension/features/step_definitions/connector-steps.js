@@ -46,6 +46,15 @@ Then(/^I should see the connector popup$/, async function () {
 Then(
   /^I select the only wallet named (.+) with ([0-9\.]+) balance$/,
   async function (walletName, expectedBalance) {
+    // DEBUG
+    const currentWindowHandle = await this.windowManager._getCurrentWindowHandle();
+    const allHandles = await this.windowManager.getAllWindowHandles();
+    console.log();
+    console.log('Current window handle:');
+    console.log(JSON.stringify(currentWindowHandle));
+    console.log('All handles:');
+    console.log(JSON.stringify(allHandles));
+    // DEBUG
     const wallets = await getWallets(this);
     expect(wallets.length).to.equal(1, `expect 1 wallet but get ${wallets.length}`);
     const name = await getWalletName(wallets, 0);
