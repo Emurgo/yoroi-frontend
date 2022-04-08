@@ -24,7 +24,7 @@ export default class QuickAccessWalletCard extends Component<{||}> {
     const { shouldHideBalance } = this.props;
 
     const [, iconComponent] = this.props.plate
-      ? constructPlate(this.props.plate, 0, styles.icon)
+      ? constructPlate(this.props.plate, 0, styles.main)
       : [];
 
     const typeText = [getType(this.props.wallet.conceptualWallet)]
