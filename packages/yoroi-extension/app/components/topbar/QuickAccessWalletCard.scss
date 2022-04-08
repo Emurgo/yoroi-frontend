@@ -10,6 +10,7 @@
         letter-spacing: 0;
         line-height: 22px;
         margin-bottom: 8px;
+
         .name {
             margin-right: 4px;
         }
@@ -24,6 +25,13 @@
         align-items: center;
         margin-top: 0px;
 
+        .isLoading {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+        }
 
         .amount {
             margin-left: 12px;

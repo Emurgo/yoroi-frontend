@@ -69,7 +69,8 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         ...walletsNavigation,
         [walletType]: walletsNavigation[walletType].filter(
           walletId => walletId !== selectedWalletId
-        )
+        ),
+        quickAccess: walletsNavigation.quickAccess.filter(walletId => walletId !== selectedWalletId)
       }
 
       await this.generated.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);

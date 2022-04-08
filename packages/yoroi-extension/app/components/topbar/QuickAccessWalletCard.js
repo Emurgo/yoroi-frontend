@@ -12,6 +12,7 @@ import { splitAmount, truncateToken } from '../../utils/formatters';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../utils/strings';
+import AmountDisplay from '../common/AmountDisplay';
 
 @observer
 export default class QuickAccessWalletCard extends Component<{||}> {
@@ -44,16 +45,18 @@ export default class QuickAccessWalletCard extends Component<{||}> {
           <div>{iconComponent}</div>
           <div className={styles.content}>
             <div className={styles.amount}>
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}
+              <AmountDisplay
+                shouldHideBalance={shouldHideBalance}
+                amount={totalAmount}
+                getTokenInfo={this.props.getTokenInfo}
+              />
             </div>
             <div className={styles.fixedAmount}>
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}
+              <AmountDisplay
+                shouldHideBalance={shouldHideBalance}
+                amount={totalAmount}
+                getTokenInfo={this.props.getTokenInfo}
+              />
             </div>
           </div>
         </div>

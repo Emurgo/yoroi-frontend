@@ -1,0 +1,10 @@
+@import '../../themes/mixins/loading-spinner';
+
+.isLoading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
+}
