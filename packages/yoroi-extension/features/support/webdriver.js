@@ -47,6 +47,7 @@ function getBraveBuilder() {
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
         '--start-maximized',
+        '--remote-debugging-port=9222',
         'disable-infobars',
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
@@ -65,6 +66,7 @@ function getChromeBuilder() {
           '--disable-dev-shm-usage',
           '--disable-setuid-sandbox',
           '--start-maximized',
+          '--remote-debugging-port=9222',
           'disable-infobars',
         )
     );
