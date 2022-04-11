@@ -71,7 +71,10 @@ import { schema } from 'lovefield';
 import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
-import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  isCardanoHaskell
+} from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
@@ -1134,12 +1137,20 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
+                    const network = wallet.getParent().getNetworkInfo();
+                    const config = getCardanoHaskellBaseConfig(
+                      network
+                    ).reduce((acc, next) => Object.assign(acc, next), {});
+                    const coinsPerUtxoWord =
+                      RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
                     const utxos = await transformCardanoUtxos(
                       await connectorGetUtxosCardano(
                         wallet,
                         pendingTxs,
                         valueExpected,
-                        paginate
+                        paginate,
+                        coinsPerUtxoWord,
+                        network.NetworkId,
                       ),
                       isCBOR,
                     );
