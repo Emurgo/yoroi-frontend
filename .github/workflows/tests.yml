@@ -7,7 +7,7 @@ on:
 jobs:
   Unit_tests:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
-    runs-on: ubuntu-latest
+    runs-on: linuxserver/webtop:ubuntu-xfce
     steps:
       - uses: actions/checkout@v2
       - name: Read .nvmrc
@@ -44,10 +44,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install ubuntu-desktop-minimal
-        run: |
-          sudo apt-get install ubuntu-desktop-minimal
-          sudo reboot
       - name: Forcefully update the Chrome browser
         run: |
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
