@@ -1,7 +1,7 @@
 // @flow
 
 import * as CoinSelection from './coinSelection'
-import { UtxoDescriptor } from './coinSelection'
+import type { UtxoDescriptor } from './coinSelection'
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { MultiToken } from '../../../common/lib/MultiToken';
 import { createMultiToken } from '../utils';

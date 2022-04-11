@@ -27,10 +27,10 @@ export type UtxoDescriptor = {|
 function describeUtxoAssets(
   u: RemoteUnspentOutput,
   requiredAssetIds: Set<string>,
-): {
+): {|
   hasRequiredAssets: boolean,
   countExtraAssets: number,
-} {
+|} {
   if (requiredAssetIds.size === 0) {
     return {
       hasRequiredAssets: false,
@@ -181,6 +181,7 @@ function joinSumMultiTokens(mts: Array<MultiToken>): MultiToken {
   if (mts == null || mts.length === 0) {
     throw new Error('Cannot process empty required values!')
   }
+  // $FlowFixMe
   return mts.length === 1 ? MultiToken.from(mts[0])
     : mts.reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2));
 }
@@ -201,10 +202,10 @@ export function takeUtxosForValues(
   requiredValues: Array<MultiToken>,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   networkId: number,
-): {
+): {|
   utxoTaken: Array<RemoteUnspentOutput>,
   utxoRemaining: Array<RemoteUnspentOutput>,
-} {
+|} {
   const totalRequiredValue = joinSumMultiTokens(requiredValues);
   const totalRequiredWasmValue: RustModule.WalletV4.Value =
     cardanoValueFromMultiToken(totalRequiredValue);
@@ -329,10 +330,10 @@ export function coinSelectionForValues(
   mustForceChange: boolean,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   networkId: number,
-): {
+): {|
   selectedUtxo: Array<RemoteUnspentOutput>,
   recommendedChange: Array<MultiToken>,
-} {
+|} {
   if (utxos.length === 0) {
     throw new Error('Cannot coin-select for empty utxos!')
   }
