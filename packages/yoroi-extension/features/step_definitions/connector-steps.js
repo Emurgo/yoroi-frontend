@@ -1,5 +1,5 @@
 // @flow
-import { Then } from 'cucumber';
+import { Then, When } from 'cucumber';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
@@ -10,6 +10,14 @@ import {
   selectWallet,
   spendingPasswordField,
 } from '../pages/connector-connectWalletPage';
+import {
+  getTransactionFee,
+  overviewTabButton,
+  getTransactionAmount,
+  utxoAddressesTabButton,
+  getUTXOAddresses,
+  transactionFeeTitle,
+} from '../pages/connector-signingTxPage';
 
 const mockDAppName = 'mockDAppTab';
 const popupConnectorName = 'popupConnectorWindow';
@@ -31,6 +39,8 @@ Then(/^I request access to Yoroi$/, async function () {
 
 Then(/^I should see the connector popup$/, async function () {
   await this.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
+  const windowTitle = await this.driver.getTitle();
+  expect(windowTitle).to.equal('Yoroi dApp Connector');
 });
 
 Then(
@@ -83,4 +93,65 @@ Then(/^The dApp should see balance (\d+)$/, async function (expectedBalance) {
     String(expectedBalance),
     `expect balance ${expectedBalance} get balance ${balance}`
   );
+});
+
+When(/^I request signing the transaction:$/, async function (table) {
+  const fields = table.hashes()[0];
+  const normalizedAmount = `${parseFloat(fields.amount) * parseFloat('1000000')}`;
+  await this.mockDAppPage.requestSigningTx(normalizedAmount, fields.toAddress);
+});
+
+Then(/^I should see the transaction amount data:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const fields = table.hashes()[0];
+  const realFee = await getTransactionFee(this);
+  const expectedFee = `-${fields.fee}`;
+  const realFullAmount = await getTransactionAmount(this);
+  const expectedTotalAmount = `-${parseFloat(fields.amount) + parseFloat(fields.fee)}`;
+  expect(realFee, 'Fee is different').to.equal(expectedFee);
+  expect(realFullAmount, 'Total amount is different').to.equal(expectedTotalAmount);
+});
+
+Then(/^I should see the transaction addresses info:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  await this.click(utxoAddressesTabButton);
+
+  const expectedFromAddress = fields.fromAddress;
+  const expectedFromAddressAmount = fields.fromAddressAmount;
+  const expectedToAddress = fields.toAddress;
+  const expectedToAddressAmount = fields.toAddressAmount;
+
+  const realAddresses = await getUTXOAddresses(this);
+  const realFromAddresses = realAddresses.fromAddresses;
+  const foundFromAddresses = realFromAddresses.filter(
+    addr =>
+      addr.address === expectedFromAddress && addr.amount === parseFloat(expectedFromAddressAmount)
+  );
+  expect(
+    foundFromAddresses.length,
+    `Expected fromAddress:
+  address:${expectedFromAddress}, amount: ${expectedFromAddressAmount}
+  Received:\n${JSON.stringify(realFromAddresses)}`
+  ).to.equal(1);
+
+  const realToAddresses = realAddresses.toAddresses;
+  const foundToAddresses = realToAddresses.filter(
+    addr =>
+      addr.address === expectedToAddress && addr.amount === parseFloat(expectedToAddressAmount)
+  );
+  expect(
+    foundToAddresses.length,
+    `Expected toAddress:
+  address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}
+  Received:\n${JSON.stringify(realFromAddresses)}`
+  ).to.equal(1);
+  await this.click(overviewTabButton);
+  await this.waitForElement(transactionFeeTitle);
+});
+
+Then(/^The signing transaction API should return (.+)$/, async function (txHex) {
+  const result = await this.mockDAppPage.getSigningTxResult();
+  expect(result).to.equal(txHex);
 });
