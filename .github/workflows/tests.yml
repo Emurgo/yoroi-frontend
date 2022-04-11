@@ -44,8 +44,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install ubuntu-desktop
-        run: sudo apt-get install ubuntu-desktop
+      - name: Install ubuntu-desktop-minimal
+        run: |
+          sudo apt-get install ubuntu-desktop-minimal
+          sudo reboot
       - name: Forcefully update the Chrome browser
         run: |
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
