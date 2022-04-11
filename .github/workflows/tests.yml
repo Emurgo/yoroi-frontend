@@ -101,6 +101,7 @@ jobs:
           mkdir reports
           touch ./reports/cucumberReports.json
       - name: Run dapp connector tests
+        working-directory: ./packages/yoroi-extension
         run: npm run test:run:e2e:dApp:chrome
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
