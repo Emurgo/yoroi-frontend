@@ -58,6 +58,8 @@ type Props = {|
   +onSelect?: void => void,
   +walletId: string,
   +idx: number,
+  +toggleQuickAccess: string => void,
+  +isInQuickAccess: boolean,
 |};
 
 type State = {| +isActionsShow: boolean |};

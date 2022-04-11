@@ -29,6 +29,7 @@ import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/ne
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
 import QuickAccessWalletsList from '../components/topbar/QuickAccessWalletsList'
+import type { WalletsNavigation } from '../api/localStorage';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -187,7 +188,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const ergoWallets = []
     const cardanoWallets = []
 
-    const walletsMap = wallets.map(wallet => {
+    wallets.forEach(wallet => {
       const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
       const walletBalance = walletTxRequests.requests.getBalanceRequest.result || null;
       const parent = wallet.getParent();
@@ -215,14 +216,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       if(isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap)
       else cardanoWallets.push(walletMap)
-
-      return walletMap
     });
 
     if (this.generated.stores.uiDialogs.isOpen(WalletListDialog)) {
       return (
         <WalletListDialog
-          wallets={walletsMap}
           cardanoWallets={cardanoWallets}
           ergoWallets={ergoWallets}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
@@ -326,7 +324,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           trigger: (params: void) => Promise<void>,
         |},
         updateSortedWalletList: {|
-          trigger: ({| sortedWallets: Array<number> |}) => Promise<void>,
+          trigger: (WalletsNavigation) => Promise<void>,
         |},
       |},
       router: {|
@@ -354,7 +352,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       |},
       profile: {|
         shouldHideBalance: boolean,
-        walletsNavigation: ?Array<number>,
+        walletsNavigation: WalletsNavigation,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,

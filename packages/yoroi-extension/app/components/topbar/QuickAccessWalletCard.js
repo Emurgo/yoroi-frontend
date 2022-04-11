@@ -1,5 +1,4 @@
 // @flow
-// @flow
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
@@ -10,9 +9,25 @@ import { getType } from '../../utils/walletInfo';
 import { constructPlate } from './WalletCard';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import AmountDisplay from '../common/AmountDisplay';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+
+type Props = {|
+  +plate: null | WalletChecksum,
+  +wallet: {|
+    conceptualWallet: ConceptualWallet,
+    conceptualWalletName: string,
+  |},
+  +rewards: null | void | MultiToken,
+  +shouldHideBalance: boolean,
+  +walletAmount: null | MultiToken,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+|}
 
 @observer
-export default class QuickAccessWalletCard extends Component<{||}> {
+export default class QuickAccessWalletCard extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

@@ -10,9 +10,6 @@ import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import { splitAmount, truncateToken } from '../../utils/formatters';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
-import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -20,6 +17,7 @@ import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
 import AmountDisplay from '../common/AmountDisplay';
+import type { WalletsNavigation } from '../../api/localStorage';
 
 const messages = defineMessages({
   addWallet: {
@@ -47,12 +45,14 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
-  +wallets: Array<Object>,
-  +walletsNavigation: Array<number> | void,
-  +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
+  +ergoWallets: Array<Object>,
+  +cardanoWallets: Array<Object>,
+  +walletsNavigation: WalletsNavigation,
+  +updateSortedWalletList: WalletsNavigation => Promise<void>,
 |};
 type State = {|
-  walletListIdx: Array<any>,
+  ergoWalletsIdx: number[],
+  cardanoWalletsIdx: number[],
 |};
 
 const reorder = (list, startIndex, endIndex) => {
@@ -114,8 +114,7 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   }
 
-  toggleQuickAccess = async (walletId: number) => {
-
+  toggleQuickAccess: number => Promise<void> = async (walletId) => {
     if(!walletId || typeof walletId !== 'number') throw new Error('Invalid wallet id.')
     const currentQuickAccessList = this.props.walletsNavigation.quickAccess
     let updatedQuickAccessList = [...currentQuickAccessList];
@@ -133,43 +132,7 @@ export default class WalletListDialog extends Component<Props, State> {
     });
   }
 
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
-
-  onDragEnd: Object => any = async (network, result) => {
+  onDragEnd: (network: 'ergo' | 'cardano' ,result:Object) => any = async (network, result) => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
       return;
@@ -206,7 +169,8 @@ export default class WalletListDialog extends Component<Props, State> {
       onAddWallet,
       walletAmount,
       onUpdateHideBalance,
-      wallets,
+      ergoWallets,
+      cardanoWallets
     } = this.props;
 
     const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
@@ -214,7 +178,7 @@ export default class WalletListDialog extends Component<Props, State> {
     return (
       <Dialog
         className={styles.component}
-        title={`${intl.formatMessage(globalMessages.allWalletsLabel)} (${wallets.length})`}
+        title={`${intl.formatMessage(globalMessages.allWalletsLabel)} (${ergoWallets.length + cardanoWallets.length})`}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}

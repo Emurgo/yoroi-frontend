@@ -40,6 +40,12 @@ export type SetCustomUserThemeRequest = {|
   cssCustomPropObject: Object,
 |};
 
+export type WalletsNavigation = {|
+  ergo: number[],
+  cardano: number[],
+  quickAccess: number[],
+|}
+
 /**
  * This api layer provides access to the electron local storage
  * for user settings that are not synced with any coin backend.
@@ -269,7 +275,7 @@ export default class LocalStorageApi {
 
 
   // ========== Sort wallets - Revamp ========== //
-  getWalletsNavigation: void => Promise<?Array<number>> = async () => {
+  getWalletsNavigation: void => Promise<?WalletsNavigation> = async () => {
     let result = await getLocalItem(storageKeys.WALLETS_NAVIGATION);
     if (result === undefined || result === null) return undefined;
     result = JSON.parse(result);
@@ -283,7 +289,7 @@ export default class LocalStorageApi {
     return result
   };
 
-  setWalletsNavigation: (Array<number>) => Promise<void> = value =>
+  setWalletsNavigation: (WalletsNavigation) => Promise<void> = value =>
     setLocalItem(storageKeys.WALLETS_NAVIGATION, JSON.stringify(value));
 
   async reset(): Promise<void> {

@@ -9,6 +9,7 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
+import type { WalletsNavigation } from '../../api/localStorage'
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -133,14 +134,15 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     (boolean) => Promise<void>
   >(this.api.localStorage.setToggleSidebar);
 
-  @observable getWalletsNavigationRequest: Request<(void) => Promise<?Array<number>>> = new Request<
-    (void) => Promise<?Array<number>>
+  @observable getWalletsNavigationRequest:
+    Request<(void) => Promise<?WalletsNavigation>> = new Request<
+    (void) => Promise<?WalletsNavigation>
   >(this.api.localStorage.getWalletsNavigation);
 
   @observable setWalletsNavigationRequest: Request<
-    ({| wallets: Array<number> |}) => Promise<void>
-  > = new Request<({| wallets: Array<number> |}) => Promise<void>>(
-    (wallets) => this.api.localStorage.setWalletsNavigation(wallets)
+  WalletsNavigation => Promise<void>
+  > = new Request<WalletsNavigation => Promise<void>>(
+    (walletsNavigation) => this.api.localStorage.setWalletsNavigation(walletsNavigation)
   );
 
   setup(): void {
@@ -246,7 +248,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   };
 
   // ========== Sort wallets - Revamp ========== //
-  @computed get walletsNavigation(): Array<number> {
+  @computed get walletsNavigation(): WalletsNavigation {
     let { result } = this.getWalletsNavigationRequest;
     if (result == null) {
       result = this.getWalletsNavigationRequest.execute().result;
@@ -256,8 +258,10 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   _getSortedWalletList: void => Promise<void> = async () => {
     await this.getWalletsNavigationRequest.execute();
   };
-  _updateSortedWalletList: ({| wallets: Array<number> |}) => Promise<void> = async (wallets) => {
-    await this.setWalletsNavigationRequest.execute(wallets);
+
+  _updateSortedWalletList: WalletsNavigation => Promise<void>
+    = async (walletsNavigation) => {
+    await this.setWalletsNavigationRequest.execute(walletsNavigation);
     await this.getWalletsNavigationRequest.execute();
   };
 }

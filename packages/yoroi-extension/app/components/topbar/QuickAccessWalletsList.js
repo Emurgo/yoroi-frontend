@@ -8,10 +8,11 @@ import QuickAccessListheader from './QuickAccessListHeader';
 import styles from './QuickAccessWalletsList.scss'
 import QuickAccessWalletCard from './QuickAccessWalletCard';
 
-// Todo: remove quick access wallet from LS when the wallet got deleted
-
+type Props = {|
+  wallets: Array<Object>
+|}
 @observer
-export default class QuickAccessWalletsList extends Component<{||}> {
+export default class QuickAccessWalletsList extends Component<Props> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
         intl: intlShape.isRequired,
     };

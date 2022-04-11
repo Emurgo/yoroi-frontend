@@ -50,7 +50,7 @@ export type WarningList = {|
   dialogs: Array<void => Node>,
 |};
 
-export const getWalletType = (publicDeriver) => {
+export const getWalletType: PublicDeriver<> => 'ergo' | 'cardano' = (publicDeriver) => {
   return isErgo(publicDeriver.getParent().getNetworkInfo()) ? 'ergo': 'cardano'
 }
 
@@ -243,6 +243,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     const walletsNavigation = this.stores.profile.walletsNavigation
     const newWalletsNavigation = {
       ...walletsNavigation,
+      // $FlowFixMe
       [walletType]: walletsNavigation[walletType].filter(
         walletId => walletId !== request.publicDeriver.publicDeriverId)
     }
