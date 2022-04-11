@@ -210,7 +210,6 @@ export async function connectorGetUtxosCardano(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
-  tokenId: TokenId,
   paginate: ?Paginate
 ): Promise<Array<RemoteUnspentOutput>> {
   const withUtxos = asGetAllUtxos(wallet);
@@ -218,29 +217,12 @@ export async function connectorGetUtxosCardano(
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  const utxosToUse = []
   const formattedUtxos = asAddressedUtxoCardano(utxos).map(u => {
     // eslint-disable-next-line no-unused-vars
     const { addressing, ...rest } = u
     return rest
   })
-  let valueAcc = new BigNumber(0);
-  for(const formatted of formattedUtxos){
-    if (tokenId === 'ADA' || tokenId === 'TADA') {
-      valueAcc = valueAcc.plus(valueToBigNumber(formatted.amount));
-      utxosToUse.push(formatted);
-    } else {
-      for (const asset of formatted.assets) {
-        if (asset.assetId === tokenId) {
-          valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
-          utxosToUse.push(formatted);
-          break;
-        }
-      }
-    }
-  }
-
-  return Promise.resolve(paginateResults(formattedUtxos, paginate))
+  return Promise.resolve(paginateResults(formattedUtxos, paginate));
 }
 
 const MAX_COLLATERAL = new BigNumber('5000000');

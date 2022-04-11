@@ -14,6 +14,7 @@ import type {
   FailedSignData,
   GetConnectedSitesData,
   GetConnectionProtocolData,
+  GetUtxosRequest,
   PendingSignData,
   PendingTransaction,
   RemoveWalletFromWhitelistData,
@@ -23,7 +24,6 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-  GetUtxosRequest,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -36,24 +36,26 @@ import {
 } from './ergo-connector/types';
 import {
   connectorCreateCardanoTx,
+  connectorGenerateReorgTx,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
+  connectorGetCollateralUtxos,
   connectorGetUnusedAddresses,
   connectorGetUsedAddresses,
   connectorGetUtxosCardano,
   connectorGetUtxosErgo,
+  connectorRecordSubmittedCardanoTransaction,
+  connectorRecordSubmittedErgoTransaction,
   connectorSendTx,
   connectorSendTxCardano,
   connectorSignCardanoTx,
   connectorSignTx,
-  connectorRecordSubmittedCardanoTransaction,
-  connectorRecordSubmittedErgoTransaction,
-  connectorGetCollateralUtxos,
-  connectorGenerateReorgTx,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
-import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
+import {
+  updateTransactions as cardanoUpdateTransactions
+} from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
 import type { IFetcher as ErgoIFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
 import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
@@ -73,9 +75,7 @@ import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepack
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
-import {
-  asAddressedUtxo as asAddressedUtxoCardano,
-} from '../../app/api/ada/transactions/utils';
+import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 
 /*::
 declare var chrome;
@@ -1108,25 +1108,41 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    let utxos;
-                    if (isCardano) {
-                      utxos = await connectorGetUtxosCardano(
+                    const utxos = await connectorGetUtxosErgo(
+                      wallet,
+                      pendingTxs,
+                      valueExpected,
+                      tokenId,
+                      paginate
+                    );
+                    rpcResponse({ ok: utxos });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+            break;
+          case 'get_utxos/cardano':
+            try {
+              checkParamCount(2);
+              const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
+              const paginate = message.params[1] == null ? null : asPaginate(message.params[1]);
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const utxos = await transformCardanoUtxos(
+                      await connectorGetUtxosCardano(
                         wallet,
                         pendingTxs,
                         valueExpected,
-                        tokenId,
                         paginate
-                      );
-                      utxos = await transformCardanoUtxos(utxos, isCBOR);
-                    } else {
-                      utxos = await connectorGetUtxosErgo(
-                        wallet,
-                        pendingTxs,
-                        valueExpected,
-                        tokenId,
-                        paginate
-                      );
-                    }
+                      ),
+                      isCBOR,
+                    );
                     rpcResponse({ ok: utxos });
                   },
                   db,
