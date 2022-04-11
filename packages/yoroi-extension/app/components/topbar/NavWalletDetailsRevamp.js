@@ -113,17 +113,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     shouldHideBalance={shouldHideBalance}
                     amount={totalAmount}
                     getTokenInfo={this.props.getTokenInfo}
-                  />
-                </div>
-                <div
-                  className={classnames([
-                  totalAmount ? styles.fixedAmount : styles.spinnerWrapper,
-                ])}
-                >
-                  <AmountDisplay
-                    shouldHideBalance={shouldHideBalance}
-                    amount={totalAmount}
-                    getTokenInfo={this.props.getTokenInfo}
+                    showFiat
                   />
                 </div>
               </div>

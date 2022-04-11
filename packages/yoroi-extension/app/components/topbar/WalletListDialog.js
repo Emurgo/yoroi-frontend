@@ -225,12 +225,6 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.amount}>
               <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
               <p className={styles.value}>
-                {/* {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: walletAmount,
-                })}{' '}
-                USD */}
-
                 <AmountDisplay
                   shouldHideBalance={shouldHideBalance}
                   amount={walletAmount}

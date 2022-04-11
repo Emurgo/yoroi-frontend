@@ -46,13 +46,7 @@ export default class QuickAccessWalletCard extends Component<{||}> {
                 shouldHideBalance={shouldHideBalance}
                 amount={totalAmount}
                 getTokenInfo={this.props.getTokenInfo}
-              />
-            </div>
-            <div className={styles.fixedAmount}>
-              <AmountDisplay
-                shouldHideBalance={shouldHideBalance}
-                amount={totalAmount}
-                getTokenInfo={this.props.getTokenInfo}
+                showFiat
               />
             </div>
           </div>

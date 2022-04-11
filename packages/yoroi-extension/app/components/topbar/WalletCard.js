@@ -186,6 +186,7 @@ export default class WalletCard extends Component<Props, State> {
                     amount={totalAmount}
                     getTokenInfo={this.props.getTokenInfo}
                     showFiat
+                    showAmount
                   />
                 </div>
                 <div className={styles.extraInfo}>

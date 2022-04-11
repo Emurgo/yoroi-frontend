@@ -15,6 +15,7 @@ export default class AmountDisplay extends Component<Props> {
     showAmount: true,
     showFiat: false,
   };
+
   render() {
     const { amount, shouldHideBalance, showFiat, showAmount } = this.props
     if (amount == null) {

@@ -35,12 +35,10 @@
 
         .amount {
             margin-left: 12px;
-            font-weight: 500;
             flex: 1;
-            .isLoading {
-              margin-left: 9px;
-              margin-bottom: 6px;
-              @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
+
+            & > p:nth-child(2) {
+                margin-top: 5px;
             }
         }
 

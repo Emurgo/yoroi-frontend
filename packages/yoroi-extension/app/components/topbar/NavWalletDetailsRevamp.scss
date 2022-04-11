@@ -98,6 +98,19 @@
 
 .amount {
   font-weight: 500;
+
+  & > p {
+    text-align: left !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    &:nth-child(2) {
+      margin-top: -2px;
+    }
+  }
+
+
 }
 
 .highlightAmount {
