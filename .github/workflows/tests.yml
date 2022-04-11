@@ -44,6 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install ubuntu-desktop
+        run: sudo apt-get install ubuntu-desktop
       - name: Forcefully update the Chrome browser
         run: |
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
@@ -99,10 +101,7 @@ jobs:
           mkdir reports
           touch ./reports/cucumberReports.json
       - name: Run dapp connector tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          working-directory: ./packages/yoroi-extension
-          run: npm run test:run:e2e:dApp:chrome
+        run: npm run test:run:e2e:dApp:chrome
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
