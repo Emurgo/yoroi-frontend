@@ -4,16 +4,14 @@ import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import { splitAmount, truncateLongName, truncateToken } from '../../utils/formatters';
+import { truncateLongName } from '../../utils/formatters';
 
 import styles from './NavWalletDetailsRevamp.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { hiddenAmount } from '../../utils/strings';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
