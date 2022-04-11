@@ -181,21 +181,12 @@ export default class WalletCard extends Component<Props, State> {
               <div className={styles.body}>
                 <div>{iconComponent}</div>
                 <div className={styles.content}>
-                  <div className={styles.amount}>
-                    <AmountDisplay
-                      shouldHideBalance={shouldHideBalance}
-                      amount={totalAmount}
-                      getTokenInfo={this.props.getTokenInfo}
-                    />
-                  </div>
-                  <div className={styles.fixedAmount}>
-                    {/* TODO: fix value to USD */}
-                    <AmountDisplay
-                      shouldHideBalance={shouldHideBalance}
-                      amount={totalAmount}
-                      getTokenInfo={this.props.getTokenInfo}
-                    />
-                  </div>
+                  <AmountDisplay
+                    shouldHideBalance={shouldHideBalance}
+                    amount={totalAmount}
+                    getTokenInfo={this.props.getTokenInfo}
+                    showFiat
+                  />
                 </div>
                 <div className={styles.extraInfo}>
                   <p className={styles.label}>

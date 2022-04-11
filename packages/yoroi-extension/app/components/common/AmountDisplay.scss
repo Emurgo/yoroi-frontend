@@ -8,3 +8,13 @@
     margin-left: 12px;
     @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
 }
+
+.amount {
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.fiat {
+    color: var(--yoroi-palette-gray-600);
+    font-size: 14px;
+}

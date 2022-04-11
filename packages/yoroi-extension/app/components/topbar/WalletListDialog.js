@@ -19,6 +19,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
+import AmountDisplay from '../common/AmountDisplay';
 
 const messages = defineMessages({
   addWallet: {
@@ -224,11 +225,19 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.amount}>
               <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
               <p className={styles.value}>
-                {this.renderAmountDisplay({
+                {/* {this.renderAmountDisplay({
                   shouldHideBalance,
                   amount: walletAmount,
                 })}{' '}
-                USD
+                USD */}
+
+                <AmountDisplay
+                  shouldHideBalance={shouldHideBalance}
+                  amount={walletAmount}
+                  getTokenInfo={this.props.getTokenInfo}
+                  showFiat
+                  showAmount={false}
+                />
               </p>
             </div>
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
