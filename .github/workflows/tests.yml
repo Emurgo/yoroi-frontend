@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
-        run: brew update && brew cask install google-chrome
+        run: brew update && brew install google-chrome
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
