@@ -378,30 +378,30 @@ describe('Create unsigned TX from UTXO', () => {
 
       const txBuilder = unsignedTxResponse.txBuilder;
       expect(unsignedTxResponse.senderUtxos).toEqual(expected.inputs);
+      expect(txBuilder.min_fee().to_str()).toEqual(expected.fee);
       expect(txBuilder.get_explicit_input().coin().to_str()).toEqual(expected.sumInputs);
       expect(txBuilder.get_explicit_output().coin().to_str()).toEqual(expected.sumOutputs);
-      expect(txBuilder.min_fee().to_str()).toEqual(expected.fee);
     }
 
     testTxConstruction([0.2, 0.2, 0.2, 0.2, 0.2], {
       inputs: [utxos[3]],
-      fee: '1024',
+      fee: '1428',
       sumInputs: '30000000',
-      sumOutputs: '29998976',
+      sumOutputs: '29998572',
     });
 
     testTxConstruction([0.7, 0.7, 0.7, 0.7, 0.7], {
-      inputs: [utxos[0], utxos[1]],
-      fee: '1168',
-      sumInputs: '1000702',
-      sumOutputs: '999534',
+      inputs: [utxos[2]],
+      fee: '1500',
+      sumInputs: '10000001',
+      sumOutputs: '9998501',
     });
 
     testTxConstruction([0.7, 0.2, 0.7, 0.2, 0.7], {
-      inputs: [utxos[0], utxos[3]],
-      fee: '1374',
-      sumInputs: '30000701',
-      sumOutputs: '29999327',
+      inputs: [utxos[2]],
+      fee: '1500',
+      sumInputs: '10000001',
+      sumOutputs: '9998501',
     });
   });
 
