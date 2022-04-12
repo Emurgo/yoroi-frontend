@@ -249,4 +249,11 @@ export class MultiToken {
   isEmpty: void => boolean = () => {
     return this.values.some(token => token.amount.gt(0)) === false;
   }
+
+  toString: () => string = () => {
+    const defAmount = this.getDefault();
+    const assetMap = this.nonDefaultEntries()
+      .reduce((acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }), {});
+    return `${nameof(MultiToken)}{amount=${defAmount}, assets=${JSON.stringify(assetMap)}}`
+  }
 }

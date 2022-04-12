@@ -340,12 +340,9 @@ export function coinSelectionForValues(
   if (requiredValues.length === 0 && !mustForceChange) {
     throw new Error('Cannot coin-select for empty required value!')
   }
-  const totalRequiredValue = joinSumMultiTokens([
-    ...requiredValues,
-    ...(mustForceChange ? [
-      createMultiToken(ONE_ADA_LOVELACES, [], networkId),
-    ] : []),
-  ]);
+  const totalRequiredValue = requiredValues.length === 0
+    ? createMultiToken(0, [], networkId)
+    : joinSumMultiTokens(requiredValues);
   if (totalRequiredValue.isEmpty() && !mustForceChange) {
     throw new CannotSendBelowMinimumValueError();
   }

@@ -3,9 +3,7 @@ import '../../lib/test-config';
 
 import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';
-import type {
-  CardanoAddressedUtxo,
-} from '../types';
+import type { CardanoAddressedUtxo, } from '../types';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import {
   newAdaUnsignedTx,
@@ -13,39 +11,22 @@ import {
   sendAllUnsignedTxFromUtxo,
   signTransaction,
 } from './transactions';
-import {
-  NotEnoughMoneyToSendError,
-  NoOutputsError,
-  AssetOverflowError,
-} from '../../../common/errors';
+import { AssetOverflowError, NoOutputsError, NotEnoughMoneyToSendError, } from '../../../common/errors';
 
-import {
-  loadLovefieldDB,
-} from '../../lib/storage/database/index';
-import {
-  Bip44DerivationLevels,
-} from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import type {
-  Address, Addressing
-} from '../../lib/storage/models/PublicDeriver/interfaces';
-import {
-  byronAddrToHex,
-} from '../../lib/storage/bridge/utils';
+import { loadLovefieldDB, } from '../../lib/storage/database/index';
+import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
+import type { Address, Addressing } from '../../lib/storage/models/PublicDeriver/interfaces';
+import { byronAddrToHex, } from '../../lib/storage/bridge/utils';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
-  HARD_DERIVATION_START,
   CoinTypes,
-  WalletTypePurpose,
+  HARD_DERIVATION_START,
   STAKING_KEY_INDEX,
+  WalletTypePurpose,
 } from '../../../../config/numbersConfig';
-import {
-  networks,
-  defaultAssets,
-} from '../../lib/storage/database/prepackaged/networks';
-import {
-  MultiToken,
-} from '../../../common/lib/MultiToken';
+import { defaultAssets, networks, } from '../../lib/storage/database/prepackaged/networks';
+import { MultiToken, } from '../../../common/lib/MultiToken';
 import { identifierToCardanoAsset } from '../utils';
 
 const network = networks.CardanoMainnet;
@@ -291,13 +272,11 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should fail due to insufficient funds (no outputs disallowed)', () => {
     const sampleUtxos = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
-    const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
-
     // should fail because we disallow burning extra ADA in fees
     expect(() => newAdaUnsignedTxFromUtxo(
       [],
       sampleAdaAddresses[0],
-      utxos,
+      [sampleUtxos[1]],
       new BigNumber(0),
       {
         ...getProtocolParams(),
@@ -326,7 +305,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(() => newAdaUnsignedTxFromUtxo(
       [],
       sampleAdaAddresses[0],
-      utxos,
+      [sampleUtxos[1]],
       new BigNumber(0),
       {
         ...getProtocolParams(),

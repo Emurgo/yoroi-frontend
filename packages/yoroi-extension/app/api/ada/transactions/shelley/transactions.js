@@ -469,8 +469,7 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const isNoOutputs = outputs.length === 0;
-  const mustForceChange = isNoOutputs && !allowNoOutputs;
+  const mustForceChange = outputs.length === 0 && !allowNoOutputs;
   if (mustForceChange && changeAdaAddr == null) {
     // cannot force change with no change address
     throw new NoOutputsError();
