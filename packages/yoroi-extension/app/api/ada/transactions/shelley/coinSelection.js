@@ -337,15 +337,9 @@ export function coinSelectionForValues(
   if (utxos.length === 0) {
     throw new NotEnoughMoneyToSendError();
   }
-  if (requiredValues.length === 0 && !mustForceChange) {
-    throw new Error('Cannot coin-select for empty required value!')
-  }
   const totalRequiredValue = requiredValues.length === 0
     ? createMultiToken(0, [], networkId)
     : joinSumMultiTokens(requiredValues);
-  if (totalRequiredValue.isEmpty() && !mustForceChange) {
-    throw new CannotSendBelowMinimumValueError();
-  }
   const classification = classifyUtxoForValues(
     utxos,
     [totalRequiredValue],
@@ -420,7 +414,7 @@ export function coinSelectionForValues(
   }
   {
     const requiredAda = totalRequiredValue.getDefault();
-    if (availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5))) {
+    if (requiredAda.gt(0) && availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5))) {
       recommendedChange.push(createMultiToken(requiredAda, [], networkId));
     }
   }

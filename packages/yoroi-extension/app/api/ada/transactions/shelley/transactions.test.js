@@ -449,11 +449,10 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
-    const expectedFee = new BigNumber('209696');
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('790305');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('755907');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('244094');
   });
 
   it('Should pick inputs with tokens when using input selection', () => {
@@ -492,11 +491,10 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will order utxos to have the ones with the required token at the top
     // it will take only one of the utxos because it covers the required token and the fee
-    const expectedFee = '1290';
-    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('2000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('1998711');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee);
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4], utxos[2]]);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11997958');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('2044');
 
     const assetInfo = identifierToCardanoAsset(testAssetId);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
@@ -506,7 +504,7 @@ describe('Create unsigned TX from UTXO', () => {
     ).toEqual('1234');
 
     const tx = unsignedTxResponse.txBuilder.build();
-    expect(tx.outputs().get(1).amount().multiasset()
+    expect(tx.outputs().get(5).amount().multiasset()
       ?.get(assetInfo.policyId)
       ?.get(assetInfo.name)
       ?.to_str()
@@ -803,7 +801,7 @@ describe('Create signed transactions', () => {
     expect(bootstrapWits.len()).toEqual(1);
 
     expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
-      '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c05840d4da0fe3615f90581926281be0510df5f6616ebed5a6d6831cceab4dd9935f7f5b6150d43b918d79e8db7cd3e17b9de91fdfbaed7cdab18818331942852fd10b58202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
+      '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0584029239c4ecf5123beb4256558be536c2745595a9be9348cede7e71138c03aaed70acdc6847165e51843e5e30d6a4bc96d3f68191d1ee35d04e5dfc0df0fd4ed0858202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
 
@@ -1037,11 +1035,12 @@ describe('Create signed transactions', () => {
     const txBody = unsignedTxResponse.txBuilder.build();
     expect(txBody.withdrawals()?.len()).toEqual(1);
     const fee = txBody.fee().to_str();
-    expect(fee).toEqual('1304');
-    expect(txBody.outputs().len()).toEqual(1);
-    expect(txBody.outputs().get(0).amount().coin().to_str()).toEqual(
+    expect(fee).toEqual('1954');
+    expect(txBody.outputs().len()).toEqual(6);
+    expect(txBody.outputs().get(5).amount().coin().to_str()).toEqual(
       new BigNumber(addressedUtxos[3].amount)
         .minus(fee)
+        .minus(5_000_000) // collateral
         .plus(withdrawAmount)
         .plus(protocolParams.keyDeposit.to_str())
         .toString()
@@ -1054,8 +1053,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840c30826d23e831e2df595de29450c444a3fccac6872b159f3e126ad91a2b5cbf5c10404478af377488e4f112c0574fea2b4b1d85e8180b2c2b315d00a2dd8bf02',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d58406db397b6835d0bc5e14e09c7f8e963082d993caaffc250f8029bcb0f9d667c3e1773b1a0e7e5838914414f5e2964638fdd1f588b38ad6a806954941dc7a5050c',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840911fd2f8eb6ffe345ea08dbb76ad699eb663c01bd099c4e28f9cae130d7381aad40be3c3e883872f2219b5bdf720b8bffccdbb56ca3b4394b70601b8fe2e5f0d',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840faab139b4304f17b7c93178a7cbda40a7cc9dbd6d7883a90f3ce4f817fab070349a9ed3e7a5e578e92a00f80acf43c6e847e4de2bd4dff270997bbc835da9502',
     ]);
   });
 });
