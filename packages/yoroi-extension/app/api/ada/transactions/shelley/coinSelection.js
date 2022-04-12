@@ -181,7 +181,7 @@ function joinSumMultiTokens(mts: Array<MultiToken>): MultiToken {
   if (mts == null || mts.length === 0) {
     throw new Error('Cannot process empty required values!')
   }
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-exact]
   return mts.length === 1 ? MultiToken.from(mts[0])
     : mts.reduce((mt1: MultiToken, mt2: MultiToken) => mt1.joinAddCopy(mt2));
 }

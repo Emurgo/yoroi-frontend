@@ -25,7 +25,7 @@ function multiToken(
   amount: number | string,
   assets: Array<{| assetId: string, amount: string |}> = [],
 ): MultiToken {
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-call]
   return createMultiToken(String(amount), assets || [], 0);
 }
 

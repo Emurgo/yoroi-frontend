@@ -203,7 +203,7 @@ export function multiTokenFromRemote(
   }>,
   networkId: number,
 ): MultiToken {
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-call]
   return createMultiToken(utxo.amount, utxo.assets, networkId);
 }
 

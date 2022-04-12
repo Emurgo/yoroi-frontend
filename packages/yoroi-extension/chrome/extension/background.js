@@ -462,13 +462,13 @@ const yoroiMessageHandler = async (
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
-    if (!connection) {
+    if (connection == null) {
       throw new ConnectorError({
         code: APIErrorCodes.API_INTERNAL_ERROR,
         info: 'Connection has failed. Please retry.',
       });
     }
-    const responseData = connection?.pendingSigns.get(request.uid);
+    const responseData = connection.pendingSigns.get(request.uid);
     if (!responseData) {
       throw new ConnectorError({
         code: APIErrorCodes.API_INTERNAL_ERROR,
@@ -989,14 +989,15 @@ function handleInjectorConnect(port) {
               await RustModule.load();
               const { tx, partialSign, returnTx } = message.params[0];
 
-              const resp = await confirmSign(tabId,
-                {
-                  type: 'tx/cardano',
-                  tx: { tx, partialSign, tabId },
-                  uid: message.uid
-                },
-                connection
-              );
+              const resp: ?({| ok: any |} | {| err: any |}) =
+                await confirmSign(tabId,
+                  {
+                    type: 'tx/cardano',
+                    tx: { tx, partialSign, tabId },
+                    uid: message.uid
+                  },
+                  connection
+                );
               if (!returnTx && resp?.ok != null) {
                 const witnessSetResp = Buffer.from(
                   RustModule.WalletV4.Transaction.from_bytes(
@@ -1431,7 +1432,7 @@ function handleInjectorConnect(port) {
                       }),
                     );
                     // do have enough
-                    if (!reorgTargetAmount) {
+                    if (reorgTargetAmount == null) {
                       const utxos = await transformCardanoUtxos(
                         utxosToUse,
                         isCBOR
@@ -1540,7 +1541,6 @@ async function transformCardanoUtxos(
   utxos: Array<RemoteUnspentOutput>,
   isCBOR: boolean,
 ) {
-  // $FlowFixMe[prop-missing]
   const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
   await RustModule.load();
   const W4 = RustModule.WalletV4;
