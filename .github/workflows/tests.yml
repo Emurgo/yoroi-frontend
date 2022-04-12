@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
         run: |
-          wget https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg
+          wget https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg > /dev/null
           open ./googlechrome.dmg
           sudo cp -r /Volumes/Google\ Chrome/Google\ Chrome.app /Applications/
       - name: Read .nvmrc
