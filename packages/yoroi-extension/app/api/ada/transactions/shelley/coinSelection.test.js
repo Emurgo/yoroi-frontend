@@ -23,8 +23,9 @@ function withMockRandom<T>(r: number, f: () => T): T {
 
 function multiToken(
   amount: number | string,
-  assets: Array<{ assetId: string, amount: string }> = [],
+  assets: Array<{| assetId: string, amount: string |}> = [],
 ): MultiToken {
+  // $FlowFixMe
   return createMultiToken(String(amount), assets || [], 0);
 }
 
@@ -45,11 +46,11 @@ beforeAll(async () => {
 function mockUtxo(
   index: number,
   amount: number | string,
-  assets: Array<{
+  assets: Array<{|
     policy: string,
     name: string,
     amount: number | string,
-  }> = [],
+  |}> = [],
 ): RemoteUnspentOutput {
   const txHash = 'abcd';
   return{
