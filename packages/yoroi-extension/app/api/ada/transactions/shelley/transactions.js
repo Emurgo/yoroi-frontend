@@ -442,50 +442,6 @@ export function newAdaUnsignedTxForConnector(
   };
 }
 
-function minRequiredForChange(
-  txBuilder: RustModule.WalletV4.TransactionBuilder,
-  changeAdaAddr: {| ...Address, ...Addressing |},
-  value: RustModule.WalletV4.Value,
-  protocolParams: {
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
-    ...,
-  },
-): RustModule.WalletV4.BigNum {
-  const wasmChange = normalizeToAddress(changeAdaAddr.address);
-  if (wasmChange == null) {
-    throw new Error(`${nameof(minRequiredForChange)} change not a valid Shelley address`);
-  }
-
-  // <TODO:PLUTUS_SUPPORT>
-  const utxoHasDataHash = false;
-
-  const minimumAda = RustModule.WalletV4.min_ada_required(
-    value,
-    utxoHasDataHash,
-    protocolParams.coinsPerUtxoWord
-  );
-
-  // we may have to increase the value used up to the minimum ADA required
-  const baseValue = (() => {
-    if (value.coin().compare(minimumAda) < 0) {
-      const newVal = RustModule.WalletV4.Value.new(minimumAda);
-      const assets = value.multiasset();
-      if (assets) {
-        newVal.set_multiasset(assets);
-      }
-      return newVal;
-    }
-    return value;
-  })();
-  const minRequired = txBuilder
-      .fee_for_output(RustModule.WalletV4.TransactionOutput.new(
-        wasmChange,
-        baseValue,
-      ))
-      .checked_add(minimumAda);
-  return minRequired;
-}
-
 /**
  * This function operates on UTXOs without a way to generate the private key for them
  * Private key needs to be added afterwards either through
@@ -1135,8 +1091,4 @@ export function genFilterSmallUtxo(request: {|
     );
     return feeForInput.lte(utxo.amount);
   };
-}
-
-function isBigNumZero(b: RustModule.WalletV4.BigNum): boolean {
-  return b.compare(RustModule.WalletV4.BigNum.zero()) === 0;
 }
