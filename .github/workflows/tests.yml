@@ -45,10 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
-        run: |
-          wget https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg > /dev/null
-          open ./googlechrome.dmg
-          sudo cp -r /Volumes/Google\ Chrome/Google\ Chrome.app /Applications/
+        run: brew update && brew cask install google-chrome
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
