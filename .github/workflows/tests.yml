@@ -41,7 +41,7 @@ jobs:
 
   E2E_tests_dApp:
     if: github.event.review && contains(github.event.review.body, '/run-dApp-e2e')
-    runs-on: [self-hosted, linux-runner-e2e]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
