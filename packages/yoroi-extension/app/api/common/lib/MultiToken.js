@@ -251,7 +251,7 @@ export class MultiToken {
   }
 
   toString: () => string = () => {
-    const defAmount = this.getDefault();
+    const defAmount = this.getDefault().toString();
     const assetMap = this.nonDefaultEntries()
       .reduce((acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }), {});
     return `${nameof(MultiToken)}{amount=${defAmount}, assets=${JSON.stringify(assetMap)}}`
