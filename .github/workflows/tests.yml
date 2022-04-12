@@ -47,7 +47,7 @@ jobs:
       - name: Forcefully update the Chrome browser
         run: |
           wget https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg
-          open ~/Downloads/googlechrome.dmg
+          open ./googlechrome.dmg
           sudo cp -r /Volumes/Google\ Chrome/Google\ Chrome.app /Applications/
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
