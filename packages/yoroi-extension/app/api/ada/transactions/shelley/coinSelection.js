@@ -335,7 +335,7 @@ export function coinSelectionForValues(
   recommendedChange: Array<MultiToken>,
 |} {
   if (utxos.length === 0) {
-    throw new Error('Cannot coin-select for empty utxos!')
+    throw new NotEnoughMoneyToSendError();
   }
   if (requiredValues.length === 0 && !mustForceChange) {
     throw new Error('Cannot coin-select for empty required value!')
