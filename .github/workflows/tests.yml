@@ -44,12 +44,11 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-#      - name: Forcefully update the Chrome browser
-#        run: |
-#          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-#          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-#          sudo apt-get update
-#          sudo apt-get --only-upgrade install google-chrome-stable
+      - name: Forcefully update the Chrome browser
+        run: |
+          wget https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg
+          open ~/Downloads/googlechrome.dmg
+          sudo cp -r /Volumes/Google\ Chrome/Google\ Chrome.app /Applications/
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
@@ -101,10 +100,6 @@ jobs:
       - name: Run dapp connector tests
         working-directory: ./packages/yoroi-extension
         run: npm run test:run:e2e:dApp:chrome
-#        uses: GabrielBB/xvfb-action@v1
-#        with:
-#          working-directory: ./packages/yoroi-extension
-#          run: npm run test:run:e2e:dApp:chrome
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
