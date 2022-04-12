@@ -169,10 +169,10 @@ export function cardanoValueFromRemoteFormat(
 }
 export function createMultiToken(
   amount: number | string | BigNumber,
-  assets: Array<{
+  assets: Array<{|
     assetId: string,
     amount: number | string | BigNumber,
-  }>,
+  |}>,
   networkId: number,
 ): MultiToken {
   const result = new MultiToken(
@@ -203,6 +203,7 @@ export function multiTokenFromRemote(
   }>,
   networkId: number,
 ): MultiToken {
+  // $FlowFixMe
   return createMultiToken(utxo.amount, utxo.assets, networkId);
 }
 

@@ -402,21 +402,21 @@ export function newAdaUnsignedTxForConnector(
     utxo_id: utxo.utxo_id,
     assets: utxo.assets,
   });
-  const addressingMapForMustIncludeUtxos = new Set<RemoteUnspentOutput>();
-  const addressingMapForCoinSelectUtxos = new Set<RemoteUnspentOutput>();
+  const addressingMapForMustIncludeUtxos = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
+  const addressingMapForCoinSelectUtxos = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of mustIncludeUtxos) {
-    addressingMapForMustIncludeUtxos.add(toRemoteUnspentOutput(utxo));
+    addressingMapForMustIncludeUtxos.set(toRemoteUnspentOutput(utxo), utxo);
   }
   for (const utxo of coinSelectUtxos) {
-    addressingMapForCoinSelectUtxos.add(toRemoteUnspentOutput(utxo));
+    addressingMapForCoinSelectUtxos.set(toRemoteUnspentOutput(utxo), utxo);
   }
   const unsignedTxResponse = newAdaUnsignedTxFromUtxoForConnector(
     outputs,
     mint,
     auxiliaryData,
     changeAdaAddr,
-    Array.from(addressingMapForMustIncludeUtxos),
-    Array.from(addressingMapForCoinSelectUtxos),
+    Array.from(addressingMapForMustIncludeUtxos.keys()),
+    Array.from(addressingMapForCoinSelectUtxos.keys()),
     absSlotNumber,
     validityStart,
     ttl,
@@ -903,7 +903,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
     if (wasmChange == null) {
       throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} change not a valid Shelley address`);
     }
-    let changeWasAdded: boolean;
+    let changeWasAdded: boolean = false;
     try {
       for (const output of changeOutputs) {
         addOutput(output);
