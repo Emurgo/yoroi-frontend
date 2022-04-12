@@ -41,15 +41,15 @@ jobs:
 
   E2E_tests_dApp:
     if: github.event.review && contains(github.event.review.body, '/run-dApp-e2e')
-    runs-on: [self-hosted]
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Forcefully update the Chrome browser
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get --only-upgrade install google-chrome-stable
+#      - name: Forcefully update the Chrome browser
+#        run: |
+#          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+#          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+#          sudo apt-get update
+#          sudo apt-get --only-upgrade install google-chrome-stable
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
@@ -99,10 +99,12 @@ jobs:
           mkdir reports
           touch ./reports/cucumberReports.json
       - name: Run dapp connector tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          working-directory: ./packages/yoroi-extension
-          run: npm run test:run:e2e:dApp:chrome
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:run:e2e:dApp:chrome
+#        uses: GabrielBB/xvfb-action@v1
+#        with:
+#          working-directory: ./packages/yoroi-extension
+#          run: npm run test:run:e2e:dApp:chrome
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
