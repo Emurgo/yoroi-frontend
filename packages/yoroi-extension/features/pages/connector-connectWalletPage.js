@@ -12,15 +12,7 @@ export const confirmButton = { locator: '.MuiButton-primary', method: 'css' };
 export const backButton = { locator: '.MuiButton-secondary', method: 'css' };
 
 export const getWallets = async (customWorld: Object): Promise<Array<WebElement>> => {
-  // DEBUG
-  console.log();
-  console.log('::getWallets::');
-  console.log(JSON.stringify(customWorld));
-  // DEBUG
   const walletList = await customWorld.waitForElement(walletListElement);
-  // DEBUG
-  console.log(JSON.stringify(walletList));
-  // DEBUG
   return await walletList.findElements(By.css('li'));
 };
 
