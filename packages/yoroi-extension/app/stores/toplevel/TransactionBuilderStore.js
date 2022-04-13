@@ -70,6 +70,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
 
   @observable selectedToken: void | $ReadOnly<TokenRow>;
+  @observable selectedTokens: $ReadOnly<TokenRow>[] = [];
 
   setup(): void {
     super.setup();
@@ -209,6 +210,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     const network = withUtxos.getParent().getNetworkInfo();
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+    const isSendingNonDefaultToken = () => (
+      this.selectedToken != null &&
+      this.selectedToken.TokenId !== defaultToken.TokenId
+    )
     if (isCardanoHaskell(network)) {
       const withHasUtxoChains = asHasUtxoChains(withUtxos);
       if (withHasUtxoChains == null) {
@@ -223,14 +229,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
-      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-
       // <TODO:PLUTUS_SUPPORT>
       const utxoHasDataHash = false;
-
       const genTokenList = (userInput) => {
         const tokens = [userInput];
-        if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
+        if (isSendingNonDefaultToken()) {
           const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
           const fakeMultitoken = new MultiToken(
             [{
@@ -289,15 +292,13 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       }
     } else if (isErgo(network)) {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
-
-      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
       const txFee = new BigNumber(
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee
 
       const genTokenList = (userInput) => {
         const tokens = [userInput];
-        if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
+        if (isSendingNonDefaultToken()) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
           tokens.push({
@@ -406,6 +407,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.shouldSendAll = false;
     this.memo = undefined;
     this.selectedToken = undefined;
+    this.selectedTokens = [];
     this.filter = () => true;
     this.metadata = undefined;
     this.createUnsignedTx.cancel();
