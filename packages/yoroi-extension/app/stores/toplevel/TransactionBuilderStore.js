@@ -239,6 +239,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       const utxoHasDataHash = false;
       const genTokenList = (userInput) => {
         const tokens = [...userInput];
+        console.log({tokens})
         if (isSendingNonDefaultToken()) {
           const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
           const fakeMultitoken = new MultiToken(
@@ -269,15 +270,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         return tokens;
       }
 
-      if (amount == null && shouldSendAll === true) {
+      if (shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,
-          tokens: genTokenList({
-            token: this.selectedToken
-              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
-            shouldSendAll,
-          }),
+          tokens: genTokenList(Object.values(this.plannedTxInfoMap).map(({ token }) => ({
+              token,
+              shouldSendAll,
+          }))),
           filter: this.filter,
           absSlotNumber,
           metadata: this.metadata,
@@ -286,11 +286,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,
-          // tokens: genTokenList({
-          //   token: this.selectedToken
-          //     ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
-          //   amount,
-          // }),
           tokens: genTokenList(Object.values(this.plannedTxInfoMap)),
           filter: this.filter,
           absSlotNumber,
