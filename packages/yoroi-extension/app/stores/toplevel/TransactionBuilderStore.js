@@ -159,8 +159,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     () => [
       // Need toJS for mobx to react to an array.
       // Note: will not trigger if re-assigned same value
-      toJS(this.plannedTxInfo),
-      this.shouldSendAll,
+      toJS(this.plannedTxInfoMap),
       this.stores.wallets.selected,
       // update if tx history changes
       this.stores.transactions.hash,
@@ -169,11 +168,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   )
 
   _canCompute(): boolean {
-    for (let i = 0; i < this.plannedTxInfoMap.length; i++) {
+    const plannedTxInfoMap = Object.values(this.plannedTxInfoMap);
+    for (const token of plannedTxInfoMap) {
       // we only care about the value in non-sendall case
       if (
-        this.plannedTxInfoMap[i].shouldSendAll === false 
-        && this.plannedTxInfoMap[i].amount == null
+        token.shouldSendAll === false
+        && token.amount == null
       ) {
         return false;
       }
@@ -199,7 +199,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     const plannedTxInfoMap = Object.values(this.plannedTxInfoMap);
-
     const receiver = this.receiver;
     if (receiver == null) return;
 
@@ -317,7 +316,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _updateSendAllStatus: (void | boolean) => void = (status) => {
     this._updateAmount(undefined, status || false);
-    this.shouldSendAll = status || false;
+    // this.shouldSendAll = status || false;
   }
 
   /** Should only set to valid address or undefined */

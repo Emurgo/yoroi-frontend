@@ -589,7 +589,7 @@ export default class WalletSendForm extends Component<Props> {
 
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
-    const { memo } = this.form.values();
+    const { memo, amount } = this.form.values();
 
     const {
       hasAnyPending,
@@ -599,6 +599,7 @@ export default class WalletSendForm extends Component<Props> {
       !this.props.fee
       || hasAnyPending
       || !isValidMemoOptional(memo)
+      || !amount
     );
 
     return (
