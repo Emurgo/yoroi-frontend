@@ -169,12 +169,15 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   )
 
   _canCompute(): boolean {
-    for (let i = 0; i < this.plannedTxInfo.length; i++) {
+    for (let i = 0; i < this.plannedTxInfoMap.length; i++) {
       // we only care about the value in non-sendall case
-      if (!this.shouldSendAll && this.plannedTxInfo[i].value == null) {
+      if (
+        this.plannedTxInfoMap[i].shouldSendAll === false 
+        && this.plannedTxInfoMap[i].amount == null
+      ) {
         return false;
       }
-      if (this.plannedTxInfo[i].address == null) {
+      if (this.receiver == null) {
         return false;
       }
     }
