@@ -195,16 +195,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       return;
     }
 
-    // type-cast to assert non-null
-    const plannedTxInfo = (this.plannedTxInfo);
     const plannedTxInfoMap = Object.values(this.plannedTxInfoMap);
 
     const receiver = this.receiver;
     if (receiver == null) return;
-    const amount = plannedTxInfo[0].value != null
-      ? plannedTxInfo[0].value.toString()
-      : null;
-    const shouldSendAll = this.shouldSendAll;
 
     if (this.createUnsignedTx.isExecuting) {
       this.createUnsignedTx.cancel();
@@ -220,8 +214,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const isIncludeDefaultToken = () => !!plannedTxInfoMap.find(
       ({ token }) => token.Identifier === defaultToken.Identifier
     )
-
-    console.log({isIncludeDefaultToken: isIncludeDefaultToken()})
 
     if (isCardanoHaskell(network)) {
       const withHasUtxoChains = asHasUtxoChains(withUtxos);
