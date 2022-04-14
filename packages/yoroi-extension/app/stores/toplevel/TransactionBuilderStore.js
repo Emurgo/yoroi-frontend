@@ -46,13 +46,13 @@ export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
  */
 export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap> {
 
-  @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<BigNumber>>, |}>;
-  @observable plannedTxInfoMap: Object<{|
+  @observable plannedTxInfoMap: Array<{|
     ...InexactSubset<TxOutType<BigNumber>>,
-    token: void | $ReadOnly<TokenRow>
-  |}> = {};
+    token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
+  |}> = [];
 
   @observable receiver: string | null;
   /** Stores the tx used to generate the information on the send form */
@@ -113,6 +113,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return this.plannedTx.totalInput();
   }
 
+  @computed get
+  shouldSendAll(): boolean {
+    return !!this.plannedTxInfoMap.find(({ shouldSendAll }) => shouldSendAll === true)
+  }
+
   // ================
   //   tentative tx
   // ================
@@ -168,8 +173,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   )
 
   _canCompute(): boolean {
-    const plannedTxInfoMap = Object.values(this.plannedTxInfoMap);
-    for (const token of plannedTxInfoMap) {
+    for (const token of this.plannedTxInfoMap) {
       // we only care about the value in non-sendall case
       if (
         token.shouldSendAll === false
@@ -198,7 +202,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       return;
     }
 
-    const plannedTxInfoMap = Object.values(this.plannedTxInfoMap);
+    const plannedTxInfoMap = this.plannedTxInfoMap;
     const receiver = this.receiver;
     if (receiver == null) return;
 
@@ -316,7 +320,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _updateSendAllStatus: (void | boolean) => void = (status) => {
     this._updateAmount(undefined, status || false);
-    // this.shouldSendAll = status || false;
   }
 
   /** Should only set to valid address or undefined */
@@ -334,15 +337,27 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   /** Should only set to valid amount or undefined */
   @action
   _updateAmount: (?BigNumber) => void = (value, shouldSendAll = false) => {
+    // Todo: Remove old `plannedTxInfo`
     this.plannedTxInfo[0].value = (value ?? undefined);
     const publicDeriver = this.stores.wallets.selected;
     const network = publicDeriver.getParent().getNetworkInfo();
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-    const identifier = this.selectedToken? this.selectedToken.Identifier : 'default';
-    if (!this.plannedTxInfoMap[identifier]) this.plannedTxInfoMap[identifier] = {};
-    this.plannedTxInfoMap[identifier].amount = (value ?? undefined);
-    this.plannedTxInfoMap[identifier].token = this.selectedToken ?? defaultToken;
-    this.plannedTxInfoMap[identifier].shouldSendAll = shouldSendAll;
+    const selectedToken = (
+      this.selectedToken ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
+    );
+    const tokenTxInfo = this.plannedTxInfoMap.find(
+      ({ token }) => token.Identifier === selectedToken.Identifier
+    );
+
+    if (!tokenTxInfo) {
+      this.plannedTxInfoMap.push({
+        amount: value ?? undefined,
+        token: selectedToken,
+        shouldSendAll,
+      })
+    } else {
+      tokenTxInfo.amount = (value ?? undefined);
+      tokenTxInfo.shouldSendAll = shouldSendAll;
+    }
 
     console.log(JSON.parse(JSON.stringify(this.plannedTxInfoMap)))
   }
@@ -361,7 +376,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _updateToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
     this.selectedToken = token;
     // Todo: Will be changed when adding multi-assets link;
-    this.plannedTxInfoMap = {};
+    this.plannedTxInfoMap = [];
   }
 
   @action
@@ -381,8 +396,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _reset: void => void = () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
-    this.plannedTxInfoMap = {};
-    this.shouldSendAll = false;
+    this.plannedTxInfoMap = [];
     this.memo = undefined;
     this.selectedToken = undefined;
     this.filter = () => true;
@@ -437,6 +451,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       throw new Error(`${nameof(this._setupSelfTx)} ${nameof(nextUnusedInternal)} == null`);
     }
     this._updateReceiver(nextUnusedInternal.addr.Hash);
+    // Todo: update shouldSendAll
     if (this.shouldSendAll === false) {
       this._updateSendAllStatus(true);
     }
