@@ -197,6 +197,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
     // type-cast to assert non-null
     const plannedTxInfo = (this.plannedTxInfo);
+    const plannedTxInfoMap = Object.values(this.plannedTxInfoMap);
 
     const receiver = this.receiver;
     if (receiver == null) return;
@@ -216,10 +217,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
     const network = withUtxos.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-    const isSendingNonDefaultToken = () => (
-      this.selectedToken != null &&
-      this.selectedToken.TokenId !== defaultToken.TokenId
+    const isIncludeDefaultToken = () => !!plannedTxInfoMap.find(
+      ({ token }) => token.Identifier === defaultToken.Identifier
     )
+
+    console.log({isIncludeDefaultToken: isIncludeDefaultToken()})
 
     if (isCardanoHaskell(network)) {
       const withHasUtxoChains = asHasUtxoChains(withUtxos);
@@ -239,8 +241,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       const utxoHasDataHash = false;
       const genTokenList = (userInput) => {
         const tokens = [...userInput];
-        console.log({tokens})
-        if (isSendingNonDefaultToken()) {
+        if (!isIncludeDefaultToken()) {
           const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
           const fakeMultitoken = new MultiToken(
             [{
@@ -248,7 +249,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
               networkId: defaultToken.NetworkId,
               amount: fakeAmount,
             },
-            ...Object.values(this.plannedTxInfoMap).map(({ token }) => ({
+            ...plannedTxInfoMap.map(({ token }) => ({
               identifier: token.Identifier,
               networkId: token.NetworkId,
               amount: fakeAmount,
@@ -270,28 +271,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         return tokens;
       }
 
-      if (shouldSendAll === true) {
-        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
-          publicDeriver: withHasUtxoChains,
-          receiver,
-          tokens: genTokenList(Object.values(this.plannedTxInfoMap).map(({ token }) => ({
-              token,
-              shouldSendAll,
-          }))),
-          filter: this.filter,
-          absSlotNumber,
-          metadata: this.metadata,
-        }));
-      } else if (amount != null) {
-        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
-          publicDeriver: withHasUtxoChains,
-          receiver,
-          tokens: genTokenList(Object.values(this.plannedTxInfoMap)),
-          filter: this.filter,
-          absSlotNumber,
-          metadata: this.metadata,
-        }));
-      }
+      await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
+        publicDeriver: withHasUtxoChains,
+        receiver,
+        tokens: genTokenList(plannedTxInfoMap),
+        filter: this.filter,
+        absSlotNumber,
+        metadata: this.metadata,
+      }));
     } else if (isErgo(network)) {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
       const txFee = new BigNumber(
@@ -299,8 +286,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       ).plus(100000); // slightly higher than default fee
 
       const genTokenList = (userInput) => {
-        const tokens = [userInput];
-        if (isSendingNonDefaultToken()) {
+        const tokens = [...userInput];
+        if (!isIncludeDefaultToken()) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
           tokens.push({
@@ -319,11 +306,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
-          tokens: genTokenList({
-            token: this.selectedToken
-              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
-            shouldSendAll,
-          }),
+          tokens: genTokenList(plannedTxInfoMap),
           filter: this.filter,
           currentHeight: lastSync.Height,
           txFee,
@@ -332,11 +315,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
-          tokens: genTokenList({
-            token: this.selectedToken
-              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
-            amount,
-          }),
+          tokens: genTokenList(plannedTxInfoMap),
           filter: this.filter,
           currentHeight: lastSync.Height,
           txFee,
@@ -353,7 +332,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   @action
   _updateSendAllStatus: (void | boolean) => void = (status) => {
-    this._updateAmount();
+    this._updateAmount(undefined, status || false);
     this.shouldSendAll = status || false;
   }
 
@@ -371,9 +350,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   /** Should only set to valid amount or undefined */
   @action
-  _updateAmount: (?BigNumber) => void = (value) => {
+  _updateAmount: (?BigNumber) => void = (value, shouldSendAll = false) => {
     this.plannedTxInfo[0].value = (value ?? undefined);
-
     const publicDeriver = this.stores.wallets.selected;
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
@@ -381,6 +359,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     if (!this.plannedTxInfoMap[identifier]) this.plannedTxInfoMap[identifier] = {};
     this.plannedTxInfoMap[identifier].amount = (value ?? undefined);
     this.plannedTxInfoMap[identifier].token = this.selectedToken ?? defaultToken;
+    this.plannedTxInfoMap[identifier].shouldSendAll = shouldSendAll;
 
     console.log(JSON.parse(JSON.stringify(this.plannedTxInfoMap)))
   }

@@ -600,7 +600,7 @@ export default class WalletSendForm extends Component<Props> {
       || hasAnyPending
       || !isValidMemoOptional(memo)
     );
-
+    console.log({fee:this.props.fee, hasAnyPending })
     return (
       <Button
         variant="primary"
