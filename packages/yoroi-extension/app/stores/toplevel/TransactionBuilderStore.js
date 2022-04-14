@@ -302,25 +302,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         return tokens;
       }
 
-      if (amount == null && shouldSendAll === true) {
-        await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
-          publicDeriver: withUtxos,
-          receiver,
-          tokens: genTokenList(plannedTxInfoMap),
-          filter: this.filter,
-          currentHeight: lastSync.Height,
-          txFee,
-        }));
-      } else if (amount != null) {
-        await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
-          publicDeriver: withUtxos,
-          receiver,
-          tokens: genTokenList(plannedTxInfoMap),
-          filter: this.filter,
-          currentHeight: lastSync.Height,
-          txFee,
-        }));
-      }
+      await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
+        publicDeriver: withUtxos,
+        receiver,
+        tokens: genTokenList(plannedTxInfoMap),
+        filter: this.filter,
+        currentHeight: lastSync.Height,
+        txFee,
+      }));
     } else {
       throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);
     }
