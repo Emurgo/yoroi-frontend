@@ -169,7 +169,14 @@ export function cardanoValueFromRemoteFormat(
 }
 export function multiTokenFromRemote(
   utxo: $ReadOnly<{
-    ...RemoteUnspentOutput,
+    +amount: string,
+    +assets: $ReadOnlyArray<$ReadOnly<{
+      +assetId: string,
+      +policyId: string,
+      +name: string,
+      +amount: string,
+      ...
+    }>>,
     ...,
   }>,
   networkId: number,

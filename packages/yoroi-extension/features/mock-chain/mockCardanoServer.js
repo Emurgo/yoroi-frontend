@@ -197,6 +197,19 @@ export function getMockServer(
       );
     });
 
+    server.get('/api/txs/io/:txHash/o/:txIndex', (req, res) => {
+      const result = mockImporter.getUtxoData(
+        req.params.txHash,
+        Number(req.params.txIndex)
+      );
+      if (result) {
+        res.send(result);
+        return;
+      }
+      res.status(404);
+      res.send('Transaction not found');
+    });
+
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {

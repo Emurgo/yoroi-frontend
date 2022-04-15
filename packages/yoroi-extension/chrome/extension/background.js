@@ -551,6 +551,21 @@ const yoroiMessageHandler = async (
       // eslint-disable-next-line no-console
       console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
     }
+  } else if (request.type === 'sign_error') {
+    const connection = connectedSites.get(request.tabId);
+    const responseData = connection?.pendingSigns.get(request.uid);
+    if (connection && responseData) {
+      responseData.resolve({
+        err: {
+          code: 3,
+          info: 'utxo error'
+        }
+      });
+      connection.pendingSigns.delete(request.uid);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+    }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
       for (const [/* uid */, responseData] of connection.pendingSigns.entries()) {

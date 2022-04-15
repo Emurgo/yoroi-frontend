@@ -641,8 +641,56 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ownAddresses,
     );
 
+    if (foreignInputs.length) {
+      const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData(
+        {
+          network: selectedWallet.publicDeriver.getParent().networkInfo,
+          utxos: foreignInputs,
+        }
+      )
+      for (let i = 0; i < foreignUtxos.length; i++) {
+        const foreignUtxo = foreignUtxos[i];
+        if (foreignUtxo === null) {
+          window.chrome.runtime.sendMessage(
+            {
+              type: 'sign_error',
+              errorType: 'missing_utxo',
+              data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
+              uid: signingMessage.sign.uid,
+              tabId: signingMessage.tabId,
+            }
+          );
+          this._closeWindow();
+          return;
+        }
+        if (foreignUtxo.spendingTxHash !== null) {
+          window.chrome.runtime.sendMessage(
+            {
+              type: 'sign_error',
+              errorType: 'spent_utxo',
+              data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
+              uid: signingMessage.sign.uid,
+              tabId: signingMessage.tabId,
+            }
+          );
+          this._closeWindow();
+          return;
+        }
+        const value = multiTokenFromRemote(
+          foreignUtxo.output,
+          defaultToken.NetworkId
+        );
+        inputs.push({
+          address: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+            foreignUtxo.output.address
+          ).to_bytes()).toString('hex'),
+          value,
+        });
+        amount.joinAddMutable(value);
+      }
+    }
+
     runInAction(() => {
-      // <TODO:FOREIGN_INPUTS>
       // $FlowFixMe[prop-missing]
       this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
     });
