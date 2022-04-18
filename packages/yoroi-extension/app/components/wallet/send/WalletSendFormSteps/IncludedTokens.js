@@ -70,25 +70,25 @@ export default class IncludedTokens extends Component<Props> {
     }
 
     render(): Node {
-        const { intl } = this.context
-        const { spendableBalance, getTokenInfo } = this.props
-        const tokens = getTokens(spendableBalance, getTokenInfo)
-        const nfts = getNFTs(spendableBalance, getTokenInfo)
-        return (
-          <div className={styles.component}>
+      const { intl } = this.context
+      const { spendableBalance, getTokenInfo } = this.props
+      const tokens = getTokens(spendableBalance, getTokenInfo)
+      const nfts = getNFTs(spendableBalance, getTokenInfo)
+      return (
+        <div className={styles.component}>
+          <div>
+            <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
             <div>
-              <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
-              <div>
-                {this.renderTokens(tokens)}
-              </div>
-            </div>
-            <div>
-              <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
-              <div>
-                {this.renderNfts(nfts)}
-              </div>
+              {this.renderTokens(tokens)}
             </div>
           </div>
-        )
+          <div>
+            <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
+            <div>
+              {this.renderNfts(nfts)}
+            </div>
+          </div>
+        </div>
+      )
     }
 }

@@ -517,6 +517,8 @@ class WalletSendPage extends Component<AllProps> {
         )}
         defaultToken={defaultToken}
         onAddToken={txBuilderActions.addToken.trigger}
+        onRemoveToken={txBuilderActions.removeToken.trigger}
+        isTokenIncluded={this.isTokenIncluded}
       />
     )
   }
