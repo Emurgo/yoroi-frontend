@@ -42,10 +42,13 @@ function getBraveBuilder() {
     new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments(
-        '--start-maximized',
-        '--disable-setuid-sandbox',
         '--no-sandbox',
-        '--disable-dev-shm-usage'
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--start-maximized',
+        '--remote-debugging-port=9222',
+        'disable-infobars',
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
   );
@@ -58,10 +61,13 @@ function getChromeBuilder() {
       new chrome.Options()
         .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
         .addArguments(
-          '--start-maximized',
-          '--disable-setuid-sandbox',
           '--no-sandbox',
-          '--disable-dev-shm-usage'
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--start-maximized',
+          '--remote-debugging-port=9222',
+          'disable-infobars',
         )
     );
 }
