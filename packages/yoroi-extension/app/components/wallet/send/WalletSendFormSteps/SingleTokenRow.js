@@ -85,12 +85,11 @@ export default class SingleTokenRow extends Component<Props> {
             ? formatValue(
               this.props.uriParams.amount.getDefaultEntry(),
             )
-            : null
+            : this.props.getTokenAmount(this.props.token.info)
         })(),
         validators: [async ({ field }) => {
           const amountValue: string = field.value;
           if (amountValue === '') {
-            this.props.updateAmount();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(

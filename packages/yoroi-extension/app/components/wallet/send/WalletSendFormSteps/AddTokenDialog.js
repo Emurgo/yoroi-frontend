@@ -276,6 +276,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                       isCalculatingFee={this.props.isCalculatingFee}
                       totalInput={this.props.totalInput}
                       isTokenIncluded={this.props.isTokenIncluded}
+                      getTokenAmount={this.props.getTokenAmount}
                     />
                   ))
                 }

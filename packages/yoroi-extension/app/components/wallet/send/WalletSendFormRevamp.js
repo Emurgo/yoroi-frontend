@@ -447,7 +447,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     disabled={shouldSendAll}
                     error={amountInputError}
                     currency={truncateToken(
-                    getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+                      getTokenName(this.props.selectedToken ?? this.props.defaultToken)
                     )}
                     fees={formatValue(transactionFee.getDefaultEntry())}
                     total={formatValue(this.getTokenEntry(totalAmount))}
