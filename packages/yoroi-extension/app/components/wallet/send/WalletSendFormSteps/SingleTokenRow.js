@@ -187,15 +187,16 @@ export default class SingleTokenRow extends Component<Props> {
                 decimalPlaces={this.getNumDecimals()}
                 error={amountInputError}
                 currency={truncateToken(
-                getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+                  getTokenName(this.props.selectedToken ?? this.props.defaultToken)
                 )}
                 fees={formatValue(transactionFee.getDefaultEntry())}
                 total={formatValue(this.getTokenEntry(totalAmount))}
                 allowSigns={false}
+                onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
               />
             </div>
-            <button type='button' onClick={() => this.props.addOrRemoveToken(token.id, false)} className={styles.close}> <CloseIcon /> </button>
+            <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
           </div>
            )}
       </div>

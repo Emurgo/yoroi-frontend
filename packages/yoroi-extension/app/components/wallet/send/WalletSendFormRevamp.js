@@ -452,6 +452,11 @@ export default class WalletSendForm extends Component<Props, State> {
                     fees={formatValue(transactionFee.getDefaultEntry())}
                     total={formatValue(this.getTokenEntry(totalAmount))}
                     allowSigns={false}
+                    onFocus={() => {
+                      this.props.onAddToken({
+                        shouldReset: true,
+                      });
+                    }}
                     amountFieldRevamp
                   />
                   <p className={styles.defaultCoin}>

@@ -546,6 +546,7 @@ class WalletSendPage extends Component<AllProps> {
         isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
         error={transactionBuilderStore.createUnsignedTx.error}
         onAddToken={txBuilderActions.addToken.trigger}
+        onRemoveToken={txBuilderActions.removeToken.trigger}
         isTokenIncluded={this.isTokenIncluded}
       />
     )
@@ -782,6 +783,7 @@ class WalletSendPage extends Component<AllProps> {
           updateReceiver: { trigger: actions.txBuilderActions.updateReceiver.trigger },
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
           addToken: { trigger: actions.txBuilderActions.addToken.trigger },
+          removeToken: { trigger: actions.txBuilderActions.removeToken.trigger },
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },

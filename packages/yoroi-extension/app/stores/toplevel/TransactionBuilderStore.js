@@ -388,6 +388,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     this.plannedTxInfoMap = this.plannedTxInfoMap.filter(t => t.Identifier !== token.Identifier);
+
+    // Deselect the token
+    this.selectedToken = undefined;
   }
 
   @action
