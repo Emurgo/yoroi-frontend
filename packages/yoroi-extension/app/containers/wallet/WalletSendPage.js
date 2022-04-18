@@ -201,7 +201,7 @@ class WalletSendPage extends Component<AllProps> {
               continuation: this.toggleShowMemo,
             })}
             spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
-            onAddToken={txBuilderActions.updateToken.trigger}
+            onAddToken={txBuilderActions.addToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}
@@ -246,7 +246,7 @@ class WalletSendPage extends Component<AllProps> {
             continuation: this.toggleShowMemo,
           })}
           spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
-          onAddToken={txBuilderActions.updateToken.trigger}
+          onAddToken={txBuilderActions.addToken.trigger}
           selectedToken={transactionBuilderStore.selectedToken}
         />
         {this.renderDialog()}
@@ -576,7 +576,7 @@ class WalletSendPage extends Component<AllProps> {
         updateAmount: {|
           trigger: (params: ?BigNumber) => void
         |},
-        updateToken: {|
+        addToken: {|
           trigger: (params: void | $ReadOnly<TokenRow>) => void
         |},
         updateMemo: {|
@@ -768,7 +768,7 @@ class WalletSendPage extends Component<AllProps> {
           updateTentativeTx: { trigger: actions.txBuilderActions.updateTentativeTx.trigger },
           updateReceiver: { trigger: actions.txBuilderActions.updateReceiver.trigger },
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
-          updateToken: { trigger: actions.txBuilderActions.updateToken.trigger },
+          addToken: { trigger: actions.txBuilderActions.addToken.trigger },
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },

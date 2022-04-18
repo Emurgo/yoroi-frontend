@@ -85,7 +85,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
-    actions.updateToken.listen(this._updateToken);
+    actions.addToken.listen(this._addToken);
+    actions.removeToken.listen(this._removeToken);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.updateSendAllStatus.listen(this._updateSendAllStatus);
     actions.initialize.listen(this._initialize);
@@ -373,10 +374,21 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _updateToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+  _addToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
     this.selectedToken = token;
     // Todo: Will be changed when adding multi-assets link;
     this.plannedTxInfoMap = [];
+  }
+
+  @action
+  _addToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+    if (!token) {
+      const publicDeriver = this.stores.wallets.selected;
+      const network = publicDeriver.getParent().getNetworkInfo();
+      token = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
+    }
+
+    this.plannedTxInfoMap = this.plannedTxInfoMap.filter(t => t.Identifier !== token.Identifier);
   }
 
   @action
