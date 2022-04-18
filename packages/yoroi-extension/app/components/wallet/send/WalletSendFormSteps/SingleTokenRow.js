@@ -185,7 +185,7 @@ export default class SingleTokenRow extends Component<Props> {
                   getTokenName(this.props.selectedToken ?? this.props.defaultToken)
                 )}
                 fees={formatValue(transactionFee.getDefaultEntry())}
-                total={formatValue(this.getTokenEntry(totalAmount))}
+                total={formatValue(totalAmount.getDefaultEntry())}
                 allowSigns={false}
                 onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
