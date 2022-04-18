@@ -58,11 +58,7 @@ export default class SingleTokenRow extends Component<Props> {
   };
 
   getNumDecimals(): number {
-    const info = this.props.selectedToken ?? this.props.getTokenInfo({
-      identifier: this.props.defaultToken.Identifier,
-      networkId: this.props.defaultToken.NetworkId,
-    });
-    return info.Metadata.numberOfDecimals;
+    return this.props.token.info.Metadata.numberOfDecimals;
   }
 
   getTokenEntry: MultiToken => TokenEntry = (tokens) => {

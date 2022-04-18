@@ -203,14 +203,6 @@ export default class WalletSendForm extends Component<Props, State> {
     );
   }
 
-  getTokenEntry: MultiToken => TokenEntry = (tokens) => {
-    return this.props.selectedToken == null
-      ? tokens.getDefaultEntry()
-      : tokens.values.find(
-        entry => entry.identifier === this.props.selectedToken?.Identifier
-      ) ?? tokens.getDefaultEntry();
-  }
-
   componentWillUnmount(): void {
     this.props.reset();
     // dispose reaction
@@ -282,7 +274,7 @@ export default class WalletSendForm extends Component<Props, State> {
           ));
           const isValidAmount = await this.props.validateAmount(
             formattedAmount,
-            this.props.selectedToken ?? this.props.defaultToken
+            this.props.defaultToken
           );
           if (isValidAmount[0]) {
             this.props.updateAmount(formattedAmount);
@@ -333,7 +325,7 @@ export default class WalletSendForm extends Component<Props, State> {
   });
 
   getNumDecimals(): number {
-    const info = this.props.selectedToken ?? this.props.getTokenInfo({
+    const info = this.props.getTokenInfo({
       identifier: this.props.defaultToken.Identifier,
       networkId: this.props.defaultToken.NetworkId,
     });
@@ -367,10 +359,10 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     const totalAmount = this.props.totalInput ?? new MultiToken([{
-      identifier: (this.props.selectedToken ?? this.props.defaultToken).Identifier,
-      networkId: (this.props.selectedToken ?? this.props.defaultToken).NetworkId,
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
       amount: formattedAmountToBigNumber(amountFieldProps.value)
-        .shiftedBy((this.props.selectedToken ?? this.props.defaultToken).Metadata.numberOfDecimals),
+        .shiftedBy(this.props.defaultToken.Metadata.numberOfDecimals),
     }], {
       defaultIdentifier: this.props.defaultToken.Identifier,
       defaultNetworkId: this.props.defaultToken.NetworkId,
@@ -447,10 +439,10 @@ export default class WalletSendForm extends Component<Props, State> {
                     disabled={shouldSendAll}
                     error={amountInputError}
                     currency={truncateToken(
-                      getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+                      getTokenName(this.props.defaultToken)
                     )}
                     fees={formatValue(transactionFee.getDefaultEntry())}
-                    total={formatValue(this.getTokenEntry(totalAmount))}
+                    total={formatValue(totalAmount.getDefaultEntry())}
                     allowSigns={false}
                     onFocus={() => {
                       this.props.onAddToken({
