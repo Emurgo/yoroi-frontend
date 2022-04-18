@@ -17,7 +17,7 @@ import type {
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-  +spendableBalance: ?MultiToken,
+  +totalAmount: ?MultiToken,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |}
 export default class IncludedTokens extends Component<Props> {
@@ -39,7 +39,7 @@ export default class IncludedTokens extends Component<Props> {
               </div>
 
               <div>
-                <button type='button' className={styles.remove}> <RemoveIcon /> </button>
+                <button onClick={() => this.props.onRemoveToken(token.info)} type='button' className={styles.remove}> <RemoveIcon /> </button>
               </div>
             </div>
           ))
@@ -48,46 +48,54 @@ export default class IncludedTokens extends Component<Props> {
 
     renderNfts(nfts: FormattedNFTDisplay[]): Node {
         return (
-            nfts.map(nft => {
-              const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
+          nfts.map(nft => {
+            const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
 
-              return (
-                <div className={styles.nftRow} key={nft.name}>
-                  <div className={styles.nft}>
-                    <div className={styles.nftImg}>
-                      {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT />}
-                    </div>
-                    <p className={styles.name}>{nft.name}{nft.name}</p>
+            return (
+              <div className={styles.nftRow} key={nft.name}>
+                <div className={styles.nft}>
+                  <div className={styles.nftImg}>
+                    {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT />}
                   </div>
-
-                  <div>
-                    <button type='button' className={styles.remove}> <RemoveIcon /> </button>
-                  </div>
+                  <p className={styles.name}>{nft.name}{nft.name}</p>
                 </div>
-              )
-            })
+
+                <div>
+                  <button type='button' className={styles.remove}> <RemoveIcon /> </button>
+                </div>
+              </div>
+            )
+          })
         )
     }
 
     render(): Node {
       const { intl } = this.context
-      const { spendableBalance, getTokenInfo } = this.props
-      const tokens = getTokens(spendableBalance, getTokenInfo)
-      const nfts = getNFTs(spendableBalance, getTokenInfo)
+      const { getTokenInfo, totalAmount } = this.props
+      const tokens = getTokens(totalAmount, getTokenInfo)
+      const nfts = getNFTs(totalAmount, getTokenInfo)
       return (
         <div className={styles.component}>
-          <div>
-            <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
-            <div>
-              {this.renderTokens(tokens)}
-            </div>
-          </div>
-          <div>
-            <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
-            <div>
-              {this.renderNfts(nfts)}
-            </div>
-          </div>
+          {
+            tokens.length > 0 && (
+              <div>
+                <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
+                <div>
+                  {this.renderTokens(tokens)}
+                </div>
+              </div>
+            )
+          }
+          {
+            nfts.length > 0 && (
+              <div>
+                <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
+                <div>
+                  {this.renderNfts(nfts)}
+                </div>
+              </div>
+            )
+          }
         </div>
       )
     }

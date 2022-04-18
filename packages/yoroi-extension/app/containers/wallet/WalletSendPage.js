@@ -202,6 +202,7 @@ class WalletSendPage extends Component<AllProps> {
             })}
             spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
             onAddToken={txBuilderActions.addToken.trigger}
+            onRemoveToken={txBuilderActions.removeToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}

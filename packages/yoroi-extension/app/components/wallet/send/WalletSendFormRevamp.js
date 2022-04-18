@@ -477,8 +477,9 @@ export default class WalletSendForm extends Component<Props, State> {
               </p>
 
               <IncludedTokens
-                spendableBalance={this.props.spendableBalance}
                 getTokenInfo={this.props.getTokenInfo}
+                totalAmount={totalAmount}
+                onRemoveToken={this.props.onRemoveToken}
               />
 
               <div className={styles.addButtonsWrapper}>
