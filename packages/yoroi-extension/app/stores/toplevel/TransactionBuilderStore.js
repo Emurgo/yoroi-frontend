@@ -374,14 +374,13 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _addToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+  _addToken: (void | $ReadOnly<TokenRow>) => void = ({ token, shouldReset }) => {
     this.selectedToken = token;
-    // Todo: Will be changed when adding multi-assets link;
-    this.plannedTxInfoMap = [];
+    if (shouldReset) this.plannedTxInfoMap = [];
   }
 
   @action
-  _addToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+  _removeToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
     if (!token) {
       const publicDeriver = this.stores.wallets.selected;
       const network = publicDeriver.getParent().getNetworkInfo();
@@ -389,6 +388,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     this.plannedTxInfoMap = this.plannedTxInfoMap.filter(t => t.Identifier !== token.Identifier);
+  }
+
+  @action
+  _isTokenIncluded: $ReadOnly<TokenRow> => void = token => {
+    return !!this.plannedTxInfoMap.find(t => t.Identifier === token.Identifier)
   }
 
   @action

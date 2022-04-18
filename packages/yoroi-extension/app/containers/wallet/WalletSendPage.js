@@ -467,6 +467,15 @@ class WalletSendPage extends Component<AllProps> {
     />);
   }
 
+  isTokenIncluded = (token) => {
+    const { transactionBuilderStore } = this.generated.stores;
+    return (
+      !!transactionBuilderStore.plannedTxInfoMap.find(
+        ({ token: t }) => t.Identifier === token.Identifier) ||
+      transactionBuilderStore?.selectedToken?.Identifier === token.Identifier
+    );
+  }
+
   renderNFTDialog: void => Node = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
@@ -497,6 +506,7 @@ class WalletSendPage extends Component<AllProps> {
           this.context.intl,
         )}
         defaultToken={defaultToken}
+        onAddToken={txBuilderActions.addToken.trigger}
       />
     )
   }
@@ -535,6 +545,8 @@ class WalletSendPage extends Component<AllProps> {
         totalInput={transactionBuilderStore.totalInput}
         isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
         error={transactionBuilderStore.createUnsignedTx.error}
+        onAddToken={txBuilderActions.addToken.trigger}
+        isTokenIncluded={this.isTokenIncluded}
       />
     )
   }
@@ -735,6 +747,7 @@ class WalletSendPage extends Component<AllProps> {
             error: stores.transactionBuilderStore.createUnsignedTx.error,
           },
           selectedToken: stores.transactionBuilderStore.selectedToken,
+          plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap
         },
         substores: {
           ada: {

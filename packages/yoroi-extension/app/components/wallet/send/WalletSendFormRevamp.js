@@ -479,10 +479,10 @@ export default class WalletSendForm extends Component<Props, State> {
                 {amountInputError}
               </p>
 
-              <IncludedTokens
+              {/* <IncludedTokens
                 spendableBalance={this.props.spendableBalance}
                 getTokenInfo={this.props.getTokenInfo}
-              />
+              /> */}
 
               <div className={styles.addButtonsWrapper}>
                 <button type='button' onClick={() => this.props.openDialog(AddTokenDialog)}>

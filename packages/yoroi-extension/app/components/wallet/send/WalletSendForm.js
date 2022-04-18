@@ -425,9 +425,12 @@ export default class WalletSendForm extends Component<Props> {
               labelId="token-assets-select"
               {...form.$('selectedToken').bind()}
               onChange={value => {
-                this.props.onAddToken(tokenOptions.find(
-                  token => token.info.TokenId === value
-                )?.info);
+                this.props.onAddToken({
+                  token: tokenOptions.find(
+                    token => token.info.TokenId === value
+                  )?.info,
+                  shouldReset: true,
+                });
 
                 // clear send all when changing currencies
                 if (this.props.shouldSendAll) {

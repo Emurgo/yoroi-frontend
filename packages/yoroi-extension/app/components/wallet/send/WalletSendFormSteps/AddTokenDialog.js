@@ -196,21 +196,7 @@ export default class AddTokenDialog extends Component<Props, State> {
       label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
       id: (getTokenIdentifierIfExists(token.info) ?? '-'),
       amount,
-      included: false,
     }});
-  }
-
-  addOrRemoveToken(tokenId: string, status: boolean): void {
-      /**
-       * Temp solution for UI purposes
-       * Normal this should be the store
-       */
-
-      this.setState(prevState => ({
-          ...prevState,
-          tokensList: prevState.tokensList.map(
-              token => ({ ...token, included: tokenId === token.id ? status: token.included  }))
-        }))
   }
 
   render(): Node {
@@ -283,11 +269,13 @@ export default class AddTokenDialog extends Component<Props, State> {
                       validateAmount={this.props.validateAmount}
                       defaultToken={this.props.defaultToken}
                       getTokenInfo={this.props.getTokenInfo}
-                      addOrRemoveToken={this.addOrRemoveToken.bind(this)}
+                      onAddToken={t => { this.props.onAddToken({ token: t, shouldReset: false }) }}
+                      onRemoveToken={this.props.onRemoveToken}
                       fee={this.props.fee}
                       error={this.props.error}
                       isCalculatingFee={this.props.isCalculatingFee}
                       totalInput={this.props.totalInput}
+                      isTokenIncluded={this.props.isTokenIncluded}
                     />
                   ))
                 }

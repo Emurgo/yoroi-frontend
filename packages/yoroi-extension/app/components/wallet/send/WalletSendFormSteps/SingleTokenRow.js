@@ -160,8 +160,8 @@ export default class SingleTokenRow extends Component<Props> {
     const amountInputError = transactionFeeError || amountField.error
     return (
       <div className={styles.component}>
-        {!token.included ? (
-          <button type='button' className={styles.token} onClick={() => this.props.addOrRemoveToken(token.id, true)}>
+        {!this.props.isTokenIncluded(token.info) ? (
+          <button type='button' className={styles.token} onClick={() => this.props.onAddToken(token.info)}>
             <div className={styles.name}>
               <div className={styles.logo}><NoAssetLogo /></div>
               <p className={styles.label}>{token.label}</p>
@@ -179,8 +179,8 @@ export default class SingleTokenRow extends Component<Props> {
               <AmountInputRevamp
                 {...amountFieldProps}
                 value={amountFieldProps.value === ''
-                ? null
-                : formattedAmountToBigNumber(amountFieldProps.value)
+                  ? null
+                  : formattedAmountToBigNumber(amountFieldProps.value)
                 }
                 className="tokenAmount"
                 label={intl.formatMessage(globalMessages.amountLabel)}
