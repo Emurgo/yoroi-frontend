@@ -79,13 +79,13 @@
 
         .amountStep {
             padding-top: 30px;
-            font-family: Rubik;
             padding-top: 40px;
             padding-right: 40px;
             padding-bottom: 20px;
             padding-left: 40px;
             height: 530px;
             overflow: auto;
+            position: relative;
 
             .amountInput {
                 position: relative;
@@ -152,6 +152,16 @@
                     font-size: 16px;
                     letter-spacing: 0;
                 }
+
+                .amountError {
+                    position: absolute;
+                    bottom: -19px;
+                    left: 17px;
+                    color: #FF1351;
+                    font-size: 12px;
+                    letter-spacing: 0.4px;
+                    line-height: 16px;
+                }
             }
 
             .amountInputError {
@@ -160,22 +170,6 @@
 
             .disabled {
                 border: 1px solid var(--yoroi-comp-input-text-disabled);
-            }
-
-            .amountError {
-                color: #FF1351;
-                font-family: Rubik;
-                font-size: 12px;
-                letter-spacing: 0.4px;
-                line-height: 16px;
-                margin-left: 16px;
-                margin-top: 4px;
-            }
-
-            .emptyError {
-                margin-top: 4px;
-                width: 100%;
-                height: 16px;
             }
 
             .addButtonsWrapper {

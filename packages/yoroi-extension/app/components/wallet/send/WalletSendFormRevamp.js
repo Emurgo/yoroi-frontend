@@ -465,15 +465,13 @@ export default class WalletSendForm extends Component<Props, State> {
                 <div className={styles.usd}>
                   <p>$0</p>
                 </div>
+                {amountInputError && (
+                  !this.props.selectedToken ||
+                  this.props.selectedToken?.Identifier === this.props.defaultToken.Identifier) ? (
+                    <p className={styles.amountError}>
+                      {amountInputError}
+                    </p>): null}
               </div>
-
-              <p
-                className={classnames(
-                  [!amountInputError ? styles.emptyError: styles.amountError ]
-                )}
-              >
-                {amountInputError}
-              </p>
 
               <IncludedTokens
                 getTokenInfo={this.props.getTokenInfo}
