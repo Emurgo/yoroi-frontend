@@ -506,17 +506,6 @@ class WalletSendPage extends Component<AllProps> {
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         classicTheme={this.generated.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-        uriParams={this.generated.stores.loading.uriParams}
-        selectedToken={transactionBuilderStore.selectedToken}
-        validateAmount={(amount) => validateAmount(
-          amount,
-          transactionBuilderStore.selectedToken ?? defaultToken,
-          getMinimumValue(
-            publicDeriver.getParent().getNetworkInfo(),
-            transactionBuilderStore.selectedToken?.IsDefault ?? true
-          ),
-          this.context.intl,
-        )}
         defaultToken={defaultToken}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}

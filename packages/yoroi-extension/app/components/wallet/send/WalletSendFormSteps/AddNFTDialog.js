@@ -25,6 +25,7 @@ import type {
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { UriParams } from '../../../../utils/URIHandling';
+import classnames from 'classnames';
 
 type Props = {|
   +onClose: void => void,
@@ -114,37 +115,52 @@ export default class AddNFTDialog extends Component<Props, State> {
     };
 
   genNftsList: void => FormattedNFTDisplay[] = () => {
-      if (this.props.spendableBalance == null) return [];
-      const { spendableBalance } = this.props;
-      return [
-        ...spendableBalance.nonDefaultEntries(),
-      ].map(entry => ({
-        entry,
-        info: this.props.getTokenInfo(entry),
-      })).filter(token => token.info.IsNFT).map(token => {
-        const policyId = token.entry.identifier.split('.')[0];
-        const name = truncateToken(getTokenStrictName(token.info) ?? '-');
-        return {
-          name,
-          id: getTokenIdentifierIfExists(token.info) ?? '-',
-          amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
-          policyId,
-          // $FlowFixMe[prop-missing]
-          nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
-        };
+    if (this.props.spendableBalance == null) return [];
+    const { spendableBalance } = this.props;
+    return [
+      ...spendableBalance.nonDefaultEntries(),
+    ].map(entry => ({
+      entry,
+      info: this.props.getTokenInfo(entry),
+    })).filter(token => !token.info.IsNFT).map(token => {
+      const policyId = token.entry.identifier.split('.')[0];
+      const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+      return {
+        info: token.info,
+        name,
+        id: getTokenIdentifierIfExists(token.info) ?? '-',
+        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
+        policyId,
+        // $FlowFixMe[prop-missing]
+        // todo: revert this change
+        // nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+        nftMetadata: null,
+      };
+    })
+    .map(item => ({
+      name: item.name,
+      image: item.nftMetadata?.image,
+      id: item.id,
+      info: item.info,
+    }));
+  }
+
+  onSelect = (token) => {
+    if (this.props.isTokenIncluded(token)) {
+      this.props.onRemoveToken(token)
+    } else {
+      this.props.onAddToken({
+        token, shouldReset: false
       })
-      .map(item => ({
-        name: item.name,
-        image: item.nftMetadata?.image,
-        id: item.id,
-      }));
+      const amount = new BigNumber('1')
+      this.props.updateAmount(amount)
+    }
   }
 
   render(): Node {
     const { intl } = this.context;
     const { onClose } = this.props
     const { nftsList } = this.state
-
     return (
       <Dialog
         title={intl.formatMessage(messages.nNft, { number: nftsList.length })}
@@ -177,12 +193,19 @@ export default class AddNFTDialog extends Component<Props, State> {
                   {
                     nftsList.map(nft => {
                       const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
-
                       return (
-                        <div className={styles.nftCard}>
+                        <button
+                          type="button"
+                          className={
+                          classnames([
+                            styles.nftCard,
+                            this.props.isTokenIncluded(nft.info) &&styles.selected])
+                          }
+                          onClick={() => this.onSelect(nft.info)}
+                        >
                           {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT /> }
                           <p className={styles.nftName}>{nft.name }</p>
-                        </div>
+                        </button>
                       )
                     })
                   }

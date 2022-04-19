@@ -108,6 +108,10 @@
                 text-overflow: ellipsis;
             }
         }
+
+        .selected {
+            border: 1px solid var(--yoroi-palette-secondary-300);
+        }
     }
 
     .add {
