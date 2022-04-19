@@ -186,7 +186,7 @@ export default class SingleTokenRow extends Component<Props> {
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
-              {token.info.Identifier === this.selectedToken?.Identifier && amountInputError}
+              {token.info.Identifier === this.props.selectedToken?.Identifier && amountInputError}
             </p>
           </div>
            )}
