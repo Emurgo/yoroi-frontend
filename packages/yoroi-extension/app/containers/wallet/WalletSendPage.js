@@ -492,7 +492,6 @@ class WalletSendPage extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
 
-    const { transactionBuilderStore } = this.generated.stores;
     const { txBuilderActions } = this.generated.actions;
 
     const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(

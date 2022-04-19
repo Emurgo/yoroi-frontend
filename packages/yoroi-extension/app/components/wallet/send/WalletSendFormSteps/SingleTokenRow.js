@@ -75,14 +75,7 @@ export default class SingleTokenRow extends Component<Props> {
         label: this.context.intl.formatMessage(globalMessages.amountLabel),
         placeholder: this.props.classicTheme ?
           `0.${'0'.repeat(this.getNumDecimals())}` : '',
-        value: (() => {
-          const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-          return this.props.uriParams
-            ? formatValue(
-              this.props.uriParams.amount.getDefaultEntry(),
-            )
-            : this.props.getTokenAmount(this.props.token.info)
-        })(),
+        value: this.props.getTokenAmount(this.props.token.info),
         validators: [async ({ field }) => {
           const amountValue: string = field.value;
           if (amountValue === '') {
@@ -180,7 +173,6 @@ export default class SingleTokenRow extends Component<Props> {
                 className="tokenAmount"
                 label={intl.formatMessage(globalMessages.amountLabel)}
                 decimalPlaces={this.getNumDecimals()}
-                error={amountInputError}
                 currency={truncateToken(
                   getTokenName(this.props.selectedToken ?? this.props.defaultToken)
                 )}
@@ -190,8 +182,12 @@ export default class SingleTokenRow extends Component<Props> {
                 onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
               />
+
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
+            <p className={styles.error}>
+              {token.info.Identifier === this.selectedToken?.Identifier && amountInputError}
+            </p>
           </div>
            )}
       </div>
