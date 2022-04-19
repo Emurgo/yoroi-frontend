@@ -15,6 +15,8 @@ import type {
   MultiToken
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import { truncateToken } from '../../../../utils/formatters';
+import { getTokenIdentifierIfExists, getTokenStrictName } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   +totalAmount: ?MultiToken,
@@ -27,23 +29,27 @@ export default class IncludedTokens extends Component<Props> {
     };
 
     renderTokens(tokens: FormattedTokenDisplay[]): Node {
-        return (
-          tokens.map(token => (
-            <div className={styles.tokenRow} key={token.id}>
-              <div className={styles.token}>
-                <div className={styles.label}>
-                  <NoAssetLogo />
-                  <p>{token.label}</p>
-                </div>
-                <p className={styles.amount}>{token.amount}</p>
+      return (
+        tokens.map(({ token, amount }) => ({
+          label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
+          amount: amount.toString(),
+          info: token,
+        })).map(token => (
+          <div className={styles.tokenRow} key={token.id}>
+            <div className={styles.token}>
+              <div className={styles.label}>
+                <NoAssetLogo />
+                <p>{token.label}</p>
               </div>
-
-              <div>
-                <button onClick={() => this.props.onRemoveToken(token.info)} type='button' className={styles.remove}> <RemoveIcon /> </button>
-              </div>
+              <p className={styles.amount}>{token.amount}</p>
             </div>
-          ))
-        )
+
+            <div>
+              <button onClick={() => this.props.onRemoveToken(token.info)} type='button' className={styles.remove}> <RemoveIcon /> </button>
+            </div>
+          </div>
+        ))
+      )
     }
 
     renderNfts(nfts: FormattedNFTDisplay[]): Node {
@@ -71,9 +77,10 @@ export default class IncludedTokens extends Component<Props> {
 
     render(): Node {
       const { intl } = this.context
-      const { getTokenInfo, totalAmount } = this.props
-      const tokens = getTokens(totalAmount, getTokenInfo)
-      const nfts = getNFTs(totalAmount, getTokenInfo)
+      const { getTokenInfo, totalAmount, plannedTxInfoMap } = this.props;
+      // Todo: Filter tokens by using `IsNFT`
+      const tokens = plannedTxInfoMap.filter(({ amount }) => amount !== '1');
+      const nfts = plannedTxInfoMap.filter(({ amount }) => amount === '1');
       return (
         <div className={styles.component}>
           {
@@ -86,7 +93,7 @@ export default class IncludedTokens extends Component<Props> {
               </div>
             )
           }
-          {
+          {/* {
             nfts.length > 0 && (
               <div>
                 <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
@@ -95,7 +102,7 @@ export default class IncludedTokens extends Component<Props> {
                 </div>
               </div>
             )
-          }
+          } */}
         </div>
       )
     }

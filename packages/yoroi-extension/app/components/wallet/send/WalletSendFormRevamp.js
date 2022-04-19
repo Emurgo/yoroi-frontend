@@ -480,6 +480,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 getTokenInfo={this.props.getTokenInfo}
                 totalAmount={totalAmount}
                 onRemoveToken={this.props.onRemoveToken}
+                plannedTxInfoMap={this.props.plannedTxInfoMap}
               />
 
               <div className={styles.addButtonsWrapper}>
