@@ -2,6 +2,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 25px;
+    margin-top: 30px;
 
     .header {
         color: var(--var-yoroi-gray-900);

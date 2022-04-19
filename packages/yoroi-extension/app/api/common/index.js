@@ -325,7 +325,6 @@ export function hasSendAllDefault(
     if (token.shouldSendAll === true && token.token.IsDefault) return true;
     return false;
   });
-  console.log({tokens: JSON.parse(JSON.stringify(tokens)), defaultSendAll })
   return defaultSendAll != null;
 }
 
