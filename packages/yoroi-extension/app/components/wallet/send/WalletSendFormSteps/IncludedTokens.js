@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react'
 import { Component } from 'react';
-import { getTokens, getNFTs } from '../../../../utils/wallet'
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import styles from './IncludedTokens.scss';
 import { intlShape } from 'react-intl';
@@ -53,34 +52,42 @@ export default class IncludedTokens extends Component<Props> {
     }
 
     renderNfts(nfts: FormattedNFTDisplay[]): Node {
-        return (
-          nfts.map(nft => {
-            const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
+      return (
+        nfts.map(({ token }) => {
+          const policyId = token.Identifier.split('.')[0];
+          return {
+              name: truncateToken(getTokenStrictName(token) ?? '-'),
+              // $FlowFixMe[prop-missing]
+              image: token.Metadata.assetMintMetadata?.[0]['721'][policyId][name]?.image,
+              info: token,
+          };
+        }).map(nft => {
+          const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
 
-            return (
-              <div className={styles.nftRow} key={nft.name}>
-                <div className={styles.nft}>
-                  <div className={styles.nftImg}>
-                    {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT />}
-                  </div>
-                  <p className={styles.name}>{nft.name}{nft.name}</p>
+          return (
+            <div className={styles.nftRow} key={nft.name}>
+              <div className={styles.nft}>
+                <div className={styles.nftImg}>
+                  {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT />}
                 </div>
-
-                <div>
-                  <button type='button' className={styles.remove}> <RemoveIcon /> </button>
-                </div>
+                <p className={styles.name}>{nft.name}</p>
               </div>
-            )
-          })
-        )
+
+              <div>
+                <button type='button' onClick={() => this.props.onRemoveToken(nft.info)} className={styles.remove}> <RemoveIcon /> </button>
+              </div>
+            </div>
+          )
+        })
+      )
     }
 
     render(): Node {
       const { intl } = this.context
-      const { getTokenInfo, totalAmount, plannedTxInfoMap } = this.props;
+      const { plannedTxInfoMap } = this.props;
       // Todo: Filter tokens by using `IsNFT`
-      const tokens = plannedTxInfoMap.filter(({ amount }) => amount !== '1');
-      const nfts = plannedTxInfoMap.filter(({ amount }) => amount === '1');
+      const tokens = plannedTxInfoMap.filter(({ token }) => !token.IsNFT);
+      const nfts = plannedTxInfoMap.filter(({ token }) => token.IsNFT);
       return (
         <div className={styles.component}>
           {
@@ -93,7 +100,7 @@ export default class IncludedTokens extends Component<Props> {
               </div>
             )
           }
-          {/* {
+          {
             nfts.length > 0 && (
               <div>
                 <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
@@ -102,7 +109,7 @@ export default class IncludedTokens extends Component<Props> {
                 </div>
               </div>
             )
-          } */}
+          }
         </div>
       )
     }

@@ -32,7 +32,6 @@ import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
 import type {
-  TokenEntry,
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
