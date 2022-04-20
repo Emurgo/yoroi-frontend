@@ -476,7 +476,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     allowSigns={false}
                     onFocus={() => {
                       this.props.onAddToken({
-                        shouldReset: true,
+                        shouldReset: false,
                       });
                     }}
                     amountFieldRevamp
@@ -487,7 +487,12 @@ export default class WalletSendForm extends Component<Props, State> {
                   <button
                     className={styles.max}
                     type='button'
-                    onClick={() => this.props.updateSendAllStatus(!shouldSendAll)}
+                    onClick={() => {
+                      this.props.onAddToken({
+                        shouldReset: true,
+                      });
+                      this.props.updateSendAllStatus(!shouldSendAll)
+                    }}
                   >
                     {intl.formatMessage(messages.max)}
                   </button>
@@ -507,17 +512,28 @@ export default class WalletSendForm extends Component<Props, State> {
                 tokens={tokens}
                 nfts={nfts}
                 onRemoveToken={this.props.onRemoveToken}
+                shouldSendAll={shouldSendAll}
               />
 
               <div className={styles.addButtonsWrapper}>
-                <button type='button' onClick={() => this.props.openDialog(AddTokenDialog)}>
+                <Button
+                  variant="ternary"
+                  sx={{ width: '160px', marginRight: '16px' }}
+                  onClick={() => this.props.openDialog(AddTokenDialog)}
+                  disabled={this.props.shouldSendAll}
+                >
                   <PlusIcon />
-                  <p>{intl.formatMessage(globalMessages.token)}</p>
-                </button>
-                <button type='button' onClick={() => this.props.openDialog(AddNFTDialog)}>
+                  <p className={styles.btnText}>{intl.formatMessage(globalMessages.token)}</p>
+                </Button>
+                <Button
+                  variant="ternary"
+                  sx={{ width: '160px' }}
+                  onClick={() => this.props.openDialog(AddNFTDialog)}
+                  disabled={this.props.shouldSendAll}
+                >
                   <PlusIcon />
-                  <p>{intl.formatMessage(globalMessages.nfts)}</p>
-                </button>
+                  <p className={styles.btnText}>{intl.formatMessage(globalMessages.nfts)}</p>
+                </Button>
               </div>
 
               {this._nextStepButton(

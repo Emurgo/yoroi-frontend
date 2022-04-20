@@ -178,27 +178,9 @@
                 display: flex;
                 align-items: center;
                 justify-content: flex-start;
-    
-                button {
-                    width: 160px;
-                    height: 45px;
-                    border: 1px solid #A7AFC0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-right: 16px;
-                    border-radius: 8px;
-    
-                    p {
-                        color: #6B7384;
-                        font-family: Rubik;
-                        font-size: 14px;
-                        font-weight: 500;
-                        letter-spacing: 0.5px;
-                        line-height: 22px;
-                        text-transform: uppercase;
-                        margin-left: 8px;
-                    }
+
+                .btnText {
+                    margin-left: 8px;
                 }
             }
         }
@@ -206,7 +188,6 @@
         // Preview Step styles 
         .receiver {
             padding-top: 10px;
-            font-family: Rubik;
             font-size: 16px;
             letter-spacing: 0;
             line-height: 24px;
