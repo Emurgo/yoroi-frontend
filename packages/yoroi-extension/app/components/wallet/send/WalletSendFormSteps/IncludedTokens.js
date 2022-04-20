@@ -31,7 +31,7 @@ export default class IncludedTokens extends Component<Props> {
       return (
         tokens.map(({ token, amount }) => ({
           label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
-          amount: amount.toString(),
+          amount: amount?.toString(),
           info: token,
         })).map(token => (
           <div className={styles.tokenRow} key={token.id}>
