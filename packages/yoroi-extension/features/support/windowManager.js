@@ -65,6 +65,16 @@ export class WindowManager {
     return await this._openNewWithCheck('window', windowTitle, url);
   }
 
+  async closeTabWindow(titleToClose: string, switchToTitle: string): Promise<void> {
+    const handleToClose = this._getHandleByTitle(titleToClose);
+    const switchToHandle = this._getHandleByTitle(switchToTitle);
+    await this.driver.switchTo().window(handleToClose[0].handle);
+    await this.driver.close();
+    await this.driver.switchTo().window(switchToHandle[0].handle);
+    const indexOfHandle = this.windowHandles.indexOf(handleToClose);
+    this.windowHandles.splice(indexOfHandle, 1);
+  }
+
   async switchTo(title: string): Promise<void> {
     const searchHandle = this._getHandleByTitle(title);
     if (searchHandle.length !== 1) {
