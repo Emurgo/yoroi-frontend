@@ -42,34 +42,30 @@ function getBraveBuilder() {
     new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments(
-        '--no-sandbox',
-        '--disable-gpu',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--start-maximized',
-        '--remote-debugging-port=9222',
-        'disable-infobars',
+        '--no-sandbox', // Disables the sandbox for all process types that are normally sandboxed. Meant to be used as a browser-level switch for testing purposes only
+        '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
+        '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
+        '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
+        '--start-maximized' // Starts the browser maximized, regardless of any previous settings
+        // '--remote-debugging-port=9222', // should be commented for local runs
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
   );
 }
 
 function getChromeBuilder() {
-  return new Builder()
-    .forBrowser('chrome')
-    .setChromeOptions(
-      new chrome.Options()
-        .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
-        .addArguments(
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--start-maximized',
-          '--remote-debugging-port=9222',
-          'disable-infobars',
-        )
-    );
+  return new Builder().forBrowser('chrome').setChromeOptions(
+    new chrome.Options()
+      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+      .addArguments(
+        '--no-sandbox',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--start-maximized'
+        // '--remote-debugging-port=9222', // should be commented for local runs
+      )
+  );
 }
 
 function getFirefoxBuilder() {
@@ -257,10 +253,10 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = (script) =>
+  this.executeLocalStorageScript = script =>
     this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
 
-  this.getFromLocalStorage = async (key) => {
+  this.getFromLocalStorage = async key => {
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
     return JSON.parse(result);
   };
@@ -273,7 +269,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
-  this.saveLastReceiveAddressIndex = (index) => {
+  this.saveLastReceiveAddressIndex = index => {
     this.driver.executeScript(i => {
       const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
@@ -284,7 +280,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, index);
   };
 
-  this.clickElementByQuery = async (query) => {
+  this.clickElementByQuery = async query => {
     await this.driver.executeScript(`document.querySelector('${query}').click()`);
   };
 
@@ -323,12 +319,10 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.isDisplayed = async (locator: LocatorObject) => {
-    const element = await this.driver.findElement(
-      getMethod(locator.method)(locator.locator)
-    );
+    const element = await this.driver.findElement(getMethod(locator.method)(locator.locator));
 
     return await element.isDisplayed();
-  }
+  };
 
   this.findElement = async (locator: LocatorObject) =>
     await this.driver.findElement(getMethod(locator.method)(locator.locator));
