@@ -259,7 +259,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         publicDeriver,
         localRequest: true,
       });
-      await this.stores.transactions.reactToTxHistoryUpdate({ publicDeriver });
+
       // if after querying local history we find nothing, we just reset the DB entirely
       const txRequests = find(this.stores.transactions.transactionsRequests, { publicDeriver });
       if (txRequests == null)
