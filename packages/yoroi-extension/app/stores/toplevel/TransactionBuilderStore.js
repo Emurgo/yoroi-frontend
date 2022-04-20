@@ -174,11 +174,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   )
 
   _canCompute(): boolean {
+    if (this.plannedTxInfoMap.length === 0) return false;
     for (const token of this.plannedTxInfoMap) {
       // we only care about the value in non-sendall case
       if (
-        token.shouldSendAll === false
-        && token.amount == null
+        !token.shouldSendAll && !token.amount
       ) {
         return false;
       }
@@ -186,6 +186,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         return false;
       }
     }
+
     return true;
   }
 
