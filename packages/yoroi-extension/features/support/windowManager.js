@@ -99,7 +99,7 @@ export class WindowManager {
   }
 
   async isClosed(title: string): Promise<boolean> {
-    const expectToBeClosedHandle = this.windowHandles.filter(
+    const expectToBeClosedHandle: Array<CustomWindowHandle> = this.windowHandles.filter(
       customHandle => customHandle.title === title
     );
     if (!expectToBeClosedHandle.length) {
@@ -107,7 +107,7 @@ export class WindowManager {
     }
     for (let i = 0; i < 20; i++) {
       const windowHandles = await this.getAllWindowHandles();
-      if (windowHandles.includes(expectToBeClosedHandle[0])) {
+      if (windowHandles.includes(expectToBeClosedHandle[0].handle)) {
         await new Promise(resolve => setTimeout(resolve, 100));
         continue;
       }
