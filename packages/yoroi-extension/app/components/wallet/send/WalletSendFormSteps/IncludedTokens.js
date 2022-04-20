@@ -14,8 +14,6 @@ import type {
   MultiToken
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { truncateToken } from '../../../../utils/formatters';
-import { getTokenIdentifierIfExists, getTokenStrictName } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   +totalAmount: ?MultiToken,
@@ -29,11 +27,7 @@ export default class IncludedTokens extends Component<Props> {
 
     renderTokens(tokens: FormattedTokenDisplay[]): Node {
       return (
-        tokens.map(({ token, amount }) => ({
-          label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
-          amount: amount?.toString(),
-          info: token,
-        })).map(token => (
+        tokens.map(token => (
           <div className={styles.tokenRow} key={token.id}>
             <div className={styles.token}>
               <div className={styles.label}>
@@ -53,15 +47,7 @@ export default class IncludedTokens extends Component<Props> {
 
     renderNfts(nfts: FormattedNFTDisplay[]): Node {
       return (
-        nfts.map(({ token }) => {
-          const policyId = token.Identifier.split('.')[0];
-          return {
-              name: truncateToken(getTokenStrictName(token) ?? '-'),
-              // $FlowFixMe[prop-missing]
-              image: token.Metadata.assetMintMetadata?.[0]['721'][policyId][name]?.image,
-              info: token,
-          };
-        }).map(nft => {
+        nfts.map(nft => {
           const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
 
           return (
@@ -84,9 +70,7 @@ export default class IncludedTokens extends Component<Props> {
 
     render(): Node {
       const { intl } = this.context
-      const { plannedTxInfoMap } = this.props;
-      const tokens = plannedTxInfoMap.filter(({ token }) => !token.IsNFT && !token.IsDefault);
-      const nfts = plannedTxInfoMap.filter(({ token }) => token.IsNFT);
+      const { tokens, nfts } = this.props;
       return (
         <div className={styles.component}>
           {

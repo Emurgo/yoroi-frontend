@@ -25,7 +25,7 @@ import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
-  getTokenName, genFormatTokenAmount,
+  getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists,
   // getTokenStrictName, getTokenIdentifierIfExists,
 } from '../../../stores/stateless/tokenHelpers';
 import {
@@ -43,6 +43,7 @@ import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
+import { getNFTs, getTokens } from '../../../utils/wallet';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -331,6 +332,35 @@ export default class WalletSendForm extends Component<Props, State> {
     return info.Metadata.numberOfDecimals;
   }
 
+  getTokensAndNFTs = (totalAmount) => {
+    if (this.props.shouldSendAll) return [
+      getTokens(totalAmount, this.props.getTokenInfo),
+      getNFTs(totalAmount, this.props.getTokenInfo)
+    ]
+    const { plannedTxInfoMap } = this.props;
+    const tokens = plannedTxInfoMap.filter(
+      ({ token }) => !token.IsNFT && !token.IsDefault
+    ).map(({ token, amount }) => ({
+      label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
+      amount: amount?.toString(),
+      info: token,
+    }));
+
+    const nfts = plannedTxInfoMap.filter(
+      ({ token }) => token.IsNFT
+    ).map(({ token }) => {
+      const policyId = token.Identifier.split('.')[0];
+      return {
+          name: truncateToken(getTokenStrictName(token) ?? '-'),
+          // $FlowFixMe[prop-missing]
+          image: token.Metadata.assetMintMetadata?.[0]['721'][policyId][name]?.image,
+          info: token,
+      };
+    });
+
+    return [tokens, nfts]
+  }
+
   renderCurrentStep(step: number): Node {
     const { form } = this
     const { intl } = this.context;
@@ -368,6 +398,7 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     const amountInputError = transactionFeeError || amountField.error
+    const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
 
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
@@ -473,10 +504,9 @@ export default class WalletSendForm extends Component<Props, State> {
               </div>
 
               <IncludedTokens
-                getTokenInfo={this.props.getTokenInfo}
-                totalAmount={totalAmount}
+                tokens={tokens}
+                nfts={nfts}
                 onRemoveToken={this.props.onRemoveToken}
-                plannedTxInfoMap={this.props.plannedTxInfoMap}
               />
 
               <div className={styles.addButtonsWrapper}>
