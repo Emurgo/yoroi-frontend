@@ -218,7 +218,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
     const network = withUtxos.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-    const isIncludeDefaultToken = () => !!plannedTxInfoMap.find(
+    const isIncludeDefaultToken = !!plannedTxInfoMap.find(
       ({ token }) => token.Identifier === defaultToken.Identifier
     )
 
@@ -239,27 +239,40 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       // <TODO:PLUTUS_SUPPORT>
       const utxoHasDataHash = false;
       const genTokenList = (userInput) => {
-        const tokens = [...userInput];
-        if (!isIncludeDefaultToken()) {
-          const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
-          const fakeMultitoken = new MultiToken(
-            [{
-              identifier: defaultToken.Identifier,
-              networkId: defaultToken.NetworkId,
-              amount: fakeAmount,
-            },
-            ...plannedTxInfoMap.map(({ token }) => ({
-              identifier: token.Identifier,
-              networkId: token.NetworkId,
-              amount: fakeAmount,
-            }))],
-            getDefaultEntryToken(defaultToken)
-          );
-          const minAmount = RustModule.WalletV4.min_ada_required(
-            cardanoValueFromMultiToken(fakeMultitoken),
-            utxoHasDataHash,
-            RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
-          );
+        let tokens = [...userInput];
+        // When sending default token we doesn't need to caculate the min amount
+        if (isIncludeDefaultToken && plannedTxInfoMap.length === 1) return tokens
+
+        const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
+        const fakeMultitoken = new MultiToken(
+          [{
+            identifier: defaultToken.Identifier,
+            networkId: defaultToken.NetworkId,
+            amount: fakeAmount,
+          },
+          ...plannedTxInfoMap.map(({ token }) => ({
+            identifier: token.Identifier,
+            networkId: token.NetworkId,
+            amount: fakeAmount,
+          }))],
+          getDefaultEntryToken(defaultToken)
+        );
+
+        const minAmount = RustModule.WalletV4.min_ada_required(
+          cardanoValueFromMultiToken(fakeMultitoken),
+          utxoHasDataHash,
+          RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
+        );
+
+        if (isIncludeDefaultToken && plannedTxInfoMap.length > 1) {
+          const defaultCoin = tokens.find(({ token }) => token.IsDefault);
+          tokens = tokens.filter(({ token }) => !token.IsDefault)
+          tokens.push({
+            token: defaultToken,
+            amount: (new BigNumber(minAmount.to_str())).plus(defaultCoin.amount),
+            add: true
+          })
+        } else if (!isIncludeDefaultToken) {
           // if the user is sending a token, we need to make sure the resulting utxo
           // has at least the minimum amount of ADA in it
           tokens.push({
@@ -267,6 +280,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
             amount: minAmount.to_str(),
           });
         }
+
         return tokens;
       }
 
@@ -286,7 +300,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
       const genTokenList = (userInput) => {
         const tokens = [...userInput];
-        if (!isIncludeDefaultToken()) {
+        if (!isIncludeDefaultToken) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
           tokens.push({
@@ -392,7 +406,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     );
 
     // Deselect the token
-    this.selectedToken = undefined;
+    // this.selectedToken = undefined;
   }
 
   @action

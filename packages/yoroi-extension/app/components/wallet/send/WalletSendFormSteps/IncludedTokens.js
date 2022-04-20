@@ -85,7 +85,6 @@ export default class IncludedTokens extends Component<Props> {
     render(): Node {
       const { intl } = this.context
       const { plannedTxInfoMap } = this.props;
-      // Todo: Filter tokens by using `IsNFT`
       const tokens = plannedTxInfoMap.filter(({ token }) => !token.IsNFT && !token.IsDefault);
       const nfts = plannedTxInfoMap.filter(({ token }) => token.IsNFT);
       return (
