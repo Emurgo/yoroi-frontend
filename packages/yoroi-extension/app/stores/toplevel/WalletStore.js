@@ -259,19 +259,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         publicDeriver,
         localRequest: true,
       });
-
-      // if after querying local history we find nothing, we just reset the DB entirely
-      const txRequests = find(this.stores.transactions.transactionsRequests, { publicDeriver });
-      if (txRequests == null)
-        throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
-      const { result } = txRequests.requests.allRequest;
-      if (result == null)
-        throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
-      if (result.totalAvailable === 0) {
-        for (const txRequest of Object.keys(txRequests.requests)) {
-          txRequests.requests[txRequest].reset();
-        }
-      }
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(
