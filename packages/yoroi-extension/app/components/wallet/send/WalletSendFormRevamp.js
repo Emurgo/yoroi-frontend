@@ -447,12 +447,10 @@ export default class WalletSendForm extends Component<Props, State> {
           return (
             <div className={styles.amountStep}>
               <div className={classnames(
-                [
-                  styles.amountInput,
+                [styles.amountInput,
                   amountInputError && styles.amountInputError,
                   shouldSendAll && styles.disabled
-                ]
-                )}
+                ])}
               >
                 <span className={classnames([styles.label, shouldSendAll && styles.labelDisabled])}>
                   {intl.formatMessage(globalMessages.amountLabel)}

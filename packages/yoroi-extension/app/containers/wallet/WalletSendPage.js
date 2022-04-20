@@ -478,7 +478,7 @@ class WalletSendPage extends Component<AllProps> {
       ({ token: t }) => t.Identifier === token.Identifier
     );
 
-    if (tokenInfo) return tokenInfo.amount.toString();
+    if (tokenInfo && tokenInfo.amount) return tokenInfo.amount.toString();
     return null;
   }
 

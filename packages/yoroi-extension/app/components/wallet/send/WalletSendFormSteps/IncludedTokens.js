@@ -71,9 +71,6 @@ export default class IncludedTokens extends Component<Props> {
     render(): Node {
       const { intl } = this.context
       const { tokens, nfts } = this.props;
-      console.log({
-        props: this.props
-      })
       return (
         <div className={styles.component}>
           {
