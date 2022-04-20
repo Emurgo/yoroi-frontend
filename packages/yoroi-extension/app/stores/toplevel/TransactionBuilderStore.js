@@ -180,6 +180,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       if (
         !token.shouldSendAll && !token.amount
       ) {
+        console.log({
+          from: '_canCompute',
+          token
+        })
         return false;
       }
       if (this.receiver == null) {

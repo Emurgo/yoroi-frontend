@@ -158,12 +158,6 @@ class WalletSendPage extends Component<AllProps> {
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
 
-    // const layoutComponents = {
-    //   CLASSIC: WalletSendFormClassic,
-    //   REVAMP: WalletSentFormRevamp
-    // }
-    // const WalletSendForm = layoutComponents[this.props.selectedLayout]
-
     if (this.props.selectedLayout === 'REVAMP') {
       return (
         <>

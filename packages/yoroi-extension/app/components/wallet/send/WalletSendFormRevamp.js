@@ -195,7 +195,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
         // once sendAll is triggered, set the amount field to the total input
         const adjustedInput = totalInput.joinSubtractCopy(fee);
-        const relatedEntry = this.getTokenEntry(adjustedInput);
+        const relatedEntry = adjustedInput.getDefaultEntry();
         this.form.$('amount').set('value', formatValue(
           relatedEntry,
         ));
@@ -336,7 +336,7 @@ export default class WalletSendForm extends Component<Props, State> {
     if (this.props.shouldSendAll) return [
       getTokens(totalAmount, this.props.getTokenInfo),
       getNFTs(totalAmount, this.props.getTokenInfo)
-    ]
+    ];
     const { plannedTxInfoMap } = this.props;
     const tokens = plannedTxInfoMap.filter(
       ({ token }) => !token.IsNFT && !token.IsDefault
