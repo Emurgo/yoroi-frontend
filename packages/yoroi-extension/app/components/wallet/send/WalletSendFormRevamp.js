@@ -489,7 +489,9 @@ export default class WalletSendForm extends Component<Props, State> {
                       this.props.onAddToken({
                         shouldReset: true,
                       });
-                      this.props.updateSendAllStatus(!shouldSendAll)
+
+                      if (shouldSendAll) amountField.reset();
+                      this.props.updateSendAllStatus(!shouldSendAll);
                     }}
                   >
                     {intl.formatMessage(messages.max)}
@@ -568,7 +570,7 @@ export default class WalletSendForm extends Component<Props, State> {
   }
 
   onUpdateStep(step: number) {
-    if(step > 3) throw new Error('Invalid Step number.')
+    if (step > 3) throw new Error('Invalid Step number.')
     this.setState({ currentStep: step })
   }
 
