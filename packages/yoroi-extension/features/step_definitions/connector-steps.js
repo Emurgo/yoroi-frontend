@@ -12,6 +12,7 @@ import {
   spendingPasswordErrorField,
   spendingPasswordInput,
 } from '../pages/connector-connectWalletPage';
+import { disconnectWallet } from '../pages/connectedWebsitesPage';
 import {
   getTransactionFee,
   overviewTabButton,
@@ -24,6 +25,7 @@ import {
 const mockDAppName = 'mockDAppTab';
 const popupConnectorName = 'popupConnectorWindow';
 const userRejectMsg = 'user reject';
+const extensionTabName = 'main';
 
 Then(/^I open the mock dApp$/, async function () {
   await this.windowManager.openNewTab(
@@ -90,6 +92,7 @@ Then(/^The access request should succeed$/, async function () {
     requestAccessResult.success,
     `Request access failed: ${requestAccessResult.errMsg}`
   ).to.be.true;
+  await this.mockDAppPage.addOnDisconnect();
 });
 
 Then(/^The user reject is received$/, async function () {
@@ -190,4 +193,18 @@ Then(/^I should see the wallet's list$/, async function () {
 
 Then(/^I close the dApp-connector pop-up window$/, async function () {
   await this.windowManager.closeTabWindow(popupConnectorName, mockDAppName);
+});
+
+Then(/^I disconnect the wallet (.+) from the dApp (.+)$/, async function (walletName, dAppUrl) {
+  await this.windowManager.switchTo(extensionTabName);
+  const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
+  // it should be reworked by using ui components when it is done
+  await this.driver.get(connectedWebsitesAddress);
+  await disconnectWallet(this, walletName, dAppUrl);
+});
+
+Then(/^I receive the wallet disconnection message$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
+  const connectionState = await this.mockDAppPage.getConnectionState();
+  expect(connectionState, 'No message from the dApp-connector is received').to.be.false;
 });
