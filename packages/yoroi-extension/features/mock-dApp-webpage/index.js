@@ -201,7 +201,7 @@ export class MockDAppWebpage {
     });
   }
 
-  async getConnectionState() {
+  async getConnectionState(): Promise<boolean> {
     return await this.driver.executeScript(() => window.walletConnected);
   }
 

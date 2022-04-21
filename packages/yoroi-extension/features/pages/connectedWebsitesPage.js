@@ -29,7 +29,7 @@ const getWalletListElements = async (customWorld: Object): Promise<Array<WebElem
 
 const getWalletName = async (
   walletRowElement: WebElement
-): Promise<{ title: string, type: string }> => {
+): Promise<{| title: string, type: string |}> => {
   const nameComponent = await walletRowElement.findElement(
     getMethod(walletNameComponent.method)(walletNameComponent.locator)
   );
@@ -40,7 +40,7 @@ const getWalletName = async (
 
 const getAmountAndCurrency = async (
   walletRowElement: WebElement
-): Promise<{ amount: string, currency: string }> => {
+): Promise<{| amount: string, currency: string |}> => {
   const totalComponent = await walletRowElement.findElement(
     getMethod(walletRowBalanceField.method)(walletRowBalanceField.locator)
   );
