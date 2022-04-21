@@ -173,7 +173,7 @@ export class MockDAppWebpage {
   }
 
   async checkAccessRequest(): Promise<AccessCallBack> {
-    return await this.driver.executeAsyncScript((...args) => {
+    const accessResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.accessRequestPromise
         // eslint-disable-next-line promise/always-return
@@ -185,6 +185,24 @@ export class MockDAppWebpage {
           callback({ success: false, errMsg: error.message });
         });
     });
+
+    await this.driver.executeScript(accResp => {
+      if (accResp.success) window.walletConnected = true;
+    }, accessResponse);
+
+    return accessResponse;
+  }
+
+  async addOnDisconnect() {
+    await this.driver.executeScript(() => {
+      window.api.experimental.onDisconnect(() => {
+        window.walletConnected = false;
+      });
+    });
+  }
+
+  async getConnectionState() {
+    return await this.driver.executeScript(() => window.walletConnected);
   }
 
   async getBalance(): Promise<string> {
@@ -213,11 +231,11 @@ export class MockDAppWebpage {
 
     const addr = CardanoWasm.Address.from_bech32(utxo.receiver);
     const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
-    if (!baseAddr){
+    if (!baseAddr) {
       throw new MockDAppWebpageError('No baseAddr');
     }
     const keyHash = baseAddr.payment_cred().to_keyhash();
-    if (!keyHash){
+    if (!keyHash) {
       throw new MockDAppWebpageError('No keyHash');
     }
 
