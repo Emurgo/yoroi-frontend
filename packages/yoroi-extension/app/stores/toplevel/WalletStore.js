@@ -325,6 +325,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
       this.publicDerivers.push(...newWithCachedData);
     });
+    this._startRefreshAllWallets();
   };
 
   @action registerObserversForNewWallet: ({|
@@ -384,6 +385,14 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
+  _startRefreshAllWallets: void => Promise<void> = async () => {
+    for (const publicDeriver of this.publicDerivers) {
+      if (this.selected !== publicDeriver) {
+        await this.refreshWalletFromRemote(publicDeriver);
+      }
+    }
+    setTimeout(this._startRefreshAllWallets, this.WALLET_REFRESH_INTERVAL);
+  }
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
     this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNotification);
