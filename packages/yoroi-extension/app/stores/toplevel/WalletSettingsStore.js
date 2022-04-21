@@ -196,26 +196,43 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   @action _resyncHistory: {|
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
-    this.clearHistory.reset();
-    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-    if (withLevels == null) {
-      throw new Error(`${nameof(this._resyncHistory)} missing levels`);
-    }
-    await this.clearHistory.execute({
-      publicDeriver: withLevels,
-      refreshWallet: () => {
-        // clear cache
-        const txRequests = this.stores.transactions
-          .getTxRequests(request.publicDeriver);
-        for (const txRequest of Object.keys(txRequests.requests)) {
-          txRequests.requests[txRequest].reset();
-        }
-        // refresh
-        return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
+    const resyncHistoryFunc = async () => {
+      this.clearHistory.reset();
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+      if (withLevels == null) {
+        throw new Error(`${nameof(this._resyncHistory)} missing levels`);
       }
-    }).promise;
+      await this.clearHistory.execute({
+        publicDeriver: withLevels,
+        refreshWallet: () => {
+          // clear cache
+          const txRequests = this.stores.transactions
+                .getTxRequests(request.publicDeriver);
+          for (const txRequest of Object.keys(txRequests.requests)) {
+            txRequests.requests[txRequest].reset();
+          }
+          this.stores.transactions.ongoingRefreshing.delete(
+            request.publicDeriver.publicDeriverId,
+          );
+          // refresh
+          return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
+        }
+      }).promise;
 
-    this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
+      this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
+    };
+    const ongoingRefreshing = this.stores.transactions.ongoingRefreshing.get(
+      request.publicDeriver.publicDeriverId
+    );
+    if (ongoingRefreshing) {
+      await ongoingRefreshing;
+    }
+    const resyncHistoryPromise = resyncHistoryFunc();
+    this.stores.transactions.ongoingRefreshing.set(
+      request.publicDeriver.publicDeriverId,
+      resyncHistoryPromise,
+    );
+    await resyncHistoryPromise;
   };
 
   @action _removeWallet: {|
