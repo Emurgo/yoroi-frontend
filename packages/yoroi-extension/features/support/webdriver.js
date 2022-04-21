@@ -329,6 +329,11 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.findElements = async (locator: LocatorObject) =>
     await this.driver.findElements(getMethod(locator.method)(locator.locator));
+
+  this.hoverOnElement = async (locator: WebElement) => {
+    const actions = this.driver.actions();
+    await actions.move({ origin: locator }).perform();
+  };
 }
 
 // no need to await
