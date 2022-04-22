@@ -61,7 +61,9 @@ import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
-import LocalStorageApi from '../../app/api/localStorage/index';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+} from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
@@ -1288,7 +1290,6 @@ function handleInjectorConnect(port) {
                   },
                   db,
                   localStorageApi,
-                  false,
                 )
               });
             } catch (e) {
@@ -1404,7 +1405,7 @@ function handleInjectorConnect(port) {
                     }
                     const walletUtxos = await withUtxos.getAllUtxos();
                     const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
-
+                    const submittedTxs = loadSubmittedTransactions() || [];
                     const {
                       utxosToUse,
                       reorgTargetAmount
@@ -1417,6 +1418,7 @@ function handleInjectorConnect(port) {
                         const { addressing, ...rest } = u;
                         return rest;
                       }),
+                      submittedTxs,
                     );
                     // do have enough
                     if (!reorgTargetAmount) {
@@ -1441,6 +1443,7 @@ function handleInjectorConnect(port) {
                         usedUtxoIds,
                         reorgTargetAmount,
                         addressedUtxos,
+                        submittedTxs,
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {

@@ -63,6 +63,7 @@ import {
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { loadSubmittedTransactions } from '../../api/localStorage';
 import {
   signTransaction as shelleySignTransaction
 } from '../../api/ada/transactions/shelley/transactions';
@@ -562,7 +563,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!response.utxos) {
       throw new Error('Missgin utxos for signing tx')
     }
-    const addressedUtxos = asAddressedUtxo(response.utxos);
+
+    const submittedTxs = loadSubmittedTransactions() || [];
+    const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
+      asAddressedUtxo(response.utxos),
+      selectedWallet.publicDeriver,
+      submittedTxs,
+    );
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       network.NetworkId
@@ -729,6 +736,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: withHasUtxoChains,
         absSlotNumber,
         cardanoTxRequest: (signingMessage.sign: any).tx,
+        submittedTxs: [],
         utxos: [],
       });
       const fee = {
@@ -769,12 +777,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected signing data type');
     }
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
+    const submittedTxs = loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       selectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
       asAddressedUtxo(utxos),
+      submittedTxs,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating

@@ -320,6 +320,16 @@ export default class LocalStorageApi {
 
 }
 
+export type PersistedSubmittedTransaction = {|
+  publicDeriverId: number,
+  networkId: number,
+  transaction: Object,
+  usedUtxos: Array<{|
+    txHash: string,
+    index: number,
+  |}>,
+|};
+
 export function persistSubmittedTransactions(
   submittedTransactions: any,
 ): void {
