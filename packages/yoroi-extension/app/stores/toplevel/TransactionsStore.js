@@ -293,10 +293,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (this.ongoingRefreshing.has(publicDeriverId)) {
       return this.ongoingRefreshing.get(publicDeriverId);
     } else {
-      const promise = this._refreshTransactionData(request);
-      this.ongoingRefreshing.set(publicDeriverId, promise);
-      await promise;
-      this.ongoingRefreshing.delete(publicDeriverId);
+      try {
+        const promise = this._refreshTransactionData(request);
+        this.ongoingRefreshing.set(publicDeriverId, promise);
+        await promise;
+      } finally {
+        this.ongoingRefreshing.delete(publicDeriverId);
+      }
     }
   }
 
