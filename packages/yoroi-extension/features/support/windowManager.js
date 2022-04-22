@@ -82,11 +82,11 @@ export class WindowManager {
   }
 
   async closeTabWindow(titleToClose: string, switchToTitle: string): Promise<void> {
-    const handleToClose = this._getHandleByTitle(titleToClose);
-    const switchToHandle = this._getHandleByTitle(switchToTitle);
-    await this.driver.switchTo().window(handleToClose[0].handle);
+    const handleToClose = this._getHandleByTitle(titleToClose)[0];
+    const switchToHandle = this._getHandleByTitle(switchToTitle)[0];
+    await this.driver.switchTo().window(handleToClose.handle);
     await this.driver.close();
-    await this.driver.switchTo().window(switchToHandle[0].handle);
+    await this.driver.switchTo().window(switchToHandle.handle);
     const indexOfHandle = this.windowHandles.indexOf(handleToClose);
     this.windowHandles.splice(indexOfHandle, 1);
   }
