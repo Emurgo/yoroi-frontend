@@ -25,6 +25,7 @@ import {
 const mockDAppName = 'mockDAppTab';
 const popupConnectorName = 'popupConnectorWindow';
 const userRejectMsg = 'user reject';
+const userRejectSigningMsg = 'User rejected';
 const extensionTabName = 'main';
 
 Then(/^I open the mock dApp$/, async function () {
@@ -207,4 +208,10 @@ Then(/^I receive the wallet disconnection message$/, async function () {
   await this.windowManager.switchTo(mockDAppName);
   const connectionState = await this.mockDAppPage.getConnectionState();
   expect(connectionState, 'No message from the dApp-connector is received').to.be.false;
+});
+
+Then(/^The user reject for signing is received$/, async function () {
+  const signingResult = await this.mockDAppPage.getSigningTxResult();
+  expect(signingResult.code, `The reject signing code is different`).to.equal(2);
+  expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });

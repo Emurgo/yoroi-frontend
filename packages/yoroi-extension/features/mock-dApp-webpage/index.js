@@ -270,7 +270,7 @@ export class MockDAppWebpage {
     }, unsignedTransactionHex);
   }
 
-  async getSigningTxResult(): Promise<string> {
+  async getSigningTxResult(): Promise<string|{| code: number, info: string |}> {
     return await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signTxPromise.then(callback).catch(callback);
