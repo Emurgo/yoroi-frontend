@@ -36,7 +36,7 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onUpdateHideBalance: void => Promise<void>,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +walletAmount: MultiToken | null,
+  +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
   +wallets: Array<Object>,
   +currentSortedWallets: Array<number> | void,
@@ -168,6 +168,7 @@ export default class WalletListDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
       >
+        {walletAmount &&
         <div className={styles.header}>
           <div className={styles.totalInfo}>
             <div className={styles.amount}>
@@ -184,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
           </div>
-        </div>
+        </div>}
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="wallet-list-droppable">
             {provided => (
@@ -192,8 +193,16 @@ export default class WalletListDialog extends Component<Props, State> {
                 {walletListIdx.length > 0 &&
                   walletListIdx.map((walletId, idx) => {
                     const wallet = this.props.wallets.find(w => w.walletId === walletId);
+                    // Previously, after a wallet was deleted, the sorted wallet list was not
+                    // updated to remove the deleted wallet, so `wallet` might be null.
+                    // This should no longer happen but we keep filtering out the null
+                    // value (instead of throwing an error) just in case some users
+                    // have already deleted wallets before the fix.
+                    if (!wallet) {
+                      return null;
+                    }
                     return <WalletCard key={walletId} idx={idx} {...wallet} />;
-                  })}
+                  }).filter(Boolean)}
                 {provided.placeholder}
               </div>
             )}

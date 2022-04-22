@@ -79,6 +79,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
 
     const content = (
       <Box
+        id='walletSummary_box'
         sx={{
           background: 'var(--yoroi-palette-common-white)',
           boxShadow:
