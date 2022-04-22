@@ -47,7 +47,6 @@ function getBraveBuilder() {
         '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
         '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
         '--start-maximized' // Starts the browser maximized, regardless of any previous settings
-        // '--remote-debugging-port=9222', // should be commented for local runs
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
   );
@@ -63,7 +62,6 @@ function getChromeBuilder() {
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
         '--start-maximized'
-        // '--remote-debugging-port=9222', // should be commented for local runs
       )
   );
 }
