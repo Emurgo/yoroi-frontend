@@ -12,12 +12,12 @@ Feature: dApp connector anonymous wallet errors checking
     Then I should see the connector popup
 
   @dApp-1003
-  Scenario: dApp connecting wallet, close pop-up, anonymous wallet (DAPP-1003)
+  Scenario: dApp, anonymous wallet, connecting wallet, close pop-up (DAPP-1003)
     Then I close the dApp-connector pop-up window
     And The user reject is received
 
   @dApp-1004
-  Scenario: dApp signing transaction, close pop-up, anonymous wallet (DAPP-1004)
+  Scenario: dApp, anonymous wallet, signing transaction, close pop-up (DAPP-1004)
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
@@ -29,7 +29,7 @@ Feature: dApp connector anonymous wallet errors checking
     And The user reject for signing is received
 
   @dApp-1005
-  Scenario: dApp, disconnect wallet, anonymous wallet (DAPP-1005)
+  Scenario: dApp, anonymous wallet, disconnect wallet (DAPP-1005)
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed

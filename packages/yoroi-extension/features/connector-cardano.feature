@@ -10,7 +10,7 @@ Feature: dApp connector data signing
     Then I open the mock dApp
 
 @dApp-1000
-  Scenario: dApp can get balance (DAPP-1000)
+  Scenario: dApp, anonymous wallet, can get balance (DAPP-1000)
     And I request anonymous access to Yoroi
     Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -19,7 +19,7 @@ Feature: dApp connector data signing
     Then The dApp should see balance 5500000
 
 @dApp-1001
-  Scenario: dApp can sign Cardano transaction, anonymous wallet (DAPP-1001)
+  Scenario: dApp, anonymous wallet, sign Cardano transaction (DAPP-1001)
     And I request anonymous access to Yoroi
     Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -40,7 +40,7 @@ Feature: dApp connector data signing
     Then The signing transaction API should return a10081825820cc9809944150c00f3913cd2b103e9b42fe6243fc36a76f9eb800692e2bda3f2e5840f601303c9cce7307e7aeac1b4c37f52758bf0ae8ba67dd1c1619d007aa4922a69e1516e1c4319d533ce4894ab16cd2de48a8c0e490e66470d9431fdee12ae207
 
 @dApp-1002
-  Scenario: dApp can sign Cardano transaction, request auth (DAPP-1002)
+  Scenario: dApp, authorised wallet, sign Cardano transaction (DAPP-1002)
     And I request access to Yoroi
     Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
