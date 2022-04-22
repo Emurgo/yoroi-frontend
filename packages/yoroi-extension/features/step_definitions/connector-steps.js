@@ -14,7 +14,7 @@ import {
   spendingPasswordErrorField,
   spendingPasswordInput,
 } from '../pages/connector-connectWalletPage';
-import { disconnectWallet } from '../pages/connectedWebsitesPage';
+import { disconnectWallet, getWalletsWithConnectedWebsites } from '../pages/connectedWebsitesPage';
 import {
   getTransactionFee,
   overviewTabButton,
@@ -203,6 +203,19 @@ Then(/^I should see the wallet's list$/, async function () {
 
 Then(/^I close the dApp-connector pop-up window$/, async function () {
   await this.windowManager.closeTabWindow(popupConnectorName, mockDAppName);
+});
+
+Then(/^The wallet (.+) is connected to the website (.+)$/, async function (walletName, websiteUrl) {
+  await this.windowManager.switchTo(extensionTabName);
+  const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
+  // it should be reworked by using ui components when it is done
+  await this.driver.get(connectedWebsitesAddress);
+  const wallets = await getWalletsWithConnectedWebsites(this);
+  const result = wallets.filter(
+    wallet => wallet.walletTitle === walletName && wallet.websiteTitle === websiteUrl
+  );
+  expect(result.length, `Result is not equal to 1:\n${JSON.stringify(result)}`).to.equal(1);
+  await this.windowManager.switchTo(mockDAppName);
 });
 
 Then(/^I disconnect the wallet (.+) from the dApp (.+)$/, async function (walletName, dAppUrl) {
