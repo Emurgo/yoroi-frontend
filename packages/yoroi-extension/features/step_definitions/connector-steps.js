@@ -1,13 +1,15 @@
 // @flow
-import { Then, When } from 'cucumber';
+import { Given, Then, When } from 'cucumber';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
   backButton,
   confirmButton,
+  createWalletBtn,
   getWalletBalance,
   getWalletName,
   getWallets,
+  noWalletsImg,
   selectWallet,
   spendingPasswordErrorField,
   spendingPasswordInput,
@@ -21,18 +23,22 @@ import {
   getUTXOAddresses,
   transactionFeeTitle,
 } from '../pages/connector-signingTxPage';
+import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
-const mockDAppName = 'mockDAppTab';
-const popupConnectorName = 'popupConnectorWindow';
 const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
-const extensionTabName = 'main';
+const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
 
-Then(/^I open the mock dApp$/, async function () {
-  await this.windowManager.openNewTab(
-    mockDAppName,
-    `http://localhost:${Ports.DevBackendServe}/mock-dapp`
-  );
+Given(/^I have opened the mock dApp$/, async function () {
+  await this.driver.get(mockDAppUrl);
+});
+
+Then(/^I open the mock dApp tab$/, async function () {
+  await this.windowManager.openNewTab(mockDAppName, mockDAppUrl);
+});
+
+Given(/^I switch back to the mock dApp$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
 });
 
 Then(/^I request anonymous access to Yoroi$/, async function () {
@@ -173,7 +179,10 @@ Then(/^The signing transaction API should return (.+)$/, async function (txHex) 
 
 Then(/^I see the error Incorrect wallet password$/, async function () {
   await this.waitForElement(spendingPasswordErrorField);
-  expect(await this.isDisplayed(spendingPasswordErrorField), "The error isn't displayed").to.be.true;
+  expect(
+    await this.isDisplayed(spendingPasswordErrorField),
+    "The error isn't displayed"
+  ).to.be.true;
   const errorText = await this.getText(spendingPasswordErrorField);
   expect(errorText).to.equal('Incorrect wallet password.');
 });
@@ -214,4 +223,24 @@ Then(/^The user reject for signing is received$/, async function () {
   const signingResult = await this.mockDAppPage.getSigningTxResult();
   expect(signingResult.code, `The reject signing code is different`).to.equal(2);
   expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
+});
+
+Then(/^I should see "No Cardano wallets is found" message$/, async function () {
+  await this.waitForElement(noWalletsImg);
+  const state = await this.isDisplayed(noWalletsImg);
+  expect(state, 'There is no "Ooops, no Cardano wallets found" message').to.be.true;
+});
+
+Then(/^I press the "Create wallet" button \(Connector pop-up window\)$/, async function () {
+  await this.waitForElement(createWalletBtn);
+  await this.click(createWalletBtn);
+});
+
+Then(/^The pop-up is closed and the extension tab is opened$/, async function () {
+  const result = await this.windowManager.isClosed(popupConnectorName);
+  expect(result, 'The window|tab is still opened').to.be.true;
+
+  await this.windowManager.findNewWindowAndSwitchTo(extensionTabName);
+  const windowTitle = await this.driver.getTitle();
+  expect(windowTitle).to.equal(extensionTabName);
 });
