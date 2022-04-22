@@ -9,6 +9,10 @@ type CustomWindowHandle = {|
 
 class WindowManagerError extends Error {}
 
+export const mockDAppName = 'MockDApp';
+export const popupConnectorName = 'popupConnectorWindow';
+export const extensionTabName = 'Yoroi';
+
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
   driver: WebDriver;
@@ -20,7 +24,19 @@ export class WindowManager {
 
   async init() {
     const mainWindowHandle = await this._getCurrentWindowHandle();
-    this.windowHandles.push({ title: 'main', handle: mainWindowHandle });
+    const windowTitle = await this._getWindowTitle();
+    this.windowHandles.push({ title: windowTitle, handle: mainWindowHandle });
+  }
+
+  async _getWindowTitle(): Promise<string> {
+    const windowTitle = await this.driver.getTitle();
+    if (windowTitle === extensionTabName) {
+      return extensionTabName;
+    }
+    if (windowTitle === mockDAppName) {
+      return mockDAppName;
+    }
+    return 'main';
   }
 
   _getHandleByTitle(title: string): Array<CustomWindowHandle> {
