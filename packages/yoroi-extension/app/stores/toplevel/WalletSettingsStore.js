@@ -70,7 +70,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
           // ignore any error because we are going to resync anyway
         }
       }
-      
+
       const promise = this.api[apiType].removeAllTransactions(req);
 
       this.stores.transactions.ongoingRefreshing.set(
@@ -247,7 +247,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         request.publicDeriver.publicDeriverId,
       );
     }
-    
+
     this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
   };
 
