@@ -1301,7 +1301,6 @@ function handleInjectorConnect(port) {
                   },
                   db,
                   localStorageApi,
-                  false,
                 )
               });
             } catch (e) {
