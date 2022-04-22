@@ -7,7 +7,7 @@ Feature: dApp connector data signing
     Then I should see the Create wallet screen
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
-    Then I open the mock dApp
+    Then I open the mock dApp tab
 
 @dApp-1000
   Scenario: dApp, anonymous wallet, can get balance (DAPP-1000)

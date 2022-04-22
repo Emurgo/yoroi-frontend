@@ -7,7 +7,7 @@ Feature: dApp connector anonymous wallet errors checking
     Then I should see the Create wallet screen
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
-    Then I open the mock dApp
+    Then I open the mock dApp tab
     And I request anonymous access to Yoroi
     Then I should see the connector popup
 

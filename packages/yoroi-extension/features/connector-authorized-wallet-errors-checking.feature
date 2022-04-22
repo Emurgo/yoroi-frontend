@@ -7,7 +7,7 @@ Feature: dApp connector errors checking
     Then I should see the Create wallet screen
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
-    Then I open the mock dApp
+    Then I open the mock dApp tab
     And I request access to Yoroi
     Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
