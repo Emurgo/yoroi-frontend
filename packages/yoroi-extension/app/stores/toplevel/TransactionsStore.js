@@ -291,7 +291,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   |} => Promise<void> = async (request) => {
     const { publicDeriverId } = request.publicDeriver;
     if (this.ongoingRefreshing.has(publicDeriverId)) {
-      await this.ongoingRefreshing.get(publicDeriverId);
+      return this.ongoingRefreshing.get(publicDeriverId);
     } else {
       const promise = this._refreshTransactionData(request);
       this.ongoingRefreshing.set(publicDeriverId, promise);

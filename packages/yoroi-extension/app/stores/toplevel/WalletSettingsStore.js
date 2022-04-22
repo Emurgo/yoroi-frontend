@@ -232,7 +232,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       request.publicDeriver.publicDeriverId,
       resyncHistoryPromise,
     );
-    await resyncHistoryPromise;
+    return resyncHistoryPromise;
   };
 
   @action _removeWallet: {|
