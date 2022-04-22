@@ -8,6 +8,8 @@ import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod } from './helpers/helpers';
+import { WindowManager } from './windowManager';
+import { MockDAppWebpage } from '../mock-dApp-webpage';
 
 const fs = require('fs');
 
@@ -40,10 +42,13 @@ function getBraveBuilder() {
     new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments(
-        '--start-maximized',
-        '--disable-setuid-sandbox',
         '--no-sandbox',
-        '--disable-dev-shm-usage'
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--start-maximized',
+        '--remote-debugging-port=9222',
+        'disable-infobars',
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
   );
@@ -56,10 +61,13 @@ function getChromeBuilder() {
       new chrome.Options()
         .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
         .addArguments(
-          '--start-maximized',
-          '--disable-setuid-sandbox',
           '--no-sandbox',
-          '--disable-dev-shm-usage'
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--start-maximized',
+          '--remote-debugging-port=9222',
+          'disable-infobars',
         )
     );
 }
@@ -109,16 +117,25 @@ function CustomWorld(cmdInput: WorldInput) {
     case 'brave': {
       const braveBuilder = getBraveBuilder();
       this.driver = braveBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     case 'firefox': {
       const firefoxBuilder = getFirefoxBuilder();
       this.driver = firefoxBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     default: {
       const chromeBuilder = getChromeBuilder();
       this.driver = chromeBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
   }
@@ -149,9 +166,9 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
-  this.waitForElementLocated = (locator: LocatorObject) => {
+  this.waitForElementLocated = async (locator: LocatorObject) => {
     const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
-    return this.driver.wait(isLocated);
+    return await this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
@@ -304,6 +321,20 @@ function CustomWorld(cmdInput: WorldInput) {
       element
     );
   };
+
+  this.isDisplayed = async (locator: LocatorObject) => {
+    const element = await this.driver.findElement(
+      getMethod(locator.method)(locator.locator)
+    );
+
+    return await element.isDisplayed();
+  }
+
+  this.findElement = async (locator: LocatorObject) =>
+    await this.driver.findElement(getMethod(locator.method)(locator.locator));
+
+  this.findElements = async (locator: LocatorObject) =>
+    await this.driver.findElements(getMethod(locator.method)(locator.locator));
 }
 
 // no need to await
