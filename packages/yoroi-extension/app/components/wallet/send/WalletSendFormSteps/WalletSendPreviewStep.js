@@ -33,6 +33,7 @@ import AssetsDropdown from './AssetsDropdown';
 import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { Asset } from '../../assets/AssetsList'
+import { isErgo } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +staleTx: boolean,
@@ -297,7 +298,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
             )}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(globalMessages.amountWithMinADA)}
+                {intl.formatMessage(
+                  isErgo(this.props.selectedNetwork) ?
+                    globalMessages.amount : globalMessages.amountWithMinADA
+                )}
               </div>
               <div className={styles.amountValue}>
                 {this.renderSingleAmount(amount.getDefaultEntry())}
