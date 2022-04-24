@@ -406,7 +406,10 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const amountInputError = transactionFeeError || amountField.error
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
-
+    const isDefaultSelected = (
+      !this.props.selectedToken ||
+      this.props.selectedToken?.Identifier === this.props.defaultToken.Identifier
+    )
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
@@ -455,7 +458,7 @@ export default class WalletSendForm extends Component<Props, State> {
             <div className={styles.amountStep}>
               <div className={classnames(
                 [styles.amountInput,
-                  amountInputError && styles.amountInputError,
+                  amountInputError && isDefaultSelected && styles.amountInputError,
                   shouldSendAll && styles.disabled
                 ])}
               >
@@ -512,11 +515,10 @@ export default class WalletSendForm extends Component<Props, State> {
                 <div className={styles.usd}>
                   <p>$0</p>
                 </div>
-                {(!this.props.selectedToken ||
-                  this.props.selectedToken?.Identifier === this.props.defaultToken.Identifier) ? (
-                    <p className={styles.amountError}>
-                      {amountInputError}
-                    </p>): null}
+                {isDefaultSelected ? (
+                  <p className={styles.amountError}>
+                    {amountInputError}
+                  </p>): null}
               </div>
 
               <IncludedTokens
