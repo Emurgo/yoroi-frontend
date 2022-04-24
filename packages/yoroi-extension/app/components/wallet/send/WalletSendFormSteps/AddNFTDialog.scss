@@ -43,6 +43,11 @@
         text-align: center;
         text-transform: uppercase;
         margin: 20px 0px;
+
+        .label {
+            display: inline-block;
+            margin-right: 4px;
+        }
     }
 
     .noAssetFound {

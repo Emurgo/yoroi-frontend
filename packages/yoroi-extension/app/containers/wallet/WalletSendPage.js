@@ -477,7 +477,6 @@ class WalletSendPage extends Component<AllProps> {
     const tokenInfo = transactionBuilderStore.plannedTxInfoMap.find(
       ({ token: t }) => t.Identifier === token.Identifier
     );
-    console.log({tokenInfo: tokenInfo && JSON.parse(JSON.stringify(tokenInfo)), src: 'getTokenAmount'})
     if (tokenInfo && tokenInfo.amount) return tokenInfo.amount.toString();
     return null;
   }
@@ -486,6 +485,7 @@ class WalletSendPage extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
 
+    const { transactionBuilderStore } = this.generated.stores;
     const { txBuilderActions } = this.generated.actions;
 
     const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
@@ -503,6 +503,9 @@ class WalletSendPage extends Component<AllProps> {
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
         isTokenIncluded={this.isTokenIncluded}
+        fee={transactionBuilderStore.fee}
+        totalInput={transactionBuilderStore.totalInput}
+        isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
       />
     )
   }

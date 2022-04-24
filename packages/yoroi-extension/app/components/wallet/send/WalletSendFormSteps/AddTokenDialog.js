@@ -200,7 +200,8 @@ export default class AddTokenDialog extends Component<Props, State> {
   }
 
   renderMinAda() {
-    const { totalInput, fee } = this.props
+    const { totalInput, fee, isCalculatingFee } = this.props
+    if (isCalculatingFee) return '...';
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
     if (!totalInput) return '0.0';
     const amount = totalInput.joinSubtractCopy(fee);

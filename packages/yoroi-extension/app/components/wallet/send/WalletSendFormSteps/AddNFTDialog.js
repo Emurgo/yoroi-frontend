@@ -158,6 +158,16 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
   }
 
+
+  renderMinAda() {
+    const { totalInput, fee, isCalculatingFee } = this.props
+    if (isCalculatingFee) return '...';
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    if (!totalInput) return '0.0';
+    const amount = totalInput.joinSubtractCopy(fee);
+    return formatValue(amount.getDefaultEntry());
+  }
+
   render(): Node {
     const { intl } = this.context;
     const { onClose } = this.props
@@ -176,7 +186,10 @@ export default class AddNFTDialog extends Component<Props, State> {
             <input onChange={this.search} className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
           </div>
           <div className={styles.minAda}>
-            <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
+            <p>
+              <span className={styles.label}>{intl.formatMessage(messages.minAda)}{':'}</span>
+              <span>{this.renderMinAda()}</span>
+            </p>
           </div>
           {
             nftsList.length === 0 ? (
