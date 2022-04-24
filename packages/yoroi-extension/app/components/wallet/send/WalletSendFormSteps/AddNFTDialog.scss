@@ -11,6 +11,7 @@
         display: flex;
         align-items: center;
         padding: 0px 20px;
+        margin-bottom: 20px;
 
         .searchInput {
             width: 100%;
@@ -26,7 +27,6 @@
 
         .searchInput::placeholder {
             color: #A7AFC0;
-            font-family: Rubik;
             font-size: 14px;
             letter-spacing: 0;
             line-height: 22px;
@@ -36,13 +36,11 @@
 
     .minAda {
         color: #242838;
-        font-family: Rubik;
         font-size: 16px;
         letter-spacing: 0;
         line-height: 24px;
         text-align: center;
         text-transform: uppercase;
-        margin: 20px 0px;
 
         .label {
             display: inline-block;
@@ -67,7 +65,6 @@
 
         .text {
             color: #242838;
-            font-family: Rubik;
             font-size: 18px;
             font-weight: 500;
             letter-spacing: 0;
@@ -84,6 +81,7 @@
         margin-bottom: 20px;
         height: 360px;
         overflow-y: scroll;
+        margin-top: 20px;
 
         .nftCard {
             cursor: pointer;

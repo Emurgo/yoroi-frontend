@@ -506,6 +506,7 @@ class WalletSendPage extends Component<AllProps> {
         fee={transactionBuilderStore.fee}
         totalInput={transactionBuilderStore.totalInput}
         isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+        selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
       />
     )
   }
@@ -548,6 +549,7 @@ class WalletSendPage extends Component<AllProps> {
         onRemoveToken={txBuilderActions.removeToken.trigger}
         getTokenAmount={this.getTokenAmount}
         isTokenIncluded={this.isTokenIncluded}
+        selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
       />
     )
   }

@@ -33,6 +33,7 @@ import type { UriParams } from '../../../../utils/URIHandling';
 import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import LocalizableError from '../../../../i18n/LocalizableError';
+import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +onClose: void => void,
@@ -226,12 +227,14 @@ export default class AddTokenDialog extends Component<Props, State> {
             <SearchIcon />
             <input onChange={this.search} className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
           </div>
+          {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <p>
               <span className={styles.label}>{intl.formatMessage(messages.minAda)}{':'}</span> 
               <span>{this.renderMinAda()}</span>
             </p>
           </div>
+          )}
           {
             tokensList.length === 0 ? (
               <div className={styles.noAssetFound}>

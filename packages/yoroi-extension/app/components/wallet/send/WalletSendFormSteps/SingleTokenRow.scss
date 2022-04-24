@@ -1,5 +1,5 @@
 .component {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     margin-right: 10px;
     
     .token {
@@ -55,7 +55,7 @@
 
         .error {
             position: absolute;
-            bottom: -15px;
+            bottom: -16px;
             right: 27px;
             color: var(--yoroi-comp-input-error);
             font-family: "Roboto","Helvetica","Arial",sans-serif;

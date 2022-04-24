@@ -27,6 +27,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { UriParams } from '../../../../utils/URIHandling';
 import classnames from 'classnames';
 import { Button } from '@mui/material';
+import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +onClose: void => void,
@@ -123,7 +124,7 @@ export default class AddNFTDialog extends Component<Props, State> {
     ].map(entry => ({
       entry,
       info: this.props.getTokenInfo(entry),
-    })).filter(token => !token.info.IsNFT).map(token => {
+    })).filter(token => token.info.IsNFT).map(token => {
       const policyId = token.entry.identifier.split('.')[0];
       const name = truncateToken(getTokenStrictName(token.info) ?? '-');
       return {
@@ -133,9 +134,7 @@ export default class AddNFTDialog extends Component<Props, State> {
         amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
         policyId,
         // $FlowFixMe[prop-missing]
-        // todo: revert this change
-        // nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
-        nftMetadata: null,
+        nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
       };
     })
     .map(item => ({
@@ -172,6 +171,8 @@ export default class AddNFTDialog extends Component<Props, State> {
     const { intl } = this.context;
     const { onClose } = this.props
     const { nftsList } = this.state
+
+    console.log({nftsList})
     return (
       <Dialog
         title={intl.formatMessage(messages.nNft, { number: nftsList.length })}
@@ -185,12 +186,14 @@ export default class AddNFTDialog extends Component<Props, State> {
             <SearchIcon />
             <input onChange={this.search} className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
           </div>
+          {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <p>
               <span className={styles.label}>{intl.formatMessage(messages.minAda)}{':'}</span>
               <span>{this.renderMinAda()}</span>
             </p>
           </div>
+         )}
           {
             nftsList.length === 0 ? (
               <div className={styles.noAssetFound}>

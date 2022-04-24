@@ -12,6 +12,7 @@
         display: flex;
         align-items: center;
         padding: 0px 20px;
+        margin-bottom: 20px;
 
         .searchInput {
             width: 100%;
@@ -39,6 +40,7 @@
         height: 360px;
         overflow-y: scroll;
         margin-right: -30px;
+        margin-top: 20px;
     }
 
     .minAda {
@@ -48,8 +50,6 @@
         line-height: 24px;
         text-align: center;
         text-transform: uppercase;
-        margin: 20px 0px;
-
 
         .label {
             display: inline-block;
@@ -59,7 +59,6 @@
 
     .headerText {
         color: #A7AFC0;
-        font-family: Rubik;
         font-size: 14px;
         letter-spacing: 0;
         line-height: 22px;
