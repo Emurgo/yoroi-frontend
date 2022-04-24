@@ -34,6 +34,7 @@ import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 
 type Props = {|
   +onClose: void => void,
@@ -139,24 +140,22 @@ export default class AddTokenDialog extends Component<Props, State> {
       this.setState({ tokensList: filteredTokensList })
     };
 
-  compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
-    let newSortDirection = SORTING_DIRECTIONS.UP
-    if (!this.state.sortingDirection) {
-      newSortDirection = SORTING_DIRECTIONS.UP
-    } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
-      newSortDirection = SORTING_DIRECTIONS.DOWN
-    }
+    compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
+      let newSortDirection = SORTING_DIRECTIONS.UP
+      if (!this.state.sortingDirection) {
+        newSortDirection = SORTING_DIRECTIONS.UP
+      } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
+        newSortDirection = SORTING_DIRECTIONS.DOWN
+      }
 
-    this.setState({ sortingDirection: newSortDirection })
+      this.setState({ sortingDirection: newSortDirection })
 
-    if ( a[field] < b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+      if (field === 'amount') {
+        return compareNumbers(a[field], b[field], newSortDirection)
+      }
+      // Other fields
+      return compareStrings(a[field], b[field], newSortDirection)
     }
-    if ( a[field] > b[field] ){
-      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
-    }
-    return 0;
-  }
 
   sortTokens: ((field: string) => void) = (field: string) => {
     const tokensListCopy = [...this.state.tokensList]
