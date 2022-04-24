@@ -65,6 +65,16 @@ export class WindowManager {
     return await this._openNewWithCheck('window', windowTitle, url);
   }
 
+  async closeTabWindow(titleToClose: string, switchToTitle: string): Promise<void> {
+    const handleToClose = this._getHandleByTitle(titleToClose);
+    const switchToHandle = this._getHandleByTitle(switchToTitle);
+    await this.driver.switchTo().window(handleToClose[0].handle);
+    await this.driver.close();
+    await this.driver.switchTo().window(switchToHandle[0].handle);
+    const indexOfHandle = this.windowHandles.indexOf(handleToClose);
+    this.windowHandles.splice(indexOfHandle, 1);
+  }
+
   async switchTo(title: string): Promise<void> {
     const searchHandle = this._getHandleByTitle(title);
     if (searchHandle.length !== 1) {
@@ -99,7 +109,7 @@ export class WindowManager {
   }
 
   async isClosed(title: string): Promise<boolean> {
-    const expectToBeClosedHandle = this.windowHandles.filter(
+    const expectToBeClosedHandle: Array<CustomWindowHandle> = this.windowHandles.filter(
       customHandle => customHandle.title === title
     );
     if (!expectToBeClosedHandle.length) {
@@ -107,7 +117,7 @@ export class WindowManager {
     }
     for (let i = 0; i < 20; i++) {
       const windowHandles = await this.getAllWindowHandles();
-      if (windowHandles.includes(expectToBeClosedHandle[0])) {
+      if (windowHandles.includes(expectToBeClosedHandle[0].handle)) {
         await new Promise(resolve => setTimeout(resolve, 100));
         continue;
       }
