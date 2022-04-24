@@ -42,14 +42,19 @@
     }
 
     .minAda {
-        color: #242838;
-        font-family: Rubik;
+        color: var(--yoroi-palette-gray-900);
         font-size: 16px;
         letter-spacing: 0;
         line-height: 24px;
         text-align: center;
         text-transform: uppercase;
         margin: 20px 0px;
+
+
+        .label {
+            display: inline-block;
+            margin-right: 4px;
+        }
     }
 
     .headerText {
