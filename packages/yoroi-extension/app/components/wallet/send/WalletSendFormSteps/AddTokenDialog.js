@@ -185,19 +185,20 @@ export default class AddTokenDialog extends Component<Props, State> {
     if (this.props.spendableBalance == null) return [];
     const { spendableBalance } = this.props;
     return [
-    ...spendableBalance.nonDefaultEntries(),
+      ...spendableBalance.nonDefaultEntries(),
     ].map(entry => ({
-    entry,
-    info: this.props.getTokenInfo(entry),
+      entry,
+      info: this.props.getTokenInfo(entry),
     })).filter(token => !token.info.IsNFT).map(token => {
-    const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
-    return {
-      value: token.info.TokenId,
-      info: token.info,
-      label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-      id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-      amount,
-    }});
+      const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+      return {
+        value: token.info.TokenId,
+        info: token.info,
+        label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+        amount,
+      }
+    });
   }
 
   renderMinAda() {

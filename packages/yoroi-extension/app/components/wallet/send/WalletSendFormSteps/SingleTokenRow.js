@@ -78,9 +78,8 @@ export default class SingleTokenRow extends Component<Props> {
       );
     }
 
-
-
     const amountInputError = transactionFeeError
+
     return (
       <div className={styles.component}>
         {!this.props.isTokenIncluded(token.info) ? (
@@ -102,8 +101,8 @@ export default class SingleTokenRow extends Component<Props> {
               <AmountInputRevamp
                 value={this.props.getTokenAmount(token.info)}
                 onChange={value => {
-                  const amount = new BigNumber(value)
-                  this.props.updateAmount(amount)
+                  if (value) value = new BigNumber(value)
+                  this.props.updateAmount(value)
                 }}
                 onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
