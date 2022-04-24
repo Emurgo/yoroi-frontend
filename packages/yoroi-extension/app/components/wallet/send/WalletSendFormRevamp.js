@@ -456,6 +456,13 @@ export default class WalletSendForm extends Component<Props, State> {
         case SEND_FORM_STEP.AMOUNT:
           return (
             <div className={styles.amountStep}>
+              {
+                !isDefaultSelected && (
+                  <p className={styles.error}>
+                    {amountInputError}
+                  </p>
+                )
+              }
               <div className={classnames(
                 [styles.amountInput,
                   amountInputError && isDefaultSelected && styles.amountInputError,
