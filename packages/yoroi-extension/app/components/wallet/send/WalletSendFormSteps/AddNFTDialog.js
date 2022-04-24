@@ -172,7 +172,6 @@ export default class AddNFTDialog extends Component<Props, State> {
     const { onClose } = this.props
     const { nftsList } = this.state
 
-    console.log({nftsList})
     return (
       <Dialog
         title={intl.formatMessage(messages.nNft, { number: nftsList.length })}

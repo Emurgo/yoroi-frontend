@@ -38,7 +38,7 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
@@ -368,6 +368,15 @@ export default class WalletSendForm extends Component<Props, State> {
     return [tokens, nfts]
   }
 
+  renderMinAda() {
+    const { totalInput, fee, isCalculatingFee } = this.props
+    if (isCalculatingFee) return '...';
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    if (!totalInput) return '0.0';
+    const amount = totalInput.joinSubtractCopy(fee);
+    return formatValue(amount.getDefaultEntry());
+  }
+
   renderCurrentStep(step: number): Node {
     const { form } = this
     const { intl } = this.context;
@@ -501,7 +510,7 @@ export default class WalletSendForm extends Component<Props, State> {
                   </p>
                   <Button
                     variant="ternary"
-                    sx={{ minWidth: '56px', minHeight: '30px' }}
+                    sx={{ minWidth: '56px', minHeight: '30px', border: 'none', background: 'var(--yoroi-palette-gray-50)' }}
                     onClick={() => {
                       if (shouldSendAll) {
                         amountField.reset();
@@ -518,7 +527,13 @@ export default class WalletSendForm extends Component<Props, State> {
                     {intl.formatMessage(messages.max)}
                   </Button>
                 </div>
-
+                {isCardanoHaskell(this.props.selectedNetwork)
+                  && !isDefaultSelected && !amountFieldProps.value && (
+                  <div className={styles.minAda}>
+                    <p className={styles.value}>{this.renderMinAda()}</p>
+                    <p className={styles.lable}>Min ADA</p>
+                  </div>
+                 )}
                 <div className={styles.usd}>
                   <p>$0</p>
                 </div>

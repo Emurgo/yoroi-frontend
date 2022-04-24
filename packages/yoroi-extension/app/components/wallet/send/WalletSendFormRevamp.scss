@@ -122,7 +122,8 @@
 
                 .amountInputGrid {
                     margin-top: 5px;
-                    padding: 0px 16px 16px 16px;
+                    padding-bottom: 16px;
+                    margin: 0px 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -144,6 +145,27 @@
                     letter-spacing: 0.5px;
                     line-height: 22px;
                     margin-right: 12px;
+                }
+
+                .minAda {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 16px 0px;
+                    margin: 0px 15px;
+                    border-bottom: 1px solid var(--yoroi-palette-gray-200);
+                    .value {
+                        color: var(--yoroi-palette-gray-600);
+                        line-height: 24px;
+                    }
+
+                    .label {
+                        color: #6B7384;
+                        font-size: 14px;
+                        font-weight: 500;
+                        letter-spacing: 0.5px;
+                        letter-spacing: 0;
+                    }
                 }
 
                 .usd {
