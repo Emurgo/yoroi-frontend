@@ -3,6 +3,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    padding: 0px 30px;
 
     .search {
         border-radius: 8px;
@@ -113,32 +114,16 @@
             border: 1px solid var(--yoroi-palette-secondary-300);
         }
     }
-
-    .add {
-        border-top: 2px solid#DCE0E9;
-        cursor: pointer;
-        text-transform: uppercase;
-        width: 690px;
-        text-align: center;
-        color: #17D1AA;
-        font-family: Rubik;
-        font-size: 16px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        line-height: 22px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: -40px;
-        margin-top: auto;
-
-    }
 }
 
 .dialog {
     min-width: 690px !important;
     padding-bottom: 0px !important;
+
+    & > div {
+        padding-left: 0px !important;
+        padding-right: 0px;
+    }
 
     h1 {
         padding: 0px;

@@ -26,6 +26,7 @@ import type {
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { UriParams } from '../../../../utils/URIHandling';
 import classnames from 'classnames';
+import { Button } from '@mui/material';
 
 type Props = {|
   +onClose: void => void,
@@ -204,7 +205,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                           onClick={() => this.onSelect(nft.info)}
                         >
                           {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT /> }
-                          <p className={styles.nftName}>{nft.name }</p>
+                          <p className={styles.nftName}>{nft.name}</p>
                         </button>
                       )
                     })
@@ -213,9 +214,19 @@ export default class AddNFTDialog extends Component<Props, State> {
               </>
             )
           }
-
-          <button type='button' className={styles.add}>{intl.formatMessage(messages.add)}</button>
         </div>
+        <Button
+          sx={{
+            width: '100%',
+            height: '61px',
+            borderRadius: '0px',
+            color: 'var(--yoroi-palette-secondary-300)',
+          }}
+          onClick={onClose}
+          variant='ternary'
+        >
+          {intl.formatMessage(messages.add)}
+        </Button>
       </Dialog>
     );
   }

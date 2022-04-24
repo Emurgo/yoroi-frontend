@@ -284,8 +284,19 @@ export default class AddTokenDialog extends Component<Props, State> {
             )
           }
 
-          <Button type='button' className={styles.add}>{intl.formatMessage(messages.add)} </Button>
         </div>
+        <Button
+          sx={{
+            width: '100%',
+            height: '61px',
+            borderRadius: '0px',
+            color: 'var(--yoroi-palette-secondary-300)',
+          }}
+          onClick={onClose}
+          variant='ternary'
+        >
+          {intl.formatMessage(messages.add)}
+        </Button>
       </Dialog>
     );
   }
