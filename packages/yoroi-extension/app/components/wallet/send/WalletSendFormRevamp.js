@@ -264,9 +264,16 @@ export default class WalletSendForm extends Component<Props, State> {
             return true;
           }
           const amountValue: string = field.value;
-          if (amountValue === '') {
+          // Amount Field should be optional
+          if (!amountValue) {
             this.props.updateAmount();
-            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+            const defaultTokenInfo = this.props.getTokenInfo({
+              identifier: this.props.defaultToken.Identifier,
+              networkId: this.props.defaultToken.NetworkId,
+            })
+
+            this.props.onRemoveToken(defaultTokenInfo)
+            return true
           }
           const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
             amountValue,
@@ -482,20 +489,24 @@ export default class WalletSendForm extends Component<Props, State> {
                   <p className={styles.defaultCoin}>
                     {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
                   </p>
-                  <button
-                    className={styles.max}
-                    type='button'
+                  <Button
+                    variant="ternary"
+                    sx={{ minWidth: '56px', minHeight: '30px' }}
                     onClick={() => {
-                      this.props.onAddToken({
-                        shouldReset: true,
-                      });
-
-                      if (shouldSendAll) amountField.reset();
-                      this.props.updateSendAllStatus(!shouldSendAll);
+                      if (shouldSendAll) {
+                        amountField.reset();
+                        this.props.onRemoveToken(); // remove default token
+                        this.props.updateSendAllStatus(false);
+                      } else {
+                        this.props.onAddToken({
+                          shouldReset: true,
+                        });
+                        this.props.updateSendAllStatus(true);
+                      }
                     }}
                   >
                     {intl.formatMessage(messages.max)}
-                  </button>
+                  </Button>
                 </div>
 
                 <div className={styles.usd}>

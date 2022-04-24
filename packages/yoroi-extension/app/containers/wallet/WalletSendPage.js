@@ -477,7 +477,7 @@ class WalletSendPage extends Component<AllProps> {
     const tokenInfo = transactionBuilderStore.plannedTxInfoMap.find(
       ({ token: t }) => t.Identifier === token.Identifier
     );
-
+    console.log({tokenInfo: tokenInfo && JSON.parse(JSON.stringify(tokenInfo)), src: 'getTokenAmount'})
     if (tokenInfo && tokenInfo.amount) return tokenInfo.amount.toString();
     return null;
   }
