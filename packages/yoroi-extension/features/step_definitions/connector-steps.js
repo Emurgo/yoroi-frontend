@@ -41,6 +41,13 @@ Given(/^I switch back to the mock dApp$/, async function () {
   await this.windowManager.switchTo(mockDAppName);
 });
 
+When(/^I refresh the dApp page$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
+  await this.driver.executeScript('location.reload(true);');
+  // wait for page to refresh
+  await this.driver.sleep(500);
+});
+
 Then(/^I request anonymous access to Yoroi$/, async function () {
   await this.mockDAppPage.requestNonAuthAccess();
 });
@@ -53,6 +60,11 @@ Then(/^I should see the connector popup$/, async function () {
   await this.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await this.driver.getTitle();
   expect(windowTitle).to.equal('Yoroi dApp Connector');
+});
+
+Then(/^There is no the connector popup$/, async function () {
+  const newWindows = await this.windowManager.findNewWindows();
+  expect(newWindows.length).to.equal(0, 'A new window is displayed');
 });
 
 Then(
@@ -228,6 +240,8 @@ Then(/^I disconnect the wallet (.+) from the dApp (.+)$/, async function (wallet
 
 Then(/^I receive the wallet disconnection message$/, async function () {
   await this.windowManager.switchTo(mockDAppName);
+  const isEnabledState = await this.mockDAppPage.isEnabled();
+  expect(isEnabledState, 'The wallet is still enabled').to.be.false;
   const connectionState = await this.mockDAppPage.getConnectionState();
   expect(connectionState, 'No message from the dApp-connector is received').to.be.false;
 });
