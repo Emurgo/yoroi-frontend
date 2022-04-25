@@ -58,9 +58,27 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     = new Request<ChangeModelPasswordFunc>(this.api.common.changeModelPassword);
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request<RemoveAllTransactionsFunc>(req => {
+    = new Request<RemoveAllTransactionsFunc>(async (req) => {
       const apiType = getApiForNetwork(req.publicDeriver.getParent().getNetworkInfo());
-      return this.api[apiType].removeAllTransactions(req);
+      const ongoingRefreshing = this.stores.transactions.ongoingRefreshing.get(
+        req.publicDeriverId
+      );
+      if (ongoingRefreshing) {
+        try {
+          await ongoingRefreshing;
+        } catch {
+          // ignore any error because we are going to resync anyway
+        }
+      }
+
+      const promise = this.api[apiType].removeAllTransactions(req);
+
+      this.stores.transactions.ongoingRefreshing.set(
+        req.publicDeriverId,
+        promise,
+      );
+
+      return promise;
     });
 
   @observable removeWalletRequest: Request<typeof _removeWalletFromDb>
@@ -201,19 +219,34 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     if (withLevels == null) {
       throw new Error(`${nameof(this._resyncHistory)} missing levels`);
     }
-    await this.clearHistory.execute({
-      publicDeriver: withLevels,
-      refreshWallet: () => {
-        // clear cache
-        const txRequests = this.stores.transactions
-          .getTxRequests(request.publicDeriver);
-        for (const txRequest of Object.keys(txRequests.requests)) {
-          txRequests.requests[txRequest].reset();
+    try {
+      await this.clearHistory.execute({
+        publicDeriver: withLevels,
+        publicDeriverId: request.publicDeriver.publicDeriverId,
+        refreshWallet: () => {
+          // clear cache
+          const txRequests = this.stores.transactions
+                .getTxRequests(request.publicDeriver);
+          for (const txRequest of Object.keys(txRequests.requests)) {
+            txRequests.requests[txRequest].reset();
+          }
+          // currently in the map the promise for this wallet is this resyncing process,
+          // we need to remove it before calling refreshing otherwise it's a deadlock
+          this.stores.transactions.ongoingRefreshing.delete(
+            request.publicDeriver.publicDeriverId,
+          );
+          // refresh
+          return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
         }
-        // refresh
-        return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
-      }
-    }).promise;
+      }).promise;
+    } finally {
+      // if everything runs without any error, the promise should have already
+      // been removed, but here make sure it is, so that future refreshing
+      // is not affected
+      this.stores.transactions.ongoingRefreshing.delete(
+        request.publicDeriver.publicDeriverId,
+      );
+    }
 
     this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
   };
@@ -232,6 +265,13 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
     }
     await removeWalletFromLS(request.publicDeriver)
+
+    // remove this wallet from wallet sort list
+    const sortedWallets = this.stores.profile.currentSortedWallets.filter(
+      id => id !== request.publicDeriver.publicDeriverId
+    );
+    this.actions.profile.updateSortedWalletList.trigger({ sortedWallets });
+
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver,
       conceptualWallet: group.publicDerivers.length === 1

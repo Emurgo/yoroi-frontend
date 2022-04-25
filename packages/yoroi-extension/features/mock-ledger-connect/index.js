@@ -56,7 +56,7 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
       const rootKey = generateLedgerWalletRootKey(wallet.mnemonic);
       return {
         rootKey,
-        serial: { serial },
+        serial: { serialHex: serial },
         version: {
           version: mockDeviceVersion,
           compatibility: {
@@ -70,6 +70,7 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsPoolRegistrationAsOperator: true,
             supportsPoolRetirement: true,
             supportsMultisigTransaction: true,
+            supportsAlonzo: false,
           },
         },
       };
@@ -191,10 +192,10 @@ class MockLedgerConnect {
     }
     const selectedWallet = MockLedgerConnect.selectedWallet;
 
-    if (selectedWallet.serial.serial !== serial) {
+    if (selectedWallet.serial.serialHex !== serial) {
       throw new IncorrectDeviceError({
         expectedDeviceId: serial,
-        responseDeviceId: selectedWallet.serial.serial,
+        responseDeviceId: selectedWallet.serial.serialHex,
       });
     }
   }

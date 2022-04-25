@@ -241,7 +241,7 @@ const bigIntToBase58 = (n) => {
   const o = [];
   let x = n;
   while (x > 0) {
-    // $FlowFixMe
+    // $FlowFixMe[cannot-resolve-name]
     const divisionResult = x / BigInt(58);
     const remainder = x % BigInt(58);
     x = divisionResult;
@@ -275,7 +275,7 @@ const hexAddressConfig: any = [
     // byron
     parse: (addr: string) => {
       /* eslint-disable */
-      // $FlowFixMe
+      // $FlowFixMe[cannot-resolve-name]
       const base58 = bigIntToBase58(BigInt(`0x${addr}`));
       if (RustModule.WalletV4.ByronAddress.is_valid(base58)) {
         return RustModule.WalletV4.ByronAddress.from_base58(base58).to_address();
