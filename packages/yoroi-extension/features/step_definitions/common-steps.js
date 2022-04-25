@@ -154,7 +154,6 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-    this.sendToAllLoggers(`=== ${cleanString} ===`);
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);

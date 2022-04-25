@@ -190,14 +190,17 @@ export class MockDAppWebpage {
   async checkAccessRequest(): Promise<AccessCallBack> {
     this.logger.info(`Checking the access request`);
     const accessResponse = await this.driver.executeAsyncScript((...args) => {
+      console.log(`checkAccessRequest.args: ${JSON.stringify(args)}`);
       const callback = args[args.length - 1];
       window.accessRequestPromise
         // eslint-disable-next-line promise/always-return
         .then(api => {
+          console.log('checkAccessRequest: then');
           window.api = api;
           callback({ success: true });
         })
         .catch(error => {
+          console.log('checkAccessRequest: catch');
           callback({ success: false, errMsg: error.message });
         });
     });
