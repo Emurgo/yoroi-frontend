@@ -102,7 +102,7 @@ export const getWalletsWithConnectedWebsites = async (
       amount: walletAmountAndCurrency.amount,
       currency: walletAmountAndCurrency.currency,
       websiteTitle,
-      connectionStatus
+      connectionStatus,
     });
   }
   return result;

@@ -4,8 +4,14 @@ import { By, WebElement } from 'selenium-webdriver';
 import { getMethod } from '../support/helpers/helpers';
 import type { LocatorObject } from '../support/webdriver';
 
-export const noWalletsImg: LocatorObject = { locator: '.ConnectPage_noWalletsImage', method: 'css' };
-export const createWalletBtn: LocatorObject = { locator: '.ConnectPage_createWallet', method: 'css' };
+export const noWalletsImg: LocatorObject = {
+  locator: '.ConnectPage_noWalletsImage',
+  method: 'css',
+};
+export const createWalletBtn: LocatorObject = {
+  locator: '.ConnectPage_createWallet',
+  method: 'css',
+};
 export const walletListElement: LocatorObject = { locator: '.ConnectPage_list', method: 'css' };
 export const walletNameField: LocatorObject = { locator: 'div.WalletCard_name', method: 'css' };
 export const walletItemButton: LocatorObject = { locator: './button', method: 'xpath' };

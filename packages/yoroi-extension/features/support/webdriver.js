@@ -53,17 +53,19 @@ function getBraveBuilder() {
 }
 
 function getChromeBuilder() {
-  return new Builder().forBrowser('chrome').setChromeOptions(
-    new chrome.Options()
-      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
-      .addArguments(
-        '--no-sandbox',
-        '--disable-gpu',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--start-maximized'
-      )
-  );
+  return new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(
+      new chrome.Options()
+        .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+        .addArguments(
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--start-maximized'
+        )
+    );
 }
 
 function getFirefoxBuilder() {
@@ -105,7 +107,6 @@ export type LocatorObject = {|
     | 'tagName',
 |};
 
-// TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
   switch (cmdInput.parameters.browser) {
     case 'brave': {
