@@ -539,7 +539,7 @@ export default class WalletSendForm extends Component<Props, State> {
       return (
         <QRScannerDialog
           onClose={this.props.closeDialog}
-          onReadQR={(address) => { receiverField.value = address }}
+          onReadQR={(address) => { receiverField.set('value', address) }}
         />
       )
     }

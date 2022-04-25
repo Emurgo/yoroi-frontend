@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100%;
 
     .scanner {
         display: inline-block;
@@ -14,25 +13,34 @@
         object-fit: cover;
         border-radius: 8px;
         overflow: hidden;
+        margin: 40px 0px;
     }
 
     .error {
-        color: #FF1351;
-        height: 10px;
-        font-size: 16px;
-        letter-spacing: 0.4px;
-        line-height: 16px;
-        text-align: center;
-        width: 300px;
-        height: 300px;
         display: flex;
+        flex-direction: column;
         align-items: center;
+        height: 100%;
         justify-content: center;
+        height: 275px;
+        width: 350px;
+        text-align: center;
+
+        & > svg {
+            height: 150px;
+        }
     }
 }
 
 
 .dialog {
-    min-width: 380px !important;
-    min-height: 425px !important;
+    min-width: 400px !important;
+    min-height: 315px !important;
+    padding-bottom: 0px !important;
+
+    & > h1 {
+        flex: 0 !important;
+        -webkit-flex: 0 !important;
+        margin-bottom: 0px !important;
+    }
 }

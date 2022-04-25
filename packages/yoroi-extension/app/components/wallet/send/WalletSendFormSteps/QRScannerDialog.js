@@ -7,7 +7,8 @@ import Scanner from 'react-webcam-qr-scanner';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './QRScannerDialog.scss'
-
+import WebcamIcon from '../../../../assets/images/webcam-picture-yoroi.inline.svg';
+import { Typography } from '@mui/material';
 
 const messages: Object = defineMessages({
   title: {
@@ -82,7 +83,14 @@ export default class QrScanner extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
       >
         <div className={styles.component}>
-          {error ? <p className={styles.error}>{error}</p> : (
+          {error ? (
+            <div className={styles.error}>
+              <WebcamIcon />
+              <Typography color='var(--yoroi-palette-gray-900)' variant='h4'>
+                {error}
+              </Typography>
+            </div>
+          ) : (
             <Scanner
               className={styles.scanner}
               onDecode={this.handleDecode}
