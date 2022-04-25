@@ -101,17 +101,25 @@ export class WindowManager {
     await this.driver.switchTo().window(searchHandle[0].handle);
   }
 
-  async findNewWindowAndSwitchTo(newWindowTitle: string): Promise<CustomWindowHandle> {
+  _filterHandles(newWindowHandles: Array<string>): Array<string> {
+    const oldHandles = this.windowHandles.map(customHandle => customHandle.handle);
+    return newWindowHandles.filter(handle => !oldHandles.includes(handle));
+  }
+
+  async findNewWindows(): Promise<Array<string>> {
     let newWindowHandles: Array<string> = [];
-    for (;;) {
+    for (let i = 0; i < 50; i++) {
       await new Promise(resolve => setTimeout(resolve, 100));
       newWindowHandles = await this.getAllWindowHandles();
       if (newWindowHandles.length > this.windowHandles.length) {
-        break;
+        return this._filterHandles(newWindowHandles);
       }
     }
-    const oldHandles = this.windowHandles.map(customHandle => customHandle.handle);
-    const popupWindowHandleArr = newWindowHandles.filter(handle => !oldHandles.includes(handle));
+    return this._filterHandles(newWindowHandles);
+  }
+
+  async findNewWindowAndSwitchTo(newWindowTitle: string): Promise<CustomWindowHandle> {
+    const popupWindowHandleArr = await this.findNewWindows();
     if (popupWindowHandleArr.length !== 1) {
       throw new WindowManagerError('Can not find the popup window');
     }
