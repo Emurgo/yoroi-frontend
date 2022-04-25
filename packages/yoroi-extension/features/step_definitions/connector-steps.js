@@ -22,6 +22,7 @@ import {
   utxoAddressesTabButton,
   getUTXOAddresses,
   transactionFeeTitle,
+  cancelButton,
 } from '../pages/connector-signingTxPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
@@ -247,6 +248,7 @@ Then(/^I receive the wallet disconnection message$/, async function () {
 });
 
 Then(/^The user reject for signing is received$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
   const signingResult = await this.mockDAppPage.getSigningTxResult();
   expect(signingResult.code, `The reject signing code is different`).to.equal(2);
   expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
@@ -270,4 +272,8 @@ Then(/^The pop-up is closed and the extension tab is opened$/, async function ()
   await this.windowManager.findNewWindowAndSwitchTo(extensionTabName);
   const windowTitle = await this.driver.getTitle();
   expect(windowTitle).to.equal(extensionTabName);
+});
+
+Then(/^I cancel signing the transaction$/, async function () {
+  await this.click(cancelButton);
 });

@@ -35,3 +35,15 @@ Feature: dApp connector anonymous wallet errors checking
     And The access request should succeed
     Then I disconnect the wallet shelley-simple-15 from the dApp localhost
     And I receive the wallet disconnection message
+
+  @dApp-1013
+  Scenario: dApp, anonymous wallet, signing transaction, cancel signing (DAPP-1013)
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
+    Then The popup window should be closed
+    And The access request should succeed
+    Then I request signing the transaction:
+      | amount | toAddress                                                                                               |
+      | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
+    Then I should see the connector popup
+    Then I cancel signing the transaction
+    And The user reject for signing is received
