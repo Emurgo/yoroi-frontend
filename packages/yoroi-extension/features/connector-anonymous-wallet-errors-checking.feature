@@ -8,16 +8,18 @@ Feature: dApp connector anonymous wallet errors checking
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
-    And I request anonymous access to Yoroi
-    Then I should see the connector popup
 
   @dApp-1003
   Scenario: dApp, anonymous wallet, connecting wallet, close pop-up (DAPP-1003)
+    And I request anonymous access to Yoroi
+    Then I should see the connector popup
     Then I close the dApp-connector pop-up window
     And The user reject is received
 
   @dApp-1004
   Scenario: dApp, anonymous wallet, signing transaction, close pop-up (DAPP-1004)
+    And I request anonymous access to Yoroi
+    Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
@@ -30,6 +32,8 @@ Feature: dApp connector anonymous wallet errors checking
 
   @dApp-1005
   Scenario: dApp, anonymous wallet, disconnect wallet (DAPP-1005)
+    And I request anonymous access to Yoroi
+    Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
@@ -38,6 +42,8 @@ Feature: dApp connector anonymous wallet errors checking
 
   @dApp-1013
   Scenario: dApp, anonymous wallet, signing transaction, cancel signing (DAPP-1013)
+    And I request anonymous access to Yoroi
+    Then I should see the connector popup
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed

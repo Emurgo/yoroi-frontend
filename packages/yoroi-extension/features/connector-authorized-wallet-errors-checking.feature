@@ -8,12 +8,12 @@ Feature: dApp connector errors checking
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
-    And I request access to Yoroi
-    Then I should see the connector popup
-    And I select the only wallet named shelley-simple-15 with 5.5 balance
 
   @dApp-1006
   Scenario: dApp, authorised wallet, connecting wallet, wrong password -> correct password (DAPP-1006)
+    When I request access to Yoroi
+    Then I should see the connector popup
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
     When I enter the spending password wrongPassword and click confirm
     Then I see the error Incorrect wallet password
     When I enter the spending password asdfasdfasdf and click confirm
@@ -22,6 +22,9 @@ Feature: dApp connector errors checking
 
   @dApp-1007
   Scenario: dApp, authorised wallet, connecting wallet, back to wallets and close pop-up (DAPP-1007)
+    When I request access to Yoroi
+    Then I should see the connector popup
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
     When I enter the spending password wrongPassword and click confirm
     Then I see the error Incorrect wallet password
     When I click the back button (Connector pop-up window)
@@ -31,6 +34,9 @@ Feature: dApp connector errors checking
 
   @dApp-1008
   Scenario: dApp, authorised wallet, signing transaction, close pop-up (DAPP-1008)
+    When I request access to Yoroi
+    Then I should see the connector popup
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     And The access request should succeed
@@ -43,6 +49,9 @@ Feature: dApp connector errors checking
 
   @dApp-1009
   Scenario: dApp, authorised wallet, disconnect wallet (DAPP-1009)
+    When I request access to Yoroi
+    Then I should see the connector popup
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     And The access request should succeed
@@ -51,6 +60,9 @@ Feature: dApp connector errors checking
 
   @dApp-1014
   Scenario: dApp, authorised wallet, signing transaction, cancel signing (DAPP-1014)
+    When I request access to Yoroi
+    Then I should see the connector popup
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     And The access request should succeed

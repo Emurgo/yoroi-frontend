@@ -116,7 +116,6 @@ Then(/^The access request should succeed$/, async function () {
 });
 
 Then(/^The user reject is received$/, async function () {
-  await this.driver.sleep(200);
   const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
   expect(requestAccessResult.success, `Request access is granted`).to.be.false;
   expect(requestAccessResult.errMsg).to.equal(userRejectMsg, 'Wrong error message');
