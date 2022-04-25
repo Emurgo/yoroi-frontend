@@ -8,17 +8,12 @@ import type {
   ConfirmedSignData,
   ConnectedSites,
   ConnectingMessage,
-  ConnectRetrieveData,
   FailedSignData,
-  GetConnectedSitesData,
-  Protocol,
   PublicDeriverCache,
   RemoveWalletFromWhitelistData,
   SigningMessage,
   Tx,
-  TxSignWindowRetrieveData,
   WhitelistEntry,
-  GetUtxosRequest,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -75,103 +70,7 @@ import type {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-
-// Need to run only once - Connecting wallets
-let initedConnecting = false;
-function sendMsgConnect(): Promise<ConnectingMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedConnecting)
-      window.chrome.runtime.sendMessage((
-        { type: 'connect_retrieve_data' }: ConnectRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedConnecting = true;
-        }
-      );
-  });
-}
-
-// Need to run only once - Sign Tx Confirmation
-let initedSigning = false;
-function sendMsgSigningTx(): Promise<SigningMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'tx_sign_window_retrieve_data' }: TxSignWindowRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedSigning = true;
-        }
-      );
-  });
-}
-
-export function getProtocol(): Promise<?Protocol> {
-  return new Promise((resolve, reject) => {
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_protocol' }),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_protocol ');
-          }
-
-          resolve(response);
-        }
-      );
-  });
-}
-
-export function getUtxosAndAddresses(
-  tabId: number,
-  select: string[]
-  ): Promise<{|
-    utxos: IGetAllUtxosResponse,
-    usedAddresses: string[],
-    unusedAddresses: string[],
-    changeAddress: string,
-  |}> {
-  return new Promise((resolve, reject) => {
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_utxos/cardano ');
-          }
-
-          resolve(response);
-        }
-      );
-  });
-}
-
-export function getConnectedSites(): Promise<ConnectedSites> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_connected_sites ');
-          }
-
-          resolve(response);
-        }
-      );
-  });
-}
+import { ConnectorMessenger } from '../utils/connectorMessenger';
 
 export async function parseWalletsList(
   wallets: Array<PublicDeriver<>>
@@ -201,6 +100,8 @@ type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
 
+const connectorMessenger = new ConnectorMessenger();
+
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
@@ -229,9 +130,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   >(({ whitelist }) => this.api.localStorage.setWhitelist(whitelist));
 
   @observable getConnectedSites: Request<
-    typeof getConnectedSites
-  > = new Request<typeof getConnectedSites>(
-    getConnectedSites
+    typeof connectorMessenger.getConnectedSites
+  > = new Request<typeof connectorMessenger.getConnectedSites>(
+    connectorMessenger.getConnectedSites
   );
 
   @observable signingMessage: ?SigningMessage = null;
@@ -276,7 +177,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // ========== connecting wallets ========== //
   @action
   _getConnectingMsg: () => Promise<void> = async () => {
-    await sendMsgConnect()
+    await connectorMessenger.sendMsgConnect()
       .then(response => {
         runInAction(() => {
           this.connectingMessage = response;
@@ -288,7 +189,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @action
   _getProtocol: () => Promise<void> = async () => {
-    const protocol = await getProtocol()
+    const protocol = await connectorMessenger.getProtocol()
     runInAction(() => {
       this.protocol = protocol?.type
     })
@@ -296,7 +197,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @action
   _getSigningMsg: () => Promise<void> = async () => {
-    await sendMsgSigningTx()
+    await connectorMessenger.sendMsgSigningTx()
       .then(response => {
         runInAction(() => {
           this.signingMessage = response;
@@ -557,7 +458,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
-    const response = await getUtxosAndAddresses(tabId, ['utxos', 'usedAddresses', 'unusedAddresses', 'changeAddress'])
+    const response = await connectorMessenger.getUtxosAndAddresses(tabId, ['utxos', 'usedAddresses', 'unusedAddresses', 'changeAddress'])
 
     if (!response.utxos) {
       throw new Error('Missgin utxos for signing tx')
