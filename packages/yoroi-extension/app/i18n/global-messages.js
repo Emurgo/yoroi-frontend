@@ -880,6 +880,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.send.trezor.confirmationDialog.info.line.2',
     defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
   },
+  syncing: {
+    id: 'wallet.syncing',
+    defaultMessage: '!!!Syncing...',
+  },
 });
 export default globalMessages;
 
