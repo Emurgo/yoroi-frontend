@@ -18,6 +18,12 @@ import { getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
+import {
+  testRunsDataDir,
+  snapshotsDir,
+  mockDAppLogsDir,
+  testRunsLogsDir,
+} from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
@@ -39,9 +45,6 @@ const { promisify } = require('util');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-const testRunsDataDir = './testRunsData/';
-const snapshotsDir = './features/yoroi_snapshots/';
-
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
   scenarioName: '',
@@ -52,6 +55,8 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(testRunsDataDir);
   fs.mkdirSync(testRunsDataDir);
+  fs.mkdirSync(testRunsLogsDir);
+  fs.mkdirSync(mockDAppLogsDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -149,6 +154,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
+    this.sendToAllLoggers(`=== ${cleanString} ===`);
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);
@@ -199,8 +205,14 @@ async function inputMnemonicForWallet(
 ): Promise<void> {
   await customWorld.input({ locator: "input[name='walletName']", method: 'css' }, restoreInfo.name);
   await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
-  await customWorld.input({ locator: "input[name='walletPassword']", method: 'css' }, restoreInfo.password);
-  await customWorld.input({ locator: "input[name='repeatPassword']", method: 'css' }, restoreInfo.password);
+  await customWorld.input(
+    { locator: "input[name='walletPassword']", method: 'css' },
+    restoreInfo.password
+  );
+  await customWorld.input(
+    { locator: "input[name='repeatPassword']", method: 'css' },
+    restoreInfo.password
+  );
   await customWorld.click({ locator: '.WalletRestoreDialog .primary', method: 'css' });
 
   const plateElements = await getPlates(customWorld);
@@ -208,13 +220,16 @@ async function inputMnemonicForWallet(
   expect(plateText).to.be.equal(restoreInfo.plate);
 
   await customWorld.click({ locator: '.confirmButton', method: 'css' });
-  await customWorld.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+  await customWorld.waitUntilText(
+    { locator: '.NavPlate_name', method: 'css' },
+    truncateLongName(walletName)
+  );
 }
 
 export async function checkErrorByTranslationId(
   client: Object,
   errorSelector: LocatorObject,
-  errorObject: Object,
+  errorObject: Object
 ) {
   await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000);
 }

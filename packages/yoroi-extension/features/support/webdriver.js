@@ -7,11 +7,13 @@ import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { getMethod } from './helpers/helpers';
+import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
+import { mockDAppLogsDir } from './helpers/common-constants';
 
 const fs = require('fs');
+const simpleNodeLogger= require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -126,14 +128,24 @@ function CustomWorld(cmdInput: WorldInput) {
       break;
     }
     default: {
+      this._allLoggers = [];
       const chromeBuilder = getChromeBuilder();
       this.driver = chromeBuilder.build();
       this.windowManager = new WindowManager(this.driver);
       this.windowManager.init().then().catch();
-      this.mockDAppPage = new MockDAppWebpage(this.driver);
+      const dAppLogPath = `${mockDAppLogsDir}mockDAppLog_${getLogDate()}.log`;
+      const mockDAppLogger = simpleNodeLogger.createSimpleFileLogger(dAppLogPath);
+      this._allLoggers.push(mockDAppLogger);
+      this.mockDAppPage = new MockDAppWebpage(this.driver, mockDAppLogger);
       break;
     }
   }
+
+  this.sendToAllLoggers = (message: string, level: string = 'info') => {
+    for (const someLogger of this._allLoggers) {
+      someLogger[level](message);
+    }
+  };
 
   this.getBrowser = (): string => cmdInput.parameters.browser;
 

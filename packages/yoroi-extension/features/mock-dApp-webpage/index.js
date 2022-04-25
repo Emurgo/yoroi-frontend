@@ -4,6 +4,7 @@ import { WebDriver } from 'selenium-webdriver';
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { bytesToHex, getTtl, hexToBytes } from '../support/helpers/dapp-helpers';
 import { MultiAsset, TransactionBuilder } from '@emurgo/cardano-serialization-lib-nodejs';
+import type { Logger } from 'simple-node-logger';
 
 class MockDAppWebpageError extends Error {}
 
@@ -33,11 +34,13 @@ type Utxo = {|
 export class MockDAppWebpage {
   driver: WebDriver;
 
-  constructor(driver: WebDriver) {
+  constructor(driver: WebDriver, logger: Logger) {
     this.driver = driver;
+    this.logger = logger;
   }
 
   _transactionBuilder(): TransactionBuilder {
+    this.logger.info('Calling the transaction builder');
     return CardanoWasm.TransactionBuilder.new(
       CardanoWasm.TransactionBuilderConfigBuilder.new()
         // all of these are taken from the mainnet genesis settings
@@ -58,6 +61,7 @@ export class MockDAppWebpage {
   }
 
   async _requestAccess(auth: boolean = false) {
+    this.logger.info(`Requesting the access ${auth ? 'with' : 'without'} authentication`);
     const scriptString = `window.accessRequestPromise = cardano.yoroi.enable(${
       auth ? '{requestIdentification: true}' : ''
     })`;
@@ -65,6 +69,7 @@ export class MockDAppWebpage {
   }
 
   _addressesFromCborIfNeeded(addresses: Array<string>): Array<string> {
+    this.logger.info(`Converting the addresses "${JSON.stringify(addresses)}" from CBOR`);
     return addresses.map(a => CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32());
   }
 
@@ -73,6 +78,7 @@ export class MockDAppWebpage {
     reducer: any,
     initValue: Array<any>
   ): Array<ReducedAsset | any> {
+    this.logger.info(`Reduce multiAsset`);
     let result = initValue;
     if (multiAsset) {
       const policyIds = multiAsset.keys();
@@ -100,6 +106,7 @@ export class MockDAppWebpage {
   }
 
   _mapCborUtxos(cborUtxos: Array<string>): Array<Utxo> {
+    this.logger.info(`Mapping cborUTXOs "${JSON.stringify(cborUtxos)}" to UTXOs`);
     return cborUtxos.map(hex => {
       const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex));
       const input = u.input();
@@ -126,6 +133,7 @@ export class MockDAppWebpage {
   }
 
   async _getChangeAddress(): Promise<string> {
+    this.logger.info(`Getting the change address`);
     const changeAddresses = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -148,6 +156,7 @@ export class MockDAppWebpage {
   }
 
   async _getUTXOs(): Promise<Array<Utxo>> {
+    this.logger.info(`Getting UTXOs`);
     const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -179,6 +188,7 @@ export class MockDAppWebpage {
   }
 
   async checkAccessRequest(): Promise<AccessCallBack> {
+    this.logger.info(`Checking the access request`);
     const accessResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.accessRequestPromise
@@ -191,6 +201,7 @@ export class MockDAppWebpage {
           callback({ success: false, errMsg: error.message });
         });
     });
+    this.logger.info(`The access response: ${JSON.stringify(accessResponse)}`);
 
     await this.driver.executeScript(accResp => {
       if (accResp.success) window.walletConnected = true;
@@ -200,6 +211,7 @@ export class MockDAppWebpage {
   }
 
   async addOnDisconnect() {
+    this.logger.info(`Setting the onDisconnect hook`);
     await this.driver.executeScript(() => {
       window.api.experimental.onDisconnect(() => {
         window.walletConnected = false;
@@ -208,6 +220,7 @@ export class MockDAppWebpage {
   }
 
   async isEnabled(): Promise<boolean> {
+    this.logger.info(`Checking is a wallet enabled`);
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.cardano.yoroi.isEnabled()
@@ -217,16 +230,20 @@ export class MockDAppWebpage {
       });
     });
     if (isEnabled.success) {
+      this.logger.info(`The wallet is enabled`);
       return isEnabled.retValue;
     }
+    this.logger.error(`The wallet is disabled. Error message: ${JSON.stringify(isEnabled)}`);
     throw new MockDAppWebpageError(isEnabled.errMsg);
   }
 
   async getConnectionState(): Promise<boolean> {
+    this.logger.info(`Getting the connection state`);
     return await this.driver.executeScript(() => window.walletConnected);
   }
 
   async getBalance(): Promise<string> {
+    this.logger.info(`Getting the balance`);
     const balanceCborHex = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -241,12 +258,15 @@ export class MockDAppWebpage {
     });
     if (balanceCborHex.success) {
       const value = CardanoWasm.Value.from_bytes(Buffer.from(balanceCborHex.retValue, 'hex'));
+      this.logger.info(`The balance is ${value}`);
       return value.coin().to_str();
     }
+    this.logger.error(`The error is received while getting the balance. Error: ${JSON.stringify(balanceCborHex)}`);
     throw new MockDAppWebpageError(balanceCborHex.errMsg);
   }
 
   async requestSigningTx(amount: string, toAddress: string) {
+    this.logger.info(`Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`)
     const UTXOs = await this._getUTXOs();
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
@@ -287,6 +307,7 @@ export class MockDAppWebpage {
     txBuilder.add_change_if_needed(shelleyChangeAddress);
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
+    this.logger.info(`unsignedTransactionHex: ${unsignedTransactionHex}`);
 
     this.driver.executeScript(unsignedTxHex => {
       window.signTxPromise = window.api.signTx({ tx: unsignedTxHex });
@@ -294,6 +315,7 @@ export class MockDAppWebpage {
   }
 
   async getSigningTxResult(): Promise<string|{| code: number, info: string |}> {
+    this.logger.info(`Getting signing result`);
     return await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signTxPromise.then(callback).catch(callback);

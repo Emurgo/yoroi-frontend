@@ -49,3 +49,7 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
     if (i === 0) await customWorld.driver.sleep(500);
   }
 }
+
+export function getLogDate() {
+  return new Date().toISOString().replace(/:/g, '_');
+}
