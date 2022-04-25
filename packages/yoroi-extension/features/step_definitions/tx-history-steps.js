@@ -41,7 +41,7 @@ When(/^I see the transactions summary$/, async function () {
   // sometimes this UI twitches on load when it starts fetching data from the server
   // sleep to avoid the twitch breaking the test
   await this.driver.sleep(500);
-  await this.waitForElement('.WalletSummary_numberOfTransactions');
+  await this.waitForElement({ locator: '.WalletSummary_numberOfTransactions', method: 'css' });
 });
 
 Then(
@@ -50,7 +50,7 @@ Then(
     const txsNumberMessage = await i18n.formatMessage(this.driver,
       { id: 'wallet.summary.page.transactionsLabel' });
     await this.waitUntilText(
-      '.WalletSummary_numberOfTransactions',
+      { locator: '.WalletSummary_numberOfTransactions', method: 'css' },
       txsNumberMessage + ': ' + expectedTxsNumber
     );
   }
@@ -58,8 +58,8 @@ Then(
 
 
 Then(/^I should see no transactions$/, async function () {
-  await this.waitForElement('.WalletNoTransactions_component');
-  const actualTxsList = await this.getElementsBy('.Transaction_component');
+  await this.waitForElement({ locator: '.WalletNoTransactions_component', method: 'css' });
+  const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
   chai.expect(actualTxsList.length).to.equal(0);
 });
 
@@ -72,17 +72,17 @@ Then(
     await this.driver.sleep(500);
     // press the show more transaction button until all transactions are visible
     for (let i = 1; i < txsAmount; i++) {
-      const buttonShowMoreExists = await this.checkIfExists(By.css(showMoreLocator));
+      const buttonShowMoreExists = await this.checkIfExists({ locator: showMoreLocator, method: 'css' });
       if (!buttonShowMoreExists) {
         break;
       }
-      await this.click(showMoreLocator);
+      await this.click({ locator: showMoreLocator, method: 'css' });
       await this.driver.sleep(500);
     }
 
-    const allTxsList = await this.getElementsBy('.Transaction_component');
-    const pendingTxsList = await this.getElementsBy('.Transaction_pendingLabel');
-    const failedTxsList = await this.getElementsBy('.Transaction_failedLabel');
+    const allTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+    const pendingTxsList = await this.getElementsBy({ locator: '.Transaction_pendingLabel', method: 'css' });
+    const failedTxsList = await this.getElementsBy({ locator: '.Transaction_failedLabel', method: 'css' });
     if (txExpectedStatus === 'pending') {
       chai.expect(pendingTxsList.length).to.equal(txsAmount);
       return;
@@ -99,8 +99,8 @@ Then(
 When(
   /^I expand the top transaction$/,
   async function () {
-    await this.waitForElement('.Transaction_component');
-    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
     const topTx = actualTxsList[0];
 
     await topTx.click();
@@ -123,8 +123,8 @@ async function parseTxInfo(addressList) {
 Then(
   /^I verify top transaction content ([^"]*)$/,
   async function (walletName) {
-    await this.waitForElement('.Transaction_component');
-    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
     const topTx = actualTxsList[0];
 
     let status = 'successful';
@@ -171,8 +171,8 @@ Then(
 Then(
   /^The number of confirmations of the top tx is ([^"]*)$/,
   async function (count) {
-    await this.waitForElement('.Transaction_component');
-    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
     const topTx = actualTxsList[0];
     const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
     const confirmationCount = await assuranceElem[0].getText();
@@ -229,5 +229,5 @@ const displayInfo = {
 };
 
 When(/^I go to the tx history screen$/, async function () {
-  await this.click('.summary ');
+  await this.click({ locator: '.summary ', method: 'css' });
 });

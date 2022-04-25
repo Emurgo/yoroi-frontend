@@ -1,7 +1,6 @@
 // @flow
 
 import { Before, Given, When, Then, After } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import {
   getMockServer,
   closeMockServer
@@ -17,6 +16,10 @@ import {
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
 import { checkErrorByTranslationId } from './common-steps';
+import { daedalusMasterKeyButton, twelveWordOption } from '../pages/walletClaimTransferPage';
+import { proceedRecoveryButton } from '../pages/restoreWalletPage';
+import { errorMessage, errorPageTitle } from '../pages/errorPage';
+import { amountField, feeField, totalAmountField } from '../pages/confirmTransactionPage';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
@@ -45,61 +48,64 @@ Given(/^My Daedalus wallet has no funds/, () => {
 });
 
 Then(/^I select the 12-word option$/, async function () {
-  await this.click('.fromDaedalusWallet12Word_legacyDaedalus');
+  await this.click(twelveWordOption);
 });
 
 When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
-  await this.click('.fromDaedalusMasterKey_masterKey');
+  await this.click(daedalusMasterKeyButton);
 });
 
 When(/^I proceed with the recovery$/, async function () {
-  await this.click('.proceedTransferButtonClasses');
+  const button = await this.findElement(proceedRecoveryButton);
+  await button.click();
 });
 
 When(/^I click next button on the Daedalus transfer page$/, async function () {
-  await this.click("//button[contains(@label, 'Next')]", By.xpath);
+  await this.click({ locator: "//button[contains(@label, 'Next')]", method: 'xpath' });
 });
 
 When(/^I click the back button$/, async function () {
-  await this.click("//button[contains(@label, 'Back')]", By.xpath);
+  await this.click({ locator: "//button[contains(@label, 'Back')]", method: 'xpath' });
 });
 
 Then(/^I should see "This field is required." error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.FormFieldOverridesClassic_error';
-  await checkErrorByTranslationId(this, errorSelector, error);
+  await checkErrorByTranslationId(
+    this,
+    { locator: '.FormFieldOverridesClassic_error', method: 'css' },
+    error);
 });
 
 When(/^I confirm Daedalus transfer funds$/, async function () {
-  await this.click('.transferButton');
+  await this.click({ locator: '.transferButton', method: 'css' });
 });
 
 Then(/^I should see the Create wallet screen$/, async function () {
-  await this.waitForElement('.WalletAdd_component');
+  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
 Then(/^I should see the Receive screen$/, async function () {
   const receiveTitle = await i18n.formatMessage(this.driver,
     { id: 'wallet.navigation.receive' });
-  await this.waitUntilText('.WalletNavButton_active', receiveTitle);
+  await this.waitUntilText({ locator: '.WalletNavButton_active', method: 'css' }, receiveTitle);
 });
 
 Then(/^I should see an Error screen$/, async function () {
-  const errorPageTitle = await i18n.formatMessage(this.driver,
+  const errorPageTitleString = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.errorPage.title.label' });
-  await this.waitUntilText('.ErrorPage_title', errorPageTitle);
+  await this.waitUntilText(errorPageTitle, errorPageTitleString);
 });
 
 Then(/^I should see 'Connection lost' error message$/, async function () {
   const errorDescription = await i18n.formatMessage(this.driver,
     { id: 'daedalusTransfer.error.webSocketRestoreError' });
-  await this.waitUntilText('.ErrorPage_error', errorDescription);
+  await this.waitUntilText(errorMessage, errorDescription);
 });
 
 Then(/^I should see 'Daedalus wallet without funds' error message$/, async function () {
   const errorDescription = await i18n.formatMessage(this.driver,
     { id: 'api.errors.noInputsError' });
-  await this.waitUntilText('.ErrorPage_error', errorDescription);
+  await this.waitUntilText(errorMessage, errorDescription);
 });
 
 Then(/^I should wait until funds are recovered:$/, async function (table) {
@@ -113,7 +119,7 @@ When(/^I see transfer CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = rows[0];
   const totalRecoveredBalance = parseFloat(fields.amount) - parseFloat(fields.fee);
   await checkAddressesRecoveredAreCorrect(rows, this);
-  await this.waitUntilContainsText('.TransferSummaryPage_fees', fields.fee);
-  await this.waitUntilContainsText('.TransferSummaryPage_amount', fields.amount);
-  await this.waitUntilContainsText('.TransferSummaryPage_totalAmount', totalRecoveredBalance);
+  await this.waitUntilContainsText(feeField, fields.fee);
+  await this.waitUntilContainsText(amountField, fields.amount);
+  await this.waitUntilContainsText(totalAmountField, totalRecoveredBalance);
 })

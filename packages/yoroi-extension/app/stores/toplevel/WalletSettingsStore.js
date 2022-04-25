@@ -265,6 +265,13 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
     }
     await removeWalletFromLS(request.publicDeriver)
+
+    // remove this wallet from wallet sort list
+    const sortedWallets = this.stores.profile.currentSortedWallets.filter(
+      id => id !== request.publicDeriver.publicDeriverId
+    );
+    this.actions.profile.updateSortedWalletList.trigger({ sortedWallets });
+
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver,
       conceptualWallet: group.publicDerivers.length === 1
