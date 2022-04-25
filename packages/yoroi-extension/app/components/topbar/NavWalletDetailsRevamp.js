@@ -7,8 +7,8 @@ import { intlShape } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
 import styles from './NavWalletDetailsRevamp.scss';
-import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open_24_revamp.png';
+import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_off_24_revamp.png';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
@@ -118,7 +118,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             </div>
           </div>
           <button disabled={totalAmount === null && !showEyeIconSafe} type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+            {shouldHideBalance ? <img src={IconEyeClosed} alt="Hide balance" /> : <img src={IconEyeOpen} alt="Show balance" />}
           </button>
         </div>
       </div>
