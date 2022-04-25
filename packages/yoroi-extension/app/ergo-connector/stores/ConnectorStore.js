@@ -100,7 +100,7 @@ type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
 
-const connectorMessenger = new ConnectorMessenger();
+const connectorMessenger: ConnectorMessenger = new ConnectorMessenger();
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;

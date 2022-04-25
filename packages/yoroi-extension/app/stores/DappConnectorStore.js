@@ -13,7 +13,7 @@ import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
 import { ConnectorMessenger } from '../ergo-connector/utils/connectorMessenger';
 
-const connectorMessenger = new ConnectorMessenger();
+const connectorMessenger: ConnectorMessenger = new ConnectorMessenger();
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -56,7 +56,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // ========== connecting wallets ========== //
   @action
   _getConnectingMsg: () => Promise<void> = async () => {
-    await connectorMessenger.sendMsgConnect().bind(connectorMessenger)
+    await connectorMessenger.sendMsgConnect()
       .then(response => {
         runInAction(() => {
           this.connectingMessage = response;

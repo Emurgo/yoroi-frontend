@@ -18,6 +18,9 @@ import type {
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export class ConnectorMessenger {
+    initedConnecting: boolean;
+    initedSigning: boolean;
+
     constructor() {
         this.initedConnecting = false
         this.initedSigning = false
@@ -54,23 +57,29 @@ export class ConnectorMessenger {
     }
 
     sendMsgConnect(): Promise<ConnectingMessage> {
-        if (!this.initedConnecting) {
-            this.initedConnecting = true
-            return this._sendMessage({ type: 'connect_retrieve_data' })
-        }
+        return new Promise(resolve => {
+            if(!this.initedConnecting) {
+                resolve(this._sendMessage({ type: 'connect_retrieve_data' }));
+                this.initedConnecting = true;
+            }
+        });
     }
 
     sendMsgSigningTx(): Promise<SigningMessage> {
-        if (!this.initedSigning) {
-            this.initedSigning = true
-            return this._sendMessage({ type: 'tx_sign_window_retrieve_data' })
-        }
+        return new Promise(resolve => {
+            if(!this.initedSigning) {
+                resolve(this._sendMessage({ type: 'tx_sign_window_retrieve_data' }));
+                this.initedSigning = true;
+            }
+        })
     }
 
     getConnectedSites(): Promise<ConnectedSites>  {
-        if(!this.initedSigning) {
-            return this._sendMessage({ type: 'get_connected_sites' })
-        }
+        return new Promise(resolve => {
+            if(!this.initedSigning) {
+                resolve(this._sendMessage({ type: 'get_connected_sites' }))
+            }
+        })
     }
 
     getUtxosAndAddresses(tabId: number, select: string[]): Promise<{|
