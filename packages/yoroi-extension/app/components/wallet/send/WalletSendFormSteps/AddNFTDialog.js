@@ -112,7 +112,6 @@ export default class AddNFTDialog extends Component<Props, State> {
     };
 
   genNftsList: void => FormattedNFTDisplay[] = () => {
-<<<<<<< HEAD
     if (this.props.spendableBalance == null) return [];
     const { spendableBalance } = this.props;
     return [
@@ -137,32 +136,6 @@ export default class AddNFTDialog extends Component<Props, State> {
       image: item.nftMetadata?.image,
       id: item.id,
     }));
-=======
-      if (this.props.spendableBalance == null) return [];
-      const { spendableBalance } = this.props;
-      return [
-        ...spendableBalance.nonDefaultEntries(),
-      ].map(entry => ({
-        entry,
-        info: this.props.getTokenInfo(entry),
-      })).filter(token => token.info.IsNFT).map(token => {
-        const policyId = token.entry.identifier.split('.')[0];
-        const name = truncateToken(getTokenStrictName(token.info) ?? '-');
-        return {
-          name,
-          id: getTokenIdentifierIfExists(token.info) ?? '-',
-          amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
-          policyId,
-          // $FlowFixMe[prop-missing]
-          nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
-        };
-      })
-      .map(item => ({
-        name: item.name,
-        image: item.nftMetadata?.image,
-        id: item.id,
-      }));
->>>>>>> e7204cb7d65ad59eedff0984649752ea0d44a04f
   }
 
   render(): Node {
