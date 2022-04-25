@@ -3,13 +3,16 @@ import { Then, When } from 'cucumber';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
+  backButton,
   confirmButton,
   getWalletBalance,
   getWalletName,
   getWallets,
   selectWallet,
-  spendingPasswordField,
+  spendingPasswordErrorField,
+  spendingPasswordInput,
 } from '../pages/connector-connectWalletPage';
+import { disconnectWallet } from '../pages/connectedWebsitesPage';
 import {
   getTransactionFee,
   overviewTabButton,
@@ -21,6 +24,8 @@ import {
 
 const mockDAppName = 'mockDAppTab';
 const popupConnectorName = 'popupConnectorWindow';
+const userRejectMsg = 'user reject';
+const extensionTabName = 'main';
 
 Then(/^I open the mock dApp$/, async function () {
   await this.windowManager.openNewTab(
@@ -68,8 +73,10 @@ Then(
 );
 
 Then(/^I enter the spending password (.+) and click confirm$/, async function (spendingPassword) {
-  await this.waitForElement(spendingPasswordField);
-  await this.input(spendingPasswordField, spendingPassword);
+  await this.waitForElement(spendingPasswordInput);
+  const text = await this.getValue(spendingPasswordInput);
+  await this.clearInputUpdatingForm(spendingPasswordInput, text.length);
+  await this.input(spendingPasswordInput, spendingPassword);
   await this.click(confirmButton);
 });
 
@@ -85,6 +92,13 @@ Then(/^The access request should succeed$/, async function () {
     requestAccessResult.success,
     `Request access failed: ${requestAccessResult.errMsg}`
   ).to.be.true;
+  await this.mockDAppPage.addOnDisconnect();
+});
+
+Then(/^The user reject is received$/, async function () {
+  const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
+  expect(requestAccessResult.success, `Request access is granted`).to.be.false;
+  expect(requestAccessResult.errMsg).to.equal(userRejectMsg, 'Wrong error message');
 });
 
 Then(/^The dApp should see balance (\d+)$/, async function (expectedBalance) {
@@ -154,4 +168,43 @@ Then(/^I should see the transaction addresses info:$/, async function (table) {
 Then(/^The signing transaction API should return (.+)$/, async function (txHex) {
   const result = await this.mockDAppPage.getSigningTxResult();
   expect(result).to.equal(txHex);
+});
+
+Then(/^I see the error Incorrect wallet password$/, async function () {
+  await this.waitForElement(spendingPasswordErrorField);
+  expect(await this.isDisplayed(spendingPasswordErrorField), "The error isn't displayed").to.be.true;
+  const errorText = await this.getText(spendingPasswordErrorField);
+  expect(errorText).to.equal('Incorrect wallet password.');
+});
+
+Then(/^I should see no password errors$/, async function () {
+  expect(await this.isDisplayed(spendingPasswordErrorField), 'The error is displayed').to.be.false;
+});
+
+When(/^I click the back button \(Connector pop-up window\)$/, async function () {
+  await this.waitForElement(backButton);
+  await this.click(backButton);
+});
+
+Then(/^I should see the wallet's list$/, async function () {
+  const wallets = await getWallets(this);
+  expect(wallets.length, 'There are no wallets').to.not.equal(0);
+});
+
+Then(/^I close the dApp-connector pop-up window$/, async function () {
+  await this.windowManager.closeTabWindow(popupConnectorName, mockDAppName);
+});
+
+Then(/^I disconnect the wallet (.+) from the dApp (.+)$/, async function (walletName, dAppUrl) {
+  await this.windowManager.switchTo(extensionTabName);
+  const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
+  // it should be reworked by using ui components when it is done
+  await this.driver.get(connectedWebsitesAddress);
+  await disconnectWallet(this, walletName, dAppUrl);
+});
+
+Then(/^I receive the wallet disconnection message$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
+  const connectionState = await this.mockDAppPage.getConnectionState();
+  expect(connectionState, 'No message from the dApp-connector is received').to.be.false;
 });
