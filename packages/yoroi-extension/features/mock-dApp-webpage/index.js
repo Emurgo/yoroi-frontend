@@ -133,15 +133,18 @@ export class MockDAppWebpage {
         .then(addresses => {
           // eslint-disable-next-line promise/always-return
           if (addresses.length === 0) {
-            throw new MockDAppWebpageError('No change addresses');
+            callback({ success: false, errMsg: 'No change addresses' });
           }
-          callback(addresses);
+          callback({ success: true, retValue: addresses });
         })
         .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
+          callback({ success: false, errMsg: error.message });
         });
     });
-    return this._addressesFromCborIfNeeded([changeAddresses])[0];
+    if (changeAddresses.success) {
+      return this._addressesFromCborIfNeeded([changeAddresses.retValue])[0];
+    }
+    throw new MockDAppWebpageError(changeAddresses.errMsg);
   }
 
   async _getUTXOs(): Promise<Array<Utxo>> {
@@ -152,16 +155,19 @@ export class MockDAppWebpage {
         .then(utxosResponse => {
           // eslint-disable-next-line promise/always-return
           if (utxosResponse.length === 0) {
-            throw new MockDAppWebpageError('NO UTXOS');
+            callback({ success: false, errMsg: 'NO UTXOS' });
           } else {
-            callback(utxosResponse);
+            callback({ success: true, retValue: utxosResponse });
           }
         })
         .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
+          callback({ success: false, errMsg: error.message });
         });
     });
-    return this._mapCborUtxos(walletUTXOsResponse);
+    if (walletUTXOsResponse.success) {
+      return this._mapCborUtxos(walletUTXOsResponse.retValue);
+    }
+    throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
   }
 
   async requestNonAuthAccess() {
@@ -179,16 +185,13 @@ export class MockDAppWebpage {
         // eslint-disable-next-line promise/always-return
         .then(api => {
           window.api = api;
+          window.walletConnected = true;
           callback({ success: true });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
     });
-
-    await this.driver.executeScript(accResp => {
-      if (accResp.success) window.walletConnected = true;
-    }, accessResponse);
 
     return accessResponse;
   }
@@ -199,6 +202,21 @@ export class MockDAppWebpage {
         window.walletConnected = false;
       });
     });
+  }
+
+  async isEnabled(): Promise<boolean> {
+    const isEnabled = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.cardano.yoroi.isEnabled()
+        .then(enabled => callback({ success: true, retValue: enabled }))
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+      });
+    });
+    if (isEnabled.success) {
+      return isEnabled.retValue;
+    }
+    throw new MockDAppWebpageError(isEnabled.errMsg);
   }
 
   async getConnectionState(): Promise<boolean> {
@@ -212,15 +230,17 @@ export class MockDAppWebpage {
         .getBalance()
         // eslint-disable-next-line promise/always-return
         .then(balance => {
-          callback(balance);
+          callback({ success: true, retValue: balance });
         })
         .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
+          callback({ success: false, errMsg: error.message });
         });
     });
-
-    const value = CardanoWasm.Value.from_bytes(Buffer.from(balanceCborHex, 'hex'));
-    return value.coin().to_str();
+    if (balanceCborHex.success) {
+      const value = CardanoWasm.Value.from_bytes(Buffer.from(balanceCborHex.retValue, 'hex'));
+      return value.coin().to_str();
+    }
+    throw new MockDAppWebpageError(balanceCborHex.errMsg);
   }
 
   async requestSigningTx(amount: string, toAddress: string) {
