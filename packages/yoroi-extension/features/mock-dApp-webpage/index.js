@@ -185,13 +185,16 @@ export class MockDAppWebpage {
         // eslint-disable-next-line promise/always-return
         .then(api => {
           window.api = api;
-          window.walletConnected = true;
           callback({ success: true });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
     });
+
+    await this.driver.executeScript(accResp => {
+      if (accResp.success) window.walletConnected = true;
+    }, accessResponse);
 
     return accessResponse;
   }
@@ -207,12 +210,11 @@ export class MockDAppWebpage {
   async isEnabled(): Promise<boolean> {
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      window.cardano.yoroi
-        .isEnabled()
+      window.cardano.yoroi.isEnabled()
         .then(enabled => callback({ success: true, retValue: enabled }))
         .catch(error => {
           callback({ success: false, errMsg: error.message });
-        });
+      });
     });
     if (isEnabled.success) {
       return isEnabled.retValue;
@@ -291,7 +293,7 @@ export class MockDAppWebpage {
     }, unsignedTransactionHex);
   }
 
-  async getSigningTxResult(): Promise<string | {| code: number, info: string |}> {
+  async getSigningTxResult(): Promise<string|{| code: number, info: string |}> {
     return await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signTxPromise.then(callback).catch(callback);
