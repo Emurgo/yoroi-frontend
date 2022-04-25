@@ -50,6 +50,7 @@ export class ConnectorMessenger {
     }
 
     getProtocol(): Promise<?Protocol> {
+        console.log(this)
         return this._sendMessage({ type: 'get_protocol' })
     }
 

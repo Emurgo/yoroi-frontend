@@ -7,33 +7,13 @@ import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
-  ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
+import { ConnectorMessenger } from '../ergo-connector/utils/connectorMessenger';
 
-// Need to run only once - Connecting wallets
-let initedConnecting = false;
-function sendMsgConnect(): Promise<ConnectingMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedConnecting)
-      window.chrome.runtime.sendMessage((
-        { type: 'connect_retrieve_data' }: ConnectRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedConnecting = true;
-        }
-      );
-  });
-}
-
+const connectorMessenger = new ConnectorMessenger();
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -53,9 +33,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   >(({ whitelist }) => this.api.localStorage.setWhitelist(whitelist));
 
   @observable getConnectedSites: Request<
-    typeof getConnectedSites
-  > = new Request<typeof getConnectedSites>(
-    getConnectedSites
+    typeof connectorMessenger.getConnectedSites
+  > = new Request<typeof connectorMessenger.getConnectedSites>(
+    connectorMessenger.getConnectedSites.bind(connectorMessenger)
   );
 
 
@@ -76,7 +56,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // ========== connecting wallets ========== //
   @action
   _getConnectingMsg: () => Promise<void> = async () => {
-    await sendMsgConnect()
+    await connectorMessenger.sendMsgConnect().bind(connectorMessenger)
       .then(response => {
         runInAction(() => {
           this.connectingMessage = response;
