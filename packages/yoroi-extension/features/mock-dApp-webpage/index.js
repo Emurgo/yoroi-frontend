@@ -190,17 +190,19 @@ export class MockDAppWebpage {
   async checkAccessRequest(): Promise<AccessCallBack> {
     this.logger.info(`Checking the access request`);
     const accessResponse = await this.driver.executeAsyncScript((...args) => {
-      console.log(`checkAccessRequest.args: ${JSON.stringify(args)}`);
       const callback = args[args.length - 1];
       window.accessRequestPromise
-        // eslint-disable-next-line promise/always-return
-        .then(api => {
-          console.log('checkAccessRequest: then');
-          window.api = api;
-          callback({ success: true });
-        })
+        .then(
+          // eslint-disable-next-line promise/always-return
+          api => {
+            window.api = api;
+            callback({ success: true });
+          },
+          error => {
+            callback({ success: false, errMsg: error.message });
+          },
+        )
         .catch(error => {
-          console.log('checkAccessRequest: catch');
           callback({ success: false, errMsg: error.message });
         });
     });
@@ -226,11 +228,12 @@ export class MockDAppWebpage {
     this.logger.info(`Checking is a wallet enabled`);
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      window.cardano.yoroi.isEnabled()
+      window.cardano.yoroi
+        .isEnabled()
         .then(enabled => callback({ success: true, retValue: enabled }))
         .catch(error => {
           callback({ success: false, errMsg: error.message });
-      });
+        });
     });
     if (isEnabled.success) {
       this.logger.info(`The wallet is enabled`);
@@ -264,12 +267,16 @@ export class MockDAppWebpage {
       this.logger.info(`The balance is ${value}`);
       return value.coin().to_str();
     }
-    this.logger.error(`The error is received while getting the balance. Error: ${JSON.stringify(balanceCborHex)}`);
+    this.logger.error(
+      `The error is received while getting the balance. Error: ${JSON.stringify(balanceCborHex)}`
+    );
     throw new MockDAppWebpageError(balanceCborHex.errMsg);
   }
 
   async requestSigningTx(amount: string, toAddress: string) {
-    this.logger.info(`Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`)
+    this.logger.info(
+      `Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
+    );
     const UTXOs = await this._getUTXOs();
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
@@ -317,7 +324,7 @@ export class MockDAppWebpage {
     }, unsignedTransactionHex);
   }
 
-  async getSigningTxResult(): Promise<string|{| code: number, info: string |}> {
+  async getSigningTxResult(): Promise<string | {| code: number, info: string |}> {
     this.logger.info(`Getting signing result`);
     return await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
