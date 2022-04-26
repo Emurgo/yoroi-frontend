@@ -7,7 +7,15 @@ export const walletListElement = { locator: '.ConnectPage_list', method: 'css' }
 export const walletNameField = { locator: 'div.WalletCard_name', method: 'css' };
 export const walletItemButton = { locator: './button', method: 'xpath' };
 export const walletBalanceField = { locator: '.WalletCard_balance', method: 'css' };
-export const spendingPasswordField = { locator: '//input[@name="walletPassword"]', method: 'xpath' };
+export const spendingPasswordInput = {
+  locator: '//input[@name="walletPassword"]',
+  method: 'xpath',
+};
+export const spendingPasswordErrorField = {
+  locator: '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]',
+  method: 'xpath',
+};
+export const eyeButton = { locator: '.MuiIconButton-edgeEnd', method: 'css' };
 export const confirmButton = { locator: '.MuiButton-primary', method: 'css' };
 export const backButton = { locator: '.MuiButton-secondary', method: 'css' };
 
