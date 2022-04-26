@@ -468,7 +468,7 @@ class WalletSendPage extends Component<AllProps> {
     return (
       !!transactionBuilderStore.plannedTxInfoMap.find(
         ({ token: t }) => t.Identifier === token.Identifier) ||
-      transactionBuilderStore?.selectedToken?.Identifier === token.Identifier
+      transactionBuilderStore.selectedToken?.Identifier === token.Identifier
     );
   }
 
@@ -592,6 +592,12 @@ class WalletSendPage extends Component<AllProps> {
           trigger: (params: ?BigNumber) => void
         |},
         addToken: {|
+          trigger: (params: {|
+            token: void | $ReadOnly<TokenRow>,
+            shouldReset?: boolean,
+          |}) => void
+        |},
+        removeToken: {|
           trigger: (params: void | $ReadOnly<TokenRow>) => void
         |},
         updateMemo: {|
@@ -662,6 +668,11 @@ class WalletSendPage extends Component<AllProps> {
         totalInput: ?MultiToken,
         txMismatch: boolean,
         selectedToken: void | $ReadOnly<TokenRow>,
+        plannedTxInfoMap: Array<{|
+          token: $ReadOnly<TokenRow>,
+          amount?: BigNumber,
+          shouldSendAll?: boolean,
+        |}>,
       |},
       substores: {|
         ada: {|

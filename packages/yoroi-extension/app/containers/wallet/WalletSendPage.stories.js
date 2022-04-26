@@ -159,6 +159,7 @@ const genBaseProps: {|
           error: undefined,
         },
         selectedToken: undefined,
+        plannedTxInfoMap: [],
       }
       : request.dialogInfo.transactionBuilderStore,
     substores: {
@@ -385,6 +386,7 @@ export const RegularConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
           }
         }
       })}
@@ -439,6 +441,7 @@ export const MultiAssetConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
           }
         }
       })}
@@ -497,6 +500,7 @@ export const LedgerConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
           }
         }
       })}
@@ -555,6 +559,7 @@ export const TrezorConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
           }
         }
       })}

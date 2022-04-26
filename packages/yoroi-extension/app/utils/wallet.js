@@ -13,7 +13,6 @@ export type FormattedTokenDisplay = {|
     label: string,
     id: string,
     amount: string,
-    included: boolean,
 |}
 
 export type FormattedNFTDisplay = {|

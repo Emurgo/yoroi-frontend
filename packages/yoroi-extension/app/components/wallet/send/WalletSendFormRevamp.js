@@ -359,7 +359,6 @@ export default class WalletSendForm extends Component<Props, State> {
       const policyId = token.Identifier.split('.')[0];
       return {
           name: truncateToken(getTokenStrictName(token) ?? '-'),
-          // $FlowFixMe[prop-missing]
           image: token.Metadata.assetMintMetadata?.[0]['721'][policyId][name]?.image,
           info: token,
       };

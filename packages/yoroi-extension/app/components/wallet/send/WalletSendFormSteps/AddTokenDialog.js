@@ -28,7 +28,7 @@ import { Button } from '@mui/material';
 import type {
   TokenLookupKey,
 } from '../../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { UriParams } from '../../../../utils/URIHandling';
 import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
@@ -53,6 +53,7 @@ type Props = {|
   +totalInput: ?MultiToken,
   +isCalculatingFee: boolean,
   +error: ?LocalizableError,
+  +selectedNetwork: $ReadOnly<NetworkRow>
 |};
 
 type State = {|

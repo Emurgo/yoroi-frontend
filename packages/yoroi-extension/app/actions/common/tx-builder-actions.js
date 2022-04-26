@@ -12,7 +12,7 @@ export default class TxBuilderActions {
   updateReceiver: Action<void | string> = new Action();
   updateAmount: Action<?BigNumber> = new Action();
   updateMemo: Action<void | string> = new Action();
-  addToken: Action<{| token: void | $ReadOnly<TokenRow>, shouldReset?: boolean |}> = new Action();
+  addToken: Action<{| token?: $ReadOnly<TokenRow>, shouldReset?: boolean |}> = new Action();
   removeToken: Action<void | $ReadOnly<TokenRow>> = new Action();
   updateTentativeTx: Action<void> = new Action();
   setFilter: Action<(ElementOf<IGetAllUtxosResponse> => boolean)> = new Action();

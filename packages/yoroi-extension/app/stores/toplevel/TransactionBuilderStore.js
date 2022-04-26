@@ -47,10 +47,9 @@ export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
 export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap> {
 
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<BigNumber>>, |}>;
   @observable plannedTxInfoMap: Array<{|
-    ...InexactSubset<TxOutType<BigNumber>>,
-    token: void | $ReadOnly<TokenRow>,
+    token: $ReadOnly<TokenRow>,
+    amount?: BigNumber,
     shouldSendAll?: boolean,
   |}> = [];
 
@@ -328,7 +327,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   /** Should only set to valid address or undefined */
   @action
   _updateReceiver: (void | string) => void = (receiver) => {
-    this.plannedTxInfo[0].address = receiver;
     this.receiver = receiver;
   }
 
@@ -340,9 +338,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   /** Should only set to valid amount or undefined */
   @action
   _updateAmount: (?BigNumber) => void = (value, shouldSendAll = false) => {
-    // Todo: Remove old `plannedTxInfo`
-    this.plannedTxInfo[0].value = (value ?? undefined);
     const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._updateAmount)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
     const selectedToken = (
       this.selectedToken ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
@@ -361,8 +358,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       tokenTxInfo.amount = (value ?? undefined);
       tokenTxInfo.shouldSendAll = shouldSendAll;
     }
-
-    console.log(JSON.parse(JSON.stringify(this.plannedTxInfoMap)))
   }
 
   @action
@@ -376,7 +371,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _addToken: (void | $ReadOnly<TokenRow>) => void = ({ token, shouldReset }) => {
+  _addToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldReset?: boolean,
+  |}) => void = ({ token, shouldReset }) => {
     this.selectedToken = token;
     if (shouldReset) this.plannedTxInfoMap = [];
     // Filter out tokens that have no amount
@@ -387,23 +385,20 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   @action
   _removeToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+    const publicDeriver = this.stores.wallets.selected;
+
+    if (!publicDeriver) throw new Error(`${nameof(this._removeToken)} requires wallet to be selected`);
     if (!token) {
-      const publicDeriver = this.stores.wallets.selected;
       const network = publicDeriver.getParent().getNetworkInfo();
       token = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     }
 
     this.plannedTxInfoMap = this.plannedTxInfoMap.filter(
-      ({ token: t }) => t.Identifier !== token.Identifier
+      ({ token: t }) => t.Identifier !== token?.Identifier
     );
 
     // Deselect the token
     this.selectedToken = undefined;
-  }
-
-  @action
-  _isTokenIncluded: $ReadOnly<TokenRow> => void = token => {
-    return !!this.plannedTxInfoMap.find(t => t.Identifier === token.Identifier)
   }
 
   @action
@@ -422,7 +417,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   @action
   _reset: void => void = () => {
-    this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.plannedTxInfoMap = [];
     this.memo = undefined;
     this.selectedToken = undefined;
