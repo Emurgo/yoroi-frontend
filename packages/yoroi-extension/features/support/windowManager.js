@@ -1,5 +1,6 @@
 // @flow
 import { WebDriver } from 'selenium-webdriver';
+import type { Logger } from 'simple-node-logger';
 
 type WindowType = 'tab' | 'window';
 type CustomWindowHandle = {|
@@ -17,19 +18,26 @@ export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
   driver: WebDriver;
 
-  constructor(driver: WebDriver) {
+  constructor(driver: WebDriver, logger: Logger) {
     this.driver = driver;
     this.windowHandles = [];
+    this.logger = logger;
   }
 
   async init() {
+    this.logger.info(`WindowManager: Initializing the Window manager`);
     const mainWindowHandle = await this._getCurrentWindowHandle();
     const windowTitle = await this._getWindowTitle();
+    this.logger.info(
+      `WindowManager: The first and main window is { "${windowTitle}": "${mainWindowHandle}" }`
+    );
     this.windowHandles.push({ title: windowTitle, handle: mainWindowHandle });
   }
 
   async _getWindowTitle(): Promise<string> {
+    this.logger.info(`WindowManager: Getting a window title`);
     const windowTitle = await this.driver.getTitle();
+    this.logger.info(`WindowManager: The window title is "${windowTitle}"`);
     if (windowTitle === extensionTabName) {
       return extensionTabName;
     }
@@ -40,20 +48,33 @@ export class WindowManager {
   }
 
   _getHandleByTitle(title: string): Array<CustomWindowHandle> {
-    return this.windowHandles.filter(customHandle => customHandle.title === title);
+    this.logger.info(`WindowManager: Getting a handle by the title "${title}"`);
+    const handles = this.windowHandles.filter(customHandle => customHandle.title === title);
+    this.logger.info(`WindowManager: The handles for title "${title}" are ${JSON.stringify(handles)}`);
+    return handles;
   }
 
   async _getCurrentWindowHandle(): Promise<string> {
-    return await this.driver.getWindowHandle();
+    this.logger.info(`WindowManager: Getting the current handle`);
+    const currentHandle = await this.driver.getWindowHandle();
+    this.logger.info(`WindowManager: The current handle is "${currentHandle}"`);
+    return currentHandle;
   }
 
   async getAllWindowHandles(): Promise<Array<string>> {
-    return await this.driver.getAllWindowHandles();
+    this.logger.info(`WindowManager: Getting all window handles`);
+    const allHandles = await this.driver.getAllWindowHandles();
+    this.logger.info(`WindowManager: All handles: ${JSON.stringify(allHandles)}`);
+    return allHandles;
   }
 
   async _openNew(type: WindowType, windowName: string): Promise<CustomWindowHandle> {
+    this.logger.info(`WindowManager: Opening a new ${type} with a name "${windowName}"`);
     await this.driver.switchTo().newWindow(type);
     const currentWindowHandle = await this._getCurrentWindowHandle();
+    this.logger.info(
+      `WindowManager: The new ${type} with a name "${windowName}" has handle "${currentWindowHandle}"`
+    );
 
     return { title: windowName, handle: currentWindowHandle };
   }
@@ -63,6 +84,9 @@ export class WindowManager {
     windowName: string,
     url: string
   ): Promise<CustomWindowHandle> {
+    this.logger.info(
+      `WindowManager: Opening with checking a new ${type} "${url}" with a name "${windowName}"`
+    );
     const checkTitle = this._getHandleByTitle(windowName);
     if (!checkTitle.length) {
       const handle = await this._openNew(type, windowName);
@@ -70,6 +94,7 @@ export class WindowManager {
       this.windowHandles.push(handle);
       return handle;
     }
+    this.logger.error(`WindowManager: The handle with the title ${windowName} already exists`);
     throw new WindowManagerError(`The handle with the title ${windowName} already exists`);
   }
 
@@ -82,6 +107,9 @@ export class WindowManager {
   }
 
   async closeTabWindow(titleToClose: string, switchToTitle: string): Promise<void> {
+    this.logger.info(
+      `WindowManager: Closing the tab "${titleToClose}" and switching to the tab "${switchToTitle}"`
+    );
     const handleToClose = this._getHandleByTitle(titleToClose)[0];
     const switchToHandle = this._getHandleByTitle(switchToTitle)[0];
     await this.driver.switchTo().window(handleToClose.handle);
@@ -89,16 +117,24 @@ export class WindowManager {
     await this.driver.switchTo().window(switchToHandle.handle);
     const indexOfHandle = this.windowHandles.indexOf(handleToClose);
     this.windowHandles.splice(indexOfHandle, 1);
+    this.logger.info(
+      `WindowManager: The tab "${titleToClose}" is closed and removed from this.windowHandles`
+    );
   }
 
   async switchTo(title: string): Promise<void> {
+    this.logger.info(`WindowManager: Switching to the tab|window "${title}"`);
     const searchHandle = this._getHandleByTitle(title);
     if (searchHandle.length !== 1) {
+      this.logger.error(
+        `Unable to switch to the window ${title} because found ${searchHandle.length} handles for the title`
+      );
       throw new WindowManagerError(
         `Unable to switch to the window ${title} because found ${searchHandle.length} handles for the title`
       );
     }
     await this.driver.switchTo().window(searchHandle[0].handle);
+    this.logger.info(`WindowManager: Switching to the tab|window "${title}" is done`);
   }
 
   _filterHandles(newWindowHandles: Array<string>): Array<string> {
@@ -107,20 +143,30 @@ export class WindowManager {
   }
 
   async findNewWindows(): Promise<Array<string>> {
+    this.logger.info(`WindowManager: Finding a new window`);
     let newWindowHandles: Array<string> = [];
     for (let i = 0; i < 50; i++) {
+      this.logger.info(`WindowManager: Try ${i} to find a new window`);
       await new Promise(resolve => setTimeout(resolve, 100));
       newWindowHandles = await this.getAllWindowHandles();
+      this.logger.info(`WindowManager: newWindowHandles: ${JSON.stringify(newWindowHandles)}`);
       if (newWindowHandles.length > this.windowHandles.length) {
-        return this._filterHandles(newWindowHandles);
+        const newHandle = this._filterHandles(newWindowHandles);
+        this.logger.info(`WindowManager: The new window handle is "${JSON.stringify(newHandle)}"`);
+        return newHandle;
       }
     }
+    this.logger.info(`WindowManager: The new window handle is not found`);
     return this._filterHandles(newWindowHandles);
   }
 
   async findNewWindowAndSwitchTo(newWindowTitle: string): Promise<CustomWindowHandle> {
+    this.logger.info(
+      `WindowManager: Finding a new window and switching to it and set the title "${newWindowTitle}" to it`
+    );
     const popupWindowHandleArr = await this.findNewWindows();
     if (popupWindowHandleArr.length !== 1) {
+      this.logger.error(`WindowManager: Can not find the popup window`);
       throw new WindowManagerError('Can not find the popup window');
     }
     const popupWindowHandle = popupWindowHandleArr[0];
@@ -128,15 +174,18 @@ export class WindowManager {
     this.windowHandles.push(popUpCustomHandle);
 
     await this.driver.switchTo().window(popupWindowHandle);
+    this.logger.info(`WindowManager: Switched to the new window ${JSON.stringify(popUpCustomHandle)}`);
 
     return popUpCustomHandle;
   }
 
   async isClosed(title: string): Promise<boolean> {
+    this.logger.info(`WindowManager: Checking the window with the title "${title}" is closed`);
     const expectToBeClosedHandle: Array<CustomWindowHandle> = this.windowHandles.filter(
       customHandle => customHandle.title === title
     );
     if (!expectToBeClosedHandle.length) {
+      this.logger.error(`WindowManager: There is no handle for the title ${title}`);
       throw new WindowManagerError(`There is no handle for the title ${title}`);
     }
     for (let i = 0; i < 20; i++) {
@@ -147,8 +196,10 @@ export class WindowManager {
       }
       const indexOfHandle = this.windowHandles.indexOf(expectToBeClosedHandle);
       this.windowHandles.splice(indexOfHandle, 1);
+      this.logger.info(`WindowManager: The window with the title "${title}" is closed`);
       return true;
     }
+    this.logger.info(`WindowManager: The window with the title "${title}" is still opened`);
     return false;
   }
 }

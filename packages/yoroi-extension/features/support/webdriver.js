@@ -10,7 +10,7 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { mockDAppLogsDir } from './helpers/common-constants';
+import { mockDAppLogsDir, windowManagerLogsDir } from './helpers/common-constants';
 
 const fs = require('fs');
 const simpleNodeLogger= require('simple-node-logger');
@@ -131,7 +131,9 @@ function CustomWorld(cmdInput: WorldInput) {
       this._allLoggers = [];
       const chromeBuilder = getChromeBuilder();
       this.driver = chromeBuilder.build();
-      this.windowManager = new WindowManager(this.driver);
+      const windowManagerLogPath = `${windowManagerLogsDir}windowManagerLog_${getLogDate()}.log`;
+      const windowManagerLogger = simpleNodeLogger.createSimpleFileLogger(windowManagerLogPath);
+      this.windowManager = new WindowManager(this.driver, windowManagerLogger);
       this.windowManager.init().then().catch();
       const dAppLogPath = `${mockDAppLogsDir}mockDAppLog_${getLogDate()}.log`;
       const mockDAppLogger = simpleNodeLogger.createSimpleFileLogger(dAppLogPath);

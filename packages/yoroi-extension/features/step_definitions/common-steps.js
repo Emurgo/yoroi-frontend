@@ -23,6 +23,7 @@ import {
   snapshotsDir,
   mockDAppLogsDir,
   testRunsLogsDir,
+  windowManagerLogsDir,
 } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
@@ -57,6 +58,7 @@ BeforeAll(() => {
   fs.mkdirSync(testRunsDataDir);
   fs.mkdirSync(testRunsLogsDir);
   fs.mkdirSync(mockDAppLogsDir);
+  fs.mkdirSync(windowManagerLogsDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
