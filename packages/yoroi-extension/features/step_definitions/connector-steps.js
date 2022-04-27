@@ -1,6 +1,5 @@
 // @flow
 import { Given, Then, When } from 'cucumber';
-import { WebDriver } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
@@ -33,7 +32,7 @@ const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
 
-const connectorPopUpIsDisplayed = async (customWorld: WebDriver) => {
+const connectorPopUpIsDisplayed = async (customWorld: Object) => {
   await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await customWorld.driver.getTitle();
   expect(windowTitle).to.equal('Yoroi dApp Connector');

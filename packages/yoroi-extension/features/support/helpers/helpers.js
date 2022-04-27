@@ -50,6 +50,6 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
   }
 }
 
-export function getLogDate() {
+export function getLogDate(): string {
   return new Date().toISOString().replace(/:/g, '_');
 }

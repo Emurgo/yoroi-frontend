@@ -4,7 +4,6 @@ import { WebDriver } from 'selenium-webdriver';
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { bytesToHex, getTtl, hexToBytes } from '../support/helpers/dapp-helpers';
 import { MultiAsset, TransactionBuilder } from '@emurgo/cardano-serialization-lib-nodejs';
-import type { Logger } from 'simple-node-logger';
 
 class MockDAppWebpageError extends Error {}
 
@@ -33,8 +32,9 @@ type Utxo = {|
 
 export class MockDAppWebpage {
   driver: WebDriver;
+  logger: Object;
 
-  constructor(driver: WebDriver, logger: Logger) {
+  constructor(driver: WebDriver, logger: Object) {
     this.driver = driver;
     this.logger = logger;
   }
@@ -75,7 +75,7 @@ export class MockDAppWebpage {
     const resultOfConverting = addresses.map(a =>
       CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32()
     );
-    this.logger.info(`MockDApp: -> Result of converting ${resultOfConverting}`);
+    this.logger.info(`MockDApp: -> Result of converting ${JSON.stringify(resultOfConverting)}`);
     return resultOfConverting;
   }
 
@@ -108,7 +108,7 @@ export class MockDAppWebpage {
         }
       }
     }
-    this.logger.info(`MockDApp: -> Reduced multiAsset ${result}`);
+    this.logger.info(`MockDApp: -> Reduced multiAsset ${JSON.stringify(result)}`);
     return result;
   }
 

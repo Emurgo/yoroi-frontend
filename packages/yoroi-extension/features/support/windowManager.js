@@ -1,6 +1,5 @@
 // @flow
 import { WebDriver } from 'selenium-webdriver';
-import type { Logger } from 'simple-node-logger';
 
 type WindowType = 'tab' | 'window';
 type CustomWindowHandle = {|
@@ -17,8 +16,9 @@ export const extensionTabName = 'Yoroi';
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
   driver: WebDriver;
+  logger: Object;
 
-  constructor(driver: WebDriver, logger: Logger) {
+  constructor(driver: WebDriver, logger: Object) {
     this.driver = driver;
     this.windowHandles = [];
     this.logger = logger;
