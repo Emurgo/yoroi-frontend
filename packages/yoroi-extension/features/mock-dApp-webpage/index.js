@@ -185,7 +185,9 @@ export class MockDAppWebpage {
           callback({ success: false, errMsg: JSON.stringify(error) });
         });
     });
-    this.logger.info(`MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`);
+    this.logger.info(
+      `MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`
+    );
     if (walletUTXOsResponse.success) {
       return this._mapCborUtxos(walletUTXOsResponse.retValue);
     }
@@ -223,9 +225,14 @@ export class MockDAppWebpage {
     this.logger.info(`MockDApp: -> The access response: ${JSON.stringify(accessResponse)}`);
 
     await this.driver.executeScript(accResp => {
-      if (accResp.success) window.walletConnected = true;
+      window.walletConnected = !!accResp.success;
     }, accessResponse);
-    this.logger.info(`MockDApp: -> window.walletConnected = true is set`);
+
+    if (accessResponse.success) {
+      this.logger.info(`MockDApp: -> window.walletConnected = true is set`);
+    } else {
+      this.logger.info(`MockDApp: -> window.walletConnected = false is set`);
+    }
 
     return accessResponse;
   }
@@ -288,7 +295,9 @@ export class MockDAppWebpage {
       return valueStr;
     }
     this.logger.error(
-      `MockDApp: -> The error is received while getting the balance. Error: ${JSON.stringify(balanceCborHex)}`
+      `MockDApp: -> The error is received while getting the balance. Error: ${JSON.stringify(
+        balanceCborHex
+      )}`
     );
     throw new MockDAppWebpageError(balanceCborHex.errMsg);
   }
