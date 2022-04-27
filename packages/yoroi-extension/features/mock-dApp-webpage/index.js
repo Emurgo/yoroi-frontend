@@ -363,12 +363,7 @@ export class MockDAppWebpage {
     this.logger.info(`MockDApp: Getting signing result`);
     const signingResult = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      window.signTxPromise
-        .then(
-          response => callback(response),
-          reject => callback(reject)
-        )
-        .catch(callback);
+      window.signTxPromise.then(callback).catch(callback);
     });
     this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
     return signingResult;
