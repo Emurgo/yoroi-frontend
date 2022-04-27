@@ -208,7 +208,7 @@ export async function connectorGetUtxosErgo(
 }
 
 function stringToWasmValue(s: string): RustModule.WalletV4.Value {
-  if (/\d+/.test(s)) {
+  if (/^\d+$/.test(s)) {
     // The string is an int number
     return RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(s));
   }
@@ -216,7 +216,7 @@ function stringToWasmValue(s: string): RustModule.WalletV4.Value {
     return RustModule.WalletV4.Value.from_bytes(hexToBytes(s));
   } catch (e) {
     throw ConnectorError.invalidRequest(
-      `Invalid required value string "${s}". Expected an int number of a hex of serialized Value instance. Cause: ${String(e)}`,
+      `Invalid required value string "${s}". Expected an int number or a hex of serialized Value instance. Cause: ${String(e)}`,
     );
   }
 }

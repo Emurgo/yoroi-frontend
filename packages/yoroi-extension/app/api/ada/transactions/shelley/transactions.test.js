@@ -385,23 +385,23 @@ describe('Create unsigned TX from UTXO', () => {
 
     testTxConstruction([0.2, 0.2, 0.2, 0.2, 0.2], {
       inputs: [utxos[3]],
-      fee: '1428',
+      fee: '1330',
       sumInputs: '30000000',
-      sumOutputs: '29998572',
+      sumOutputs: '29998670',
     });
 
     testTxConstruction([0.7, 0.7, 0.7, 0.7, 0.7], {
       inputs: [utxos[2]],
-      fee: '1500',
+      fee: '1402',
       sumInputs: '10000001',
-      sumOutputs: '9998501',
+      sumOutputs: '9998599',
     });
 
     testTxConstruction([0.7, 0.2, 0.7, 0.2, 0.7], {
       inputs: [utxos[2]],
-      fee: '1500',
+      fee: '1402',
       sumInputs: '10000001',
-      sumOutputs: '9998501',
+      sumOutputs: '9998599',
     });
   });
 
@@ -451,8 +451,8 @@ describe('Create unsigned TX from UTXO', () => {
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('755907');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('244094');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('790305');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('209696');
   });
 
   it('Should pick inputs with tokens when using input selection', () => {
@@ -493,8 +493,8 @@ describe('Create unsigned TX from UTXO', () => {
     // it will take only one of the utxos because it covers the required token and the fee
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4], utxos[2]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11997958');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('2044');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998056');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1946');
 
     const assetInfo = identifierToCardanoAsset(testAssetId);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
@@ -504,7 +504,7 @@ describe('Create unsigned TX from UTXO', () => {
     ).toEqual('1234');
 
     const tx = unsignedTxResponse.txBuilder.build();
-    expect(tx.outputs().get(5).amount().multiasset()
+    expect(tx.outputs().get(4).amount().multiasset()
       ?.get(assetInfo.policyId)
       ?.get(assetInfo.name)
       ?.to_str()

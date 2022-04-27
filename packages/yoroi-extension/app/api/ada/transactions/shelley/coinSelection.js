@@ -414,7 +414,10 @@ export function coinSelectionForValues(
   }
   {
     const requiredAda = totalRequiredValue.getDefault();
-    if (requiredAda.gt(0) && availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5))) {
+    const requiredNotTooSmall = requiredAda.gt(ONE_ADA_LOVELACES);
+    const availableEnoughOverRequired =
+      availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5));
+    if (requiredNotTooSmall && availableEnoughOverRequired) {
       recommendedChange.push(createMultiToken(requiredAda, [], networkId));
     }
   }
