@@ -1131,6 +1131,7 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
+                    await RustModule.load();
                     const network = wallet.getParent().getNetworkInfo();
                     const config = getCardanoHaskellBaseConfig(
                       network
