@@ -225,13 +225,17 @@ export class MockDAppWebpage {
     this.logger.info(`MockDApp: -> The access response: ${JSON.stringify(accessResponse)}`);
 
     await this.driver.executeScript(accResp => {
-      window.walletConnected = !!accResp.success;
+      if (accResp.success) {
+        window.walletConnected = true;
+      } else {
+        window.walletConnected = null;
+      }
     }, accessResponse);
 
     if (accessResponse.success) {
       this.logger.info(`MockDApp: -> window.walletConnected = true is set`);
     } else {
-      this.logger.info(`MockDApp: -> window.walletConnected = false is set`);
+      this.logger.info(`MockDApp: -> window.walletConnected = null is set`);
     }
 
     return accessResponse;
