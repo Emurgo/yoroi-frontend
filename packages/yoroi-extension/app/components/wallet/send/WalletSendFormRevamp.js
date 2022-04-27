@@ -43,7 +43,7 @@ import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
-import { getNFTs, getTokens } from '../../../utils/wallet';
+import { FormattedNFTDisplay, FormattedTokenDisplay, getNFTs, getTokens } from '../../../utils/wallet';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -133,11 +133,20 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
-  +onAddToken: (void | $ReadOnly<TokenRow>) => void,
+  +onAddToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldReset?: boolean,
+  |}) => void,
+  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
   +openDialog: any => void,
+  +plannedTxInfoMap: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: BigNumber,
+    shouldSendAll?: boolean,
+  |}>,
 |};
 
 type State = {|
@@ -339,7 +348,10 @@ export default class WalletSendForm extends Component<Props, State> {
     return info.Metadata.numberOfDecimals;
   }
 
-  getTokensAndNFTs = (totalAmount) => {
+  getTokensAndNFTs: (MultiToken) => [
+    FormattedTokenDisplay[],
+    FormattedNFTDisplay[],
+  ] = (totalAmount) => {
     if (this.props.shouldSendAll) return [
       getTokens(totalAmount, this.props.getTokenInfo),
       getNFTs(totalAmount, this.props.getTokenInfo)

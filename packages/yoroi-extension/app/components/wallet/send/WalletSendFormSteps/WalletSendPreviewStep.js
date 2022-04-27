@@ -27,7 +27,7 @@ import {
 import type {
   TokenLookupKey, TokenEntry,
 } from '../../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
 import { Button } from '@mui/material';
@@ -52,6 +52,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?number,
+  +selectedNetwork: $ReadOnly<NetworkRow>,
 |};
 
 const messages = defineMessages({

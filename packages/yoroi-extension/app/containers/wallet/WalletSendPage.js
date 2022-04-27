@@ -463,7 +463,7 @@ class WalletSendPage extends Component<AllProps> {
     />);
   }
 
-  isTokenIncluded = (token) => {
+  isTokenIncluded: ($ReadOnly<TokenRow>) => boolean = (token) => {
     const { transactionBuilderStore } = this.generated.stores;
     return (
       !!transactionBuilderStore.plannedTxInfoMap.find(
@@ -472,7 +472,7 @@ class WalletSendPage extends Component<AllProps> {
     );
   }
 
-  getTokenAmount = (token) => {
+  getTokenAmount: ($ReadOnly<TokenRow>) => ?string = (token) => {
     const { transactionBuilderStore } = this.generated.stores;
     const tokenInfo = transactionBuilderStore.plannedTxInfoMap.find(
       ({ token: t }) => t.Identifier === token.Identifier

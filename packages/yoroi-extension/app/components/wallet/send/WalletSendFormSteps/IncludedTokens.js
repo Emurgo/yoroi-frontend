@@ -18,6 +18,10 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 type Props = {|
   +totalAmount: ?MultiToken,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +shouldSendAll: boolean,
+  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +tokens: FormattedTokenDisplay[],
+  +nfts: FormattedNFTDisplay[],
 |}
 export default class IncludedTokens extends Component<Props> {
 

@@ -19,6 +19,7 @@ export type FormattedNFTDisplay = {|
     id: string,
     image?: string,
     name: string,
+    info: $ReadOnly<TokenRow>,
 |}
 
 export const getTokens: (
@@ -63,6 +64,7 @@ export const getNFTs: (
             policyId,
             // $FlowFixMe[prop-missing]
             nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+            info: token.info,
         };
     })
     .map(item => ({

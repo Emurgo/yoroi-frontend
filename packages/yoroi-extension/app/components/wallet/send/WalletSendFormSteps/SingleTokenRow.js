@@ -38,6 +38,10 @@ type Props = {|
     +isCalculatingFee: boolean,
     +error: ?LocalizableError,
     +totalInput: ?MultiToken,
+    +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+    +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
+    +onAddToken: $ReadOnly<TokenRow> => void,
+    +getTokenAmount: ($ReadOnly<TokenRow>) => ?string
 |}
 
 const messages = defineMessages({

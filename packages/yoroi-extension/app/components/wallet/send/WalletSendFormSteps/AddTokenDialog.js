@@ -53,7 +53,14 @@ type Props = {|
   +totalInput: ?MultiToken,
   +isCalculatingFee: boolean,
   +error: ?LocalizableError,
-  +selectedNetwork: $ReadOnly<NetworkRow>
+  +selectedNetwork: $ReadOnly<NetworkRow>,
+  +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
+  +onAddToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldReset?: boolean,
+  |}) => void,
+  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +getTokenAmount: ($ReadOnly<TokenRow>) => ?string
 |};
 
 type State = {|

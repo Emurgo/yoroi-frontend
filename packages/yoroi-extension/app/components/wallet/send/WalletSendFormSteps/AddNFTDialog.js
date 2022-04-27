@@ -23,8 +23,7 @@ import BigNumber from 'bignumber.js'
 import type {
   TokenLookupKey,
 } from '../../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { UriParams } from '../../../../utils/URIHandling';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import classnames from 'classnames';
 import { Button } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -35,13 +34,17 @@ type Props = {|
   +classicTheme: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
-  +uriParams: ?UriParams,
-  +selectedToken: void | $ReadOnly<TokenRow>,
-  +validateAmount: (
-    amountInNaturalUnits: BigNumber,
-    tokenRow: $ReadOnly<TokenRow>,
-  ) => Promise<[boolean, void | string]>,
   +defaultToken: $ReadOnly<TokenRow>,
+  +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
+  +onAddToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldReset?: boolean,
+  |}) => void,
+  +totalInput: ?MultiToken,
+  +fee: ?MultiToken,
+  +selectedNetwork: $ReadOnly<NetworkRow>,
+  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +isCalculatingFee: boolean,
 |};
 
 type State = {|
