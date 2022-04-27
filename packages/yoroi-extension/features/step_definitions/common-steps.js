@@ -21,9 +21,7 @@ import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import {
   testRunsDataDir,
   snapshotsDir,
-  mockDAppLogsDir,
   testRunsLogsDir,
-  windowManagerLogsDir,
 } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
@@ -57,8 +55,6 @@ BeforeAll(() => {
   rimraf.sync(testRunsDataDir);
   fs.mkdirSync(testRunsDataDir);
   fs.mkdirSync(testRunsLogsDir);
-  fs.mkdirSync(mockDAppLogsDir);
-  fs.mkdirSync(windowManagerLogsDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -132,6 +128,7 @@ After({ tags: '@invalidWitnessTest' }, () => {
 });
 
 After(async function (scenario) {
+  this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has done ####`);
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
