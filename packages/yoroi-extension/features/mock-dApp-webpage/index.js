@@ -255,8 +255,15 @@ export class MockDAppWebpage {
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.cardano.yoroi
-        .isEnabled()
-        .then(enabled => callback({ success: true, retValue: enabled }))
+        .isEnabled().then(
+        // eslint-disable-next-line promise/always-return
+          onSuccess => {
+            callback({ success: true, retValue: onSuccess })
+          },
+          onReject => {
+            callback({ success: false, errMsg: onReject.message })
+          }
+        )
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
