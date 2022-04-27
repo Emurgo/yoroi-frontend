@@ -182,13 +182,14 @@ export class MockDAppWebpage {
           }
         })
         .catch(error => {
-          callback({ success: false, errMsg: error.message });
+          callback({ success: false, errMsg: JSON.stringify(error) });
         });
     });
+    this.logger.info(`MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`);
     if (walletUTXOsResponse.success) {
       return this._mapCborUtxos(walletUTXOsResponse.retValue);
     }
-    this.logger.info(`MockDApp: -> The error is received: ${walletUTXOsResponse.errMsg}`);
+    this.logger.error(`MockDApp: -> The error is received: ${walletUTXOsResponse.errMsg}`);
     throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
   }
 
