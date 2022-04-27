@@ -43,7 +43,9 @@ export async function baseCheckAddressesRecoveredAreCorrect(
   fieldName: string
 ): Promise<void> {
   const waitUntilAddressesRecoveredAppeared = rows.map((row, index) =>
-    world.waitUntilText(`.${fieldName}-${index + 1}`, truncateAddress(row.fromAddress))
+    world.waitUntilText(
+      { locator: `.${fieldName}-${index + 1}`, method: 'css' },
+      truncateAddress(row.fromAddress))
   );
   await Promise.all(waitUntilAddressesRecoveredAppeared);
 }
@@ -77,7 +79,7 @@ export async function checkTotalAmountIsCorrect(
   const totalAmountFormatted = `${totalAmount
     .dividedBy(amountPerUnit)
     .toFormat(decimalPlaces)} ${ticker}`;
-  await world.waitUntilText('.TransferSummaryPage_amount', totalAmountFormatted);
+  await world.waitUntilText({ locator: '.TransferSummaryPage_amount', method: 'css' }, totalAmountFormatted);
 }
 
 export async function checkFinalBalanceIsCorrect(
@@ -98,5 +100,5 @@ export async function checkFinalBalanceIsCorrect(
   const ticker = getTokenName(assetInfo);
   const finalBalance = `${finalAmount} ${ticker}`;
 
-  await world.waitUntilText('.TransferSummaryPage_totalAmount', finalBalance);
+  await world.waitUntilText({ locator: '.TransferSummaryPage_totalAmount', method: 'css' }, finalBalance);
 }

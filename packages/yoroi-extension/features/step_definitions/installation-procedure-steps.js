@@ -7,7 +7,7 @@ import { expect } from 'chai';
 const TERMS_OF_USE_FORM = '.TermsOfUseForm_component';
 
 Given(/^I am on the "Terms of use" screen$/, async function () {
-  await this.waitForElement(TERMS_OF_USE_FORM);
+  await this.waitForElement({ locator: TERMS_OF_USE_FORM, method: 'css' });
 });
 
 When(/^I click on "I agree with the terms of use" checkbox$/, async function () {
@@ -23,7 +23,10 @@ When(/^I submit the "Terms of use" form$/, async function () {
 });
 
 Then(/^I should not see the "Terms of use" screen anymore$/, async function () {
-  await this.waitForElementNotPresent(TERMS_OF_USE_FORM);
+  await this.waitForElementNotPresent({
+    locator: TERMS_OF_USE_FORM,
+    method: 'css'
+  });
 });
 
 Then(/^I should have "Terms of use" accepted$/, async function () {
