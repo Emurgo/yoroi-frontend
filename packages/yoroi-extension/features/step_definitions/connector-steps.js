@@ -1,5 +1,6 @@
 // @flow
 import { Given, Then, When } from 'cucumber';
+import { WebDriver } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { Ports } from '../../scripts/connections';
 import {
@@ -9,6 +10,7 @@ import {
   getWalletBalance,
   getWalletName,
   getWallets,
+  logoElement,
   noWalletsImg,
   selectWallet,
   spendingPasswordErrorField,
@@ -23,12 +25,19 @@ import {
   getUTXOAddresses,
   transactionFeeTitle,
   cancelButton,
+  transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
+
+const connectorPopUpIsDisplayed = async (customWorld: WebDriver) => {
+  await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
+  const windowTitle = await customWorld.driver.getTitle();
+  expect(windowTitle).to.equal('Yoroi dApp Connector');
+};
 
 Given(/^I have opened the mock dApp$/, async function () {
   await this.driver.get(mockDAppUrl);
@@ -57,10 +66,14 @@ Then(/^I request access to Yoroi$/, async function () {
   await this.mockDAppPage.requestAuthAccess();
 });
 
-Then(/^I should see the connector popup$/, async function () {
-  await this.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
-  const windowTitle = await this.driver.getTitle();
-  expect(windowTitle).to.equal('Yoroi dApp Connector');
+Then(/^I should see the connector popup for connection$/, async function () {
+  await connectorPopUpIsDisplayed(this);
+  await this.waitForElement(logoElement);
+});
+
+Then(/^I should see the connector popup for signing$/, async function () {
+  await connectorPopUpIsDisplayed(this);
+  await this.waitForElement(transactionTotalAmountField);
 });
 
 Then(/^There is no the connector popup$/, async function () {

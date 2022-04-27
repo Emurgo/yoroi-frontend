@@ -4,6 +4,7 @@ import { By, WebElement } from 'selenium-webdriver';
 import { getMethod } from '../support/helpers/helpers';
 import type { LocatorObject } from '../support/webdriver';
 
+export const logoElement: LocatorObject = { locator: '.Layout_logo', method: 'css' };
 export const noWalletsImg: LocatorObject = {
   locator: '.ConnectPage_noWalletsImage',
   method: 'css',

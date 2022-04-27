@@ -363,7 +363,17 @@ export class MockDAppWebpage {
     this.logger.info(`MockDApp: Getting signing result`);
     const signingResult = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      window.signTxPromise.then(callback).catch(callback);
+      window.signTxPromise
+        .then(
+          // eslint-disable-next-line promise/always-return
+          onSuccess => {
+            callback(onSuccess);
+          },
+          onReject => {
+            callback(onReject);
+          }
+        )
+        .catch(callback);
     });
     this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
     return signingResult;

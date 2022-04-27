@@ -12,7 +12,7 @@ Feature: dApp connector errors checking
   @dApp-1006
   Scenario: dApp, authorised wallet, connecting wallet, wrong password -> correct password (DAPP-1006)
     When I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     When I enter the spending password wrongPassword and click confirm
     Then I see the error Incorrect wallet password
@@ -23,7 +23,7 @@ Feature: dApp connector errors checking
   @dApp-1007
   Scenario: dApp, authorised wallet, connecting wallet, back to wallets and close pop-up (DAPP-1007)
     When I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     When I enter the spending password wrongPassword and click confirm
     Then I see the error Incorrect wallet password
@@ -35,7 +35,7 @@ Feature: dApp connector errors checking
   @dApp-1008
   Scenario: dApp, authorised wallet, signing transaction, close pop-up (DAPP-1008)
     When I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
@@ -43,14 +43,14 @@ Feature: dApp connector errors checking
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
-    Then I should see the connector popup
+    Then I should see the connector popup for signing
     Then I close the dApp-connector pop-up window
     And The user reject for signing is received
 
   @dApp-1009
   Scenario: dApp, authorised wallet, disconnect wallet (DAPP-1009)
     When I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
@@ -61,7 +61,7 @@ Feature: dApp connector errors checking
   @dApp-1014
   Scenario: dApp, authorised wallet, signing transaction, cancel signing (DAPP-1014)
     When I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
@@ -69,6 +69,6 @@ Feature: dApp connector errors checking
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
-    Then I should see the connector popup
+    Then I should see the connector popup for signing
     Then I cancel signing the transaction
     And The user reject for signing is received

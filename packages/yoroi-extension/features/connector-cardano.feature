@@ -12,7 +12,7 @@ Feature: dApp connector data signing
   @dApp-1000
   Scenario: dApp, anonymous wallet, can get balance (DAPP-1000)
     And I request anonymous access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
@@ -22,7 +22,7 @@ Feature: dApp connector data signing
   @dApp-1001
   Scenario: dApp, anonymous wallet, sign Cardano transaction (DAPP-1001)
     And I request anonymous access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
@@ -30,7 +30,7 @@ Feature: dApp connector data signing
     Then I request signing the transaction:
     | amount | toAddress                                                                                               |
     | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
-    Then I should see the connector popup
+    Then I should see the connector popup for signing
     And I should see the transaction amount data:
     | amount | fee      |
     | 3      | 0.168317 |
@@ -44,7 +44,7 @@ Feature: dApp connector data signing
   @dApp-1002
   Scenario: dApp, authorised wallet, sign Cardano transaction (DAPP-1002)
     And I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
@@ -53,7 +53,7 @@ Feature: dApp connector data signing
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
-    Then I should see the connector popup
+    Then I should see the connector popup for signing
     And I should see the transaction amount data:
       | amount | fee      |
       | 3      | 0.168317 |
@@ -67,7 +67,7 @@ Feature: dApp connector data signing
   @dApp-1011
   Scenario: dApp, anonymous wallet, connect and reload dApp page (DAPP-1011)
     And I request anonymous access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
@@ -80,7 +80,7 @@ Feature: dApp connector data signing
   @dApp-1012
   Scenario: dApp, authorised wallet, connect and reload dApp page (DAPP-1012)
     And I request access to Yoroi
-    Then I should see the connector popup
+    Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
