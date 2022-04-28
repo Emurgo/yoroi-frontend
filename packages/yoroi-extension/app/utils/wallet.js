@@ -22,10 +22,12 @@ export type FormattedNFTDisplay = {|
     info: $ReadOnly<TokenRow>,
 |}
 
-export const getTokens: (
+type GetTokenFunc = (
     spendableBalance: ?MultiToken,
     getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
-    ) => FormattedTokenDisplay[] = ( spendableBalance, getTokenInfo ) => {
+) => FormattedTokenDisplay[]
+
+export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo ) => {
     if (spendableBalance == null) return [];
     return [
             ...spendableBalance.nonDefaultEntries(),
@@ -44,10 +46,12 @@ export const getTokens: (
         });
 }
 
-export const getNFTs: (
+type GetNFTFunc = (
     spendableBalance: ?MultiToken,
     getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
-    ) => FormattedNFTDisplay[] = (spendableBalance, getTokenInfo) => {
+) => FormattedNFTDisplay[]
+
+export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
         ...spendableBalance.nonDefaultEntries(),

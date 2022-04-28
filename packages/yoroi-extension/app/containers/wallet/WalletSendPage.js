@@ -201,6 +201,8 @@ class WalletSendPage extends Component<AllProps> {
             previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}
             plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+            closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+            isOpen={uiDialogs.isOpen}
           />
           {this.renderDialog()}
         </>

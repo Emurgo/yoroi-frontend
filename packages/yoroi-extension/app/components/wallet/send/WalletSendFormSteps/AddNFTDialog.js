@@ -1,7 +1,5 @@
 // @flow
-
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
-
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';

@@ -26,7 +26,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists,
-  // getTokenStrictName, getTokenIdentifierIfExists,
 } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
@@ -44,6 +43,7 @@ import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
 import { FormattedNFTDisplay, FormattedTokenDisplay, getNFTs, getTokens } from '../../../utils/wallet';
+import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -147,6 +147,8 @@ type Props = {|
     amount?: BigNumber,
     shouldSendAll?: boolean,
   |}>,
+  +isOpen: any => boolean,
+  +closeDialog: void => void,
 |};
 
 type State = {|
@@ -440,6 +442,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 {...receiverField.bind()}
                 error={receiverField.error}
                 done={receiverField.isValid}
+                QRHandler={() => this.props.openDialog(QRScannerDialog)}
               />
             </div>
             <div className={styles.memo}>
@@ -600,21 +603,38 @@ export default class WalletSendForm extends Component<Props, State> {
   render(): Node {
     const { currentStep } = this.state
     return (
-      <div className={styles.component}>
-        <div className={styles.wrapper}>
-          <SendFormHeader
-            step={currentStep}
-            onUpdateStep={this.onUpdateStep.bind(this)}
-          />
+      <>
+        {this.renderDialog()}
+        <div className={styles.component}>
+          <div className={styles.wrapper}>
+            <SendFormHeader
+              step={currentStep}
+              onUpdateStep={this.onUpdateStep.bind(this)}
+            />
 
-          <div className={styles.formBody}>
-            {this.renderCurrentStep(currentStep)}
+            <div className={styles.formBody}>
+              {this.renderCurrentStep(currentStep)}
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
+  renderDialog(): Node {
+    const { form } = this
+    const receiverField = form.$('receiver');
+
+    if (this.props.isOpen(QRScannerDialog)) {
+      return (
+        <QRScannerDialog
+          onClose={this.props.closeDialog}
+          onReadQR={(address) => { receiverField.set('value', address) }}
+        />
+      )
+    }
+    return ''
+  }
   onUpdateStep(step: number) {
     if (step > 3) throw new Error('Invalid Step number.')
     this.setState({ currentStep: step })
