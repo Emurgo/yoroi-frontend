@@ -144,7 +144,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
 
-  @observable ongoingRefreshing: Map<number, Promise<void>> = new Map();
+  ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
 
   setup(): void {
     super.setup();

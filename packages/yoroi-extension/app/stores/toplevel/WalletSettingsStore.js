@@ -73,11 +73,12 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
       const promise = this.api[apiType].removeAllTransactions(req);
 
-      this.stores.transactions.ongoingRefreshing.set(
-        req.publicDeriverId,
-        promise,
-      );
-
+      runInAction(() => {
+        this.stores.transactions.ongoingRefreshing.set(
+          req.publicDeriverId,
+          promise,
+        );
+      });
       return promise;
     });
 
@@ -232,9 +233,11 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
           }
           // currently in the map the promise for this wallet is this resyncing process,
           // we need to remove it before calling refreshing otherwise it's a deadlock
-          this.stores.transactions.ongoingRefreshing.delete(
-            request.publicDeriver.publicDeriverId,
-          );
+          runInAction(() => {
+            this.stores.transactions.ongoingRefreshing.delete(
+              request.publicDeriver.publicDeriverId,
+            );
+          });
           // refresh
           return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
         }
@@ -243,9 +246,11 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       // if everything runs without any error, the promise should have already
       // been removed, but here make sure it is, so that future refreshing
       // is not affected
-      this.stores.transactions.ongoingRefreshing.delete(
-        request.publicDeriver.publicDeriverId,
-      );
+      runInAction(() => {
+        this.stores.transactions.ongoingRefreshing.delete(
+          request.publicDeriver.publicDeriverId,
+        );
+      });
     }
 
     this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);

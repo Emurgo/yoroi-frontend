@@ -388,7 +388,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   _startRefreshAllWallets: void => Promise<void> = async () => {
     for (const publicDeriver of this.publicDerivers) {
       if (this.selected !== publicDeriver) {
-        await this.refreshWalletFromRemote(publicDeriver);
+        try {
+          await this.refreshWalletFromRemote(publicDeriver);
+        } catch {
+          // ignore error
+        }
       }
     }
     setTimeout(this._startRefreshAllWallets, this.WALLET_REFRESH_INTERVAL);
