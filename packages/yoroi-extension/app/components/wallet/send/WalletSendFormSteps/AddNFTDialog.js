@@ -1,7 +1,5 @@
 // @flow
-
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
-
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
@@ -114,30 +112,30 @@ export default class AddNFTDialog extends Component<Props, State> {
     };
 
   genNftsList: void => FormattedNFTDisplay[] = () => {
-      if (this.props.spendableBalance == null) return [];
-      const { spendableBalance } = this.props;
-      return [
-        ...spendableBalance.nonDefaultEntries(),
-      ].map(entry => ({
-        entry,
-        info: this.props.getTokenInfo(entry),
-      })).filter(token => token.info.IsNFT).map(token => {
-        const policyId = token.entry.identifier.split('.')[0];
-        const name = truncateToken(getTokenStrictName(token.info) ?? '-');
-        return {
-          name,
-          id: getTokenIdentifierIfExists(token.info) ?? '-',
-          amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
-          policyId,
-          // $FlowFixMe[prop-missing]
-          nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
-        };
-      })
-      .map(item => ({
-        name: item.name,
-        image: item.nftMetadata?.image,
-        id: item.id,
-      }));
+    if (this.props.spendableBalance == null) return [];
+    const { spendableBalance } = this.props;
+    return [
+      ...spendableBalance.nonDefaultEntries(),
+    ].map(entry => ({
+      entry,
+      info: this.props.getTokenInfo(entry),
+    })).filter(token => token.info.IsNFT).map(token => {
+      const policyId = token.entry.identifier.split('.')[0];
+      const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+      return {
+        name,
+        id: getTokenIdentifierIfExists(token.info) ?? '-',
+        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
+        policyId,
+        // $FlowFixMe[prop-missing]
+        nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+      };
+    })
+    .map(item => ({
+      name: item.name,
+      image: item.nftMetadata?.image,
+      id: item.id,
+    }));
   }
 
   render(): Node {

@@ -42,6 +42,11 @@
     @include loading-spinner('../../../assets/images/spinner-dark.svg', 14);
   }
 
+  .isSyncing {
+    @extend .isLoading;
+    margin-bottom: 4px;
+  }
+
   & + & {
     margin-left: 24px;
   }

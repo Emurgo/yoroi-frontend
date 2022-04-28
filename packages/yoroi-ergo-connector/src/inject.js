@@ -229,8 +229,8 @@ class CardanoAPI {
       return this._cardano_rpc_call("get_change_address", []);
     }
     
-    getUtxos(amount = undefined, token_id = 'ADA', paginate = undefined) {
-      return this._cardano_rpc_call("get_utxos", [amount, token_id, paginate]);
+    getUtxos(amount = undefined, paginate = undefined) {
+      return this._cardano_rpc_call("get_utxos/cardano", [amount, paginate]);
     }
     
     submitTx(tx) {
