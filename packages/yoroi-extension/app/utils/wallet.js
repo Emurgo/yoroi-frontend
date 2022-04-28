@@ -8,15 +8,15 @@ import type {
 } from '../api/common/lib/MultiToken';
 
 export type FormattedTokenDisplay = {|
-    value: number,
+    value?: number,
     info: $ReadOnly<TokenRow>,
     label: string,
     id: string,
-    amount: string,
+    amount?: string,
 |}
 
 export type FormattedNFTDisplay = {|
-    id: string,
+    id?: string,
     image?: string,
     name: string,
     info: $ReadOnly<TokenRow>,
@@ -75,5 +75,6 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         name: item.name,
         image: item.nftMetadata?.image,
         id: item.id,
+        info: item.info,
     }));
 }

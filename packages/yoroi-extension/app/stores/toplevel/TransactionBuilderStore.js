@@ -49,7 +49,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfoMap: Array<{|
     token: $ReadOnly<TokenRow>,
-    amount?: BigNumber,
+    amount?: string,
     shouldSendAll?: boolean,
   |}> = [];
 
@@ -327,7 +327,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   /** Should only set to valid address or undefined */
   @action
   _updateReceiver: (void | string) => void = (receiver) => {
-    this.receiver = receiver;
+    this.receiver = receiver ?? null;
   }
 
   @action
@@ -337,7 +337,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   /** Should only set to valid amount or undefined */
   @action
-  _updateAmount: (?BigNumber) => void = (value, shouldSendAll = false) => {
+  _updateAmount: (
+    value: ?BigNumber,
+    shouldSendAll?: boolean,
+  ) => void = (value, shouldSendAll = false) => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._updateAmount)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
@@ -350,12 +353,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
     if (!tokenTxInfo) {
       this.plannedTxInfoMap.push({
-        amount: value ?? undefined,
+        amount: value ? value.toString() : undefined,
         token: selectedToken,
         shouldSendAll,
       })
     } else {
-      tokenTxInfo.amount = (value ?? undefined);
+      tokenTxInfo.amount = value ? value.toString() : undefined;
       tokenTxInfo.shouldSendAll = shouldSendAll;
     }
   }

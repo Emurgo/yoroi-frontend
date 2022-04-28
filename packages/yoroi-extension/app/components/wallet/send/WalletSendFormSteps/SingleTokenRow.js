@@ -23,7 +23,6 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 
 type Props = {|
     +token: FormattedTokenDisplay,
-    +addOrRemoveToken: (tokenId: string, status: boolean) => void,
     +classicTheme: boolean,
     +updateAmount: (?BigNumber) => void,
     +uriParams: ?UriParams,

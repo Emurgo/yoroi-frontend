@@ -146,7 +146,7 @@ export default class AddNFTDialog extends Component<Props, State> {
     }));
   }
 
-  onSelect = (token) => {
+  onSelect: $ReadOnly<TokenRow> => void = (token) => {
     if (this.props.isTokenIncluded(token)) {
       this.props.onRemoveToken(token)
     } else {
@@ -159,11 +159,11 @@ export default class AddNFTDialog extends Component<Props, State> {
   }
 
 
-  renderMinAda() {
+  renderMinAda(): string {
     const { totalInput, fee, isCalculatingFee } = this.props
     if (isCalculatingFee) return '...';
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    if (!totalInput) return '0.0';
+    if (!totalInput || !fee) return '0.0';
     const amount = totalInput.joinSubtractCopy(fee);
     return formatValue(amount.getDefaultEntry());
   }

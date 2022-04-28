@@ -595,7 +595,7 @@ class WalletSendPage extends Component<AllProps> {
         |},
         addToken: {|
           trigger: (params: {|
-            token: void | $ReadOnly<TokenRow>,
+            token?: $ReadOnly<TokenRow>,
             shouldReset?: boolean,
           |}) => void
         |},
@@ -672,7 +672,7 @@ class WalletSendPage extends Component<AllProps> {
         selectedToken: void | $ReadOnly<TokenRow>,
         plannedTxInfoMap: Array<{|
           token: $ReadOnly<TokenRow>,
-          amount?: BigNumber,
+          amount?: string,
           shouldSendAll?: boolean,
         |}>,
       |},

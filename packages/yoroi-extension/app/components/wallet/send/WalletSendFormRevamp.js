@@ -42,7 +42,8 @@ import PlusIcon from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
-import { FormattedNFTDisplay, FormattedTokenDisplay, getNFTs, getTokens } from '../../../utils/wallet';
+import { getNFTs, getTokens } from '../../../utils/wallet';
+import type { FormattedNFTDisplay, FormattedTokenDisplay, } from '../../../utils/wallet';
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 
 const messages = defineMessages({
@@ -134,7 +135,7 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
   +onAddToken: ({|
-    token: void | $ReadOnly<TokenRow>,
+    token?: $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}) => void,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
@@ -144,7 +145,7 @@ type Props = {|
   +openDialog: any => void,
   +plannedTxInfoMap: Array<{|
     token: $ReadOnly<TokenRow>,
-    amount?: BigNumber,
+    amount?: string,
     shouldSendAll?: boolean,
   |}>,
   +isOpen: any => boolean,
@@ -363,16 +364,19 @@ export default class WalletSendForm extends Component<Props, State> {
       ({ token }) => !token.IsNFT && !token.IsDefault
     ).map(({ token, amount }) => ({
       label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
-      amount: amount?.toString(),
+      amount,
       info: token,
+      id: (getTokenIdentifierIfExists(token) ?? '-'),
     }));
 
     const nfts = plannedTxInfoMap.filter(
       ({ token }) => token.IsNFT
     ).map(({ token }) => {
       const policyId = token.Identifier.split('.')[0];
+      const name = truncateToken(getTokenStrictName(token) ?? '-');
       return {
-          name: truncateToken(getTokenStrictName(token) ?? '-'),
+          name,
+          // $FlowFixMe[prop-missing]
           image: token.Metadata.assetMintMetadata?.[0]['721'][policyId][name]?.image,
           info: token,
       };
@@ -381,11 +385,11 @@ export default class WalletSendForm extends Component<Props, State> {
     return [tokens, nfts]
   }
 
-  renderMinAda() {
+  renderMinAda(): string {
     const { totalInput, fee, isCalculatingFee } = this.props
     if (isCalculatingFee) return '...';
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    if (!totalInput) return '0.0';
+    if (!totalInput || !fee) return '0.0';
     const amount = totalInput.joinSubtractCopy(fee);
     return formatValue(amount.getDefaultEntry());
   }

@@ -9,15 +9,9 @@ import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.s
 import globalMessages from '../../../../i18n/global-messages';
 import RemoveIcon from '../../../../assets/images/forms/close.inline.svg';
 import NoNFT from '../../../../assets/images/nft-no.inline.svg';
-import type {
-  TokenLookupKey,
-  MultiToken
-} from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-  +totalAmount: ?MultiToken,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +shouldSendAll: boolean,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
   +tokens: FormattedTokenDisplay[],

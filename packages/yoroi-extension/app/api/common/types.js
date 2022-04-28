@@ -53,8 +53,6 @@ export type CreateWalletFunc = (
 
 export type SendTokenList = Array<$ReadOnly<{|
   token: $ReadOnly<TokenRow>,
-  amount: string, // in lovelaces
-|}> | $ReadOnly<{|
-  token: $ReadOnly<TokenRow>,
-  shouldSendAll: true,
+  amount?: string, // in lovelaces
+  shouldSendAll?: boolean,
 |}>>;
