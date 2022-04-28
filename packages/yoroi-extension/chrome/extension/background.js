@@ -856,17 +856,10 @@ function handleInjectorConnect(port) {
           const prot = message.protocol;
           const func = message.function;
           const args = message.params.map(JSON.stringify).join(', ');
-          if (e?.stack != null) {
-            Logger.error(`RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
-          } else {
-            Logger.error(`RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}`);
-          }
-          rpcResponse({
-            err: {
-              code: APIErrorCodes.API_INTERNAL_ERROR,
-              info: 'Yoroi has encountered an internal error - please see logs'
-            }
-          });
+          const msg = `Yoroi internal error: RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}`;
+          const info = e?.stack == null ? msg : `${msg}\n${e.stack}`;
+          Logger.error(info);
+          rpcResponse({ err: { code: APIErrorCodes.API_INTERNAL_ERROR, info } });
         }
       }
       async function addressesToBech(addressesHex: string[]): Promise<string[]> {
@@ -1138,6 +1131,7 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
+                    await RustModule.load();
                     const network = wallet.getParent().getNetworkInfo();
                     const config = getCardanoHaskellBaseConfig(
                       network
