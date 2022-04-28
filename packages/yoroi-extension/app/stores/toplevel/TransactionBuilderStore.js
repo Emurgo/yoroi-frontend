@@ -49,12 +49,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<BigNumber>>, |}>;
-  @observable plannedTxInfoMap: Object<{|
-    ...InexactSubset<TxOutType<BigNumber>>,
-    token: void | $ReadOnly<TokenRow>
-  |}> = {};
-
-  @observable receiver: string | null;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | ISignRequest<any>;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -198,7 +192,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     // type-cast to assert non-null
     const plannedTxInfo = (this.plannedTxInfo);
 
-    const receiver = this.receiver;
+    const receiver = plannedTxInfo[0].address;
     if (receiver == null) return;
     const amount = plannedTxInfo[0].value != null
       ? plannedTxInfo[0].value.toString()
@@ -215,12 +209,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     const network = withUtxos.getParent().getNetworkInfo();
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-    const isSendingNonDefaultToken = () => (
-      this.selectedToken != null &&
-      this.selectedToken.TokenId !== defaultToken.TokenId
-    )
-
     if (isCardanoHaskell(network)) {
       const withHasUtxoChains = asHasUtxoChains(withUtxos);
       if (withHasUtxoChains == null) {
@@ -235,11 +223,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+
       // <TODO:PLUTUS_SUPPORT>
       const utxoHasDataHash = false;
+
       const genTokenList = (userInput) => {
-        const tokens = [...userInput];
-        if (isSendingNonDefaultToken()) {
+        const tokens = [userInput];
+        if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
           const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
           const fakeMultitoken = new MultiToken(
             [{
@@ -247,11 +238,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
               networkId: defaultToken.NetworkId,
               amount: fakeAmount,
             },
-            ...Object.values(this.plannedTxInfoMap).map(({ token }) => ({
-              identifier: token.Identifier,
-              networkId: token.NetworkId,
+            {
+              identifier: this.selectedToken.Identifier,
+              networkId: this.selectedToken.NetworkId,
               amount: fakeAmount,
-            }))],
+            }],
             getDefaultEntryToken(defaultToken)
           );
           const minAmount = RustModule.WalletV4.min_ada_required(
@@ -286,12 +277,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,
-          // tokens: genTokenList({
-          //   token: this.selectedToken
-          //     ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
-          //   amount,
-          // }),
-          tokens: genTokenList(Object.values(this.plannedTxInfoMap)),
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            amount,
+          }),
           filter: this.filter,
           absSlotNumber,
           metadata: this.metadata,
@@ -299,13 +289,15 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       }
     } else if (isErgo(network)) {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
+
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
       const txFee = new BigNumber(
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee
 
       const genTokenList = (userInput) => {
         const tokens = [userInput];
-        if (isSendingNonDefaultToken()) {
+        if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
           tokens.push({
@@ -366,7 +358,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _updateReceiver: (void | string) => void = (receiver) => {
     this.plannedTxInfo[0].address = receiver;
-    this.receiver = receiver;
   }
 
   @action
@@ -378,16 +369,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _updateAmount: (?BigNumber) => void = (value) => {
     this.plannedTxInfo[0].value = (value ?? undefined);
-
-    const publicDeriver = this.stores.wallets.selected;
-    const network = publicDeriver.getParent().getNetworkInfo();
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-    const identifier = this.selectedToken? this.selectedToken.Identifier : 'default';
-    if (!this.plannedTxInfoMap[identifier]) this.plannedTxInfoMap[identifier] = {};
-    this.plannedTxInfoMap[identifier].amount = (value ?? undefined);
-    this.plannedTxInfoMap[identifier].token = this.selectedToken ?? defaultToken;
-
-    console.log(JSON.parse(JSON.stringify(this.plannedTxInfoMap)))
   }
 
   @action
@@ -403,8 +384,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _updateToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
     this.selectedToken = token;
-    // Todo: Will be changed when adding multi-assets link;
-    this.plannedTxInfoMap = {};
   }
 
   @action
@@ -424,7 +403,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _reset: void => void = () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
-    this.plannedTxInfoMap = {};
     this.shouldSendAll = false;
     this.memo = undefined;
     this.selectedToken = undefined;
