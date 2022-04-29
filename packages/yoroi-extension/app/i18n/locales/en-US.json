@@ -166,6 +166,8 @@
   "wallet.send.form.dialog.noTokensYet": "There are no tokens in your wallet yet",
   "wallet.send.form.dialog.nNft": "NFT ({number})",
   "wallet.send.form.dialog.nToken": "Tokens ({number})",
+  "wallet.send.form.qrDialog.title": "Scan QR code",
+  "wallet.send.form.qrDialog.noDevices": "Webcam not found or permission is not given",
   "global.labels.processing": "Processing...",
   "global.labels.remove": "Remove",
   "global.labels.rewardsLabel": "Rewards",
