@@ -14,7 +14,8 @@ import {
 import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
 import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
 import NoNFT from '../../../../assets/images/nft-no.inline.svg';
-import { FormattedNFTDisplay, getNFTs } from '../../../../utils/wallet';
+import { getNFTs } from '../../../../utils/wallet';
+import type { FormattedNFTDisplay } from '../../../../utils/wallet';
 import BigNumber from 'bignumber.js';
 import type {
   TokenLookupKey,

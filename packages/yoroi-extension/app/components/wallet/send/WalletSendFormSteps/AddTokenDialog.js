@@ -51,7 +51,8 @@ type Props = {|
 |};
 
 type State = {|
-  tokensList: FormattedTokenDisplay[],
+  currentTokensList: FormattedTokenDisplay[],
+  fullTokensList: FormattedTokenDisplay[],
   sortingDirection: null | 'UP' | 'DOWN',
   sortingColumn: string
 |}
@@ -130,7 +131,7 @@ export default class AddTokenDialog extends Component<Props, State> {
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
     (event: SyntheticEvent<HTMLInputElement>) => {
       const keyword = event.currentTarget.value
-      this.setState((prev) => ({ tokensList: prev.fullTokensList }))
+      this.setState((prev) => ({ currentTokensList: prev.fullTokensList }))
       if(!keyword) return
       const regExp = new RegExp(keyword, 'gi')
       const tokensListCopy = [...this.state.fullTokensList]
@@ -188,7 +189,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
       this.setState(prevState => ({
           ...prevState,
-          tokensList: prevState.tokensList.map(
+          currentTokensList: prevState.currentTokensList.map(
               token => ({ ...token, included: tokenId === token.id ? status: token.included  }))
         }))
   }
