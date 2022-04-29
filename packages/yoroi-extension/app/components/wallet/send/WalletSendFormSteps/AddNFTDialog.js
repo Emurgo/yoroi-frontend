@@ -24,6 +24,7 @@ import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/datab
 import classnames from 'classnames';
 import { Button } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   +onClose: void => void,

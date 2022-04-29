@@ -32,6 +32,7 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
+import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   +onClose: void => void,
