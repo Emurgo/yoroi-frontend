@@ -41,6 +41,10 @@ type Props = {|
     +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
     +onAddToken: $ReadOnly<TokenRow> => void,
     +getTokenAmount: ($ReadOnly<TokenRow>) => ?string
+|};
+
+type State = {|
+  error: string,
 |}
 
 const messages = defineMessages({
@@ -49,11 +53,15 @@ const messages = defineMessages({
         defaultMessage: '!!!Calculating fee...',
     },
 })
-export default class SingleTokenRow extends Component<Props> {
+export default class SingleTokenRow extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  state: State = {
+    error: ''
+  }
 
   getNumDecimals(): number {
     return this.props.token.info.Metadata.numberOfDecimals;
@@ -68,20 +76,22 @@ export default class SingleTokenRow extends Component<Props> {
   }
 
   render(): Node {
-    const { token } = this.props
+    const { token } = this.props;
+    const { error } = this.state;
 
-    let transactionFeeError = null;
-    if (this.props.isCalculatingFee) {
-      transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
+    let transactionError = null;
+
+    if (error) {
+      transactionError = error
+    } else if (this.props.isCalculatingFee) {
+      transactionError = this.context.intl.formatMessage(messages.calculatingFee);
     }
     if (this.props.error) {
-      transactionFeeError = this.context.intl.formatMessage(
+      transactionError = this.context.intl.formatMessage(
         this.props.error,
         this.props.error.values
       );
     }
-
-    const amountInputError = transactionFeeError
 
     return (
       <div className={styles.component}>
@@ -103,7 +113,7 @@ export default class SingleTokenRow extends Component<Props> {
             <div className={styles.amountInput}>
               <AmountInputRevamp
                 value={this.props.getTokenAmount(token.info)}
-                onChange={value => {
+                onChange={async (value) => {
                   if (value) value = new BigNumber(value)
                   this.props.updateAmount(value)
                 }}
@@ -114,7 +124,7 @@ export default class SingleTokenRow extends Component<Props> {
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
-              {token.info.Identifier === this.props.selectedToken?.Identifier && amountInputError}
+              {token.info.Identifier === this.props.selectedToken?.Identifier && transactionError}
             </p>
           </div>
            )}
