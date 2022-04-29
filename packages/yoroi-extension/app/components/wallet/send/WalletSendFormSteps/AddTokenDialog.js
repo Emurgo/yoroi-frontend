@@ -11,12 +11,8 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import styles from './AddTokenDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
-    truncateToken,
-} from '../../../../utils/formatters';
-import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
-import { genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../../stores/stateless/tokenHelpers';
 import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
 import ArrowsListFromBottom from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import ArrowsListFromTop from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
@@ -33,6 +29,7 @@ import type { UriParams } from '../../../../utils/URIHandling';
 import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import LocalizableError from '../../../../i18n/LocalizableError';
+import { getTokens } from '../../../../utils/wallet';
 
 type Props = {|
   +onClose: void => void,
@@ -118,11 +115,14 @@ export default class AddTokenDialog extends Component<Props, State> {
   };
 
   componentDidMount(): void {
-    this.setState({ tokensList: this.genTokensList() })
+    const { spendableBalance, getTokenInfo } = this.props;
+    const tokensList = getTokens(spendableBalance, getTokenInfo)
+    this.setState({ currentTokensList: tokensList, fullTokensList: tokensList })
   }
 
   state: State = {
-    tokensList: [],
+    currentTokensList: [],
+    fullTokensList: [],
     sortingDirection: null,
     sortingColumn: '',
   };
@@ -130,12 +130,12 @@ export default class AddTokenDialog extends Component<Props, State> {
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
     (event: SyntheticEvent<HTMLInputElement>) => {
       const keyword = event.currentTarget.value
-      this.setState({ tokensList: this.genTokensList() })
+      this.setState((prev) => ({ tokensList: prev.fullTokensList }))
       if(!keyword) return
       const regExp = new RegExp(keyword, 'gi')
-      const tokensListCopy = [...this.genTokensList()]
+      const tokensListCopy = [...this.state.fullTokensList]
       const filteredTokensList = tokensListCopy.filter(a => a.label.match(regExp))
-      this.setState({ tokensList: filteredTokensList })
+      this.setState({ currentTokensList: filteredTokensList })
     };
 
   compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
@@ -158,9 +158,9 @@ export default class AddTokenDialog extends Component<Props, State> {
   }
 
   sortTokens: ((field: string) => void) = (field: string) => {
-    const tokensListCopy = [...this.state.tokensList]
+    const tokensListCopy = [...this.state.fullTokensList]
     const sortedTokens = tokensListCopy.sort((a,b) => this.compare(a,b, field))
-    this.setState({ tokensList: sortedTokens, sortingColumn: field });
+    this.setState({ currentTokensList: sortedTokens, sortingColumn: field });
   };
 
   displayColumnLogo: ((column: string) => Node) = (column: string) => {
@@ -180,26 +180,6 @@ export default class AddTokenDialog extends Component<Props, State> {
     return <ArrowsList />;
   }
 
-  genTokensList: void => FormattedTokenDisplay[] = () => {
-    if (this.props.spendableBalance == null) return [];
-    const { spendableBalance } = this.props;
-    return [
-    ...spendableBalance.nonDefaultEntries(),
-    ].map(entry => ({
-    entry,
-    info: this.props.getTokenInfo(entry),
-    })).filter(token => !token.info.IsNFT).map(token => {
-    const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
-    return {
-      value: token.info.TokenId,
-      info: token.info,
-      label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-      id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-      amount,
-      included: false,
-    }});
-  }
-
   addOrRemoveToken(tokenId: string, status: boolean): void {
       /**
        * Temp solution for UI purposes
@@ -216,11 +196,11 @@ export default class AddTokenDialog extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { onClose } = this.props
-    const { tokensList } = this.state
+    const { currentTokensList, fullTokensList } = this.state
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.nTokens, { number: tokensList.length })}
+        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
@@ -235,12 +215,12 @@ export default class AddTokenDialog extends Component<Props, State> {
             <p><span className={styles.minAdaLabel}>{intl.formatMessage(messages.minAda)}{':'}</span> {0}</p>
           </div>
           {
-            tokensList.length === 0 ? (
+            currentTokensList.length === 0 ? (
               <div className={styles.noAssetFound}>
                 <NoItemsFoundImg />
                 <h1 className={styles.text}>
                   {intl.formatMessage(
-                    this.genTokensList().length === 0 ? messages.noTokensYet : messages.noAssetFound
+                    fullTokensList.length === 0 ? messages.noTokensYet : messages.noAssetFound
                   )}
                 </h1>
               </div>
@@ -272,7 +252,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                 </ul>
 
                 {
-                  tokensList.map(token => (
+                  currentTokensList.map(token => (
                     <SingleTokenRow
                       key={token.id}
                       token={token}
