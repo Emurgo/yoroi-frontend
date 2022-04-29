@@ -11,13 +11,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
-import { genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../../stores/stateless/tokenHelpers';
 import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
-import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
-import { truncateToken } from '../../../../utils/formatters';
-import NoNFT from '../../../../assets/images/nft-no.inline.svg'
-import type { FormattedNFTDisplay } from '../../../../utils/wallet'
-import BigNumber from 'bignumber.js'
+import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
+import NoNFT from '../../../../assets/images/nft-no.inline.svg';
+import { getNFTs } from '../../../../utils/wallet';
+import type { FormattedNFTDisplay } from '../../../../utils/wallet';
+import BigNumber from 'bignumber.js';
 import type {
   TokenLookupKey,
 } from '../../../../api/common/lib/MultiToken';
@@ -46,7 +45,8 @@ type Props = {|
 |};
 
 type State = {|
-  nftsList: FormattedNFTDisplay[],
+  currentNftsList: FormattedNFTDisplay[],
+  fullNftsList: FormattedNFTDisplay[],
 |}
 
 
@@ -98,53 +98,27 @@ export default class AddNFTDialog extends Component<Props, State> {
   };
 
   componentDidMount(): void {
-    this.setState({ nftsList: this.genNftsList() })
+    const { spendableBalance, getTokenInfo } = this.props;
+    const nftsList = getNFTs(spendableBalance, getTokenInfo)
+    this.setState({ fullNftsList: nftsList,  currentNftsList: nftsList })
   }
 
 
   state: State = {
-    nftsList: [],
+    currentNftsList: [],
+    fullNftsList: []
   };
 
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
     (event: SyntheticEvent<HTMLInputElement>) => {
       const keyword = event.currentTarget.value
-      this.setState({ nftsList: this.genNftsList() })
+      this.setState((prev) => ({ currentNftsList: prev.fullNftsList }))
       if(!keyword) return
       const regExp = new RegExp(keyword, 'gi')
-      const nftsListCopy = [...this.genNftsList()]
+      const nftsListCopy = [...this.state.fullNftsList]
       const filteredNftsList = nftsListCopy.filter(a => a.name.match(regExp))
-      this.setState({ nftsList: filteredNftsList })
+      this.setState({ currentNftsList: filteredNftsList })
     };
-
-  genNftsList: void => FormattedNFTDisplay[] = () => {
-    if (this.props.spendableBalance == null) return [];
-    const { spendableBalance } = this.props;
-    return [
-      ...spendableBalance.nonDefaultEntries(),
-    ].map(entry => ({
-      entry,
-      info: this.props.getTokenInfo(entry),
-    })).filter(token => token.info.IsNFT).map(token => {
-      const policyId = token.entry.identifier.split('.')[0];
-      const name = truncateToken(getTokenStrictName(token.info) ?? '-');
-      return {
-        info: token.info,
-        name,
-        id: getTokenIdentifierIfExists(token.info) ?? '-',
-        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry),
-        policyId,
-        // $FlowFixMe[prop-missing]
-        nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
-      };
-    })
-    .map(item => ({
-      name: item.name,
-      image: item.nftMetadata?.image,
-      id: item.id,
-      info: item.info,
-    }));
-  }
 
   onSelect: $ReadOnly<TokenRow> => void = (token) => {
     if (this.props.isTokenIncluded(token)) {
@@ -171,11 +145,11 @@ export default class AddNFTDialog extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { onClose } = this.props
-    const { nftsList } = this.state
+    const { currentNftsList, fullNftsList } = this.state
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.nNft, { number: nftsList.length })}
+        title={intl.formatMessage(messages.nNft, { number: fullNftsList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
@@ -195,12 +169,12 @@ export default class AddNFTDialog extends Component<Props, State> {
           </div>
          )}
           {
-            nftsList.length === 0 ? (
+            currentNftsList.length === 0 ? (
               <div className={styles.noAssetFound}>
                 <NoItemsFoundImg />
                 <h1 className={styles.text}>
                   {intl.formatMessage(
-                    this.genNftsList().length === 0 ? messages.noTokensYet : messages.noAssetFound
+                    fullNftsList.length === 0 ? messages.noTokensYet : messages.noAssetFound
                   )}
                 </h1>
               </div>
@@ -208,7 +182,7 @@ export default class AddNFTDialog extends Component<Props, State> {
               <>
                 <div className={styles.nftsGrid}>
                   {
-                    nftsList.map(nft => {
+                    currentNftsList.map(nft => {
                       const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
                       return (
                         <button
