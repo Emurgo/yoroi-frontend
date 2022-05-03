@@ -167,6 +167,36 @@ export function cardanoValueFromRemoteFormat(
   }
   return value;
 }
+export function createMultiToken(
+  amount: number | string | BigNumber,
+  assets: Array<{|
+    assetId: string,
+    amount: number | string | BigNumber,
+    ...,
+  |}>,
+  networkId: number,
+): MultiToken {
+  const result = new MultiToken(
+    [],
+    {
+      defaultNetworkId: networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    }
+  );
+  result.add({
+    identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    amount: new BigNumber(amount),
+    networkId,
+  });
+  for (const token of assets) {
+    result.add({
+      identifier: token.assetId,
+      amount: new BigNumber(token.amount),
+      networkId,
+    });
+  }
+  return result;
+}
 export function multiTokenFromRemote(
   utxo: $ReadOnly<{
     +amount: string,
@@ -181,27 +211,8 @@ export function multiTokenFromRemote(
   }>,
   networkId: number,
 ): MultiToken {
-  const result = new MultiToken(
-    [],
-    {
-      defaultNetworkId: networkId,
-      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-    }
-  );
-  result.add({
-    identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-    amount: new BigNumber(utxo.amount),
-    networkId,
-  });
-  for (const token of utxo.assets) {
-    result.add({
-      identifier: token.assetId,
-      amount: new BigNumber(token.amount),
-      networkId,
-    });
-  }
-
-  return result;
+  // $FlowFixMe[incompatible-call]
+  return createMultiToken(utxo.amount, utxo.assets, networkId);
 }
 
 export function getFromUserPerspective(data: {|

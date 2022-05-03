@@ -1,21 +1,23 @@
 // @flow
 
 import type {
+  AccountBalance,
   Address,
+  CardanoTx,
   Paginate,
   PendingTransaction,
+  SignedTx,
   TokenId,
   Tx,
   TxId,
-  SignedTx,
   Value,
-  CardanoTx, AccountBalance,
 } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
+  Addressing,
   IGetAllUtxosResponse,
-  IPublicDeriver
+  IPublicDeriver,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -24,6 +26,7 @@ import {
   asGetSigningKey,
   asHasLevels,
   asHasUtxoChains,
+  asGetAllAccounting,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
@@ -40,6 +43,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import {
   CoreAddressTypes,
+  PRIMARY_ASSET_CONSTANTS,
   TxStatusCodes,
 } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -57,16 +61,14 @@ import {
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
-import {
-  signTransaction as shelleySignTransaction
-} from '../../../app/api/ada/transactions/shelley/transactions';
+import { signTransaction as shelleySignTransaction } from '../../../app/api/ada/transactions/shelley/transactions';
 import {
   getCardanoHaskellBaseConfig,
   getErgoBaseConfig,
 } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
-import AdaApi from '../../../app/api/ada';
 import type CardanoTxRequest from '../../../app/api/ada';
+import AdaApi from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { WalletTransactionCtorData } from '../../../app/domain/WalletTransaction';
@@ -75,6 +77,9 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
+import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelley/coinSelection';
+import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { cip8Sign } from '../../../app/ergo-connector/api';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -206,41 +211,62 @@ export async function connectorGetUtxosErgo(
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
+function stringToWasmValue(s: string): RustModule.WalletV4.Value {
+  if (/^\d+$/.test(s)) {
+    // The string is an int number
+    return RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(s));
+  }
+  try {
+    return RustModule.WalletV4.Value.from_bytes(hexToBytes(s));
+  } catch (e) {
+    throw ConnectorError.invalidRequest(
+      `Invalid required value string "${s}". Expected an int number or a hex of serialized Value instance. Cause: ${String(e)}`,
+    );
+  }
+}
+
 export async function connectorGetUtxosCardano(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
-  tokenId: TokenId,
-  paginate: ?Paginate
+  paginate: ?Paginate,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  networkId: number,
 ): Promise<Array<RemoteUnspentOutput>> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  const utxosToUse = []
-  const formattedUtxos = asAddressedUtxoCardano(utxos).map(u => {
-    // eslint-disable-next-line no-unused-vars
-    const { addressing, ...rest } = u
-    return rest
-  })
-  let valueAcc = new BigNumber(0);
-  for(const formatted of formattedUtxos){
-    if (tokenId === 'ADA' || tokenId === 'TADA') {
-      valueAcc = valueAcc.plus(valueToBigNumber(formatted.amount));
-      utxosToUse.push(formatted);
-    } else {
-      for (const asset of formatted.assets) {
-        if (asset.assetId === tokenId) {
-          valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
-          utxosToUse.push(formatted);
-          break;
-        }
-      }
-    }
+  const toRemoteUnspentOutput = (utxo: CardanoAddressedUtxo): RemoteUnspentOutput => ({
+    amount: utxo.amount,
+    receiver: utxo.receiver,
+    tx_hash: utxo.tx_hash,
+    tx_index: utxo.tx_index,
+    utxo_id: utxo.utxo_id,
+    assets: utxo.assets,
+  });
+  const formattedUtxos: Array<RemoteUnspentOutput> =
+    asAddressedUtxoCardano(utxos).map(toRemoteUnspentOutput)
+  const valueStr = valueExpected?.trim() ?? '';
+  if (valueStr.length === 0) {
+    return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
-
-  return Promise.resolve(paginateResults(formattedUtxos, paginate))
+  const value = multiTokenFromCardanoValue(
+    stringToWasmValue(valueStr),
+    {
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+      defaultNetworkId: networkId,
+    },
+  );
+  const { selectedUtxo } = coinSelectionForValues(
+    formattedUtxos,
+    [value],
+    false,
+    coinsPerUtxoWord,
+    networkId,
+  );
+  return Promise.resolve(selectedUtxo);
 }
 
 const MAX_COLLATERAL = new BigNumber('5000000');
@@ -1162,8 +1188,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
   persistSubmittedTransactions(submittedTxs);
 }
 
-// TODO: generic data sign
-
 const REORG_OUTPUT_AMOUNT  = '1000000';
 
 export async function connectorGenerateReorgTx(
@@ -1222,4 +1246,104 @@ export async function connectorGenerateReorgTx(
     utxos: utxos.filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
   });
   return { unsignedTx, collateralOutputAddressSet };
+}
+
+export async function getAddressing(
+  publicDeriver: PublicDeriver<>,
+  address: string,
+): Promise<?Addressing> {
+  const findAddressing = (addresses) => {
+    for (const { addrs, addressing } of addresses) {
+      for (const { Hash } of addrs) {
+        if (Hash === address) {
+          return { addressing };
+        }
+      }
+    }
+  };
+
+  const withAccounting = asGetAllAccounting(publicDeriver);
+  if (!withAccounting) {
+    throw new Error('unable to get accounting addresses from public deriver');
+  }
+  const rewardAddressing = findAddressing(
+    await withAccounting.getAllAccountingAddresses(),
+  );
+  if (rewardAddressing) {
+    return rewardAddressing;
+  }
+
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (!withUtxos) {
+    throw new Error('unable to get UTxO addresses from public deriver');
+  }
+  return findAddressing(
+    await withUtxos.getAllUtxoAddresses(),
+  );
+}
+
+export async function connectorSignData(
+  publicDeriver: PublicDeriver<>,
+  password: string,
+  addressing: Addressing,
+  address: string,
+  payload: string,
+): Promise<{| signature: string, key: string |}> {
+  const withSigningKey = asGetSigningKey(publicDeriver);
+  if (!withSigningKey) {
+    throw new Error('unable to get signing key');
+  }
+  const normalizedKey = await withSigningKey.normalizeKey({
+    ...(await withSigningKey.getSigningKey()),
+    password,
+  });
+
+  const withLevels = asHasLevels(publicDeriver);
+  if (!withLevels) {
+    throw new Error('unable to get levels');
+  }
+
+  const signingKey = derivePrivateByAddressing({
+    addressing: addressing.addressing,
+    startingFrom: {
+      key: RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+        Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      ),
+      level: withLevels.getParent().getPublicDeriverLevel(),
+    },
+  }).to_raw_key();
+
+  const coseSign1 = await cip8Sign(
+    Buffer.from(address, 'hex'),
+    signingKey,
+    Buffer.from(payload, 'hex'),
+  );
+
+  const key = RustModule.MessageSigning.COSEKey.new(
+    RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
+  );
+  key.set_algorithm_id(
+    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
+  );
+  key.set_header(
+    RustModule.MessageSigning.Label.new_int(
+      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
+    ),
+    RustModule.MessageSigning.CBORValue.new_int(
+      RustModule.MessageSigning.Int.new_i32(6)
+    )
+  );
+  key.set_header(
+    RustModule.MessageSigning.Label.new_int(
+      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
+    ),
+    RustModule.MessageSigning.CBORValue.new_bytes(
+      signingKey.to_public().as_bytes()
+    )
+  );
+
+  return {
+    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
+    key: Buffer.from(key.to_bytes()).toString('hex'),
+  };
 }
