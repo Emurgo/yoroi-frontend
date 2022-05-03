@@ -27,13 +27,21 @@ import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import DragIcon from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import StarIcon from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
+import StaredIcon from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
+
 import { Draggable } from 'react-beautiful-dnd';
+import { Tooltip, Typography } from '@mui/material';
+import AmountDisplay from '../common/AmountDisplay';
 
 const messages = defineMessages({
   tokenTypes: {
     id: 'wallet.topbar.dialog.tokenTypes',
     defaultMessage: '!!!Token types',
   },
+  quickAccessTooltip: {
+    id: 'wallet.topbar.dialog.quickAccess',
+    defaultMessage: '!!!Add to quick acceess wallets list',
+  }
 });
 
 type Props = {|
@@ -50,11 +58,13 @@ type Props = {|
   +onSelect?: void => void,
   +walletId: string,
   +idx: number,
+  +toggleQuickAccess: string => void,
+  +isInQuickAccess: boolean,
 |};
 
 type State = {| +isActionsShow: boolean |};
 
-function constructPlate(
+export function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
   divClass: string
@@ -153,14 +163,18 @@ export default class WalletCard extends Component<Props, State> {
               this.props.isCurrentWallet === true && styles.currentCardWrapper,
               snapshot.isDragging === true && styles.isDragging
             )}
-            onClick={this.props.onSelect}
-            onKeyDown={this.props.onSelect}
             onMouseEnter={this.showActions}
             onMouseLeave={this.hideActions}
             {...provided.draggableProps}
             ref={provided.innerRef}
           >
-            <div className={styles.main}>
+            <div
+              className={styles.main}
+              role="button"
+              tabIndex="0"
+              onClick={this.props.onSelect}
+              onKeyDown={this.props.onSelect}
+            >
               <div className={styles.header}>
                 <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
                 {' ·  '}
@@ -169,20 +183,13 @@ export default class WalletCard extends Component<Props, State> {
               <div className={styles.body}>
                 <div>{iconComponent}</div>
                 <div className={styles.content}>
-                  <div className={styles.amount}>
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}
-                  </div>
-                  <div className={styles.fixedAmount}>
-                    {/* TODO: fix value to USD */}
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}{' '}
-                    USD
-                  </div>
+                  <AmountDisplay
+                    shouldHideBalance={shouldHideBalance}
+                    amount={totalAmount}
+                    getTokenInfo={this.props.getTokenInfo}
+                    showFiat
+                    showAmount
+                  />
                 </div>
                 <div className={styles.extraInfo}>
                   <p className={styles.label}>
@@ -204,10 +211,28 @@ export default class WalletCard extends Component<Props, State> {
               <div {...provided.dragHandleProps}>
                 <DragIcon />
               </div>
-              <button type="button" onClick={() => {}}>
-                <StarIcon />
-              </button>
+              {!this.props.isInQuickAccess &&
+                <Tooltip
+                  title={
+                    <Typography variant="body3">
+                      {intl.formatMessage(messages.quickAccessTooltip)}
+                    </Typography>
+                  }
+                  placement="bottom-end"
+                >
+                  <button type="button" onClick={() => this.props.toggleQuickAccess(this.props.walletId)}>
+                    <StarIcon />
+                  </button>
+                </Tooltip>}
             </div>
+            {this.props.isInQuickAccess &&
+            <button
+              className={styles.quickAccessToggle}
+              onClick={() => this.props.toggleQuickAccess(this.props.walletId)}
+              type='button'
+            >
+              <StaredIcon />
+            </button>}
           </div>
         )}
       </Draggable>

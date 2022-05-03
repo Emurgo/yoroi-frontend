@@ -63,7 +63,7 @@ function TextField({
       onBlur={onBlur}
       onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
-      variant={revamp ? 'standard' : 'outlined'}
+      variant={revamp === true ? 'standard' : 'outlined'}
       /*
         In order to show placeholders for classic theme we dont' need to override
         'shrink' and 'notched' prop status so we pass an empty object
