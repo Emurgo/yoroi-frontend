@@ -72,6 +72,7 @@
   "connector.signin.connectedTo": "Connected To",
   "connector.signin.more": "more",
   "connector.signin.receiver": "Receiver",
+  "connector.signin.signMessage": "Sign Message",
   "connector.signin.title": "Sign transaction",
   "connector.signin.totalAmount": "Total Amount",
   "connector.signin.totals": "Totals",

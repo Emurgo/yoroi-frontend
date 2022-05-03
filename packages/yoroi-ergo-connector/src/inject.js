@@ -254,9 +254,8 @@ class CardanoAPI {
       return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign, returnTx }]);
     }
     
-    signData(address, sigStructure) {
-      // TODO
-      throw new Error('Not implemented yet');
+    signData(address, payload) {
+      return this._cardano_rpc_call("sign_data", [address, payload]);
     }
 
     getCollateralUtxos(requiredAmount) {
