@@ -22,6 +22,7 @@ const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
 const createTx = document.querySelector('#create-tx')
 const getCollateralUtxos = document.querySelector('#get-collateral-utxos')
+const signData = document.querySelector('#sign-data')
 const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
@@ -30,6 +31,7 @@ let cardanoApi
 let returnType = 'cbor'
 let utxos
 let usedAddresses
+let unusedAddresses
 let changeAddress
 let unsignedTransactionHex
 let transactionHex
@@ -211,6 +213,7 @@ getUnUsedAddresses.addEventListener('click', () => {
           return;
         }
         addresses = addressesFromCborIfNeeded(addresses)
+        unusedAddresses = addresses
         alertSuccess(`Address: `)
         alertEl.innerHTML = '<h2>Unused addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
       });
@@ -626,11 +629,12 @@ createTx.addEventListener('click', () => {
 
 getCollateralUtxos.addEventListener('click', () => {
   toggleSpinner('show');
-  
+
   if (!accessGranted) {
     alertError('Should request access first');
     return;
   }
+
   const amount = '4900000';
   cardanoApi.getCollateralUtxos(
     Buffer.from(
@@ -648,6 +652,41 @@ getCollateralUtxos.addEventListener('click', () => {
     alertWarrning(`Getting collateral UTXOs tx fails: ${JSON.stringify(error)}`)
   })
 })
+
+signData.addEventListener('click', () => {
+  toggleSpinner('show');
+
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+
+  let address;
+  if (usedAddresses && usedAddresses.length > 0) {
+    address = usedAddresses[0];
+  } else if (unusedAddresses && unusedAddresses.length > 0) {
+    address = unusedAddresses[0];
+  } else {
+    alertError('Should request used or unused addresses first');
+    return;
+  }
+
+  const payload = document.querySelector('#sign-data-payload').value;
+  let payloadHex;
+  if (payload.startsWith('0x')) {
+    payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+  } else {
+    payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+  }
+  cardanoApi.signData(address, payloadHex).then(sig => {
+    alertSuccess('Signature:' + JSON.stringify(sig))
+  }).catch(error => {
+    console.error(error);
+    alertError(error.info);
+  }).then(() => {
+    toggleSpinner('hide');
+  });
+});
 
 function alertError (text) {
     toggleSpinner('hide');
