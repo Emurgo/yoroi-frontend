@@ -47,13 +47,17 @@ export class MultiToken {
     this.values = [];
 
     // things are just easier if we enforce the default entry to be part of the list of tokens
-    this.defaults = defaults;
+    this.defaults = Object.freeze(defaults);
     this.add({
       identifier: defaults.defaultIdentifier,
       networkId: defaults.defaultNetworkId,
       amount: new BigNumber(0),
     });
     values.forEach(value => this.add(value));
+  }
+
+  getDefaults(): DefaultTokenEntry {
+    return this.defaults;
   }
 
   _checkNetworkId: number => void = (networkId) => {
@@ -79,6 +83,21 @@ export class MultiToken {
     return this;
   }
 
+  /**
+   * Add the entry amount but remove in case the value is equal or below zero
+   */
+  addWithLimitZero: TokenEntry => MultiToken = (entry) => {
+    this._checkNetworkId(entry.networkId);
+    const existingEntry = this.values.find(value => value.identifier === entry.identifier);
+    if (existingEntry == null) {
+      this.values.push(entry);
+      return this;
+    }
+    existingEntry.amount = existingEntry.amount.plus(entry.amount);
+    this._removeIfZeroOrBelow(entry.identifier);
+    return this;
+  }
+
   _removeIfZero: string => void = (identifier) => {
     // if after modifying a token value we end up with a value of 0,
     // we should just remove the token from the list
@@ -92,8 +111,33 @@ export class MultiToken {
     }
   }
 
+  _removeIfZeroOrBelow: string => void = (identifier) => {
+    // if after modifying a token value we end up with a value of 0,
+    // we should just remove the token from the list
+    // However, we must keep a value of 0 for the default entry
+    if (identifier === this.defaults.defaultIdentifier) {
+      return;
+    }
+    const existingValue = this.get(identifier);
+    if (existingValue != null && existingValue.lte(0)) {
+      this.values = this.values.filter(value => value.identifier !== identifier);
+    }
+  }
+
   subtract: TokenEntry => MultiToken = (entry) => {
     return this.add({
+      identifier: entry.identifier,
+      amount: entry.amount.negated(),
+      networkId: entry.networkId,
+    });
+  }
+
+  /**
+   * Subtract the specified entry from this multitoken,
+   * but remove the entry in case it's zero or below
+   */
+  subtractWithLimitZero: TokenEntry => MultiToken = (entry) => {
+    return this.addWithLimitZero({
       identifier: entry.identifier,
       amount: entry.amount.negated(),
       networkId: entry.networkId,
@@ -112,6 +156,16 @@ export class MultiToken {
     }
     return this;
   }
+  /**
+   * Subtract the specified multitoken from this multitoken,
+   * remove any entries that are zero or below
+   */
+  joinSubtractMutableWithLimitZero: MultiToken => MultiToken = (target) => {
+    for (const entry of target.values) {
+      this.subtractWithLimitZero(entry);
+    }
+    return this;
+  }
   joinAddCopy: MultiToken => MultiToken = (target) => {
     const copy = new MultiToken(
       this.values,
@@ -125,6 +179,18 @@ export class MultiToken {
       this.defaults
     );
     return copy.joinSubtractMutable(target);
+  }
+
+  /**
+   * Subtract the specified multitoken from a new copy of this multitoken,
+   * remove any entries that are zero or below
+   */
+  joinSubtractCopyWithLimitZero: MultiToken => MultiToken = (target) => {
+    const copy = new MultiToken(
+      this.values,
+      this.defaults
+    );
+    return copy.joinSubtractMutableWithLimitZero(target);
   }
 
   absCopy: void => MultiToken = () => {
@@ -181,6 +247,13 @@ export class MultiToken {
   size: void => number = () => this.values.length;
 
   isEmpty: void => boolean = () => {
-    return this.values.filter(token => token.amount.gt(0)).length === 0;
+    return this.values.some(token => token.amount.gt(0)) === false;
+  }
+
+  toString: () => string = () => {
+    const defAmount = this.getDefault().toString();
+    const assetMap = this.nonDefaultEntries()
+      .reduce((acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }), {});
+    return `${nameof(MultiToken)}{amount=${defAmount}, assets=${JSON.stringify(assetMap)}}`
   }
 }

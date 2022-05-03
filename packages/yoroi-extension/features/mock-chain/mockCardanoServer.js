@@ -189,7 +189,10 @@ export function getMockServer(
       // $FlowFixMe[incompatible-call]
       res.send(`
                <!doctype html>
-               <html>
+               <html lang="en">
+                 <head>
+                   <title>MockDApp</title>
+                 </head>
                  <body>
                  </body>
                </html>

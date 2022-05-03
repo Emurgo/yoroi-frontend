@@ -112,6 +112,7 @@ const genBaseProps: {|
       },
       transactions: {
         getTxRequests: request.lookup.getTransactions,
+        isWalletRefreshing: _publicDeriver => false,
       },
       walletSettings: {
         getConceptualWalletSettingsCache: request.lookup.getConceptualWalletSettingsCache,

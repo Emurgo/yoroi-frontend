@@ -29,6 +29,7 @@ type Props = {|
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +isRefreshing: boolean,
 |};
 
 @observer
@@ -122,6 +123,11 @@ export default class WalletDetails extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
+    return (
+      <>
+        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
+        {this.props.isRefreshing && <div className={styles.isSyncing} />}
+      </>
+    );
   }
 }

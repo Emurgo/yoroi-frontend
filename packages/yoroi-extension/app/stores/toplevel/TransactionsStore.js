@@ -144,7 +144,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
 
-  ongoingRefreshing: Map<number, Promise<void>> = new Map();
+  ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
 
   setup(): void {
     super.setup();
@@ -295,11 +295,19 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }
     try {
       const promise = this._refreshTransactionData(request);
-      this.ongoingRefreshing.set(publicDeriverId, promise);
+      runInAction(() => {
+        this.ongoingRefreshing.set(publicDeriverId, promise);
+      });
       await promise;
     } finally {
-      this.ongoingRefreshing.delete(publicDeriverId);
+      runInAction(() => {
+        this.ongoingRefreshing.delete(publicDeriverId);
+      });
     }
+  }
+
+  isWalletRefreshing:  PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */

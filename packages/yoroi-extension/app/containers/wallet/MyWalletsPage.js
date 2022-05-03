@@ -254,6 +254,10 @@ class MyWalletsPage extends Component<AllProps> {
       ? null
       : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
+    const isRefreshing =  this.generated.stores.transactions.isWalletRefreshing(
+      publicDeriver
+    );
+
     return (
       <WalletRow
         isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
@@ -266,6 +270,7 @@ class MyWalletsPage extends Component<AllProps> {
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          isRefreshing={isRefreshing}
         />}
         walletSumCurrencies={walletSumCurrencies}
         walletSubRow={() => this.createSubrow(publicDeriver)}
@@ -282,6 +287,7 @@ class MyWalletsPage extends Component<AllProps> {
                 ? moment(txRequests.lastSyncInfo.Time).fromNow()
                 : null
             }
+            isRefreshing={isRefreshing}
           />
         }
         onSettings={() => this.openToSettings(publicDeriver)}
@@ -339,6 +345,7 @@ class MyWalletsPage extends Component<AllProps> {
           rewards={null /* TODO */}
           walletAmount={null /* TODO */}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          isRefreshing={false /* not actually used */}
         />}
         walletNumber={1}
         walletAddresses={walletAddresses /* TODO: replace with proper hashes */}
@@ -423,7 +430,8 @@ class MyWalletsPage extends Component<AllProps> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests
+        getTxRequests: (PublicDeriver<>) => TxRequests,
+        isWalletRefreshing: (PublicDeriver<>) => boolean,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
@@ -462,6 +470,7 @@ class MyWalletsPage extends Component<AllProps> {
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,
+          isWalletRefreshing: stores.transactions.isWalletRefreshing,
         },
         walletSettings: {
           getConceptualWalletSettingsCache:

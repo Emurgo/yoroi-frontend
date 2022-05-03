@@ -799,6 +799,7 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "You have successfully created a new Wallet",
   "wallet.summary.page.walletRestoredNotificationMessage": "You have successfully restored your Wallet",
   "wallet.summary.page.yesterdayLabel": "Yesterday",
+  "wallet.syncing": "Syncing...",
   "wallet.syncingOverlay.explanation": "We are processing your wallet data. This may take time. Please wait...",
   "wallet.syncingOverlay.return": "Return to my wallets",
   "wallet.syncingOverlay.title": "Wallet Syncing",
