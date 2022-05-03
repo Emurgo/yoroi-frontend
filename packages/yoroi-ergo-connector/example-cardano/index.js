@@ -107,7 +107,10 @@ function onApiConnectied(api) {
       messageJson,
       messageHex,
     }))
+    const start = performance.now();
     auth.signHexPayload(messageHex).then(sig => {
+      const elapsed = performance.now() - start;
+      console.log(`Signature created in ${elapsed} ms`);
       console.log('Signature received: ', sig);
       console.log('Verifying signature against the message');
       auth.checkHexPayload(messageHex, sig).then(r => {
@@ -293,21 +296,57 @@ function mapCborUtxos(cborUtxos) {
   });
 }
 
-getUtxos.addEventListener('click', () => {
-    if(!accessGranted) {
-        alertError('Should request access first')
-        return
+function valueRequestObjectToWasmHex(requestObj) {
+  const { amount, assets } = requestObj;
+  const result = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(String(amount)));
+  if (assets != null) {
+    if (typeof assets !== 'object') {
+      throw 'Assets is expected to be an object like `{ [policyId]: { [assetName]: amount } }`';
     }
-    toggleSpinner('show')
-    cardanoApi.getUtxos().then(utxosResponse => {
-      toggleSpinner('hide')
-      if(utxosResponse.length === 0){
-        alertWarrning('NO UTXOS')
-      } else {
-        utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
-        alertSuccess(`<h2>UTxO (${utxos.length}):</h2><pre>` + JSON.stringify(utxos, undefined, 2) + '</pre>')
+    const wmasset = CardanoWasm.MultiAsset.new();
+    for (const [policyId, assets2] of Object.entries(assets)) {
+      if (typeof assets2 !== 'object') {
+        throw 'Assets is expected to be an object like `{ [policyId]: { [assetName]: amount } }`';
       }
-    })
+      const wassets = CardanoWasm.Assets.new();
+      for (const [assetName, amount] of Object.entries(assets2)) {
+        wassets.insert(
+          CardanoWasm.AssetName.new(hexToBytes(assetName)),
+          CardanoWasm.BigNum.from_str(String(amount)),
+        );
+      }
+      wmasset.insert(
+        CardanoWasm.ScriptHash.from_bytes(hexToBytes(policyId)),
+        wassets,
+      );
+    }
+    result.set_multiasset(wmasset);
+  }
+  return bytesToHex(result.to_bytes());
+}
+
+window._getUtxos = function(value) {
+  if(!accessGranted) {
+    alertError('Should request access first')
+    return
+  }
+  toggleSpinner('show')
+  if (value != null && typeof value !== 'string') {
+    value = valueRequestObjectToWasmHex(value);
+  }
+  cardanoApi.getUtxos(value).then(utxosResponse => {
+    toggleSpinner('hide')
+    if(utxosResponse.length === 0){
+      alertWarrning('NO UTXOS')
+    } else {
+      utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
+      alertSuccess(`<h2>UTxO (${utxos.length}):</h2><pre>` + JSON.stringify(utxos, undefined, 2) + '</pre>')
+    }
+  });
+}
+
+getUtxos.addEventListener('click', () => {
+    window._getUtxos();
 })
 
 submitTx.addEventListener('click', () => {

@@ -179,6 +179,27 @@ export function getMockServer(
       res.send(status);
     });
 
+    // To test the dApp connector, we need a no-op mock dApp.
+    server.get('/mock-dapp', (
+      req,
+      res: { send(arg: ServerStatusResponse): any, ... }
+    ): void => {
+      // $FlowFixMe[prop-missing]
+      res.header('content-type', 'text/html');
+      // $FlowFixMe[incompatible-call]
+      res.send(`
+               <!doctype html>
+               <html lang="en">
+                 <head>
+                   <title>MockDApp</title>
+                 </head>
+                 <body>
+                 </body>
+               </html>
+               `
+      );
+    });
+
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {

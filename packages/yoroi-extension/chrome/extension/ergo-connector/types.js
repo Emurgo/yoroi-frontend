@@ -501,8 +501,9 @@ export type ConnectResponseData = {|
 |}
 
 export type GetUtxosRequest = {|
-  type: 'get_utxos/cardano',
+  type: 'get_utxos/addresses',
   tabId: number,
+  select: string[],
 |}
 
 export type TxSignWindowRetrieveData = {|

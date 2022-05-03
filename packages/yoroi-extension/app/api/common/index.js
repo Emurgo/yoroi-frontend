@@ -95,6 +95,7 @@ export type RefreshPendingTransactionsFunc = (
 
 export type RemoveAllTransactionsRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  publicDeriverId: number,
   refreshWallet: () => Promise<void>,
 |};
 export type RemoveAllTransactionsResponse = void;

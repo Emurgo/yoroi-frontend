@@ -13,10 +13,16 @@ import {
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By, logging } from 'selenium-webdriver';
-import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
+import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import { getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
+import {
+  testRunsDataDir,
+  snapshotsDir,
+  testRunsLogsDir,
+} from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
@@ -38,9 +44,6 @@ const { promisify } = require('util');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-const testRunsDataDir = './testRunsData/';
-const snapshotsDir = './features/yoroi_snapshots/';
-
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
   scenarioName: '',
@@ -51,6 +54,7 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(testRunsDataDir);
   fs.mkdirSync(testRunsDataDir);
+  fs.mkdirSync(testRunsLogsDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -124,6 +128,7 @@ After({ tags: '@invalidWitnessTest' }, () => {
 });
 
 After(async function (scenario) {
+  this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has done ####`);
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
@@ -198,8 +203,14 @@ async function inputMnemonicForWallet(
 ): Promise<void> {
   await customWorld.input({ locator: "input[name='walletName']", method: 'css' }, restoreInfo.name);
   await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
-  await customWorld.input({ locator: "input[name='walletPassword']", method: 'css' }, restoreInfo.password);
-  await customWorld.input({ locator: "input[name='repeatPassword']", method: 'css' }, restoreInfo.password);
+  await customWorld.input(
+    { locator: "input[name='walletPassword']", method: 'css' },
+    restoreInfo.password
+  );
+  await customWorld.input(
+    { locator: "input[name='repeatPassword']", method: 'css' },
+    restoreInfo.password
+  );
   await customWorld.click({ locator: '.WalletRestoreDialog .primary', method: 'css' });
 
   const plateElements = await getPlates(customWorld);
@@ -207,13 +218,16 @@ async function inputMnemonicForWallet(
   expect(plateText).to.be.equal(restoreInfo.plate);
 
   await customWorld.click({ locator: '.confirmButton', method: 'css' });
-  await customWorld.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+  await customWorld.waitUntilText(
+    { locator: '.NavPlate_name', method: 'css' },
+    truncateLongName(walletName)
+  );
 }
 
 export async function checkErrorByTranslationId(
   client: Object,
   errorSelector: LocatorObject,
-  errorObject: Object,
+  errorObject: Object
 ) {
   await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000);
 }

@@ -7,9 +7,13 @@ import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { getMethod } from './helpers/helpers';
+import { getMethod, getLogDate } from './helpers/helpers';
+import { WindowManager } from './windowManager';
+import { MockDAppWebpage } from '../mock-dApp-webpage';
+import { testRunsLogsDir } from './helpers/common-constants';
 
 const fs = require('fs');
+const simpleNodeLogger= require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -40,10 +44,11 @@ function getBraveBuilder() {
     new chrome.Options()
       .setChromeBinaryPath('/usr/bin/brave-browser')
       .addArguments(
-        '--start-maximized',
-        '--disable-setuid-sandbox',
-        '--no-sandbox',
-        '--disable-dev-shm-usage'
+        '--no-sandbox', // Disables the sandbox for all process types that are normally sandboxed. Meant to be used as a browser-level switch for testing purposes only
+        '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
+        '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
+        '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
+        '--start-maximized' // Starts the browser maximized, regardless of any previous settings
       )
       .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
   );
@@ -56,10 +61,11 @@ function getChromeBuilder() {
       new chrome.Options()
         .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
         .addArguments(
-          '--start-maximized',
-          '--disable-setuid-sandbox',
           '--no-sandbox',
-          '--disable-dev-shm-usage'
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--start-maximized'
         )
     );
 }
@@ -103,25 +109,43 @@ export type LocatorObject = {|
     | 'tagName',
 |};
 
-// TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
   switch (cmdInput.parameters.browser) {
     case 'brave': {
       const braveBuilder = getBraveBuilder();
       this.driver = braveBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     case 'firefox': {
       const firefoxBuilder = getFirefoxBuilder();
       this.driver = firefoxBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     default: {
+      this._allLoggers = [];
       const chromeBuilder = getChromeBuilder();
       this.driver = chromeBuilder.build();
+      const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
+      const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
+      this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
+      this.windowManager.init().then().catch();
+      this._allLoggers.push(mockAndWMLogger);
+      this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
       break;
     }
   }
+
+  this.sendToAllLoggers = (message: string, level: string = 'info') => {
+    for (const someLogger of this._allLoggers) {
+      someLogger[level](message);
+    }
+  };
 
   this.getBrowser = (): string => cmdInput.parameters.browser;
 
@@ -149,9 +173,9 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
-  this.waitForElementLocated = (locator: LocatorObject) => {
+  this.waitForElementLocated = async (locator: LocatorObject) => {
     const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
-    return this.driver.wait(isLocated);
+    return await this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
@@ -240,10 +264,10 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = (script) =>
+  this.executeLocalStorageScript = script =>
     this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
 
-  this.getFromLocalStorage = async (key) => {
+  this.getFromLocalStorage = async key => {
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
     return JSON.parse(result);
   };
@@ -256,7 +280,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
-  this.saveLastReceiveAddressIndex = (index) => {
+  this.saveLastReceiveAddressIndex = index => {
     this.driver.executeScript(i => {
       const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
@@ -267,7 +291,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, index);
   };
 
-  this.clickElementByQuery = async (query) => {
+  this.clickElementByQuery = async query => {
     await this.driver.executeScript(`document.querySelector('${query}').click()`);
   };
 
@@ -303,6 +327,23 @@ function CustomWorld(cmdInput: WorldInput) {
       "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');",
       element
     );
+  };
+
+  this.isDisplayed = async (locator: LocatorObject) => {
+    const element = await this.driver.findElement(getMethod(locator.method)(locator.locator));
+
+    return await element.isDisplayed();
+  };
+
+  this.findElement = async (locator: LocatorObject) =>
+    await this.driver.findElement(getMethod(locator.method)(locator.locator));
+
+  this.findElements = async (locator: LocatorObject) =>
+    await this.driver.findElements(getMethod(locator.method)(locator.locator));
+
+  this.hoverOnElement = async (locator: WebElement) => {
+    const actions = this.driver.actions();
+    await actions.move({ origin: locator }).perform();
   };
 }
 
