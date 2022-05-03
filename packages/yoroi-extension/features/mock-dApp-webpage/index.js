@@ -32,13 +32,16 @@ type Utxo = {|
 
 export class MockDAppWebpage {
   driver: WebDriver;
+  logger: Object;
 
-  constructor(driver: WebDriver) {
+  constructor(driver: WebDriver, logger: Object) {
     this.driver = driver;
+    this.logger = logger;
   }
 
   _transactionBuilder(): TransactionBuilder {
-    return CardanoWasm.TransactionBuilder.new(
+    this.logger.info('MockDApp: Calling the transaction builder');
+    const transactionBuilder = CardanoWasm.TransactionBuilder.new(
       CardanoWasm.TransactionBuilderConfigBuilder.new()
         // all of these are taken from the mainnet genesis settings
         // linear fee parameters (a*size + b)
@@ -55,9 +58,12 @@ export class MockDAppWebpage {
         .max_tx_size(16384)
         .build()
     );
+    this.logger.info('MockDApp: -> The transaction builder is created');
+    return transactionBuilder;
   }
 
   async _requestAccess(auth: boolean = false) {
+    this.logger.info(`MockDApp: Requesting the access ${auth ? 'with' : 'without'} authentication`);
     const scriptString = `window.accessRequestPromise = cardano.yoroi.enable(${
       auth ? '{requestIdentification: true}' : ''
     })`;
@@ -65,7 +71,12 @@ export class MockDAppWebpage {
   }
 
   _addressesFromCborIfNeeded(addresses: Array<string>): Array<string> {
-    return addresses.map(a => CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32());
+    this.logger.info(`MockDApp: Converting the addresses "${JSON.stringify(addresses)}" from CBOR`);
+    const resultOfConverting = addresses.map(a =>
+      CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32()
+    );
+    this.logger.info(`MockDApp: -> Result of converting ${JSON.stringify(resultOfConverting)}`);
+    return resultOfConverting;
   }
 
   _reduceWasmMultiAsset(
@@ -73,6 +84,7 @@ export class MockDAppWebpage {
     reducer: any,
     initValue: Array<any>
   ): Array<ReducedAsset | any> {
+    this.logger.info(`MockDApp: Reduce multiAsset`);
     let result = initValue;
     if (multiAsset) {
       const policyIds = multiAsset.keys();
@@ -96,11 +108,13 @@ export class MockDAppWebpage {
         }
       }
     }
+    this.logger.info(`MockDApp: -> Reduced multiAsset ${JSON.stringify(result)}`);
     return result;
   }
 
   _mapCborUtxos(cborUtxos: Array<string>): Array<Utxo> {
-    return cborUtxos.map(hex => {
+    this.logger.info(`MockDApp: Mapping cborUTXOs "${JSON.stringify(cborUtxos)}" to UTXOs`);
+    const mappedUtxos = cborUtxos.map(hex => {
       const u = CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(hex));
       const input = u.input();
       const output = u.output();
@@ -123,9 +137,12 @@ export class MockDAppWebpage {
         ),
       };
     });
+    this.logger.info(`MockDApp: -> Mapped UTXOs "${JSON.stringify(mappedUtxos)}"`);
+    return mappedUtxos;
   }
 
   async _getChangeAddress(): Promise<string> {
+    this.logger.info(`MockDApp: Getting the change address`);
     const changeAddresses = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -133,18 +150,25 @@ export class MockDAppWebpage {
         .then(addresses => {
           // eslint-disable-next-line promise/always-return
           if (addresses.length === 0) {
-            throw new MockDAppWebpageError('No change addresses');
+            callback({ success: false, errMsg: 'No change addresses' });
           }
-          callback(addresses);
+          callback({ success: true, retValue: addresses });
         })
         .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
+          callback({ success: false, errMsg: error.message });
         });
     });
-    return this._addressesFromCborIfNeeded([changeAddresses])[0];
+    if (changeAddresses.success) {
+      const changeAddress = this._addressesFromCborIfNeeded([changeAddresses.retValue])[0];
+      this.logger.info(`MockDApp: -> The change address is ${changeAddress}`);
+      return changeAddress;
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${changeAddresses.errMsg}`);
+    throw new MockDAppWebpageError(changeAddresses.errMsg);
   }
 
   async _getUTXOs(): Promise<Array<Utxo>> {
+    this.logger.info(`MockDApp: Getting UTXOs`);
     const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
@@ -152,16 +176,23 @@ export class MockDAppWebpage {
         .then(utxosResponse => {
           // eslint-disable-next-line promise/always-return
           if (utxosResponse.length === 0) {
-            throw new MockDAppWebpageError('NO UTXOS');
+            callback({ success: false, errMsg: 'NO UTXOS' });
           } else {
-            callback(utxosResponse);
+            callback({ success: true, retValue: utxosResponse });
           }
         })
         .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
+          callback({ success: false, errMsg: JSON.stringify(error) });
         });
     });
-    return this._mapCborUtxos(walletUTXOsResponse);
+    this.logger.info(
+      `MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`
+    );
+    if (walletUTXOsResponse.success) {
+      return this._mapCborUtxos(walletUTXOsResponse.retValue);
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${walletUTXOsResponse.errMsg}`);
+    throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
   }
 
   async requestNonAuthAccess() {
@@ -173,27 +204,45 @@ export class MockDAppWebpage {
   }
 
   async checkAccessRequest(): Promise<AccessCallBack> {
+    this.logger.info(`MockDApp: Checking the access request`);
     const accessResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.accessRequestPromise
-        // eslint-disable-next-line promise/always-return
-        .then(api => {
-          window.api = api;
-          callback({ success: true });
-        })
+        .then(
+          // eslint-disable-next-line promise/always-return
+          api => {
+            window.api = api;
+            callback({ success: true });
+          },
+          error => {
+            callback({ success: false, errMsg: error.message });
+          }
+        )
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
     });
+    this.logger.info(`MockDApp: -> The access response: ${JSON.stringify(accessResponse)}`);
 
     await this.driver.executeScript(accResp => {
-      if (accResp.success) window.walletConnected = true;
+      if (accResp.success) {
+        window.walletConnected = true;
+      } else {
+        window.walletConnected = null;
+      }
     }, accessResponse);
+
+    if (accessResponse.success) {
+      this.logger.info(`MockDApp: -> window.walletConnected = true is set`);
+    } else {
+      this.logger.info(`MockDApp: -> window.walletConnected = null is set`);
+    }
 
     return accessResponse;
   }
 
   async addOnDisconnect() {
+    this.logger.info(`MockDApp: Setting the onDisconnect hook`);
     await this.driver.executeScript(() => {
       window.api.experimental.onDisconnect(() => {
         window.walletConnected = false;
@@ -201,29 +250,73 @@ export class MockDAppWebpage {
     });
   }
 
+  async isEnabled(): Promise<boolean> {
+    this.logger.info(`MockDApp: Checking is a wallet enabled`);
+    const isEnabled = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.cardano.yoroi
+        .isEnabled().then(
+        // eslint-disable-next-line promise/always-return
+          onSuccess => {
+            callback({ success: true, retValue: onSuccess })
+          },
+          onReject => {
+            callback({ success: false, errMsg: onReject.message })
+          }
+        )
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (isEnabled.success) {
+      this.logger.info(`MockDApp: -> The wallet is enabled`);
+      return isEnabled.retValue;
+    }
+    this.logger.error(
+      `MockDApp: -> The wallet is disabled. Error message: ${JSON.stringify(isEnabled)}`
+    );
+    throw new MockDAppWebpageError(isEnabled.errMsg);
+  }
+
   async getConnectionState(): Promise<boolean> {
-    return await this.driver.executeScript(() => window.walletConnected);
+    this.logger.info(`MockDApp: Getting the connection state`);
+    const walletConnectedState = await this.driver.executeScript(() => window.walletConnected);
+    this.logger.info(`MockDApp: -> The connection state is ${walletConnectedState}`);
+    return walletConnectedState;
   }
 
   async getBalance(): Promise<string> {
+    this.logger.info(`MockDApp: Getting the balance`);
     const balanceCborHex = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
         .getBalance()
         // eslint-disable-next-line promise/always-return
         .then(balance => {
-          callback(balance);
+          callback({ success: true, retValue: balance });
         })
         .catch(error => {
-          throw new MockDAppWebpageError(JSON.stringify(error));
+          callback({ success: false, errMsg: error.message });
         });
     });
-
-    const value = CardanoWasm.Value.from_bytes(Buffer.from(balanceCborHex, 'hex'));
-    return value.coin().to_str();
+    if (balanceCborHex.success) {
+      const value = CardanoWasm.Value.from_bytes(Buffer.from(balanceCborHex.retValue, 'hex'));
+      const valueStr = value.coin().to_str();
+      this.logger.info(`MockDApp: -> The balance is ${valueStr}`);
+      return valueStr;
+    }
+    this.logger.error(
+      `MockDApp: -> The error is received while getting the balance. Error: ${JSON.stringify(
+        balanceCborHex
+      )}`
+    );
+    throw new MockDAppWebpageError(balanceCborHex.errMsg);
   }
 
   async requestSigningTx(amount: string, toAddress: string) {
+    this.logger.info(
+      `MockDApp: Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
+    );
     const UTXOs = await this._getUTXOs();
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
@@ -232,10 +325,12 @@ export class MockDAppWebpage {
     const addr = CardanoWasm.Address.from_bech32(utxo.receiver);
     const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
     if (!baseAddr) {
+      this.logger.error(`MockDApp: -> The error is received: No baseAddr`);
       throw new MockDAppWebpageError('No baseAddr');
     }
     const keyHash = baseAddr.payment_cred().to_keyhash();
     if (!keyHash) {
+      this.logger.error(`MockDApp: -> The error is received: No keyHash`);
       throw new MockDAppWebpageError('No keyHash');
     }
 
@@ -264,16 +359,30 @@ export class MockDAppWebpage {
     txBuilder.add_change_if_needed(shelleyChangeAddress);
 
     const unsignedTransactionHex = bytesToHex(txBuilder.build_tx().to_bytes());
+    this.logger.info(`MockDApp: -> unsignedTransactionHex: ${unsignedTransactionHex}`);
 
     this.driver.executeScript(unsignedTxHex => {
       window.signTxPromise = window.api.signTx({ tx: unsignedTxHex });
     }, unsignedTransactionHex);
   }
 
-  async getSigningTxResult(): Promise<string> {
-    return await this.driver.executeAsyncScript((...args) => {
+  async getSigningTxResult(): Promise<string | {| code: number, info: string |}> {
+    this.logger.info(`MockDApp: Getting signing result`);
+    const signingResult = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
-      window.signTxPromise.then(callback).catch(callback);
+      window.signTxPromise
+        .then(
+          // eslint-disable-next-line promise/always-return
+          onSuccess => {
+            callback(onSuccess);
+          },
+          onReject => {
+            callback(onReject);
+          }
+        )
+        .catch(callback);
     });
+    this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
+    return signingResult;
   }
 }
