@@ -5,16 +5,29 @@
   flex-direction: column;
   justify-content: center;
   color: var(--yoroi-palette-gray-900);
+  border: 1px solid var(--yoroi-palette-gray-300);
+  border-radius: 8px;
+  min-width: 360px;
 }
 
 .outerWrapper {
   display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.contentWrapper {
+  display: flex;
   align-items: center;
+  width: 100%;
+  padding: 0px;
+  padding: 0px 16px;
 }
 
 .currency {
   margin-right: 12px;
   display: flex;
+  flex-shrink: 0;
   border-radius: 50%;
   border: none;
   overflow: hidden;
@@ -26,28 +39,78 @@
   }
 }
 
-.content {
+.walletInfo {
+  max-width: 100px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: start;
+  margin-right: auto;
+
+  .name { 
+    font-size: 14px;
+    line-height: 22px;
+    color: #242838;
+    font-weight: 500;
+  }
+
+  .plateId {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.2px;
+    color: #6B7384;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
   font-size: 16px;
   line-height: 22px;
+  width: 100%;
+}
+.balance {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  text-align: left;
+  font-size: 16px;
+  line-height: 22px;
+  width: 100%;
 }
 
-.isLoading {
-  position: relative;
-  display: inline-block;
-  margin-left: 15px;
-  margin-bottom: 4px;
+.spinnerWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  font-size: 16px;
+  line-height: 22px;
+  width: 100%;
 }
+
 
 .amount {
   font-weight: 500;
-  .isLoading {
-    margin-left: 9px;
-    margin-bottom: 6px;
-    @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
+
+  & > p {
+    text-align: left !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    &:nth-child(2) {
+      margin-top: -2px;
+    }
   }
+
+
 }
 
 .highlightAmount {
@@ -56,8 +119,17 @@
 
 .toggleButton {
   margin-left: auto;
+  background-color: var(--yoroi-palette-primary-200);
+  width: 56px;
+  height: 56px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
   &:hover {
     cursor: pointer;
+  }
+
+  g {
+    stroke: #ffffff;
   }
 }
 
