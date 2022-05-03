@@ -188,6 +188,10 @@ const messages = defineMessages({
     id: 'api.errors.hardwareUnsupportedError',
     defaultMessage: '!!!This action is not supported for the currently selected hardware.',
   },
+  getUtxoDataError: {
+    id: 'api.errors.getUtxoDataError',
+    defaultMessage: '!!!Error received from server while getting UTXO data',
+  },
 });
 
 export class ServerStatusError extends LocalizableError {
@@ -579,6 +583,15 @@ export class HardwareUnsupportedError extends LocalizableError {
     super({
       id: messages.hardwareUnsupportedError.id,
       defaultMessage: messages.hardwareUnsupportedError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetUtxoDataError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getUtxoDataError.id,
+      defaultMessage: messages.getUtxoDataError.defaultMessage || '',
     });
   }
 }

@@ -169,10 +169,11 @@ export function cardanoValueFromRemoteFormat(
 }
 export function createMultiToken(
   amount: number | string | BigNumber,
-  assets: Array<{|
+  assets: Array<{
     assetId: string,
     amount: number | string | BigNumber,
-  |}>,
+    ...,
+  }>,
   networkId: number,
 ): MultiToken {
   const result = new MultiToken(
@@ -198,7 +199,14 @@ export function createMultiToken(
 }
 export function multiTokenFromRemote(
   utxo: $ReadOnly<{
-    ...RemoteUnspentOutput,
+    +amount: string,
+    +assets: $ReadOnlyArray<$ReadOnly<{
+      +assetId: string,
+      +policyId: string,
+      +name: string,
+      +amount: string,
+      ...
+    }>>,
     ...,
   }>,
   networkId: number,

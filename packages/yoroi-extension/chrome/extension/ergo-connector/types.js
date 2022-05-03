@@ -486,8 +486,13 @@ export type FailedSignData = {|
   type: 'sign_rejected',
   uid: RpcUid,
   tabId: number,
+|} | {|
+  type: 'sign_error',
+  errorType: 'string',
+  data: string,
+  uid: RpcUid,
+  tabId: number,
 |}
-
 export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: true,
