@@ -169,11 +169,11 @@ export function cardanoValueFromRemoteFormat(
 }
 export function createMultiToken(
   amount: number | string | BigNumber,
-  assets: Array<{|
+  assets: Array<{
     assetId: string,
     amount: number | string | BigNumber,
     ...,
-  |}>,
+  }>,
   networkId: number,
 ): MultiToken {
   const result = new MultiToken(
