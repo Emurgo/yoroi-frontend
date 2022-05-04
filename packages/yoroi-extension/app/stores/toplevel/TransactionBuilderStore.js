@@ -86,6 +86,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateMemo.listen(this._updateMemo);
     actions.addToken.listen(this._addToken);
     actions.removeToken.listen(this._removeToken);
+    actions.filterTokensWithNoAmount.listen(this._filterTokensWithNoAmount)
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.updateSendAllStatus.listen(this._updateSendAllStatus);
     actions.initialize.listen(this._initialize);
@@ -173,7 +174,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   )
 
   _canCompute(): boolean {
-    console.log({ len: this.plannedTxInfoMap.length })
     if (this.plannedTxInfoMap.length === 0) return false;
     for (const token of this.plannedTxInfoMap) {
       // we only care about the value in non-sendall case
@@ -204,7 +204,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       return;
     }
 
-    const plannedTxInfoMap = this.plannedTxInfoMap;
+    const plannedTxInfoMap = this.plannedTxInfoMap
     const receiver = this.receiver;
     if (receiver == null) return;
 
@@ -399,6 +399,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     this.selectedToken = token;
+  }
+
+  @action
+  _filterTokensWithNoAmount: void => void = () => {
+    // Filter out tokens that has no amount
+    this.plannedTxInfoMap = this.plannedTxInfoMap.filter(
+      ({ amount, shouldSendAll }) => amount || shouldSendAll
+    );
   }
 
   @action

@@ -526,7 +526,10 @@ class WalletSendPage extends Component<AllProps> {
 
     return (
       <AddTokenDialog
-        onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        onClose={() => {
+          txBuilderActions.filterTokensWithNoAmount.trigger()
+          this.generated.actions.dialogs.closeActiveDialog.trigger()
+        }}
         spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         classicTheme={this.generated.stores.profile.isClassicTheme}
@@ -600,7 +603,10 @@ class WalletSendPage extends Component<AllProps> {
           |}) => void
         |},
         removeToken: {|
-          trigger: (params: void | $ReadOnly<TokenRow>) => void
+          trigger: (params: void | $ReadOnly<TokenRow>) => void,
+        |},
+        filterTokensWithNoAmount: {|
+          trigger: (params: void) => void,
         |},
         updateMemo: {|
           trigger: (params: void | string) => void
@@ -799,6 +805,7 @@ class WalletSendPage extends Component<AllProps> {
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
           addToken: { trigger: actions.txBuilderActions.addToken.trigger },
           removeToken: { trigger: actions.txBuilderActions.removeToken.trigger },
+          filterTokensWithNoAmount: { trigger: actions.txBuilderActions.filterTokensWithNoAmount.trigger },
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },
