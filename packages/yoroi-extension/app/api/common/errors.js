@@ -188,6 +188,10 @@ const messages = defineMessages({
     id: 'api.errors.hardwareUnsupportedError',
     defaultMessage: '!!!This action is not supported for the currently selected hardware.',
   },
+  invalidAmount: {
+    id: 'api.error.invalidAmountError',
+    defaultMessage: '!!!Invalid Amount',
+  }
 });
 
 export class ServerStatusError extends LocalizableError {
@@ -286,6 +290,16 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
       id: messages.notEnoughMoneyToSendError.id,
       defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
     });
+  }
+}
+
+export class InvalidTokenAmountError extends LocalizableError {
+  constructor(tokenId: string) {
+    super({
+      id: messages.notEnoughMoneyToSendError.id,
+      defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
+    })
+    this.tokenId = tokenId;
   }
 }
 export class CannotSendBelowMinimumValueError extends LocalizableError {

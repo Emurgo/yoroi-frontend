@@ -378,14 +378,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _addToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
-  |}) => void = ({ token, shouldReset }) => {
+  |}) => void = ({ token, shouldReset, maxAmount }) => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
     const selectedToken = (
       token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     );
-    const tokensToAdd = [{ token: selectedToken }]
+    const tokensToAdd = [{ token: selectedToken, maxAmount }]
     if (shouldReset) {
       this.plannedTxInfoMap = tokensToAdd;
     } else {

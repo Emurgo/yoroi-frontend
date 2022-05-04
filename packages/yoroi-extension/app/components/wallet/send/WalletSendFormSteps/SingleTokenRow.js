@@ -13,8 +13,7 @@ import {
 import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import type {
-  TokenLookupKey,
-  TokenEntry
+  TokenLookupKey
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { UriParams } from '../../../../utils/URIHandling';
@@ -43,9 +42,6 @@ type Props = {|
     +getTokenAmount: ($ReadOnly<TokenRow>) => ?string
 |};
 
-type State = {|
-  error: string,
-|}
 
 const messages = defineMessages({
     calculatingFee: {
@@ -53,37 +49,26 @@ const messages = defineMessages({
         defaultMessage: '!!!Calculating fee...',
     },
 })
-export default class SingleTokenRow extends Component<Props, State> {
+export default class SingleTokenRow extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state: State = {
-    error: ''
-  }
-
   getNumDecimals(): number {
     return this.props.token.info.Metadata.numberOfDecimals;
   }
 
-  getTokenEntry: MultiToken => TokenEntry = (tokens) => {
-    return this.props.selectedToken == null
-      ? tokens.getDefaultEntry()
-      : tokens.values.find(
-        entry => entry.identifier === this.props.selectedToken?.Identifier
-      ) ?? tokens.getDefaultEntry();
+  componentDidMount() {
+    this.isValidAmount();
   }
 
   render(): Node {
     const { token } = this.props;
-    const { error } = this.state;
 
     let transactionError = null;
 
-    if (error) {
-      transactionError = error
-    } else if (this.props.isCalculatingFee) {
+    if (this.props.isCalculatingFee) {
       transactionError = this.context.intl.formatMessage(messages.calculatingFee);
     }
     if (this.props.error) {
@@ -114,8 +99,8 @@ export default class SingleTokenRow extends Component<Props, State> {
               <AmountInputRevamp
                 value={this.props.getTokenAmount(token.info)}
                 onChange={async (value) => {
-                  if (value) value = new BigNumber(value)
-                  this.props.updateAmount(value)
+                  if (value) value = new BigNumber(value);
+                  this.props.updateAmount(value);
                 }}
                 onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
@@ -124,7 +109,7 @@ export default class SingleTokenRow extends Component<Props, State> {
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
-              {token.info.Identifier === this.props.selectedToken?.Identifier && transactionError}
+              {token.info.Identifier === this.props.error?.tokenId && transactionError}
             </p>
           </div>
            )}

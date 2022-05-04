@@ -274,7 +274,11 @@ export default class AddTokenDialog extends Component<Props, State> {
                       validateAmount={this.props.validateAmount}
                       defaultToken={this.props.defaultToken}
                       getTokenInfo={this.props.getTokenInfo}
-                      onAddToken={t => { this.props.onAddToken({ token: t, shouldReset: false }) }}
+                      onAddToken={t => {
+                        this.props.onAddToken({
+                          token: t, shouldReset: false, maxAmount: token.amount,
+                        })
+                      }}
                       onRemoveToken={this.props.onRemoveToken}
                       fee={this.props.fee}
                       error={this.props.error}

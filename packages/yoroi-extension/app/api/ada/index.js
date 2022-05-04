@@ -92,6 +92,7 @@ import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
 import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
+  InvalidTokenAmountError,
   IncorrectWalletPasswordError,
   InvalidWitnessError,
   NotEnoughMoneyToSendError,
@@ -1089,6 +1090,14 @@ export default class AdaApi {
   async createUnsignedTx(
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
+    // Valid non-default tokens amount
+    request.tokens.forEach(({ token, shouldSendAll, amount, maxAmount }) => {
+      if(!token.IsDefault && !shouldSendAll && maxAmount) {
+        amount = new BigNumber(amount)
+        if (amount.gt(maxAmount)) throw new InvalidTokenAmountError(token.Identifier)
+      }
+    });
+
     const utxos = await request.publicDeriver.getAllUtxos();
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 

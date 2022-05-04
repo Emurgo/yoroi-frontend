@@ -27,7 +27,7 @@ type GetTokenFunc = (
     getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
 ) => FormattedTokenDisplay[]
 
-export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo ) => {
+export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo) => {
     if (spendableBalance == null) return [];
     return [
             ...spendableBalance.nonDefaultEntries(),

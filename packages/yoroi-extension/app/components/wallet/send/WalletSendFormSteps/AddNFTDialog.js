@@ -125,10 +125,10 @@ export default class AddNFTDialog extends Component<Props, State> {
     if (this.props.isTokenIncluded(token)) {
       this.props.onRemoveToken(token)
     } else {
-      this.props.onAddToken({
-        token, shouldReset: false
-      })
       const amount = new BigNumber('1')
+      this.props.onAddToken({
+        token, shouldReset: false, maxAmount: amount
+      })
       this.props.updateAmount(amount)
     }
   }
