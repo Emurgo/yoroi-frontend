@@ -59,10 +59,6 @@ export default class SingleTokenRow extends Component<Props> {
     return this.props.token.info.Metadata.numberOfDecimals;
   }
 
-  componentDidMount() {
-    this.isValidAmount();
-  }
-
   render(): Node {
     const { token } = this.props;
 
