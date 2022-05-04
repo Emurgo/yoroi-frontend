@@ -173,6 +173,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   )
 
   _canCompute(): boolean {
+    console.log({ len: this.plannedTxInfoMap.length })
     if (this.plannedTxInfoMap.length === 0) return false;
     for (const token of this.plannedTxInfoMap) {
       // we only care about the value in non-sendall case
@@ -378,12 +379,26 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}) => void = ({ token, shouldReset }) => {
-    this.selectedToken = token;
-    if (shouldReset) this.plannedTxInfoMap = [];
-    // Filter out tokens that have no amount
-    this.plannedTxInfoMap = this.plannedTxInfoMap.filter(
-      ({ amount, shouldSendAll }) => amount || shouldSendAll
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const selectedToken = (
+      token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     );
+    const tokensToAdd = [{ token: selectedToken }]
+    if (shouldReset) {
+      this.plannedTxInfoMap = tokensToAdd;
+    } else {
+        const tokenTxInfo = this.plannedTxInfoMap.find(
+          ({ token: t }) => t.Identifier === selectedToken.Identifier
+        );
+
+        if (!tokenTxInfo) {
+          this.plannedTxInfoMap.push(...tokensToAdd)
+        }
+    }
+
+    this.selectedToken = token;
   }
 
   @action
