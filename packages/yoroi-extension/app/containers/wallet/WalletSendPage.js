@@ -465,11 +465,16 @@ class WalletSendPage extends Component<AllProps> {
     />);
   }
 
+  _getTokenFromTxInfo(token) {
+    const { transactionBuilderStore } = this.generated.stores;
+    return transactionBuilderStore.plannedTxInfoMap.find(
+      ({ token: t }) => t.Identifier === token.Identifier)
+  }
+
   isTokenIncluded: ($ReadOnly<TokenRow>) => boolean = (token) => {
     const { transactionBuilderStore } = this.generated.stores;
     return (
-      !!transactionBuilderStore.plannedTxInfoMap.find(
-        ({ token: t }) => t.Identifier === token.Identifier) ||
+      !!this._getTokenFromTxInfo(token) ||
       transactionBuilderStore.selectedToken?.Identifier === token.Identifier
     );
   }
@@ -554,6 +559,11 @@ class WalletSendPage extends Component<AllProps> {
         onRemoveToken={txBuilderActions.removeToken.trigger}
         getTokenAmount={this.getTokenAmount}
         isTokenIncluded={this.isTokenIncluded}
+        isValidAmount={(token) => {
+          const tokenInfo = this._getTokenFromTxInfo(token);
+          if (!tokenInfo || !tokenInfo.amount) return true
+          return tokenInfo.isValidAmount === true;
+        }}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
       />
     )

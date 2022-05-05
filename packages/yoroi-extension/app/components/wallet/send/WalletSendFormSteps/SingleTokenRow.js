@@ -55,24 +55,26 @@ export default class SingleTokenRow extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  state = {
+    amount: null,
+  }
+
+  componentDidMount() {
+    this.setState({ amount: this.props.getTokenAmount(this.props.token.info) })
+  }
+
   getNumDecimals(): number {
     return this.props.token.info.Metadata.numberOfDecimals;
   }
 
+  onAmountUpdate(value) {
+    if (value) value = new BigNumber(value);
+    this.setState({ amount: value })
+    this.props.updateAmount(value);
+  }
+
   render(): Node {
-    const { token } = this.props;
-
-    let transactionError = null;
-
-    if (this.props.isCalculatingFee) {
-      transactionError = this.context.intl.formatMessage(messages.calculatingFee);
-    }
-    if (this.props.error) {
-      transactionError = this.context.intl.formatMessage(
-        this.props.error,
-        this.props.error.values
-      );
-    }
+    const { token, isValidAmount } = this.props;
 
     return (
       <div className={styles.component}>
@@ -93,11 +95,8 @@ export default class SingleTokenRow extends Component<Props> {
             </div>
             <div className={styles.amountInput}>
               <AmountInputRevamp
-                value={this.props.getTokenAmount(token.info)}
-                onChange={async (value) => {
-                  if (value) value = new BigNumber(value);
-                  this.props.updateAmount(value);
-                }}
+                value={this.state.amount}
+                onChange={this.onAmountUpdate.bind(this)}
                 onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
               />
@@ -105,7 +104,7 @@ export default class SingleTokenRow extends Component<Props> {
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
-              {token.info.Identifier === this.props.error?.tokenId && transactionError}
+              {!isValidAmount(token.info) && 'hello world error!'}
             </p>
           </div>
            )}

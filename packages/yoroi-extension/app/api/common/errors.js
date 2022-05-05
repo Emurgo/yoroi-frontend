@@ -187,10 +187,6 @@ const messages = defineMessages({
   hardwareUnsupportedError: {
     id: 'api.errors.hardwareUnsupportedError',
     defaultMessage: '!!!This action is not supported for the currently selected hardware.',
-  },
-  invalidAmount: {
-    id: 'api.error.invalidAmountError',
-    defaultMessage: '!!!Invalid Amount',
   }
 });
 

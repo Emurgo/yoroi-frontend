@@ -191,19 +191,19 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   _isValidAmounts(): boolean  {
-    // Valid non-default tokens amount
+    // Validate non-default tokens amount
     let isValidAmounts = Boolean(this.plannedTxInfoMap.length)
     for (let i = 0; i < this.plannedTxInfoMap.length; i++) {
       const { token, shouldSendAll, maxAmount, amount } = this.plannedTxInfoMap[i];
-      if(!token.IsDefault && !shouldSendAll && maxAmount && amount) {
-        if (( new BigNumber(amount)).gt(maxAmount)) {
-          runInAction(() => {
-            this.plannedTxInfoMap[i].isValidAmount = false;
-          })
-          isValidAmounts = false
-        }
-      }
-    }
+      if(!token.IsDefault && !shouldSendAll && maxAmount) {
+        const isValidAmount = amount && (new BigNumber(amount)).lt(maxAmount)
+        runInAction(() => {
+          this.plannedTxInfoMap[i].isValidAmount = isValidAmount;
+        })
+
+        if (isValidAmount === false) isValidAmounts = false
+      };
+    };
 
     return isValidAmounts
   }
@@ -422,10 +422,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   @action
   _filterTokensWithNoAmount: void => void = () => {
-    // Filter out tokens that has no amount
-    this.plannedTxInfoMap = this.plannedTxInfoMap.filter(
-      ({ amount, shouldSendAll }) => amount || shouldSendAll
-    );
+    // Filter out tokens with invalid amount
+    this.plannedTxInfoMap = this.plannedTxInfoMap.filter(({
+      token, shouldSendAll, isValidAmount
+    }) => token.IsDefault || shouldSendAll || isValidAmount);
   }
 
   @action
