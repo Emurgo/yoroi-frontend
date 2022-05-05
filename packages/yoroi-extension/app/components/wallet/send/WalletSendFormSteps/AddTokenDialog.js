@@ -33,6 +33,7 @@ import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepa
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
 import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
+import MinAda from './MinAda';
 
 type Props = {|
   +onClose: void => void,
@@ -111,7 +112,7 @@ export const messages: Object = defineMessages({
   },
   minAda: {
     id: 'wallet.send.form.dialog.minAda',
-    defaultMessage: '!!!min-ada'
+    defaultMessage: '!!!Min-ADA'
   },
   add: {
     id: 'wallet.send.form.dialog.add',
@@ -201,7 +202,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onClose } = this.props
+    const { onClose, totalInput, fee, isCalculatingFee, getTokenInfo } = this.props
     const { currentTokensList, fullTokensList } = this.state
 
     return (
@@ -219,10 +220,12 @@ export default class AddTokenDialog extends Component<Props, State> {
           </div>
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
-            <p>
-              <span className={styles.label}>{intl.formatMessage(messages.minAda)}{':'}</span> 
-              <span>{this.renderMinAda()}</span>
-            </p>
+            <MinAda
+              totalInput={totalInput}
+              fee={fee}
+              isCalculatingFee={isCalculatingFee}
+              getTokenInfo={getTokenInfo}
+            />
           </div>
           )}
           {

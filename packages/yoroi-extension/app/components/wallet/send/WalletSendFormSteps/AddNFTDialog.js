@@ -24,7 +24,7 @@ import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/datab
 import classnames from 'classnames';
 import { Button } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
+import MinAda from './MinAda';
 
 type Props = {|
   +onClose: void => void,
@@ -76,10 +76,6 @@ export const messages: Object = defineMessages({
   noTokensYet: {
     id: 'wallet.send.form.dialog.noTokensYet',
     defaultMessage: '!!!There are no tokens in your wallet yet'
-  },
-  minAda: {
-    id: 'wallet.send.form.dialog.minAda',
-    defaultMessage: '!!!min-ada'
   },
   add: {
     id: 'wallet.send.form.dialog.add',
@@ -133,19 +129,9 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
   }
 
-
-  renderMinAda(): string {
-    const { totalInput, fee, isCalculatingFee } = this.props
-    if (isCalculatingFee) return '...';
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    if (!totalInput || !fee) return '0.0';
-    const amount = totalInput.joinSubtractCopy(fee);
-    return formatValue(amount.getDefaultEntry());
-  }
-
   render(): Node {
     const { intl } = this.context;
-    const { onClose } = this.props
+    const { onClose, totalInput, fee, isCalculatingFee, getTokenInfo } = this.props
     const { currentNftsList, fullNftsList } = this.state
 
     return (
@@ -163,10 +149,12 @@ export default class AddNFTDialog extends Component<Props, State> {
           </div>
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
-            <p>
-              <span className={styles.label}>{intl.formatMessage(messages.minAda)}{':'}</span>
-              <span>{this.renderMinAda()}</span>
-            </p>
+            <MinAda
+              totalInput={totalInput}
+              fee={fee}
+              isCalculatingFee={isCalculatingFee}
+              getTokenInfo={getTokenInfo}
+            />
           </div>
          )}
           {
