@@ -602,6 +602,24 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const input = txBody.inputs().get(i);
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
       const txIndex = input.index();
+      if (
+        submittedTxs.find(
+          ({ usedUtxos }) =>
+            usedUtxos.find(usedUtxo => usedUtxo.txHash === txHash && usedUtxo.index === txIndex)
+        )
+      ) {
+        window.chrome.runtime.sendMessage(
+          {
+            type: 'sign_error',
+            errorType: 'spent_utxo',
+            data: `${txHash}${txIndex}`,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+          }
+        );
+        this._closeWindow();
+        return;
+      }
       // eslint-disable-next-line camelcase
       const utxo = addressedUtxos.find(({ tx_hash, tx_index }) =>
         // eslint-disable-next-line camelcase
