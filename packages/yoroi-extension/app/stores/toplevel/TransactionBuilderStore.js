@@ -190,6 +190,23 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return true;
   }
 
+  _isValidAmounts(): boolean  {
+    // Valid non-default tokens amount
+    let isValidAmounts = Boolean(this.plannedTxInfoMap.length)
+    for (let i = 0; i < this.plannedTxInfoMap.length; i++) {
+      const { token, shouldSendAll, maxAmount, amount } = this.plannedTxInfoMap[i];
+      if(!token.IsDefault && !shouldSendAll && maxAmount && amount) {
+        if (( new BigNumber(amount)).gt(maxAmount)) {
+          runInAction(() => {
+            this.plannedTxInfoMap[i].isValidAmount = false;
+          })
+          isValidAmounts = false
+        }
+      }
+    }
+
+    return isValidAmounts
+  }
   /**
    * Note: need to check state outside of runInAction
    * Otherwise reaction won't trigger
@@ -199,8 +216,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       this.createUnsignedTx.reset();
       this.plannedTx = null;
     });
+
+    console.log({isValid: this._isValidAmounts(), plannedTxInfoMap: JSON.parse(JSON.stringify(this.plannedTxInfoMap)) })
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver || !this._canCompute()) {
+    if (!publicDeriver || !this._canCompute() || !this._isValidAmounts()) {
       return;
     }
 
