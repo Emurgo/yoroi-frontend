@@ -455,7 +455,7 @@ export type PendingSignData = {|
   type: 'data',
   uid: RpcUid,
   address: Address,
-  bytes: string
+  payload: string
 |} | {|
   type: 'tx/cardano',
   uid: RpcUid,
@@ -476,7 +476,7 @@ export type PendingSignData = {|
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput>,
+  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput> | null,
   uid: RpcUid,
   tabId: number,
   pw: string,

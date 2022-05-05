@@ -109,11 +109,6 @@ export const getTransactionAmount = async (customWorld: Object): Promise<string>
   return (await amountFieldElement.getText()).split(' ')[0];
 };
 
-export const spendingPasswordInput: LocatorObject = {
-  locator: '//input[@name="walletPassword"]',
-  method: 'xpath',
-};
-
 export const confirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
 export const cancelButton: LocatorObject = { locator: '.MuiButton-secondary', method: 'css' };
 
