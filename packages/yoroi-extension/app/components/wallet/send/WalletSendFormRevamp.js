@@ -398,22 +398,13 @@ export default class WalletSendForm extends Component<Props, State> {
     const { form } = this
     const { intl } = this.context;
     const { showMemoWarning, invalidMemo, memo } = this.state
-    const { shouldSendAll } = this.props
+    const { shouldSendAll, isCalculatingFee, error, getTokenInfo } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    const formatValue = genFormatTokenAmount(getTokenInfo);
 
-    let transactionFeeError = null;
-    if (this.props.isCalculatingFee) {
-      transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
-    }
-    if (this.props.error) {
-      transactionFeeError = this.context.intl.formatMessage(
-        this.props.error,
-        this.props.error.values
-      );
-    }
+    const transactionFeeError = error && intl.formatMessage(error, error.values);
 
     const transactionFee = this.props.fee ?? new MultiToken([], {
       defaultIdentifier: this.props.defaultToken.Identifier,
@@ -483,13 +474,11 @@ export default class WalletSendForm extends Component<Props, State> {
         case SEND_FORM_STEP.AMOUNT:
           return (
             <div className={styles.amountStep}>
-              {
-                !isDefaultSelected && (
-                  <p className={styles.error}>
-                    {amountInputError}
-                  </p>
-                )
-              }
+              {isCalculatingFee && (
+                <p className={styles.calculatingFee}>
+                  {intl.formatMessage(messages.calculatingFee)}
+                </p>
+              )}
               <div className={classnames(
                 [styles.amountInput,
                   amountInputError && isDefaultSelected && styles.amountInputError,
