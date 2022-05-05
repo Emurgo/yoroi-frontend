@@ -44,10 +44,10 @@ type Props = {|
 
 
 const messages = defineMessages({
-    calculatingFee: {
-        id: 'wallet.send.form.calculatingFee',
-        defaultMessage: '!!!Calculating fee...',
-    },
+  notEnoughMoneyToSendError: {
+    id: 'api.errors.NotEnoughMoneyToSendError',
+    defaultMessage: '!!!Not enough funds to make this transaction.',
+  },
 })
 export default class SingleTokenRow extends Component<Props> {
 
@@ -74,6 +74,7 @@ export default class SingleTokenRow extends Component<Props> {
   }
 
   render(): Node {
+    const { intl } = this.context;
     const { token, isValidAmount } = this.props;
 
     return (
@@ -104,7 +105,7 @@ export default class SingleTokenRow extends Component<Props> {
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
-              {!isValidAmount(token.info) && 'hello world error!'}
+              {!isValidAmount(token.info) && intl.formatMessage(messages.notEnoughMoneyToSendError)}
             </p>
           </div>
            )}

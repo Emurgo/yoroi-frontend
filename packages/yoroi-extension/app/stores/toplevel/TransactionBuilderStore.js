@@ -196,7 +196,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     for (let i = 0; i < this.plannedTxInfoMap.length; i++) {
       const { token, shouldSendAll, maxAmount, amount } = this.plannedTxInfoMap[i];
       if(!token.IsDefault && !shouldSendAll && maxAmount) {
-        const isValidAmount = amount && (new BigNumber(amount)).lt(maxAmount)
+        const isValidAmount = amount && (new BigNumber(amount)).lte(maxAmount)
         runInAction(() => {
           this.plannedTxInfoMap[i].isValidAmount = isValidAmount;
         })
