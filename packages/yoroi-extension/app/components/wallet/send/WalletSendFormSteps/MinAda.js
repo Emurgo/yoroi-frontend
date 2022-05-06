@@ -7,9 +7,14 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Typography } from '@mui/material';
+import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
+import type { TokenRow, } from '../../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-
+  +fee: ?MultiToken,
+  +isCalculatingFee: boolean,
+  +totalInput: ?MultiToken,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |}
 
 export const messages: Object = defineMessages({
@@ -54,6 +59,8 @@ export default class MinAda extends Component<Props> {
               </Typography>
             )
         }
+
+        if (!fee || !totalInput) return '';
         const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
         const amount = totalInput.joinSubtractCopy(fee);
 

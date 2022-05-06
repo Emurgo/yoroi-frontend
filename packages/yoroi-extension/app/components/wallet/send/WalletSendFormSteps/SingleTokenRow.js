@@ -39,9 +39,13 @@ type Props = {|
     +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
     +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
     +onAddToken: $ReadOnly<TokenRow> => void,
-    +getTokenAmount: ($ReadOnly<TokenRow>) => ?string
+    +getTokenAmount: ($ReadOnly<TokenRow>) => ?string,
+    +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
+type State = {|
+  amount: ?string,
+|}
 
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
@@ -49,13 +53,13 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough funds to make this transaction.',
   },
 })
-export default class SingleTokenRow extends Component<Props> {
+export default class SingleTokenRow extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     amount: null,
   }
 
@@ -67,10 +71,9 @@ export default class SingleTokenRow extends Component<Props> {
     return this.props.token.info.Metadata.numberOfDecimals;
   }
 
-  onAmountUpdate(value) {
-    if (value) value = new BigNumber(value);
+  onAmountUpdate(value: string): void {
     this.setState({ amount: value })
-    this.props.updateAmount(value);
+    this.props.updateAmount(value ? (new BigNumber(value)) : null);
   }
 
   render(): Node {

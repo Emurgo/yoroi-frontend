@@ -136,6 +136,7 @@ type Props = {|
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
   +onAddToken: ({|
     token?: $ReadOnly<TokenRow>,
+    maxAmount?: string,
     shouldReset?: boolean,
   |}) => void,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
@@ -146,6 +147,8 @@ type Props = {|
   +plannedTxInfoMap: Array<{|
     token: $ReadOnly<TokenRow>,
     amount?: string,
+    isValidAmount?: boolean,
+    maxAmount?: string,
     shouldSendAll?: boolean,
   |}>,
   +isOpen: any => boolean,

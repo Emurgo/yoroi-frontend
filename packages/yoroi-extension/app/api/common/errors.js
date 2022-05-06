@@ -289,15 +289,6 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
   }
 }
 
-export class InvalidTokenAmountError extends LocalizableError {
-  constructor(tokenId: string) {
-    super({
-      id: messages.notEnoughMoneyToSendError.id,
-      defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
-    })
-    this.tokenId = tokenId;
-  }
-}
 export class CannotSendBelowMinimumValueError extends LocalizableError {
   constructor() {
     super({

@@ -109,7 +109,11 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
-  +onAddToken: ({| token: void | $ReadOnly<TokenRow>, shouldReset?: boolean, |}) => void,
+  +onAddToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldReset?: boolean,
+    maxAmount?: string,
+  |}) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
 |};

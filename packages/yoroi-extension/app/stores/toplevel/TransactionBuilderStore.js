@@ -37,6 +37,14 @@ export type SetupSelfTxRequest = {|
 |};
 export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
 
+export type PlannedTxInfoMap = Array<{|
+  token: $ReadOnly<TokenRow>,
+  shouldSendAll?: boolean,
+  amount?: string,
+  maxAmount?: string,
+  isValidAmount?: boolean,
+|}>
+
 /**
  * TODO: we make the following assumptions
  * - only single output for transaction
@@ -47,11 +55,7 @@ export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
 export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap> {
 
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfoMap: Array<{|
-    token: $ReadOnly<TokenRow>,
-    amount?: string,
-    shouldSendAll?: boolean,
-  |}> = [];
+  @observable plannedTxInfoMap: PlannedTxInfoMap= [];
 
   @observable receiver: string | null;
   /** Stores the tx used to generate the information on the send form */
@@ -198,7 +202,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       if(!token.IsDefault && !shouldSendAll && maxAmount) {
         const isValidAmount = amount && (new BigNumber(amount)).lte(maxAmount)
         runInAction(() => {
-          this.plannedTxInfoMap[i].isValidAmount = isValidAmount;
+          this.plannedTxInfoMap[i].isValidAmount = Boolean(isValidAmount);
         })
 
         if (isValidAmount === false) isValidAmounts = false
@@ -217,7 +221,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       this.plannedTx = null;
     });
 
-    console.log({isValid: this._isValidAmounts(), plannedTxInfoMap: JSON.parse(JSON.stringify(this.plannedTxInfoMap)) })
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver || !this._canCompute() || !this._isValidAmounts()) {
       return;
@@ -258,8 +261,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
       // <TODO:PLUTUS_SUPPORT>
       const utxoHasDataHash = false;
-      const genTokenList = (userInput) => {
-        const tokens = [...userInput];
+      const genTokenList: PlannedTxInfoMap => Array<$ReadOnly<{|
+        token: $ReadOnly<TokenRow>,
+        amount?: string,
+        shouldSendAll?: boolean,
+      |}>> = (userInput) => {
+        const tokens: PlannedTxInfoMap = [...userInput];
         if (!isIncludeDefaultToken) {
           const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
           const fakeMultitoken = new MultiToken(
@@ -288,7 +295,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
           });
         }
 
-        return tokens;
+        return tokens.map((txEntry) => ({
+            token: txEntry.token,
+            amount: txEntry.amount,
+            shouldSendAll: txEntry.shouldSendAll,
+        }));
       }
 
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
@@ -305,8 +316,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee
 
-      const genTokenList = (userInput) => {
-        const tokens = [...userInput];
+      const genTokenList: PlannedTxInfoMap => Array<$ReadOnly<{|
+        token: $ReadOnly<TokenRow>,
+        amount?: string,
+        shouldSendAll?: boolean,
+      |}>> = (userInput) => {
+        const tokens: PlannedTxInfoMap = [...userInput];
         if (!isIncludeDefaultToken) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
@@ -319,7 +334,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
             amount: new BigNumber(10000000).toString()
           });
         }
-        return tokens;
+        return tokens.map((txEntry) => ({
+          token: txEntry.token,
+          amount: txEntry.amount,
+          shouldSendAll: txEntry.shouldSendAll,
+        }));
       }
 
       await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
@@ -397,6 +416,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _addToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
+    maxAmount?: string,
   |}) => void = ({ token, shouldReset, maxAmount }) => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);

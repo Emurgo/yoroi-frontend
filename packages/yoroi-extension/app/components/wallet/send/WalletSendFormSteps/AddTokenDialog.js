@@ -57,9 +57,11 @@ type Props = {|
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
+    maxAmount?: string,
   |}) => void,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
-  +getTokenAmount: ($ReadOnly<TokenRow>) => ?string
+  +getTokenAmount: ($ReadOnly<TokenRow>) => ?string,
+  +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
 type State = {|
