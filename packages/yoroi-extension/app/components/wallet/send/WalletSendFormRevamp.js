@@ -106,7 +106,11 @@ const messages = defineMessages({
   max: {
     id: 'wallet.send.form.max',
     defaultMessage: '!!!MAX',
-  }
+  },
+  minAdaLabel: {
+    id: 'wallet.send.form.amount.minAdaLabel',
+    defaultMessage: '!!!Min ADA'
+},
 });
 
 type Props = {|
@@ -553,7 +557,9 @@ export default class WalletSendForm extends Component<Props, State> {
                   && !isDefaultSelected && !amountFieldProps.value && (
                   <div className={styles.minAda}>
                     <p className={styles.value}>{this.renderMinAda()}</p>
-                    <p className={styles.lable}>Min ADA</p> {/** todo: change it to intl */}
+                    <p className={styles.lable}>
+                      {intl.formatMessage(messages.minAdaLabel)}
+                    </p>
                   </div>
                  )}
                 <div className={styles.usd}>

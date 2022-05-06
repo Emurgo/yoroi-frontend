@@ -164,6 +164,7 @@
   "wallet.send.form.max": "MAX",
   "wallet.send.form.dialog.add": "add",
   "wallet.send.form.dialog.minAda": "Min-ADA: {minAda}",
+  "wallet.send.form.amount.minAdaLabel": "Min ADA",
   "wallet.send.form.dialog.calculatingMinAda": "Calculating min ADA...",
   "wallet.send.form.dialog.noTokensYet": "There are no tokens in your wallet yet",
   "wallet.send.form.dialog.nNft": "NFT ({number})",

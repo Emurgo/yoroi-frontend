@@ -112,10 +112,6 @@ export const messages: Object = defineMessages({
     id: 'wallet.send.form.dialog.noTokensYet',
     defaultMessage: '!!!There are no tokens in your wallet yet'
   },
-  minAda: {
-    id: 'wallet.send.form.dialog.minAda',
-    defaultMessage: '!!!Min-ADA'
-  },
   add: {
     id: 'wallet.send.form.dialog.add',
     defaultMessage: '!!!add'
