@@ -510,6 +510,10 @@ export default class WalletSendForm extends Component<Props, State> {
                         shouldReset: false,
                       });
                     }}
+                    onBlur={() => {
+                      // Remove default token if now amount entered
+                      if (!amountField.value) this.props.onRemoveToken();
+                    }}
                     amountFieldRevamp
                   />
                   <p className={styles.defaultCoin}>
@@ -517,12 +521,20 @@ export default class WalletSendForm extends Component<Props, State> {
                   </p>
                   <Button
                     variant="ternary"
-                    sx={{ minWidth: '56px', minHeight: '30px', border: 'none', background: 'var(--yoroi-palette-gray-50)' }}
+                    sx={{
+                      minWidth: '56px',
+                      minHeight: '30px',
+                      border: 'none',
+                      background: `var(--yoroi-palette-gray-${shouldSendAll ? '900' : '50'})`,
+                      color: shouldSendAll && '#FFFFFF',
+                      '&:hover': {
+                        background: `var(--yoroi-palette-gray-${shouldSendAll ? '800' : '100'})`,
+                      }
+                    }}
                     onClick={() => {
                       if (shouldSendAll) {
                         amountField.reset();
                         this.props.onRemoveToken(); // remove default token
-                        this.props.updateSendAllStatus(false);
                       } else {
                         this.props.onAddToken({
                           shouldReset: true,
@@ -538,7 +550,7 @@ export default class WalletSendForm extends Component<Props, State> {
                   && !isDefaultSelected && !amountFieldProps.value && (
                   <div className={styles.minAda}>
                     <p className={styles.value}>{this.renderMinAda()}</p>
-                    <p className={styles.lable}>Min ADA</p>
+                    <p className={styles.lable}>Min ADA</p> {/** todo: change it to intl */}
                   </div>
                  )}
                 <div className={styles.usd}>

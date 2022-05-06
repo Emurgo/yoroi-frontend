@@ -1,6 +1,6 @@
 {
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
-  "api.errors.CannotSendBelowMinimumValueError": "Minimum required is 1 ADA",
+  "api.errors.CannotSendBelowMinimumValueError": "Cannot send blow minimum required value",
   "api.errors.GenericApiError": "An error occurred, please try again later.",
   "api.errors.IncorrectPasswordError": "Incorrect wallet password.",
   "api.errors.NotEnoughMoneyToSendError": "Not enough funds to make this transaction.",
