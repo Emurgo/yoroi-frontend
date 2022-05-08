@@ -13,6 +13,8 @@ import App from '../../app/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 import { Logger } from '../../app/utils/logging';
+import { LazyLoadPromises } from '../../app/Routes';
+import environment from '../../app/environment';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -47,6 +49,13 @@ const initializeYoroi: void => Promise<void> = async () => {
     throw new Error('Root element not found.');
   }
   Logger.debug(`[yoroi] root located`);
+
+  // lazy loading breaks e2e tests, so eagerly load the pages
+  if (environment.isTest()) {
+    for (const promise of LazyLoadPromises) {
+      promise()
+    }
+  }
 
   render(
     <App stores={stores} actions={actions} history={history} />,
