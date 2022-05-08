@@ -20,8 +20,10 @@ import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inl
 // This is essentially bulk require
 
 // $FlowExpectedError[prop-missing] require.context comes from webpack
-const req = require.context('./locales', true, /\.json.*$/);
-export const translations: { [locale: string]: { [key: string]: string, ... }, ... } = {};
+const req = require.context('./locales', true, /\.json.*$/, 'lazy');
+export const translations: {|
+  [locale: string]: Promise<{| [key: string]: string, |}>,
+|} = {};
 
 req.keys().forEach((file) => {
   const locale = file.replace('./', '').replace('.json', '');

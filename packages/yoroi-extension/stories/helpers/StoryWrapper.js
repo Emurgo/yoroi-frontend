@@ -19,6 +19,7 @@ import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
+import { observable, autorun, runInAction } from 'mobx';
 import { globalStyles } from '../../app/styles/globalStyles';
 import { ThemeProvider as EmotionThemeProvider } from 'emotion-theming';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
@@ -86,17 +87,29 @@ export const isFirefoxKnob: void => boolean = () => {
 
 @observer
 export default class StoryWrapper extends Component<Props> {
+  @observable mergedMessages: null | {| [key: string]: string, |} = null;
+
+  componentDidMount: () => void = () => {
+    autorun(async () => {
+      const _mergedMessages = Object.assign(
+        {},
+        await translations['en-US'],
+        await translations[globalKnobs.locale()]
+      );
+      runInAction(() => {
+        this.mergedMessages = _mergedMessages;
+      });
+    });
+  }
+
   render(): Node {
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
     const { children: Story } = this.props;
     const locale = globalKnobs.locale();
     const currentTheme = globalKnobs.currentTheme();
-
-    // Merged english messages with selected by user locale messages
-    // In this case all english data would be overridden to user selected locale, but untranslated
-    // (missed in object keys) just stay in english
-    // eslint-disable-next-line prefer-object-spread
-    const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
-
 
     changeToplevelTheme(currentTheme);
     const muiTheme = MuiThemes[currentTheme];

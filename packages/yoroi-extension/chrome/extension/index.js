@@ -50,6 +50,9 @@ const initializeYoroi: void => Promise<void> = async () => {
   }
   Logger.debug(`[yoroi] root located`);
 
+  // eagerly cache
+  await stores.profile.getProfileLocaleRequest.execute();
+
   // lazy loading breaks e2e tests, so eagerly load the pages
   if (environment.isTest()) {
     for (const promise of LazyLoadPromises) {
