@@ -2,10 +2,10 @@
 // @flow
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
-import ErrorIcon from '../../assets/images/forms/error.inline.svg';
-import DoneIcon from '../../assets/images/forms/done.inline.svg';
-import EyeIcon from '../../assets/images/forms/password-eye-close.inline.svg';
-import CloseEyeIcon from '../../assets/images/forms/password-eye.inline.svg';
+import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
+import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inline.svg';
+import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
+import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
 import React from 'react';
 
 type Props = {|

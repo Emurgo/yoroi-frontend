@@ -10,7 +10,7 @@ import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/typ
 import CustomTooltip from '../../../widgets/CustomTooltip';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import AttentionIcon from '../../../../assets/images/attention-modern.inline.svg';
+import { ReactComponent as AttentionIcon }  from '../../../../assets/images/attention-modern.inline.svg';
 import { truncateStakePool } from '../../../../utils/formatters';
 
 import Card from './Card';

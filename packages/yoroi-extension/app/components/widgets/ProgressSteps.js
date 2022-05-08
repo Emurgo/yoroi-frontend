@@ -4,10 +4,10 @@ import type { Element, Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 
-import IconTickSVG from '../../assets/images/widget/tick.inline.svg';
-import IconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
-import IconCrossSVG from '../../assets/images/widget/cross.inline.svg';
-import IconCrossGreenSVG from '../../assets/images/widget/cross-green.inline.svg';
+import { ReactComponent as IconTickSVG }  from '../../assets/images/widget/tick.inline.svg';
+import { ReactComponent as IconTickGreenSVG }  from '../../assets/images/widget/tick-green.inline.svg';
+import { ReactComponent as IconCrossSVG }  from '../../assets/images/widget/cross.inline.svg';
+import { ReactComponent as IconCrossGreenSVG }  from '../../assets/images/widget/cross-green.inline.svg';
 import styles from './ProgressSteps.scss';
 
 // TODO: move to type folder?

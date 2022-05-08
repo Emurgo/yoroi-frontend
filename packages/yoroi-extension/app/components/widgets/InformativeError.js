@@ -4,7 +4,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
-import EmptyIllustration from '../../assets/images/dashboard/empty-dashboard.inline.svg';
+import { ReactComponent as EmptyIllustration }  from '../../assets/images/dashboard/empty-dashboard.inline.svg';
 import styles from './InformativeError.scss';
 
 type Props = {|

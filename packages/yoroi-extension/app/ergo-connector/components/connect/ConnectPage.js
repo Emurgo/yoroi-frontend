@@ -28,8 +28,8 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
-import NoWalletImage from '../../assets/images/no-websites-connected.inline.svg'
-import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as NoWalletImage }  from '../../assets/images/no-websites-connected.inline.svg'
+import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 const messages = defineMessages({
   subtitle: {

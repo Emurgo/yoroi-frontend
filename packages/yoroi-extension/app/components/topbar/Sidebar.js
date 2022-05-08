@@ -7,9 +7,9 @@ import styles from './Sidebar.scss';
 import type { SidebarCategory } from '../../stores/stateless/sidebarCategories';
 import classnames from 'classnames';
 
-import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
-import yoroiLogoExpanded from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
-import toggleIcon from '../../assets/images/sidebar/open_sidebar.inline.svg';
+import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as yoroiLogoExpanded }  from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
+import { ReactComponent as toggleIcon }  from '../../assets/images/sidebar/open_sidebar.inline.svg';
 
 type Props = {|
   +children?: ?Node,

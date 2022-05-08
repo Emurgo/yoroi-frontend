@@ -35,7 +35,7 @@ import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
-import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +tx: Tx,
