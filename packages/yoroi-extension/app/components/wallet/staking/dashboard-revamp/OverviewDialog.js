@@ -8,7 +8,7 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HelperTooltip } from './StakePool/StakePool';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
@@ -88,7 +88,26 @@ export default class OverviewModal extends Component<Props> {
         <Box display="flex" alignItems="center" py="50px">
           <Box display="flex" alignItems="center" flex="1">
             <Typography mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
-            <HelperTooltip message={intl.formatMessage(messages.availableTotalRewardsHelper)} />
+            <HelperTooltip
+              message={
+                <p>
+                  <span>{intl.formatMessage(messages.availableTotalRewardsHelper)}</span>
+                  <Link
+                    href="https://emurgohelpdesk.zendesk.com"
+                    target='_blank'
+                    rel="noreferrer noopener"
+                    sx={{
+                      color: 'inherit',
+                      textDecoration: 'underline',
+                      marginLeft: '4px'
+                    }}
+                  >
+                    {intl.formatMessage(messages.FAQPage)}
+                  </Link>
+                  .
+                </p>
+              }
+            />
           </Box>
 
           <Box flex="1">
