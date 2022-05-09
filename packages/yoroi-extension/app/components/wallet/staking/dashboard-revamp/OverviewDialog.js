@@ -33,8 +33,12 @@ const messages = defineMessages({
   availableTotalRewardsHelper: {
     id: 'wallet.staking.availableTotalRewardsHelper',
     defaultMessage:
-      '!!!If the Reward amount is different than expected, see possible reasons of that on our FAQ page.',
+      '!!!If the Reward amount is different than expected, see possible reasons of that on our',
   },
+  FAQPage: {
+    id: 'wallet.staking.FAQPage',
+    defaultMessage: '!!!FAQ page'
+  }
 });
 
 type Props = {|
