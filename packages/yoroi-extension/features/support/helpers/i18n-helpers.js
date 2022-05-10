@@ -26,9 +26,12 @@ export default {
     client: any,
     { id, values }: any
   ): Promise<string> => {
-    const [locale, messages] = await client.executeScript(() => (
-      [yoroi.stores.profile.currentLocale, yoroi.translations]
-    ));
+    const [locale, messages] = await client.executeAsyncScript((callback) => {
+      const locale = yoroi.stores.profile.currentLocale;
+      yoroi.translations[locale].then(translations => {
+        callback([locale, { [locale]: translations }]);
+      });
+    });
     const intlProvider = new IntlProvider({ locale, messages: messages[locale] }, {});
     const translation = intlProvider.getChildContext()
       .intl.formatMessage({ id }, values || {});
