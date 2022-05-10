@@ -20,6 +20,7 @@ import votingIcon from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import settingIcon from '../../assets/images/sidebar/revamp/setting.inline.svg';
 import faqIcon from '../../assets/images/sidebar/revamp/faq.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 // import newUpdatesIcon from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
 // import feedbackIcon from '../../assets/images/sidebar/revamp/feedback.inline.svg';
@@ -135,7 +136,9 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: _request => _request.selected !== null,
+    isVisible: ({ selected }) => (
+      selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
+    ),
   },
   {
     className: 'assets',
