@@ -30,13 +30,14 @@ const messages = defineMessages({
   },
 });
 
-function StakingTabs({ delegatedPool, undelegate, intl }: Props & Intl): Node {
+function StakingTabs({ delegatedPool, undelegate, intl, graphData }: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  const { hideYAxis, items } = graphData.rewardsGraphData
   const tabs = [
     {
       id: 0,
@@ -55,8 +56,8 @@ function StakingTabs({ delegatedPool, undelegate, intl }: Props & Intl): Node {
             xAxisLabel='X Label'
             yAxisLabel='Y Label'
             primaryBarLabel='Bar Label'
-            data={[]}
-            hideYAxis={false}
+            data={items.perEpochRewards}
+            hideYAxis={hideYAxis}
           />
         </Box>
       ),
