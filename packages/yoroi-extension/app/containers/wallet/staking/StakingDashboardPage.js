@@ -70,6 +70,7 @@ import {
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
+import { generateGraphData } from '../../../utils/graph';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -144,9 +145,14 @@ export default class StakingDashboardPage extends Component<Props> {
           errorIfPresent,
         })}
         upcomingRewards={rewardInfo?.rewardPopup}
-        graphData={this._generateGraphData({
+        graphData={generateGraphData({
           delegationRequests,
           publicDeriver,
+          currentEpoch:
+            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
