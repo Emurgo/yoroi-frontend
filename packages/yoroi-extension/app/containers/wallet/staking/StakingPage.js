@@ -50,6 +50,8 @@ import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../tra
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
+import { generateGraphData } from '../../../utils/graph';
+import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -227,6 +229,15 @@ class StakingPage extends Component<AllProps> {
               }
             : undefined
         }
+        graphData={generateGraphData({
+          delegationRequests,
+          publicDeriver,
+          currentEpoch:
+            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
+        })}
       />
     );
   };
@@ -445,6 +456,9 @@ class StakingPage extends Component<AllProps> {
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
+      time: {|
+        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+      |},
       profile: {|
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
@@ -472,6 +486,22 @@ class StakingPage extends Component<AllProps> {
     if (selected == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no wallet selected`);
     }
+    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
+    const time = (() => {
+      if (api === ApiOptions.ada) {
+        return {
+          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+        };
+      }
+      if (api === ApiOptions.jormungandr) {
+        return {
+          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
+        };
+      }
+      return {
+        getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingPage)} api not supported`) },
+      };
+    })();
 
     return Object.freeze({
       stores: {
@@ -502,6 +532,7 @@ class StakingPage extends Component<AllProps> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
+        time,
         substores: {
           ada: {
             delegation: {
