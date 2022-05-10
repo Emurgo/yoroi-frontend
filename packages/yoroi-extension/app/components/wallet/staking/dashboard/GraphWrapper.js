@@ -95,7 +95,7 @@ const GraphTabs: {|
 //   );
 // };
 
-const Graph: {|
+export const Graph: {|
   data: Array<GraphItems>,
   epochTitle: string,
   stakepoolNameTitle: string,

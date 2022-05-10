@@ -12,6 +12,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
+import { Graph as RewardGraph } from '../dashboard/GraphWrapper';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -47,6 +48,16 @@ function StakingTabs({ delegatedPool, undelegate, intl }: Props & Intl): Node {
           <Box py="10px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
             <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />
           </Box>
+
+          <RewardGraph
+            epochTitle='some cool title'
+            stakepoolNameTitle='Poll Name'
+            xAxisLabel='X Label'
+            yAxisLabel='Y Label'
+            primaryBarLabel='Bar Label'
+            data={[]}
+            hideYAxis={false}
+          />
         </Box>
       ),
     },
