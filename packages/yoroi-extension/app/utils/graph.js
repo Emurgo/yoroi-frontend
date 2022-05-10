@@ -1,7 +1,12 @@
 // @flow
-
+import type { GraphData } from '../components/wallet/staking/dashboard/StakingDashboard';
+import type { GraphItems } from '../components/wallet/staking/dashboard/GraphWrapper';
 import { getCardanoHaskellBaseConfig, isCardanoHaskell, isJormungandr } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../api/common/lib/MultiToken';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
+import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
+import type { PoolMeta, DelegationRequests } from '../stores/toplevel/DelegationStore';
+import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 
 const generateRewardGraphData: ({|
     delegationRequests: DelegationRequests,
@@ -13,7 +18,6 @@ const generateRewardGraphData: ({|
     totalRewards: Array<GraphItems>,
     perEpochRewards: Array<GraphItems>,
 |} = request => {
-    console.log({request})
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const history = request.delegationRequests.rewardHistory.result;
@@ -122,10 +126,10 @@ const generateRewardGraphData: ({|
 export const generateGraphData: ({|
    delegationRequests: DelegationRequests,
    publicDeriver: PublicDeriver<>,
-   currentEpoch: boolean,
+   currentEpoch: number,
    shouldHideBalance: boolean,
-   getLocalPoolInfo: string, 
-   tokenInfo: string,
+   getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
+   tokenInfo: TokenInfoMap,
 |}) => GraphData = request => {
     // const timeStore = this.generated.stores.time;
     // const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
