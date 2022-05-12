@@ -137,7 +137,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
     isVisible: ({ selected }) => (
-      selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
+      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
     ),
   },
   {

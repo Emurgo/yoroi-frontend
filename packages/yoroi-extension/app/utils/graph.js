@@ -55,7 +55,7 @@ const generateRewardGraphData: ({|
         return request.currentEpoch + 1;
       }
       throw new Error(
-        `${nameof(this._generateRewardGraphData)} can't compute endEpoch for rewards`
+        `${nameof(generateRewardGraphData)} can't compute endEpoch for rewards`
       );
     })();
 

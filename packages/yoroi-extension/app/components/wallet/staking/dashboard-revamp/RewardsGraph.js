@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { readCssVar } from '../../../../styles/utils';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
+import type { GraphItems } from '../dashboard/GraphWrapper';
 
 const graphVars = {
     axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),

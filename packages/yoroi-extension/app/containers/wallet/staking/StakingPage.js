@@ -52,6 +52,7 @@ import UndelegateDialog from '../../../components/wallet/staking/dashboard/Undel
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { generateGraphData } from '../../../utils/graph';
 import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
+import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin

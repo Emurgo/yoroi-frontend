@@ -13,11 +13,15 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import RewardGraph from './RewardsGraph';
+import type { GraphData } from '../dashboard/StakingDashboard';
 
 type Props = {|
   delegatedPool: PoolData,
   +undelegate: void | (void => Promise<void>),
+  +epochLength: ?number,
+  +graphData: GraphData
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -80,7 +84,7 @@ function StakingTabs({
             xAxisLabel={getEpochLengthLabel()}
             yAxisLabel={intl.formatMessage(globalMessages.rewardsLabel)}
             primaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
-            data={items.perEpochRewards}
+            data={items ? items.perEpochRewards : []}
             hideYAxis={hideYAxis}
           />
         </Box>
