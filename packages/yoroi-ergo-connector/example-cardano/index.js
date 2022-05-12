@@ -201,6 +201,10 @@ function addressesFromCborIfNeeded(addresses) {
     CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32()) : addresses;
 }
 
+function addressToCbor(address) {
+  return bytesToHex(CardanoWasm.Address.from_bech32(address).to_bytes());
+}
+
 getUnUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
        alertError('Should request access first')
@@ -671,6 +675,10 @@ signData.addEventListener('click', () => {
     return;
   }
 
+  if (isCBOR()) {
+    address = addressToCbor(address);
+  }
+
   const payload = document.querySelector('#sign-data-payload').value;
   let payloadHex;
   if (payload.startsWith('0x')) {
@@ -678,6 +686,8 @@ signData.addEventListener('click', () => {
   } else {
     payloadHex = Buffer.from(payload, 'utf8').toString('hex');
   }
+
+  console.log('address >>> ', address);
   cardanoApi.signData(address, payloadHex).then(sig => {
     alertSuccess('Signature:' + JSON.stringify(sig))
   }).catch(error => {
