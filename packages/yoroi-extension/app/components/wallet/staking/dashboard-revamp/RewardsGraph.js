@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { readCssVar } from '../../../../styles/utils';
 import { Box } from '@mui/system';
+import { Typography } from '@mui/material';
 
 const graphVars = {
     axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),
@@ -78,12 +79,21 @@ export default class RewardGraph extends Component<Props> {
       const graphTooltip = (<GraphTooltip />);
       return (
         <>
-          <p>{yAxisLabel}</p>
-          <ResponsiveContainer width="100%" height={240}>
+          <Typography
+            variant='body1'
+            color='var(--yoroi-palette-gray-600)'
+            sx={{
+              marginTop: '20px',
+              marginBottom: '6px',
+            }}
+          >
+            {yAxisLabel}
+          </Typography>
+          <ResponsiveContainer width="100%" height={200}>
             <BarChart
               data={data}
               margin={{
-                left: -20
+                left: -25
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
