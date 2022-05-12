@@ -24,7 +24,7 @@ type Props = {|
     yAxisLabel: string,
     primaryBarLabel: string,
     hideYAxis: boolean,
-|}
+|};
 
 export default class RewardGraph extends Component<Props> {
     render(): Node {
