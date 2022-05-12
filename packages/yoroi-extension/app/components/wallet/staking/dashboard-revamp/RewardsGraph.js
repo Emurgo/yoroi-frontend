@@ -130,6 +130,7 @@ export default class RewardGraph extends Component<Props> {
               <Bar
                 name={primaryBarLabel}
                 maxBarSize={graphVars.barWidth}
+                radius={[25, 25, 0, 0]}
                 dataKey="primary"
                 stackId="a"
                 fill="#C4CAD7"
