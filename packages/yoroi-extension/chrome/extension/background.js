@@ -567,7 +567,7 @@ const yoroiMessageHandler = async (
       responseData.resolve({
         err: {
           code: 3,
-          info: 'utxo error'
+          info: `utxo error: ${request.errorType} (${request.data})`
         }
       });
       connection.pendingSigns.delete(request.uid);
