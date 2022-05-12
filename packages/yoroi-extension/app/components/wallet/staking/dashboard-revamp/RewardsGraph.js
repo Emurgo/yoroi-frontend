@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { readCssVar } from '../../../../styles/utils';
 import { Box } from '@mui/system';
 
@@ -27,65 +27,64 @@ type Props = {|
 
 export default class RewardGraph extends Component<Props> {
     render(): Node {
-        const {
-            hideYAxis,
-            data,
-            xAxisLabel,
-            yAxisLabel,
-            primaryBarLabel,
-            epochTitle,
-            stakepoolNameTitle
-        } = this.props;
+      const {
+          hideYAxis,
+          data,
+          xAxisLabel,
+          yAxisLabel,
+          primaryBarLabel,
+          epochTitle,
+          stakepoolNameTitle
+      } = this.props;
 
-        const formatYAxis = (value) => (
-            !hideYAxis ? value : '∗∗∗ '
-        );
-        const GraphTooltip = (
-            { active, payload, label }: {| active: boolean, payload: ?[any], label: string |}
-        ) => {
-            if (active && payload != null) {
-              const { poolName } =  payload[0].payload
-              return (
-                <Box sx={{
-                  padding: '8px 12px 8px 8px',
-                  backgroundColor: 'var(--yoroi-dashboard-graph-tooltip-background)',
-                  color: 'var(--yoroi-dashboard-graph-tooltip-text-color)',
-                  fontSize: '0.75rem',
-                  lineHeight: '14px',
-                  borderRadius: '4px',
-                }}
-                >
-                  <p>
-                    <span>{epochTitle}:</span>&nbsp;
-                    <span>{label}</span>
-                  </p>
-                  <p>
-                    <span>{primaryBarLabel}:</span>&nbsp;
-                    <span>{payload[0].value}</span>
-                  </p>
-                  {poolName && (
-                  <p>
-                    <span>{stakepoolNameTitle}:</span>&nbsp;
-                    <span>{payload[0].payload.poolName}</span>
-                  </p>)}
-                </Box>
-              );
-            }
-            return null;
-        };
+      const formatYAxis = (value) => (
+          !hideYAxis ? value : '∗∗∗ '
+      );
+      const GraphTooltip = (
+          { active, payload, label }: {| active: boolean, payload: ?[any], label: string |}
+      ) => {
+          if (active && payload != null) {
+            const { poolName } =  payload[0].payload
+            return (
+              <Box sx={{
+                padding: '8px 12px 8px 8px',
+                backgroundColor: 'var(--yoroi-dashboard-graph-tooltip-background)',
+                color: 'var(--yoroi-dashboard-graph-tooltip-text-color)',
+                fontSize: '0.75rem',
+                lineHeight: '14px',
+                borderRadius: '4px',
+              }}
+              >
+                <p>
+                  <span>{epochTitle}:</span>&nbsp;
+                  <span>{label}</span>
+                </p>
+                <p>
+                  <span>{primaryBarLabel}:</span>&nbsp;
+                  <span>{payload[0].value}</span>
+                </p>
+                {poolName && (
+                <p>
+                  <span>{stakepoolNameTitle}:</span>&nbsp;
+                  <span>{payload[0].payload.poolName}</span>
+                </p>)}
+              </Box>
+            );
+          }
+          return null;
+      };
 
-        // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
-        const graphTooltip = (<GraphTooltip />);
-
-        return (
+      // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
+      const graphTooltip = (<GraphTooltip />);
+      return (
+        <>
+          <p>{yAxisLabel}</p>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart
               data={data}
-              margin={{ top: 20,
-                right: 0,
-                left: 10,
-                bottom: 0
-            }}
+              margin={{
+                left: -20
+              }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
@@ -97,11 +96,12 @@ export default class RewardGraph extends Component<Props> {
                 dataKey="name"
                 height={50}
                 label={{
-                value: xAxisLabel,
-                position: 'insideBottom',
-                fontSize: graphVars.fontSize,
-                fill: graphVars.axisTextColor
+                  value: xAxisLabel,
+                  position: 'insideBottom',
+                  fontSize: graphVars.fontSize,
+                  fill: graphVars.axisTextColor
                 }}
+                tickLine={false}
               />
               <YAxis
                 tickFormatter={formatYAxis}
@@ -110,15 +110,8 @@ export default class RewardGraph extends Component<Props> {
                   fontSize: graphVars.fontSize,
                   lineHeight: graphVars.lineHeight
                 }}
-              >
-                <Label
-                  value={yAxisLabel}
-                  position="insideLeft"
-                  angle={-90}
-                  offset={-5}
-                  style={{ textAnchor: 'middle', fontSize: graphVars.fontSize, fill: graphVars.axisTextColor }}
-                />
-              </YAxis>
+                tickLine={false}
+              />
               <Tooltip
                 content={graphTooltip}
                 cursor={{ fill: graphVars.barHoverBgColor }}
@@ -129,10 +122,11 @@ export default class RewardGraph extends Component<Props> {
                 maxBarSize={graphVars.barWidth}
                 dataKey="primary"
                 stackId="a"
-                fill={graphVars.barPrimaryColor}
+                fill="#C4CAD7"
               />
             </BarChart>
           </ResponsiveContainer>
-        );
+        </>
+      );
     }
 };
