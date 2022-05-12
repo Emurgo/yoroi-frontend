@@ -167,6 +167,21 @@ class StakingPage extends Component<AllProps> {
     return undefined;
   };
 
+  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
+    const timeStore = this.generated.stores.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
+    if (getEpochLength == null) return null;
+
+    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
+    if (getSlotLength == null) return null;
+
+    const epochLengthInSeconds = getEpochLength() * getSlotLength();
+    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
+    return epochLengthInDays;
+  };
+
+
   getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -238,6 +253,7 @@ class StakingPage extends Component<AllProps> {
           getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
   };
@@ -458,6 +474,7 @@ class StakingPage extends Component<AllProps> {
       |},
       time: {|
         getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
       |},
       profile: {|
         shouldHideBalance: boolean,
@@ -490,15 +507,18 @@ class StakingPage extends Component<AllProps> {
     const time = (() => {
       if (api === ApiOptions.ada) {
         return {
+          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
           getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
         };
       }
       if (api === ApiOptions.jormungandr) {
         return {
+          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
           getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
         };
       }
       return {
+        getTimeCalcRequests: (undefined: any),
         getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingPage)} api not supported`) },
       };
     })();
