@@ -77,7 +77,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
           </div>
 
           <h1 className={styles.nameToHexHeader}>Colors Direct Hex Colors</h1>
-          {nameToHex.map((color, idx) => (
+          {nameToHex.map((color) => (
             <div className={styles.row} key={color.name}>
               <span
                 className={styles.colorBox}
