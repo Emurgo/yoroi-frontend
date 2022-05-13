@@ -538,6 +538,7 @@ class WalletSendPage extends Component<AllProps> {
     return (
       <AddTokenDialog
         onClose={() => {
+          txBuilderActions.addToken.trigger({})
           txBuilderActions.filterTokensWithNoAmount.trigger()
           this.generated.actions.dialogs.closeActiveDialog.trigger()
         }}
