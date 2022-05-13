@@ -11,8 +11,6 @@ const graphVars = {
     axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),
     axisTextColor: readCssVar('--yoroi-dashboard-graph-axis-text-color'),
     barWidth: readCssVar('--yoroi-dashboard-graph-bar-width'),
-    barHoverBgColor: readCssVar('--yoroi-dashboard-graph-bar-hover-background-color'),
-    barPrimaryColor: readCssVar('--yoroi-palette-gray-300'),
     fontSize: '0.75rem',
     lineHeight: 14,
 };
@@ -125,7 +123,7 @@ export default class RewardGraph extends Component<Props> {
               />
               <Tooltip
                 content={graphTooltip}
-                cursor={{ fill: graphVars.barHoverBgColor }}
+                cursor={{ fill: '#D9DDE0' }}
               />
 
               <Bar
