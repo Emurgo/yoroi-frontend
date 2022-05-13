@@ -55,7 +55,7 @@ function TextField({
     <TextFieldBase
       className={className}
       error={Boolean(error)}
-      label={!revamp && label}
+      label={!Boolean(revamp) && label}
       value={value}
       disabled={disabled}
       autoFocus={autoFocus}
@@ -64,7 +64,7 @@ function TextField({
       onBlur={onBlur}
       onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
-      variant={revamp === true ? 'standard' : 'outlined'}
+      variant={Boolean(revamp) ? 'standard' : 'outlined'}
       /*
         In order to show placeholders for classic theme we dont' need to override
         'shrink' and 'notched' prop status so we pass an empty object
@@ -96,7 +96,7 @@ function TextField({
             </InputAdornment>
           ),
           disableUnderline: revamp,
-          placeholder: placeholder || (revamp ? '0.0' : ''),
+          placeholder: placeholder != null ? placeholder : (Boolean(revamp) ? '0.0' : ''),
       }}
       {...props}
     />
@@ -115,7 +115,7 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
   revamp: false,
-  placeholder: null,
+  placeholder: undefined,
 };
 
 export default TextField;
