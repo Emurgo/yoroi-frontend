@@ -11,6 +11,7 @@ import type {
   RemoteAccountState,
   HistoryFunc,
   BestBlockFunc,
+  UtxoData,
 } from '../../app/api/ada/lib/state-fetch/types';
 import {
   ShelleyCertificateTypes
@@ -2271,6 +2272,51 @@ const getAccountState: AccountStateFunc = async (request) => {
   return result;
 };
 
+const mockScriptOutputs = [
+  {
+    txHash: '156f481d054e1e2798ef3cae84c0e7902b6ec18641c571d54c913e489327ab2d',
+    txIndex: 0,
+    output: {
+      address: '31d7a345ebead42207d4321763c8172869843254c81d007dfa2a7ee279d7a345ebead42207d4321763c8172869843254c81d007dfa2a7ee279',
+      amount: '2000000',
+      dataHash: null,
+      assets: [],
+    },
+    spendingTxHash: '4a3f86762383f1d228542d383ae7ac89cf75cf7ff84dec8148558ea92b0b92d0',
+  },
+  {
+    txHash: 'e7db1f809fcc21d3dd108ced6218bf0f0cbb6a0f679f848ff1790b68d3a35872',
+    txIndex: 0,
+    output: {
+      address: 'addr1w9jur974vh5g5gygtef4lym426pygnfuqt75fhts3ql738sez7sqy',
+      amount: '1000000',
+      dataHash: null,
+      assets: [
+        {
+          assetId: '3652a89686608c45ca5b7768f44a961fe0e3459e21db4ea61b713aa6.4465764578',
+          policyId: '3652a89686608c45ca5b7768f44a961fe0e3459e21db4ea61b713aa6',
+          name: '4465764578',
+          amount: '10'
+        }
+      ],
+    },
+    spendingTxHash: null,
+  }
+];
+
+const getUtxoData  = (txHash: string, txIndex: number): UtxoData | null => {
+  const output = mockScriptOutputs.find(
+    entry => entry.txHash === txHash && entry.txIndex === txIndex
+  );
+  if (!output) {
+    return null;
+  }
+  return {
+    output: output.output,
+    spendingTxHash: output.spendingTxHash
+  };
+}
+
 export default {
   utxoForAddresses,
   utxoSumForAddresses,
@@ -2282,4 +2328,5 @@ export default {
   getPoolInfo,
   getRewardHistory,
   getAccountState,
+  getUtxoData,
 };

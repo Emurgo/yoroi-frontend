@@ -1,10 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import classnames from 'classnames';
 import type { Node, ElementRef } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdownRevamp.scss';
-import ArrowDown from '../../assets/images/my-wallets/arrow_down.inline.svg';
 
 import NavDropdownContentRevamp from './NavDropdownContentRevamp';
 
@@ -48,17 +46,10 @@ export default class NavDropdownRevamp extends Component<Props, State> {
 
     return (
       <div
-        className={classnames([styles.wrapper, isExpanded && styles.wrapperHovered])}
+        className={styles.wrapper}
         onMouseEnter={this.toggleExpansion}
         onMouseLeave={this.toggleExpansion}
       >
-        <div className={styles.icon}>
-          {isExpanded ? (
-            <button className={styles.toggle} type="button">
-              <ArrowDown />
-            </button>
-          ) : null}
-        </div>
         <div className={styles.component}>{headerComponent}</div>
         {isExpanded ? (
           <NavDropdownContentRevamp

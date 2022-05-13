@@ -43,11 +43,11 @@ export const createAuthEntry: ({|
       stakingKey.to_public().hash()
     )
   ).to_address();
-  const entropy = await cip8Sign(
+  const entropy = (await cip8Sign(
     Buffer.from(address.to_bytes()),
     derivedSignKey,
     Buffer.from(`DAPP_LOGIN: ${appAuthID}`, 'utf8'),
-  );
+  )).signature();
 
   const appPrivKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
     entropy,
@@ -72,12 +72,11 @@ export const authSignHexPayload: ({|
   return appPrivKey.sign(Buffer.from(payloadHex, 'hex')).to_hex();
 }
 
-// return the hex string representation of the COSESign1
-const cip8Sign = async (
+export const cip8Sign = async (
   address: Buffer,
   signKey: RustModule.WalletV4.PrivateKey,
   payload: Buffer,
-): Promise<Buffer> => {
+): Promise<RustModule.MessageSigning.COSESign1> => {
   const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
   protectedHeader.set_algorithm_id(
     RustModule.MessageSigning.Label.from_algorithm_id(
@@ -94,6 +93,5 @@ const cip8Sign = async (
   const builder = RustModule.MessageSigning.COSESign1Builder.new(headers, payload, false);
   const toSign = builder.make_data_to_sign().to_bytes();
   const signedSigStruct = signKey.sign(toSign).to_bytes();
-  const coseSign1 = builder.build(signedSigStruct);
-  return Buffer.from(coseSign1.signature());
+  return builder.build(signedSigStruct);
 }

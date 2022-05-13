@@ -93,6 +93,10 @@ export const signTxMessages: Object = defineMessages({
     id: 'api.errors.IncorrectPasswordError',
     defaultMessage: '!!!Incorrect wallet password.',
   },
+  signMessage: {
+    id: 'connector.signin.signMessage',
+    defaultMessage: '!!!Sign Message',
+  },
 });
 
 type State = {|

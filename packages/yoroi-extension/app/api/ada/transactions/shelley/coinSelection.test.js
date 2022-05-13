@@ -23,7 +23,7 @@ function withMockRandom<T>(r: number, f: () => T): T {
 
 function multiToken(
   amount: number | string,
-  assets: Array<{| assetId: string, amount: string |}> = [],
+  assets: Array<{ assetId: string, amount: string, ... }> = [],
 ): MultiToken {
   // $FlowFixMe[incompatible-call]
   return createMultiToken(String(amount), assets || [], 0);
