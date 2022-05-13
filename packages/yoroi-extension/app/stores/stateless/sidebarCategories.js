@@ -21,9 +21,6 @@ import { ReactComponent as settingIcon }  from '../../assets/images/sidebar/reva
 import { ReactComponent as faqIcon }  from '../../assets/images/sidebar/revamp/faq.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
-// import { ReactComponent as newUpdatesIcon }  from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
-// import { ReactComponent as feedbackIcon }  from '../../assets/images/sidebar/revamp/feedback.inline.svg';
-
 export type SidebarCategory = {|
   +className: string,
   +route: string,

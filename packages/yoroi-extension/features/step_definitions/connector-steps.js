@@ -81,7 +81,7 @@ Then(/^There is no the connector popup$/, async function () {
 });
 
 Then(
-  /^I select the only wallet named (.+) with ([0-9\.]+) balance$/,
+  /^I select the only wallet named (.+) with ([0-9.]+) balance$/,
   async function (walletName, expectedBalance) {
     const wallets = await getWallets(this);
     expect(wallets.length).to.equal(1, `expect 1 wallet but get ${wallets.length}`);
@@ -91,7 +91,7 @@ Then(
       `expect wallet name ${walletName} but get wallet name ${name}`
     );
     const balance = await getWalletBalance(wallets, 0);
-    const match = balance.match(/^[0-9\.]+/);
+    const match = balance.match(/^[0-9.]+/);
     expect(match, 'Can not get wallet balance').to.not.be.null;
     // $FlowFixMe[incompatible-use]
     const balanceMatch = match[0];

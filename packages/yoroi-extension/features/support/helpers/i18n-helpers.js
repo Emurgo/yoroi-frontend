@@ -27,14 +27,15 @@ export default {
     { id, values }: any
   ): Promise<string> => {
     const [locale, messages] = await client.executeAsyncScript((callback) => {
+      // eslint-disable-next-line no-shadow
       const locale = yoroi.stores.profile.currentLocale;
-      yoroi.translations[locale].then(translations => {
-        callback([locale, { [locale]: translations }]);
-      });
+      yoroi.translations[locale]
+        .then(translations => callback([locale, { [locale]: translations }]))
+        // eslint-disable-next-line no-console
+        .catch(e => { console.error('Intl fail: ', e); });
     });
     const intlProvider = new IntlProvider({ locale, messages: messages[locale] }, {});
-    const translation = intlProvider.getChildContext()
+    return intlProvider.getChildContext()
       .intl.formatMessage({ id }, values || {});
-    return translation;
   }
 };

@@ -277,7 +277,10 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.intl = (key, lang = 'en-US') => this.driver.executeAsyncScript(
     (k, l, callback) => {
-      window.yoroi.translations[l].then(translation => callback(translation[k]))
+      window.yoroi.translations[l]
+        .then(translation => callback(translation[k]))
+        // eslint-disable-next-line no-console
+        .catch(e => { console.error('Intl fail: ', e); });
     },
     key,
     lang
