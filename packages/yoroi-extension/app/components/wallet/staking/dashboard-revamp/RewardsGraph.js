@@ -8,8 +8,6 @@ import { Typography } from '@mui/material';
 import type { GraphItems } from '../dashboard/GraphWrapper';
 
 const graphVars = {
-    axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),
-    axisTextColor: readCssVar('--yoroi-dashboard-graph-axis-text-color'),
     barWidth: readCssVar('--yoroi-dashboard-graph-bar-width'),
     fontSize: '0.75rem',
     lineHeight: 14,
@@ -98,7 +96,7 @@ export default class RewardGraph extends Component<Props> {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 tick={{
-                  fill: graphVars.axisTickColor,
+                  fill: '#A7AFC0',
                   fontSize: graphVars.fontSize,
                   lineHeight: graphVars.lineHeight
                 }}
@@ -108,17 +106,19 @@ export default class RewardGraph extends Component<Props> {
                   value: xAxisLabel,
                   position: 'insideBottom',
                   fontSize: graphVars.fontSize,
-                  fill: graphVars.axisTextColor
+                  fill: '#A7AFC0'
                 }}
+                stroke="#A7AFC0"
                 tickLine={false}
               />
               <YAxis
                 tickFormatter={formatYAxis}
                 tick={{
-                  fill: graphVars.axisTickColor,
+                  fill: '#A7AFC0',
                   fontSize: graphVars.fontSize,
                   lineHeight: graphVars.lineHeight
                 }}
+                stroke="#A7AFC0"
                 tickLine={false}
               />
               <Tooltip
