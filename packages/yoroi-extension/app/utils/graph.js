@@ -60,10 +60,6 @@ const generateRewardGraphData: ({|
     })();
 
     const getMiniPoolInfo = (poolHash: string) => {
-    //   const meta = this.generated.stores.delegation.getLocalPoolInfo(
-    //     request.publicDeriver.getParent().getNetworkInfo(),
-    //     poolHash
-    //   );
       const meta = request.getLocalPoolInfo(
         request.publicDeriver.getParent().getNetworkInfo(),
         poolHash
@@ -75,9 +71,6 @@ const generateRewardGraphData: ({|
     }
 
     const getNormalized = (tokenEntry) => {
-    //   const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
-    //     .get(tokenEntry.networkId.toString())
-    //     ?.get(tokenEntry.identifier);
          const tokenRow = request.tokenInfo
            .get(tokenEntry.networkId.toString())
            ?.get(tokenEntry.identifier);
