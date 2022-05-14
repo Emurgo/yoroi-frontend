@@ -248,6 +248,7 @@ export class MockDAppWebpage {
         window.walletConnected = false;
       });
     });
+    this.logger.info(`MockDApp: -> onDisconnect hook is set`);
   }
 
   async isEnabled(): Promise<boolean> {
@@ -255,13 +256,14 @@ export class MockDAppWebpage {
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.cardano.yoroi
-        .isEnabled().then(
-        // eslint-disable-next-line promise/always-return
+        .isEnabled()
+        .then(
+          // eslint-disable-next-line promise/always-return
           onSuccess => {
-            callback({ success: true, retValue: onSuccess })
+            callback({ success: true, retValue: onSuccess });
           },
           onReject => {
-            callback({ success: false, errMsg: onReject.message })
+            callback({ success: false, errMsg: onReject.message });
           }
         )
         .catch(error => {
@@ -269,11 +271,14 @@ export class MockDAppWebpage {
         });
     });
     if (isEnabled.success) {
-      this.logger.info(`MockDApp: -> The wallet is enabled`);
+      this.logger.info(`MockDApp: -> The request cardano.yoroi.isEnabled() is successful`);
+      this.logger.info(`MockDApp: -> The wallet is enabled: ${isEnabled.retValue}`);
       return isEnabled.retValue;
     }
     this.logger.error(
-      `MockDApp: -> The wallet is disabled. Error message: ${JSON.stringify(isEnabled)}`
+      `MockDApp: -> The request cardano.yoroi.isEnabled() is unsuccessful. Error message: ${JSON.stringify(
+        isEnabled
+      )}`
     );
     throw new MockDAppWebpageError(isEnabled.errMsg);
   }
