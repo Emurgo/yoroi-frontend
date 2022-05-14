@@ -243,11 +243,7 @@ export class MockDAppWebpage {
 
   async addOnDisconnect() {
     this.logger.info(`MockDApp: Setting the onDisconnect hook`);
-    await this.driver.executeScript(() => {
-      window.api.experimental.onDisconnect(() => {
-        window.walletConnected = false;
-      });
-    });
+    await this.driver.executeScript(`window.walletConnected = false`);
     this.logger.info(`MockDApp: -> onDisconnect hook is set`);
   }
 
@@ -285,7 +281,7 @@ export class MockDAppWebpage {
 
   async getConnectionState(): Promise<boolean> {
     this.logger.info(`MockDApp: Getting the connection state`);
-    const walletConnectedState = await this.driver.executeScript(() => window.walletConnected);
+    const walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
     this.logger.info(`MockDApp: -> The connection state is ${walletConnectedState}`);
     return walletConnectedState;
   }
