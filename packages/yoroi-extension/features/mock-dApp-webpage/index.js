@@ -243,11 +243,16 @@ export class MockDAppWebpage {
 
   async addOnDisconnect() {
     this.logger.info(`MockDApp: Setting the onDisconnect hook`);
-    await this.driver.executeScript(`window.walletConnected = false`);
+    await this.driver.executeScript(() => {
+      window.api.experimental.onDisconnect(() => {
+        window.walletConnected = false;
+      });
+    });
     this.logger.info(`MockDApp: -> onDisconnect hook is set`);
   }
 
   async isEnabled(): Promise<boolean> {
+    await this.driver.sleep(100);
     this.logger.info(`MockDApp: Checking is a wallet enabled`);
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
