@@ -287,7 +287,7 @@ export class MockDAppWebpage {
   async getConnectionState(): Promise<boolean> {
     const states = [];
     this.logger.info(`MockDApp: Getting the connection state`);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 10; i++) {
       this.logger.info(`MockDApp: -> Try ${i + 1} to get the connection state`);
       await this.driver.sleep(100);
       const walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
