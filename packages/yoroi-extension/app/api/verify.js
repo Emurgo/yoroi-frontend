@@ -14,17 +14,17 @@ function verify(
   obj: any,
   serializer: any => Buffer,
   signatureHex: string,
-  publicKey: RustModule.WalletV3.PublicKey
+  publicKey: RustModule.WalletV4.PublicKey
 ): boolean {
   return publicKey.verify(
     serializer(obj),
-    RustModule.WalletV3.Ed25519Signature.from_hex(signatureHex)
+    RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex)
   );
 }
 
 export function verifyTicker(
   ticker: ResponseTicker,
-  pubKeyData: RustModule.WalletV3.PublicKey
+  pubKeyData: RustModule.WalletV4.PublicKey
 ): boolean {
   if (ticker.signature == null) {
     throw new Error('ticker has no signature');
@@ -41,6 +41,6 @@ export function verifyPubKeyDataReplacement(
     pubKeyData,
     s => Buffer.from(s),
     pubKeyDataSignature,
-    RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(pubKeyMaster, 'hex'))
+    RustModule.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyMaster, 'hex'))
   );
 }

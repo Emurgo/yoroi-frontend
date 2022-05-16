@@ -11,7 +11,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import ChangellyFetcher from './ChangellyFetcher'
 
 import styles from './BuySellDialog.scss';
-import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
+import { ReactComponent as VerifyIcon }  from '../../assets/images/verify-icon.inline.svg'
 import VerticalFlexContainer from '../layout/VerticalFlexContainer'
 import LoadingSpinner from '../widgets/LoadingSpinner'
 import globalMessages from '../../i18n/global-messages';

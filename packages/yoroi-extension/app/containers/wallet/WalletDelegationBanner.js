@@ -4,7 +4,7 @@ import { Box, styled } from '@mui/system';
 import { Stack, Button, IconButton, Typography, Link } from '@mui/material';
 
 import { injectIntl, defineMessages } from 'react-intl';
-import CloseIcon from '../../assets/images/close.inline.svg';
+import { ReactComponent as CloseIcon }  from '../../assets/images/close.inline.svg';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';

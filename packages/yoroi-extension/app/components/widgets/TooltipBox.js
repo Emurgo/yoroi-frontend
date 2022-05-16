@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './TooltipBox.scss';
 import globalMessages from '../../i18n/global-messages';
-import WarningIcon from '../../assets/images/attention-modern.inline.svg';
-import CloseCross from '../../assets/images/small-cross.inline.svg';
+import { ReactComponent as WarningIcon }  from '../../assets/images/attention-modern.inline.svg';
+import { ReactComponent as CloseCross }  from '../../assets/images/small-cross.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|

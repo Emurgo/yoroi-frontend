@@ -4,9 +4,9 @@ import { isCardanoHaskell } from '../api/ada/lib/storage/database/prepackaged/ne
 import { Bip44Wallet } from '../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet';
 import globalMessages from '../i18n/global-messages';
-import ConceptualIcon from '../assets/images/wallet-nav/conceptual-wallet.inline.svg';
-import TrezorIcon from '../assets/images/wallet-nav/trezor-wallet.inline.svg';
-import LedgerIcon from '../assets/images/wallet-nav/ledger-wallet.inline.svg';
+import { ReactComponent as ConceptualIcon }  from '../assets/images/wallet-nav/conceptual-wallet.inline.svg';
+import { ReactComponent as TrezorIcon }  from '../assets/images/wallet-nav/trezor-wallet.inline.svg';
+import { ReactComponent as LedgerIcon }  from '../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import StarIcon from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
+import { ReactComponent as StarIcon }  from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 

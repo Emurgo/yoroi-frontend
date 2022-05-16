@@ -8,12 +8,12 @@ import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from
 import { Button } from '@mui/material';
 import Card from './Card';
 import styles from './UserSummary.scss';
-import IconAda from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
-import IconRewards from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
-import IconDelegated from '../../../../assets/images/dashboard/grey-total-delegated.inline.svg';
+import { ReactComponent as IconAda }  from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
+import { ReactComponent as IconRewards }  from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
+import { ReactComponent as IconDelegated }  from '../../../../assets/images/dashboard/grey-total-delegated.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import TooltipBox from '../../../widgets/TooltipBox';
-import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
+import { ReactComponent as WarningIcon }  from '../../../../assets/images/attention-modern.inline.svg';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import {
   MultiToken,

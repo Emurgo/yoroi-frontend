@@ -6,7 +6,7 @@ import { intlShape } from 'react-intl';
 import classnames from 'classnames';
 
 import globalMessages from '../../../i18n/global-messages';
-import ArrowDownSVG from '../../../assets/images/expand-arrow-grey.inline.svg';
+import { ReactComponent as ArrowDownSVG }  from '../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './OptionBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
