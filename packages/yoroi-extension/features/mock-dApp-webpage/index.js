@@ -285,16 +285,18 @@ export class MockDAppWebpage {
   }
 
   async getConnectionState(): Promise<boolean> {
-    let walletConnectedState: boolean;
+    const states = [];
     this.logger.info(`MockDApp: Getting the connection state`);
     for (let i = 0; i < 3; i++) {
       this.logger.info(`MockDApp: -> Try ${i + 1} to get the connection state`);
       await this.driver.sleep(100);
-      walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
-      this.logger.info(`MockDApp: -> Try ${i + 1} the connection state is ${walletConnectedState}`);
+      const walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
+      this.logger.info(`MockDApp: -> Try ${i + 1} the connection state is ${JSON.stringify(walletConnectedState)}`);
+      states.push(walletConnectedState);
     }
-    this.logger.info(`MockDApp: -> The connection state is ${walletConnectedState}`);
-    return walletConnectedState;
+    const resultConnectionState = states.every((walletState) => walletState === true);
+    this.logger.info(`MockDApp: -> The connection state is ${JSON.stringify(resultConnectionState)}`);
+    return resultConnectionState;
   }
 
   async getBalance(): Promise<string> {
