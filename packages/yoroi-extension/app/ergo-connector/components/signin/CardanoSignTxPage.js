@@ -46,7 +46,7 @@ import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
-import NoDappIcon from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,

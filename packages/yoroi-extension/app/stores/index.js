@@ -186,7 +186,7 @@ export default (action(
     initializeSubstore<JormungandrStoresMap>(loadedStores.substores[ApiOptions.jormungandr]);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    loadedStores.loading.load();
+    loadedStores.loading.load('extension');
 
     return loadedStores;
   }

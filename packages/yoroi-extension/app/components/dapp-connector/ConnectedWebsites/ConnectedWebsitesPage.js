@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
 import styles from './ConnectedWebsitesPage.scss'
-import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
+import { ReactComponent as NoItemsFoundImg }  from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';

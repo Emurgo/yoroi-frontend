@@ -8,7 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
-import InvalidURIImg from '../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg }  from '../../assets/images/uri/invalid-uri.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import { truncateAddress } from '../../utils/formatters';

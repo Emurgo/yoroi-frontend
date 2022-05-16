@@ -6,9 +6,8 @@ import classnames from 'classnames';
 
 import styles from './WalletRow.scss';
 
-import ToggleIcon from '../../../assets/images/my-wallets/arrow_down.inline.svg';
-import SettingsIcon from '../../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
-// import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
+import { ReactComponent as ToggleIcon }  from '../../../assets/images/my-wallets/arrow_down.inline.svg';
+import { ReactComponent as SettingsIcon }  from '../../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 
 type Props = {|
   +walletSumDetails: Node,

@@ -6,7 +6,7 @@ import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 
-import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 
 type Props = {|
   +children?: ?Node,

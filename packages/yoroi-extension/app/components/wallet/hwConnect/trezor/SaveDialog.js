@@ -16,13 +16,13 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import InfoIconSVG from '../../../../assets/images/info-icon.inline.svg';
+import { ReactComponent as InfoIconSVG }  from '../../../../assets/images/info-icon.inline.svg';
 
-import SaveLoadImage from '../../../../assets/images/hardware-wallet/trezor/save-load-modern.inline.svg';
-import SaveErrorImage from '../../../../assets/images/hardware-wallet/trezor/save-error-modern.inline.svg';
+import { ReactComponent as SaveLoadImage }  from '../../../../assets/images/hardware-wallet/trezor/save-load-modern.inline.svg';
+import { ReactComponent as SaveErrorImage }  from '../../../../assets/images/hardware-wallet/trezor/save-error-modern.inline.svg';
 
-import SaveLoadSVG from '../../../../assets/images/hardware-wallet/trezor/save-load.inline.svg';
-import SaveErrorSVG from '../../../../assets/images/hardware-wallet/trezor/save-error.inline.svg';
+import { ReactComponent as SaveLoadSVG }  from '../../../../assets/images/hardware-wallet/trezor/save-load.inline.svg';
+import { ReactComponent as SaveErrorSVG }  from '../../../../assets/images/hardware-wallet/trezor/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';

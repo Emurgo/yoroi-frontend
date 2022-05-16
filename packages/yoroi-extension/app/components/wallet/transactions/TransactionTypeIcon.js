@@ -3,10 +3,10 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import ExpendIcon from '../../../assets/images/transaction/send-ic.inline.svg';
-import IncomeIcon from '../../../assets/images/transaction/receive-ic.inline.svg';
-import ExchangeIcon from '../../../assets/images/exchange-ic.inline.svg';
-import FailedIcon from '../../../assets/images/transaction/deny-ic.inline.svg';
+import { ReactComponent as ExpendIcon }  from '../../../assets/images/transaction/send-ic.inline.svg';
+import { ReactComponent as IncomeIcon }  from '../../../assets/images/transaction/receive-ic.inline.svg';
+import { ReactComponent as ExchangeIcon }  from '../../../assets/images/exchange-ic.inline.svg';
+import { ReactComponent as FailedIcon }  from '../../../assets/images/transaction/deny-ic.inline.svg';
 import styles from './TransactionTypeIcon.scss';
 
 type Props = {|

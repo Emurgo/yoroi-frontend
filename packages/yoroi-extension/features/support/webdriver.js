@@ -275,8 +275,16 @@ function CustomWorld(cmdInput: WorldInput) {
   this.saveToLocalStorage = (key, value) =>
     this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 
-  this.intl = (key, lang = 'en-US') =>
-    this.driver.executeScript((k, l) => window.yoroi.translations[l][k], key, lang);
+  this.intl = (key, lang = 'en-US') => this.driver.executeAsyncScript(
+    (k, l, callback) => {
+      window.yoroi.translations[l]
+        .then(translation => callback(translation[k]))
+        // eslint-disable-next-line no-console
+        .catch(e => { console.error('Intl fail: ', e); });
+    },
+    key,
+    lang
+  );
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
