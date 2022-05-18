@@ -10,7 +10,6 @@ import styles from './UserSummary.scss';
 import { ReactComponent as IconAda }  from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
 import { ReactComponent as IconRewards }  from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
-import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
@@ -22,6 +21,8 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import { hiddenAmount } from '../../../../utils/strings';
 import { truncateToken } from '../../../../utils/formatters';
 import { ReactComponent as InfoIcon }  from '../../../../assets/images/attention-big-light.inline.svg';
+import Skeleton from '@mui/material/Skeleton';
+import { Box } from '@mui/system';
 
 const messages = defineMessages({
   title: {
@@ -85,20 +86,24 @@ export default class UserSummary extends Component<Props> {
 
     return (
       <div className={styles.card}>
-        <div className={styles.cardContent}>
-          <div>
-            <h3 className={styles.label}>
-              {intl.formatMessage(globalMessages.totalTokenLabel, {
-                ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
-              })}
-              :
-            </h3>
-            {this.renderAmount(this.props.totalSum)}
-          </div>
-          <div className={styles.amountNote}>
-            {intl.formatMessage(messages.adaAmountNote)}
-          </div>
-        </div>
+        {
+          !this.props.totalSum ? this.getCardSkeleton() : (
+            <div className={styles.cardContent}>
+              <div>
+                <h3 className={styles.label}>
+                  {intl.formatMessage(globalMessages.totalTokenLabel, {
+                    ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
+                  })}
+                  :
+                </h3>
+                {this.renderAmount(this.props.totalSum)}
+              </div>
+              <div className={styles.amountNote}>
+                {intl.formatMessage(messages.adaAmountNote)}
+              </div>
+            </div>
+          )
+        }
         <div className={styles.icon}>
           <IconAda />
         </div>
@@ -110,29 +115,34 @@ export default class UserSummary extends Component<Props> {
     const { intl } = this.context;
     return (
       <div className={styles.card}>
-        <div className={styles.cardContent}>
-          <div>
-            <h3 className={styles.label}>
-              <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
-              <button className={styles.infoIcon} type='button' onClick={this.props.openLearnMore}>
-                <InfoIcon />
-              </button>
-            </h3>
-            {this.renderAmount(this.props.totalRewards)}
-          </div>
-          <div className={styles.footer}>
-            {this.props.withdrawRewards != null && (
-              <Button
-                className="withdrawButton"
-                variant="secondary"
-                onClick={this.props.withdrawRewards}
-                sx={{ height: '46px', width: '144px' }}
-              >
-                {intl.formatMessage(globalMessages.withdrawLabel)}
-              </Button>
-            )}
-          </div>
-        </div>
+        {
+          !this.props.totalRewards ? this.getCardSkeleton() : (
+            <div className={styles.cardContent}>
+              <div>
+                <h3 className={styles.label}>
+                  <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
+                  <button className={styles.infoIcon} type='button' onClick={this.props.openLearnMore}>
+                    <InfoIcon />
+                  </button>
+                </h3>
+                {this.renderAmount(this.props.totalRewards)}
+              </div>
+              <div className={styles.footer}>
+                {this.props.withdrawRewards != null && (
+                  <Button
+                    className="withdrawButton"
+                    variant="secondary"
+                    onClick={this.props.withdrawRewards}
+                    sx={{ height: '46px', width: '144px' }}
+                  >
+                    {intl.formatMessage(globalMessages.withdrawLabel)}
+                  </Button>
+                )}
+              </div>
+            </div>
+          )
+        }
+
         <div className={styles.icon}>
           <IconRewards />
         </div>
@@ -140,13 +150,38 @@ export default class UserSummary extends Component<Props> {
     );
   };
 
+  getSkeleton(layout): Node {
+    return (
+      <Skeleton
+        variant="rectangular"
+        width={layout.width}
+        height={layout.height}
+        animation='wave'
+        sx={{
+          backgroundColor: 'var(--yoroi-palette-gray-50)',
+          borderRadius: '4px',
+          marginBottom: layout.marginBottom,
+        }}
+      />
+    )
+  }
+
+  getCardSkeleton() {
+    const skeletons = [
+      { width: 244, height: 15, marginBottom: '5px' }, // Label
+      { width: 428, height: 32, marginBottom: '16px' }, // Amount
+      { width: 400, height: 57, marginBottom: '0px' } // Text
+    ]
+    return (
+      <Box>
+        {skeletons.map(skeleton => this.getSkeleton(skeleton))}
+      </Box>
+    )
+  }
+
   renderAmount: (void | MultiToken) => Node = (token) => {
     if (token == null) {
-      return (
-        <div className={styles.loadingSpinner}>
-          <LoadingSpinner small />
-        </div>
-      );
+      return this.getSkeleton(428, 32);
     }
     const unitOfAccount = this.props.unitOfAccount(
       token.getDefaultEntry()
