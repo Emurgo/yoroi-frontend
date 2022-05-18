@@ -95,7 +95,7 @@ export default class UserSummary extends Component<Props, State> {
     const { intl } = this.context;
 
     return (
-      <div className={classnames([styles.card, styles.mr20])}>
+      <div className={styles.card}>
         <div className={styles.cardContent}>
           <div>
             <h3 className={styles.label}>
@@ -120,7 +120,7 @@ export default class UserSummary extends Component<Props, State> {
   getTotalRewards: void => Node = () => {
     const { intl } = this.context;
     return (
-      <div className={classnames([styles.card, styles.mr20])}>
+      <div className={styles.card}>
         <div className={styles.cardContent}>
           <div>
             <h3 className={styles.label}>
