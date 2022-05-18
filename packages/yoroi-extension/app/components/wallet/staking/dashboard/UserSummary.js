@@ -39,19 +39,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.adaAmountNote',
     defaultMessage: '!!!This balance includes rewards (withdrawal required to be able to send this full amount)',
   },
-  mangledPopupDialogLine1: {
-    id: 'wallet.dashboard.summary.mangled.line1',
-    defaultMessage:
-      '!!!Your wallet has {adaAmount} {ticker} with a different delegation preference.',
-  },
-  canUnmangleLine: {
-    id: 'wallet.dashboard.summary.mangled.can',
-    defaultMessage: '!!!{adaAmount} {ticker} can be corrected',
-  },
-  cannotUnmangleLine: {
-    id: 'wallet.dashboard.summary.mangled.cannot',
-    defaultMessage: '!!!{adaAmount} {ticker} cannot be corrected',
-  },
   mangledPopupDialogLine2: {
     id: 'wallet.dashboard.summary.mangled.line2',
     defaultMessage: '!!!We recommend to {transactionMessage} to delegate the {ticker}',
@@ -99,7 +86,6 @@ export default class UserSummary extends Component<Props, State> {
         <div className={styles.wrapper}>
           {this.getTotal()}
           {this.getTotalRewards()}
-          {this.getTotalDelegated()}
         </div>
       </Card>
     );
@@ -166,106 +152,6 @@ export default class UserSummary extends Component<Props, State> {
         </div>
         <div className={styles.icon}>
           <IconRewards />
-        </div>
-      </div>
-    );
-  };
-
-  getTotalDelegated: void => Node = () => {
-    const { intl } = this.context;
-
-    const mangledWarningIcon =
-      !this.props.canUnmangleSum.isEmpty() || !this.props.cannotUnmangleSum.isEmpty() ? (
-        <div className={styles.mangledWarningIcon}>
-          <WarningIcon
-            width="24"
-            height="24"
-            onClick={() =>
-              this.setState(prevState => ({
-                mangledPopupOpen: !prevState.mangledPopupOpen,
-              }))
-            }
-          />
-        </div>
-      ) : (
-        []
-      );
-
-    return (
-      <div className={styles.wrapperCard}>
-        <div className={styles.popupSection}>
-          {this.state.mangledPopupOpen && (
-            <div className={styles.mangledPopup}>
-              <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
-                <p>
-                  {this.formatWithAmount(
-                    messages.mangledPopupDialogLine1,
-                    this.props.canUnmangleSum
-                      .joinAddCopy(this.props.cannotUnmangleSum)
-                      .getDefaultEntry(),
-                  )}
-                </p>
-                {!this.props.cannotUnmangleSum.isEmpty() && (
-                  <ul>
-                    <li>
-                      {this.formatWithAmount(
-                        messages.canUnmangleLine,
-                        this.props.canUnmangleSum.getDefaultEntry(),
-                      )}
-                    </li>
-                    <li>
-                      {this.formatWithAmount(
-                        messages.cannotUnmangleLine,
-                        this.props.cannotUnmangleSum.getDefaultEntry(),
-                      )}
-                    </li>
-                  </ul>
-                )}
-                {!this.props.canUnmangleSum.isEmpty() && (
-                  <p>
-                    <FormattedMessage
-                      {...messages.mangledPopupDialogLine2}
-                      values={{
-                        ticker: truncateToken(getTokenName(this.props.getTokenInfo(
-                          this.props.canUnmangleSum.getDefaultEntry()
-                        ))),
-                        transactionMessage: (
-                          <span
-                            className={styles.link}
-                            onClick={this.props.onUnmangle}
-                            role="button"
-                            tabIndex={0}
-                            onKeyPress={this.props.onUnmangle}
-                          >
-                            {intl.formatMessage(messages.makeTransaction)}
-                          </span>
-                        ),
-                      }}
-                    />
-                  </p>
-                )}
-              </TooltipBox>
-            </div>
-          )}
-        </div>
-        <div className={styles.subCard}>
-          <div className={styles.cardContent}>
-            <div>
-              <div className={styles.delegatedHeader}>
-                <h3 className={styles.label}>
-                  {intl.formatMessage(globalMessages.totalDelegated)}:
-                </h3>
-                <div className={styles.mangledSection}>
-                  {mangledWarningIcon}
-                </div>
-              </div>
-              {this.renderAmount(this.props.totalDelegated)}
-            </div>
-            <div />
-          </div>
-          <div className={styles.icon}>
-            <IconDelegated />
-          </div>
         </div>
       </div>
     );
