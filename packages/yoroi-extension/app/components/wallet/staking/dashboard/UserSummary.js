@@ -179,10 +179,7 @@ export default class UserSummary extends Component<Props> {
     )
   }
 
-  renderAmount: (void | MultiToken) => Node = (token) => {
-    if (token == null) {
-      return this.getSkeleton(428, 32);
-    }
+  renderAmount: (MultiToken) => Node = (token) => {
     const unitOfAccount = this.props.unitOfAccount(
       token.getDefaultEntry()
     );
