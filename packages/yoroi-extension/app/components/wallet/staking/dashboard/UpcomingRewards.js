@@ -8,13 +8,14 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/types';
 import CustomTooltip from '../../../widgets/CustomTooltip';
-import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as AttentionIcon }  from '../../../../assets/images/attention-modern.inline.svg';
 import { truncateStakePool } from '../../../../utils/formatters';
 
 import Card from './Card';
 import styles from './UpcomingRewards.scss';
+import { Skeleton } from '@mui/material';
+import { Box } from '@mui/system';
 
 const messages = defineMessages({
   title: {
@@ -114,15 +115,43 @@ export default class UpcomingRewards extends Component<Props> {
     );
   }
 
+  getSkeleton(layout): Node {
+    return (
+      <Skeleton
+        variant="rectangular"
+        width={layout.width}
+        height={layout.height}
+        animation='wave'
+        sx={{
+          backgroundColor: 'var(--yoroi-palette-common-white)',
+          borderRadius: '4px',
+          marginBottom: layout.marginBottom,
+        }}
+      />
+    )
+  }
+
+  rewardsSkeleton(): Node {
+    const skeletons = [
+      { width: 225, height: 22, marginBottom: '6px' }, // Label
+      { width: 178, height: 32, marginBottom: '24px' }, // ??
+      { width: 225, height: 22, marginBottom: '6px' }, // Label
+      { width: 178, height: 32, marginBottom: '0px' }, // ??
+    ]
+    return (
+      <Box>
+        {skeletons.map(skeleton => this.getSkeleton(skeleton))}
+      </Box>
+    )
+  }
+
   infoToNode: (?BoxInfo, Array<Node>) => Node = (info, additional) => {
     const { intl } = this.context;
 
     if (info == null) {
       return (
         <div className={styles.card}>
-          <div className={styles.loading}>
-            <LoadingSpinner />
-          </div>
+          {this.rewardsSkeleton()}
         </div>
       );
     }
