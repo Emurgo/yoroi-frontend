@@ -11,6 +11,7 @@ import CardShadow from './CardShadow';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { readCssVar } from '../../../../styles/utils';
+import { Skeleton } from '@mui/material';
 
 const messages = defineMessages({
   epochAxisLabel: {
@@ -260,26 +261,39 @@ export default class GraphWrapper extends Component<Props, State> {
           selected={this.state.selectedTab}
           setSelected={tab => this.setState({ selectedTab: tab })}
         />
-        <CardShadow>
-          <div className={styles.graphContainer}>
-            {/*
-            <GraphToggles
-              graphName={this.props.graphName}
-              dayLabel={intl.formatMessage(messages.dayToggleLabel)}
-              epochLabel={intl.formatMessage(globalMessages.epochLabel)}
+        {
+          !tabs[this.state.selectedTab].data ? (
+            <Skeleton
+              variant='rectangular'
+              width='100%'
+              height='256px'
+              animation='wave'
+              sx={{
+            backgroundColor: 'var(--yoroi-palette-gray-50)',
+            borderRadius: '4px',
+          }}
             />
-            */}
-            <Graph
-              epochTitle={intl.formatMessage(globalMessages.epochLabel)}
-              stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
-              xAxisLabel={this._getEpochLengthLabel()}
-              yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
-              primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
-              data={tabs[this.state.selectedTab].data}
-              hideYAxis={tabs[this.state.selectedTab].hideYAxis}
-            />
-          </div>
-        </CardShadow>
+          ) : (
+            <CardShadow>
+              <div className={styles.graphContainer}>
+                {/* <GraphToggles
+                    graphName={this.props.graphName}
+                    dayLabel={intl.formatMessage(messages.dayToggleLabel)}
+                    epochLabel={intl.formatMessage(globalMessages.epochLabel)}
+                  /> */}
+                <Graph
+                  epochTitle={intl.formatMessage(globalMessages.epochLabel)}
+                  stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
+                  xAxisLabel={this._getEpochLengthLabel()}
+                  yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
+                  primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
+                  data={tabs[this.state.selectedTab].data}
+                  hideYAxis={tabs[this.state.selectedTab].hideYAxis}
+                />
+              </div>
+            </CardShadow>
+          )
+        }
       </div>
     );
   }
