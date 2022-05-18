@@ -133,10 +133,10 @@ export default class UpcomingRewards extends Component<Props> {
 
   rewardsSkeleton(): Node {
     const skeletons = [
-      { width: 225, height: 22, marginBottom: '6px' }, // Label
-      { width: 178, height: 32, marginBottom: '24px' }, // ??
-      { width: 225, height: 22, marginBottom: '6px' }, // Label
-      { width: 178, height: 32, marginBottom: '0px' }, // ??
+      { width: '95%', height: 22, marginBottom: '6px' }, // End of Epoch Label
+      { width: '75%', height: 32, marginBottom: '24px' }, // Date
+      { width: '95%', height: 22, marginBottom: '6px' }, // Stake pool label
+      { width: '75%', height: 32, marginBottom: '0px' }, // Pool Id
     ]
     return (
       <Box>
