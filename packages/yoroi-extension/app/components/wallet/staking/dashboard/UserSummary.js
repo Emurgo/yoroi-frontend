@@ -1,7 +1,6 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -10,10 +9,7 @@ import Card from './Card';
 import styles from './UserSummary.scss';
 import { ReactComponent as IconAda }  from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
 import { ReactComponent as IconRewards }  from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
-import { ReactComponent as IconDelegated }  from '../../../../assets/images/dashboard/grey-total-delegated.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
-import TooltipBox from '../../../widgets/TooltipBox';
-import { ReactComponent as WarningIcon }  from '../../../../assets/images/attention-modern.inline.svg';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import {
   MultiToken,
@@ -25,6 +21,7 @@ import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { hiddenAmount } from '../../../../utils/strings';
 import { truncateToken } from '../../../../utils/formatters';
+import { ReactComponent as InfoIcon }  from '../../../../assets/images/attention-big-light.inline.svg';
 
 const messages = defineMessages({
   title: {
@@ -65,18 +62,10 @@ type Props = {|
   +withdrawRewards: void | (void => void),
 |};
 
-type State = {|
-  mangledPopupOpen: boolean,
-|};
-
 @observer
-export default class UserSummary extends Component<Props, State> {
+export default class UserSummary extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
-  };
-
-  state: State = {
-    mangledPopupOpen: false,
   };
 
   render(): Node {
@@ -124,7 +113,10 @@ export default class UserSummary extends Component<Props, State> {
         <div className={styles.cardContent}>
           <div>
             <h3 className={styles.label}>
-              {intl.formatMessage(globalMessages.totalRewardsLabel)}:
+              <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
+              <button className={styles.infoIcon} type='button' onClick={this.props.openLearnMore}>
+                <InfoIcon />
+              </button>
             </h3>
             {this.renderAmount(this.props.totalRewards)}
           </div>
@@ -139,15 +131,6 @@ export default class UserSummary extends Component<Props, State> {
                 {intl.formatMessage(globalMessages.withdrawLabel)}
               </Button>
             )}
-            <div
-              className={styles.note}
-              role="button"
-              tabIndex={0}
-              onKeyPress={() => null}
-              onClick={this.props.openLearnMore}
-            >
-              {intl.formatMessage(messages.note)}
-            </div>
           </div>
         </div>
         <div className={styles.icon}>

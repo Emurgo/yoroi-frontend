@@ -58,6 +58,20 @@
   line-height: 32px;
   margin-bottom: 1px;
   width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .infoIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    & > svg {
+      width: 12px;
+      height: 12px;  
+    }
+  }
 }
 
 .value {
