@@ -150,7 +150,11 @@ export default class UserSummary extends Component<Props> {
     );
   };
 
-  getSkeleton(layout): Node {
+  getSkeleton(layout: {|
+    width: string,
+    height: string,
+    marginBottom: string,
+  |}): Node {
     return (
       <Skeleton
         variant="rectangular"
@@ -166,11 +170,11 @@ export default class UserSummary extends Component<Props> {
     )
   }
 
-  getCardSkeleton(card) {
+  getCardSkeleton(card: ?string): Node {
     const skeletons = [
-      { width: '50%', height: 15, marginBottom: '5px' }, // Label
-      { width: '85%', height: 32, marginBottom: '16px' }, // Amount
-      { width: card === 'rewards' ? '43%' : '70%', height: 57, marginBottom: '0px' } // Text / Button
+      { width: '50%', height: '15px', marginBottom: '5px' }, // Label
+      { width: '85%', height: '32px', marginBottom: '16px' }, // Amount
+      { width: card === 'rewards' ? '43%' : '70%', height: '57px', marginBottom: '0px' } // Text / Button
     ]
     return (
       <Box>
@@ -179,7 +183,9 @@ export default class UserSummary extends Component<Props> {
     )
   }
 
-  renderAmount: (MultiToken) => Node = (token) => {
+  renderAmount: (void | MultiToken) => Node = (token) => {
+
+    if (!token) throw new Error('Token is not defined - Should never happend')
     const unitOfAccount = this.props.unitOfAccount(
       token.getDefaultEntry()
     );

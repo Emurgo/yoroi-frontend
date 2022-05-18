@@ -262,7 +262,7 @@ export default class GraphWrapper extends Component<Props, State> {
           setSelected={tab => this.setState({ selectedTab: tab })}
         />
         {
-          !tabs[this.state.selectedTab].data ? (
+          tabs[this.state.selectedTab].data.length === 0 ? (
             <Skeleton
               variant='rectangular'
               width='100%'

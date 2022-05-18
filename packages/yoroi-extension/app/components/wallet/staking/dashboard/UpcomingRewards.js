@@ -115,7 +115,11 @@ export default class UpcomingRewards extends Component<Props> {
     );
   }
 
-  getSkeleton(layout): Node {
+  getSkeleton(layout: {|
+    width: string,
+    height: string,
+    marginBottom: string,
+  |}): Node {
     return (
       <Skeleton
         variant="rectangular"
@@ -133,10 +137,10 @@ export default class UpcomingRewards extends Component<Props> {
 
   rewardsSkeleton(): Node {
     const skeletons = [
-      { width: '95%', height: 22, marginBottom: '6px' }, // End of Epoch Label
-      { width: '75%', height: 32, marginBottom: '24px' }, // Date
-      { width: '95%', height: 22, marginBottom: '6px' }, // Stake pool label
-      { width: '75%', height: 32, marginBottom: '0px' }, // Pool Id
+      { width: '95%', height: '22', marginBottom: '6px' }, // End of Epoch Label
+      { width: '75%', height: '32', marginBottom: '24px' }, // Date
+      { width: '95%', height: '22', marginBottom: '6px' }, // Stake pool label
+      { width: '75%', height: '32', marginBottom: '0px' }, // Pool Id
     ]
     return (
       <Box>

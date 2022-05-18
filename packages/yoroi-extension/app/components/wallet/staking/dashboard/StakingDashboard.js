@@ -163,14 +163,14 @@ export default class StakingDashboard extends Component<Props> {
         tabs={[
           {
             tabName: intl.formatMessage(globalMessages.rewardsLabel),
-            data: items?.perEpochRewards,
+            data: items ? items.perEpochRewards : [],
             primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
             hideYAxis: graphData.hideYAxis,
           },
           {
             tabName: intl.formatMessage(globalMessages.totalRewardsLabel),
-            data: items?.totalRewards,
+            data: items ? items.totalRewards : [],
             primaryBarLabel: intl.formatMessage(globalMessages.totalRewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
             hideYAxis: graphData.hideYAxis,
