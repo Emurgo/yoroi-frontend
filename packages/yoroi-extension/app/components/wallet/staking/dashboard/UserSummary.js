@@ -57,7 +57,7 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +totalSum: void | MultiToken,
   +totalRewards: void | MultiToken,
-  +totalDelegated: void | MultiToken,
+  +isDelegated: boolean,
   +unitOfAccount: TokenEntry => (void | {| currency: string, amount: string |}),
   +shouldHideBalance: boolean,
   +openLearnMore: void => void,
@@ -99,7 +99,7 @@ export default class UserSummary extends Component<Props> {
                     {intl.formatMessage(globalMessages.totalTokenLabel, {
                       ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
                     })}:
-                    {this.props.totalDelegated && (
+                    {this.props.isDelegated && (
                       <span className={styles.delegated}>
                         {intl.formatMessage(messages.delegated)}
                       </span>
