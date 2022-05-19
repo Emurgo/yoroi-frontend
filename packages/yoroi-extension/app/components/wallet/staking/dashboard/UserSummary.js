@@ -45,6 +45,10 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.mangled.makeTx',
     defaultMessage: '!!!make a transaction',
   },
+  delegated: {
+    id: 'wallet.dashboard.summary.delegated',
+    defaultMessage: '!!!Delegated'
+  }
 });
 
 type Props = {|
@@ -91,10 +95,16 @@ export default class UserSummary extends Component<Props> {
             <div className={styles.cardContent}>
               <div>
                 <h3 className={styles.label}>
-                  {intl.formatMessage(globalMessages.totalTokenLabel, {
-                    ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
-                  })}
-                  :
+                  <span>
+                    {intl.formatMessage(globalMessages.totalTokenLabel, {
+                      ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
+                    })}:
+                    {this.props.totalDelegated && (
+                      <span className={styles.delegated}>
+                        {intl.formatMessage(messages.delegated)}
+                      </span>
+                    )}
+                  </span>
                 </h3>
                 {this.renderAmount(this.props.totalSum)}
               </div>
