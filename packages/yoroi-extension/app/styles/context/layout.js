@@ -15,17 +15,19 @@ const LayoutProvider = (props: Object): Node => {
   const localLayout: Layouts = layout === THEMES.YOROI_REVAMP ? 'REVAMP' : 'CLASSIC';
 
   return (
-    <LayoutContext.Provider
-      value={{
-        selectedLayout: localLayout,
-        isRevampLayout: localLayout === 'REVAMP',
-        renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
-          const selectedComponent = layoutMap[localLayout];
-          return selectedComponent;
-        },
-      }}
-      {...props}
-    />
+    <>
+      <LayoutContext.Provider
+        value={{
+          selectedLayout: localLayout,
+          isRevampLayout: localLayout === 'REVAMP',
+          renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
+            const selectedComponent = layoutMap[localLayout];
+            return selectedComponent;
+          },
+        }}
+        {...props}
+      />
+    </>
   );
 };
 
