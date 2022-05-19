@@ -80,9 +80,14 @@ export default class Sidebar extends Component<Props> {
           }) : null}
         </div>
 
-        <button type='button'>
+        <a
+          className={styles.faq}
+          href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
+          target='_blank'
+          rel="noreferrer"
+        >
           {intl.formatMessage(globalMessages.sidebarFaq)}
-        </button>
+        </a>
         <button
           type="button"
           onClick={onToggleSidebar}
