@@ -1,23 +1,17 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { Box } from '@mui/system';
 import { ReactComponent as SupportIcon } from '../../assets/images/support.inline.svg';
-import { Button, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 
 export default class Support extends Component <{||}> {
     loadScript = (src, id) => {
         const script = document.createElement('script')
         script.src = src
-        // script.setAttribute('Content-Security-Policy', "script-src 'self'")
-        console.log(script)
-
-        if (id) {
-          script.id = id
-        }
+        script.id = id
 
         script.addEventListener('load', () => {
-          console.log(`SCRIPT LOADED : ${script.src}`);
+          console.log('script loaded!')
         })
 
         script.addEventListener('error', (e) => {
@@ -27,11 +21,14 @@ export default class Support extends Component <{||}> {
         document.body.appendChild(script)
     }
 
-    // eslint-disable-next-line react/no-deprecated
-    componentWillMount() {
-        // Start of emurgohelpdesk Zendesk Widget script -->
+    componentDidMount() {
         this.loadScript('https://static.zdassets.com/ekr/snippet.js?key=68b95d72-6354-4343-8a64-427979a6f5d6', 'ze-snippet');
-        // End of emurgohelpdesk Zendesk Widget script <--
+        this.interval = setInterval(()=>{
+          if (typeof window.zE !== 'undefined' && typeof window.zE.hide === 'function') {
+            window.zE.hide()
+            clearInterval(this.interval)
+          }
+        }, 500);
     }
 
     openChatBoxSupport(){
@@ -40,9 +37,14 @@ export default class Support extends Component <{||}> {
         }
     }
 
-    componentWillUnmount(){
-        window.zE.hide()
-    }
+    // componentDidMount() {
+    //     this.interval = setInterval(()=>{
+    //       if (typeof window.zE !== 'undefined') {
+    //         // window.zE.hide()
+    //         clearInterval(this.interval)
+    //       }
+    //     }, 500);
+    // }    
 
     render(): Node {
         return (
@@ -50,10 +52,11 @@ export default class Support extends Component <{||}> {
             sx={{
               position: 'absolute',
               bottom: '24px',
-              right: '24px',
+              right: '30px',
               zIndex: '1',
               padding: '0px'
             }}
+            className="main-btn"
             onClick={this.openChatBoxSupport}
           >
             <SupportIcon />
