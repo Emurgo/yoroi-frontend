@@ -326,8 +326,20 @@ export type CardanoTxRequestMint = {|
   // This metadata will be wrapped into { tag: { [policyId]: { [assetName]: json } } }
   metadata?: CardanoTxRequestMintMetadata,
 |};
+type CardanoTxRequestInput =
+  string | // UTxO IDs
+  {|
+    id: string, // UTxO ID
+    nativeScript: string,
+  |} |
+  {|
+    id: string, // UTxO ID
+    plutusScript: string,
+    datum: string,
+    redeemer: string,
+  |};
 export type CardanoTxRequest = {|
-  includeInputs?: Array<string>, // Array of UTxO IDs
+  includeInputs?: Array<CardanoTxRequestInput>,
   includeOutputs?: Array<string>, // HEX of WASM TransactionOutput values
   includeTargets?: Array<{|
     address: string,
@@ -1163,17 +1175,25 @@ export default class AdaApi {
     );
 
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
-    const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {
-      if (!allUtxoIds.has(utxoId)) {
-        throw new Error(`No UTxO found for input id ${utxoId}`);
+    const includeInputMap = includeInputs.reduce((acc, e: CardanoTxRequestInput) => {
+      // eslint-disable-next-line no-nested-ternary
+      const id = typeof e === 'string' ? e
+        : (typeof e.id === 'string' ? e.id : null);
+      if (id == null) {
+        throw new Error(`Unrecognised input request format: ${JSON.stringify(e)}`);
       }
-      return true;
-    }));
+      if (!allUtxoIds.has(id)) {
+        throw new Error(`No UTxO found for input id: ${id}`);
+      }
+      acc[id] = e;
+      return acc;
+    }, {})
 
     const mustIncludeUtxos = [];
     const coinSelectUtxos = [];
     for (const utxo of utxos) {
-      if (utxoIdSet.has(utxo.utxo_id)) {
+      const includeInputEntry = includeInputMap[utxo.utxo_id];
+      if (includeInputEntry != null) {
         mustIncludeUtxos.push(utxo);
       } else {
         coinSelectUtxos.push(utxo);
