@@ -11,6 +11,7 @@ import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
 import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
+import Support from './components/widgets/Support';
 
 // PAGES
 const WalletAddPagePromise = () => import('./containers/wallet/WalletAddPage');
@@ -148,6 +149,7 @@ export const Routes = (
   actions: ActionsMap
 ): Node => (
   <div style={{ height: '100%' }}>
+    <Support />
     <Suspense fallback={null}>
       <Switch>
         <Route
