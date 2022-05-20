@@ -1175,7 +1175,7 @@ export default class AdaApi {
     );
 
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
-    const includeInputMap = includeInputs.reduce((acc, e: CardanoTxRequestInput) => {
+    const includeInputMap = (includeInputs||[]).reduce((acc, e: CardanoTxRequestInput) => {
       // eslint-disable-next-line no-nested-ternary
       const id = typeof e === 'string' ? e
         : (typeof e.id === 'string' ? e.id : null);
@@ -1253,8 +1253,10 @@ export default class AdaApi {
     |} {
       const { script, assetName } = mintEntry;
       const policyId = bytesToHex(
-        RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(script))
-          .hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
+        RustModule.WalletV4.NativeScript
+          .from_bytes(hexToBytes(script))
+          .hash()
+          .to_bytes()
       );
       const assetId = `${policyId}.${assetName}`;
       return { policyId, assetId };
