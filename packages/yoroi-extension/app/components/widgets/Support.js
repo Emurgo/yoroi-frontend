@@ -5,19 +5,11 @@ import { ReactComponent as SupportIcon } from '../../assets/images/support.inlin
 import { IconButton } from '@mui/material';
 
 export default class Support extends Component <{||}> {
-    loadScript = (src, id) => {
+
+    loadScript(src: string, id: string): void {
         const script = document.createElement('script')
         script.src = src
         script.id = id
-
-        script.addEventListener('load', () => {
-          console.log('script loaded!')
-        })
-
-        script.addEventListener('error', (e) => {
-          console.log(`SCRIPT LOAD ERROR : ${e.message}`);
-        })
-
         document.body.appendChild(script)
     }
 
@@ -36,15 +28,6 @@ export default class Support extends Component <{||}> {
           window.zE.activate()
         }
     }
-
-    // componentDidMount() {
-    //     this.interval = setInterval(()=>{
-    //       if (typeof window.zE !== 'undefined') {
-    //         // window.zE.hide()
-    //         clearInterval(this.interval)
-    //       }
-    //     }, 500);
-    // }    
 
     render(): Node {
         return (
