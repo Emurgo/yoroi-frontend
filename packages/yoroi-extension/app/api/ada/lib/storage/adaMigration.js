@@ -111,6 +111,9 @@ export async function migrateToLatest(
     ['<3.9.6', async () => {
       return await ergoTxHistoryReset(persistentDb);
     }],
+    ['<4.14', async () => {
+      return await populateNewUtxodata(persistentDb);
+    }],
   ];
 
   let appliedMigration = false;
@@ -359,5 +362,11 @@ export async function ergoTxHistoryReset(
     await removeAllTransactions({ publicDeriver: withLevels });
   }
 
+  return true;
+}
+
+export async function populateNewUtxodata(
+  persistentDb: lf$Database,
+): Promise<boolean> {
   return true;
 }

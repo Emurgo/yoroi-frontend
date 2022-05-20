@@ -1,0 +1,149 @@
+// @flow
+
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
+import { op } from 'lovefield';
+import {
+  addOrReplaceRow, addNewRowToTable, removeFromTableBatch,
+} from '../../utils';
+import * as Tables from '../tables';
+import type {
+  UtxoAtSafePoint,
+  UtxoAtSafePointInsert,
+  UtxoAtSafePointRow,
+  UtxoDiffToBestBlock,
+  UtxoDiffToBestBlockInsert,
+  UtxoDiffToBestBlockRow,
+} from '../tables';
+import { GetUtxoAtSafePoint, GetUtxoDiffToBestBlock } from './read';
+
+export class ModifyUtxoAtSafePoint {
+  static ownTables: {|
+    UtxoAtSafePointTable: typeof Tables.UtxoAtSafePointSchema,
+  |} = Object.freeze({
+    [Tables.UtxoAtSafePointSchema.name]: Tables.UtxoAtSafePointSchema,
+  });
+
+  static depTables: {||} = Object.freeze({});
+
+  static async addOrReplace(
+    db: lf$Database,
+    tx: lf$Transaction,
+    conceptualWalletId: number,
+    utxoAtSafePoint: UtxoAtSafePoint
+  ): Promise<void> {
+    const row = await GetUtxoAtSafePoint.forWallet(db, tx, conceptualWalletId);
+    if (row) {
+      const newRow: UtxoAtSafePointRow = {
+        UtxoAtSafePointId: row.UtxoAtSafePointId,
+        ConceptualWalletId: conceptualWalletId,
+        UtxoAtSafePoint: utxoAtSafePoint,
+      };
+      await addOrReplaceRow<UtxoAtSafePointRow, UtxoAtSafePointRow>(
+        db, tx,
+        newRow,
+        ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
+      );
+    } else {
+      await addNewRowToTable<UtxoAtSafePointInsert, UtxoAtSafePointRow>(
+        db, tx,
+        {
+          ConceptualWalletId: conceptualWalletId,
+          UtxoAtSafePoint: utxoAtSafePoint,
+        },
+        ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
+      );
+    }
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    conceptualWalletId: number,
+  ): Promise<void> {
+    await removeFromTableBatch(
+      db, tx,
+      ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
+      ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].properties.ConceptualWalletId,
+      ([conceptualWalletId]: Array<number>),
+    );
+  }
+}
+
+export class ModifyUtxoDiffToBestBlock {
+  static ownTables: {|
+    UtxoDiffToBestBlock: typeof Tables.UtxoDiffToBestBlockSchema,
+  |} = Object.freeze({
+    [Tables.UtxoDiffToBestBlockSchema.name]: Tables.UtxoDiffToBestBlockSchema,
+  });
+
+  static depTables: {||} = Object.freeze({});
+
+  static async removeAll(
+    db: lf$Database,
+    tx: lf$Transaction,
+    conceptualWalletId: number,
+  ): Promise<void> {
+    const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
+    const tableName = schema.name;
+    const fieldNames = schema.properties;
+    const table = db.getSchema().table(tableName);
+    await tx.attach(
+      db.delete().from(table)
+        .where(table[fieldNames.ConceptualWalletId].eq(conceptualWalletId))
+    );
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    conceptualWalletId: number,
+    lastBestBlockHash: string,
+  ): Promise<void> {
+    const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
+    const tableName = schema.name;
+    const fieldNames = schema.properties;
+    const table = db.getSchema().table(tableName);
+    await tx.attach(
+      db.delete().from(table)
+        .where(
+          op.and(
+            table[fieldNames.ConceptualWalletId].eq(conceptualWalletId),
+            table[fieldNames.lastBestBlockHash].eq(lastBestBlockHash)
+          )
+        )
+    );
+  }
+
+  static async add(
+    db: lf$Database,
+    tx: lf$Transaction,
+    conceptualWalletId: number,
+    utxoDiffToBestBlock: UtxoDiffToBestBlock,
+  ): Promise<void> {
+    // Do nothing if a row with `utxoDiffToBestBlock.lastBestBlockHash` is already 
+    // present. But we can't rely on the unique index because the exception is
+    // thrown when the tx is being committed and there is no way to catch it
+    // only for this query.
+    const existing = await GetUtxoDiffToBestBlock.findLastBestBlockHash(
+      db, tx,
+      conceptualWalletId,
+      utxoDiffToBestBlock.lastBestBlockHash
+    );
+
+    if (!existing) {
+      await addNewRowToTable<UtxoDiffToBestBlockInsert, UtxoDiffToBestBlockRow>(
+        db, tx,
+        {
+          ConceptualWalletId: conceptualWalletId,
+          lastBestBlockHash: utxoDiffToBestBlock.lastBestBlockHash,
+          spentUtxoIds: utxoDiffToBestBlock.spentUtxoIds,
+          newUtxos: utxoDiffToBestBlock.newUtxos,
+        },
+        ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].name,
+      );
+    }
+  }
+}

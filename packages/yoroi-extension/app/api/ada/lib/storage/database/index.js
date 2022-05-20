@@ -28,6 +28,7 @@ import { populateWalletDb } from './walletTypes/core/tables';
 import { populateMemoTransactionsDb } from './memos/tables';
 import { populatePricesDb } from './prices/tables';
 import { populateExplorerDb } from './explorers/tables';
+import { populateUtxoDb } from './utxo/tables';
 import { KeyKind } from '../../../../common/lib/crypto/keys/types';
 import { networks, defaultAssets } from './prepackaged/networks';
 import { prepackagedExplorers } from './prepackaged/explorers';
@@ -205,6 +206,7 @@ const populateAndCreate = async (
   populateMemoTransactionsDb(schemaBuilder);
   populatePricesDb(schemaBuilder);
   populateExplorerDb(schemaBuilder);
+  populateUtxoDb(schemaBuilder);
 
   const db = await schemaBuilder.connect({
     storeType,
