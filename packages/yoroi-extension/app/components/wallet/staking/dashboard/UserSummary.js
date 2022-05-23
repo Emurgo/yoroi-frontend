@@ -247,13 +247,11 @@ export default class UserSummary extends Component<Props> {
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
       .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
       .toString();
-    const splitAmount = tokenAmount.split('.');
     const amountNode = this.props.shouldHideBalance
       ? <>{hiddenAmount}</>
       : (
         <>
-          {splitAmount[0]}
-          <span className={styles.decimal}>{splitAmount[1] ? '.' + splitAmount[1] : null} </span>
+          {tokenAmount}
         </>
       );
     return (
