@@ -4,8 +4,8 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, } from 'react-intl';
 import classnames from 'classnames';
-import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
-import GenerateURIIcon from '../../assets/images/generate-uri.inline.svg';
+import { ReactComponent as VerifyIcon }  from '../../assets/images/verify-icon.inline.svg';
+import { ReactComponent as GenerateURIIcon }  from '../../assets/images/generate-uri.inline.svg';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
@@ -18,9 +18,9 @@ import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddressShort, splitAmount, truncateToken } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import NoTransactionModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
-import AddLabelIcon from '../../assets/images/add-label.inline.svg';
-import EditLabelIcon from '../../assets/images/edit.inline.svg';
+import { ReactComponent as NoTransactionModernSvg }  from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import { ReactComponent as AddLabelIcon }  from '../../assets/images/add-label.inline.svg';
+import { ReactComponent as EditLabelIcon }  from '../../assets/images/edit.inline.svg';
 import { hiddenAmount } from '../../utils/strings';
 import type {
   TokenEntry, TokenLookupKey,

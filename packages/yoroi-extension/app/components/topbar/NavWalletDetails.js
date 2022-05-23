@@ -9,8 +9,8 @@ import { truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
-import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen }  from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed }  from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
 import { hiddenAmount } from '../../utils/strings';

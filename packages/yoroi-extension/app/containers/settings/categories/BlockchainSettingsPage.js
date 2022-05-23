@@ -11,7 +11,7 @@ import UriSettingsBlock from '../../../components/settings/categories/general-se
 import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
-import AdaCurrency from '../../../assets/images/currencies/ADA.inline.svg';
+import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencies/ADA.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import LocalizableError from '../../../i18n/LocalizableError';

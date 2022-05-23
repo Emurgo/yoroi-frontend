@@ -57,7 +57,7 @@ export default class BaseCoinPriceStore
 
   expirePriceDataTimeoutId: ?TimeoutID = null;
   // Cached public key to verify the price data.
-  @observable pubKeyData: ?RustModule.WalletV3.PublicKey = null;
+  @observable pubKeyData: ?RustModule.WalletV4.PublicKey = null;
 
   @observable getAllPrices: Request<GetAllPricesFunc>
     = new Request<GetAllPricesFunc>(getAllPrices);
@@ -107,7 +107,7 @@ export default class BaseCoinPriceStore
     const storedKey: ?string = await this.api.localStorage.getCoinPricePubKeyData();
     Logger.debug(`${nameof(BaseCoinPriceStore)}: stored pubKeyData ${storedKey == null ? 'null' : storedKey}`);
     runInAction(() => {
-      this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(
+      this.pubKeyData = RustModule.WalletV4.PublicKey.from_bytes(Buffer.from(
         storedKey != null ? storedKey : CONFIG.app.pubKeyData,
         'hex'
       ));
@@ -312,7 +312,7 @@ export default class BaseCoinPriceStore
       return;
     }
     runInAction(() => {
-      this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(pubKeyData, 'hex'));
+      this.pubKeyData = RustModule.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyData, 'hex'));
     });
     await this.api.localStorage.setCoinPricePubKeyData(pubKeyData);
   }

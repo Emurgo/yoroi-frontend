@@ -8,8 +8,10 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen }  from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed }  from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { splitAmount, truncateToken } from '../../utils/formatters';
+import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -19,6 +21,8 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
 import { formatValue } from '../../utils/unit-of-account';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import AmountDisplay from '../common/AmountDisplay';
+import type { WalletsNavigation } from '../../api/localStorage';
 
 const messages = defineMessages({
   addWallet: {
@@ -29,6 +33,14 @@ const messages = defineMessages({
     id: 'wallet.topbar.dialog.totalBalance',
     defaultMessage: '!!!Total Balance',
   },
+  ergo: {
+    id: 'wallet.topbar.dialog.ergo',
+    defaultMessage: '!!!Ergo, ERG',
+  },
+  cardano: {
+    id: 'wallet.topbar.dialog.cardano',
+    defaultMessage: '!!!Cardano, ADA',
+  },
 });
 
 type Props = {|
@@ -38,14 +50,17 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
-  +wallets: Array<Object>,
-  +currentSortedWallets: Array<number> | void,
-  +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?number,
+  +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
+  +ergoWallets: Array<Object>,
+  +cardanoWallets: Array<Object>,
+  +walletsNavigation: WalletsNavigation,
+  +updateSortedWalletList: WalletsNavigation => Promise<void>,
 |};
 type State = {|
-  walletListIdx: Array<any>,
+  ergoWalletsIdx: number[],
+  cardanoWalletsIdx: number[],
 |};
 
 const reorder = (list, startIndex, endIndex) => {
@@ -54,85 +69,79 @@ const reorder = (list, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed);
   return result;
 };
+
+const getGeneratedWalletIds = (sortedWalletListIdx, currentWalletIdx) => {
+  let generatedWalletIds;
+  if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
+    const newWalletIds = currentWalletIdx.filter(id => {
+      const index = sortedWalletListIdx.indexOf(id);
+      if (index === -1) {
+        return true;
+      }
+      return false;
+    });
+    generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
+  } else {
+    generatedWalletIds = currentWalletIdx;
+  }
+
+  return generatedWalletIds
+}
 @observer
 export default class WalletListDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
   state: State = {
-    walletListIdx: [],
+    ergoWalletsIdx: [],
+    cardanoWalletsIdx: [],
   };
 
   async componentDidMount(): Promise<void> {
-    const sortedWalletListIdx = this.props.currentSortedWallets;
-    const currentWalletIdx = this.props.wallets.map(wallet => wallet.walletId);
-
-    let generatedWalletIds;
-    if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
-      const newWalletIds = currentWalletIdx.filter(id => {
-        const index = sortedWalletListIdx.indexOf(id);
-        if (index === -1) {
-          return true;
-        }
-        return false;
-      });
-      generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
-    } else {
-      generatedWalletIds = currentWalletIdx;
-    }
+    const cardanoWalletsId = getGeneratedWalletIds(
+      this.props.walletsNavigation.cardano,
+      this.props.cardanoWallets.map(wallet => wallet.walletId)
+    )
+    const ergoWalletsId = getGeneratedWalletIds(
+      this.props.walletsNavigation.ergo,
+      this.props.ergoWallets.map(wallet => wallet.walletId)
+    )
 
     this.setState(
       {
-        walletListIdx: generatedWalletIds,
+        ergoWalletsIdx: ergoWalletsId,
+        cardanoWalletsIdx: cardanoWalletsId,
       },
       async () => {
-        await this.props.updateSortedWalletList({ sortedWallets: generatedWalletIds });
+        await this.props.updateSortedWalletList({
+          ergo: ergoWalletsId,
+          cardano: cardanoWalletsId,
+          quickAccess: this.props.walletsNavigation.quickAccess || [],
+        });
       }
     );
   }
 
-  renderWalletSum: {|
-    shouldHideBalance: boolean,
-    walletAmounts: Array<?MultiToken>,
-    rewards: Array<?MultiToken>,
-  |} => Node = (request) => {
-    const { currency } = this.props.unitOfAccountSetting;
-    if (!currency) {
-      throw new Error(`unexpected unit of account ${String(currency)}`);
-    }
-    if (request.shouldHideBalance) {
-      return (
-        <>
-          <span>{hiddenAmount}</span>
-          {' ' + currency}
-        </>
-      );
+  toggleQuickAccess: number => Promise<void> = async (walletId) => {
+    if(!walletId || typeof walletId !== 'number') throw new Error('Invalid wallet id.')
+    const currentQuickAccessList = this.props.walletsNavigation.quickAccess
+    let updatedQuickAccessList = [...currentQuickAccessList];
+    // Remove wallet
+    if(currentQuickAccessList.indexOf(walletId) !== -1) {
+      updatedQuickAccessList =  updatedQuickAccessList.filter(id => id !== walletId)
+    } else {
+      // Add wallet
+      updatedQuickAccessList.push(walletId)
     }
     let totalAmount = new BigNumber('0');
 
-    for (const amount of [...request.walletAmounts, ...request.rewards]) {
-      if (!amount) {
-        return <div className={styles.isLoading} />;
-      }
-      const defaultEntry = amount.getDefaultEntry();
-      const tokenInfo = this.props.getTokenInfo(defaultEntry);
-      const shiftedAmount = defaultEntry.amount
-            .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-      const ticker = tokenInfo.Metadata.ticker;
-      if (ticker == null) {
-        throw new Error('unexpected main token type');
-      }
-      const price = this.props.getCurrentPrice(ticker, currency);
-      if (price != null) {
-        totalAmount = totalAmount.plus(shiftedAmount.multipliedBy(price));
-      } else {
-        return '- ' + currency;
-      }
-    }
-    return formatValue(totalAmount) + ' ' + currency;
+    await this.props.updateSortedWalletList({
+      ...this.props.walletsNavigation,
+      quickAccess: updatedQuickAccessList
+    });
   }
 
-  onDragEnd: Object => any = async result => {
+  onDragEnd: (network: 'ergo' | 'cardano' ,result:Object) => any = async (network, result) => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
       return;
@@ -141,70 +150,78 @@ export default class WalletListDialog extends Component<Props, State> {
     this.setState(
       prev => {
         const walletListIdx = reorder(
-          prev.walletListIdx,
+          network === 'ergo' ? prev.ergoWalletsIdx : prev.cardanoWalletsIdx,
           result.source.index,
           result.destination.index
         );
         return {
-          walletListIdx,
+          ergoWalletsIdx: network === 'ergo' ? walletListIdx : prev.ergoWalletsIdx,
+          cardanoWalletsIdx: network === 'cardano' ? walletListIdx: prev.cardanoWalletsIdx
         };
       },
       async function () {
-        await this.props.updateSortedWalletList({ sortedWallets: this.state.walletListIdx });
+        await this.props.updateSortedWalletList({
+          ergo: this.state.ergoWalletsIdx,
+          cardano: this.state.cardanoWalletsIdx,
+          quickAccess: this.props.walletsNavigation.quickAccess || [],
+        });
       }
     );
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { walletListIdx } = this.state;
+    const { ergoWalletsIdx, cardanoWalletsIdx } = this.state;
 
     const {
       shouldHideBalance,
       onAddWallet,
       onUpdateHideBalance,
-      wallets,
+      ergoWallets,
+      cardanoWallets,
+      walletAmount,
     } = this.props;
+
+    const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
 
     return (
       <Dialog
         className={styles.component}
-        title={`${intl.formatMessage(globalMessages.allWalletsLabel)} (${wallets.length})`}
+        title={`${intl.formatMessage(globalMessages.allWalletsLabel)} (${ergoWallets.length + cardanoWallets.length})`}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
       >
         <div className={styles.header}>
           <div className={styles.totalInfo}>
-            {this.props.unitOfAccountSetting.enabled && (
-              <div className={styles.amount}>
-                <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-                <p className={styles.fixedAmount}>
-                  {this.renderWalletSum({
-                    shouldHideBalance,
-                    walletAmounts: wallets.map(wallet => wallet.walletAmount),
-                    rewards: wallets.map(wallet => wallet.rewards),
-                  })}
-                </p>
-              </div>
-            )}
+            <div className={styles.amount}>
+              <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
+              <p className={styles.value}>
+                <AmountDisplay
+                  shouldHideBalance={shouldHideBalance}
+                  amount={walletAmount}
+                  getTokenInfo={this.props.getTokenInfo}
+                  showFiat
+                  showAmount={false}
+                />
+              </p>
+            </div>
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
           </div>
         </div>
-        <DragDropContext onDragEnd={this.onDragEnd}>
-          <Droppable droppableId="wallet-list-droppable">
+        {cardanoWalletsIdx.length > 0 &&
+        <div className={styles.sectionHeader}>
+          <h1>{intl.formatMessage(messages.cardano)}</h1>
+        </div>}
+        <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
+          <Droppable droppableId="cardano-list-droppable">
             {provided => (
               <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                {walletListIdx.length > 0 &&
-                  walletListIdx.map((walletId, idx) => {
-                    const wallet = this.props.wallets.find(w => w.walletId === walletId);
-                    // Previously, after a wallet was deleted, the sorted wallet list was not
-                    // updated to remove the deleted wallet, so `wallet` might be null.
-                    // This should no longer happen but we keep filtering out the null
-                    // value (instead of throwing an error) just in case some users
-                    // have already deleted wallets before the fix.
+                {cardanoWalletsIdx.length > 0 &&
+                  cardanoWalletsIdx.map((walletId, idx) => {
+                    const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
                     if (!wallet) {
                       return null;
                     }
@@ -212,9 +229,37 @@ export default class WalletListDialog extends Component<Props, State> {
                       <WalletCard
                         key={walletId}
                         idx={idx}
+                        toggleQuickAccess={this.toggleQuickAccess}
+                        isInQuickAccess={quickAccessList.has(walletId)}
                         {...wallet}
-                        unitOfAccountSetting={this.props.unitOfAccountSetting}
-                        getCurrentPrice={this.props.getCurrentPrice}
+                      />);
+                  }).filter(Boolean)}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+        {cardanoWalletsIdx.length > 0 &&
+        <div className={styles.sectionHeader}>
+          <h1>{intl.formatMessage(messages.ergo)}</h1>
+        </div>}
+        <DragDropContext onDragEnd={(result) => this.onDragEnd('ergo', result)}>
+          <Droppable droppableId="ergo-list-droppable">
+            {provided => (
+              <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
+                {ergoWalletsIdx.length > 0 &&
+                  ergoWalletsIdx.map((walletId, idx) => {
+                    const wallet = this.props.ergoWallets.find(w => w.walletId === walletId);
+                    if (!wallet) {
+                      return null;
+                    }
+                    return (
+                      <WalletCard
+                        key={walletId}
+                        idx={idx}
+                        toggleQuickAccess={this.toggleQuickAccess}
+                        isInQuickAccess={quickAccessList.has(walletId)}
+                        {...wallet}
                       />
                     );
                   }).filter(Boolean)}

@@ -2,9 +2,9 @@
 import { Component } from 'react';
 import type { Node } from 'react'
 import styles from './AssetsDropdown.scss'
-import DefaultAssetIcon from '../../../../assets/images/assets-page/asset-no.inline.svg'
-import ArrowUpIcon from '../../../../assets/images/arrow-up.inline.svg'
-import ArrowDownIcon from '../../../../assets/images/arrow-down.inline.svg'
+import { ReactComponent as DefaultAssetIcon }  from '../../../../assets/images/assets-page/asset-no.inline.svg'
+import { ReactComponent as ArrowUpIcon }  from '../../../../assets/images/arrow-up.inline.svg'
+import { ReactComponent as ArrowDownIcon }  from '../../../../assets/images/arrow-down.inline.svg'
 import type { Asset } from '../../assets/AssetsList'
 
 type Props = {|

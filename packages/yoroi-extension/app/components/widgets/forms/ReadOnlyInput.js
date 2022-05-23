@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import TextField from '../../common/TextField';
 import globalMessages from '../../../i18n/global-messages';
-import EditSvg from '../../../assets/images/edit.inline.svg';
+import { ReactComponent as EditSvg }  from '../../../assets/images/edit.inline.svg';
 import styles from './ReadOnlyInput.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 

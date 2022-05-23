@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import ExportTxToFileSvg from '../../../assets/images/transaction/export.inline.svg';
+import { ReactComponent as ExportTxToFileSvg }  from '../../../assets/images/transaction/export.inline.svg';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';

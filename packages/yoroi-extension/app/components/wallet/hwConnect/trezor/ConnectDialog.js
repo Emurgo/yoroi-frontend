@@ -17,10 +17,10 @@ import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadImage from '../../../../assets/images/hardware-wallet/trezor/connect-load-modern.inline.gif';
-import ConnectErrorImage from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
+import { ReactComponent as ConnectErrorImage }  from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
-import ConnectErrorSVG from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
+import { ReactComponent as ConnectErrorSVG }  from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import { StepState } from '../../../widgets/ProgressSteps';

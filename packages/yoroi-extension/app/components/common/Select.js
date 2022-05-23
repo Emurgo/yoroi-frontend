@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { FormControl, FormHelperText, InputLabel, Select as SelectBase } from '@mui/material';
-import ArrowIcon from '../../assets/images/forms/arrow-dropdown.inline.svg';
+import { ReactComponent as ArrowIcon }  from '../../assets/images/forms/arrow-dropdown.inline.svg';
 
 type Props = {|
   label: string,

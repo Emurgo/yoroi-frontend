@@ -100,6 +100,7 @@ type SubmittedTransactionEntry = {|
   networkId: number,
   publicDeriverId: number,
   transaction: WalletTransaction,
+  usedUtxos: Array<{| txHash: string, index: number |}>,
 |};
 
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
@@ -143,6 +144,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable isExporting: boolean = false;
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
+
+  ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
 
   setup(): void {
     super.setup();
@@ -269,8 +272,35 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return result ? result.totalAvailable : 0;
   }
 
+  // This method ensures that at any time, there is only one refreshing process
+  // for each wallet.
+  refreshTransactionData: {|
+    publicDeriver: PublicDeriver<>,
+    localRequest: boolean,
+  |} => Promise<void> = async (request) => {
+    const { publicDeriverId } = request.publicDeriver;
+    if (this.ongoingRefreshing.has(publicDeriverId)) {
+      return this.ongoingRefreshing.get(publicDeriverId);
+    }
+    try {
+      const promise = this._refreshTransactionData(request);
+      runInAction(() => {
+        this.ongoingRefreshing.set(publicDeriverId, promise);
+      });
+      await promise;
+    } finally {
+      runInAction(() => {
+        this.ongoingRefreshing.delete(publicDeriverId);
+      });
+    }
+  }
+
+  isWalletRefreshing:  PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
+  }
+
   /** Refresh transaction data for all wallets and update wallet balance */
-  @action refreshTransactionData: {|
+  @action _refreshTransactionData: {|
     publicDeriver: PublicDeriver<>,
     localRequest: boolean,
   |} => Promise<void> = async (request) => {
@@ -758,14 +788,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   recordSubmittedTransaction: (
     PublicDeriver<>,
     WalletTransaction,
+    Array<{| txHash: string, index: number |}>,
   ) => void = (
     publicDeriver,
     transaction,
+    usedUtxos,
   ) => {
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
       networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       transaction,
+      usedUtxos,
     });
     this._persistSubmittedTransactions();
   }

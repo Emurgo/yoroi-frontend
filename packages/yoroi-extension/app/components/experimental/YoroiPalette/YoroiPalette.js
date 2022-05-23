@@ -6,7 +6,7 @@ import type { Node } from 'react';
 import { classicTheme } from '../../../styles/themes/classic-theme'
 import {  modernTheme } from '../../../styles/themes/modern-theme'
 import classNames from 'classnames';
-import ArrowDown from '../../../assets/images/down-arrow.inline.svg';
+import { ReactComponent as ArrowDown }  from '../../../assets/images/down-arrow.inline.svg';
 import { getMainYoroiPalette, formatPalette } from '../../../styles/globalStyles';
 import type { DesignToken } from '../../../styles/globalStyles'
 
@@ -77,8 +77,8 @@ export default class YoroiPalettePage extends Component<Props, State> {
           </div>
 
           <h1 className={styles.nameToHexHeader}>Colors Direct Hex Colors</h1>
-          {nameToHex.map((color, idx) => (
-            <div className={styles.row} key={idx}>
+          {nameToHex.map((color) => (
+            <div className={styles.row} key={color.name}>
               <span
                 className={styles.colorBox}
                 style={{

@@ -4,8 +4,8 @@ import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import styles from './PageSelect.scss';
-import NavAll from '../../assets/images/widget/page-nav/arrow-all.inline.svg';
-import NavSingle from '../../assets/images/widget/page-nav/arrow-single.inline.svg';
+import { ReactComponent as NavAll }  from '../../assets/images/widget/page-nav/arrow-all.inline.svg';
+import { ReactComponent as NavSingle }  from '../../assets/images/widget/page-nav/arrow-single.inline.svg';
 
 type Props = {|
   +currentPage: number;

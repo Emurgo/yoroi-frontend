@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import ExportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
+import { ReactComponent as ExportTxToFileSvg }  from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';

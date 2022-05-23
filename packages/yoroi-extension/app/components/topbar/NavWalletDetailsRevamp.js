@@ -4,22 +4,21 @@ import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import { splitAmount, truncateToken } from '../../utils/formatters';
+import { truncateLongName } from '../../utils/formatters';
 
 import styles from './NavWalletDetailsRevamp.scss';
-import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open_24_revamp.png';
+import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_off_24_revamp.png';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { hiddenAmount } from '../../utils/strings';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import AmountDisplay from '../common/AmountDisplay';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -85,7 +84,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     const {
       shouldHideBalance,
       onUpdateHideBalance,
-      highlightTitle,
       showEyeIcon,
       plate,
     } = this.props;
@@ -94,38 +92,38 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
 
-    const [, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
-
+    const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
-          <div className={classnames([styles.currency])}>{iconComponent}</div>
-          <div className={styles.content}>
-            <div
-              className={classnames([
-                styles.amount,
-                highlightTitle !== null && highlightTitle === true && styles.highlightAmount,
-              ])}
-            >
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}
-            </div>
-            {this.props.unitOfAccountSetting.enabled && (
-              <div className={styles.fixedAmount}>
-                {this.renderAmountWithUnitOfAccount({
-                  shouldHideBalance,
-                  amount: totalAmount,
-                })}
+          <div className={styles.contentWrapper}>
+            <div className={classnames([styles.currency])}>{iconComponent}</div>
+            <div className={styles.content}>
+              <div className={styles.walletInfo}>
+                <p className={styles.name}>
+                  {truncateLongName(this.props.wallet.conceptualWalletName)}
+                </p>
+                <p className={styles.plateId}>{accountPlateId}</p>
               </div>
-            )}
+              <div className={styles.balance}>
+                <div
+                  className={classnames([
+                    totalAmount ? styles.amount : styles.spinnerWrapper,
+                  ])}
+                >
+                  <AmountDisplay
+                    shouldHideBalance={shouldHideBalance}
+                    amount={totalAmount}
+                    getTokenInfo={this.props.getTokenInfo}
+                    showFiat
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          {totalAmount != null && showEyeIconSafe && (
-            <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-              {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-            </button>
-          )}
+          <button disabled={totalAmount === null && !showEyeIconSafe} type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
+            {shouldHideBalance ? <img src={IconEyeClosed} alt="Hide balance" /> : <img src={IconEyeOpen} alt="Show balance" />}
+          </button>
         </div>
       </div>
     );
@@ -140,75 +138,4 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     }
     return this.props.rewards.joinAddCopy(this.props.walletAmount);
   };
-
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
-
-  renderAmountWithUnitOfAccount: {|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken
-  |} => Node = (request) => {
-    if (request.amount == null) {
-      return null;
-    }
-    const { currency } = this.props.unitOfAccountSetting;
-    if (currency == null) {
-      throw new Error(`unexpected unit of account ${String(currency)}`);
-    }
-    if (request.shouldHideBalance) {
-      return (
-        <>
-          <span>{hiddenAmount}</span>
-          {` ${currency}`}
-        </>
-      );
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
-          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-    const ticker = tokenInfo.Metadata.ticker;
-    if (ticker == null) {
-      throw new Error('unexpected main token type');
-    }
-    const price = this.props.getCurrentPrice(ticker, currency);
-    if (price != null) {
-      return `${calculateAndFormatValue(shiftedAmount, price)} ${currency}`;
-    }
-    return null;
-  }
 }

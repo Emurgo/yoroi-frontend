@@ -259,19 +259,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         publicDeriver,
         localRequest: true,
       });
-      await this.stores.transactions.reactToTxHistoryUpdate({ publicDeriver });
-      // if after querying local history we find nothing, we just reset the DB entirely
-      const txRequests = find(this.stores.transactions.transactionsRequests, { publicDeriver });
-      if (txRequests == null)
-        throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
-      const { result } = txRequests.requests.allRequest;
-      if (result == null)
-        throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
-      if (result.totalAvailable === 0) {
-        for (const txRequest of Object.keys(txRequests.requests)) {
-          txRequests.requests[txRequest].reset();
-        }
-      }
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(
@@ -325,9 +312,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       });
     }
     for (const publicDeriver of newWithCachedData) {
-      await this.refreshWalletFromLocalOnLaunch(publicDeriver);
-    }
-    for (const publicDeriver of newWithCachedData) {
       this._queueWarningIfNeeded(publicDeriver);
     }
     runInAction('refresh active wallet', () => {
@@ -338,6 +322,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
       this.publicDerivers.push(...newWithCachedData);
     });
+    setTimeout(async () => {
+      for (const publicDeriver of newWithCachedData) {
+        await this.refreshWalletFromLocalOnLaunch(publicDeriver);
+      }
+      this._startRefreshAllWallets();
+    }, 50); // let the UI render first so that the loading process is perceived faster
   };
 
   @action registerObserversForNewWallet: ({|
@@ -397,6 +387,18 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
+  _startRefreshAllWallets: void => Promise<void> = async () => {
+    for (const publicDeriver of this.publicDerivers) {
+      if (this.selected !== publicDeriver) {
+        try {
+          await this.refreshWalletFromRemote(publicDeriver);
+        } catch {
+          // ignore error
+        }
+      }
+    }
+    setTimeout(this._startRefreshAllWallets, this.WALLET_REFRESH_INTERVAL);
+  }
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
     this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNotification);

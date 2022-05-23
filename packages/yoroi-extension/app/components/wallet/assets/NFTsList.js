@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { assetsMessage } from './AssetsList';
-import Search from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
