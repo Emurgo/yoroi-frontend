@@ -4,9 +4,14 @@ import type { Node } from 'react';
 import { ReactComponent as SupportIcon } from '../../assets/images/support.inline.svg';
 import { IconButton } from '@mui/material';
 
-export default class Support extends Component <{||}> {
+type Props = {||}
+type State = {|
+  isOpened: boolean,
+|}
 
-  state = {
+export default class Support extends Component <Props, State> {
+
+  state: State = {
     isOpened: false
   }
 
@@ -14,19 +19,22 @@ export default class Support extends Component <{||}> {
       const script = document.createElement('script')
       script.src = src
       script.id = id
-      document.body.appendChild(script)
+      document.body?.appendChild(script)
   }
 
   componentDidMount() {
       this.loadScript('https://static.zdassets.com/ekr/snippet.js?key=68b95d72-6354-4343-8a64-427979a6f5d6', 'ze-snippet');
-      this.interval = setInterval(()=>{
+
+      const interval = setInterval(()=>{
         if (typeof window.zE !== 'undefined' && typeof window.zE.hide === 'function') {
           window.zE.hide()
-          clearInterval(this.interval)
-
           window.zE('webWidget:on', 'close', () => {
             this.setState({ isOpened: false })
           })
+
+          if (interval) {
+            clearInterval(interval)
+          }
         }
       }, 500);
   }
