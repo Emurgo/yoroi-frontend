@@ -14,6 +14,14 @@ import {
   BigNumber
 } from 'bignumber.js';
 
+import type { UtxoStorage } from '@emurgo/yoroi-lib-core/dist/utxo'
+import type {
+  Utxo,
+  UtxoAtSafePoint,
+  UtxoDiffToBestBlock
+} from '@emurgo/yoroi-lib-core/dist/utxo/models'
+import type { Utxo as StorageUtxo } from '../database/utxo/tables';
+
 import type {
   IPublicDeriver,
   UtxoAddressPath,
@@ -63,6 +71,12 @@ import type {
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
+import {
+  GetUtxoAtSafePoint, GetUtxoDiffToBestBlock,
+} from '../database/utxo/api/read';
+import {
+  ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock,
+} from '../database/utxo/api/write';
 import { TxStatusCodes, } from '../database/primitives/enums';
 import { MultiToken } from '../../../../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../../../../common/lib/MultiToken';
@@ -544,5 +558,153 @@ export function verifyFromBip44Root(request: $ReadOnly<{|
   const lastLevelSpecified = request.startLevel + request.path.length - 1;
   if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
     throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
+  }
+}
+
+// convert from storage Utxo type to Yoroi-lib Utxo type
+function storageUtxoToYoroiLib(utxo: StorageUtxo): Utxo {
+  return {
+    ...utxo,
+    assets: utxo.assets.map(
+      asset => (
+        {
+          assetId: asset.assetId,
+          policyId: asset.policyId,
+          name: asset.name,
+          amount: asset.amount,
+        }
+      )
+    ),
+    amount: new BigNumber(utxo.amount),
+  };
+}
+
+function yoroiLibUtxoToStorage(utxo: Utxo): StorageUtxo {
+  return {
+    utxoId: utxo.utxoId,
+    txHash: utxo.txHash,
+    txIndex: utxo.txIndex,
+    receiver: utxo.receiver,
+    blockNum: utxo.blockNum,
+
+    assets: utxo.assets.map(
+      asset => (
+        {
+          assetId: asset.assetId,
+          policyId: asset.policyId,
+          name: asset.name,
+          amount: asset.amount,
+        }
+      )
+    ),
+    amount: utxo.amount.toString(),
+  };
+}
+
+
+export class UtxoStorageApi implements UtxoStorage {
+  static depsTables: {|
+    ModifyUtxoAtSafePoint: Class<ModifyUtxoAtSafePoint>,
+    ModifyUtxoDiffToBestBlock: Class<ModifyUtxoDiffToBestBlock>,
+    GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+    GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+  |} = Object.freeze({
+    ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock,
+    GetUtxoAtSafePoint, GetUtxoDiffToBestBlock,
+  });
+
+  conceptualWalletId: number;
+  db: lf$Database;
+  dbTx: lf$Transaction;
+
+  constructor(conceptualWalletId: number) {
+    this.conceptualWalletId = conceptualWalletId;
+  }
+
+  setDb(db: lf$Database): void {
+    this.db = db;
+  }
+
+  setDbTx(dbTx: lf$Transaction): void {
+    this.dbTx = dbTx;
+  }
+
+  async getUtxoAtSafePoint(): Promise<UtxoAtSafePoint | void> {
+    const result = await GetUtxoAtSafePoint.forWallet(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+    );
+    if (result) {
+      // convert from storage UtxoAtSafePoint type to Yoroi-lib UtxoAtSafePoint type
+      return {
+        lastSafeBlockHash: result.UtxoAtSafePoint.lastSafeBlockHash,
+        utxos: result.UtxoAtSafePoint.utxos.map(storageUtxoToYoroiLib),
+      };
+    }
+    return undefined;
+  }
+
+  async getUtxoDiffToBestBlock(): Promise<UtxoDiffToBestBlock[]> {
+    return (
+      await GetUtxoDiffToBestBlock.forWallet(
+        this.db,
+        this.dbTx,
+        this.conceptualWalletId,
+      )
+    ).map(utxoDiffToBestBlock => (
+      {
+        ...utxoDiffToBestBlock,
+        newUtxos: utxoDiffToBestBlock.newUtxos.map(storageUtxoToYoroiLib),
+      }
+    ));
+  }
+
+  async replaceUtxoAtSafePoint(utxos: Utxo[], lastSafeBlockHash: string): Promise<void> {
+    await ModifyUtxoAtSafePoint.addOrReplace(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+      {
+        lastSafeBlockHash,
+        utxos: utxos.map(yoroiLibUtxoToStorage),
+      },
+    );
+  }
+
+
+  async clearUtxoState(): Promise<void> {
+    await ModifyUtxoAtSafePoint.remove(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+    );
+    await ModifyUtxoDiffToBestBlock.removeAll(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+    );
+  }
+
+  async appendUtxoDiffToBestBlock(diff: UtxoDiffToBestBlock): Promise<void> {
+    await ModifyUtxoDiffToBestBlock.add(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+      {
+        lastBestBlockHash: diff.lastBestBlockHash,
+        spentUtxoIds: diff.spentUtxoIds,
+        newUtxos: diff.newUtxos.map(yoroiLibUtxoToStorage),
+      },
+    );
+  }
+
+  async removeDiffWithBestBlock(blockHash: string): Promise<void> {
+    await ModifyUtxoDiffToBestBlock.remove(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+      blockHash,
+    );
   }
 }

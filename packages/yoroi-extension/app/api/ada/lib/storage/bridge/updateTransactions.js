@@ -150,6 +150,8 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
+import { UtxoStorageApi } from '../models/utils';
+import { PublicDeriver } from '../models/PublicDeriver';
 
 type TokensMintMetadata = {|
 ...{[key: string]: TokenMintMetadata[]}
@@ -939,11 +941,17 @@ export async function updateTransactions(
       .map(key => updateDepTables[key])
       .flatMap(table => getAllSchemaTables(db, table));
 
+    const updateUtxoTables = Object
+      .keys(UtxoStorageApi.depsTables)
+      .map(key => UtxoStorageApi.depsTables[key])
+      .flatMap(table => getAllSchemaTables(db, table));
+
     await raii(
       db,
       [
         ...updateTables,
         ...mapToTables(db, derivationTables),
+        ...updateUtxoTables,
       ],
       async dbTx => {
         lastSyncInfo = await updateDepTables.GetLastSyncForPublicDeriver.forId(
@@ -955,7 +963,8 @@ export async function updateTransactions(
           GetLastSyncForPublicDeriver, // eslint-disable-line no-unused-vars, no-shadow
           ...remainingDeps
         } = updateDepTables;
-        await rawUpdateTransactions(
+
+        const addresses = await rawUpdateTransactions(
           db, dbTx,
           remainingDeps,
           publicDeriver,
@@ -967,6 +976,17 @@ export async function updateTransactions(
           getTokenInfo,
           getMultiAssetMetadata
         );
+
+        if (addresses) {
+          if (!(publicDeriver instanceof PublicDeriver)) {
+            throw new Error('unxpected publicDeriver type');
+          }
+          await updateUtxos(
+            db, dbTx,
+            publicDeriver,
+            addresses,
+          );
+        }
       }
     );
   } catch (e) {
@@ -1185,6 +1205,8 @@ async function rollback(
   // note: we don't modify the display cutoff since it may confuse the user to suddenly shrink it
 }
 
+// return all addresses that may have transactions, or undefined if there is no need
+// for updating
 async function rawUpdateTransactions(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -1226,7 +1248,7 @@ async function rawUpdateTransactions(
   derivationTables: Map<number, string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-): Promise<void> {
+): Promise<Array<string> | void> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
@@ -1245,6 +1267,8 @@ async function rawUpdateTransactions(
       return;
     }
   }
+
+  let requestAddresses = undefined;
 
   if (bestBlock.hash != null) {
     const untilBlock = bestBlock.hash;
@@ -1305,34 +1329,35 @@ async function rawUpdateTransactions(
           tx: bestInStorage.Transaction.Hash,
         }
       };
+    requestAddresses = [
+      // needs to send legacy addresses directly since they don't use the payment key method
+      ...addresses.utxoAddresses
+        .filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY)
+        .map(address => address.Hash),
+      // payment keys will fetch all addresses with the same payment key
+      ...addresses.utxoAddresses
+        .filter(address => address.Type === CoreAddressTypes.CARDANO_ENTERPRISE)
+        .reduce(
+          (list, next) => {
+            const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(next.Hash, 'hex'));
+            const enterpriseWasm = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+            if (enterpriseWasm == null) return list;
+            const keyHash = enterpriseWasm.payment_cred().to_keyhash();
+            if (keyHash == null) return list;
+            list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
+            return list;
+          },
+          []
+        ),
+      // note: sending account addresses is required
+      // since for example, the staking key registration certificate doesn't need a witness
+      // so a tx where no input/output belongs to you could register your staking key
+      ...addresses.accountingAddresses.map(address => address.Hash),
+    ];
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
       network,
-      addresses: [
-        // needs to send legacy addresses directly since they don't use the payment key method
-        ...addresses.utxoAddresses
-          .filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY)
-          .map(address => address.Hash),
-        // payment keys will fetch all addresses with the same payment key
-        ...addresses.utxoAddresses
-          .filter(address => address.Type === CoreAddressTypes.CARDANO_ENTERPRISE)
-          .reduce(
-            (list, next) => {
-              const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(next.Hash, 'hex'));
-              const enterpriseWasm = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
-              if (enterpriseWasm == null) return list;
-              const keyHash = enterpriseWasm.payment_cred().to_keyhash();
-              if (keyHash == null) return list;
-              list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
-              return list;
-            },
-            []
-          ),
-        // note: sending account addresses is required
-        // since for example, the staking key registration certificate doesn't need a witness
-        // so a tx where no input/output belongs to you could register your staking key
-        ...addresses.accountingAddresses.map(address => address.Hash),
-      ],
+      addresses: requestAddresses,
       untilBlock,
     });
 
@@ -1401,6 +1426,8 @@ async function rawUpdateTransactions(
       Height: bestBlock.height,
     }
   );
+
+  return requestAddresses;
 }
 
 /**
@@ -2833,4 +2860,18 @@ async function certificateToDb(
     }
   }
   return result;
+}
+
+async function updateUtxos(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  publicDeriver: PublicDeriver<>,
+  addresses: Array<string>,
+) {
+  const { utxoStorageApi, utxoService, } = publicDeriver;
+
+  utxoStorageApi.setDb(db);
+  utxoStorageApi.setDbTx(dbTx);
+
+  await utxoService.syncUtxoState(addresses);
 }

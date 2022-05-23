@@ -37,6 +37,20 @@ import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepa
 import { bech32 } from 'bech32';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
+import type { UtxoApiContract } from '@emurgo/yoroi-lib-core/dist/utxo/api';
+import type {
+  Asset,
+  DiffPoint,
+  TipStatusReference,
+  Utxo,
+  UtxoApiResponse,
+  UtxoAtPointRequest,
+  UtxoDiff,
+  UtxoDiffItem,
+  UtxoDiffItemOutput,
+  UtxoDiffSincePointRequest
+} from '@emurgo/yoroi-lib-core/dist/utxo/models';
+import { UtxoApiResult, } from '@emurgo/yoroi-lib-core/dist/utxo/models';
 
 /** convert bech32 address to bytes */
 function fixAddresses(
@@ -677,4 +691,210 @@ export function genGetTokenInfo(
 export function genGetMultiAssetMetadata(
 ): MultiAssetMintMetadataFunc {
   return async (_) => ({});
+}
+
+
+export class MockUtxoApi implements UtxoApiContract {
+  blockchain: Array<RemoteTransaction>;
+  lastSafeBlockTxIndex: number;
+
+  constructor(
+    blockchain: Array<RemoteTransaction>,
+    safeConfirmations: number,
+  ) {
+    this.blockchain = blockchain;
+
+    let blockCount = 0;
+    let currentBlockHash = blockchain[blockchain.length - 1].block_hash;
+    let i;
+    for (i = blockchain.length - 1; i >= 0; i --) {
+      if (blockchain[i].block_hash !== currentBlockHash) {
+        blockCount += 1;
+        if (blockCount = safeConfirmations) {
+          break;
+        } else {
+          currentBlockHash = blockchain[i].block_hash;
+        }
+      }
+    }
+    if (i === -1) {
+      throw new Error('not enough blocks for a safe block');
+    } else {
+      this.lastSafeBlockTxIndex = i;
+    }
+  }
+
+  async getBestBlock(): Promise<string> {
+    const hash = this.blockchain[this.blockchain.length - 1].block_hash;
+    if (!hash) {
+      throw new Error('expect hash');
+    }
+    return hash;
+  }
+
+  async getSafeBlock(): Promise<string> {
+    const hash =  this.blockchain[this.lastSafeBlockTxIndex].block_hash;
+    if (!hash) {
+      throw new Error('expect hash');
+    }
+    return hash;
+  }
+
+  async getTipStatusWithReference(
+    bestBlocks: string[]
+  ): Promise<UtxoApiResponse<TipStatusReference>> {
+    for (let i = this.blockchain.length - 1; i >= 0; i--) {
+      const hash = this.blockchain[i].block_hash;
+      if (!hash) {
+        throw new Error('expect hash');
+      }
+      const height = this.blockchain[i].height;
+      if (height == null) {
+        throw new Error('expect height');
+      }
+      if (bestBlocks.includes(hash)) {
+        const safeBlockHash = this.blockchain[this.lastSafeBlockTxIndex].block_hash;
+        if (!safeBlockHash) {
+          throw new Error('expect hash');
+        }
+        const safeBlockHeight = this.blockchain[this.lastSafeBlockTxIndex].height;
+        if (safeBlockHeight == null) {
+          throw new Error('expect block height');
+        }
+        return {
+          result: UtxoApiResult.SUCCESS,
+          value: {
+            reference: {
+              lastFoundBestBlock: hash,
+              lastFoundSafeBlock: (safeBlockHeight >= height)
+                ? safeBlockHash
+                : hash,
+            }
+          }
+        };
+      }
+    }
+    return {
+      result: UtxoApiResult.SAFEBLOCK_ROLLBACK
+    };
+  }
+
+  async getUtxoAtPoint(req: UtxoAtPointRequest): Promise<UtxoApiResponse<Utxo[]>> {
+    const { addresses, referenceBlockHash } = req;
+    let lastTxIndex;
+    for (lastTxIndex = this.blockchain.length - 1; lastTxIndex >= 0; lastTxIndex--) {
+      const hash = this.blockchain[lastTxIndex].block_hash;
+      if (hash === referenceBlockHash) {
+        break;
+      }
+    }
+    if (lastTxIndex === -1) {
+      throw new Error('block not found');
+    }
+    let utxos = [];
+    for (let i = 0; i <= lastTxIndex; i++) {
+      const tx = this.blockchain[i];
+      // remove spent
+      utxos = utxos.filter(
+        utxo => !tx.inputs.some(
+          input => input.txHash === utxo.txHash && input.index === utxo.txIndex
+        )
+      );
+      // add new
+      tx.outputs.filter(
+        ({ address }) => addresses.includes(address)
+      ).forEach((output, outputIndex) => {
+        const { height } = tx;
+        if (height == null) {
+          throw new Error('expect height');
+        }
+        utxos.push({
+          utxoId: `${tx.hash}${outputIndex}`,
+          txHash: tx.hash,
+          txIndex: outputIndex,
+          receiver: output.address,
+          amount: new BigNumber(output.amount),
+          assets: output.assets.map(asset => ({
+            assetId: asset.assetId,
+            policyId: asset.policyId,
+            name: asset.name,
+            amount: asset.amount,
+          })),
+          blockNum: height,
+        });
+      });
+    }
+    return {
+      result: UtxoApiResult.SUCCESS,
+      value: utxos,
+    };
+  }
+
+  async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
+    const { addresses, untilBlockHash, afterBestBlock, } = req;
+    let seenBestBlock = false;
+    let seenUntilBlock = false;
+    let utxoDiffItems = [];
+    for (let i = 0; i <= this.blockchain.length; i++) {
+      const tx = this.blockchain[i];
+      if (seenBestBlock) {
+        if (tx.block_hash === afterBestBlock) {
+          continue;
+        }
+        if (tx.block_hash === untilBlockHash) {
+          seenUntilBlock = true;
+          break;
+        }
+        tx.outputs.filter(
+          ({ address }) => addresses.includes(address)
+        ).forEach((output, outputIndex) => {
+          const utxoId = `${tx.hash}${outputIndex}`
+          utxoDiffItems.push(
+            {
+              type: 'output',
+              id: utxoId,
+              amount: new BigNumber(output.amount),
+              utxo:{
+                utxoId,
+                txHash: tx.hash,
+                txIndex: outputIndex,
+                receiver: output.address,
+                amount: new BigNumber(output.amount),
+                assets: output.assets.map(asset => ({
+                  assetId: asset.assetId,
+                  policyId: asset.policyId,
+                  name: asset.name,
+                  amount: asset.amount,
+                })),
+                blockNum: tx.height,
+              }
+            }
+          );
+        });
+        tx.inputs.filter(input => addresses.includes(input.address))
+          .forEach(input => {
+            utxoDiffItems.push(
+              ({
+                type: 'input',
+                id: input.id,
+                amount: new BigNumber(input.amount),
+              }: UtxoDiffItem)
+            );
+          });
+      } else {
+        if (tx.block_hash === afterBestBlock) {
+          seenBestBlock = true;
+        }
+      }
+    }
+    if (!seenUntilBlock) {
+      return {
+        result: UtxoApiResult.BESTBLOCK_ROLLBACK
+      };
+    }
+    return {
+      result: UtxoApiResult.SUCCESS,
+      value: { diffItems: utxoDiffItems },
+    };
+  }
 }
