@@ -106,7 +106,11 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import { scanShelleyCip1852Account } from './restoration/shelley/scan';
-import type { CardanoAddressedUtxo, V4UnsignedTxAddressedUtxoResponse, } from './transactions/types';
+import type {
+  CardanoAddressedUtxo,
+  CardanoUtxoScriptWitness,
+  V4UnsignedTxAddressedUtxoResponse,
+} from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -327,16 +331,10 @@ export type CardanoTxRequestMint = {|
   metadata?: CardanoTxRequestMintMetadata,
 |};
 type CardanoTxRequestInput =
-  string | // UTxO IDs
+  string | // UTxO ID
   {|
     id: string, // UTxO ID
-    nativeScript: string,
-  |} |
-  {|
-    id: string, // UTxO ID
-    plutusScript: string,
-    datum: string,
-    redeemer: string,
+    witness: CardanoUtxoScriptWitness,
   |};
 export type CardanoTxRequest = {|
   includeInputs?: Array<CardanoTxRequestInput>,
@@ -1189,12 +1187,12 @@ export default class AdaApi {
       return acc;
     }, {})
 
-    const mustIncludeUtxos = [];
+    const mustIncludeUtxos: Array<[CardanoAddressedUtxo, ?CardanoUtxoScriptWitness]> = [];
     const coinSelectUtxos = [];
     for (const utxo of utxos) {
       const includeInputEntry = includeInputMap[utxo.utxo_id];
       if (includeInputEntry != null) {
-        mustIncludeUtxos.push(utxo);
+        mustIncludeUtxos.push([utxo, includeInputEntry.witness]);
       } else {
         coinSelectUtxos.push(utxo);
       }
