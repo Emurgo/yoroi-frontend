@@ -91,7 +91,7 @@ export default class UserSummary extends Component<Props> {
     return (
       <div className={styles.card}>
         {
-          !this.props.totalSum ? this.getCardSkeleton() : (
+          !this.props.totalSum ? this.getCardSkeleton('total') : (
             <div className={styles.cardContent}>
               <div>
                 <h3 className={styles.label}>
@@ -180,10 +180,10 @@ export default class UserSummary extends Component<Props> {
     )
   }
 
-  getCardSkeleton(card: ?string): Node {
+  getCardSkeleton(card: 'rewards' | 'total'): Node {
     const skeletons = [
       { width: '50%', height: '15px', marginBottom: '5px' }, // Label
-      { width: '85%', height: '32px', marginBottom: '16px' }, // Amount
+      { width: '85%', height: '32px', marginBottom: card === 'rewards' ? '25px' : '16px' }, // Amount
       { width: card === 'rewards' ? '43%' : '70%', height: '57px', marginBottom: '0px' } // Text / Button
     ]
     return (
