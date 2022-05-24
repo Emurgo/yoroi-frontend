@@ -78,6 +78,7 @@ import type {
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { UtxoData } from '../../api/ada/lib/state-fetch/types';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -204,7 +205,7 @@ type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
 
-export type ForeignUtxoFetcher = Array<string> => Promise<GetUtxoDataResponse>;
+export type ForeignUtxoFetcher = Array<string> => Promise<Array<RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
@@ -732,7 +733,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher =
     (fetcher, networkInfo) => {
-      return async (utxoIds: Array<string>): Promise<GetUtxoDataResponse> => {
+      return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
         const foreignInputs = utxoIds.map((id: string) => {
           // tx hash length is 64
           if (id.length < 65) {
@@ -747,9 +748,23 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             throw new Error(`Failed to parse utxo ID "${id}": ${String(e)}`);
           }
         })
-        return await fetcher.getUtxoData({
+        const fetchedData: GetUtxoDataResponse = await fetcher.getUtxoData({
           network: networkInfo,
           utxos: foreignInputs,
+        });
+        return fetchedData.map((data: (UtxoData | null), i): ?RemoteUnspentOutput => {
+          if (data == null) {
+            return null;
+          }
+          const { txHash, txIndex } = foreignInputs[i];
+          return {
+            utxo_id: utxoIds[i],
+            tx_hash: txHash,
+            tx_index: txIndex,
+            receiver: data.output.address,
+            amount: data.output.amount,
+            assets: data.output.assets,
+          };
         })
       };
     }

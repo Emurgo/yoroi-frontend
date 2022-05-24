@@ -1204,7 +1204,7 @@ export default class AdaApi {
     }
 
     const mustIncludeUtxos: Array<[CardanoAddressedUtxo, ?CardanoUtxoScriptWitness]> = [];
-    const coinSelectUtxos = [];
+    const coinSelectUtxos: Array<CardanoAddressedUtxo> = [];
     for (const utxo of [...foreignUtxos, ...utxos]) {
       const includeInputEntry = includeInputMap[utxo.utxo_id];
       if (includeInputEntry != null) {
