@@ -5,15 +5,8 @@ import { ReactComponent as SupportIcon } from '../../assets/images/support.inlin
 import { IconButton } from '@mui/material';
 
 type Props = {||}
-type State = {|
-  isOpened: boolean,
-|}
 
-export default class Support extends Component <Props, State> {
-
-  state: State = {
-    isOpened: false
-  }
+export default class Support extends Component <Props> {
 
   loadScript(src: string, id: string): void {
       const script = document.createElement('script')
@@ -28,10 +21,6 @@ export default class Support extends Component <Props, State> {
       const interval = setInterval(()=>{
         if (typeof window.zE !== 'undefined' && typeof window.zE.hide === 'function') {
           window.zE.hide()
-          window.zE('webWidget:on', 'close', () => {
-            this.setState({ isOpened: false })
-          })
-
           if (interval) {
             clearInterval(interval)
           }
@@ -41,7 +30,6 @@ export default class Support extends Component <Props, State> {
 
   openChatBoxSupport(){
     if (typeof window.zE !== 'undefined') {
-        this.setState({ isOpened: true })
         window.zE.activate()
       }
   }
@@ -55,8 +43,6 @@ export default class Support extends Component <Props, State> {
             right: '30px',
             zIndex: '1',
             padding: '3px',
-            transition: 'transform 400ms ease-in-out 50ms',
-            transform: this.state.isOpened ? 'translateY(100px)' : 'translateY(0px)'
           }}
           onClick={this.openChatBoxSupport.bind(this)}
         >
