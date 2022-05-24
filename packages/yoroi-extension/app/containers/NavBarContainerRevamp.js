@@ -143,7 +143,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
       })
 
       return (
-        <QuickAccessWalletsList wallets={walletsMap} />
+        <QuickAccessWalletsList
+          wallets={walletsMap}
+          unitOfAccountSetting={profile.unitOfAccount}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+        />
       )
     }
 

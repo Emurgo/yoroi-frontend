@@ -16,7 +16,6 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
-import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 
@@ -86,6 +85,8 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       onUpdateHideBalance,
       showEyeIcon,
       plate,
+      unitOfAccountSetting,
+      getCurrentPrice,
     } = this.props;
 
     const totalAmount = this.getTotalAmount();
@@ -116,6 +117,8 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     amount={totalAmount}
                     getTokenInfo={this.props.getTokenInfo}
                     showFiat
+                    unitOfAccountSetting={unitOfAccountSetting}
+                    getCurrentPrice={getCurrentPrice}
                   />
                 </div>
               </div>

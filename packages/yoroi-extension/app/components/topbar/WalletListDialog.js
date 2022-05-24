@@ -10,18 +10,14 @@ import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as IconEyeOpen }  from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed }  from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import { splitAmount, truncateToken } from '../../utils/formatters';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
-import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
-import { formatValue } from '../../utils/unit-of-account';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import AmountDisplay from '../common/AmountDisplay';
+import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import type { WalletsNavigation } from '../../api/localStorage';
 
 const messages = defineMessages({
@@ -133,7 +129,6 @@ export default class WalletListDialog extends Component<Props, State> {
       // Add wallet
       updatedQuickAccessList.push(walletId)
     }
-    let totalAmount = new BigNumber('0');
 
     await this.props.updateSortedWalletList({
       ...this.props.walletsNavigation,
@@ -179,7 +174,8 @@ export default class WalletListDialog extends Component<Props, State> {
       onUpdateHideBalance,
       ergoWallets,
       cardanoWallets,
-      walletAmount,
+      unitOfAccountSetting,
+      getCurrentPrice,
     } = this.props;
 
     const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
@@ -197,13 +193,7 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.amount}>
               <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
               <p className={styles.value}>
-                <AmountDisplay
-                  shouldHideBalance={shouldHideBalance}
-                  amount={walletAmount}
-                  getTokenInfo={this.props.getTokenInfo}
-                  showFiat
-                  showAmount={false}
-                />
+                {this.renderWalletsTotal()}
               </p>
             </div>
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
@@ -232,7 +222,10 @@ export default class WalletListDialog extends Component<Props, State> {
                         toggleQuickAccess={this.toggleQuickAccess}
                         isInQuickAccess={quickAccessList.has(walletId)}
                         {...wallet}
-                      />);
+                        unitOfAccountSetting={unitOfAccountSetting}
+                        getCurrentPrice={getCurrentPrice}
+                      />
+                    );
                   }).filter(Boolean)}
                 {provided.placeholder}
               </div>
@@ -260,6 +253,8 @@ export default class WalletListDialog extends Component<Props, State> {
                         toggleQuickAccess={this.toggleQuickAccess}
                         isInQuickAccess={quickAccessList.has(walletId)}
                         {...wallet}
+                        unitOfAccountSetting={unitOfAccountSetting}
+                        getCurrentPrice={getCurrentPrice}
                       />
                     );
                   }).filter(Boolean)}
@@ -275,5 +270,126 @@ export default class WalletListDialog extends Component<Props, State> {
         </div>
       </Dialog>
     );
+  }
+
+  renderWalletsTotal(): Node {
+    const {
+      unitOfAccountSetting,
+      cardanoWallets,
+      ergoWallets,
+      shouldHideBalance,
+      getCurrentPrice,
+    } = this.props;
+    if (unitOfAccountSetting.enabled) {
+      let totalFiat;
+      const adaFiat = this.sumWallets(cardanoWallets).fiat;
+      const ergFiat = this.sumWallets(ergoWallets).fiat;
+      if (adaFiat == null || ergFiat == null) {
+        totalFiat = null;
+      } else {
+        totalFiat = adaFiat.plus(ergFiat);
+      }
+      const { currency } = unitOfAccountSetting;
+      return (
+        <FiatDisplay
+          shouldHideBalance={shouldHideBalance}
+          amount={totalFiat}
+          currency={currency}
+        />
+      );
+    }
+    if (ergoWallets.length === 0) {
+      // only have Cardano wallets
+      const amount = this.sumWallets(cardanoWallets).sum;
+      return (
+        <AmountDisplay
+          shouldHideBalance={shouldHideBalance}
+          amount={amount}
+          getTokenInfo={this.props.getTokenInfo}
+          showFiat={false}
+          showAmount
+          unitOfAccountSetting={unitOfAccountSetting}
+          getCurrentPrice={getCurrentPrice}
+        />
+      );
+    }
+    if (cardanoWallets.length === 0) {
+      const amount = this.sumWallets(ergoWallets).sum;
+      return (
+        <AmountDisplay
+          shouldHideBalance={shouldHideBalance}
+          amount={amount}
+          getTokenInfo={this.props.getTokenInfo}
+          showFiat={false}
+          showAmount
+          unitOfAccountSetting={unitOfAccountSetting}
+          getCurrentPrice={getCurrentPrice}
+        />
+      );
+    }
+    // there are both ADAs and ERGs, don't show total
+    return null;
+  }
+
+  sumWallets(
+    wallets: Array<Object>
+  ): {|
+    sum: MultiToken | null,
+    fiat: BigNumber | null,
+  |} {
+    const {
+      unitOfAccountSetting,
+      getTokenInfo,
+      getCurrentPrice,
+    } = this.props;
+    if (wallets.length === 0) {
+      return { sum: null, fiat: new BigNumber('0') };
+    }
+    let sum;
+    if (wallets[0].walletAmount) {
+      sum = new MultiToken(
+        wallets[0].walletAmount.values,
+        wallets[0].walletAmount.defaults,
+      );
+    } else {
+      return { sum: null, fiat: null };
+    }
+    if (wallets[0].rewards) {
+      sum.joinAddMutable(wallets[0].rewards);
+    } else {
+      return { sum: null, fiat: null };
+    }
+    for (let i = 1; i < wallets.length; i ++ ) {
+      if (wallets[i].walletAmount) {
+        sum.joinAddMutable(wallets[i].walletAmount);
+      } else {
+        return { sum: null, fiat: null };
+      }
+      if (wallets[i].rewards) {
+        sum.joinAddMutable(wallets[i].rewards);
+      } else {
+        return { sum: null, fiat: null };
+      }
+    }
+    if (!unitOfAccountSetting.enabled) {
+      return { sum, fiat: null };
+    }
+    const defaultEntry = sum.getDefaultEntry();
+    const tokenInfo = getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const { currency } = unitOfAccountSetting;
+    if (!currency) {
+      throw new Error(`unexpected unit of account ${String(currency)}`);
+    }
+    const price = getCurrentPrice(ticker, currency);
+    if (price) {
+      return { sum, fiat: shiftedAmount.multipliedBy(price) };
+    }
+    return { sum, fiat: null };
   }
 }
