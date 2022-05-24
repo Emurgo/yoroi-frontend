@@ -569,9 +569,47 @@ createTx.addEventListener('click', () => {
     ).to_bytes()
   );
 
+  let includeInput = randomUtxo.utxo_id;
+
+  const nativeScriptInputUtxoId = '1287e36f9387c3a43379891d2448131aa2ac553ea282a8ff7a881c98eb2d228e1';
+
+  // noinspection PointlessBooleanExpressionJS
+  if (nativeScriptInputUtxoId != null) {
+
+    const nscripts = CardanoWasm.NativeScripts.new();
+    nscripts.add(
+      CardanoWasm.NativeScript.new_timelock_start(
+        CardanoWasm.TimelockStart.new(1234)
+      ),
+    );
+    nscripts.add(
+      CardanoWasm.NativeScript.new_timelock_start(
+        CardanoWasm.TimelockStart.new(1)
+      ),
+    );
+    const nativeScript = CardanoWasm.NativeScript.new_script_all(
+      CardanoWasm.ScriptAll.new(nscripts),
+    );
+
+    const scriptHash = nativeScript.hash();
+    console.log(`[createTx] Native script hash: ${bytesToHex(scriptHash.to_bytes())}`)
+    const nativeScriptAddress = CardanoWasm.EnterpriseAddress.new(
+      0,
+      CardanoWasm.StakeCredential.from_scripthash(scriptHash),
+    ).to_address().to_bech32();
+    console.log(`[createTx] Native script address: ${nativeScriptAddress}`)
+
+    includeInput = {
+      id: nativeScriptInputUtxoId,
+      witness: {
+        nativeScript: bytesToHex(nativeScript.to_bytes()),
+      }
+    }
+  }
+
   const txReq = {
-    validityIntervalStart: 42,
-    includeInputs: [randomUtxo.utxo_id],
+    validityIntervalStart: 2000,
+    includeInputs: [includeInput],
     includeOutputs: [outputHex],
     includeTargets: [
       {
@@ -687,7 +725,7 @@ signData.addEventListener('click', () => {
     payloadHex = Buffer.from(payload, 'utf8').toString('hex');
   }
 
-  console.log('address >>> ', address);
+  console.log('[signData][address] ', address);
   cardanoApi.signData(address, payloadHex).then(sig => {
     alertSuccess('Signature:' + JSON.stringify(sig))
   }).catch(error => {

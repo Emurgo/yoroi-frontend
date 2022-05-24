@@ -948,7 +948,10 @@ function newAdaUnsignedTxFromUtxoForConnector(
   })();
 
   return {
-    senderUtxos: [...mustIncludeUtxos, ...selectedUtxo],
+    senderUtxos: [
+      ...mustIncludeUtxos.map(([utxo]) => utxo),
+      ...selectedUtxo,
+    ],
     txBuilder,
     changeAddr,
   };

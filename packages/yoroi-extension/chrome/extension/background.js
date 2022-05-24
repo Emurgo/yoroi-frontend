@@ -84,6 +84,8 @@ import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
+import ConnectorStore from '../../app/stores/DappConnectorStore';
+import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
 
 /*::
 declare var chrome;
@@ -1407,10 +1409,16 @@ function handleInjectorConnect(port) {
                 await withDb(async (db, localStorageApi) => {
                   return await withSelectedWallet(tabId,
                     async (wallet) => {
+                      const stateFetcher: CardanoIFetcher =
+                        await getCardanoStateFetcher(localStorageApi);
+                      const networkInfo = wallet.getParent().getNetworkInfo();
+                      const foreignUtxoFetcher: ForeignUtxoFetcher =
+                        ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
                       const resp = await connectorCreateCardanoTx(
                         wallet,
                         null,
                         message.params[0],
+                        foreignUtxoFetcher,
                       );
                       rpcResponse({
                         ok: resp,

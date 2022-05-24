@@ -81,6 +81,7 @@ import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelle
 import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/ergo-connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
+import type { ForeignUtxoFetcher } from '../../../app/ergo-connector/stores/ConnectorStore';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -838,6 +839,7 @@ export async function connectorCreateCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: ?string,
   cardanoTxRequest: CardanoTxRequest,
+  foreignUtxoFetcher: ForeignUtxoFetcher,
 ): Promise<string> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -863,14 +865,17 @@ export async function connectorCreateCardanoTx(
   );
 
   const adaApi = new AdaApi();
-  const signRequest = await adaApi.createUnsignedTxForConnector({
-    publicDeriver,
-    absSlotNumber,
-    // $FlowFixMe[incompatible-exact]
-    cardanoTxRequest,
-    submittedTxs,
-    utxos,
-  });
+  const signRequest = await adaApi.createUnsignedTxForConnector(
+    {
+      publicDeriver,
+      absSlotNumber,
+      // $FlowFixMe[incompatible-exact]
+      cardanoTxRequest,
+      submittedTxs,
+      utxos,
+    },
+    foreignUtxoFetcher,
+  );
 
   if (password == null) {
     return Buffer.from(
@@ -1294,21 +1299,24 @@ export async function connectorGenerateReorgTx(
   }
   const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
-  const unsignedTx = await adaApi.createUnsignedTxForConnector({
-    publicDeriver: withHasUtxoChains,
-    absSlotNumber,
-    cardanoTxRequest: {
-      includeTargets,
+  const unsignedTx = await adaApi.createUnsignedTxForConnector(
+    {
+      publicDeriver: withHasUtxoChains,
+      absSlotNumber,
+      cardanoTxRequest: {
+        includeTargets,
+      },
+      utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
+        utxos,
+        publicDeriver,
+        submittedTxs,
+      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+      // we already factored in submitted transactions above, no need to handle it
+      // any more, so just use an empty array here
+      submittedTxs: [],
     },
-    utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
-      utxos,
-      publicDeriver,
-      submittedTxs,
-    )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-    // we already factored in submitted transactions above, no need to handle it
-    // any more, so just use an empty array here
-    submittedTxs: [],
-  });
+    null,
+  );
   return { unsignedTx, collateralOutputAddressSet };
 }
 

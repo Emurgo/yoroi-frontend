@@ -125,7 +125,7 @@ import type {
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
-  RemoteUnspentOutput,
+  RemoteUnspentOutput, GetUtxoDataResponse,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -163,6 +163,7 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
+import type { ForeignUtxoFetcher } from '../../ergo-connector/stores/ConnectorStore';
 
 // ADA specific Request / Response params
 
@@ -1138,7 +1139,8 @@ export default class AdaApi {
   }
 
   async createUnsignedTxForConnector(
-    request: CreateUnsignedTxForConnectorRequest
+    request: CreateUnsignedTxForConnectorRequest,
+    foreignUtxoFetcher: ?ForeignUtxoFetcher,
   ): Promise<CreateUnsignedTxResponse> {
     const {
       includeInputs,
@@ -1173,6 +1175,7 @@ export default class AdaApi {
     );
 
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
+    const foreignUtxoIds: Array<string> = [];
     const includeInputMap = (includeInputs||[]).reduce((acc, e: CardanoTxRequestInput) => {
       // eslint-disable-next-line no-nested-ternary
       const id = typeof e === 'string' ? e
@@ -1181,15 +1184,28 @@ export default class AdaApi {
         throw new Error(`Unrecognised input request format: ${JSON.stringify(e)}`);
       }
       if (!allUtxoIds.has(id)) {
-        throw new Error(`No UTxO found for input id: ${id}`);
+        foreignUtxoIds.push(id);
       }
       acc[id] = e;
       return acc;
     }, {})
 
+    const foreignUtxos = [];
+    if (foreignUtxoIds.length > 0) {
+      if (foreignUtxoFetcher == null) {
+        throw new Error('Foreign utxos are present, but foreign utxo fetcher is missing!');
+      }
+      foreignUtxos.push(...await foreignUtxoFetcher(foreignUtxoIds));
+      foreignUtxos.forEach((u, i) => {
+        if (u == null) {
+          throw new Error(`No UTxO found for input id: ${foreignUtxoIds[i]}`);
+        }
+      });
+    }
+
     const mustIncludeUtxos: Array<[CardanoAddressedUtxo, ?CardanoUtxoScriptWitness]> = [];
     const coinSelectUtxos = [];
-    for (const utxo of utxos) {
+    for (const utxo of [...foreignUtxos, ...utxos]) {
       const includeInputEntry = includeInputMap[utxo.utxo_id];
       if (includeInputEntry != null) {
         mustIncludeUtxos.push([utxo, includeInputEntry.witness]);
