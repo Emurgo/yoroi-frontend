@@ -840,6 +840,15 @@ function newAdaUnsignedTxFromUtxoForConnector(
     }
   }
 
+  const isPlutusPresent =
+    mustIncludeUtxos.some(([_, { plutusScript }]) => plutusScript != null);
+
+  if (isPlutusPresent) {
+    txBuilder.calc_script_data_hash(
+      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
+    );
+  }
+
   /**
    * REMAINING REQUIRED VALUE
    */

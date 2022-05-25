@@ -569,9 +569,10 @@ createTx.addEventListener('click', () => {
     ).to_bytes()
   );
 
-  let includeInput = randomUtxo.utxo_id;
+  let includeInputs = [randomUtxo.utxo_id];
 
-  const nativeScriptInputUtxoId = '1287e36f9387c3a43379891d2448131aa2ac553ea282a8ff7a881c98eb2d228e1';
+  const nativeScriptInputUtxoId = null;
+  const plutusScriptInputUtxoId = 'b475af40ef0b0e1cc01f9257d2493d11acb9b474a914cd50c9e653dc8e9da8ca1';
 
   // noinspection PointlessBooleanExpressionJS
   if (nativeScriptInputUtxoId != null) {
@@ -592,24 +593,66 @@ createTx.addEventListener('click', () => {
     );
 
     const scriptHash = nativeScript.hash();
-    console.log(`[createTx] Native script hash: ${bytesToHex(scriptHash.to_bytes())}`)
+    console.log(`[createTx] Native script hash: ${bytesToHex(scriptHash.to_bytes())}`);
     const nativeScriptAddress = CardanoWasm.EnterpriseAddress.new(
       0,
       CardanoWasm.StakeCredential.from_scripthash(scriptHash),
     ).to_address().to_bech32();
-    console.log(`[createTx] Native script address: ${nativeScriptAddress}`)
+    console.log(`[createTx] Native script address: ${nativeScriptAddress}`);
 
-    includeInput = {
+    includeInputs.push({
       id: nativeScriptInputUtxoId,
       witness: {
         nativeScript: bytesToHex(nativeScript.to_bytes()),
-      }
-    }
+      },
+    });
+  }
+
+  // noinspection PointlessBooleanExpressionJS
+  if (plutusScriptInputUtxoId != null) {
+
+    const plutusScript = CardanoWasm.PlutusScript
+      .from_bytes(hexToBytes('4e4d01000033222220051200120011'));
+
+    const plutusScriptHash = plutusScript.hash();
+    console.log(`[createTx] Plutus script hash: ${bytesToHex(plutusScriptHash.to_bytes())}`);
+    const plutusScriptAddress = CardanoWasm.EnterpriseAddress.new(
+      0,
+      CardanoWasm.StakeCredential.from_scripthash(plutusScriptHash),
+    ).to_address().to_bech32();
+    console.log(`[createTx] Plutus script address: ${plutusScriptAddress}`);
+
+    const plutusList = CardanoWasm.PlutusList.new();
+    plutusList.add(CardanoWasm.PlutusData.new_integer(CardanoWasm.BigInt.from_str('1234')));
+    const datum = CardanoWasm.PlutusData.new_constr_plutus_data(
+      CardanoWasm.ConstrPlutusData.new(CardanoWasm.BigNum.zero(), plutusList),
+    );
+    const datumHash = bytesToHex(CardanoWasm.hash_plutus_data(datum).to_bytes());
+    console.log(`[createTx] Plutus datum hash: ${datumHash}`);
+
+    const redeemer = CardanoWasm.Redeemer.new(
+      CardanoWasm.RedeemerTag.new_spend(),
+      CardanoWasm.BigNum.zero(),
+      CardanoWasm.PlutusData.new_integer(CardanoWasm.BigInt.from_str('1234')),
+      CardanoWasm.ExUnits.new(
+        CardanoWasm.BigNum.from_str('1700'),
+        CardanoWasm.BigNum.from_str('476468'),
+      ),
+    );
+
+    includeInputs.push({
+      id: plutusScriptInputUtxoId,
+      witness: {
+        plutusScript: bytesToHex(plutusScript.to_bytes()),
+        datum: bytesToHex(datum.to_bytes()),
+        redeemer: bytesToHex(redeemer.to_bytes()),
+      },
+    });
   }
 
   const txReq = {
     validityIntervalStart: 2000,
-    includeInputs: [includeInput],
+    includeInputs,
     includeOutputs: [outputHex],
     includeTargets: [
       {
