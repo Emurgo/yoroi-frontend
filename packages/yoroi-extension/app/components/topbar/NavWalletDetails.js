@@ -48,7 +48,8 @@ export default class NavWalletDetails extends Component<Props> {
     highlightTitle: boolean,
     infoText: void,
     showDetails: boolean,
-    showEyeIcon: boolean
+    showEyeIcon: boolean,
+    purpose: void,
   |} = {
     highlightTitle: false,
     infoText: undefined,
