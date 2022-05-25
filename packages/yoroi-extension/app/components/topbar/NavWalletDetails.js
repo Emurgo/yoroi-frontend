@@ -38,6 +38,7 @@ type Props = {|
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
+  +purpose?: 'allWallets' | 'topBar',
 |};
 
 @observer
@@ -53,6 +54,7 @@ export default class NavWalletDetails extends Component<Props> {
     infoText: undefined,
     showDetails: true,
     showEyeIcon: true,
+    purpose: undefined,
   };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
