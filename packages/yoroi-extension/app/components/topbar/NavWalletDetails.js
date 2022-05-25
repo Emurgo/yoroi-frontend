@@ -180,7 +180,7 @@ export default class NavWalletDetails extends Component<Props> {
     amount: ?MultiToken
   |} => Node = (request) => {
     if (request.amount == null) {
-      return <div className={styles.isLoading} />;
+      throw new Error('Amount is required to be rendered')
     }
 
     const defaultEntry = request.amount.getDefaultEntry();
