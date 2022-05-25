@@ -41,7 +41,7 @@ export default class Support extends Component <Props> {
             position: 'absolute',
             bottom: '24px',
             right: '30px',
-            zIndex: '1',
+            zIndex: '9999', // Support button should be on top of every component including models!
             padding: '3px',
           }}
           onClick={this.openChatBoxSupport.bind(this)}
