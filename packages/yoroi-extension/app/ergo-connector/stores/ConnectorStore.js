@@ -685,7 +685,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       )
       for (let i = 0; i < foreignUtxos.length; i++) {
         const foreignUtxo = foreignUtxos[i];
-        if (foreignUtxo === null) {
+        if (foreignUtxo == null) {
           window.chrome.runtime.sendMessage(
             {
               type: 'sign_error',
@@ -698,7 +698,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this._closeWindow();
           return;
         }
-        if (foreignUtxo.spendingTxHash !== null) {
+        if (foreignUtxo.spendingTxHash != null) {
           window.chrome.runtime.sendMessage(
             {
               type: 'sign_error',
