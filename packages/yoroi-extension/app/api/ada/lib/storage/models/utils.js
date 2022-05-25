@@ -14,12 +14,12 @@ import {
   BigNumber
 } from 'bignumber.js';
 
-import type { UtxoStorage } from '@emurgo/yoroi-lib-core/dist/utxo'
+import type { UtxoStorage } from '@emurgo/yoroi-lib-core/dist/utxo';
 import type {
   Utxo,
   UtxoAtSafePoint,
   UtxoDiffToBestBlock
-} from '@emurgo/yoroi-lib-core/dist/utxo/models'
+} from '@emurgo/yoroi-lib-core/dist/utxo/models';
 import type { Utxo as StorageUtxo } from '../database/utxo/tables';
 
 import type {
@@ -452,8 +452,16 @@ export function getTokenCountForUtxos(
   };
 }
 
+type UtxoTokenInfo = {
+  tokens: $ReadOnlyArray<$ReadOnly<{
+    TokenList: $ReadOnly<{ Amount: string, ... }>,
+    Token: $ReadOnly<{ Identifier: string, NetworkId: number, ... }>,
+    ...
+  }>>,
+  ...
+};
 export function getBalanceForUtxos(
-  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTokenInfo>>,
   defaultToken: DefaultTokenEntry,
 ): IGetUtxoBalanceResponse {
   const tokens = new MultiToken([], defaultToken);

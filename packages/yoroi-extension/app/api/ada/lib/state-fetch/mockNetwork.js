@@ -704,17 +704,18 @@ export class MockUtxoApi implements UtxoApiContract {
   ) {
     this.blockchain = blockchain;
 
-    let blockCount = 0;
-    let currentBlockHash = blockchain[blockchain.length - 1].block_hash;
+    let lastHeight = blockchain[blockchain.length - 1].height;
+    if (lastHeight == null) {
+      throw new Error('missing height');
+    }
     let i;
     for (i = blockchain.length - 1; i >= 0; i --) {
-      if (blockchain[i].block_hash !== currentBlockHash) {
-        blockCount += 1;
-        if (blockCount = safeConfirmations) {
-          break;
-        } else {
-          currentBlockHash = blockchain[i].block_hash;
-        }
+      const currentHeight = blockchain[i].height;
+      if (currentHeight == null) {
+        throw new Error('missing height');
+      }
+      if (lastHeight - currentHeight >= safeConfirmations) {
+        break;
       }
     }
     if (i === -1) {
@@ -743,39 +744,30 @@ export class MockUtxoApi implements UtxoApiContract {
   async getTipStatusWithReference(
     bestBlocks: string[]
   ): Promise<UtxoApiResponse<TipStatusReference>> {
-    for (let i = this.blockchain.length - 1; i >= 0; i--) {
-      const hash = this.blockchain[i].block_hash;
-      if (!hash) {
-        throw new Error('expect hash');
-      }
-      const height = this.blockchain[i].height;
-      if (height == null) {
-        throw new Error('expect height');
-      }
-      if (bestBlocks.includes(hash)) {
-        const safeBlockHash = this.blockchain[this.lastSafeBlockTxIndex].block_hash;
-        if (!safeBlockHash) {
-          throw new Error('expect hash');
+    const blocks = bestBlocks.map(
+      hash => {
+        const index = this.blockchain.findIndex(tx => tx.block_hash === hash);
+        if (index === -1) {
+          return { index, height: null, hash };
         }
-        const safeBlockHeight = this.blockchain[this.lastSafeBlockTxIndex].height;
-        if (safeBlockHeight == null) {
-          throw new Error('expect block height');
-        }
-        return {
-          result: UtxoApiResult.SUCCESS,
-          value: {
-            reference: {
-              lastFoundBestBlock: hash,
-              lastFoundSafeBlock: (safeBlockHeight >= height)
-                ? safeBlockHash
-                : hash,
-            }
-          }
-        };
+        const height = this.blockchain[index].height;
+        return { index, height, hash };
       }
+    ).filter(b => b.index !== -1).sort((b1, b2) => b1.index - b2.index);
+    if (blocks.length === 0) {
+      return {
+        result: UtxoApiResult.SAFEBLOCK_ROLLBACK
+      };
     }
+
     return {
-      result: UtxoApiResult.SAFEBLOCK_ROLLBACK
+      result: UtxoApiResult.SUCCESS,
+      value: {
+        reference: {
+          lastFoundBestBlock: blocks[blocks.length - 1].hash,
+          lastFoundSafeBlock: blocks[0].hash,
+        }
+      }
     };
   }
 
@@ -832,19 +824,20 @@ export class MockUtxoApi implements UtxoApiContract {
 
   async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
     const { addresses, untilBlockHash, afterBestBlock, } = req;
-    let seenBestBlock = false;
+
     let seenUntilBlock = false;
     let utxoDiffItems = [];
-    for (let i = 0; i <= this.blockchain.length; i++) {
+    for (let i = this.blockchain.length - 1; i >= 0; i--) {
       const tx = this.blockchain[i];
-      if (seenBestBlock) {
+      if (tx.block_hash === untilBlockHash) {
+        seenUntilBlock = true;
+      }
+
+      if (seenUntilBlock) {
         if (tx.block_hash === afterBestBlock) {
-          continue;
-        }
-        if (tx.block_hash === untilBlockHash) {
-          seenUntilBlock = true;
           break;
         }
+
         tx.outputs.filter(
           ({ address }) => addresses.includes(address)
         ).forEach((output, outputIndex) => {
@@ -881,10 +874,6 @@ export class MockUtxoApi implements UtxoApiContract {
               }: UtxoDiffItem)
             );
           });
-      } else {
-        if (tx.block_hash === afterBestBlock) {
-          seenBestBlock = true;
-        }
       }
     }
     if (!seenUntilBlock) {

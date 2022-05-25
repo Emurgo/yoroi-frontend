@@ -101,9 +101,14 @@ import {
   GetKeyDerivation,
   GetKey,
   GetAddress,
+  GetToken,
 } from '../../database/primitives/api/read';
 import { CoreAddressTypes } from '../../database/primitives/enums';
-import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
+import type {
+  KeyRow,
+  KeyDerivationRow,
+  TokenRow,
+} from '../../database/primitives/tables';
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
@@ -131,6 +136,15 @@ import {
   isJormungandr,
 } from '../../database/prepackaged/networks';
 import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
+import {
+  GetUtxoAtSafePoint,
+  GetUtxoDiffToBestBlock,
+} from '../../database/utxo/api/read';
+import { PublicDeriver } from './';
+import type {
+  Utxo,
+} from '@emurgo/yoroi-lib-core/dist/utxo/models';
+import { isErgo } from '../../database/prepackaged/networks';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -202,6 +216,9 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllUtxosRequest,
@@ -222,12 +239,79 @@ const GetAllUtxosMixin = (
       undefined,
       derivationTables,
     );
+    // TODO: perhaps should use seperate types for Ergo and Cardano wallets instead
+    // of condition
+    if (!isErgo(this.getParent().getNetworkInfo())) {
+      const utxoStorageApi = this.getUtxoStorageApi();
+      utxoStorageApi.setDb(super.getDb());
+      utxoStorageApi.setDbTx(tx);
+      const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
+
+      const networkId = this.getParent().getNetworkInfo().NetworkId;
+      const tokens = (await deps.GetToken.fromIdentifier(
+        super.getDb(), tx,
+        [
+          '',
+          ...utxosInStorage.flatMap(
+            ({ assets }) => assets.map(asset => asset.assetId)
+          )
+        ]
+      )).filter(token => token.NetworkId === networkId);
+      const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
+        tokens.map(token => [ token.Identifier, token ])
+      );
+
+      const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(
+        addresses.flatMap(family => family.addrs.map(addr => [addr.Hash, {
+          addressing: family.addressing,
+          address: addr.Hash,
+        }]))
+      );
+
+      const addressedUtxos = utxosInStorage.map(utxo => {
+        const addressingInfo = addressingMap.get(utxo.receiver);
+        if (addressingInfo == null) {
+          throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)} should never happen`);
+        }
+
+        const tokens = [ '', ...utxo.assets.map(asset => asset.assetId) ].map((tokenId, i) => {
+          let amount;
+          if (i === 0) {
+            amount = utxo.amount;
+          } else {
+            amount = utxo.assets[i].amount;
+          }
+          const token = tokenMap.get(tokenId);
+          if (!token) {
+            throw new Error(`missing token ID in UTXO: ${tokenId}`);
+          }
+          return { Token: token, TokenList: { Amount: amount.toString() } };
+        });
+        return {
+          output: {
+            Transaction: { Hash: utxo.txHash },
+            UtxoTransactionOutput: {
+              OutputIndex: utxo.txIndex,
+              ErgoBoxId: null,
+              ErgoCreationHeight: null,
+              ErgoTree: null,
+              ErgoRegisters: null,
+            },
+            tokens,
+          },
+          addressing: addressingInfo.addressing,
+          address: addressingInfo.address,
+        };
+      });
+    }
+    // Ergo:
     const addressIds = addresses.flatMap(family => family.addrs.map(addr => addr.AddressId));
     const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
       addressIds,
       this.getParent().getNetworkInfo().NetworkId
     );
+
     const addressingMap = new Map<number, {| ...Address, ...Addressing |}>(
       addresses.flatMap(family => family.addrs.map(addr => [addr.AddressId, {
         addressing: family.addressing,
@@ -246,6 +330,7 @@ const GetAllUtxosMixin = (
         address: addressingInfo.address,
       });
     }
+
     return addressedUtxos;
   }
   getAllUtxos: IGetAllUtxosRequest => Promise<IGetAllUtxosResponse> = async (
@@ -256,6 +341,9 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific,
       GetAddress,
       GetUtxoTxOutputsWithTx,
+      GetUtxoAtSafePoint,
+      GetUtxoDiffToBestBlock,
+      GetToken,
       GetDerivationSpecific,
     });
     const depTables = Object
@@ -2350,18 +2438,24 @@ const GetUtxoBalanceMixin = (
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetUtxoBalanceRequest,
     Map<number, string>,
   ) => Promise<IGetUtxoBalanceResponse> = async (tx, deps, _body, derivationTables) => {
-    const utxos = await this.rawGetAllUtxos(
+    const utxos: IGetAllUtxosResponse = await this.rawGetAllUtxos(
       tx,
       {
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
+        GetUtxoAtSafePoint: deps.GetUtxoAtSafePoint,
+        GetUtxoDiffToBestBlock: deps.GetUtxoDiffToBestBlock,
+        GetToken: deps.GetToken,
         GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
@@ -2378,6 +2472,9 @@ const GetUtxoBalanceMixin = (
       GetPathWithSpecific,
       GetAddress,
       GetUtxoTxOutputsWithTx,
+      GetUtxoAtSafePoint,
+      GetUtxoDiffToBestBlock,
+      GetToken,
       GetDerivationSpecific,
     });
     const depTables = Object

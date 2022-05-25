@@ -185,6 +185,9 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       async tx => this.rawGetLastSyncInfo(tx, deps, body)
     );
   }
+
+  getUtxoService: void => UtxoService = () => this.utxoService;
+  getUtxoStorageApi: void => UtxoStorageApi = () => this.utxoStorageApi;
 }
 
 export async function refreshPublicDeriverFunctionality(
