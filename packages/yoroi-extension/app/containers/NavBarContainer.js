@@ -102,6 +102,7 @@ export default class NavBarContainer extends Component<Props> {
                 wallet.getParent().getNetworkInfo().NetworkId
               )}
               showEyeIcon={false}
+              purpose='allWallets'
             />
           }
         />
