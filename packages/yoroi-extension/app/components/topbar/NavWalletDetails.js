@@ -87,7 +87,8 @@ export default class NavWalletDetails extends Component<Props> {
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
     return (
       <div className={styles.wrapper}>
-        {
+        <div className={styles.outerWrapper}>
+          {
           !totalAmount || (totalAmount && showsRewards && (!rewards || !walletAmount)) ? (
             <Box sx={{
               height: '100%',
@@ -100,26 +101,26 @@ export default class NavWalletDetails extends Component<Props> {
               <LoadingSpinner small />
             </Box>
           ) : (
-            <div className={styles.outerWrapper}>
+            <>
               <div
                 className={classnames([
-              styles.currency,
-              showsRewards && styles.currencyAlign
-            ])}
+                  styles.currency,
+                  showsRewards && styles.currencyAlign
+                ])}
               >
                 <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
               </div>
               <div className={styles.content}>
                 <div
                   className={classnames([
-                styles.amount,
-                highlightTitle !== null && highlightTitle === true && styles.highlightAmount
-              ])}
+                    styles.amount,
+                    highlightTitle !== null && highlightTitle === true && styles.highlightAmount
+                  ])}
                 >
                   {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount
-              })}
+                    shouldHideBalance,
+                    amount: totalAmount
+                  })}
                 </div>
                 {showsRewards &&
                 <div className={styles.details}>
@@ -136,25 +137,25 @@ export default class NavWalletDetails extends Component<Props> {
                     {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
                   </div>
                 </div>
-            }
+                }
                 {this.props.rewards === undefined && (
                 <div className={styles.info}>
                   {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
                 </div>
-            )}
+                )}
               </div>
-              {totalAmount != null && showEyeIconSafe &&
-              <button
-                type="button"
-                className={styles.toggleButton}
-                onClick={onUpdateHideBalance}
-              >
-                {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-              </button>
+            </>
+          )}
+          {showEyeIconSafe &&
+          <button
+            type="button"
+            className={styles.toggleButton}
+            onClick={onUpdateHideBalance}
+          >
+            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+          </button>
           }
-            </div>
-          )
-        }
+        </div>
         {infoText != null && (
           <div className={styles.info}>
             {infoText}
