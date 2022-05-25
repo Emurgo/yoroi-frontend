@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
 import MainCards from './MainCards';
-import LogoYoroiIcon from '../../../assets/images/yoroi-logo-white.inline.svg';
-import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
+import { ReactComponent as LogoYoroiIcon }  from '../../../assets/images/yoroi-logo-white.inline.svg';
+import { ReactComponent as NightlyLogo }  from '../../../assets/images/yoroi-logo-nightly.inline.svg';
 
 import styles from './AddAnotherWallet.scss';
 

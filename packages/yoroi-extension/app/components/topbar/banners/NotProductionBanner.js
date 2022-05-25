@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, } from 'react-intl';
 import styles from './NotProductionBanner.scss';
-import ShelleyTestnetWarningSvg from '../../../assets/images/shelley-testnet-warning.inline.svg';
+import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({

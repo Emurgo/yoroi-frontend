@@ -14,7 +14,7 @@ import Dialog from '../../../components/widgets/Dialog';
 import { getJormungandrTxFee } from '../../../api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
-import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg }  from '../../../assets/images/uri/invalid-uri.inline.svg';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';

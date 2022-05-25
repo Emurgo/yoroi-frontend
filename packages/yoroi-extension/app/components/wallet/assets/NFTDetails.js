@@ -4,7 +4,7 @@ import { Box, styled } from '@mui/system';
 import { Link as LinkMui, Grid, Typography, Stack } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl } from 'react-intl';
-import LinkSvg from '../../../assets/images/link.inline.svg';
+import { ReactComponent as LinkSvg }  from '../../../assets/images/link.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';

@@ -35,11 +35,14 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
   setup(): void {
   }
 
-  load(): void {
+  load(env: 'connector' | 'extension'): void {
     when(() => this.isLoading, this.postLoadingScreenEnd.bind(this));
     Promise
       .all([
-        this.loadRustRequest.execute().promise,
+        // $FlowFixMe[invalid-tuple-arity]: this is correct, flow is confused
+        this.loadRustRequest.execute(
+          (env === 'extension') ? [ 'dontLoadMessagesSigning' ] : []
+        ).promise,
         this.loadPersistentDbRequest.execute().promise
       ])
       .then(async () => {

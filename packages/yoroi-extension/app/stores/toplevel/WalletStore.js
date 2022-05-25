@@ -312,9 +312,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       });
     }
     for (const publicDeriver of newWithCachedData) {
-      await this.refreshWalletFromLocalOnLaunch(publicDeriver);
-    }
-    for (const publicDeriver of newWithCachedData) {
       this._queueWarningIfNeeded(publicDeriver);
     }
     runInAction('refresh active wallet', () => {
@@ -325,7 +322,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
       this.publicDerivers.push(...newWithCachedData);
     });
-    this._startRefreshAllWallets();
+    setTimeout(async () => {
+      for (const publicDeriver of newWithCachedData) {
+        await this.refreshWalletFromLocalOnLaunch(publicDeriver);
+      }
+      this._startRefreshAllWallets();
+    }, 50); // let the UI render first so that the loading process is perceived faster
   };
 
   @action registerObserversForNewWallet: ({|

@@ -10,7 +10,7 @@ import NotificationMessage from '../../components/widgets/NotificationMessage';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
-import successIcon from '../../assets/images/success-small.inline.svg';
+import { ReactComponent as successIcon }  from '../../assets/images/success-small.inline.svg';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';

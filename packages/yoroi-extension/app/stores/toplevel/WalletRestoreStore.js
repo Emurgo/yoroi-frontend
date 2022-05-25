@@ -283,30 +283,7 @@ export function generatePlates(
     );
   })();
 
-  const shouldShowJormungandrPlate = (() => {
-    // TODO: we disable shelley restoration information for paper wallet restoration
-    // this is because we've temporarily disabled paper wallet creation for Shelley
-    // so no point in showing the Shelley checksum
-    if (mode.extra === 'paper') {
-      return false;
-    }
-
-    if (
-      isJormungandr(network) &&
-      mode.type === 'cip1852'
-    ) {
-      return true;
-    }
-    if (
-      isCardanoHaskell(network) &&
-      mode.type === 'cip1852' &&
-      mode.length === 15
-    ) {
-      return true;
-    }
-
-    return false;
-  })();
+  const shouldShowJormungandrPlate = false;
 
   if (shouldShowShelleyPlate) {
     const shelleyPlate = generateShelleyPlate(
