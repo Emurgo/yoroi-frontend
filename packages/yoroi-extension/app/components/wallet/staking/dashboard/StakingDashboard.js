@@ -18,6 +18,7 @@ import { ReactComponent as InvalidURIImg }  from '../../../../assets/images/uri/
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import RevampAnnouncement from './RevampAnnouncement';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -119,6 +120,7 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
+          <RevampAnnouncement />
           {pendingTxWarningComponent}
           <div className={styles.statsWrapper}>
             <div className={styles.summary}>

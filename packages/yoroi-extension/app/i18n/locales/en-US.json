@@ -575,6 +575,8 @@
   "wallet.dashboard.upcomingRewards.stakePoolDelegated": "Stake Pool Delegated",
   "wallet.dashboard.upcomingRewards.title": "Upcoming Rewards",
   "wallet.dashboard.warning.pendingTx": "Staking dashboard information will update once your pending transaction is confirmed",
+  "wallet.dashboard.revampAnnouncement.title": "New yoroi version is available",
+  "wallet.dashboard.revampAnnouncement.text": "New Yoroi version enables an exceptional experience for Cardano ADA holders. Apply it and take advantage of the new and improved existing features.",
   "wallet.debugwallet.explanation1": "The wallet you selected ({checksumTextPart}) is for testing & debugging.",
   "wallet.debugwallet.explanation2": "To avoid any issues, do not use this wallet.<br />Instead, use Yoroi to create a new wallet.",
   "wallet.debugwallet.explanation3": "If you did not expect this message, please {contactSupportLink}.",
