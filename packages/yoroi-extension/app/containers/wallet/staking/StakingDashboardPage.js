@@ -70,6 +70,7 @@ import {
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
+import RevampSwitchDialog from '../../../components/wallet/staking/dashboard/RevampSwitchDialog';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -690,6 +691,10 @@ export default class StakingDashboardPage extends Component<Props> {
           }}
         />
       );
+    }
+
+    if (true) {
+      return <RevampSwitchDialog />
     }
 
     return null;
