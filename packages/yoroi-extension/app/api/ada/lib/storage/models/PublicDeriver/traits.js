@@ -229,19 +229,20 @@ const GetAllUtxosMixin = (
     _body,
     derivationTables,
   ) => {
-    const addresses = await this.rawGetAllUtxoAddresses(
-      tx,
-      {
-        GetAddress: deps.GetAddress,
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
     // TODO: perhaps should use seperate types for Ergo and Cardano wallets instead
-    // of condition
+    // of branching
     if (!isErgo(this.getParent().getNetworkInfo())) {
+      const addresses = await this.rawGetAllUtxoAddresses(
+        tx,
+        {
+          GetAddress: deps.GetAddress,
+          GetPathWithSpecific: deps.GetPathWithSpecific,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
+        },
+        undefined,
+        derivationTables,
+      );
+
       const utxoStorageApi = this.getUtxoStorageApi();
       utxoStorageApi.setDb(super.getDb());
       utxoStorageApi.setDbTx(tx);
@@ -305,6 +306,38 @@ const GetAllUtxosMixin = (
       });
     }
     // Ergo:
+    return this.rawGetAllUtxosFromOldDb(tx, deps, _body, derivationTables);
+  }
+  rawGetAllUtxosFromOldDb: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IGetAllUtxosRequest,
+    Map<number, string>,
+  ) => Promise<IGetAllUtxosResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
+  ) => {
+    const addresses = await this.rawGetAllUtxoAddresses(
+      tx,
+      {
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    );
+
     const addressIds = addresses.flatMap(family => family.addrs.map(addr => addr.AddressId));
     const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
@@ -333,6 +366,7 @@ const GetAllUtxosMixin = (
 
     return addressedUtxos;
   }
+
   getAllUtxos: IGetAllUtxosRequest => Promise<IGetAllUtxosResponse> = async (
     _body
   ) => {
@@ -357,6 +391,33 @@ const GetAllUtxosMixin = (
         ...mapToTables(super.getDb(), derivationTables),
       ],
       async tx => this.rawGetAllUtxos(tx, deps, undefined, derivationTables)
+    );
+  }
+
+  getAllUtxosFromOldDb: IGetAllUtxosRequest => Promise<IGetAllUtxosResponse> = async (
+    _body
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetUtxoTxOutputsWithTx,
+      GetUtxoAtSafePoint,
+      GetUtxoDiffToBestBlock,
+      GetToken,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+          .keys(deps)
+          .map(key => deps[key])
+          .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IGetAllUtxosResponse>(
+      super.getDb(),
+      [
+          ...depTables,
+          ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetAllUtxosFromOldDb(tx, deps, undefined, derivationTables)
     );
   }
 

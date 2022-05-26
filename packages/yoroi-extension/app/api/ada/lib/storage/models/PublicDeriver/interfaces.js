@@ -198,6 +198,7 @@ export interface IGetAllUtxos {
     IGetAllUtxosRequest
   >;
   +getAllUtxos: IGetAllUtxosFunc;
+  +getAllUtxosFromOldDb: IGetAllUtxosFunc;
 
   +rawGetAllUtxoAddresses: RawTableVariation<
     IGetAllUtxoAddressesFunc,
