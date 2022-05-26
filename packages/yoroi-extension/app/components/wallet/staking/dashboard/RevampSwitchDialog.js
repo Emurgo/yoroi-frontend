@@ -6,6 +6,8 @@ import { observer } from 'mobx-react';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ReactComponent as RevampAnnouncement } from '../../../../assets/images/revamp-announcement.inline.svg';
+import { List, ListItem, Typography } from '@mui/material';
 
 const messages = defineMessages({
     dialogTitle: {
@@ -28,7 +30,7 @@ const messages = defineMessages({
         id: 'wallet.dashboard.revampAnnouncement.dialog.feature3',
         defaultMessage: '!!!NFT Gallery (NEW)',
     },
-    featrue4: {
+    feature4: {
         id: 'wallet.dashboard.revampAnnouncement.dialog.feature4',
         defaultMessage: '!!!FAQ (NEW)',
     },
@@ -58,15 +60,56 @@ export default class RevampSwitchDialog extends Component {
 
     render(): Node {
         const { intl } = this.context;
+        const features = [
+            messages.feature1,
+            messages.feature2,
+            messages.feature3,
+            messages.feature4,
+            messages.feature5,
+            messages.feature6,
+            messages.feature7,
+        ]
 
+        const actions = [
+            {
+              label: intl.formatMessage(messages.dialogTitle),
+              onClick: () => {},
+              primary: true,
+              isSubmitting: this.props.isSubmitting,
+            },
+          ];
         return (
           <Dialog
             title={intl.formatMessage(messages.dialogTitle)}
             closeOnOverlayClick={false}
             closeButton={<DialogCloseButton />}
             onClose={this.props.close}
+            actions={actions}
           >
-            <head>Hello, world</head>
+            <Typography fontWeight='500' fontSize='16px' lineHeight='24px' color='var(--yoroi-palette-gray-900)' marginBottom='16px'>
+              {intl.formatMessage(messages.header)}
+            </Typography>
+            <List disablePadding>
+              {features.map((message) => (
+                <ListItem
+                  disablePadding
+                  sx={{
+                    display: 'list-item',
+                    listStyle: 'inside',
+                    fontWeight: '400',
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    color: 'var(--yoroi-palette-gray-900)'
+                  }}
+                >
+                  {intl.formatMessage(message)}
+                </ListItem>
+                ))}
+            </List>
+
+            <Typography fontWeight='500' fontSize='16px' lineHeight='24px' color='var(--yoroi-palette-gray-900)' marginTop='16px'>
+              {intl.formatMessage(messages.footer)}
+            </Typography>
           </Dialog>
         )
     }
