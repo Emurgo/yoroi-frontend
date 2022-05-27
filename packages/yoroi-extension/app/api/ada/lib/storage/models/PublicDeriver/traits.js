@@ -304,6 +304,7 @@ const GetAllUtxosMixin = (
           address: addressingInfo.address,
         };
       });
+      return addressedUtxos;
     }
     // Ergo:
     return this.rawGetAllUtxosFromOldDb(tx, deps, _body, derivationTables);

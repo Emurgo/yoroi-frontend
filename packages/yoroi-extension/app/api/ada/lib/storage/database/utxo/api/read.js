@@ -28,13 +28,13 @@ export class GetUtxoAtSafePoint {
   static forWallet(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
   ): Promise<$ReadOnly<UtxoAtSafePointRow> | void> {
     return getRowFromKey<UtxoAtSafePointRow>(
       db, tx,
-      conceptualWalletId,
+      publicDeriverId,
       GetUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
-      GetUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].properties.ConceptualWalletId,
+      GetUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].properties.PublicDeriverId,
     );
   }
 }
@@ -51,13 +51,13 @@ export class GetUtxoDiffToBestBlock {
   static async forWallet(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
   ): Promise<Array<UtxoDiffToBestBlock>> {
     const rows = await getRowIn<UtxoDiffToBestBlockRow>(
       db, tx,
       GetUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].name,
-      GetUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].properties.ConceptualWalletId,
-      ([conceptualWalletId]: Array<number>),
+      GetUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].properties.PublicDeriverId,
+      ([publicDeriverId]: Array<number>),
     );
     return rows.map(r => ({
       lastBestBlockHash: r.lastBestBlockHash,
@@ -70,7 +70,7 @@ export class GetUtxoDiffToBestBlock {
   static async findLastBestBlockHash(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
     lastBestBlockHash: string,
   ): Promise<$ReadOnly<UtxoDiffToBestBlock> | void> {
     const schema = GetUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
@@ -81,7 +81,7 @@ export class GetUtxoDiffToBestBlock {
           .from(table)
           .where(
             op.and(
-              table[schema.properties.ConceptualWalletId].eq(conceptualWalletId),
+              table[schema.properties.PublicDeriverId].eq(publicDeriverId),
               table[schema.properties.lastBestBlockHash].eq(lastBestBlockHash)
             )
           );

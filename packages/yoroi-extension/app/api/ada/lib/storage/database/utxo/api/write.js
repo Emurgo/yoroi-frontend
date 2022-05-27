@@ -31,14 +31,14 @@ export class ModifyUtxoAtSafePoint {
   static async addOrReplace(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
     utxoAtSafePoint: UtxoAtSafePoint
   ): Promise<void> {
-    const row = await GetUtxoAtSafePoint.forWallet(db, tx, conceptualWalletId);
+    const row = await GetUtxoAtSafePoint.forWallet(db, tx, publicDeriverId);
     if (row) {
       const newRow: UtxoAtSafePointRow = {
         UtxoAtSafePointId: row.UtxoAtSafePointId,
-        ConceptualWalletId: conceptualWalletId,
+        PublicDeriverId: publicDeriverId,
         UtxoAtSafePoint: utxoAtSafePoint,
       };
       await addOrReplaceRow<UtxoAtSafePointRow, UtxoAtSafePointRow>(
@@ -50,7 +50,7 @@ export class ModifyUtxoAtSafePoint {
       await addNewRowToTable<UtxoAtSafePointInsert, UtxoAtSafePointRow>(
         db, tx,
         {
-          ConceptualWalletId: conceptualWalletId,
+          PublicDeriverId: publicDeriverId,
           UtxoAtSafePoint: utxoAtSafePoint,
         },
         ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
@@ -61,13 +61,13 @@ export class ModifyUtxoAtSafePoint {
   static async remove(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
   ): Promise<void> {
     await removeFromTableBatch(
       db, tx,
       ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
-      ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].properties.ConceptualWalletId,
-      ([conceptualWalletId]: Array<number>),
+      ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].properties.PublicDeriverId,
+      ([publicDeriverId]: Array<number>),
     );
   }
 }
@@ -84,7 +84,7 @@ export class ModifyUtxoDiffToBestBlock {
   static async removeAll(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
   ): Promise<void> {
     const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
     const tableName = schema.name;
@@ -92,14 +92,14 @@ export class ModifyUtxoDiffToBestBlock {
     const table = db.getSchema().table(tableName);
     await tx.attach(
       db.delete().from(table)
-        .where(table[fieldNames.ConceptualWalletId].eq(conceptualWalletId))
+        .where(table[fieldNames.PublicDeriverId].eq(publicDeriverId))
     );
   }
 
   static async remove(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
     lastBestBlockHash: string,
   ): Promise<void> {
     const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
@@ -110,7 +110,7 @@ export class ModifyUtxoDiffToBestBlock {
       db.delete().from(table)
         .where(
           op.and(
-            table[fieldNames.ConceptualWalletId].eq(conceptualWalletId),
+            table[fieldNames.PublicDeriverId].eq(publicDeriverId),
             table[fieldNames.lastBestBlockHash].eq(lastBestBlockHash)
           )
         )
@@ -120,7 +120,7 @@ export class ModifyUtxoDiffToBestBlock {
   static async add(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    publicDeriverId: number,
     utxoDiffToBestBlock: UtxoDiffToBestBlock,
   ): Promise<void> {
     // Do nothing if a row with `utxoDiffToBestBlock.lastBestBlockHash` is already 
@@ -129,7 +129,7 @@ export class ModifyUtxoDiffToBestBlock {
     // only for this query.
     const existing = await GetUtxoDiffToBestBlock.findLastBestBlockHash(
       db, tx,
-      conceptualWalletId,
+      publicDeriverId,
       utxoDiffToBestBlock.lastBestBlockHash
     );
 
@@ -137,7 +137,7 @@ export class ModifyUtxoDiffToBestBlock {
       await addNewRowToTable<UtxoDiffToBestBlockInsert, UtxoDiffToBestBlockRow>(
         db, tx,
         {
-          ConceptualWalletId: conceptualWalletId,
+          PublicDeriverId: publicDeriverId,
           lastBestBlockHash: utxoDiffToBestBlock.lastBestBlockHash,
           spentUtxoIds: utxoDiffToBestBlock.spentUtxoIds,
           newUtxos: utxoDiffToBestBlock.newUtxos,

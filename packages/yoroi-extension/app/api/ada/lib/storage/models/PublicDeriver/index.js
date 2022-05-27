@@ -72,7 +72,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       throw new Error('missing backend service URL');
     }
     const utxoApi = new UtxoApi(BackendService);
-    this.utxoStorageApi = new UtxoStorageApi(this.parent.getConceptualWalletId());
+    this.utxoStorageApi = new UtxoStorageApi(this.publicDeriverId);
     this.utxoService = new UtxoService(utxoApi, this.utxoStorageApi);
 
     return this;

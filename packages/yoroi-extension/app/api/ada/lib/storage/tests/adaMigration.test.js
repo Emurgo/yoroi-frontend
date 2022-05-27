@@ -90,7 +90,7 @@ test('Migrate to Yoroi-lib UtxoService storage', async () => {
   expect(dump.tables.UtxoAtSafePointTable).toEqual(
     [
       {
-        ConceptualWalletId: 1,
+        PublicDeriverId: 1,
         UtxoAtSafePoint: {
           lastSafeBlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
           utxos: [

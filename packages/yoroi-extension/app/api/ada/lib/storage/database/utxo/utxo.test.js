@@ -1,16 +1,11 @@
 // @flow
 
 import { schema, } from 'lovefield';
-import { loadLovefieldDB } from '../index';
+import { loadLovefieldDBFromDump } from '../index';
 import { GetUtxoAtSafePoint, GetUtxoDiffToBestBlock } from './api/read';
-import { ModifyConceptualWallet } from '../walletTypes/core/api/write';
 import { ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock } from './api/write';
 import { getAllSchemaTables, raii } from '../utils';
-
-const CONCEPTUAL_WALLET = {
-  Name: '',
-  NetworkId: 1,
-};
+import dbdump from '../../tests/testDb.dump.json';
 
 const UTXO_AT_SAFE_BLOCK_1 = {
   lastSafeBlockHash: 'lastSafeBlockHash1',
@@ -75,21 +70,12 @@ const UTXO_DIFF_TO_BEST_BLOCK_2 = {
 };
 
 let db;
-let conceptualWalletId;
+let publicDeriverId;
 
 beforeAll(async () => {
-  db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
+  db = await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, dbdump);
 
-  const result = await raii(
-    db,
-    getAllSchemaTables(db, ModifyConceptualWallet),
-    async tx => ModifyConceptualWallet.add(
-      db,
-      tx,
-      CONCEPTUAL_WALLET,
-    )
-  );
-  conceptualWalletId = result.ConceptualWalletId;
+  publicDeriverId = 1;
 });
 
 test('UtxoAtSafePoint', async () => {
@@ -101,7 +87,7 @@ test('UtxoAtSafePoint', async () => {
       await ModifyUtxoAtSafePoint.addOrReplace(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_AT_SAFE_BLOCK_1,
       );
     }
@@ -114,7 +100,7 @@ test('UtxoAtSafePoint', async () => {
     tx => GetUtxoAtSafePoint.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 
@@ -130,7 +116,7 @@ test('UtxoAtSafePoint', async () => {
       await ModifyUtxoAtSafePoint.addOrReplace(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_AT_SAFE_BLOCK_2,
       );
     }
@@ -143,7 +129,7 @@ test('UtxoAtSafePoint', async () => {
     tx => GetUtxoAtSafePoint.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
   
@@ -159,7 +145,7 @@ test('UtxoAtSafePoint', async () => {
       await ModifyUtxoAtSafePoint.remove(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
       );
     }
   );
@@ -171,7 +157,7 @@ test('UtxoAtSafePoint', async () => {
     tx => GetUtxoAtSafePoint.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
   
@@ -186,7 +172,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 
@@ -200,7 +186,7 @@ test('UtxoDiffToBestBlock', async () => {
       await ModifyUtxoDiffToBestBlock.add(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_DIFF_TO_BEST_BLOCK_1,
       );
     }
@@ -213,7 +199,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 
@@ -225,7 +211,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.findLastBestBlockHash(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
       UTXO_DIFF_TO_BEST_BLOCK_1.lastBestBlockHash,
     )
   );
@@ -240,7 +226,7 @@ test('UtxoDiffToBestBlock', async () => {
       await ModifyUtxoDiffToBestBlock.add(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_DIFF_TO_BEST_BLOCK_1,
       );
     }
@@ -253,7 +239,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 
@@ -267,7 +253,7 @@ test('UtxoDiffToBestBlock', async () => {
       await ModifyUtxoDiffToBestBlock.remove(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_DIFF_TO_BEST_BLOCK_1.lastBestBlockHash,
       );
     }
@@ -280,7 +266,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 
@@ -294,7 +280,7 @@ test('UtxoDiffToBestBlock', async () => {
       await ModifyUtxoDiffToBestBlock.add(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_DIFF_TO_BEST_BLOCK_1,
       );
     }
@@ -306,7 +292,7 @@ test('UtxoDiffToBestBlock', async () => {
       await ModifyUtxoDiffToBestBlock.add(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
         UTXO_DIFF_TO_BEST_BLOCK_2,
       );
     }
@@ -319,7 +305,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 
@@ -333,7 +319,7 @@ test('UtxoDiffToBestBlock', async () => {
       await ModifyUtxoDiffToBestBlock.removeAll(
         db,
         tx,
-        conceptualWalletId,
+        publicDeriverId,
       );
     }
   );
@@ -345,7 +331,7 @@ test('UtxoDiffToBestBlock', async () => {
     tx => GetUtxoDiffToBestBlock.forWallet(
       db,
       tx,
-      conceptualWalletId,
+      publicDeriverId,
     )
   );
 

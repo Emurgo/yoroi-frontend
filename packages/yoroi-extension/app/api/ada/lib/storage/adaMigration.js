@@ -469,7 +469,7 @@ export async function populateNewUtxodata(
         tx => ModifyUtxoAtSafePoint.addOrReplace(
           db,
           tx,
-          publicDeriver.getParent().getConceptualWalletId(),
+          publicDeriver.getPublicDeriverId(),
           {
             lastSafeBlockHash: blockHash,
             utxos: newUtxos

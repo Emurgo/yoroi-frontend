@@ -2,7 +2,7 @@
 import BigNumber from 'bignumber.js';
 import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
-import { ConceptualWalletSchema } from '../walletTypes/core/tables';
+import { PublicDeriverSchema } from '../walletTypes/core/tables';
 
 type Asset = {|
   assetId: string,
@@ -34,7 +34,7 @@ export type UtxoDiffToBestBlock = {|
 
 // DB schema:
 export type UtxoAtSafePointInsert = {|
-  ConceptualWalletId: number,
+  PublicDeriverId: number,
   UtxoAtSafePoint: UtxoAtSafePoint,
 |};
 export type UtxoAtSafePointRow = {|
@@ -48,13 +48,13 @@ export const UtxoAtSafePointSchema: {|
   name: 'UtxoAtSafePointTable',
   properties: {
     UtxoAtSafePointId: 'UtxoAtSafePointId',
-    ConceptualWalletId: 'ConceptualWalletId',
+    PublicDeriverId: 'PublicDeriverId',
     UtxoAtSafePoint: 'UtxoAtSafePoint',
   },
 };
 
 export type UtxoDiffToBestBlockInsert = {|
-  ConceptualWalletId: number,
+  PublicDeriverId: number,
   // we need to index into the `lastBestBlockHash` field, so we have to spread it
   ...UtxoDiffToBestBlock,
 |};
@@ -69,7 +69,7 @@ export const UtxoDiffToBestBlockSchema: {|
   name: 'UtxoDiffToBestBlock',
   properties: {
     UtxoDiffToBestBlockId: 'UtxoDiffToBestBlockId',
-    ConceptualWalletId: 'ConceptualWalletId',
+    PublicDeriverId: 'PublicDeriverId',
     lastBestBlockHash: 'lastBestBlockHash',
     spentUtxoIds: 'spentUtxoIds',
     newUtxos: 'newUtxos',
@@ -79,25 +79,25 @@ export const UtxoDiffToBestBlockSchema: {|
 export const populateUtxoDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(UtxoAtSafePointSchema.name)
     .addColumn(UtxoAtSafePointSchema.properties.UtxoAtSafePointId, Type.INTEGER)
-    .addColumn(UtxoAtSafePointSchema.properties.ConceptualWalletId, Type.INTEGER)
+    .addColumn(UtxoAtSafePointSchema.properties.PublicDeriverId, Type.INTEGER)
     .addColumn(UtxoAtSafePointSchema.properties.UtxoAtSafePoint, Type.OBJECT)
     .addPrimaryKey(
       ([UtxoAtSafePointSchema.properties.UtxoAtSafePointId]: Array<string>),
       true
     )
-    .addForeignKey('UtxoAtSafePoint_ConceptualWallet', {
-      local: UtxoAtSafePointSchema.properties.ConceptualWalletId,
-      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
+    .addForeignKey('UtxoAtSafePoint_PublicDeriver', {
+      local: UtxoAtSafePointSchema.properties.PublicDeriverId,
+      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`
     })
     .addIndex(
-      'UtxoAtSafePoint_ConceptualWallet_Index',
-      ([UtxoAtSafePointSchema.properties.ConceptualWalletId]: Array<string>),
+      'UtxoAtSafePoint_PublicDeriver_Index',
+      ([UtxoAtSafePointSchema.properties.PublicDeriverId]: Array<string>),
       false
     );
 
   schemaBuilder.createTable(UtxoDiffToBestBlockSchema.name)
     .addColumn(UtxoDiffToBestBlockSchema.properties.UtxoDiffToBestBlockId, Type.INTEGER)
-    .addColumn(UtxoDiffToBestBlockSchema.properties.ConceptualWalletId, Type.INTEGER)
+    .addColumn(UtxoDiffToBestBlockSchema.properties.PublicDeriverId, Type.INTEGER)
     .addColumn(UtxoDiffToBestBlockSchema.properties.lastBestBlockHash, Type.STRING)
     .addColumn(UtxoDiffToBestBlockSchema.properties.spentUtxoIds, Type.OBJECT)
     .addColumn(UtxoDiffToBestBlockSchema.properties.newUtxos, Type.OBJECT)
@@ -105,20 +105,20 @@ export const populateUtxoDb = (schemaBuilder: lf$schema$Builder) => {
       ([UtxoDiffToBestBlockSchema.properties.UtxoDiffToBestBlockId]: Array<string>),
       true
     )
-    .addForeignKey('UtxoDiffToBestBlock_ConceptualWallet', {
-      local: UtxoDiffToBestBlockSchema.properties.ConceptualWalletId,
-      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
+    .addForeignKey('UtxoDiffToBestBlock_PublicDeriver', {
+      local: UtxoDiffToBestBlockSchema.properties.PublicDeriverId,
+      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`
     })
     .addIndex(
-      'UtxoDiffToBestBlock_ConceptualWallet_Index',
-      ([UtxoDiffToBestBlockSchema.properties.ConceptualWalletId]: Array<string>),
+      'UtxoDiffToBestBlock_PublicDeriver_Index',
+      ([UtxoDiffToBestBlockSchema.properties.PublicDeriverId]: Array<string>),
       false
     )
     .addIndex(
-      'UtxoDiffToBestBlock_ConceptualWallet_lastBestBlockHash_Index',
+      'UtxoDiffToBestBlock_PublicDeriver_lastBestBlockHash_Index',
       (
         [
-          UtxoDiffToBestBlockSchema.properties.ConceptualWalletId,
+          UtxoDiffToBestBlockSchema.properties.PublicDeriverId,
           UtxoDiffToBestBlockSchema.properties.lastBestBlockHash,
         ]: Array<string>
       ),
