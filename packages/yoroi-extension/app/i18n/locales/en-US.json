@@ -587,6 +587,8 @@
   "wallet.dashboard.revampAnnouncement.dialog.feature5": "Support center (NEW)",
   "wallet.dashboard.revampAnnouncement.dialog.feature6": "Fiat pairing (NEW)",
   "wallet.dashboard.revampAnnouncement.dialog.feature7": "Release notes (Coming soon)",
+  "wallet.dashboard.revampAnnouncement.dialog.getStartedBtn": "get started",
+  "wallet.dashboard.revampAnnouncement.dialog.tryItNowBtn": "try it now",
   "wallet.debugwallet.explanation1": "The wallet you selected ({checksumTextPart}) is for testing & debugging.",
   "wallet.debugwallet.explanation2": "To avoid any issues, do not use this wallet.<br />Instead, use Yoroi to create a new wallet.",
   "wallet.debugwallet.explanation3": "If you did not expect this message, please {contactSupportLink}.",
