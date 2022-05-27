@@ -71,6 +71,7 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import RevampSwitchDialog from '../../../components/wallet/staking/dashboard/RevampSwitchDialog';
+import type { Theme } from '../../../styles/utils';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -161,6 +162,7 @@ export default class StakingDashboardPage extends Component<Props> {
             dialog: RevampSwitchDialog,
           })
         }}
+        currentTheme={this.generated.stores.profile.currentTheme}
       />
     );
 
@@ -1010,6 +1012,7 @@ export default class StakingDashboardPage extends Component<Props> {
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
+        currentTheme: Theme,
       |},
       delegation: {|
         selectedPage: number,
@@ -1101,6 +1104,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
+          currentTheme: stores.profile.currentTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
           unitOfAccount: stores.profile.unitOfAccount,
         },

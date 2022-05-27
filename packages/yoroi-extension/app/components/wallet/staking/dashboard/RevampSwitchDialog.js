@@ -80,12 +80,12 @@ export default class RevampSwitchDialog extends Component {
         ]
 
         const actions = [
-            {
-              label: intl.formatMessage(messages.tryItNow),
-              onClick: () => {},
-              primary: true,
-            },
-          ];
+          {
+            label: intl.formatMessage(messages.tryItNow),
+            onClick: () => {},
+            primary: true,
+          },
+        ];
         return (
           <Dialog
             title={intl.formatMessage(messages.dialogTitle)}

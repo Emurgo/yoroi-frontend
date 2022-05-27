@@ -19,6 +19,7 @@ import ErrorBlock from '../../../widgets/ErrorBlock';
 import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import RevampAnnouncement from './RevampAnnouncement';
+import { THEMES } from '../../../../styles/utils';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -83,6 +84,7 @@ export default class StakingDashboard extends Component<Props> {
   render(): Node {
     const {
       graphData,
+      currentTheme
     } = this.props;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
@@ -120,9 +122,10 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
+          {currentTheme !== THEMES.YOROI_REVAMP && (
           <RevampAnnouncement
             onClick={this.props.openRevampAnnouncementDialog}
-          />
+          />)}
           {pendingTxWarningComponent}
           <div className={styles.statsWrapper}>
             <div className={styles.summary}>
