@@ -156,6 +156,17 @@ export const loadLovefieldDB = async (
   return db;
 };
 
+export const loadLovefieldDBFromDump = async (
+  storeType: $Values<typeof schema.DataStoreType>,
+  dump: Object,
+): Promise<lf$Database> => {
+  const db = await populateAndCreate(storeType);
+
+  db.import(dump);
+
+  return db;
+};
+
 /** deletes the old database and returns the new database to use */
 export async function importOldDb(
   oldDb: lf$Database,
