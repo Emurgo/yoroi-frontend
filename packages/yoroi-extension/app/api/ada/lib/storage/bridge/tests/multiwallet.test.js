@@ -28,7 +28,8 @@ import {
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
-  genGetMultiAssetMetadata
+  genGetMultiAssetMetadata,
+  MockUtxoApi,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -49,6 +50,8 @@ import {
   networks,
 } from '../../database/prepackaged/networks';
 import { TransactionType } from '../../database/primitives/tables';
+import UtxoApi from '../../../state-fetch/utxoApi';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 jest.mock('../../database/initialSeed');
 
@@ -168,6 +171,10 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   ]
 }];
 
+beforeAll(async () => {
+  await RustModule.load();
+});
+
 beforeEach(() => {
   mockDate();
 });
@@ -208,28 +215,14 @@ async function checkPub1HasTx(
       },
       output: {
         Transaction: {
-          Type: TransactionType.CardanoByron,
-          ErrorMessage: null,
           Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-          Digest: 8.191593645542673e-27,
-          Ordinal: 0,
-          BlockId: 1,
-          LastUpdateTime: 1568392636000,
-          Status: 1,
-          TransactionId: 1,
-          Extra: null,
         },
         UtxoTransactionOutput: {
-          AddressId: 5,
-          IsUnspent: true,
           OutputIndex: 0,
-          TransactionId: 1,
-          UtxoTransactionOutputId: 1,
           ErgoBoxId: null,
           ErgoCreationHeight: null,
           ErgoRegisters: null,
           ErgoTree: null,
-          TokenListId: 1,
         },
         tokens: [{
           Token: {
@@ -250,9 +243,6 @@ async function checkPub1HasTx(
           },
           TokenList: {
             Amount: '2100000',
-            ListId: 1,
-            TokenId: 1,
-            TokenListItemId: 2,
           },
         }],
       }
@@ -344,28 +334,14 @@ async function checkPub2HasTx(
       },
       output: {
         Transaction: {
-          Type: TransactionType.CardanoByron,
-          ErrorMessage: null,
           Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-          Digest: 8.191593645542673e-27,
-          Ordinal: 0,
-          BlockId: 1,
-          LastUpdateTime: 1568392636000,
-          Status: 1,
-          TransactionId: 2,
-          Extra: null,
         },
         UtxoTransactionOutput: {
-          AddressId: 41,
-          IsUnspent: true,
           OutputIndex: 1,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 4,
           ErgoBoxId: null,
           ErgoCreationHeight: null,
           ErgoRegisters: null,
           ErgoTree: null,
-          TokenListId: 5,
         },
         tokens: [{
           Token: {
@@ -386,9 +362,6 @@ async function checkPub2HasTx(
           },
           TokenList: {
             Amount: '2700000',
-            ListId: 5,
-            TokenId: 1,
-            TokenListItemId: 6,
           },
         }],
       }
@@ -414,11 +387,13 @@ async function checkPub2HasTx(
 async function syncingSimpleTransaction(
   purposeForTest: WalletTypePurposeT,
 ): Promise<void> {
+  const txHistory = networkTransactions(purposeForTest);
+  UtxoApi.utxoApiFactory = (_: string) => new MockUtxoApi(txHistory, 0);
+
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver1 = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
   const publicDeriver2 = await setup(db, TX_TEST_MNEMONIC_2, purposeForTest);
 
-  const txHistory = networkTransactions(purposeForTest);
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -491,7 +466,6 @@ async function syncingSimpleTransaction(
       getTokenInfo,
       getMultiAssetMetadata
     );
-
     await checkPub2HasTx(purposeForTest, publicDeriver2);
     {
       const response = await publicDeriver2.getLastSyncInfo();

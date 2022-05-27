@@ -1467,6 +1467,8 @@ Object {
   "TokenList": Array [],
   "Transaction": Array [],
   "TxMemo": Array [],
+  "UtxoAtSafePointTable": Array [],
+  "UtxoDiffToBestBlock": Array [],
   "UtxoTransactionInput": Array [],
   "UtxoTransactionOutput": Array [],
 }

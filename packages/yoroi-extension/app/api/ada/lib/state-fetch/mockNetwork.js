@@ -696,45 +696,59 @@ export function genGetMultiAssetMetadata(
 
 export class MockUtxoApi implements UtxoApiContract {
   blockchain: Array<RemoteTransaction>;
-  lastSafeBlockTxIndex: number;
+  safeConfirmations: number;
 
   constructor(
     blockchain: Array<RemoteTransaction>,
     safeConfirmations: number,
   ) {
     this.blockchain = blockchain;
-
-    let lastHeight = blockchain[blockchain.length - 1].height;
-    if (lastHeight == null) {
-      throw new Error('missing height');
-    }
+    this.safeConfirmations = safeConfirmations;
+  }
+  
+  _getLastSafeBlockTxIndex(): number {
+    let lastHeight = null;
     let i;
-    for (i = blockchain.length - 1; i >= 0; i --) {
-      const currentHeight = blockchain[i].height;
-      if (currentHeight == null) {
-        throw new Error('missing height');
+    for (i = this.blockchain.length - 1; i >= 0; i --) {
+      if (this.blockchain[i].tx_state === 'Successful') {
+        lastHeight = this.blockchain[i].height;
+        break;
       }
-      if (lastHeight - currentHeight >= safeConfirmations) {
+    }
+    if (lastHeight == null) {
+      throw new Error('no successful tx');
+    }
+    for (; i >= 0; i --) {
+      const currentHeight = this.blockchain[i].height;
+      if (
+        currentHeight != null &&
+          lastHeight - currentHeight >= this.safeConfirmations
+      ) {
         break;
       }
     }
     if (i === -1) {
       throw new Error('not enough blocks for a safe block');
     } else {
-      this.lastSafeBlockTxIndex = i;
+      return i;
     }
   }
 
   async getBestBlock(): Promise<string> {
-    const hash = this.blockchain[this.blockchain.length - 1].block_hash;
-    if (!hash) {
-      throw new Error('expect hash');
+    for (let i = this.blockchain.length - 1; i >= 0; i --) {
+      if (this.blockchain[i].tx_state === 'Successful') {
+        const hash = this.blockchain[i].block_hash;
+        if (!hash) {
+          throw new Error('expect hash');
+        }
+        return hash;
+      }
     }
-    return hash;
+    throw new Error('no successful tx');
   }
 
   async getSafeBlock(): Promise<string> {
-    const hash =  this.blockchain[this.lastSafeBlockTxIndex].block_hash;
+    const hash =  this.blockchain[this._getLastSafeBlockTxIndex()].block_hash;
     if (!hash) {
       throw new Error('expect hash');
     }
@@ -786,6 +800,9 @@ export class MockUtxoApi implements UtxoApiContract {
     let utxos = [];
     for (let i = 0; i <= lastTxIndex; i++) {
       const tx = this.blockchain[i];
+      if (tx.tx_state !== 'Successful') {
+        continue;
+      }
       // remove spent
       utxos = utxos.filter(
         utxo => !tx.inputs.some(
@@ -793,9 +810,11 @@ export class MockUtxoApi implements UtxoApiContract {
         )
       );
       // add new
-      tx.outputs.filter(
-        ({ address }) => addresses.includes(address)
-      ).forEach((output, outputIndex) => {
+      tx.outputs.forEach((output, outputIndex) => {
+        if (!addresses.includes(output.address)) {
+          return;
+        }
+
         const { height } = tx;
         if (height == null) {
           throw new Error('expect height');
@@ -829,6 +848,10 @@ export class MockUtxoApi implements UtxoApiContract {
     let utxoDiffItems = [];
     for (let i = this.blockchain.length - 1; i >= 0; i--) {
       const tx = this.blockchain[i];
+      if (tx.tx_state !== 'Successful') {
+        continue;
+      }
+
       if (tx.block_hash === untilBlockHash) {
         seenUntilBlock = true;
       }
@@ -838,9 +861,10 @@ export class MockUtxoApi implements UtxoApiContract {
           break;
         }
 
-        tx.outputs.filter(
-          ({ address }) => addresses.includes(address)
-        ).forEach((output, outputIndex) => {
+        tx.outputs.forEach((output, outputIndex) => {
+          if (!addresses.includes(output.address)) {
+            return;
+          }
           const utxoId = `${tx.hash}${outputIndex}`
           utxoDiffItems.push(
             {
