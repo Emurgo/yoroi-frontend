@@ -1,0 +1,11 @@
+.dialog {
+    width: 615px;
+    max-width: initial;
+    height: auto;
+    max-height: initial;
+    overflow: auto;
+}
+
+:global(.dialog__title) {
+    margin-bottom: 24px !important;
+}

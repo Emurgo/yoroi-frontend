@@ -8,6 +8,7 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as RevampAnnouncement } from '../../../../assets/images/revamp-announcement.inline.svg';
 import { List, ListItem, Typography } from '@mui/material';
+import styles from './RevampSwitchDialog.scss'
 
 const messages = defineMessages({
     dialogTitle: {
@@ -85,8 +86,10 @@ export default class RevampSwitchDialog extends Component {
             closeButton={<DialogCloseButton />}
             onClose={this.props.close}
             actions={actions}
+            className={styles.dialog}
           >
-            <Typography fontWeight='500' fontSize='16px' lineHeight='24px' color='var(--yoroi-palette-gray-900)' marginBottom='16px'>
+            <RevampAnnouncement />
+            <Typography fontWeight='500' fontSize='16px' lineHeight='24px' color='var(--yoroi-palette-gray-900)' marginBottom='16px' marginTop='24px'>
               {intl.formatMessage(messages.header)}
             </Typography>
             <List disablePadding>
