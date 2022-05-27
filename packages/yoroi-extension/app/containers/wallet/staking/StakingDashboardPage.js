@@ -71,7 +71,7 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import RevampSwitchDialog from '../../../components/wallet/staking/dashboard/RevampSwitchDialog';
-import type { Theme } from '../../../styles/utils';
+import { Theme, THEMES } from '../../../styles/utils';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -704,6 +704,9 @@ export default class StakingDashboardPage extends Component<Props> {
       return (
         <RevampSwitchDialog
           onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+          onSubmit={() => {
+            this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
+          }}
         />
       )
     }
@@ -1000,6 +1003,13 @@ export default class StakingDashboardPage extends Component<Props> {
       notifications: {|
         open: {| trigger: (params: Notification) => void |},
       |},
+      profile: {|
+        updateTheme: {|
+          trigger: (params: {|
+            theme: string,
+          |}) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
       coinPriceStore: {|
@@ -1159,6 +1169,9 @@ export default class StakingDashboardPage extends Component<Props> {
         },
       },
       actions: {
+        profile: {
+          updateTheme: { trigger: actions.profile.updateTheme.trigger },
+        },
         dialogs: {
           closeActiveDialog: {
             trigger: actions.dialogs.closeActiveDialog.trigger,

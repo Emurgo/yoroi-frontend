@@ -69,6 +69,7 @@ export default class RevampSwitchDialog extends Component {
 
     render(): Node {
         const { intl } = this.context;
+        const { onClose, onSubmit } = this.props;
         const features = [
             messages.feature1,
             messages.feature2,
@@ -82,7 +83,7 @@ export default class RevampSwitchDialog extends Component {
         const actions = [
           {
             label: intl.formatMessage(messages.tryItNow),
-            onClick: () => {},
+            onClick: onSubmit,
             primary: true,
           },
         ];
@@ -91,7 +92,7 @@ export default class RevampSwitchDialog extends Component {
             title={intl.formatMessage(messages.dialogTitle)}
             closeOnOverlayClick={false}
             closeButton={<DialogCloseButton />}
-            onClose={this.props.onClose}
+            onClose={onClose}
             actions={actions}
             className={styles.dialog}
           >
