@@ -27,6 +27,7 @@ export default class RevampAnnouncement extends Component<{}> {
 
     render(): Node {
         const { intl } = this.context;
+        const { onClick } = this.props
 
         return (
           <Box
@@ -51,6 +52,7 @@ export default class RevampAnnouncement extends Component<{}> {
               <LearnMoreButton
                 variant='text'
                 size='small'
+                onClick={onClick}
               >
                 {intl.formatMessage(globalMessages.learnMore)}
               </LearnMoreButton>

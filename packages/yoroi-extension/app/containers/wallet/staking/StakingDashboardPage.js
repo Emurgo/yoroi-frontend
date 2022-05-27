@@ -156,6 +156,11 @@ export default class StakingDashboardPage extends Component<Props> {
             publicDeriver.getParent().getNetworkInfo().NetworkId
           )
         ))}
+        openRevampAnnouncementDialog={() => {
+          this.generated.actions.dialogs.open.trigger({
+            dialog: RevampSwitchDialog,
+          })
+        }}
       />
     );
 
@@ -693,8 +698,12 @@ export default class StakingDashboardPage extends Component<Props> {
       );
     }
 
-    if (true) {
-      return <RevampSwitchDialog />
+    if (uiDialogs.isOpen(RevampSwitchDialog)) {
+      return (
+        <RevampSwitchDialog
+          onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        />
+      )
     }
 
     return null;

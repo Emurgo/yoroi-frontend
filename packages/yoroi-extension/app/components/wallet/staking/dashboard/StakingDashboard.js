@@ -120,7 +120,9 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
-          <RevampAnnouncement />
+          <RevampAnnouncement
+            onClick={this.props.openRevampAnnouncementDialog}
+          />
           {pendingTxWarningComponent}
           <div className={styles.statsWrapper}>
             <div className={styles.summary}>

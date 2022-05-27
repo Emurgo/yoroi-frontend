@@ -81,10 +81,9 @@ export default class RevampSwitchDialog extends Component {
 
         const actions = [
             {
-              label: intl.formatMessage(messages.dialogTitle),
+              label: intl.formatMessage(messages.tryItNow),
               onClick: () => {},
               primary: true,
-              isSubmitting: this.props.isSubmitting,
             },
           ];
         return (
@@ -92,7 +91,7 @@ export default class RevampSwitchDialog extends Component {
             title={intl.formatMessage(messages.dialogTitle)}
             closeOnOverlayClick={false}
             closeButton={<DialogCloseButton />}
-            onClose={this.props.close}
+            onClose={this.props.onClose}
             actions={actions}
             className={styles.dialog}
           >
@@ -119,7 +118,7 @@ export default class RevampSwitchDialog extends Component {
             </List>
 
             <Typography fontWeight='500' fontSize='16px' lineHeight='24px' color='var(--yoroi-palette-gray-900)' marginTop='16px'>
-              {intl.formatMessage(messages.tryItNow)}
+              {intl.formatMessage(messages.footer)}
             </Typography>
           </Dialog>
         )
