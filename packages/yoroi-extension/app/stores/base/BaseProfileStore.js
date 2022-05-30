@@ -266,7 +266,6 @@ export default class BaseProfileStore
     if (result == null) {
       result = this.getShowRevampDialogRequest.execute().result;
     }
-    console.log(result)
     return result
   }
 

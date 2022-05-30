@@ -30,6 +30,8 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
+import RevampSwitchDialog from '../../components/wallet/staking/dashboard/RevampSwitchDialog';
+import { THEMES } from '../../styles/utils';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -108,6 +110,29 @@ class Wallet extends Component<AllProps> {
       )
     }
     return null
+  }
+
+  getDialog(): Node {
+    const uiDialogs = this.generated.stores.uiDialogs;
+    const { shouldShowRevampDialog } = this.generated.stores.profile
+    if (uiDialogs.isOpen(RevampSwitchDialog) || shouldShowRevampDialog) {
+      return (
+        <RevampSwitchDialog
+          onClose={() => {
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+            if (shouldShowRevampDialog)
+              this.generated.actions.profile.updateShowRevampDialog.trigger();
+          }}
+          onSubmit={() => {
+            this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
+          }}
+          numOfWallets={this.generated.stores.wallets.publicDerivers.length}
+          shouldShowRevampDialog={shouldShowRevampDialog}
+        />
+      )
+    }
+
+    return null;
   }
 
   render(): Node {
@@ -191,6 +216,7 @@ class Wallet extends Component<AllProps> {
         >
           {this.props.children}
           {this.renderOverlay()}
+          {this.getDialog()}
         </WalletWithNavigation>
       </TopBarLayout>
     );
@@ -247,6 +273,21 @@ class Wallet extends Component<AllProps> {
           |}) => void,
         |},
       |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void,
+        |},
+      |},
+      profile: {|
+        updateTheme: {|
+          trigger: (params: {|
+            theme: string,
+          |}) => Promise<void>,
+        |},
+        updateShowRevampDialog: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
@@ -255,6 +296,7 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
+        publicDerivers: Array<publicDerivers<>>,
         firstSync: ?number,
       |},
       router: {| location: any |},
@@ -265,6 +307,10 @@ class Wallet extends Component<AllProps> {
       |},
       profile: {|
         isClassicTheme: boolean,
+        shouldShowRevampDialog: boolean,
+      |},
+      uiDialogs: {|
+        isOpen: any => boolean,
       |},
     |}
     |} {
@@ -283,7 +329,11 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
-          firstSync: stores.wallets.firstSync
+          publicDerivers: stores.wallets.publicDerivers,
+          firstSync: stores.wallets.firstSync,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
@@ -304,13 +354,23 @@ class Wallet extends Component<AllProps> {
           })(),
         },
         profile: {
-          isClassicTheme: stores.profile.isClassicTheme
+          isClassicTheme: stores.profile.isClassicTheme,
+          shouldShowRevampDialog: stores.profile.shouldShowRevampDialog,
         }
       },
       actions: {
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
+        },
+        profile: {
+          updateTheme: { trigger: actions.profile.updateTheme.trigger },
+          updateShowRevampDialog: { trigger: actions.profile.updateShowRevampDialog.trigger }
+        },
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
         },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),

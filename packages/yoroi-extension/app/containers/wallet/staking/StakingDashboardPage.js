@@ -71,7 +71,7 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import RevampSwitchDialog from '../../../components/wallet/staking/dashboard/RevampSwitchDialog';
-import { Theme, THEMES } from '../../../styles/utils';
+import { Theme } from '../../../styles/utils';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -644,7 +644,6 @@ export default class StakingDashboardPage extends Component<Props> {
 
   getDialog: (PublicDeriver<>) => Node = publicDeriver => {
     const uiDialogs = this.generated.stores.uiDialogs;
-    const { shouldShowRevampDialog } = this.generated.stores.profile
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
@@ -699,23 +698,6 @@ export default class StakingDashboardPage extends Component<Props> {
           }}
         />
       );
-    }
-
-    if (uiDialogs.isOpen(RevampSwitchDialog) || shouldShowRevampDialog) {
-      return (
-        <RevampSwitchDialog
-          onClose={() => {
-            this.generated.actions.dialogs.closeActiveDialog.trigger();
-            if (shouldShowRevampDialog)
-              this.generated.actions.profile.updateShowRevampDialog.trigger();
-          }}
-          onSubmit={() => {
-            this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
-          }}
-          numOfWallets={this.generated.stores.wallets.publicDerivers.length}
-          shouldShowRevampDialog={shouldShowRevampDialog}
-        />
-      )
     }
 
     return null;
@@ -1010,16 +992,6 @@ export default class StakingDashboardPage extends Component<Props> {
       notifications: {|
         open: {| trigger: (params: Notification) => void |},
       |},
-      profile: {|
-        updateTheme: {|
-          trigger: (params: {|
-            theme: string,
-          |}) => Promise<void>,
-        |},
-        updateShowRevampDialog: {|
-          trigger: (params: void) => Promise<void>,
-        |},
-      |},
     |},
     stores: {|
       coinPriceStore: {|
@@ -1031,7 +1003,6 @@ export default class StakingDashboardPage extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
-        shouldShowRevampDialog: boolean,
         unitOfAccount: UnitOfAccountSettingType,
         currentTheme: Theme,
       |},
@@ -1083,7 +1054,6 @@ export default class StakingDashboardPage extends Component<Props> {
           isExecuting: boolean,
         |},
         selected: null | PublicDeriver<>,
-        publicDerivers: Array<publicDerivers<>>
       |},
     |},
   |} {
@@ -1133,7 +1103,6 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
-          publicDerivers: stores.wallets.publicDerivers,
           sendMoneyRequest: {
             error: stores.wallets.sendMoneyRequest.error,
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
@@ -1183,10 +1152,6 @@ export default class StakingDashboardPage extends Component<Props> {
         },
       },
       actions: {
-        profile: {
-          updateTheme: { trigger: actions.profile.updateTheme.trigger },
-          updateShowRevampDialog: { trigger: actions.profile.updateShowRevampDialog.trigger }
-        },
         dialogs: {
           closeActiveDialog: {
             trigger: actions.dialogs.closeActiveDialog.trigger,
