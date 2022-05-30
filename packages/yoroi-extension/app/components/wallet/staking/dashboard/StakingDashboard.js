@@ -20,6 +20,7 @@ import type { CertificateForKey } from '../../../../api/ada/lib/storage/database
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import RevampAnnouncement from './RevampAnnouncement';
 import { THEMES } from '../../../../styles/utils';
+import type { Theme } from '../../../../styles/utils';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -61,6 +62,8 @@ export type GraphData = {|
 
 type Props = {|
   +graphData: GraphData,
+  +currentTheme: Theme,
+  +openRevampAnnouncementDialog: void => void,
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node | void> |},
   +userSummary: Node,
   +upcomingRewards: void | Node,

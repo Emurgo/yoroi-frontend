@@ -70,7 +70,7 @@ export default class LocalStorageApi {
     ))
   )
 
-  setShowRevampDialog: void => Promise<boolean> = (status) => (
+  setShowRevampDialog: boolean => Promise<void> = (status) => (
     setLocalItem(storageKeys.SHOW_REVAMP_DIALOG, JSON.stringify(status))
   )
   // ========== Terms of Use ========== //

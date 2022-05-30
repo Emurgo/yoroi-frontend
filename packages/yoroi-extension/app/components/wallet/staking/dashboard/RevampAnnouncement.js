@@ -19,8 +19,12 @@ const messages = defineMessages({
     },
 });
 
+type Props = {|
+  onClick: void => void,
+|}
+
 @observer
-export default class RevampAnnouncement extends Component<{}> {
+export default class RevampAnnouncement extends Component<Props> {
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,
     };

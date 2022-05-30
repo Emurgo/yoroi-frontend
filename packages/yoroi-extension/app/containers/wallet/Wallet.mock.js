@@ -36,10 +36,15 @@ export const mockWalletProps: {
         currentRoute: request.location,
       },
       profile: {
-        isClassicTheme: true
+        isClassicTheme: true,
+        shouldShowRevampDialog: false,
+      },
+      uiDialogs: {
+        isOpen: () => false,
       },
       wallets: {
         selected: request.selected,
+        publicDerivers: [],
         firstSync: null,
       },
       transactions: {
@@ -61,6 +66,13 @@ export const mockWalletProps: {
         goToRoute: { trigger: action('goToRoute') },
         redirect: { trigger: action('redirect') },
       },
+      dialogs: {
+        closeActiveDialog: { trigger: action('closeActiveDialog') }
+      },
+      profile: {
+        updateTheme: { trigger: async req => action('updateTheme')(req) },
+        updateShowRevampDialog: { trigger: async req => action('updateShowRevampDialog')(req) },
+      }
     },
     SidebarContainerProps: {
       generated: {

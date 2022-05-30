@@ -296,7 +296,7 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
-        publicDerivers: Array<publicDerivers<>>,
+        publicDerivers: Array<PublicDeriver<>>,
         firstSync: ?number,
       |},
       router: {| location: any |},

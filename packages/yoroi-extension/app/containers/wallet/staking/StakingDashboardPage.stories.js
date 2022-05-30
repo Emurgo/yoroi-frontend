@@ -133,6 +133,7 @@ const genBaseProps: {|
       },
       profile: {
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+        currentTheme: globalKnobs.currentTheme(),
         shouldHideBalance: request.allowToggleHidden
           ? boolean('hideBalance', false)
           : false,

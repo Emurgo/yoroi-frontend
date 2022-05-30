@@ -266,7 +266,7 @@ export default class BaseProfileStore
     if (result == null) {
       result = this.getShowRevampDialogRequest.execute().result;
     }
-    return result
+    return result === true;
   }
 
   _updateShowRevampDialog: void => Promise<void> = async () => {

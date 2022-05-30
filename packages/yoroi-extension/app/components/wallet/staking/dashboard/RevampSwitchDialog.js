@@ -61,8 +61,15 @@ const messages = defineMessages({
     },
 });
 
+type Props = {|
+  +onClose: void => void,
+  +onSubmit: void => void,
+  +shouldShowRevampDialog: boolean,
+  +numOfWallets: number,
+|}
+
 @observer
-export default class RevampSwitchDialog extends Component {
+export default class RevampSwitchDialog extends Component<Props> {
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,
     };
