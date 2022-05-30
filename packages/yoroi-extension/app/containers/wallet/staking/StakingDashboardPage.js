@@ -706,12 +706,14 @@ export default class StakingDashboardPage extends Component<Props> {
         <RevampSwitchDialog
           onClose={() => {
             this.generated.actions.dialogs.closeActiveDialog.trigger();
-            if (this.generated.stores.profile.shouldShowRevampDialog)
+            if (shouldShowRevampDialog)
               this.generated.actions.profile.updateShowRevampDialog.trigger();
           }}
           onSubmit={() => {
             this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
           }}
+          numOfWallets={this.generated.stores.wallets.publicDerivers.length}
+          shouldShowRevampDialog={shouldShowRevampDialog}
         />
       )
     }
@@ -1081,6 +1083,7 @@ export default class StakingDashboardPage extends Component<Props> {
           isExecuting: boolean,
         |},
         selected: null | PublicDeriver<>,
+        publicDerivers: Array<publicDerivers<>>
       |},
     |},
   |} {
@@ -1130,6 +1133,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          publicDerivers: stores.wallets.publicDerivers,
           sendMoneyRequest: {
             error: stores.wallets.sendMoneyRequest.error,
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,

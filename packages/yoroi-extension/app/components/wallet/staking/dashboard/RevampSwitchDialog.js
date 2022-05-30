@@ -69,7 +69,7 @@ export default class RevampSwitchDialog extends Component {
 
     render(): Node {
         const { intl } = this.context;
-        const { onClose, onSubmit } = this.props;
+        const { onClose, onSubmit, shouldShowRevampDialog, numOfWallets } = this.props;
         const features = [
             messages.feature1,
             messages.feature2,
@@ -82,7 +82,9 @@ export default class RevampSwitchDialog extends Component {
 
         const actions = [
           {
-            label: intl.formatMessage(messages.tryItNow),
+            label: intl.formatMessage(
+              shouldShowRevampDialog && numOfWallets <= 1 ? messages.getStarted : messages.tryItNow
+            ),
             onClick: () => {
               onSubmit()
               onClose()
