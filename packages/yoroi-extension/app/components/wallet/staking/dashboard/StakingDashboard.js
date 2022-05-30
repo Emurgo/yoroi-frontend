@@ -18,6 +18,7 @@ import { ReactComponent as InvalidURIImg }  from '../../../../assets/images/uri/
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Skeleton, Typography } from '@mui/material';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -31,6 +32,10 @@ const messages = defineMessages({
   pendingTxWarning: {
     id: 'wallet.dashboard.warning.pendingTx',
     defaultMessage: '!!!Staking dashboard information will update once your pending transaction is confirmed',
+  },
+  title: {
+    id: 'wallet.dashboard.stakePool.title',
+    defaultMessage: '!!!Stake Pool Delegated',
   },
 });
 
@@ -151,27 +156,21 @@ export default class StakingDashboard extends Component<Props> {
         </div>
       );
     }
-    if (graphData.items == null) {
-      return (
-        <VerticallyCenteredLayout>
-          <LoadingSpinner />
-        </VerticallyCenteredLayout>
-      );
-    }
+
     const items = graphData.items;
     return (
       <GraphWrapper
         tabs={[
           {
             tabName: intl.formatMessage(globalMessages.rewardsLabel),
-            data: items.perEpochRewards,
+            data: items ? items.perEpochRewards : [],
             primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
             hideYAxis: graphData.hideYAxis,
           },
           {
             tabName: intl.formatMessage(globalMessages.totalRewardsLabel),
-            data: items.totalRewards,
+            data: items ? items.totalRewards : [],
             primaryBarLabel: intl.formatMessage(globalMessages.totalRewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
             hideYAxis: graphData.hideYAxis,
@@ -200,12 +199,31 @@ export default class StakingDashboard extends Component<Props> {
         </div>
       );
     }
-    if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
+    if (
+      this.props.stakePools.pools === null ||
+      this.props.pageInfo == null ||
+      this.props.stakePools.pools[this.props.pageInfo.currentPage] == null
+    ) {
       return (
         <div className={width}>
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
+          <Typography
+            fontWeight='500'
+            fontSize='18px'
+            lineHeight='22px'
+            marginBottom='16px'
+          >
+            {intl.formatMessage(messages.title)}
+          </Typography>
+          <Skeleton
+            variant='rectangular'
+            width='100%'
+            height='254px'
+            animation='wave'
+            sx={{
+              backgroundColor: 'var(--yoroi-palette-gray-50)',
+              borderRadius: '4px',
+            }}
+          />
         </div>
       );
     }
