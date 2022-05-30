@@ -698,25 +698,24 @@ export default class StakingDashboardPage extends Component<Props> {
           }}
         />
       );
-    } 
-
+    }
     console.log(this.generated.stores.profile)
     if (
       uiDialogs.isOpen(RevampSwitchDialog) ||
-      !this.generated.stores.profile.shouldHideRevampDialog
+      this.generated.stores.profile.shouldShowRevampDialog
     ) {
       return (
         <RevampSwitchDialog
           onClose={() => {
             this.generated.actions.dialogs.closeActiveDialog.trigger();
-            if (!this.generated.stores.profile.shouldHideRevampDialog)
-              this.generated.actions.profile.updateHideRevampDialog.trigger();
+            if (this.generated.stores.profile.shouldShowRevampDialog)
+              this.generated.actions.profile.updateShowRevampDialog.trigger();
           }}
           onSubmit={() => {
             this.generated.actions.dialogs.closeActiveDialog.trigger();
             this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
-            if (!this.generated.stores.profile.shouldHideRevampDialog);
-              this.generated.actions.profile.updateHideRevampDialog.trigger();
+            if (this.generated.stores.profile.shouldShowRevampDialog);
+              this.generated.actions.profile.updateShowRevampDialog.trigger();
           }}
         />
       )
@@ -1020,7 +1019,7 @@ export default class StakingDashboardPage extends Component<Props> {
             theme: string,
           |}) => Promise<void>,
         |},
-        updateHideRevampDialog: {|
+        updateShowRevampDialog: {|
           trigger: (params: void) => Promise<void>,
         |},
       |},
@@ -1035,7 +1034,7 @@ export default class StakingDashboardPage extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
-        shouldHideRevampDialog: boolean,
+        shouldShowRevampDialog: boolean,
         unitOfAccount: UnitOfAccountSettingType,
         currentTheme: Theme,
       |},
@@ -1131,7 +1130,7 @@ export default class StakingDashboardPage extends Component<Props> {
           isClassicTheme: stores.profile.isClassicTheme,
           currentTheme: stores.profile.currentTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
-          shouldHideRevampDialog: stores.profile.shouldHideRevampDialog,
+          shouldShowRevampDialog: stores.profile.shouldShowRevampDialog,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
@@ -1187,7 +1186,7 @@ export default class StakingDashboardPage extends Component<Props> {
       actions: {
         profile: {
           updateTheme: { trigger: actions.profile.updateTheme.trigger },
-          updateHideRevampDialog: { trigger: actions.profile.updateHideRevampDialog.trigger }
+          updateShowRevampDialog: { trigger: actions.profile.updateShowRevampDialog.trigger }
         },
         dialogs: {
           closeActiveDialog: {

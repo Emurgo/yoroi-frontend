@@ -14,7 +14,7 @@ export default class BaseProfileActions {
   exportTheme: AsyncAction<void> = new AsyncAction();
   commitLocaleToStorage: AsyncAction<void> = new AsyncAction();
   updateHideBalance: AsyncAction<void> = new AsyncAction();
-  updateHideRevampDialog: AsyncAction<void> = new AsyncAction();
+  updateShowRevampDialog: AsyncAction<void> = new AsyncAction();
   acceptNightly: Action<void> = new Action();
   updateUnitOfAccount: AsyncAction<UnitOfAccountSettingType> = new AsyncAction();
 }

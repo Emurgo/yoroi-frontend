@@ -85,13 +85,13 @@ export default class BaseProfileStore
     (string) => Promise<void>
   >(this.api.localStorage.setUserTheme);
 
-  @observable getHideRevampDialogRequest: Request<(void) => Promise<boolean>> = new Request<
+  @observable getShowRevampDialogRequest: Request<(void) => Promise<boolean>> = new Request<
     (void) => Promise<boolean>
-  >(this.api.localStorage.getHideRevampDialogStatus);
+  >(this.api.localStorage.getShowRevampDialog);
 
-  @observable setHideRevampDialogRequest: Request<(boolean) => Promise<void>> = new Request<
+  @observable setShowRevampDialogRequest: Request<(boolean) => Promise<void>> = new Request<
     (boolean) => Promise<void>
-  >(this.api.localStorage.setHideRevampDialogStatus);
+  >(this.api.localStorage.setShowRevampDialog);
 
   @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
     (void) => Promise<?string>
@@ -157,7 +157,7 @@ export default class BaseProfileStore
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
     this.actions.profile.updateTheme.listen(this._updateTheme);
-    this.actions.profile.updateHideRevampDialog.listen(this._updateHideRevampDialog)
+    this.actions.profile.updateShowRevampDialog.listen(this._updateShowRevampDialog)
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
@@ -261,19 +261,19 @@ export default class BaseProfileStore
     return momentJSLocalKey;
   };
 
-  @computed get shouldHideRevampDialog(): boolean {
-    let { result } = this.getHideRevampDialogRequest;
+  @computed get shouldShowRevampDialog(): boolean {
+    let { result } = this.getShowRevampDialogRequest;
     if (result == null) {
-      result = this.getHideRevampDialogRequest.execute().result;
+      result = this.getShowRevampDialogRequest.execute().result;
     }
-
+    console.log(result)
     return result
   }
 
-  _updateHideRevampDialog: void => Promise<void> = async () => {
-    const shouldHideRevampDialog = this.shouldHideRevampDialog;
-    await this.setHideRevampDialogRequest.execute(true);
-    await this.getHideRevampDialogRequest.execute();
+  _updateShowRevampDialog: void => Promise<void> = async () => {
+    // User should see it once
+    await this.setShowRevampDialogRequest.execute(false);
+    await this.getShowRevampDialogRequest.execute();
   }
   // ========== Current/Custom Theme ========== //
 
