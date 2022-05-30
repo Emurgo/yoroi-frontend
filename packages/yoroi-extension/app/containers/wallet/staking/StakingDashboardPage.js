@@ -698,14 +698,25 @@ export default class StakingDashboardPage extends Component<Props> {
           }}
         />
       );
-    }
+    } 
 
-    if (uiDialogs.isOpen(RevampSwitchDialog)) {
+    console.log(this.generated.stores.profile)
+    if (
+      uiDialogs.isOpen(RevampSwitchDialog) ||
+      !this.generated.stores.profile.shouldHideRevampDialog
+    ) {
       return (
         <RevampSwitchDialog
-          onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+          onClose={() => {
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+            if (!this.generated.stores.profile.shouldHideRevampDialog)
+              this.generated.actions.profile.updateHideRevampDialog.trigger();
+          }}
           onSubmit={() => {
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
             this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
+            if (!this.generated.stores.profile.shouldHideRevampDialog);
+              this.generated.actions.profile.updateHideRevampDialog.trigger();
           }}
         />
       )
@@ -1009,6 +1020,9 @@ export default class StakingDashboardPage extends Component<Props> {
             theme: string,
           |}) => Promise<void>,
         |},
+        updateHideRevampDialog: {|
+          trigger: (params: void) => Promise<void>,
+        |},
       |},
     |},
     stores: {|
@@ -1021,6 +1035,7 @@ export default class StakingDashboardPage extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
+        shouldHideRevampDialog: boolean,
         unitOfAccount: UnitOfAccountSettingType,
         currentTheme: Theme,
       |},
@@ -1116,6 +1131,7 @@ export default class StakingDashboardPage extends Component<Props> {
           isClassicTheme: stores.profile.isClassicTheme,
           currentTheme: stores.profile.currentTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
+          shouldHideRevampDialog: stores.profile.shouldHideRevampDialog,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
@@ -1171,6 +1187,7 @@ export default class StakingDashboardPage extends Component<Props> {
       actions: {
         profile: {
           updateTheme: { trigger: actions.profile.updateTheme.trigger },
+          updateHideRevampDialog: { trigger: actions.profile.updateHideRevampDialog.trigger }
         },
         dialogs: {
           closeActiveDialog: {

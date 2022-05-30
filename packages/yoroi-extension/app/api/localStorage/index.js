@@ -19,7 +19,7 @@ import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/ty
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
-  SHOW_REVAMP_DIALOG: 'SHOW-REVAMP-DIALOG',
+  HIDE_REVAMP_DIALOG: 'HIDE-REVAMP-DIALOG',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
@@ -64,14 +64,14 @@ export default class LocalStorageApi {
 
   unsetUserLocale: void => Promise<void> = () => removeLocalItem(storageKeys.USER_LOCALE);
   // ========== Revamp Announcement Dialog ========== //
-  getRevampAnnouncementStatus: void => Promise<boolean> = () => (
-    getLocalItem(storageKeys.SHOW_REVAMP_DIALOG).then(status => (
+  getHideRevampDialogStatus: void => Promise<boolean> = () => (
+    getLocalItem(storageKeys.HIDE_REVAMP_DIALOG).then(status => (
       status === 'true'
     ))
   )
 
-  setRevampAnnouncementStatus: void => Promise<boolean> = () => (
-    setLocalItem(storageKeys.SHOW_REVAMP_DIALOG, JSON.stringify(true))
+  setHideRevampDialogStatus: void => Promise<boolean> = (status) => (
+    setLocalItem(storageKeys.HIDE_REVAMP_DIALOG, JSON.stringify(status))
   )
   // ========== Terms of Use ========== //
 

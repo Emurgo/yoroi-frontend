@@ -85,6 +85,14 @@ export default class BaseProfileStore
     (string) => Promise<void>
   >(this.api.localStorage.setUserTheme);
 
+  @observable getHideRevampDialogRequest: Request<(void) => Promise<boolean>> = new Request<
+    (void) => Promise<boolean>
+  >(this.api.localStorage.getHideRevampDialogStatus);
+
+  @observable setHideRevampDialogRequest: Request<(boolean) => Promise<void>> = new Request<
+    (boolean) => Promise<void>
+  >(this.api.localStorage.setHideRevampDialogStatus);
+
   @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
     (void) => Promise<?string>
   >(this.api.localStorage.getCustomUserTheme);
@@ -149,6 +157,7 @@ export default class BaseProfileStore
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
     this.actions.profile.updateTheme.listen(this._updateTheme);
+    this.actions.profile.updateHideRevampDialog.listen(this._updateHideRevampDialog)
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
@@ -252,6 +261,20 @@ export default class BaseProfileStore
     return momentJSLocalKey;
   };
 
+  @computed get shouldHideRevampDialog(): boolean {
+    let { result } = this.getHideRevampDialogRequest;
+    if (result == null) {
+      result = this.getHideRevampDialogRequest.execute().result;
+    }
+
+    return result
+  }
+
+  _updateHideRevampDialog: void => Promise<void> = async () => {
+    const shouldHideRevampDialog = this.shouldHideRevampDialog;
+    await this.setHideRevampDialogRequest.execute(true);
+    await this.getHideRevampDialogRequest.execute();
+  }
   // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): Theme {
