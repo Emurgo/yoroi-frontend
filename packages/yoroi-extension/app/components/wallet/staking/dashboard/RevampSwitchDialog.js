@@ -83,7 +83,10 @@ export default class RevampSwitchDialog extends Component {
         const actions = [
           {
             label: intl.formatMessage(messages.tryItNow),
-            onClick: onSubmit,
+            onClick: () => {
+              onSubmit()
+              onClose()
+            },
             primary: true,
           },
         ];
@@ -103,6 +106,7 @@ export default class RevampSwitchDialog extends Component {
             <List disablePadding>
               {features.map((message) => (
                 <ListItem
+                  key={message.id}
                   disablePadding
                   sx={{
                     display: 'list-item',

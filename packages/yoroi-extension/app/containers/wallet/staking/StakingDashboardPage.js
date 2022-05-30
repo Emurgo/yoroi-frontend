@@ -644,6 +644,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
   getDialog: (PublicDeriver<>) => Node = publicDeriver => {
     const uiDialogs = this.generated.stores.uiDialogs;
+    const { shouldShowRevampDialog } = this.generated.stores.profile
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
@@ -699,11 +700,8 @@ export default class StakingDashboardPage extends Component<Props> {
         />
       );
     }
-    console.log(this.generated.stores.profile)
-    if (
-      uiDialogs.isOpen(RevampSwitchDialog) ||
-      this.generated.stores.profile.shouldShowRevampDialog
-    ) {
+
+    if (uiDialogs.isOpen(RevampSwitchDialog) || shouldShowRevampDialog) {
       return (
         <RevampSwitchDialog
           onClose={() => {
@@ -712,10 +710,7 @@ export default class StakingDashboardPage extends Component<Props> {
               this.generated.actions.profile.updateShowRevampDialog.trigger();
           }}
           onSubmit={() => {
-            this.generated.actions.dialogs.closeActiveDialog.trigger();
             this.generated.actions.profile.updateTheme.trigger({ theme: THEMES.YOROI_REVAMP })
-            if (this.generated.stores.profile.shouldShowRevampDialog);
-              this.generated.actions.profile.updateShowRevampDialog.trigger();
           }}
         />
       )
