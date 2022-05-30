@@ -2,7 +2,6 @@
 import React from 'react';
 import type { Node } from 'react';
 import { THEMES } from '../utils';
-// import { ReactComponent as SupportIcon } from '../../assets/images/support.svg'
 
 export type Layouts = 'CLASSIC' | 'REVAMP';
 export type LayoutComponentMap = {|

@@ -138,6 +138,7 @@ export default class NavBarContainer extends Component<Props> {
             defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
               publicDeriver.getParent().getNetworkInfo().NetworkId
             )}
+            purpose='topBar'
           />
         );
       };
