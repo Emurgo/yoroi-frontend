@@ -132,7 +132,7 @@ test('UtxoAtSafePoint', async () => {
       publicDeriverId,
     )
   );
-  
+
   expect(result).toEqual(
     expect.objectContaining({ UtxoAtSafePoint: UTXO_AT_SAFE_BLOCK_2 })
   );
@@ -160,7 +160,7 @@ test('UtxoAtSafePoint', async () => {
       publicDeriverId,
     )
   );
-  
+
   expect(result).toBe(undefined);
 });
 

@@ -123,7 +123,7 @@ export class ModifyUtxoDiffToBestBlock {
     publicDeriverId: number,
     utxoDiffToBestBlock: UtxoDiffToBestBlock,
   ): Promise<void> {
-    // Do nothing if a row with `utxoDiffToBestBlock.lastBestBlockHash` is already 
+    // Do nothing if a row with `utxoDiffToBestBlock.lastBestBlockHash` is already
     // present. But we can't rely on the unique index because the exception is
     // thrown when the tx is being committed and there is no way to catch it
     // only for this query.

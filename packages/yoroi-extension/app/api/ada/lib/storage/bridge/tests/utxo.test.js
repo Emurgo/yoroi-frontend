@@ -13,7 +13,6 @@ import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
   mockDate,
-  filterDbSnapshot,
 } from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
@@ -45,7 +44,6 @@ import {
 import {
   networks,
 } from '../../database/prepackaged/networks';
-import { TransactionType } from '../../database/primitives/tables';
 import UtxoApi from '../../../state-fetch/utxoApi';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 

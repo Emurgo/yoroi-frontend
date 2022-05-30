@@ -10,24 +10,18 @@ import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 import {
   GetUtxoTxOutputsWithTx,
 } from '../../database/transactionModels/utxo/api/read';
-import type { UtxoTxOutput } from '../../database/transactionModels/utxo/api/read';
 import type {
-  UtxoTransactionOutputRow,
   ErgoFields,
 } from '../../database/transactionModels/utxo/tables';
 import type {
-  TransactionRow,
   TokenRow,
-  TokenListRow,
-} from '../../database/primitives/tables';
-
-import type {
   AddressRow,
   KeyRow,
   CanonicalAddressInsert,
   CanonicalAddressRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
+
 import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTypes/core/tables';
 
 import type {
@@ -46,6 +40,7 @@ import {
   GetKeyDerivation,
   GetKey,
   GetAddress,
+  GetToken,
 } from '../../database/primitives/api/read';
 import type {
   CoreAddressT,
@@ -73,7 +68,6 @@ import type {
   GetUtxoAtSafePoint,
   GetUtxoDiffToBestBlock,
 } from '../../database/utxo/api/read';
-import { GetToken } from '../../database/primitives/api/read';
 import { UtxoService } from '@emurgo/yoroi-lib-core/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 

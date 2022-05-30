@@ -1,6 +1,5 @@
 // @flow
-import BigNumber from 'bignumber.js';
-import { Type, ConstraintAction, } from 'lovefield';
+import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { PublicDeriverSchema } from '../walletTypes/core/tables';
 

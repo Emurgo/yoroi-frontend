@@ -46,7 +46,6 @@ import {
 import {
   networks,
 } from '../../database/prepackaged/networks';
-import { TransactionType } from '../../database/primitives/tables';
 import UtxoApi from '../../../state-fetch/utxoApi';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 

@@ -10,7 +10,6 @@ import {
 } from '../../utils';
 import * as Tables from '../tables';
 import type {
-  UtxoAtSafePoint,
   UtxoAtSafePointRow,
   UtxoDiffToBestBlock,
   UtxoDiffToBestBlockRow,
@@ -56,7 +55,9 @@ export class GetUtxoDiffToBestBlock {
     const rows = await getRowIn<UtxoDiffToBestBlockRow>(
       db, tx,
       GetUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].name,
-      GetUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].properties.PublicDeriverId,
+      GetUtxoDiffToBestBlock.ownTables[
+        Tables.UtxoDiffToBestBlockSchema.name
+      ].properties.PublicDeriverId,
       ([publicDeriverId]: Array<number>),
     );
     return rows.map(r => ({

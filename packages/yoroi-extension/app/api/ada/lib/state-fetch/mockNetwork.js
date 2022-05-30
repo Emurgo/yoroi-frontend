@@ -39,15 +39,12 @@ import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
 import type { UtxoApiContract } from '@emurgo/yoroi-lib-core/dist/utxo/api';
 import type {
-  Asset,
-  DiffPoint,
   TipStatusReference,
   Utxo,
   UtxoApiResponse,
   UtxoAtPointRequest,
   UtxoDiff,
   UtxoDiffItem,
-  UtxoDiffItemOutput,
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib-core/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib-core/dist/utxo/models';
@@ -705,7 +702,7 @@ export class MockUtxoApi implements UtxoApiContract {
     this.blockchain = blockchain;
     this.safeConfirmations = safeConfirmations;
   }
-  
+
   _getLastSafeBlockTxIndex(): number {
     let lastHeight = null;
     let i;
@@ -810,9 +807,11 @@ export class MockUtxoApi implements UtxoApiContract {
         )
       );
       // add new
-      tx.outputs.forEach((output, outputIndex) => {
+      for (let outputIndex = 0; outputIndex < tx.outputs.length; outputIndex++) {
+        const output = tx.outputs[outputIndex];
+
         if (!addresses.includes(output.address)) {
-          return;
+          continue;
         }
 
         const { height } = tx;
@@ -833,7 +832,7 @@ export class MockUtxoApi implements UtxoApiContract {
           })),
           blockNum: height,
         });
-      });
+      };
     }
     return {
       result: UtxoApiResult.SUCCESS,
@@ -845,7 +844,7 @@ export class MockUtxoApi implements UtxoApiContract {
     const { addresses, untilBlockHash, afterBestBlock, } = req;
 
     let seenUntilBlock = false;
-    let utxoDiffItems = [];
+    const utxoDiffItems = [];
     for (let i = this.blockchain.length - 1; i >= 0; i--) {
       const tx = this.blockchain[i];
       if (tx.tx_state !== 'Successful') {
@@ -871,7 +870,7 @@ export class MockUtxoApi implements UtxoApiContract {
               type: 'output',
               id: utxoId,
               amount: new BigNumber(output.amount),
-              utxo:{
+              utxo: {
                 utxoId,
                 txHash: tx.hash,
                 txIndex: outputIndex,

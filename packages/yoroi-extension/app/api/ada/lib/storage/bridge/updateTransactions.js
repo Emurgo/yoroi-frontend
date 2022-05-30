@@ -2861,7 +2861,7 @@ async function updateUtxos(
     ...
   },
   derivationTables: Map<number, string>,
-) {
+): Promise<void> {
   // Note: we are still using the pre-Yoroi-lib-UtxoService data to get the set of
   // wallet addresses. May change in the future.
   const addresses = await rawGetAddressRowsForWallet(

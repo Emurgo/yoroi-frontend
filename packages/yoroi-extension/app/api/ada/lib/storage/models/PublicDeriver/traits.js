@@ -140,11 +140,9 @@ import {
   GetUtxoAtSafePoint,
   GetUtxoDiffToBestBlock,
 } from '../../database/utxo/api/read';
-import { PublicDeriver } from './';
 import type {
   Utxo,
 } from '@emurgo/yoroi-lib-core/dist/utxo/models';
-import { isErgo } from '../../database/prepackaged/networks';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -231,7 +229,7 @@ const GetAllUtxosMixin = (
   ) => {
     // TODO: perhaps should use seperate types for Ergo and Cardano wallets instead
     // of branching
-    if (!isErgo(this.getParent().getNetworkInfo())) {
+    if (isCardanoHaskell(this.getParent().getNetworkInfo())) {
       const addresses = await this.rawGetAllUtxoAddresses(
         tx,
         {
@@ -249,17 +247,17 @@ const GetAllUtxosMixin = (
       const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
 
       const networkId = this.getParent().getNetworkInfo().NetworkId;
-      const tokens = (await deps.GetToken.fromIdentifier(
-        super.getDb(), tx,
-        [
-          '',
-          ...utxosInStorage.flatMap(
-            ({ assets }) => assets.map(asset => asset.assetId)
-          )
-        ]
-      )).filter(token => token.NetworkId === networkId);
       const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
-        tokens.map(token => [ token.Identifier, token ])
+        (await deps.GetToken.fromIdentifier(
+          super.getDb(), tx,
+          [
+            '',
+            ...utxosInStorage.flatMap(
+              ({ assets }) => assets.map(asset => asset.assetId)
+            )
+          ]
+        )).filter(token => token.NetworkId === networkId)
+          .map(token => [ token.Identifier, token ])
       );
 
       const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(

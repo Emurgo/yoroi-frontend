@@ -383,7 +383,6 @@ export async function populateNewUtxodata(
 
   for (const publicDeriver of wallets) {
     try {
-      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
       if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
         continue;
       }
