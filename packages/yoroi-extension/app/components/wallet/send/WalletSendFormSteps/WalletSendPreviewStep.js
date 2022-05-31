@@ -34,6 +34,7 @@ import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { Asset } from '../../assets/AssetsList'
 import { isErgo } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 
 type Props = {|
   +staleTx: boolean,
@@ -70,9 +71,8 @@ export default class WalletSendPreviewStep extends Component<Props> {
   };
 
   state = {
-    // isValidating: false,
-    // isValidPassword: null,
-    error: null,
+    txError: null,
+    passwordError: null,
   }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
@@ -108,7 +108,12 @@ export default class WalletSendPreviewStep extends Component<Props> {
         try {
           await this.props.onSubmit({ password: walletPassword });
         } catch (error) {
-          this.setState({ error: this.context.intl.formatMessage(error, error.values)})
+          const errorMessage = this.context.intl.formatMessage(error, error.values)
+          if (error instanceof IncorrectWalletPasswordError) {
+            this.setState({ passwordError: errorMessage })
+          } else {
+            this.setState({ txError: errorMessage })
+          }
         }
       },
       onError: () => {}
@@ -265,7 +270,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
       receivers,
       isSubmitting,
     } = this.props;
-    const { isValidating, error } = this.state;
+    const { txError, passwordError } = this.state;
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -352,22 +357,26 @@ export default class WalletSendPreviewStep extends Component<Props> {
           <TextField
             type="password"
             {...walletPasswordField.bind()}
-            disabled={isSubmitting || isValidating}
-            error={walletPasswordField.error || error}
+            disabled={isSubmitting}
+            error={walletPasswordField.error || passwordError}
             onChange={(e) => {
-              this.setState({ error: null }) // Error reset
+              this.setState({ passwordError: null }) // Error reset
               walletPasswordField.set(e.target.value)
             }}
           />
+
+          <p>
+            {txError}
+          </p>
         </div>
 
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid || isSubmitting || isValidating}
+          disabled={!walletPasswordField.isValid || isSubmitting}
           sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
-          {isSubmitting || isValidating ?
+          {isSubmitting ?
             <LoadingSpinner light /> :
             intl.formatMessage(globalMessages.sendButtonLabel)}
         </Button>
