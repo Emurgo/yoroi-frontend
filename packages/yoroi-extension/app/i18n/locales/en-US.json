@@ -569,6 +569,7 @@
   "wallet.dashboard.summary.rewardsTitle": "Total Rewards",
   "wallet.dashboard.summary.title": "Your Summary",
   "wallet.dashboard.summary.totalDelegated": "Total Delegated",
+  "wallet.dashboard.summary.delegated": "Delegated",
   "wallet.dashboard.upcomingRewards.at": "at",
   "wallet.dashboard.upcomingRewards.endOfEpoch": "End of Epoch",
   "wallet.dashboard.upcomingRewards.noRewards": "no rewards will be earned on this epoch",
