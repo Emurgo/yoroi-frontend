@@ -69,6 +69,12 @@ export default class WalletSendPreviewStep extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  state = {
+    // isValidating: false,
+    // isValidPassword: null,
+    error: null,
+  }
+
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletPassword: {
@@ -99,10 +105,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
     this.form.submit({
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
-        const transactionData = {
-          password: walletPassword,
-        };
-        await this.props.onSubmit(transactionData);
+        try {
+          await this.props.onSubmit({ password: walletPassword });
+        } catch (error) {
+          this.setState({ error: this.context.intl.formatMessage(error, error.values)})
+        }
       },
       onError: () => {}
     });
@@ -258,6 +265,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
       receivers,
       isSubmitting,
     } = this.props;
+    const { isValidating, error } = this.state;
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -343,20 +351,23 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
           <TextField
             type="password"
-            className={styles.walletPassword}
             {...walletPasswordField.bind()}
-            disabled={isSubmitting}
-            error={walletPasswordField.error}
+            disabled={isSubmitting || isValidating}
+            error={walletPasswordField.error || error}
+            onChange={(e) => {
+              this.setState({ error: null }) // Error reset
+              walletPasswordField.set(e.target.value)
+            }}
           />
         </div>
 
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid || isSubmitting}
+          disabled={!walletPasswordField.isValid || isSubmitting || isValidating}
           sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
-          {isSubmitting ?
+          {isSubmitting || isValidating ?
             <LoadingSpinner light /> :
             intl.formatMessage(globalMessages.sendButtonLabel)}
         </Button>

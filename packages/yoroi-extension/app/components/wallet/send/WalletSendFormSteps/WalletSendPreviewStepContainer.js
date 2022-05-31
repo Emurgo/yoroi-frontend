@@ -87,11 +87,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
           });
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
-        onCancel={() => {
-          actions.dialogs.closeActiveDialog.trigger();
-          sendMoneyRequest.reset();
-        }}
-        error={sendMoneyRequest.error}
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={
