@@ -102,7 +102,7 @@ export default (action(
     initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    loadedStores.loading.load();
+    loadedStores.loading.load('connector');
 
     return loadedStores;
   }

@@ -2,21 +2,17 @@
 @import '../../../../themes/mixins/unordered-list';
 
 .wrapper {
-  display: flex;
-  height: 100%;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 36px;
 }
 
 .card {
   padding: 20px 20px;
-  flex: 1;
-  border-radius: 6px;
-  box-shadow: 0px 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
+  border-radius: 8px;
+  box-shadow: 0px 3px 10px rgba(56, 62, 84, 0.06);
   position: relative;
   overflow: hidden;
-  min-width: 342px;
-  max-width: 378px;
-  min-height: 164px;
   margin-bottom: 10px;
 
   .cardContent {
@@ -62,15 +58,37 @@
   line-height: 32px;
   margin-bottom: 1px;
   width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .infoIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    & > svg {
+      width: 12px;
+      height: 12px;  
+    }
+  }
+  
+  .delegated {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    color: #0CDDB3;
+    background: #E4F7F3;
+    border-radius: 4px;
+    padding: 4px;
+    display: inline-block;
+    margin-left: 8px;
+  }
 }
 
 .value {
   font-size: 30px;
   line-height: 45px;
-
-  .decimal {
-    font-size: 24px;
-  }
 }
 
 .note {
@@ -88,7 +106,7 @@
   font-size: 12px;
   line-height: 20px;
   color: var(--yoroi-palette-gray-400);
-  max-width: 248px;
+  max-width: 258px;
 }
 
 .mr20 {

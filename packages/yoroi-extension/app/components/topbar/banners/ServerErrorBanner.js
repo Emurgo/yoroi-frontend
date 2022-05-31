@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import styles from './ServerErrorBanner.scss';
-import WarningSvg from '../../../assets/images/warning.inline.svg';
+import { ReactComponent as WarningSvg }  from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

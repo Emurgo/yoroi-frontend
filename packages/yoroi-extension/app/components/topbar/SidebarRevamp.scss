@@ -4,6 +4,28 @@
   flex-direction: column;
   align-items: center;
   background: linear-gradient(30.09deg, #244abf 0%, #4760ff 100%);
+
+  .faq {
+    max-width: 47px;
+    text-transform: uppercase;
+    border-radius: 20px;
+    background: #1737A3;
+    text-decoration: none;
+    color: #FFFFFF;
+    font-weight: 400;
+    font-size: 12px;
+    padding: 14px 12px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0px 12px;
+    margin-bottom: 32px;
+    &:hover {
+      background-color: #122770;
+    }
+  }  
 }
 
 .header {

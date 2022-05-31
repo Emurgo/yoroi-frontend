@@ -7,8 +7,8 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from '@mui/material';
-import AppStoreBadge from '../../../assets/images/app-store-badge.inline.svg';
-import PlayStoreBadge from '../../../assets/images/google-play-badge.inline.svg';
+import { ReactComponent as AppStoreBadge }  from '../../../assets/images/app-store-badge.inline.svg';
+import { ReactComponent as PlayStoreBadge }  from '../../../assets/images/google-play-badge.inline.svg';
 import WarningBox from '../../widgets/WarningBox';
 
 import styles from './Voting.scss';

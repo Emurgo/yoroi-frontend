@@ -20,6 +20,7 @@ import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
 import cs from 'react-intl/locale-data/cs';
 import sk from 'react-intl/locale-data/sk';
+import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
@@ -34,6 +35,7 @@ import { LayoutProvider } from './styles/context/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
+import Support from './components/widgets/Support';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -65,6 +67,20 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
+  @observable mergedMessages: null | {| [key: string]: string, |} = null;
+
+  componentDidMount: () => void = () => {
+    autorun(async () => {
+      const _mergedMessages = {
+        ...await translations['en-US'],
+        ...await translations[this.props.stores.profile.currentLocale]
+      };
+      runInAction(() => {
+        this.mergedMessages = _mergedMessages;
+      });
+    });
+  }
+
   state: State = {
     crashed: false,
   };
@@ -79,18 +95,13 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
+
     const { stores } = this.props;
     const locale = stores.profile.currentLocale;
-
-    // Merged english messages with selected by user locale messages
-    // In this case all english data would be overridden to user selected locale, but untranslated
-    // (missed in object keys) just stay in english
-    // eslint-disable-next-line prefer-object-spread
-    const mergedMessages: { [key: string]: string, ... } = Object.assign(
-      {},
-      translations['en-US'],
-      translations[locale]
-    );
 
     Logger.debug(`[yoroi] messages merged`);
 
@@ -133,7 +144,14 @@ class App extends Component<Props, State> {
     if (stores.serverConnectionStore.isMaintenance) {
       return <MaintenancePage stores={stores} actions={actions} />;
     }
-    return <Router history={history}>{Routes(stores, actions)}</Router>;
+    return (
+      <Router history={history}>
+        <div style={{ height: '100%' }}>
+          <Support />
+          {Routes(stores, actions)}
+        </div>
+      </Router>
+    );
   };
 }
 

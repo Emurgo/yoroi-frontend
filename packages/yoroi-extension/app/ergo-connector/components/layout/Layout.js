@@ -1,13 +1,13 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import YoroiLogo from '../../assets/images/yoroi_logo.inline.svg';
+import { ReactComponent as YoroiLogo }  from '../../assets/images/yoroi_logo.inline.svg';
 import styles from './Layout.scss';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
-import DappConnectorIcon from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import { ReactComponent as DappConnectorIcon }  from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import environment from '../../../environment';
 
 type Props = {|

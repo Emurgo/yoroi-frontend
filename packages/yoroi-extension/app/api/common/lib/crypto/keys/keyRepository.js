@@ -23,10 +23,10 @@ import { decode, encode } from 'bs58check';
 // ================
 
 export class BIP32ED25519PublicKey implements IKey, IKeyDerivation, IPublic {
-  key: RustModule.WalletV3.Bip32PublicKey;
+  key: RustModule.WalletV4.Bip32PublicKey;
 
   // warning: don't use this function as it's won't decorate the object correctly
-  constructor(key: RustModule.WalletV3.Bip32PublicKey) {
+  constructor(key: RustModule.WalletV4.Bip32PublicKey) {
     this.key = key;
   }
 
@@ -39,14 +39,14 @@ export class BIP32ED25519PublicKey implements IKey, IKeyDerivation, IPublic {
   verify(data: Buffer, signature: Buffer): boolean {
     return this.key.to_raw_key().verify(
       data,
-      RustModule.WalletV3.Ed25519Signature.from_bytes(signature)
+      RustModule.WalletV4.Ed25519Signature.from_bytes(signature)
     );
   }
   static fromBuffer(buff: Buffer): BIP32ED25519PublicKey {
-    const key = RustModule.WalletV3.Bip32PublicKey.from_bytes(buff);
+    const key = RustModule.WalletV4.Bip32PublicKey.from_bytes(buff);
     return BIP32ED25519PublicKey.fromV3Key(key);
   }
-  static fromV3Key(key: RustModule.WalletV3.Bip32PublicKey): BIP32ED25519PublicKey {
+  static fromV3Key(key: RustModule.WalletV4.Bip32PublicKey): BIP32ED25519PublicKey {
     const newKey = annotateBIP32ED25519PublicKey(BIP32ED25519PublicKey);
     return new newKey(key);
   }
@@ -58,10 +58,10 @@ function annotateBIP32ED25519PublicKey(
 }
 
 export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
-  key: RustModule.WalletV3.Bip32PrivateKey;
+  key: RustModule.WalletV4.Bip32PrivateKey;
 
   // warning: don't use this function as it's won't decorate the object correctly
-  constructor(key: RustModule.WalletV3.Bip32PrivateKey) {
+  constructor(key: RustModule.WalletV4.Bip32PrivateKey) {
     this.key = key;
   }
 
@@ -79,10 +79,10 @@ export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
     return BIP32ED25519PublicKey.fromV3Key(pubKey);
   }
   static fromBuffer(buff: Buffer): BIP32ED25519PrivateKey {
-    const key = RustModule.WalletV3.Bip32PrivateKey.from_bytes(buff);
+    const key = RustModule.WalletV4.Bip32PrivateKey.from_bytes(buff);
     return BIP32ED25519PrivateKey.fromV3Key(key);
   }
-  static fromV3Key(key: RustModule.WalletV3.Bip32PrivateKey): BIP32ED25519PrivateKey {
+  static fromV3Key(key: RustModule.WalletV4.Bip32PrivateKey): BIP32ED25519PrivateKey {
     const newKey = annotateBIP32ED25519PrivateKey(BIP32ED25519PrivateKey);
     return new newKey(key);
   }

@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Typography, Tooltip } from '@mui/material'
-import InfoIcon from '../../assets/images/info-icon.inline.svg';
+import { ReactComponent as InfoIcon }  from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
 import classnames from 'classnames';
 

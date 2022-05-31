@@ -1,5 +1,5 @@
 // @flow
-import Pdf from 'jspdf';
+import type Pdf from 'jspdf';
 import qr from 'qr-image';
 import paperWalletPage1Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.front-min.png';
 import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wallet-certificate.back-min.png';
@@ -39,7 +39,10 @@ export const generateAdaPaperPdf = async (
 
   const width = 595.28;
   const height = 841.98;
-  const doc = new Pdf({
+
+  const JsPdf = (await import('jspdf')).default;
+
+  const doc = new JsPdf({
     format: [width, height],
     compressPdf: true,
   });

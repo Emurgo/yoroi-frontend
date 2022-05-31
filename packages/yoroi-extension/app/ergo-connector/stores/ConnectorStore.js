@@ -598,16 +598,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const inputs = [];
     const foreignInputs = [];
 
+    const allUsedUtxoIdsSet = new Set(
+      submittedTxs.flatMap(({ usedUtxos }) =>
+        usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
+    );
+
     for (let i = 0; i < txBody.inputs().len(); i++) {
       const input = txBody.inputs().get(i);
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
       const txIndex = input.index();
-      if (
-        submittedTxs.find(
-          ({ usedUtxos }) =>
-            usedUtxos.find(usedUtxo => usedUtxo.txHash === txHash && usedUtxo.index === txIndex)
-        )
-      ) {
+      if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
         window.chrome.runtime.sendMessage(
           {
             type: 'sign_error',

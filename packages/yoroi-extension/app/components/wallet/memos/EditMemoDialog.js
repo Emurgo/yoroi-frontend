@@ -22,7 +22,7 @@ import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IconButton, InputAdornment } from '@mui/material';
-import CloseIcon from '../../../assets/images/forms/close.inline.svg'
+import { ReactComponent as CloseIcon }  from '../../../assets/images/forms/close.inline.svg'
 
 type Props = {|
   selectedWallet: PublicDeriver<>,
