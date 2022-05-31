@@ -42,11 +42,11 @@ const globalMessages: * = defineMessages({
   },
   invalidWalletPassword: {
     id: 'global.errors.invalidWalletPassword',
-    defaultMessage: '!!!Invalid password',
+    defaultMessage: '!!!Password requires at least 10 characters.',
   },
   invalidPaperPassword: {
     id: 'global.errors.invalidPaperPassword',
-    defaultMessage: '!!!Invalid Paper Wallet password',
+    defaultMessage: '!!!Password requires at least 10 characters.',
   },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
@@ -503,11 +503,11 @@ const globalMessages: * = defineMessages({
   },
   recoveryPhraseNoResults: {
     id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
+    defaultMessage: '!!!Not found',
   },
   invalidRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
+    defaultMessage: '!!!Invalid recovery phrase. Please retype.',
   },
   totalRewardsLabel: {
     id: 'wallet.dashboard.summary.rewardsTitle',
