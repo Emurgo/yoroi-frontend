@@ -36,7 +36,6 @@ export default class ServerErrorBanner extends Component<Props> {
     } = this.props;
 
     const displayMessage = (() => {
-      return messages.serverErrorLabel;
       switch (errorType) {
         case ServerStatusErrors.Server:
           return messages.serverErrorLabel;
