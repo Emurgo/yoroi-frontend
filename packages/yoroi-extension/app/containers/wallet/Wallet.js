@@ -99,14 +99,14 @@ class Wallet extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
 
-    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
+    // if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
         <WalletSyncingOverlay
           classicTheme={this.generated.stores.profile.isClassicTheme}
           onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
       )
-    }
+    // }
     return null
   }
 

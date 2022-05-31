@@ -1,10 +1,8 @@
 .component {
     display: flex;
-    height: 100%;
     align-items: center;
     justify-content: center;
-    min-height: 150px;
-
+    overflow: hidden;
     .title {
       color: var(--theme-default-main-color);
       text-transform: uppercase;
@@ -26,8 +24,7 @@
     }
   
     .spinnerSection {
-      margin-top: 12px;
-      margin-bottom: 5px;
+      margin-top: 34px;
     }
 }
   
