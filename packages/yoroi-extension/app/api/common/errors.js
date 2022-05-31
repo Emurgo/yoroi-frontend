@@ -6,7 +6,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 const messages = defineMessages({
   serverStatusError: {
     id: 'api.errors.serverStatusError',
-    defaultMessage: '!!!Connection to the server failed. Please check your internet connection or our Twitter account (https://twitter.com/YoroiWallet).',
+    defaultMessage: '!!!Server connection failed. Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
   },
   currentCoinPriceError: {
     id: 'api.errors.currentCoinPriceError',

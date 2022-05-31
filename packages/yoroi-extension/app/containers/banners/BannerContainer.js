@@ -41,9 +41,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
             serverTime={this.generated.stores.serverConnectionStore.serverTime}
           />
         )}
-        {serverStatus !== ServerStatusErrors.Healthy && (
+        {/* {serverStatus !== ServerStatusErrors.Healthy && ( */}
           <ServerErrorBanner errorType={serverStatus} />
-        )}
+        {/* )} */}
         <TestnetWarningBanner isTestnet={isWalletTestnet} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
