@@ -89,6 +89,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
     actions.addToken.listen(this._addToken);
+    actions.deselectToken.listen(this._deselectToken)
     actions.removeToken.listen(this._removeToken);
     actions.filterTokensWithNoAmount.listen(this._filterTokensWithNoAmount)
     actions.updateTentativeTx.listen(this._updateTentativeTx);
@@ -118,9 +119,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return this.plannedTx.totalInput();
   }
 
-  @computed get
-  shouldSendAll(): boolean {
+  @computed get shouldSendAll(): boolean {
     return !!this.plannedTxInfoMap.find(({ shouldSendAll }) => shouldSendAll === true)
+  }
+
+  @computed get isDefaultIncluded(): boolean {
+    return !!this.plannedTxInfoMap.find(({ token }) => token.IsDefault)
   }
 
   // ================
@@ -421,6 +425,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
+
     const selectedToken = (
       token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     );
@@ -463,6 +468,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     );
 
     // Deselect the token
+    this._deselectToken()
+  }
+
+  @action
+  _deselectToken: void => void = () => {
     this.selectedToken = undefined;
   }
 

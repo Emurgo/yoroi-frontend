@@ -405,7 +405,14 @@ export default class WalletSendForm extends Component<Props, State> {
     const { form } = this
     const { intl } = this.context;
     const { showMemoWarning, invalidMemo, memo } = this.state
-    const { shouldSendAll, isCalculatingFee, error, getTokenInfo } = this.props
+    const {
+      shouldSendAll,
+      isCalculatingFee,
+      error,
+      getTokenInfo,
+      isDefaultIncluded,
+      plannedTxInfoMap
+    } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
@@ -430,10 +437,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const amountInputError = transactionFeeError || amountField.error
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
-    const isDefaultSelected = (
-      !this.props.selectedToken ||
-      this.props.selectedToken?.Identifier === this.props.defaultToken.Identifier
-    )
+
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
@@ -488,7 +492,7 @@ export default class WalletSendForm extends Component<Props, State> {
               )}
               <div className={classnames(
                 [styles.amountInput,
-                  amountInputError && isDefaultSelected && styles.amountInputError,
+                  amountInputError && isDefaultIncluded && styles.amountInputError,
                   shouldSendAll && styles.disabled
                 ])}
               >
@@ -553,19 +557,19 @@ export default class WalletSendForm extends Component<Props, State> {
                     {intl.formatMessage(messages.max)}
                   </Button>
                 </div>
-                {isCardanoHaskell(this.props.selectedNetwork)
-                  && !isDefaultSelected && !amountFieldProps.value && (
-                  <div className={styles.minAda}>
-                    <p className={styles.value}>{this.renderMinAda()}</p>
-                    <p className={styles.lable}>
-                      {intl.formatMessage(messages.minAdaLabel)}
-                    </p>
-                  </div>
+                {isCardanoHaskell(this.props.selectedNetwork) &&
+                 !isDefaultIncluded && plannedTxInfoMap.length > 0 && (
+                 <div className={styles.minAda}>
+                   <p className={styles.value}>{this.renderMinAda()}</p>
+                   <p className={styles.lable}>
+                     {intl.formatMessage(messages.minAdaLabel)}
+                   </p>
+                 </div>
                  )}
                 <div className={styles.usd}>
                   <p>$0</p>
                 </div>
-                {isDefaultSelected ? (
+                {isDefaultIncluded ? (
                   <p className={styles.amountError}>
                     {amountInputError}
                   </p>): null}

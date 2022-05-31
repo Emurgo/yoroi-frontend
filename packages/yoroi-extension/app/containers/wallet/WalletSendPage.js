@@ -203,6 +203,7 @@ class WalletSendPage extends Component<AllProps> {
             plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
             closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
             isOpen={uiDialogs.isOpen}
+            isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
           />
           {this.renderDialog()}
         </>
@@ -538,7 +539,7 @@ class WalletSendPage extends Component<AllProps> {
     return (
       <AddTokenDialog
         onClose={() => {
-          txBuilderActions.addToken.trigger({})
+          txBuilderActions.deselectToken.trigger()
           txBuilderActions.filterTokensWithNoAmount.trigger()
           this.generated.actions.dialogs.closeActiveDialog.trigger()
         }}
@@ -619,6 +620,9 @@ class WalletSendPage extends Component<AllProps> {
             shouldReset?: boolean,
             maxAmount?: string,
           |}) => void
+        |},
+        deselectToken: {|
+          trigger: void => void
         |},
         removeToken: {|
           trigger: (params: void | $ReadOnly<TokenRow>) => void,
@@ -784,6 +788,7 @@ class WalletSendPage extends Component<AllProps> {
           shouldSendAll: stores.transactionBuilderStore.shouldSendAll,
           tentativeTx: stores.transactionBuilderStore.tentativeTx,
           txMismatch: stores.transactionBuilderStore.txMismatch,
+          isDefaultIncluded: stores.transactionBuilderStore.isDefaultIncluded,
           createUnsignedTx: {
             isExecuting: stores.transactionBuilderStore.createUnsignedTx.isExecuting,
             error: stores.transactionBuilderStore.createUnsignedTx.error,
@@ -824,8 +829,11 @@ class WalletSendPage extends Component<AllProps> {
           updateReceiver: { trigger: actions.txBuilderActions.updateReceiver.trigger },
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
           addToken: { trigger: actions.txBuilderActions.addToken.trigger },
+          deselectToken: { trigger: actions.txBuilderActions.deselectToken.trigger },
           removeToken: { trigger: actions.txBuilderActions.removeToken.trigger },
-          filterTokensWithNoAmount: { trigger: actions.txBuilderActions.filterTokensWithNoAmount.trigger },
+          filterTokensWithNoAmount: {
+            trigger: actions.txBuilderActions.filterTokensWithNoAmount.trigger
+          },
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },

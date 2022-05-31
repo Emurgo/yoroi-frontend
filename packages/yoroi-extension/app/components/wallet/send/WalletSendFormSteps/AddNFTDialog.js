@@ -75,8 +75,8 @@ export const messages: Object = defineMessages({
     defaultMessage: '!!!No Asset Found',
   },
   noTokensYet: {
-    id: 'wallet.send.form.dialog.noTokensYet',
-    defaultMessage: '!!!There are no tokens in your wallet yet'
+    id: 'wallet.send.form.dialog.noNFTYet',
+    defaultMessage: '!!!There are no NFTs in your wallet yet'
   },
   add: {
     id: 'wallet.send.form.dialog.add',

@@ -17,6 +17,7 @@ export default class TxBuilderActions {
     shouldReset?: boolean,
     maxAmount?: string,
   |}> = new Action();
+  deselectToken: Action<void> = new Action();
   removeToken: Action<void | $ReadOnly<TokenRow>> = new Action();
   filterTokensWithNoAmount: Action<void> = new Action();
   updateTentativeTx: Action<void> = new Action();
