@@ -50,7 +50,7 @@ const globalMessages: * = defineMessages({
   },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
-    defaultMessage: '!!!Doesn\'t match.',
+    defaultMessage: '!!!Passwords do not match. Please retype.',
   },
   errorLabel: {
     id: 'global.labels.error',
