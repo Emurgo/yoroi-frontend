@@ -400,8 +400,11 @@ export function coinSelectionForValues(
   ).joinSubtractCopyWithLimitZero(totalRequiredValue);
   const minRequiredAda =
     calculateMinRequiredAda(totalExtraValue, coinsPerUtxoWord);
-  let availableExtraAda =
-    totalExtraValue.getDefault().minus(minRequiredAda);
+  let availableExtraAda = totalExtraValue.getDefault()
+    // Subtract the min ada required to store any dirt in the change
+    .minus(minRequiredAda)
+    // Subtract 2 ADA buffer to guarantee fee is possible
+    .minus(ONE_ADA_LOVELACES * 2);
   const recommendedChange = [];
   {
     // Adding recommended collaterals
