@@ -94,7 +94,7 @@ const messages = defineMessages({
   },
   generateTransferTxError: {
     id: 'api.errors.generateTransferTxError',
-    defaultMessage: '!!!Error while generating transfer transaction.',
+    defaultMessage: '!!!An error occurred while generating the transfer transaction. Please retry.',
   },
   sendTransactionError: {
     id: 'api.errors.sendTransactionError',
