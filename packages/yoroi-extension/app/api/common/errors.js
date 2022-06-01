@@ -10,23 +10,23 @@ const messages = defineMessages({
   },
   currentCoinPriceError: {
     id: 'api.errors.currentCoinPriceError',
-    defaultMessage: '!!!Current coin price data not available now.',
+    defaultMessage: '!!!There is no current coin price data available.',
   },
   historicalCoinPriceError: {
     id: 'api.errors.histoicalCoinPriceError',
-    defaultMessage: '!!!Historical coin price data not available now.',
+    defaultMessage: '!!!There is no historical coin price data available.',
   },
   genericApiError: {
     id: 'api.errors.GenericApiError',
-    defaultMessage: '!!!An error occurred, please try again later.',
+    defaultMessage: '!!!An error occurred. Please retry.',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
+    defaultMessage: '!!!Incorrect spending password. Please retype.',
   },
   walletAlreadyRestoredError: {
     id: 'api.errors.WalletAlreadyRestoredError',
-    defaultMessage: '!!!Wallet you are trying to restore already exists.',
+    defaultMessage: '!!!The wallet you are trying to restore already exists.',
   },
   reportRequestError: {
     id: 'api.errors.ReportRequestError',
@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough funds to make this transaction.',
+    defaultMessage: '!!!Insufficient funds to complete this transaction.',
   },
   cannotSendBelowMinimumValueError: {
     id: 'api.errors.CannotSendBelowMinimumValueError',
@@ -78,19 +78,19 @@ const messages = defineMessages({
   },
   getAddressesKeysError: {
     id: 'api.errors.getAddressesWithFundsError',
-    defaultMessage: '!!!Error while getting addresses with funds.',
+    defaultMessage: '!!!An error occurred while getting addresses with funds. Please retry.',
   },
   noInputsError: {
     id: 'api.errors.noInputsError',
-    defaultMessage: '!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.',
+    defaultMessage: '!!!Your recovered wallet is empty. Please check your recovery phrase and restore again.',
   },
   rewardAddressEmptyError: {
     id: 'api.errors.rewardAddressEmpty',
-    defaultMessage: '!!!Reward address is empty.',
+    defaultMessage: '!!!Reward address is not visible until users get any reward.',
   },
   noOutputsError: {
     id: 'api.errors.noOutputsError',
-    defaultMessage: '!!!Transaction requires at least 1 output, but no output was added',
+    defaultMessage: '!!!The transaction requires at least 1 output, but none was provided.',
   },
   generateTransferTxError: {
     id: 'api.errors.generateTransferTxError',
@@ -170,7 +170,7 @@ const messages = defineMessages({
   },
   poolMissingApiError: {
     id: 'api.errors.poolMissingApiError',
-    defaultMessage: '!!!Could not find this pool. Double-check the ID and make sure the pool was not deregistered.',
+    defaultMessage: '!!!Pool could not be found. Please check the pool ID and ensure the pool was not deregistered.',
   },
   getReputationError: {
     id: 'api.errors.getReputationError',
@@ -186,7 +186,7 @@ const messages = defineMessages({
   },
   hardwareUnsupportedError: {
     id: 'api.errors.hardwareUnsupportedError',
-    defaultMessage: '!!!This action is not supported for the currently selected hardware.',
+    defaultMessage: '!!!This action is incompatible with the hardware.',
   },
   getUtxoDataError: {
     id: 'api.errors.getUtxoDataError',

@@ -38,7 +38,7 @@ const globalMessages: * = defineMessages({
   },
   invalidWalletName: {
     id: 'global.errors.invalidWalletName',
-    defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
+    defaultMessage: '!!!Wallet name requires at least 1 and no more than 40 characters.',
   },
   invalidWalletPassword: {
     id: 'global.errors.invalidWalletPassword',
@@ -342,7 +342,7 @@ const globalMessages: * = defineMessages({
   },
   noTransactionsFound: {
     id: 'wallet.summary.no.transaction',
-    defaultMessage: '!!!No transactions found',
+    defaultMessage: '!!!No transaction history.',
   },
   assetSelect: {
     id: 'global.selectAsset.labael',
@@ -487,7 +487,7 @@ const globalMessages: * = defineMessages({
   },
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
-    defaultMessage: '!!!Cannot send a transaction while there is a pending one',
+    defaultMessage: '!!!Unable to process. Please retry after the previous transaction has been completed.',
   },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
@@ -874,11 +874,11 @@ const globalMessages: * = defineMessages({
   },
   pinDoesNotMatch: {
     id: 'global.errors.pinDoesNotMatch',
-    defaultMessage: '!!!Pin Does Not Match',
+    defaultMessage: '!!!PIN codes do not match. Please retype.',
   },
   invalidPin: {
     id: 'global.errors.invalidPin',
-    defaultMessage: '!!!Invalid Pin',
+    defaultMessage: '!!!Invalid PIN. Please retype.',
   },
   buyAda: {
     id: 'button.buyAda',
