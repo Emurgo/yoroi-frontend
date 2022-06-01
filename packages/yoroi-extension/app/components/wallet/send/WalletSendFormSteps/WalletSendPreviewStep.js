@@ -373,7 +373,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid || isSubmitting}
+          disabled={!walletPasswordField.isValid || isSubmitting || passwordError}
           sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
           {isSubmitting ?
