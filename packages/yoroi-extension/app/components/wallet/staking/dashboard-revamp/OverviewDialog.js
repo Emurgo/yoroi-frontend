@@ -3,7 +3,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
@@ -33,7 +33,7 @@ const messages = defineMessages({
   availableTotalRewardsHelper: {
     id: 'wallet.staking.availableTotalRewardsHelper',
     defaultMessage:
-      '!!!If the Reward amount is different than expected, see possible reasons of that on our',
+      '!!!If the Reward amount is different than expected, see possible reasons of that on our {faqLink}.',
   },
   FAQPage: {
     id: 'wallet.staking.FAQPage',
@@ -74,6 +74,19 @@ export default class OverviewModal extends Component<Props> {
       },
     ];
 
+    const faqLink = (
+      <Link
+        href="https://emurgohelpdesk.zendesk.com"
+        target='_blank'
+        rel="noreferrer noopener"
+        sx={{
+          color: 'inherit',
+          textDecoration: 'underline',
+        }}
+      >
+        {intl.formatMessage(messages.FAQPage)}
+      </Link>
+    )
     return (
       <Dialog
         title={this.context.intl.formatMessage(globalMessages.overview)}
@@ -90,22 +103,7 @@ export default class OverviewModal extends Component<Props> {
             <Typography mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
             <HelperTooltip
               message={
-                <p>
-                  <span>{intl.formatMessage(messages.availableTotalRewardsHelper)}</span>
-                  <Link
-                    href="https://emurgohelpdesk.zendesk.com"
-                    target='_blank'
-                    rel="noreferrer noopener"
-                    sx={{
-                      color: 'inherit',
-                      textDecoration: 'underline',
-                      marginLeft: '4px'
-                    }}
-                  >
-                    {intl.formatMessage(messages.FAQPage)}
-                  </Link>
-                  .
-                </p>
+                <FormattedMessage {...messages.availableTotalRewardsHelper} values={{ faqLink }} />
               }
             />
           </Box>
