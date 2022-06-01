@@ -4,8 +4,8 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './IntroBanner.scss';
 import { intlShape, } from 'react-intl';
-import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
-import YoroiLogo from '../../../assets/images/yoroi-logo-blue.inline.svg';
+import { ReactComponent as NightlyLogo }  from '../../../assets/images/yoroi-logo-nightly.inline.svg';
+import { ReactComponent as YoroiLogo }  from '../../../assets/images/yoroi-logo-blue.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|

@@ -6,13 +6,13 @@ import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
 
 import GridFlexContainer from '../../../layout/GridFlexContainer';
-import githubSvg from '../../../../assets/images/social/github.inline.svg';
-import youtubeSvg from '../../../../assets/images/social/youtube.inline.svg';
-import telegramSvg from '../../../../assets/images/social/telegram.inline.svg';
-import twitterSvg from '../../../../assets/images/social/twitter.inline.svg';
-import yoroiSvg from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
-import facebookSvg from '../../../../assets/images/social/facebook.inline.svg';
-import mediumSvg from '../../../../assets/images/social/medium.inline.svg';
+import { ReactComponent as githubSvg }  from '../../../../assets/images/social/github.inline.svg';
+import { ReactComponent as youtubeSvg }  from '../../../../assets/images/social/youtube.inline.svg';
+import { ReactComponent as telegramSvg }  from '../../../../assets/images/social/telegram.inline.svg';
+import { ReactComponent as twitterSvg }  from '../../../../assets/images/social/twitter.inline.svg';
+import { ReactComponent as yoroiSvg }  from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
+import { ReactComponent as facebookSvg }  from '../../../../assets/images/social/facebook.inline.svg';
+import { ReactComponent as mediumSvg }  from '../../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';

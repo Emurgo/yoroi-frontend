@@ -2,8 +2,8 @@
 import type { Node } from 'react';
 import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 
-import OutlineIcon from '../../assets/images/forms/checkbox-outline.inline.svg';
-import CheckedIcon from '../../assets/images/forms/checkbox-checked.inline.svg';
+import { ReactComponent as OutlineIcon }  from '../../assets/images/forms/checkbox-outline.inline.svg';
+import { ReactComponent as CheckedIcon }  from '../../assets/images/forms/checkbox-checked.inline.svg';
 import { Box } from '@mui/system';
 import ReactMarkdown from 'react-markdown';
 

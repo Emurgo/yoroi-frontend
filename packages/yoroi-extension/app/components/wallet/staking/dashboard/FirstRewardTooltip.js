@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import styles from './FirstRewardTooltip.scss';
-import WarningIcon from '../../../../assets/images/dashboard/exclamation-mark.inline.svg';
+import { ReactComponent as WarningIcon }  from '../../../../assets/images/dashboard/exclamation-mark.inline.svg';
 
 type Props = {|
   text: string,

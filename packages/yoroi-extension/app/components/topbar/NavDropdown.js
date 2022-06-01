@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import type { Node, ElementRef } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdown.scss';
-import CaretIcon from '../../assets/images/wallet-nav/caret-down.inline.svg';
+import { ReactComponent as CaretIcon }  from '../../assets/images/wallet-nav/caret-down.inline.svg';
 import NavDropdownContent from './NavDropdownContent';
 
 type Props = {|

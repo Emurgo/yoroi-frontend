@@ -248,20 +248,23 @@ export class MockDAppWebpage {
         window.walletConnected = false;
       });
     });
+    this.logger.info(`MockDApp: -> onDisconnect hook is set`);
   }
 
   async isEnabled(): Promise<boolean> {
+    await this.driver.sleep(100);
     this.logger.info(`MockDApp: Checking is a wallet enabled`);
     const isEnabled = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.cardano.yoroi
-        .isEnabled().then(
-        // eslint-disable-next-line promise/always-return
+        .isEnabled()
+        .then(
+          // eslint-disable-next-line promise/always-return
           onSuccess => {
-            callback({ success: true, retValue: onSuccess })
+            callback({ success: true, retValue: onSuccess });
           },
           onReject => {
-            callback({ success: false, errMsg: onReject.message })
+            callback({ success: false, errMsg: onReject.message });
           }
         )
         .catch(error => {
@@ -269,20 +272,31 @@ export class MockDAppWebpage {
         });
     });
     if (isEnabled.success) {
-      this.logger.info(`MockDApp: -> The wallet is enabled`);
+      this.logger.info(`MockDApp: -> The request cardano.yoroi.isEnabled() is successful`);
+      this.logger.info(`MockDApp: -> The wallet is enabled: ${isEnabled.retValue}`);
       return isEnabled.retValue;
     }
     this.logger.error(
-      `MockDApp: -> The wallet is disabled. Error message: ${JSON.stringify(isEnabled)}`
+      `MockDApp: -> The request cardano.yoroi.isEnabled() is unsuccessful. Error message: ${JSON.stringify(
+        isEnabled
+      )}`
     );
     throw new MockDAppWebpageError(isEnabled.errMsg);
   }
 
   async getConnectionState(): Promise<boolean> {
+    const states = [];
     this.logger.info(`MockDApp: Getting the connection state`);
-    const walletConnectedState = await this.driver.executeScript(() => window.walletConnected);
-    this.logger.info(`MockDApp: -> The connection state is ${walletConnectedState}`);
-    return walletConnectedState;
+    for (let i = 0; i < 10; i++) {
+      this.logger.info(`MockDApp: -> Try ${i + 1} to get the connection state`);
+      await this.driver.sleep(100);
+      const walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
+      this.logger.info(`MockDApp: -> Try ${i + 1} the connection state is ${JSON.stringify(walletConnectedState)}`);
+      states.push(walletConnectedState);
+    }
+    const resultConnectionState = states.every((walletState) => walletState === true);
+    this.logger.info(`MockDApp: -> The connection state is ${JSON.stringify(resultConnectionState)}`);
+    return resultConnectionState;
   }
 
   async getBalance(): Promise<string> {
