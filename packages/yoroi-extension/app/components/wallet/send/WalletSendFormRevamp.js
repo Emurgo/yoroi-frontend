@@ -38,7 +38,7 @@ import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import { isCardanoHaskell, isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import PlusIcon from '../../../assets/images/plus.inline.svg'
+import { ReactComponent as PlusIcon } from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';

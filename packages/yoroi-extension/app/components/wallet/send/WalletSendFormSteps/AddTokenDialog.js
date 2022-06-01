@@ -13,13 +13,13 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
-import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
-import ArrowsListFromBottom from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
-import ArrowsListFromTop from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
-import InfoIcon from '../../../../assets/images/assets-page/info.inline.svg';
-import ArrowsList from '../../../../assets/images/assets-page/arrows-list.inline.svg';
+import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
+import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import { ReactComponent as InfoIcon } from '../../../../assets/images/assets-page/info.inline.svg';
+import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import SingleTokenRow from './SingleTokenRow';
-import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { Button } from '@mui/material';
 import type {
   TokenLookupKey,

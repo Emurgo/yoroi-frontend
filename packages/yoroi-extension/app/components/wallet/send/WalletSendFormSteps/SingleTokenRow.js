@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react'
 import styles from './SingleTokenRow.scss'
-import NoAssetLogo from '../../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as NoAssetLogo} from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import { truncateAddressShort } from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
@@ -10,7 +10,7 @@ import { AmountInputRevamp } from '../../../common/NumericInputRP';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
-import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
+import { ReactComponent as CloseIcon} from '../../../../assets/images/forms/close.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import type {
   TokenLookupKey

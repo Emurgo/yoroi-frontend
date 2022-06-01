@@ -11,9 +11,9 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
-import SearchIcon from '../../../../assets/images/assets-page/search.inline.svg';
-import NoItemsFoundImg from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
-import NoNFT from '../../../../assets/images/nft-no.inline.svg';
+import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
+import { ReactComponent as NoNFT } from '../../../../assets/images/nft-no.inline.svg';
 import { getNFTs } from '../../../../utils/wallet';
 import type { FormattedNFTDisplay } from '../../../../utils/wallet';
 import BigNumber from 'bignumber.js';

@@ -7,7 +7,7 @@ import Scanner from 'react-webcam-qr-scanner';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './QRScannerDialog.scss'
-import WebcamIcon from '../../../../assets/images/webcam-picture-yoroi.inline.svg';
+import { ReactComponent as WebcamIcon } from '../../../../assets/images/webcam-picture-yoroi.inline.svg';
 import { Typography } from '@mui/material';
 
 const messages: Object = defineMessages({
