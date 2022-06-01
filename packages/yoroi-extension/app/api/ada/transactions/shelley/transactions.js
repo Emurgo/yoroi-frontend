@@ -848,13 +848,6 @@ function newAdaUnsignedTxFromUtxoForConnector(
     // $FlowFixMe[prop-missing]
     mustIncludeUtxos.some(([_, w]) => w != null && w.plutusScript != null);
 
-  if (isPlutusPresent) {
-    // <todo:collateral>
-    txBuilder.calc_script_data_hash(
-      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
-    );
-  }
-
   /**
    * REMAINING REQUIRED VALUE
    */
@@ -877,13 +870,43 @@ function newAdaUnsignedTxFromUtxoForConnector(
    * are added to the transaction builder, we calculate the coin-selection
    * for the remaining required value from the remaining available utxos.
    */
-  const { selectedUtxo, recommendedChange } = coinSelectionForValues(
+  const { selectedUtxo, recommendedChange, collateralReserve } = coinSelectionForValues(
     coinSelectUtxos,
     [requiredValue],
     false,
     protocolParams.coinsPerUtxoWord,
     protocolParams.networkId,
   );
+
+  function addInputFromUtxo(
+    inputBuilder: RustModule.WalletV4.TransactionBuilder | RustModule.WalletV4.TxInputsBuilder,
+    utxo: RemoteUnspentOutput,
+    ): void {
+    const wasmAddr = normalizeToAddress(utxo.receiver);
+    if (wasmAddr == null) {
+      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} collateral input not a valid Shelley address`);
+    }
+    const txInput = utxoToTxInput(utxo);
+    const wasmAmount = cardanoValueFromRemoteFormat(utxo);
+    inputBuilder.add_input(
+      wasmAddr,
+      txInput,
+      wasmAmount,
+    );
+  }
+
+  if (isPlutusPresent) {
+    txBuilder.calc_script_data_hash(
+      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
+    );
+    if (collateralReserve.length === 0) {
+      // <todo:call_reorg_for_collateral>
+      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
+    }
+    const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
+    addInputFromUtxo(collateralBuilder, collateralReserve[0]);
+    txBuilder.set_collateral(collateralBuilder);
+  }
 
   const changeOutputs: Array<TxOutput> = [];
   if (changeAdaAddr != null) {
@@ -896,17 +919,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
 
   // add utxos until we have enough to send the transaction
   for (const utxo of selectedUtxo) {
-    const wasmAddr = normalizeToAddress(utxo.receiver);
-    if (wasmAddr == null) {
-      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} input not a valid Shelley address`);
-    }
-    const txInput = utxoToTxInput(utxo);
-    const wasmAmount = cardanoValueFromRemoteFormat(utxo);
-    txBuilder.add_input(
-      wasmAddr,
-      txInput,
-      wasmAmount,
-    );
+    addInputFromUtxo(txBuilder, utxo);
   }
 
   const changeAddr = (() => {
