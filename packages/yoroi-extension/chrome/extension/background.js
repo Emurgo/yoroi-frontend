@@ -33,6 +33,7 @@ import {
   asTx,
   asValue,
   ConnectorError,
+  DataSignErrorCodes,
 } from './ergo-connector/types';
 import {
   connectorCreateCardanoTx,
@@ -51,6 +52,8 @@ import {
   connectorSendTxCardano,
   connectorSignCardanoTx,
   connectorSignTx,
+  getAddressing,
+  connectorSignData,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -63,7 +66,9 @@ import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
-import LocalStorageApi from '../../app/api/localStorage/index';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+} from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
@@ -525,8 +530,9 @@ const yoroiMessageHandler = async (
       }
         break;
       case 'data':
-        // mocked data sign
-        responseData.resolve({ err: 'Generic data signing is not implemented yet' });
+      {
+        responseData.resolve({ ok: { password } });
+      }
         break;
       case 'tx-reorg/cardano':
       {
@@ -547,6 +553,21 @@ const yoroiMessageHandler = async (
         err: {
           code: 2,
           info: 'User rejected'
+        }
+      });
+      connection.pendingSigns.delete(request.uid);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+    }
+  } else if (request.type === 'sign_error') {
+    const connection = connectedSites.get(request.tabId);
+    const responseData = connection?.pendingSigns.get(request.uid);
+    if (connection && responseData) {
+      responseData.resolve({
+        err: {
+          code: 3,
+          info: `utxo error: ${request.errorType} (${request.data})`
         }
       });
       connection.pendingSigns.delete(request.uid);
@@ -1042,18 +1063,86 @@ function handleInjectorConnect(port) {
               handleError(e);
             }
             break;
-          // unsupported until EIP-0012's definition is finalized
-          // case 'sign_data':
-          //   {
-          //     const resp = await confirmSign(tabId, {
-          //       type: 'data',
-          //       address: message.params[0],
-          //       bytes: message.params[1],
-          //       uid: message.uid
-          //     });
-          //     rpcResponse(resp);
-          //   }
-          //   break;
+          case 'sign_data':
+            try {
+              const rawAddress = message.params[0];
+              const payload = message.params[1];
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    if (isCardano) {
+                      await RustModule.load();
+                      const connection = connectedSites.get(tabId);
+                      if (connection == null) {
+                        Logger.error(`ERR - sign_data could not find connection with tabId = ${tabId}`);
+                        rpcResponse(undefined); // shouldn't happen
+                        return;
+                      }
+                      let address;
+                      try {
+                        address = Buffer.from(
+                          RustModule.WalletV4.Address.from_bech32(rawAddress).to_bytes()
+                        ).toString('hex');
+                      } catch {
+                        address = rawAddress;
+                      }
+                      const addressing = await getAddressing(wallet, address);
+                      if (!addressing) {
+                        rpcResponse({
+                          err: {
+                            code: DataSignErrorCodes.DATA_SIGN_ADDRESS_NOT_PK,
+                            info: 'address not found',
+                          }
+                        });
+                        return;
+                      }
+                      const resp = await confirmSign(
+                        tabId,
+                        {
+                          type: 'data',
+                          address,
+                          payload,
+                          uid: message.uid
+                        },
+                        connection,
+                      );
+                      if (!resp.ok) {
+                        rpcResponse(resp);
+                        return;
+                      }
+                      let dataSig;
+                      try {
+                        dataSig = await connectorSignData(
+                          wallet,
+                          resp.ok.password,
+                          addressing,
+                          address,
+                          payload,
+                        );
+                      } catch (error) {
+                        Logger.error(`error when signing data ${error}`);
+                        rpcResponse({
+                          err: {
+                            code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
+                            info: error.message,
+                          }
+                        });
+                        return;
+                      }
+                      rpcResponse({ ok: dataSig });
+                    } else {
+                      rpcResponse({ err: 'not implemented' });
+                    }
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           case 'get_balance':
             try {
               checkParamCount(1);
@@ -1410,7 +1499,7 @@ function handleInjectorConnect(port) {
                     }
                     const walletUtxos = await withUtxos.getAllUtxos();
                     const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
-
+                    const submittedTxs = loadSubmittedTransactions() || [];
                     const {
                       utxosToUse,
                       reorgTargetAmount
@@ -1423,6 +1512,7 @@ function handleInjectorConnect(port) {
                         const { addressing, ...rest } = u;
                         return rest;
                       }),
+                      submittedTxs,
                     );
                     // do have enough
                     if (reorgTargetAmount == null) {
@@ -1447,6 +1537,7 @@ function handleInjectorConnect(port) {
                         usedUtxoIds,
                         reorgTargetAmount,
                         addressedUtxos,
+                        submittedTxs,
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {

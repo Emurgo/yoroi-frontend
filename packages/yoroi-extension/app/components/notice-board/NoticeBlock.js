@@ -6,14 +6,14 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 
 import Notice, { NoticeKind } from '../../domain/Notice';
-import DelegatedIcon from '../../assets/images/notice-board/delegated.inline.svg';
-import UndelegatedIcon from '../../assets/images/notice-board/undelegated.inline.svg';
-import RedelegatedIcon from '../../assets/images/notice-board/redelegated.inline.svg';
-import FeeChangedIcon from '../../assets/images/notice-board/fee-changed.inline.svg';
-import CostChangedIcon from '../../assets/images/notice-board/cost-changed.inline.svg';
-import RewardRecievedIcon from '../../assets/images/notice-board/reward-received.inline.svg';
-import PoolToRetireIcon from '../../assets/images/notice-board/retired.inline.svg';
-import NoRewardForUndelegationIcon from '../../assets/images/notice-board/reward-not-received.inline.svg';
+import { ReactComponent as DelegatedIcon }  from '../../assets/images/notice-board/delegated.inline.svg';
+import { ReactComponent as UndelegatedIcon }  from '../../assets/images/notice-board/undelegated.inline.svg';
+import { ReactComponent as RedelegatedIcon }  from '../../assets/images/notice-board/redelegated.inline.svg';
+import { ReactComponent as FeeChangedIcon }  from '../../assets/images/notice-board/fee-changed.inline.svg';
+import { ReactComponent as CostChangedIcon }  from '../../assets/images/notice-board/cost-changed.inline.svg';
+import { ReactComponent as RewardRecievedIcon }  from '../../assets/images/notice-board/reward-received.inline.svg';
+import { ReactComponent as PoolToRetireIcon }  from '../../assets/images/notice-board/retired.inline.svg';
+import { ReactComponent as NoRewardForUndelegationIcon }  from '../../assets/images/notice-board/reward-not-received.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './NoticeBlock.scss';

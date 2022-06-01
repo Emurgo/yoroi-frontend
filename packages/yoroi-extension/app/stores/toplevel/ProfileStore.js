@@ -9,6 +9,7 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
+import type { WalletsNavigation } from '../../api/localStorage'
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -133,14 +134,15 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     (boolean) => Promise<void>
   >(this.api.localStorage.setToggleSidebar);
 
-  @observable getSortedWalletsRequest: Request<(void) => Promise<?Array<number>>> = new Request<
-    (void) => Promise<?Array<number>>
-  >(this.api.localStorage.getSortedWallets);
+  @observable getWalletsNavigationRequest:
+    Request<(void) => Promise<?WalletsNavigation>> = new Request<
+    (void) => Promise<?WalletsNavigation>
+  >(this.api.localStorage.getWalletsNavigation);
 
-  @observable setSortedWalletsRequest: Request<
-    ({| sortedWallets: Array<number> |}) => Promise<void>
-  > = new Request<({| sortedWallets: Array<number> |}) => Promise<void>>(
-    ({ sortedWallets }) => this.api.localStorage.setSortedWallets(sortedWallets)
+  @observable setWalletsNavigationRequest: Request<
+  WalletsNavigation => Promise<void>
+  > = new Request<WalletsNavigation => Promise<void>>(
+    (walletsNavigation) => this.api.localStorage.setWalletsNavigation(walletsNavigation)
   );
 
   setup(): void {
@@ -246,21 +248,21 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   };
 
   // ========== Sort wallets - Revamp ========== //
-  @computed get currentSortedWallets(): Array<number> {
-    let { result } = this.getSortedWalletsRequest;
+  @computed get walletsNavigation(): WalletsNavigation {
+    let { result } = this.getWalletsNavigationRequest;
     if (result == null) {
-      result = this.getSortedWalletsRequest.execute().result;
+      result = this.getWalletsNavigationRequest.execute().result;
     }
-    return result ?? [];
+    return result ?? { ergo: [], cardano: [], quickAccess: [] };
   }
   _getSortedWalletList: void => Promise<void> = async () => {
-    await this.getSortedWalletsRequest.execute();
+    await this.getWalletsNavigationRequest.execute();
   };
-  _updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void> = async ({
-    sortedWallets,
-  }) => {
-    await this.setSortedWalletsRequest.execute({ sortedWallets });
-    await this.getSortedWalletsRequest.execute();
+
+  _updateSortedWalletList: WalletsNavigation => Promise<void>
+    = async (walletsNavigation) => {
+    await this.setWalletsNavigationRequest.execute(walletsNavigation);
+    await this.getWalletsNavigationRequest.execute();
   };
 }
 

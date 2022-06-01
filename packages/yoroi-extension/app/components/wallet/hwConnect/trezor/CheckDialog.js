@@ -16,10 +16,10 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import ExternalLinkSVG from '../../../../assets/images/link-external.inline.svg';
-import AboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
-import AboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
-import AboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
+import { ReactComponent as ExternalLinkSVG }  from '../../../../assets/images/link-external.inline.svg';
+import { ReactComponent as AboutPrerequisiteIconSVG }  from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
+import { ReactComponent as AboutPrerequisiteTrezorSVG }  from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
+import { ReactComponent as AboutTrezorSvg }  from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

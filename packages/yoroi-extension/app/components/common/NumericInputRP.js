@@ -427,7 +427,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
         onChange={this.onChange}
         onBlur={this.onBlur}
         value={inputValue}
-        error={amountFieldRevamp ? '' : error}
+        error={Boolean(amountFieldRevamp) ? '' : error}
         revamp={amountFieldRevamp}
         {...rest}
       />

@@ -24,6 +24,7 @@ const disconnectButton: LocatorObject = {
 };
 
 const getWalletListElements = async (customWorld: Object): Promise<Array<WebElement>> => {
+  await customWorld.waitForElement(walletComponent);
   return await customWorld.findElements(walletComponent);
 };
 
@@ -102,7 +103,7 @@ export const getWalletsWithConnectedWebsites = async (
       amount: walletAmountAndCurrency.amount,
       currency: walletAmountAndCurrency.currency,
       websiteTitle,
-      connectionStatus
+      connectionStatus,
     });
   }
   return result;

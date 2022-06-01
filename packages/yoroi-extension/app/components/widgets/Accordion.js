@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
-import ArrowDownSVG from '../../assets/images/expand-arrow-grey.inline.svg';
+import { ReactComponent as ArrowDownSVG }  from '../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Accordion.scss';
 
 type Props = {|

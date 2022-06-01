@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js'
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AssetsList.scss'
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
-import NoAssetLogo from '../../../assets/images/assets-page/asset-no.inline.svg';
-import ArrowsListFromBottom from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
-import ArrowsListFromTop from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
-import ArrowsList from '../../../assets/images/assets-page/arrows-list.inline.svg';
-import Search from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as NoAssetLogo }  from '../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as ArrowsListFromBottom }  from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
+import { ReactComponent as ArrowsListFromTop }  from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import { ReactComponent as ArrowsList }  from '../../../assets/images/assets-page/arrows-list.inline.svg';
+import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import BorderedBox from '../../widgets/BorderedBox';
 import { MultiToken } from '../../../api/common/lib/MultiToken';

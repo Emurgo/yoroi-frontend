@@ -16,7 +16,7 @@ import Dialog from '../../../components/widgets/Dialog';
 import { getJormungandrTxFee } from '../../../api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
-import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg }  from '../../../assets/images/uri/invalid-uri.inline.svg';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
@@ -782,17 +782,10 @@ export default class StakingDashboardPage extends Component<Props> {
           };
         }}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-        totalDelegated={(() => {
-            if (!showRewardAmount) return undefined;
-            if (request.delegationRequests.getDelegatedBalance.result == null) return undefined;
-
-            return currentlyDelegating
-              ? request.delegationRequests.getDelegatedBalance.result.utxoPart
-                  .joinAddCopy(
-                    request.delegationRequests.getDelegatedBalance.result.accountPart
-                  )
-              : new MultiToken([], defaultToken)
-          })()
+        isDelegated={
+          showRewardAmount &&
+          request.delegationRequests.getDelegatedBalance.result !== null &&
+          currentlyDelegating
         }
       />
     );
