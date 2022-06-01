@@ -35,6 +35,7 @@ import { LayoutProvider } from './styles/context/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
+import Support from './components/widgets/Support';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -143,7 +144,14 @@ class App extends Component<Props, State> {
     if (stores.serverConnectionStore.isMaintenance) {
       return <MaintenancePage stores={stores} actions={actions} />;
     }
-    return <Router history={history}>{Routes(stores, actions)}</Router>;
+    return (
+      <Router history={history}>
+        <div style={{ height: '100%' }}>
+          <Support />
+          {Routes(stores, actions)}
+        </div>
+      </Router>
+    );
   };
 }
 
