@@ -37,6 +37,10 @@
                 & > p {
                     font-size: 16px;
                     margin-left: 12px;
+                    max-width: 85px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
         }
