@@ -332,6 +332,7 @@ export function coinSelectionForValues(
   networkId: number,
 ): {|
   selectedUtxo: Array<RemoteUnspentOutput>,
+  collateralReserve: Array<RemoteUnspentOutput>,
   recommendedChange: Array<MultiToken>,
 |} {
   if (utxos.length === 0) {
@@ -424,5 +425,6 @@ export function coinSelectionForValues(
   return {
     selectedUtxo: improvedTakenUtxo,
     recommendedChange,
+    collateralReserve: collateralReserve.map(({ utxo }) => utxo),
   };
 }

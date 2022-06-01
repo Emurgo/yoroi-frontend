@@ -223,6 +223,7 @@ function addUtxoInput(
     );
   } else if (witness.nativeScript != null) {
     const nativeScript = logErr(
+      // $FlowFixMe[prop-missing]
       () => RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(witness.nativeScript)),
       `Failed to parse witness.nativeScript: ${JSON.stringify(witness)}`,
     );
@@ -238,14 +239,17 @@ function addUtxoInput(
     );
   } else if (witness.plutusScript != null) {
     const plutusScript = logErr(
+      // $FlowFixMe[prop-missing]
       () => RustModule.WalletV4.PlutusScript.from_bytes(hexToBytes(witness.plutusScript)),
       `Failed to parse witness.plutusScript: ${JSON.stringify(witness)}`,
     );
     const datum = logErr(
+      // $FlowFixMe[prop-missing]
       () => RustModule.WalletV4.PlutusData.from_bytes(hexToBytes(witness.datum)),
       `Failed to parse witness.datum: ${JSON.stringify(witness)}`,
     );
     const redeemer = logErr(
+      // $FlowFixMe[prop-missing]
       () => RustModule.WalletV4.Redeemer.from_bytes(hexToBytes(witness.redeemer)),
       `Failed to parse witness.redeemer: ${JSON.stringify(witness)}`,
     );
@@ -841,9 +845,11 @@ function newAdaUnsignedTxFromUtxoForConnector(
   }
 
   const isPlutusPresent =
-    mustIncludeUtxos.some(([_, { plutusScript }]) => plutusScript != null);
+    // $FlowFixMe[prop-missing]
+    mustIncludeUtxos.some(([_, w]) => w != null && w.plutusScript != null);
 
   if (isPlutusPresent) {
+    // <todo:collateral>
     txBuilder.calc_script_data_hash(
       RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
     );

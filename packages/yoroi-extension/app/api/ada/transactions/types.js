@@ -28,13 +28,13 @@ export type UserAnnotation = {|
   +fee: MultiToken,
 |};
 
-export type CardanoUtxoScriptWitness = {
+export type CardanoUtxoScriptWitness = {|
   nativeScript: string,
-} | {
+|} | {|
   plutusScript: string,
   datum: string,
   redeemer: string,
-}
+|}
 
 export type CardanoAddressedUtxo = {|
   ...RemoteUnspentOutput,

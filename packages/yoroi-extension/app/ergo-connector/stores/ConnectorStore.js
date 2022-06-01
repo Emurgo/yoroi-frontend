@@ -78,7 +78,7 @@ import type {
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { UtxoData } from '../../api/ada/lib/state-fetch/types';
+import type { UtxoData } from '../../api/ada/lib/state-fetch/types';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -205,7 +205,7 @@ type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
 
-export type ForeignUtxoFetcher = Array<string> => Promise<Array<RemoteUnspentOutput>>;
+export type ForeignUtxoFetcher = Array<string> => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;

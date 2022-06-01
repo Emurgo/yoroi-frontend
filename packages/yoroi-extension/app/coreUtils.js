@@ -12,7 +12,7 @@ export function hexToUtf(hex: string): string {
   return hexToBytes(hex).toString('utf-8');
 }
 
-export function logErr<T>(f: () => T, msg: (string | (Error) => string)) {
+export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
   try {
     return f();
   } catch (e) {
