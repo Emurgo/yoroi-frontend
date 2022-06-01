@@ -35,6 +35,7 @@ import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { Asset } from '../../assets/AssetsList'
 import { isErgo } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
+import { getNFTs, getTokens } from '../../../../utils/wallet';
 
 type Props = {|
   +staleTx: boolean,
@@ -308,7 +309,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
           <div className={styles.amountFeesWrapper}>
             {(amount.nonDefaultEntries().length > 0) &&
             (
-              <AssetsDropdown assets={this.getAssetsList()} />
+              <AssetsDropdown
+                assets={this.getAssetsList()}
+                tokens={getTokens(amount, this.props.getTokenInfo)}
+                nfts={getNFTs(amount, this.props.getTokenInfo)}
+              />
             )}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
