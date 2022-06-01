@@ -895,19 +895,6 @@ function newAdaUnsignedTxFromUtxoForConnector(
     );
   }
 
-  if (isPlutusPresent) {
-    txBuilder.calc_script_data_hash(
-      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
-    );
-    if (collateralReserve.length === 0) {
-      // <todo:call_reorg_for_collateral>
-      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
-    }
-    const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
-    addInputFromUtxo(collateralBuilder, collateralReserve[0]);
-    txBuilder.set_collateral(collateralBuilder);
-  }
-
   const changeOutputs: Array<TxOutput> = [];
   if (changeAdaAddr != null) {
     // Can produce recommended pure change
@@ -920,6 +907,21 @@ function newAdaUnsignedTxFromUtxoForConnector(
   // add utxos until we have enough to send the transaction
   for (const utxo of selectedUtxo) {
     addInputFromUtxo(txBuilder, utxo);
+  }
+
+  if (isPlutusPresent) {
+    // collateral
+    if (collateralReserve.length === 0) {
+      // <todo:call_reorg_for_collateral>
+      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
+    }
+    const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
+    addInputFromUtxo(collateralBuilder, collateralReserve[0]);
+    txBuilder.set_collateral(collateralBuilder);
+    // script data hash
+    txBuilder.calc_script_data_hash(
+      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
+    );
   }
 
   const changeAddr = (() => {
