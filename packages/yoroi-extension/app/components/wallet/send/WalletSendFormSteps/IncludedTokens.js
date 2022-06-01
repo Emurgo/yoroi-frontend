@@ -5,10 +5,10 @@ import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../uti
 import styles from './IncludedTokens.scss';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactCommonent as NoAssetLogo }from '../../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as NoAssetLogo  }from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
-import { ReactCommonent as RemoveIcon }from '../../../../assets/images/forms/close.inline.svg';
-import { ReactCommonent as NoNFT }from '../../../../assets/images/nft-no.inline.svg';
+import { ReactComponent as RemoveIcon  }from '../../../../assets/images/forms/close.inline.svg';
+import { ReactComponent as NoNFT  }from '../../../../assets/images/nft-no.inline.svg';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|

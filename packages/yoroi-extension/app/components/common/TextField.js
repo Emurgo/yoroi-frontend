@@ -113,7 +113,7 @@ function TextField({
             </InputAdornment>
           ),
           disableUnderline: revamp,
-          placeholder: placeholder != null ? placeholder : (Boolean(revamp) ? '0.0' : ''),
+          placeholder: placeholder != null ? placeholder : '',
       }}
       {...props}
     />

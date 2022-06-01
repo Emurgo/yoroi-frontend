@@ -103,6 +103,7 @@ export default class SingleTokenRow extends Component<Props, State> {
                 onChange={this.onAmountUpdate.bind(this)}
                 onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
+                placeholder='0.0'
               />
 
             </div>

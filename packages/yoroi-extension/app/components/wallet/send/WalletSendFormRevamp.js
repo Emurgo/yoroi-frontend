@@ -526,6 +526,7 @@ export default class WalletSendForm extends Component<Props, State> {
                       if (!amountField.value) this.props.onRemoveToken();
                     }}
                     amountFieldRevamp
+                    placeholder='0.0'
                   />
                   <p className={styles.defaultCoin}>
                     {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
