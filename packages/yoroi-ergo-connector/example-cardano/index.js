@@ -572,7 +572,7 @@ createTx.addEventListener('click', () => {
   let includeInputs = [randomUtxo.utxo_id];
 
   const nativeScriptInputUtxoId = null;
-  const plutusScriptInputUtxoId = 'b475af40ef0b0e1cc01f9257d2493d11acb9b474a914cd50c9e653dc8e9da8ca1';
+  const plutusScriptInputUtxoId = null;
 
   // noinspection PointlessBooleanExpressionJS
   if (nativeScriptInputUtxoId != null) {
@@ -633,7 +633,7 @@ createTx.addEventListener('click', () => {
     const redeemer = CardanoWasm.Redeemer.new(
       CardanoWasm.RedeemerTag.new_spend(),
       CardanoWasm.BigNum.zero(),
-      CardanoWasm.PlutusData.new_integer(CardanoWasm.BigInt.from_str('1234')),
+      CardanoWasm.PlutusData.new_empty_constr_plutus_data(CardanoWasm.BigNum.one()),
       CardanoWasm.ExUnits.new(
         CardanoWasm.BigNum.from_str('1700'),
         CardanoWasm.BigNum.from_str('476468'),
