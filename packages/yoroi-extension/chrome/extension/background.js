@@ -86,6 +86,7 @@ import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import { NoCollateralReserveInputsError } from '../../app/api/ada/transactions/shelley/transactions';
 
 /*::
 declare var chrome;
@@ -1414,6 +1415,85 @@ function handleInjectorConnect(port) {
                       const networkInfo = wallet.getParent().getNetworkInfo();
                       const foreignUtxoFetcher: ForeignUtxoFetcher =
                         ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
+                      try {
+                        const resp = await connectorCreateCardanoTx(
+                          wallet,
+                          null,
+                          message.params[0],
+                          foreignUtxoFetcher,
+                        );
+                        rpcResponse({
+                          ok: resp,
+                        });
+                        return;
+                      } catch (error) {
+                        if (!(error instanceof NoCollateralReserveInputsError)) {
+                          throw error;
+                        }
+                      }
+                      // failed due to no collateral reserve input, try to re-org
+
+                      // these UTXOs are designated inputs, can't be used for re-org
+                      const usedUtxoIds = message.params[0].includeInputs.filter(
+                        input => typeof input === 'string'
+                      );
+                      // fixme
+                      const reorgTargetAmount = '1000000';
+
+                      const withUtxos = asGetAllUtxos(wallet)
+                      if (withUtxos == null) {
+                        throw new Error('wallet doesn\'t support IGetAllUtxos');
+                      }
+                      const walletUtxos = await withUtxos.getAllUtxos();
+                      const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
+                      const submittedTxs = loadSubmittedTransactions() || [];
+
+                      // test if we can get enough collaterals after re-organization
+                      try {
+                        await connectorGenerateReorgTx(
+                          wallet,
+                          usedUtxoIds,
+                          reorgTargetAmount,
+                          addressedUtxos,
+                          submittedTxs,
+                        );
+                      } catch (error) {
+                        if (error instanceof NotEnoughMoneyToSendError) {
+                          rpcResponse({ error: 'not enough UTXOs for Plutus script collateral' });
+                          return;
+                        }
+                        throw error;
+                      }
+                      // we can get enough collaterals after re-organization
+                      // pop-up the UI
+                      const connection = connectedSites.get(tabId);
+                      if (connection == null) {
+                        Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
+                        rpcResponse(undefined); // shouldn't happen
+                        return;
+                      }
+                      
+                      const confirmSignresp = await confirmSign(
+                        tabId,
+                        {
+                          type: 'tx-reorg/cardano',
+                          tx: {
+                            usedUtxoIds,
+                            reorgTargetAmount,
+                            utxos: walletUtxos,
+                          },
+                          uid: message.uid,
+                        },
+                        connection,
+                      );
+                      if (!confirmSignresp.ok) {
+                        rpcResponse({ error: 'signing re-org tx failed' });
+                        return;
+                      }
+
+                      // now that the re-org tx has been submitted, the newly
+                      // produced collateral UTXOs should be in the "submitted txs"
+                      // set and picked up `connectorCreateCardanoTx`
                       const resp = await connectorCreateCardanoTx(
                         wallet,
                         null,
@@ -1423,6 +1503,7 @@ function handleInjectorConnect(port) {
                       rpcResponse({
                         ok: resp,
                       });
+
                     },
                     db,
                     localStorageApi

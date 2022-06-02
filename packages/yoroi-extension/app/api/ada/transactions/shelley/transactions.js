@@ -912,8 +912,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
   if (isPlutusPresent) {
     // collateral
     if (collateralReserve.length === 0) {
-      // <todo:call_reorg_for_collateral>
-      throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
+      throw new NoCollateralReserveInputsError();
     }
     const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
     addInputFromUtxo(collateralBuilder, collateralReserve[0]);
@@ -986,6 +985,8 @@ function newAdaUnsignedTxFromUtxoForConnector(
     changeAddr,
   };
 }
+
+export class NoCollateralReserveInputsError extends Error {}
 
 type UtxoOrAddressing = CardanoAddressedUtxo | {| ...Address, ...Addressing |};
 
