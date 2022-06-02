@@ -1157,14 +1157,14 @@ export default class AdaApi {
       }
       return a == null || a.length === 0;
     }
-    const noInputs = !noneOrEmpty(includeInputs);
+    const noInputs = noneOrEmpty(includeInputs);
     const noOutputs = noneOrEmpty(includeOutputs) && noneOrEmpty(includeTargets);
     if (noOutputs) {
       if (noInputs) {
         throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
       }
       if (Boolean(onlyInputsIntended) === false) {
-        throw new Error('No outputs is specified and intended inputs flag is false');
+        throw new Error('No outputs is specified and `onlyInputsIntended` flag is false');
       }
     }
 
@@ -1198,7 +1198,7 @@ export default class AdaApi {
       foreignUtxos.push(...await foreignUtxoFetcher(foreignUtxoIds));
       foreignUtxos.forEach((u, i) => {
         if (u == null) {
-          throw new Error(`No UTxO found for input id: ${foreignUtxoIds[i]}`);
+          throw new Error(`No UTxO found for input id: ${JSON.stringify(foreignUtxoIds[i])}`);
         }
       });
     }
