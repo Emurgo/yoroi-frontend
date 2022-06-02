@@ -441,6 +441,7 @@ export function newAdaUnsignedTxForConnector(
   absSlotNumber: BigNumber,
   validityStart: ?number,
   ttl: ?number,
+  requiredSigners: ?Array<string>,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -478,6 +479,7 @@ export function newAdaUnsignedTxForConnector(
     absSlotNumber,
     validityStart,
     ttl,
+    requiredSigners,
     protocolParams,
   );
 
@@ -723,6 +725,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
   absSlotNumber: BigNumber,
   validityStart: ?number,
   ttl: ?number,
+  requiredSigners: ?Array<string>,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -922,6 +925,36 @@ function newAdaUnsignedTxFromUtxoForConnector(
     txBuilder.calc_script_data_hash(
       RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
     );
+  }
+
+  /*
+   * REQUIRED SIGNERS
+   */
+  for (const reqSigner of (requiredSigners || [])) {
+    let str = (reqSigner||'').trim();
+    if (str.length === 0) {
+      throw new Error(`Cannot process an empty required signer! (got: "${reqSigner})"`);
+    }
+    if (str.length === 56) {
+      // Ed25519KeyHash is 28 bytes long
+      let keyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(str));
+      txBuilder.add_required_signer(keyHash);
+    } else {
+      const address = normalizeToAddress(str);
+      if (address == null) {
+        throw new Error(
+          `Cannot process an invalid required signer, expecting an Ed25519KeyHash or a valid address, got: ${reqSigner}`
+        );
+      }
+      const keyHash = getCardanoSpendingKeyHash(address);
+      if (keyHash == null) {
+        throw new Error(
+          `Cannot process an invalid required signer, expecting an Ed25519KeyHash
+           or a valid address with a payment key-hash, got: ${reqSigner}`
+        );
+      }
+      txBuilder.add_required_signer(keyHash);
+    }
   }
 
   const changeAddr = (() => {

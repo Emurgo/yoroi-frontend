@@ -352,6 +352,7 @@ export type CardanoTxRequest = {|
   onlyInputsIntended?: boolean,
   validityIntervalStart?: number,
   ttl?: number,
+  requiredSigners?: Array<string>, // HEX of WASM key-hashes, or HEX of WASM addresses, or beck32 addresses
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
@@ -1150,6 +1151,7 @@ export default class AdaApi {
       onlyInputsIntended,
       validityIntervalStart,
       ttl,
+      requiredSigners,
     } = request.cardanoTxRequest;
     const noneOrEmpty = a => {
       if (a != null && !Array.isArray(a)) {
@@ -1351,8 +1353,8 @@ export default class AdaApi {
       const dataHash = target.dataHash;
       const ensureMinValue = target.ensureRequiredMinimalValue;
       if (ensureMinValue == null || ensureMinValue === false) {
-        if (target.value === undefined) {
-          throw new Error('Value is required for a valid tx output');
+        if (target.value == null) {
+          throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
         // ensureRequiredMinimalValue is true
@@ -1404,6 +1406,7 @@ export default class AdaApi {
       request.absSlotNumber,
       validityIntervalStart,
       ttl,
+      requiredSigners,
       protocolParams,
     );
 

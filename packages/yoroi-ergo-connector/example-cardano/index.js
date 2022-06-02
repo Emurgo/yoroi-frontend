@@ -658,7 +658,7 @@ createTx.addEventListener('click', () => {
   }
 
   if (includeDefaultTargets) {
-    includeTargets.push([
+    includeTargets.push(
       {
         address: targetAddress,
         value: '2000000',
@@ -686,15 +686,19 @@ createTx.addEventListener('click', () => {
             }),
           }
         }]
-      },
-    ])
+      }
+    )
   }
 
   const txReq = {
-    // validityIntervalStart: 2000,
+    validityIntervalStart: 2000,
     includeInputs,
-    // includeOutputs: [outputHex],
+    includeOutputs: [outputHex],
     includeTargets,
+    requiredSigners: [
+      // addr_test1qzcdaez05glfeehd6e9uk833rafygu2clcm8ew2sdtk26uwr3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0q09ux2l
+      'b0dee44fa23e9ce6edd64bcb1e311f52447158fe367cb9506aecad71',
+    ],
   }
 
   if (includeAssetTargets) {
