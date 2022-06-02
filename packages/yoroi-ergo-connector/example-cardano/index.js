@@ -622,11 +622,7 @@ createTx.addEventListener('click', () => {
     ).to_address().to_bech32();
     console.log(`[createTx] Plutus script address: ${plutusScriptAddress}`);
 
-    const plutusList = CardanoWasm.PlutusList.new();
-    plutusList.add(CardanoWasm.PlutusData.new_integer(CardanoWasm.BigInt.from_str('1234')));
-    const datum = CardanoWasm.PlutusData.new_constr_plutus_data(
-      CardanoWasm.ConstrPlutusData.new(CardanoWasm.BigNum.zero(), plutusList),
-    );
+    const datum = CardanoWasm.PlutusData.new_empty_constr_plutus_data(CardanoWasm.BigNum.zero());
     const datumHash = bytesToHex(CardanoWasm.hash_plutus_data(datum).to_bytes());
     console.log(`[createTx] Plutus datum hash: ${datumHash}`);
 
