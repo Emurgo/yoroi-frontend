@@ -911,7 +911,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
 
   if (isPlutusPresent) {
     // collateral
-    if (collateralReserve.length === 0) {
+    if ((collateralReserve?.length ?? 0) === 0) {
       // <todo:call_reorg_for_collateral>
       throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
     }
