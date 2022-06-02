@@ -7,7 +7,7 @@ function portToSocketPermission(port /*: number */)/*: string */ {
   return `ws://localhost:${port} wss://localhost:${port}`;
 }
 function serverToPermission(server /*: string */)/*: string */ {
-  return `https://${server} wss://${server}:443 http://lim-06.emurgo-rnd.com`;
+  return `https://${server} wss://${server}:443`;
 }
 
 const Ports = {
