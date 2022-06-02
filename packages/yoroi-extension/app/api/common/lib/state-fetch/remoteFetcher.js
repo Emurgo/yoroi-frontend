@@ -28,7 +28,7 @@ const priceBackendUrl = CONFIG.network.priceBackendUrl;
 
 function getEndpoint(): string {
   // TODO: some currency-independent endpoint
-  const endpoint = networks.CardanoMainnet.Backend.BackendService;
+  const endpoint = networks.CardanoTestnet.Backend.BackendService;
   if (endpoint == null) {
     throw new Error();
   }
