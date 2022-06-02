@@ -696,6 +696,20 @@ function getScriptRequiredSigningKeys(
   return set;
 }
 
+function getTxRequiredSigningKeys(
+  txBody: RustModule.WalletV4.TransactionBody,
+): Set<string> {
+  const set = new Set<string>();
+  const requiredSigners: ?RustModule.WalletV4.Ed25519KeyHashes = txBody.required_signers();
+  if (requiredSigners != null && requiredSigners.len() > 0) {
+    for (let i = 0; i < requiredSigners.len(); i++) {
+      const requiredKeyHash = requiredSigners.get(i);
+      set.add(bytesToHex(requiredKeyHash.to_bytes()));
+    }
+  }
+  return set;
+}
+
 export async function connectorSignCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: string,
@@ -732,11 +746,18 @@ export async function connectorSignCardanoTx(
     throw new Error(`missing chains functionality`);
   }
 
-  const requiredScriptSignAddresses = new Set<string>();
+  const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
   const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet);
-  const scriptSignaturesRequired = requiredScriptSignKeys.size > 0;
+  const totalAdditionalRequiredSignKeys = new Set<string>([
+    ...requiredTxSignKeys,
+    ...requiredScriptSignKeys,
+  ]);
+
+  console.log('totalAdditionalRequiredSignKeys', JSON.stringify(totalAdditionalRequiredSignKeys));
+  const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
+
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
-    if (scriptSignaturesRequired) {
+    if (additionalSignaturesRequired) {
       return getAllAddressesForDisplay({
         publicDeriver,
         type: CoreAddressTypes.CARDANO_BASE,
@@ -750,9 +771,10 @@ export async function connectorSignCardanoTx(
     queryAllBaseAddresses(),
   ]);
 
+  const requiredTxSignAddresses = new Set<string>();
   const otherRequiredSigners = [];
 
-  if (scriptSignaturesRequired) {
+  if (additionalSignaturesRequired) {
     if (allBaseAddresses.length === 0) {
       throw new Error('Cannot sign transaction script - no base addresses are available in the wallet!');
     }
@@ -764,27 +786,30 @@ export async function connectorSignCardanoTx(
     if (parsedStakingCred == null) {
       throw new Error('Cannot sign transaction script - failed to parse the base address staking cred!');
     }
-    for (const scriptKeyHash of requiredScriptSignKeys) {
+    for (const signingKeyHash of totalAdditionalRequiredSignKeys) {
       const requiredKeyHash = RustModule.WalletV4.Ed25519KeyHash
-        .from_bytes(hexToBytes(scriptKeyHash));
+        .from_bytes(hexToBytes(signingKeyHash));
       const requiredPaymentCred = RustModule.WalletV4.StakeCredential
         .from_keyhash(requiredKeyHash);
-      const requiredAddressBytes = RustModule.WalletV4.BaseAddress.new(
+      const requiredAddress = RustModule.WalletV4.BaseAddress.new(
         parsedNetworkId,
         requiredPaymentCred,
         parsedStakingCred,
-      ).to_address().to_bytes();
-      requiredScriptSignAddresses.add(bytesToHex(requiredAddressBytes))
+      ).to_address();
+      console.log('requiredAddress', requiredAddress.to_bech32());
+      requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
+    console.log('requiredTxSignAddresses', JSON.stringify(requiredTxSignAddresses));
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
-      if (requiredScriptSignAddresses.delete(address)) {
+      if (requiredTxSignAddresses.delete(address)) {
         otherRequiredSigners.push({ address, addressing });
       }
-      if (requiredScriptSignAddresses.size === 0) {
+      if (requiredTxSignAddresses.size === 0) {
         break;
       }
     }
+    console.log('otherRequiredSigners', JSON.stringify(otherRequiredSigners));
   }
 
   const submittedTxs = loadSubmittedTransactions() || [];
