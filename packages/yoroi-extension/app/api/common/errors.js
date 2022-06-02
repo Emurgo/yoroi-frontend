@@ -40,10 +40,6 @@ const messages = defineMessages({
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
   },
-  walletFileImportError: {
-    id: 'api.errors.WalletFileImportError',
-    defaultMessage: '!!!Wallet could not be imported, please make sure you are providing a correct file.',
-  },
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
     defaultMessage: '!!!Insufficient funds to complete this transaction.',
@@ -55,26 +51,6 @@ const messages = defineMessages({
   assetOverflowError: {
     id: 'api.errors.assetOverflowError',
     defaultMessage: '!!!Maximum value of a token inside a UTXO exceeded (overflow).',
-  },
-  updateAdaWalletError: {
-    id: 'api.errors.updateAdaWalletError',
-    defaultMessage: '!!!Error while updating ada wallet.',
-  },
-  getBalanceError: {
-    id: 'api.errors.getBalanceError',
-    defaultMessage: '!!!Error while getting Balance.',
-  },
-  updateAdaTxsHistoryError: {
-    id: 'api.errors.updateAdaTxsHistoryError',
-    defaultMessage: '!!!Error while updating ada transactions history.',
-  },
-  transactionError: {
-    id: 'api.errors.transactionError',
-    defaultMessage: '!!!Error while creating transaction.',
-  },
-  pendingTransactionError: {
-    id: 'api.errors.pendingTransactionError',
-    defaultMessage: '!!!Error while updating pending transactions.',
   },
   getAddressesKeysError: {
     id: 'api.errors.getAddressesWithFundsError',
@@ -275,15 +251,6 @@ export class WalletAlreadyImportedError extends LocalizableError {
   }
 }
 
-export class WalletFileImportError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.walletFileImportError.id,
-      defaultMessage: messages.walletFileImportError.defaultMessage || '',
-    });
-  }
-}
-
 export class NotEnoughMoneyToSendError extends LocalizableError {
   constructor() {
     super({
@@ -305,33 +272,6 @@ export class AssetOverflowError extends LocalizableError {
     super({
       id: messages.assetOverflowError.id,
       defaultMessage: messages.assetOverflowError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetBalanceError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getBalanceError.id,
-      defaultMessage: messages.getBalanceError.defaultMessage || '',
-    });
-  }
-}
-
-export class TransactionError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.transactionError.id,
-      defaultMessage: messages.transactionError.defaultMessage || '',
-    });
-  }
-}
-
-export class PendingTransactionError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.pendingTransactionError.id,
-      defaultMessage: messages.pendingTransactionError.defaultMessage || '',
     });
   }
 }
