@@ -28,6 +28,7 @@ const priceBackendUrl = CONFIG.network.priceBackendUrl;
 
 function getEndpoint(): string {
   // TODO: some currency-independent endpoint
+  return 'https://backend.waw.emurgo-rnd.com';
   const endpoint = networks.CardanoTestnet.Backend.BackendService;
   if (endpoint == null) {
     throw new Error();
