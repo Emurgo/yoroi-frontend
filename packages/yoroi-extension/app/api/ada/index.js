@@ -1320,6 +1320,9 @@ export default class AdaApi {
       };
 
       if (target.mintRequest != null && target.mintRequest.length > 0) {
+        if ((target.address || '').trim().length === 0) {
+          throw new Error('A transaction target must include a valid non-empty address `address`!');
+        }
         for (const mintEntry of target.mintRequest) {
           const { script, assetName, amount, metadata, storeScriptOnChain } = mintEntry;
           const { policyId, assetId } = mintEntryToIdentifier(mintEntry);
