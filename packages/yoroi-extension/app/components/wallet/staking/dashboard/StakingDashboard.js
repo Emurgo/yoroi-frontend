@@ -202,7 +202,8 @@ export default class StakingDashboard extends Component<Props> {
     if (
       this.props.stakePools.pools === null ||
       this.props.pageInfo == null ||
-      this.props.stakePools.pools[this.props.pageInfo.currentPage] == null
+      (this.props.stakePools.pools.length > 0 &&
+       this.props.stakePools.pools[this.props.pageInfo.currentPage] == null)
     ) {
       return (
         <div className={width}>
