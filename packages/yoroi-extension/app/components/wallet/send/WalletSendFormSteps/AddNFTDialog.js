@@ -13,7 +13,6 @@ import {
 } from '../../../../api/common/lib/MultiToken';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
-import { ReactComponent as NoNFT } from '../../../../assets/images/nft-no.inline.svg';
 import { getNFTs } from '../../../../utils/wallet';
 import type { FormattedNFTDisplay } from '../../../../utils/wallet';
 import BigNumber from 'bignumber.js';
@@ -25,6 +24,7 @@ import classnames from 'classnames';
 import { Button } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import MinAda from './MinAda';
+import NFTImage from './NFTImage';
 
 type Props = {|
   +onClose: void => void,
@@ -173,7 +173,6 @@ export default class AddNFTDialog extends Component<Props, State> {
                 <div className={styles.nftsGrid}>
                   {
                     currentNftsList.map(nft => {
-                      const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
                       return (
                         <button
                           type="button"
@@ -184,7 +183,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                           }
                           onClick={() => this.onSelect(nft.info)}
                         >
-                          {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <NoNFT /> }
+                          <NFTImage image={nft.image} name={nft.name} width={155} height={190} />
                           <p className={styles.nftName}>{nft.name}</p>
                         </button>
                       )

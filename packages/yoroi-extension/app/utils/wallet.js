@@ -34,8 +34,11 @@ export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo) => {
         ].map(entry => ({
             entry,
             info: getTokenInfo(entry),
-        })).filter(token => !token.info.IsNFT).map(token => {
+        })).filter(token => (
+            !token.info.Metadata.assetMintMetadata?.[0]?.['721']
+        )).map(token => {
             const amount = genFormatTokenAmount(getTokenInfo)(token.entry)
+            console.log(JSON.parse(JSON.stringify(token.info.Metadata.assetMintMetadata)))
             return {
                 value: token.info.TokenId,
                 info: token.info,
@@ -58,7 +61,9 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
     ].map(entry => ({
         entry,
         info: getTokenInfo(entry),
-    })).filter(token => token.info.IsNFT).map(token => {
+    }))
+    .filter(token => token.info.Metadata.assetMintMetadata?.[0]?.['721'])
+    .map(token => {
         const policyId = token.entry.identifier.split('.')[0];
         const name = truncateToken(getTokenStrictName(token.info) ?? '-');
         return {
@@ -77,4 +82,11 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         id: item.id,
         info: item.info,
     }));
+}
+
+export function checkNFTImage(imageSrc, onload, onerror) {
+    const img = new Image();
+    img.onload = onload;
+    img.onerror = onerror;
+    img.src = imageSrc;
 }
