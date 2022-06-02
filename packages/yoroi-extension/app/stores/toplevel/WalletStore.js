@@ -407,7 +407,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  _startRefreshAllWallets: void => Promise<void> = async () => {    
+  _startRefreshAllWallets: void => Promise<void> = async () => {
     if (this.stores.serverConnectionStore.parallelSync) {
       for (const publicDeriver of this.publicDerivers) {
         this._startParallelRefreshForWallet(publicDeriver);

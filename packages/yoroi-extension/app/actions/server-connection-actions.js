@@ -1,5 +1,5 @@
 // @flow
-import { AsyncAction, Action } from './lib/Action';
+import { Action } from './lib/Action';
 
 // ======= WALLET ACTIONS =======
 
