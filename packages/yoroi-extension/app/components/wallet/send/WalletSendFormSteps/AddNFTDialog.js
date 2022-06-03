@@ -105,7 +105,8 @@ export default class AddNFTDialog extends Component<Props, State> {
 
   state: State = {
     currentNftsList: [],
-    fullNftsList: []
+    fullNftsList: [],
+    selectedTokens: [],
   };
 
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
@@ -119,16 +120,35 @@ export default class AddNFTDialog extends Component<Props, State> {
       this.setState({ currentNftsList: filteredNftsList })
     };
 
-  onSelect: $ReadOnly<TokenRow> => void = (token) => {
-    if (this.props.isTokenIncluded(token)) {
-      this.props.onRemoveToken(token)
+  onSelect: $ReadOnly<TokenRow> => void = (tokenInfo) => {
+    if (this.isTokenIncluded(tokenInfo)) {
+      this.onRemoveToken(tokenInfo)
     } else {
-      const amount = new BigNumber('1')
+      this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, tokenInfo] }))
+    }
+  }
+
+  onRemoveToken = (tokenInfo) => {
+    this.setState(prev => ({ ...prev,  selectedTokens: [...prev.selectedTokens].filter(
+      t => t.Identifier !== tokenInfo.Identifier) }))
+    this.props.onRemoveToken(tokenInfo)
+  }
+
+  isTokenIncluded = (token) => {
+    const isIncluded = this.state.selectedTokens.find(t => t.Identifier === token.Identifier)
+    return isIncluded || this.props.isTokenIncluded(token)
+  }
+
+  onAddAll = () => {
+    const amount = new BigNumber('1');
+    for (const token of this.state.selectedTokens) {
       this.props.onAddToken({
         token, shouldReset: false, maxAmount: amount.toString(),
       })
       this.props.updateAmount(amount)
     }
+
+    this.props.onClose();
   }
 
   render(): Node {
@@ -178,13 +198,15 @@ export default class AddNFTDialog extends Component<Props, State> {
                 <div className={styles.nftsGrid}>
                   {
                     currentNftsList.map(nft => {
+                      const isInclude = this.isTokenIncluded(nft.info)
                       return (
                         <button
                           type="button"
+                          key={nft.info.Identifier}
                           className={
                           classnames([
                             styles.nftCard,
-                            this.props.isTokenIncluded(nft.info) &&styles.selected])
+                            isInclude && styles.selected])
                           }
                           onClick={() => this.onSelect(nft.info)}
                         >
@@ -207,7 +229,8 @@ export default class AddNFTDialog extends Component<Props, State> {
               borderRadius: '0px',
               color: 'var(--yoroi-palette-secondary-300)',
             }}
-            onClick={onClose}
+            disabled={this.state.selectedTokens.length === 0}
+            onClick={this.onAddAll}
             variant='ternary'
           >
             {intl.formatMessage(messages.add)}

@@ -300,7 +300,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           }
 
         </div>
-        {fullTokensList.length === 0 && (
+        {fullTokensList.length !== 0 && (
           <Button
             sx={{
               width: '100%',

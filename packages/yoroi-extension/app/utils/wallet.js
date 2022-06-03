@@ -61,7 +61,8 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         entry,
         info: getTokenInfo(entry),
     }))
-    .filter(token => token.info.Metadata.assetMintMetadata?.[0]?.['721'])
+    // Todo: Revert this change
+    .filter(token => !token.info.Metadata.assetMintMetadata?.[0]?.['721'])
     .map(token => {
         const policyId = token.entry.identifier.split('.')[0];
         const name = truncateToken(getTokenStrictName(token.info) ?? '-');
@@ -71,7 +72,7 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
             amount: genFormatTokenAmount(getTokenInfo)(token.entry),
             policyId,
             // $FlowFixMe[prop-missing]
-            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]?.['721'][policyId][name],
             info: token.info,
         };
     })
