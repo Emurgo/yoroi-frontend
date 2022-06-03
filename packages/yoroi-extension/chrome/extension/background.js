@@ -1493,9 +1493,16 @@ function handleInjectorConnect(port) {
             try {
               checkParamCount(1);
               await RustModule.load();
-              const requiredAmount = RustModule.WalletV4.Value.from_bytes(
-                Buffer.from(message.params[0], 'hex')
-              ).coin().to_str();
+              let requiredAmount: string = message.params[0];
+              if (!/^\d+$/.test(requiredAmount)) {
+                try {
+                  requiredAmount = RustModule.WalletV4.Value.from_bytes(
+                    Buffer.from(requiredAmount, 'hex')
+                  ).coin().to_str();
+                } catch (e) {
+                  throw new Error(`Failed to parse the required collateral amount: "${requiredAmount}"`);
+                }
+              }
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,

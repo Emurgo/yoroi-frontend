@@ -919,7 +919,9 @@ function newAdaUnsignedTxFromUtxoForConnector(
       throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
     }
     const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
-    addInputFromUtxo(collateralBuilder, collateralReserve[0]);
+    for (let i = 0; i < collateralReserve.length && i < 3; i++) {
+      addInputFromUtxo(collateralBuilder, collateralReserve[i]);
+    }
     txBuilder.set_collateral(collateralBuilder);
     // script data hash
     txBuilder.calc_script_data_hash(

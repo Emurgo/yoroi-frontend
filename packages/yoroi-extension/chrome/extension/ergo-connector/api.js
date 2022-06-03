@@ -835,10 +835,19 @@ export async function connectorSignCardanoTx(
     password,
   });
   const utxoIdSet: Set<string> = new Set();
-  for (let i = 0; i < txBody.inputs().len(); i++) {
-    const input = txBody.inputs().get(i);
+  const txBodyInputs = txBody.inputs();
+  for (let i = 0; i < txBodyInputs.len(); i++) {
+    const input = txBodyInputs.get(i);
     const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
     utxoIdSet.add(`${txHash}${String(input.index())}`);
+  }
+  const txBodyCollateralInputs = txBody.collateral();
+  if (txBodyCollateralInputs != null) {
+    for (let i = 0; i < txBodyCollateralInputs.len(); i++) {
+      const input = txBodyCollateralInputs.get(i);
+      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+      utxoIdSet.add(`${txHash}${String(input.index())}`);
+    }
   }
   const usedUtxos = addressedUtxos.filter(utxo =>
     utxoIdSet.has(utxo.utxo_id)
