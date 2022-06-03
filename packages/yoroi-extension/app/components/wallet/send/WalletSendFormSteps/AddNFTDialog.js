@@ -26,7 +26,6 @@ import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepa
 import MinAda from './MinAda';
 import NFTImage from './NFTImage';
 import globalMessages from '../../../../i18n/global-messages';
-import { Box } from '@mui/system';
 
 type Props = {|
   +onClose: void => void,
@@ -200,7 +199,7 @@ export default class AddNFTDialog extends Component<Props, State> {
             )
           }
         </div>
-        {fullNftsList.length !== 0 ? (
+        {fullNftsList.length !== 0 && (
           <Button
             sx={{
               width: '100%',
@@ -213,7 +212,7 @@ export default class AddNFTDialog extends Component<Props, State> {
           >
             {intl.formatMessage(messages.add)}
           </Button>
-        ): <Box sx={{ height: '30px' }} />}
+        )}
       </Dialog>
     );
   }

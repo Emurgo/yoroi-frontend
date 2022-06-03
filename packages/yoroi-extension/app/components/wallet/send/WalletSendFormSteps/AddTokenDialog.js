@@ -34,6 +34,7 @@ import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
 import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import MinAda from './MinAda';
+import globalMessages from '../../../../i18n/global-messages';
 
 type Props = {|
   +onClose: void => void,
@@ -205,7 +206,10 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
+        title={
+          fullTokensList.length === 0 ? intl.formatMessage(globalMessages.tokens) :
+            intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
+        }
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
@@ -296,18 +300,20 @@ export default class AddTokenDialog extends Component<Props, State> {
           }
 
         </div>
-        <Button
-          sx={{
-            width: '100%',
-            height: '61px',
-            borderRadius: '0px',
-            color: 'var(--yoroi-palette-secondary-300)',
-          }}
-          onClick={onClose}
-          variant='ternary'
-        >
-          {intl.formatMessage(messages.add)}
-        </Button>
+        {fullTokensList.length === 0 && (
+          <Button
+            sx={{
+              width: '100%',
+              height: '61px',
+              borderRadius: '0px',
+              color: 'var(--yoroi-palette-secondary-300)',
+            }}
+            onClick={onClose}
+            variant='ternary'
+          >
+            {intl.formatMessage(messages.add)}
+          </Button>
+        )}
       </Dialog>
     );
   }
