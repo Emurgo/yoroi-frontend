@@ -49,7 +49,6 @@ import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {

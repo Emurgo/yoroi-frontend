@@ -25,6 +25,8 @@ import { Button } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import MinAda from './MinAda';
 import NFTImage from './NFTImage';
+import globalMessages from '../../../../i18n/global-messages';
+import { Box } from '@mui/system';
 
 type Props = {|
   +onClose: void => void,
@@ -137,7 +139,11 @@ export default class AddNFTDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.nNft, { number: fullNftsList.length })}
+        title={
+          fullNftsList.length === 0 ?
+            intl.formatMessage(globalMessages.nfts)
+            : intl.formatMessage(messages.nNft, { number: fullNftsList.length })
+        }
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
@@ -194,18 +200,20 @@ export default class AddNFTDialog extends Component<Props, State> {
             )
           }
         </div>
-        <Button
-          sx={{
-            width: '100%',
-            height: '61px',
-            borderRadius: '0px',
-            color: 'var(--yoroi-palette-secondary-300)',
-          }}
-          onClick={onClose}
-          variant='ternary'
-        >
-          {intl.formatMessage(messages.add)}
-        </Button>
+        {fullNftsList.length !== 0 ? (
+          <Button
+            sx={{
+              width: '100%',
+              height: '61px',
+              borderRadius: '0px',
+              color: 'var(--yoroi-palette-secondary-300)',
+            }}
+            onClick={onClose}
+            variant='ternary'
+          >
+            {intl.formatMessage(messages.add)}
+          </Button>
+        ): <Box sx={{ height: '30px' }} />}
       </Dialog>
     );
   }
