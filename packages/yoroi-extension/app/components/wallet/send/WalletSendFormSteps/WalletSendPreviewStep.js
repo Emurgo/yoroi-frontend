@@ -27,14 +27,11 @@ import {
 import type {
   TokenLookupKey, TokenEntry,
 } from '../../../../api/common/lib/MultiToken';
-import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists } from '../../../../stores/stateless/tokenHelpers';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
 import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import type { Asset } from '../../assets/AssetsList'
-import { isErgo } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 
 type Props = {|
@@ -54,7 +51,6 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?number,
-  +selectedNetwork: $ReadOnly<NetworkRow>,
 |};
 
 const messages = defineMessages({
@@ -70,11 +66,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
-
-  state = {
-    txError: null,
-    passwordError: null,
-  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -106,16 +97,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
     this.form.submit({
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
-        try {
-          await this.props.onSubmit({ password: walletPassword });
-        } catch (error) {
-          const errorMessage = this.context.intl.formatMessage(error, error.values)
-          if (error instanceof IncorrectWalletPasswordError) {
-            this.setState({ passwordError: errorMessage })
-          } else {
-            this.setState({ txError: errorMessage })
-          }
-        }
+        const transactionData = {
+          password: walletPassword,
+        };
+        await this.props.onSubmit(transactionData);
       },
       onError: () => {}
     });
@@ -127,10 +112,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
     const shiftedAmount = token.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    const coinPrice = this.props.getCurrentPrice(
-      tokenInfo.Identifier,
-      toCurrency
-    );
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const coinPrice = this.props.getCurrentPrice(ticker, toCurrency);
 
     if (coinPrice == null) return '-';
 
@@ -142,33 +128,16 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
   renderSingleAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.amount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.amountSmall}>{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.amount}>{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
+    return (
+      <div className={styles.amount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
             truncateToken(getTokenName(this.props.getTokenInfo(entry)))
           }
-          </span>
-        </div>
-      );
+        </span>
+      </div>
+    );
   }
+
   renderTotalAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
@@ -176,16 +145,16 @@ export default class WalletSendPreviewStep extends Component<Props> {
     return unitOfAccountSetting.enabled
       ? (
         <>
-          <div className={styles.totalAmount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.totalAmountSmall}>{formatValue(entry)}
+          <div className={styles.totalAmount}>{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
               truncateToken(getTokenName(this.props.getTokenInfo(entry)))
             }
+            </span>
+          </div>
+          <div className={styles.totalFiatAmount}>
+            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
+            <span className={styles.currencySymbol}>
+              &nbsp;{unitOfAccountSetting.currency}
             </span>
           </div>
         </>
@@ -200,38 +169,17 @@ export default class WalletSendPreviewStep extends Component<Props> {
   }
   renderSingleFee: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.fees}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.feesSmall}>
-            {formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(
-                entry
-              )))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.fees}>
-          {formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
+    return(
+      <div className={styles.fees}>
+        {formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
             truncateToken(getTokenName(this.props.getTokenInfo(
               entry
             )))
           }
-          </span>
-        </div>
-      );
+        </span>
+      </div>
+    );
   }
 
   renderBundle: {|
@@ -250,18 +198,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
     );
   }
 
-  getAssetsList: (() => Asset[]) = () => {
-    const { getTokenInfo } = this.props
-    return this.props.amount.nonDefaultEntries().map(entry => ({
-      entry,
-      info: getTokenInfo(entry)
-    })).map(token => ({
-      name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-      id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-      amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-    }))
-  }
-
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
@@ -271,7 +207,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
       receivers,
       isSubmitting,
     } = this.props;
-    const { txError, passwordError } = this.state;
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -308,19 +243,13 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
           <div className={styles.amountFeesWrapper}>
             {(amount.nonDefaultEntries().length > 0) &&
-            (
-              <AssetsDropdown
-                assets={this.getAssetsList()}
-                tokens={getTokens(amount, this.props.getTokenInfo)}
-                nfts={getNFTs(amount, this.props.getTokenInfo)}
-              />
-            )}
+            (<AssetsDropdown
+              tokens={getTokens(amount, this.props.getTokenInfo)}
+              nfts={getNFTs(amount, this.props.getTokenInfo)}
+            />)}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(
-                  isErgo(this.props.selectedNetwork) ?
-                    globalMessages.amount : globalMessages.amountWithMinADA
-                )}
+                {intl.formatMessage(globalMessages.amountWithMinADA)}
               </div>
               <div className={styles.amountValue}>
                 {this.renderSingleAmount(amount.getDefaultEntry())}
@@ -361,24 +290,17 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
           <TextField
             type="password"
+            className={styles.walletPassword}
             {...walletPasswordField.bind()}
             disabled={isSubmitting}
-            error={walletPasswordField.error || passwordError}
-            onChange={(e) => {
-              this.setState({ passwordError: null }) // Error reset
-              walletPasswordField.set(e.target.value)
-            }}
+            error={walletPasswordField.error}
           />
-
-          <p>
-            {txError}
-          </p>
         </div>
 
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid || isSubmitting || passwordError}
+          disabled={!walletPasswordField.isValid || isSubmitting}
           sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
           {isSubmitting ?

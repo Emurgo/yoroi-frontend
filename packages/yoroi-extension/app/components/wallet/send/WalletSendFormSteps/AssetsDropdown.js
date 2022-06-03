@@ -68,7 +68,7 @@ export default class AssetsDropdown extends Component<Props, State> {
   }
 
   render(): Node {
-    const { assets, tokens, nfts } = this.props
+    const { tokens, nfts } = this.props
     const { isOpen } = this.state;
     const { intl } = this.context;
     return (
@@ -76,7 +76,7 @@ export default class AssetsDropdown extends Component<Props, State> {
         <button type='button' onClick={() => this.toggleDropdown()} className={styles.header}>
           <p className={styles.title}>Assets</p>
           <div className={styles.headerRight}>
-            <p className={styles.count}>{assets.length}</p>
+            <p className={styles.count}>{tokens.length + nfts.length}</p>
             {
               isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />
             }

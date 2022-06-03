@@ -458,7 +458,6 @@ export default class WalletSendForm extends Component<Props, State> {
                   onFocus={() => this.setState({ showMemoWarning: true })}
                   placeholder={intl.formatMessage(memoMessages.addMemo)}
                   onChange={(e) => this.onUpdateMemo(e.target.value)}
-                  value={memo}
                 />
               </div>
               {invalidMemo ? (
@@ -662,7 +661,7 @@ export default class WalletSendForm extends Component<Props, State> {
   onUpdateMemo(memo: string) {
     const isValid = isValidMemoOptional(memo);
     this.props.updateMemo(memo);
-    this.setState({ memo, invalidMemo: !isValid })
+    this.setState({ invalidMemo: !isValid })
   }
 
   _nextStepButton(
