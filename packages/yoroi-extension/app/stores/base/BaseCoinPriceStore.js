@@ -261,6 +261,9 @@ export default class BaseCoinPriceStore
 
       for (let i = 0; i < missingTimestamps.length; i++) {
         const ticker = response.tickers[i];
+        if (ticker == null) {
+          continue
+        }
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
         }
