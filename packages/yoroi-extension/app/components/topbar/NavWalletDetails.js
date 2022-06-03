@@ -22,6 +22,8 @@ import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import LoadingSpinner from '../widgets/LoadingSpinner';
+import { Box } from '@mui/system';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -41,6 +43,7 @@ type Props = {|
   +defaultToken: $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?number,
+  +purpose: 'allWallets' | 'topBar',
 |};
 
 @observer
@@ -50,7 +53,7 @@ export default class NavWalletDetails extends Component<Props> {
     highlightTitle: boolean,
     infoText: void,
     showDetails: boolean,
-    showEyeIcon: boolean
+    showEyeIcon: boolean,
   |} = {
     highlightTitle: false,
     infoText: undefined,
@@ -72,6 +75,7 @@ export default class NavWalletDetails extends Component<Props> {
       infoText,
       showDetails,
       showEyeIcon,
+      purpose
     } = this.props;
 
     const { intl } = this.context;
@@ -87,56 +91,72 @@ export default class NavWalletDetails extends Component<Props> {
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
-          <div
-            className={classnames([
-              styles.currency,
-              showsRewards && styles.currencyAlign
-            ])}
+          {
+          !totalAmount || (totalAmount && showsRewards && (!rewards || !walletAmount)) ? (
+            <Box sx={{
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: purpose === 'allWallets' ? '180px' : '100%'
+            }}
+            >
+              <LoadingSpinner small />
+            </Box>
+          ) : (
+            <>
+              <div
+                className={classnames([
+                  styles.currency,
+                  showsRewards && styles.currencyAlign
+                ])}
+              >
+                <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
+              </div>
+              <div className={styles.content}>
+                <div
+                  className={classnames([
+                    styles.amount,
+                    highlightTitle !== null && highlightTitle === true && styles.highlightAmount
+                  ])}
+                >
+                  {this.renderAmountDisplay({
+                    shouldHideBalance,
+                    amount: totalAmount
+                  })}
+                </div>
+                {showsRewards &&
+                <div className={styles.details}>
+                  <div>
+                    <p className={styles.label}>
+                      {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                    </p>
+                    {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                  </div>
+                  <div>
+                    <p className={styles.label}>
+                      {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                    </p>
+                    {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                  </div>
+                </div>
+                }
+                {this.props.rewards === undefined && (
+                <div className={styles.info}>
+                  {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+                </div>
+                )}
+              </div>
+            </>
+          )}
+          {showEyeIconSafe &&
+          <button
+            type="button"
+            className={styles.toggleButton}
+            onClick={onUpdateHideBalance}
           >
-            <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
-          </div>
-          <div className={styles.content}>
-            <div
-              className={classnames([
-                styles.amount,
-                highlightTitle !== null && highlightTitle === true && styles.highlightAmount
-              ])}
-            >
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount
-              })}
-            </div>
-            {showsRewards &&
-              <div className={styles.details}>
-                <div>
-                  <p className={styles.label}>
-                    {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                  </p>
-                  {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
-                </div>
-                <div>
-                  <p className={styles.label}>
-                    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                  </p>
-                  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-                </div>
-              </div>
-            }
-            {this.props.rewards === undefined && (
-              <div className={styles.info}>
-                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-              </div>
-            )}
-          </div>
-          {totalAmount != null && showEyeIconSafe &&
-            <button
-              type="button"
-              className={styles.toggleButton}
-              onClick={onUpdateHideBalance}
-            >
-              {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-            </button>
+            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+          </button>
           }
         </div>
         {infoText != null && (
@@ -163,7 +183,7 @@ export default class NavWalletDetails extends Component<Props> {
     amount: ?MultiToken
   |} => Node = (request) => {
     if (request.amount == null) {
-      return <div className={styles.isLoading} />;
+      throw new Error('Amount is required to be rendered')
     }
 
     const defaultEntry = request.amount.getDefaultEntry();

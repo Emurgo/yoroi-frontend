@@ -782,17 +782,10 @@ export default class StakingDashboardPage extends Component<Props> {
           };
         }}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-        totalDelegated={(() => {
-            if (!showRewardAmount) return undefined;
-            if (request.delegationRequests.getDelegatedBalance.result == null) return undefined;
-
-            return currentlyDelegating
-              ? request.delegationRequests.getDelegatedBalance.result.utxoPart
-                  .joinAddCopy(
-                    request.delegationRequests.getDelegatedBalance.result.accountPart
-                  )
-              : new MultiToken([], defaultToken)
-          })()
+        isDelegated={
+          showRewardAmount &&
+          request.delegationRequests.getDelegatedBalance.result !== null &&
+          currentlyDelegating
         }
       />
     );

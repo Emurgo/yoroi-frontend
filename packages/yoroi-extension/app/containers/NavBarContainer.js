@@ -105,6 +105,7 @@ export default class NavBarContainer extends Component<Props> {
               showEyeIcon={false}
               unitOfAccountSetting={profile.unitOfAccount}
               getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+              purpose='allWallets'
             />
           }
         />
@@ -142,6 +143,7 @@ export default class NavBarContainer extends Component<Props> {
             )}
             unitOfAccountSetting={profile.unitOfAccount}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            purpose='topBar'
           />
         );
       };
