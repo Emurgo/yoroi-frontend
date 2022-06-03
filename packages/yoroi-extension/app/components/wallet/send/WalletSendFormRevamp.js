@@ -180,7 +180,6 @@ export default class WalletSendForm extends Component<Props, State> {
   state: State = {
     showMemoWarning: false,
     invalidMemo: false,
-    memo: '',
     currentStep: SEND_FORM_STEP.RECEIVER
   }
 
@@ -419,7 +418,7 @@ export default class WalletSendForm extends Component<Props, State> {
   renderCurrentStep(step: number): Node {
     const { form } = this
     const { intl } = this.context;
-    const { showMemoWarning, invalidMemo, memo } = this.state
+    const { showMemoWarning, invalidMemo } = this.state
     const {
       shouldSendAll,
       isCalculatingFee,
@@ -619,7 +618,7 @@ export default class WalletSendForm extends Component<Props, State> {
               </div>
 
               {this._nextStepButton(
-               !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),
+               !this.props.fee || this.props.hasAnyPending || invalidMemo,
                () => {
                 this.props.onSubmit()
                 this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
@@ -693,33 +692,6 @@ export default class WalletSendForm extends Component<Props, State> {
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={disabledCondition}
         sx={{ margin: '125px 0px 0px 0px', display: 'block' }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>);
-  }
-
-  _makeInvokeConfirmationButton(): Node {
-    const { intl } = this.context;
-    const { memo } = this.form.values();
-
-    const {
-      hasAnyPending,
-    } = this.props;
-
-    const disabledCondition = (
-      !this.props.fee
-      || hasAnyPending
-      || !isValidMemoOptional(memo)
-    );
-
-    return (
-      <Button
-        variant="primary"
-        onClick={this.props.onSubmit}
-        /** Next Action can't be performed in case transaction fees are not calculated
-          * or there's a transaction waiting to be confirmed (pending) */
-        disabled={disabledCondition}
-        sx={{ margin: '30px auto 0', display: 'block' }}
       >
         {intl.formatMessage(globalMessages.nextButtonLabel)}
       </Button>);
