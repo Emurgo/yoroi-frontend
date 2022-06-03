@@ -38,7 +38,6 @@ export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo) => {
             !token.info.Metadata.assetMintMetadata?.[0]?.['721']
         )).map(token => {
             const amount = genFormatTokenAmount(getTokenInfo)(token.entry)
-            console.log(JSON.parse(JSON.stringify(token.info.Metadata.assetMintMetadata)))
             return {
                 value: token.info.TokenId,
                 info: token.info,
