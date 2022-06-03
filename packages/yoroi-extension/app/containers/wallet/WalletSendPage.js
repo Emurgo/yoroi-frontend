@@ -49,6 +49,7 @@ import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -163,15 +164,6 @@ class WalletSendPage extends Component<AllProps> {
         <>
           <WalletSendFormRevamp
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
-            validateAmount={(amount) => validateAmount(
-              amount,
-              transactionBuilderStore.selectedToken ?? defaultToken,
-              getMinimumValue(
-                publicDeriver.getParent().getNetworkInfo(),
-                transactionBuilderStore.selectedToken?.IsDefault ?? true
-              ),
-              this.context.intl,
-            )}
             defaultToken={defaultToken}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             onSubmit={txBuilderActions.updateTentativeTx.trigger}

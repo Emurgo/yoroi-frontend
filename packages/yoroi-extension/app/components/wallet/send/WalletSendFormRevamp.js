@@ -110,7 +110,11 @@ const messages = defineMessages({
   minAdaLabel: {
     id: 'wallet.send.form.amount.minAdaLabel',
     defaultMessage: '!!!Min ADA'
-},
+  },
+  minimumRequiredADA: {
+    id: 'wallet.send.form.amount.minimumRequiredADA',
+    defaultMessage: '!!!The minimum required is 1 ADA'
+  }
 });
 
 type Props = {|
@@ -230,6 +234,20 @@ export default class WalletSendForm extends Component<Props, State> {
     }
   }
 
+  validateDefaultTokenAmount(amount: BigNumber) {
+    const MIN_ADA = 1_000_000;
+    const { plannedTxInfoMap } = this.props;
+    if (
+      isCardanoHaskell(this.props.selectedNetwork) &&
+      amount.lt(MIN_ADA) &&
+      plannedTxInfoMap.length < 2 // when sending only ADA without any additional tokens
+    ) {
+      return [false, this.context.intl.formatMessage(messages.minimumRequiredADA)]
+    }
+
+    return [true, null]
+  }
+
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -298,10 +316,7 @@ export default class WalletSendForm extends Component<Props, State> {
             amountValue,
             this.getNumDecimals(),
           ));
-          const isValidAmount = await this.props.validateAmount(
-            formattedAmount,
-            this.props.defaultToken
-          );
+          const isValidAmount = await this.validateDefaultTokenAmount(formattedAmount);
           if (isValidAmount[0]) {
             this.props.updateAmount(formattedAmount);
           } else {
