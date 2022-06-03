@@ -24,7 +24,13 @@ import type { ConfigType } from '../../../../../config/config-types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const priceBackendUrl = CONFIG.network.priceBackendUrl;
+const priceBackendUrl = (() => {
+  const endpoint = networks.CardanoTestnet.Backend.BackendService;
+  if (endpoint == null) {
+    throw new Error();
+  }
+  return endpoint;
+})();
 
 function getEndpoint(): string {
   // TODO: some currency-independent endpoint
