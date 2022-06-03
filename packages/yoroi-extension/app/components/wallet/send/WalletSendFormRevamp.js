@@ -661,12 +661,8 @@ export default class WalletSendForm extends Component<Props, State> {
 
   onUpdateMemo(memo: string) {
     const isValid = isValidMemoOptional(memo);
-    if (isValid) {
-      this.props.updateMemo(memo);
-      this.setState({ memo, invalidMemo: false })
-    } else {
-      this.setState({ invalidMemo: true })
-    }
+    this.props.updateMemo(memo);
+    this.setState({ memo, invalidMemo: !isValid })
   }
 
   _nextStepButton(
