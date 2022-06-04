@@ -25,6 +25,7 @@ import type { AdaActionsMap } from './ada/index';
 import type { ErgoActionsMap } from './ergo/index';
 import type { JormungandrActionsMap } from './jormungandr/index';
 import  ConnectorActionsMap from '../ergo-connector/actions/connector-actions';
+import ServerConnectionActions from './server-connection-actions';
 
 export type ActionsMap = {|
   txBuilderActions: TxBuilderActions,
@@ -50,6 +51,7 @@ export type ActionsMap = {|
   ergo: ErgoActionsMap,
   jormungandr: JormungandrActionsMap,
   connector: ConnectorActionsMap,
+  serverConnection: ServerConnectionActions,
 |};
 
 const actionsMap: ActionsMap = Object.freeze({
@@ -76,6 +78,7 @@ const actionsMap: ActionsMap = Object.freeze({
   ada: adaActionsMap,
   ergo: ergoActionsMap,
   jormungandr: jormungandrActionsMap,
+  serverConnection: new ServerConnectionActions(),
 });
 
 export default actionsMap;
