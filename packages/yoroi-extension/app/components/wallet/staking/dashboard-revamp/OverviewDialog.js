@@ -103,7 +103,10 @@ export default class OverviewModal extends Component<Props> {
             <Typography mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
             <HelperTooltip
               message={
-                <FormattedMessage {...messages.availableTotalRewardsHelper} values={{ faqLink }} />
+                <FormattedMessage
+                  {...messages.availableTotalRewardsHelper}
+                  values={{ faqLink }}
+                />
               }
             />
           </Box>
