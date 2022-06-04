@@ -14,6 +14,7 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
 
   @observable serverStatus: ServerStatusErrorType = ServerStatusErrors.Healthy;
   @observable isMaintenance: boolean = false;
+  parallelSync: boolean = false;
 
   // set to undefined as a starting value
   // to detect if we've never managed to connect to the server (Yoroi running in offline mode)
@@ -41,6 +42,11 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
           ? ServerStatusErrors.Healthy
           : ServerStatusErrors.Server;
         this.isMaintenance = response.isMaintenance || false;
+        const parallelSync = response.parallelSync || false;
+        if (parallelSync !== this.parallelSync) {
+          this.parallelSync = parallelSync;
+          this.actions.serverConnection.parallelSyncStateChange.trigger();
+        }
         this.serverTime = new Date(response.serverTime);
       });
     } catch (err) {
