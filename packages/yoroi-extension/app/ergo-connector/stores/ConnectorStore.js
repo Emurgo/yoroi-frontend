@@ -67,7 +67,7 @@ import { loadSubmittedTransactions } from '../../api/localStorage';
 import {
   signTransaction as shelleySignTransaction
 } from '../../api/ada/transactions/shelley/transactions';
-import type { GetUtxoDataResponse, RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
+import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import type {
   HaskellShelleyTxSignRequest
@@ -78,7 +78,6 @@ import type {
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { UtxoData } from '../../api/ada/lib/state-fetch/types';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;

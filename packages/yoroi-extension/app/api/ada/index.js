@@ -125,7 +125,7 @@ import type {
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
-  RemoteUnspentOutput, GetUtxoDataResponse,
+  RemoteUnspentOutput,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -352,7 +352,8 @@ export type CardanoTxRequest = {|
   onlyInputsIntended?: boolean,
   validityIntervalStart?: number,
   ttl?: number,
-  requiredSigners?: Array<string>, // HEX of WASM key-hashes, or HEX of WASM addresses, or beck32 addresses
+  // HEX of WASM key-hashes, or HEX of WASM addresses, or beck32 addresses
+  requiredSigners?: Array<string>,
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
@@ -1321,11 +1322,12 @@ export default class AdaApi {
         );
       };
 
-      if (target.mintRequest != null && target.mintRequest.length > 0) {
+      const targetMintRequest = target.mintRequest;
+      if (targetMintRequest != null && targetMintRequest.length > 0) {
         if ((target.address || '').trim().length === 0) {
           throw new Error('A transaction target must include a valid non-empty address `address`!');
         }
-        for (const mintEntry of target.mintRequest) {
+        for (const mintEntry of targetMintRequest) {
           const { script, assetName, amount, metadata, storeScriptOnChain } = mintEntry;
           const { policyId, assetId } = mintEntryToIdentifier(mintEntry);
           const assetAmountBignum = new BigNumber(targetAssets[assetId] ?? '0')
