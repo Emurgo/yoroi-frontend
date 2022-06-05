@@ -57,6 +57,10 @@ const currencyLabels = defineMessages({
     id: 'settings.unitOfAccount.currency.eth',
     defaultMessage: '!!!Ethereum',
   },
+  BRL: {
+    id: 'settings.unitOfAccount.currency.brl',
+    defaultMessage: '!!!Brazilian real',
+  },
 });
 
 type GeneratedData = typeof BlockchainSettingsPage.prototype.generated;

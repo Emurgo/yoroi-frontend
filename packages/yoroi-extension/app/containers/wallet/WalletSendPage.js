@@ -195,6 +195,8 @@ class WalletSendPage extends Component<AllProps> {
             onAddToken={txBuilderActions.updateToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
+            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
           />
           {this.renderDialog()}
         </>

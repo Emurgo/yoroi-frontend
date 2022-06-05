@@ -1,51 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="60px" height="59px" viewBox="0 0 60 59" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>CNY</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <rect id="path-1" x="0" y="0" width="38" height="37.9047619" rx="18.952381"></rect>
-        <filter x="-46.1%" y="-40.9%" width="192.1%" height="192.3%" filterUnits="objectBoundingBox" id="filter-2">
-            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
-        </filter>
-        <circle id="path-3" cx="9" cy="9" r="9"></circle>
-        <circle id="path-5" cx="9" cy="9" r="9"></circle>
-    </defs>
-    <g id="*Feature---multicurrencies-1.9.0" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="general-setting" transform="translate(-65.000000, -1091.000000)">
-            <g id="dropdown" transform="translate(60.000000, 703.000000)">
-                <g id="cny" transform="translate(16.000000, 395.000000)">
-                    <g id="CNY" transform="translate(0.000000, 1.994987)">
-                        <g id="Rectangle-11-Copy">
-                            <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                            <use fill="#F0F3F5" fill-rule="evenodd" xlink:href="#path-1"></use>
-                        </g>
-                        <g id="chinese" transform="translate(10.000000, 10.000000)">
-                            <mask id="mask-4" fill="white">
-                                <use xlink:href="#path-3"></use>
-                            </mask>
-                            <g id="path-1"></g>
-                            <g id="if_57_Ensign_Flag_Nation_china_2634487-Copy-3-Clipped" mask="url(#mask-4)">
-                                <mask id="mask-6" fill="white">
-                                    <use xlink:href="#path-5"></use>
-                                </mask>
-                                <g id="path-1"></g>
-                                <g id="if_57_Ensign_Flag_Nation_china_2634487-Copy-3" mask="url(#mask-6)">
-                                    <polygon id="XMLID_7_" fill="#CB2127" points="0 0 31.5 0 31.5 18 0 18"></polygon>
-                                    <polygon id="XMLID_6_" fill="#F7DE28" points="3.11053593 6.75 3.63672351 5.03297055 2.25 3.96702945 3.96559074 3.9612676 4.50274056 2.25 5.03440926 3.9612676 6.75 3.96702945 5.36327649 5.03297055 5.88946407 6.75 4.50274056 5.68982074"></polygon>
-                                    <polygon id="XMLID_5_" fill="#F7DE28" points="7.97586207 7.0897651 8.79827587 7.4068792 9.36465517 6.75 9.30258621 7.61073825 10.125 7.93540269 9.26379311 8.14681208 9.20172413 9 8.72844828 8.27516779 7.875 8.47902684 8.44137931 7.81459731"></polygon>
-                                    <polygon id="XMLID_4_" fill="#F7DE28" points="12.375 3.88429054 11.5178571 3.73986486 11.1045918 4.5 10.9821429 3.6410473 10.125 3.48902027 10.9056122 3.1089527 10.7831633 2.25 11.3954082 2.87331081 12.1760205 2.49324325 11.7704081 3.26097973"></polygon>
-                                    <polygon id="XMLID_3_" fill="#F7DE28" points="10.5553691 7.875 10.8196309 7.0193662 10.125 6.48855633 10.9857383 6.48855633 11.25 5.625 11.5142617 6.48855633 12.375 6.48855633 11.6803691 7.0193662 11.9446309 7.875 11.25 7.35211268"></polygon>
-                                    <polygon id="XMLID_2_" fill="#F7DE28" points="8.04394198 1.39772727 8.84257679 1.75378788 9.4415529 1.125 9.33404437 1.98106061 10.125 2.35227273 9.26493174 2.5189394 9.15742321 3.375 8.73506826 2.61742425 7.875 2.7840909 8.46629693 2.14772727"></polygon>
-                                </g>
-                            </g>
-                        </g>
-                        <ellipse id="Oval" stroke-opacity="0.3" stroke="#4A4A4A" stroke-width="0.5" cx="19" cy="18.9799499" rx="9.16666667" ry="9.14369256"></ellipse>
-                    </g>
-                </g>
-            </g>
-        </g>
-    </g>
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 20C0 8.95431 8.95431 0 20 0V0C31.0457 0 40 8.95431 40 20V20C40 31.0457 31.0457 40 20 40V40C8.95431 40 0 31.0457 0 20V20Z" fill="#F0F3F5"/>
+<mask id="mask0_319_30387" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="11" y="11" width="18" height="18">
+<path d="M19.9999 28.8783C24.8801 28.8783 28.8363 24.9122 28.8363 20.0198C28.8363 15.1273 24.8801 11.1612 19.9999 11.1612C15.1197 11.1612 11.1636 15.1273 11.1636 20.0198C11.1636 24.9122 15.1197 28.8783 19.9999 28.8783Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_319_30387)">
+<mask id="mask1_319_30387" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="11" y="11" width="18" height="18">
+<path d="M19.9999 28.8783C24.8801 28.8783 28.8363 24.9122 28.8363 20.0198C28.8363 15.1273 24.8801 11.1612 19.9999 11.1612C15.1197 11.1612 11.1636 15.1273 11.1636 20.0198C11.1636 24.9122 15.1197 28.8783 19.9999 28.8783Z" fill="white"/>
+</mask>
+<g mask="url(#mask1_319_30387)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.1636 11.1612H42.0909V28.8783H11.1636V11.1612Z" fill="#CB2127"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14.2177 17.8051L14.7343 16.1151L13.3728 15.0659L15.0572 15.0602L15.5846 13.3758L16.1066 15.0602L17.791 15.0659L16.4295 16.1151L16.9461 17.8051L15.5846 16.7616L14.2177 17.8051Z" fill="#F7DE28"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M18.9945 18.1395L19.802 18.4517L20.3581 17.8051L20.2971 18.6523L21.1046 18.9719L20.2591 19.18L20.1981 20.0198L19.7334 19.3063L18.8955 19.507L19.4516 18.853L18.9945 18.1395Z" fill="#F7DE28"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M23.3138 14.9844L22.4723 14.8423L22.0665 15.5905L21.9463 14.745L21.1047 14.5954L21.8712 14.2213L21.7509 13.3758L22.352 13.9893L23.1185 13.6152L22.7202 14.3709L23.3138 14.9844Z" fill="#F7DE28"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M21.5273 18.9124L21.7867 18.0702L21.1047 17.5478H21.9498L22.2093 16.6978L22.4687 17.5478H23.3138L22.6318 18.0702L22.8913 18.9124L22.2093 18.3978L21.5273 18.9124Z" fill="#F7DE28"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M19.0614 12.5369L19.8455 12.8874L20.4336 12.2685L20.328 13.1111L21.1046 13.4765L20.2602 13.6405L20.1546 14.4831L19.7399 13.7375L18.8955 13.9015L19.4761 13.2751L19.0614 12.5369Z" fill="#F7DE28"/>
+</g>
+</g>
 </svg>
