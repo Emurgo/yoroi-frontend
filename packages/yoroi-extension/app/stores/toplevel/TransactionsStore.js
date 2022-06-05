@@ -4,9 +4,8 @@ import { find } from 'lodash';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
-import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
+import WalletTransaction from '../../domain/WalletTransaction';
 import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
   BaseGetTransactionsRequest,
@@ -54,11 +53,12 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import {
   persistSubmittedTransactions,
   loadSubmittedTransactions
 } from '../../api/localStorage';
+import { assuranceLevels } from '../../config/transactionAssuranceConfig';
+import { transactionTypes } from '../../api/ada/transactions/types';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -165,21 +165,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
-    const selectedNetwork = this.stores.profile.selectedNetwork;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.unconfirmedAmount)} no network selected`);
-
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId);
-    const defaultTokenInfo = {
-      defaultNetworkId: defaultToken.NetworkId,
-      defaultIdentifier: defaultToken.Identifier,
-    };
-
     const defaultUnconfirmedAmount = {
-      total: newMultiToken(defaultTokenInfo),
-      incoming: newMultiToken(defaultTokenInfo),
-      outgoing: newMultiToken(defaultTokenInfo),
-      incomingInSelectedCurrency: new BigNumber(0),
-      outgoingInSelectedCurrency: new BigNumber(0),
+      incoming: [],
+      outgoing: [],
     };
 
     // Get current public deriver
@@ -362,10 +350,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     // note: possible existing memos were modified on a difference instance, etc.
     await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
-    // note: possible we failed to get the historical price for something in the past
+
+    const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+    const ticker = defaultTokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected default token type');
+    }
     await this.stores.coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
       timestamps: result.timestamps,
+      defaultToken: ticker,
     });
 
     const remoteTransactionIds = result.remoteTransactionIds;
@@ -566,32 +562,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   genComputeOnAllTransactions: string => GetTransactionsDataFunc = (apiType) => {
     return async (request) => {
       const publicDeriver = request.publicDeriver;
-      const NetworkId = publicDeriver.getParent().getNetworkInfo().NetworkId
-
-      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(NetworkId);
-      const defaultTokenInfo = {
-        defaultNetworkId: defaultToken.NetworkId,
-        defaultIdentifier: defaultToken.Identifier,
-      };
-
 
       // Get current transactions for public deriver
       const txRequests = this.getTxRequests((publicDeriver: any));
 
-      const unitOfAccount = this.stores.profile.unitOfAccount;
-
       const { assuranceMode } = this.stores.walletSettings
             .getPublicDeriverSettingsCache((publicDeriver: any));
-      const getUnitOfAccount = (timestamp: Date) =>
-            (!unitOfAccount.enabled
-             ? undefined
-             : this.stores.coinPriceStore.priceMap.get(getPriceKey(
-               getTokenName(this.stores.tokenInfoStore.getDefaultTokenInfo(
-                 publicDeriver.getParent().getNetworkInfo().NetworkId
-               )),
-               unitOfAccount.currency,
-               timestamp
-             )));
 
       let cursor = 0;
 
@@ -601,8 +577,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         new UnconfirmedAmountReducer(
           txRequests.lastSyncInfo.Height,
           assuranceMode,
-          getUnitOfAccount,
-          defaultTokenInfo,
         ),
         new RemoteTransactionIdsReducer(),
         new TimestampsReducer(),
@@ -985,58 +959,47 @@ class UnconfirmedAmountReducer {
   amount: UnconfirmedAmount;
   lastSyncHeight: number;
   assuranceMode: AssuranceMode;
-  getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>);
-  defaultTokenInfo: DefaultTokenEntry;
 
   constructor(
     lastSyncHeight: number,
     assuranceMode: AssuranceMode,
-    getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
-    defaultTokenInfo: DefaultTokenEntry
   ) {
     this.amount = {
-      total: new MultiToken([], defaultTokenInfo),
-      incoming: new MultiToken([], defaultTokenInfo),
-      outgoing: new MultiToken([], defaultTokenInfo),
-      incomingInSelectedCurrency: new BigNumber(0),
-      outgoingInSelectedCurrency: new BigNumber(0),
+      incoming: [],
+      outgoing: [],
     };
 
     this.lastSyncHeight = lastSyncHeight;
     this.assuranceMode = assuranceMode;
-    this.getUnitOfAccount = getUnitOfAccount;
-    this.defaultTokenInfo = defaultTokenInfo;
   }
 
   reduce(transactions: Array<WalletTransaction>): void {
-    const batchAmount = calculateUnconfirmedAmount(
-      transactions,
-      this.lastSyncHeight,
-      this.assuranceMode,
-      this.getUnitOfAccount,
-      this.defaultTokenInfo,
-    );
+    for (const transaction of transactions) {
+      // skip any failed transactions
+      if (transaction.state < 0) continue;
 
-    this.amount.total.joinAddMutable(batchAmount.total);
-    this.amount.incoming.joinAddMutable(batchAmount.incoming);
-    this.amount.outgoing.joinAddMutable(batchAmount.outgoing);
-    if (
-      this.amount.incomingInSelectedCurrency &&
-        batchAmount.incomingInSelectedCurrency
-    ) {
-      this.amount.incomingInSelectedCurrency =
-        this.amount.incomingInSelectedCurrency.plus(
-          batchAmount.incomingInSelectedCurrency
-        );
-    }
-    if (
-      this.amount.outgoingInSelectedCurrency &&
-        batchAmount.outgoingInSelectedCurrency
-    ) {
-      this.amount.outgoingInSelectedCurrency =
-        this.amount.outgoingInSelectedCurrency.plus(
-          batchAmount.outgoingInSelectedCurrency
-        );
+      const assuranceForTx = transaction.getAssuranceLevelForMode(
+        this.assuranceMode,
+        this.lastSyncHeight
+      );
+
+      if (assuranceForTx !== assuranceLevels.HIGH) {
+        // outgoing
+        if (transaction.type === transactionTypes.EXPEND) {
+          this.amount.outgoing.push({
+            amount: transaction.amount.absCopy(),
+            timestamp: transaction.date.valueOf(),
+          });
+        }
+
+        // incoming
+        if (transaction.type === transactionTypes.INCOME) {
+          this.amount.incoming.push({
+            amount: transaction.amount.absCopy(),
+            timestamp: transaction.date.valueOf(),
+          });
+        }
+      }
     }
   }
   get result(): UnconfirmedAmount {

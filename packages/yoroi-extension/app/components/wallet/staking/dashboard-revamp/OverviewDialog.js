@@ -116,7 +116,7 @@ export default class OverviewModal extends Component<Props> {
               {this.renderAmount(totalRewards)}
             </Typography>
             <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-              {this.renderAmount(totalRewards)} USD
+              {this.renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </Box>
         </Box>
@@ -155,18 +155,25 @@ export default class OverviewModal extends Component<Props> {
         </div>
       );
     }
+
+    return this.formatTokenEntry(token.getDefaultEntry());
+  };
+
+  renderAmountWithUnitOfAccount: (void | MultiToken) => Node = token => {
+    if (token == null) {
+      return null;
+    }
+
     const unitOfAccountCalculated = this.props.unitOfAccount(token.getDefaultEntry());
 
-    const entryNode = this.formatTokenEntry(token.getDefaultEntry());
-    const unitOfAccountNode = unitOfAccountCalculated
-      ? `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`
-      : null;
+    if (!unitOfAccountCalculated) {
+      return null;
+    }
 
-    return (
-      <>
-        {unitOfAccountNode}
-        {entryNode}
-      </>
-    );
+    if (this.props.shouldHideBalance) {
+      return `${hiddenAmount}  ${unitOfAccountCalculated.currency}`;
+    }
+
+    return `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`;
   };
 }
