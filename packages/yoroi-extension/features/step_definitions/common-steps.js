@@ -189,11 +189,15 @@ async function takePageSnapshot(driver, name) {
 }
 
 async function getConsoleLogs(driver, name) {
+  try {
   const dir = createDirInTestRunsData('consoleLogs');
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
   const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
+} catch (error) {
+  //console.error(error);
+}
 }
 
 async function inputMnemonicForWallet(
@@ -335,7 +339,7 @@ async function acceptUriPrompt(world: any) {
   }
 }
 
-Given(/^I have opened the extension$/, async function () {
+Given(/^I have opened the extension$/, { timeout: 60000 }, async function () {
   await this.driver.get(this.getExtensionUrl());
 });
 
