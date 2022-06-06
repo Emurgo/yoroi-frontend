@@ -130,7 +130,11 @@ export default class BaseCoinPriceStore
       return null;
     }
     const normalizedFrom = from === 'TADA' ? 'ADA' : from;
-    return String(getPrice(normalizedFrom, to, this.currentPriceTickers));
+    const price = getPrice(normalizedFrom, to, this.currentPriceTickers);
+    if (price == null) {
+      return price;
+    }
+    return String(price);
   }
 
   getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string = (
@@ -140,7 +144,10 @@ export default class BaseCoinPriceStore
     const price = this.priceMap.get(
       getPriceKey(normalizedFrom, to, new Date(timestamp))
     );
-    return String(price?.Price);
+    if (price == null) {
+      return undefined;
+    }
+    return String(price.Price);
   }
 
   _pollRefresh: void => Promise<void> = async () => {
