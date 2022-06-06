@@ -140,16 +140,14 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
           error={stores.explorers.setSelectedExplorerRequest.error}
         />
         {uriSettings}
-        {(!environment.isProduction() || environment.isTest()) &&
-          <UnitOfAccountSettings
-            onSelect={this.onSelectUnitOfAccount}
-            isSubmitting={isSubmittingUnitOfAccount}
-            currencies={currencies}
-            currentValue={unitOfAccountValue}
-            error={stores.profile.setUnitOfAccountRequest.error}
-            lastUpdatedTimestamp={stores.coinPriceStore.lastUpdateTimestamp}
-          />
-        }
+        <UnitOfAccountSettings
+          onSelect={this.onSelectUnitOfAccount}
+          isSubmitting={isSubmittingUnitOfAccount}
+          currencies={currencies}
+          currentValue={unitOfAccountValue}
+          error={stores.profile.setUnitOfAccountRequest.error}
+          lastUpdatedTimestamp={stores.coinPriceStore.lastUpdateTimestamp}
+        />
       </>
     );
   }
