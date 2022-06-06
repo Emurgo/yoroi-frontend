@@ -146,7 +146,7 @@ export default class WalletSummary extends Component<Props> {
             currency,
             timestamp
           );
-          if (!price) {
+          if (price == null) {
             totalFiatAmount = null;
             break;
           }

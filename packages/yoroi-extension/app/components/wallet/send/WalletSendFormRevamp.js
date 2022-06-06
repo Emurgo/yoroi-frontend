@@ -596,7 +596,7 @@ export default class WalletSendForm extends Component<Props, State> {
       }
       const price = this.props.getCurrentPrice(ticker, currency);
 
-      if (price) {
+      if (price != null) {
         convertedAmount = calculateAndFormatValue(amount, price);
       } else {
         convertedAmount = '-';

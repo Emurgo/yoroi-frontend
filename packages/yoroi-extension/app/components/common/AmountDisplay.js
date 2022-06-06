@@ -64,7 +64,7 @@ export default class AmountDisplay extends Component<Props> {
         </>
       );
 
-      if (unitOfAccountSetting.enabled && showFiat) {
+      if (unitOfAccountSetting.enabled && Boolean(showFiat)) {
         const ticker = tokenInfo.Metadata.ticker;
         if (ticker == null) {
           throw new Error('unexpected main token type');

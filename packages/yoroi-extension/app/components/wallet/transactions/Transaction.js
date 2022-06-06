@@ -447,7 +447,7 @@ export default class Transaction extends Component<Props, State> {
       throw new Error('missing token info');
     }
 
-    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const numberOfDecimals = tokenInfo.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(

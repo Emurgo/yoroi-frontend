@@ -124,14 +124,14 @@ export default class WalletSummaryRevamp extends Component<Props> {
             currency,
             timestamp
           );
-          if (!price) {
+          if (price == null) {
             totalFiatAmount = null;
             break;
           }
           totalFiatAmount = totalFiatAmount.plus(
             tokenEntry.amount
               .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-              .multipliedBy(String(price))
+              .multipliedBy(price)
           );
         }
         if (totalFiatAmount) {

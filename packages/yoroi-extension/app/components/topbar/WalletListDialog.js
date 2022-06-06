@@ -192,7 +192,7 @@ export default class WalletListDialog extends Component<Props, State> {
       >
         <div className={styles.header}>
           <div className={styles.totalInfo}>
-            {walletsTotal && (
+            {(walletsTotal !== undefined) && (
               <div className={styles.amount}>
                 <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
                 <p className={styles.value}>
@@ -276,7 +276,7 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   }
 
-  renderWalletsTotal(): Node {
+  renderWalletsTotal(): ?Node {
     const {
       unitOfAccountSetting,
       cardanoWallets,
@@ -330,7 +330,7 @@ export default class WalletListDialog extends Component<Props, State> {
       );
     }
     // there are both ADAs and ERGs, don't show total
-    return null;
+    return undefined;
   }
 
   sumWallets(
@@ -400,7 +400,7 @@ export default class WalletListDialog extends Component<Props, State> {
       throw new Error(`unexpected unit of account ${String(currency)}`);
     }
     const price = getCurrentPrice(ticker, currency);
-    if (price) {
+    if (price != null) {
       return { sum, fiat: shiftedAmount.multipliedBy(price) };
     }
     return { sum, fiat: null };
