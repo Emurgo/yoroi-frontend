@@ -136,7 +136,7 @@ type Props = {|
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 type State = {|

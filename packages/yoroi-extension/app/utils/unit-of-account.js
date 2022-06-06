@@ -6,7 +6,7 @@ export function calculateAndFormatValue(
   // Note: make sure you pass the right denomination
   // ex: pass ADA instead of lovelaces
   coinAmount: BigNumber,
-  price: number
+  price: string
 ): string {
   try {
     /*

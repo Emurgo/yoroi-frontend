@@ -177,7 +177,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
         getCurrentPrice: (
           from: string,
           to: string
-        ) => ?number,
+        ) => ?string,
         lastUpdateTimestamp: null | number,
         refreshCurrentUnit: {| isExecuting: boolean |}
       |},

@@ -82,7 +82,7 @@ const genBaseProps: {|
       refreshWalletFromRemote: async () => action('refreshWalletFromRemote')(),
     },
     coinPriceStore: {
-      getCurrentPrice: (_from, _to) => 5,
+      getCurrentPrice: (_from, _to) => '5',
     },
     tokenInfoStore: {
       tokenInfo: mockFromDefaults(defaultAssets),

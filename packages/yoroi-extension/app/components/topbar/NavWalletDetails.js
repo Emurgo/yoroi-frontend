@@ -42,7 +42,7 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +purpose: 'allWallets' | 'topBar',
 |};
 

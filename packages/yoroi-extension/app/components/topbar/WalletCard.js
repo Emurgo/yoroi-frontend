@@ -57,7 +57,7 @@ type Props = {|
   +walletId: string,
   +idx: number,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +toggleQuickAccess: string => void,
   +isInQuickAccess: boolean,
 |};
