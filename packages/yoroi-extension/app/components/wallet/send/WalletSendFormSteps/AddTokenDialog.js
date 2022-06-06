@@ -169,9 +169,23 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     const filteredTokens = this.state.selectedTokens.filter(
       ({ tokenInfo: t }) => t.Identifier !== tokenInfo.Identifier
-    )
+    );
 
-    this.setState({ selectedTokens: [...filteredTokens, tokenEntryCopy] })
+    this.setState({ selectedTokens: [...filteredTokens, tokenEntryCopy] });
+  }
+
+  getCurrentAmount = (tokenInfo) => {
+    const token = this.getSelectedToken(tokenInfo);
+
+    if (!token) return this.props.getTokenAmount(tokenInfo);
+
+    return token.amount;
+  }
+
+  getSelectedToken = (tokenInfo) => {
+    return this.state.selectedTokens.find(
+      ({ tokenInfo: t }) => t.Identifier === tokenInfo.Identifier
+    )
   }
 
 
@@ -206,6 +220,13 @@ export default class AddTokenDialog extends Component<Props, State> {
       if (maxAmount.lt(token.amount || 0) || token.amount < 0) {
         return false
       }
+    }
+    return true
+  }
+
+  isValidAmounts = () => {
+    for (const tokenEntry of this.state.selectedTokens) {
+      if (!this.isValidAmount(tokenEntry.tokenInfo)) return false;
     }
     return true
   }
@@ -272,9 +293,8 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onClose, totalInput, fee, isCalculatingFee, getTokenInfo } = this.props
-    const { currentTokensList, fullTokensList, selectedTokens, error } = this.state
-    console.log({selectedTokens})
+    const { onClose, totalInput, fee, isCalculatingFee, getTokenInfo } = this.props;
+    const { currentTokensList, fullTokensList, selectedTokens } = this.state;
     return (
       <Dialog
         title={
@@ -345,7 +365,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                       token={token}
                       classicTheme={this.props.classicTheme}
                       updateAmount={this.updateAmount}
-                      getTokenAmount={this.props.getTokenAmount}
+                      getTokenAmount={this.getCurrentAmount}
                       uriParams={this.props.uriParams}
                       selectedToken={this.props.selectedToken}
                       validateAmount={this.props.validateAmount}
@@ -375,7 +395,7 @@ export default class AddTokenDialog extends Component<Props, State> {
               borderRadius: '0px',
               color: 'var(--yoroi-palette-secondary-300)',
             }}
-            disabled={selectedTokens.length === 0 || error}
+            disabled={selectedTokens.length === 0 || !this.isValidAmounts()}
             onClick={this.onAddAll}
             variant='ternary'
           >
