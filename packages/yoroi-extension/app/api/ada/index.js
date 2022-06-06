@@ -106,7 +106,11 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import { scanShelleyCip1852Account } from './restoration/shelley/scan';
-import type { CardanoAddressedUtxo, V4UnsignedTxAddressedUtxoResponse, } from './transactions/types';
+import type {
+  CardanoAddressedUtxo,
+  CardanoUtxoScriptWitness,
+  V4UnsignedTxAddressedUtxoResponse,
+} from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
@@ -159,6 +163,7 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
+import type { ForeignUtxoFetcher } from '../../ergo-connector/stores/ConnectorStore';
 
 // ADA specific Request / Response params
 
@@ -326,8 +331,14 @@ export type CardanoTxRequestMint = {|
   // This metadata will be wrapped into { tag: { [policyId]: { [assetName]: json } } }
   metadata?: CardanoTxRequestMintMetadata,
 |};
+type CardanoTxRequestInput =
+  string | // UTxO ID
+  {|
+    id: string, // UTxO ID
+    witness: CardanoUtxoScriptWitness,
+  |};
 export type CardanoTxRequest = {|
-  includeInputs?: Array<string>, // Array of UTxO IDs
+  includeInputs?: Array<CardanoTxRequestInput>,
   includeOutputs?: Array<string>, // HEX of WASM TransactionOutput values
   includeTargets?: Array<{|
     address: string,
@@ -341,6 +352,8 @@ export type CardanoTxRequest = {|
   onlyInputsIntended?: boolean,
   validityIntervalStart?: number,
   ttl?: number,
+  // HEX of WASM key-hashes, or HEX of WASM addresses, or beck32 addresses
+  requiredSigners?: Array<string>,
 |};
 export type CreateUnsignedTxForConnectorRequest = {|
   cardanoTxRequest: CardanoTxRequest,
@@ -1128,7 +1141,8 @@ export default class AdaApi {
   }
 
   async createUnsignedTxForConnector(
-    request: CreateUnsignedTxForConnectorRequest
+    request: CreateUnsignedTxForConnectorRequest,
+    foreignUtxoFetcher: ?ForeignUtxoFetcher,
   ): Promise<CreateUnsignedTxResponse> {
     const {
       includeInputs,
@@ -1138,6 +1152,7 @@ export default class AdaApi {
       onlyInputsIntended,
       validityIntervalStart,
       ttl,
+      requiredSigners,
     } = request.cardanoTxRequest;
     const noneOrEmpty = a => {
       if (a != null && !Array.isArray(a)) {
@@ -1145,14 +1160,14 @@ export default class AdaApi {
       }
       return a == null || a.length === 0;
     }
-    const noInputs = !noneOrEmpty(includeInputs);
+    const noInputs = noneOrEmpty(includeInputs);
     const noOutputs = noneOrEmpty(includeOutputs) && noneOrEmpty(includeTargets);
     if (noOutputs) {
       if (noInputs) {
         throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
       }
       if (Boolean(onlyInputsIntended) === false) {
-        throw new Error('No outputs is specified and intended inputs flag is false');
+        throw new Error('No outputs is specified and `onlyInputsIntended` flag is false');
       }
     }
 
@@ -1163,18 +1178,40 @@ export default class AdaApi {
     );
 
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
-    const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {
-      if (!allUtxoIds.has(utxoId)) {
-        throw new Error(`No UTxO found for input id ${utxoId}`);
+    const foreignUtxoIds: Array<string> = [];
+    const includeInputMap = (includeInputs||[]).reduce((acc, e: CardanoTxRequestInput) => {
+      // eslint-disable-next-line no-nested-ternary
+      const id = typeof e === 'string' ? e
+        : (typeof e.id === 'string' ? e.id : null);
+      if (id == null) {
+        throw new Error(`Unrecognised input request format: ${JSON.stringify(e)}`);
       }
-      return true;
-    }));
+      if (!allUtxoIds.has(id)) {
+        foreignUtxoIds.push(id);
+      }
+      acc[id] = e;
+      return acc;
+    }, {})
 
-    const mustIncludeUtxos = [];
-    const coinSelectUtxos = [];
-    for (const utxo of utxos) {
-      if (utxoIdSet.has(utxo.utxo_id)) {
-        mustIncludeUtxos.push(utxo);
+    const foreignUtxos = [];
+    if (foreignUtxoIds.length > 0) {
+      if (foreignUtxoFetcher == null) {
+        throw new Error('Foreign utxos are present, but foreign utxo fetcher is missing!');
+      }
+      foreignUtxos.push(...await foreignUtxoFetcher(foreignUtxoIds));
+      foreignUtxos.forEach((u, i) => {
+        if (u == null) {
+          throw new Error(`No UTxO found for input id: ${JSON.stringify(foreignUtxoIds[i])}`);
+        }
+      });
+    }
+
+    const mustIncludeUtxos: Array<[CardanoAddressedUtxo, ?CardanoUtxoScriptWitness]> = [];
+    const coinSelectUtxos: Array<CardanoAddressedUtxo> = [];
+    for (const utxo of [...foreignUtxos, ...utxos]) {
+      const includeInputEntry = includeInputMap[utxo.utxo_id];
+      if (includeInputEntry != null) {
+        mustIncludeUtxos.push([utxo, includeInputEntry.witness]);
       } else {
         coinSelectUtxos.push(utxo);
       }
@@ -1233,8 +1270,10 @@ export default class AdaApi {
     |} {
       const { script, assetName } = mintEntry;
       const policyId = bytesToHex(
-        RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(script))
-          .hash(RustModule.WalletV4.ScriptHashNamespace.NativeScript).to_bytes()
+        RustModule.WalletV4.NativeScript
+          .from_bytes(hexToBytes(script))
+          .hash()
+          .to_bytes()
       );
       const assetId = `${policyId}.${assetName}`;
       return { policyId, assetId };
@@ -1283,8 +1322,12 @@ export default class AdaApi {
         );
       };
 
-      if (target.mintRequest != null && target.mintRequest.length > 0) {
-        for (const mintEntry of target.mintRequest) {
+      const targetMintRequest = target.mintRequest;
+      if (targetMintRequest != null && targetMintRequest.length > 0) {
+        if ((target.address || '').trim().length === 0) {
+          throw new Error('A transaction target must include a valid non-empty address `address`!');
+        }
+        for (const mintEntry of targetMintRequest) {
           const { script, assetName, amount, metadata, storeScriptOnChain } = mintEntry;
           const { policyId, assetId } = mintEntryToIdentifier(mintEntry);
           const assetAmountBignum = new BigNumber(targetAssets[assetId] ?? '0')
@@ -1312,8 +1355,8 @@ export default class AdaApi {
       const dataHash = target.dataHash;
       const ensureMinValue = target.ensureRequiredMinimalValue;
       if (ensureMinValue == null || ensureMinValue === false) {
-        if (target.value === undefined) {
-          throw new Error('Value is required for a valid tx output');
+        if (target.value == null) {
+          throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
         // ensureRequiredMinimalValue is true
@@ -1365,6 +1408,7 @@ export default class AdaApi {
       request.absSlotNumber,
       validityIntervalStart,
       ttl,
+      requiredSigners,
       protocolParams,
     );
 

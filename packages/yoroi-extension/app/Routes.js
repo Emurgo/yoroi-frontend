@@ -147,124 +147,122 @@ export const Routes = (
   stores: StoresMap,
   actions: ActionsMap
 ): Node => (
-  <div style={{ height: '100%' }}>
-    <Suspense fallback={null}>
-      <Switch>
-        <Route
-          exact
-          path={ROUTES.ROOT}
-          component={(props) => <LoadingPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.NIGHTLY_INFO}
-          component={(props) => <NightlyPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.PROFILE.LANGUAGE_SELECTION}
-          component={(props) => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
-          component={(props) => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.PROFILE.TERMS_OF_USE}
-          component={(props) => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.PROFILE.URI_PROMPT}
-          component={(props) => <UriPromptPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.MY_WALLETS}
-          component={(props) => <MyWalletsPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.STAKING}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          path={ROUTES.ASSETS.ROOT}
-          component={(props) => (
-            wrapAssets(
-              { ...props, stores, actions },
-              AssetsSubpages(stores, actions)
-            )
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.ADD}
-          component={(props) => <WalletAddPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-          component={(props) => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
-          component={(props) => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.EXPERIMENTAL.THEMES}
-          component={(props) => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          path={ROUTES.WALLETS.ROOT}
-          component={(props) => (
-            wrapWallet(
-              { ...props, stores, actions },
-              WalletsSubpages(stores, actions)
-            )
-          )}
-        />
-        <Route
-          path={ROUTES.SETTINGS.ROOT}
-          component={(props) => (
-            wrapSettings(
-              { ...props, stores, actions },
-              SettingsSubpages(stores, actions)
-            )
-          )}
-        />
-        <Route
-          path={ROUTES.TRANSFER.ROOT}
-          component={(props) => <Transfer {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.SEND_FROM_URI.ROOT}
-          component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-          component={(props) => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.NOTICE_BOARD.ROOT}
-          component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.SWITCH}
-          component={(props) => <WalletSwitch {...props} stores={stores} actions={actions} />}
-        />
-        <Redirect to={ROUTES.MY_WALLETS} />
-      </Switch>
-    </Suspense>
-  </div>
+  <Suspense fallback={null}>
+    <Switch>
+      <Route
+        exact
+        path={ROUTES.ROOT}
+        component={(props) => <LoadingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.NIGHTLY_INFO}
+        component={(props) => <NightlyPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.LANGUAGE_SELECTION}
+        component={(props) => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
+        component={(props) => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.TERMS_OF_USE}
+        component={(props) => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.URI_PROMPT}
+        component={(props) => <UriPromptPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.MY_WALLETS}
+        component={(props) => <MyWalletsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.STAKING}
+        component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.ASSETS.ROOT}
+        component={(props) => (
+          wrapAssets(
+            { ...props, stores, actions },
+            AssetsSubpages(stores, actions)
+          )
+        )}
+      />
+      <Route
+        exact
+        path={ROUTES.WALLETS.ADD}
+        component={(props) => <WalletAddPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
+        component={(props) => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
+        component={(props) => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXPERIMENTAL.THEMES}
+        component={(props) => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.WALLETS.ROOT}
+        component={(props) => (
+          wrapWallet(
+            { ...props, stores, actions },
+            WalletsSubpages(stores, actions)
+          )
+        )}
+      />
+      <Route
+        path={ROUTES.SETTINGS.ROOT}
+        component={(props) => (
+          wrapSettings(
+            { ...props, stores, actions },
+            SettingsSubpages(stores, actions)
+          )
+        )}
+      />
+      <Route
+        path={ROUTES.TRANSFER.ROOT}
+        component={(props) => <Transfer {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.SEND_FROM_URI.ROOT}
+        component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
+        component={(props) => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.NOTICE_BOARD.ROOT}
+        component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.SWITCH}
+        component={(props) => <WalletSwitch {...props} stores={stores} actions={actions} />}
+      />
+      <Redirect to={ROUTES.MY_WALLETS} />
+    </Switch>
+  </Suspense>
 );
 
 const WalletsSubpages = (stores, actions) => (

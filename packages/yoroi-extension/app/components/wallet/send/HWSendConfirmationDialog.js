@@ -16,7 +16,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -62,117 +61,44 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  convertedToUnitOfAccount: (TokenEntry, string) => string = (token, toCurrency) => {
-    const tokenInfo = this.props.getTokenInfo(token);
-
-    const shiftedAmount = token.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    const coinPrice = this.props.getCurrentPrice(
-      tokenInfo.Identifier,
-      toCurrency
-    );
-
-    if (coinPrice == null) return '-';
-
-    return calculateAndFormatValue(
-      shiftedAmount,
-      coinPrice
-    );
-  }
-
   renderSingleAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.amount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.amountSmall}>{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.amount}>{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
-            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-          }
-          </span>
-        </div>
-      );
+    return (
+      <div className={styles.amount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(entry)))
+        }
+        </span>
+      </div>
+    );
   }
   renderTotalAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.totalAmount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.totalAmountSmall}>{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.totalAmount}>{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
-            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-          }
-          </span>
-        </div>
-      );
+    return (
+      <div className={styles.totalAmount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(entry)))
+        }
+        </span>
+      </div>
+    );
   }
   renderSingleFee: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.fees}>+
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.feesSmall}>
-            +{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(
-                entry
-              )))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.fees}>
-          +{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
-            truncateToken(getTokenName(this.props.getTokenInfo(
-              entry
-            )))
-          }
-          </span>
-        </div>
-      );
+    return (
+      <div className={styles.fees}>
+        +{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(
+            entry
+          )))
+        }
+        </span>
+      </div>
+    );
   }
 
   renderBundle: {|
