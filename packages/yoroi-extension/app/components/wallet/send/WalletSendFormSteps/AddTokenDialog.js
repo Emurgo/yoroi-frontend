@@ -137,7 +137,78 @@ export default class AddTokenDialog extends Component<Props, State> {
     fullTokensList: [],
     sortingDirection: null,
     sortingColumn: '',
+    selectedTokens: [],
+    error: false,
   };
+
+  onSelect: $ReadOnly<TokenRow> => void = (tokenInfo) => {
+    this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, { tokenInfo }] }))
+  }
+
+  onRemoveToken = (tokenInfo) => {
+    this.setState(prev => ({ ...prev,  selectedTokens: [...prev.selectedTokens].filter(
+      ({ tokenInfo: t }) => t.Identifier !== tokenInfo.Identifier) }))
+    this.props.onRemoveToken(tokenInfo)
+  }
+
+  isTokenIncluded = (tokenInfo) => {
+    const isIncluded = this.state.selectedTokens.find(
+      ({ tokenInfo: t }) => t.Identifier === tokenInfo?.Identifier
+    )
+    return isIncluded || this.props.isTokenIncluded(tokenInfo)
+  }
+
+  updateAmount = (tokenInfo, amount) => {
+    const tokenEntry = this.state.selectedTokens.find(
+      ({ tokenInfo: t }) => t.Identifier === tokenInfo.Identifier
+    )
+
+    const tokenEntryCopy = { ...tokenEntry };
+    tokenEntryCopy.amount = amount;
+    tokenEntryCopy.tokenInfo = tokenInfo;
+
+    const filteredTokens = this.state.selectedTokens.filter(
+      ({ tokenInfo: t }) => t.Identifier !== tokenInfo.Identifier
+    )
+
+    this.setState({ selectedTokens: [...filteredTokens, tokenEntryCopy] })
+  }
+
+
+  onAddAll = () => {
+    for (const { tokenInfo, amount } of this.state.selectedTokens) {
+      this.props.onAddToken({
+            token: tokenInfo, shouldReset: false, maxAmount: this.getMaxAmount(tokenInfo),
+      })
+
+      this.props.updateAmount(new BigNumber(amount))
+    }
+    this.props.onClose();
+  }
+
+  getMaxAmount = (tokenInfo) => {
+    const token = this.state.fullTokensList.find(
+      entry => entry.info.Identifier === tokenInfo.Identifier
+    )
+
+    if (!token) throw new Error('Token not found.')
+
+    return token.amount
+  }
+
+  isValidAmount = (tokenInfo) => {
+    const token = this.state.selectedTokens.find(
+      ({ tokenInfo: t }) => t.Identifier === tokenInfo.Identifier
+    )
+
+    if (token) {
+      const maxAmount = new BigNumber(this.getMaxAmount(tokenInfo))
+      if (maxAmount.lt(token.amount || 0) || token.amount < 0) {
+        return false
+      }
+    }
+    return true
+  }
 
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
     (event: SyntheticEvent<HTMLInputElement>) => {
@@ -202,8 +273,8 @@ export default class AddTokenDialog extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { onClose, totalInput, fee, isCalculatingFee, getTokenInfo } = this.props
-    const { currentTokensList, fullTokensList } = this.state
-
+    const { currentTokensList, fullTokensList, selectedTokens, error } = this.state
+    console.log({selectedTokens})
     return (
       <Dialog
         title={
@@ -273,25 +344,21 @@ export default class AddTokenDialog extends Component<Props, State> {
                       key={token.id}
                       token={token}
                       classicTheme={this.props.classicTheme}
-                      updateAmount={this.props.updateAmount}
+                      updateAmount={this.updateAmount}
+                      getTokenAmount={this.props.getTokenAmount}
                       uriParams={this.props.uriParams}
                       selectedToken={this.props.selectedToken}
                       validateAmount={this.props.validateAmount}
                       defaultToken={this.props.defaultToken}
                       getTokenInfo={this.props.getTokenInfo}
-                      onAddToken={t => {
-                        this.props.onAddToken({
-                          token: t, shouldReset: false, maxAmount: token.amount,
-                        })
-                      }}
-                      onRemoveToken={this.props.onRemoveToken}
+                      onAddToken={this.onSelect}
+                      onRemoveToken={this.onRemoveToken}
                       fee={this.props.fee}
                       error={this.props.error}
                       isCalculatingFee={this.props.isCalculatingFee}
                       totalInput={this.props.totalInput}
-                      isTokenIncluded={this.props.isTokenIncluded}
-                      isValidAmount={this.props.isValidAmount}
-                      getTokenAmount={this.props.getTokenAmount}
+                      isTokenIncluded={this.isTokenIncluded}
+                      isValidAmount={this.isValidAmount}
                     />
                   ))
                 }
@@ -308,7 +375,8 @@ export default class AddTokenDialog extends Component<Props, State> {
               borderRadius: '0px',
               color: 'var(--yoroi-palette-secondary-300)',
             }}
-            onClick={onClose}
+            disabled={selectedTokens.length === 0 || error}
+            onClick={this.onAddAll}
             variant='ternary'
           >
             {intl.formatMessage(messages.add)}

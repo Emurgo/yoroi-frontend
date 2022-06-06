@@ -72,8 +72,8 @@ export default class SingleTokenRow extends Component<Props, State> {
   }
 
   onAmountUpdate(value: string): void {
-    this.setState({ amount: value })
-    this.props.updateAmount(value ? (new BigNumber(value)) : null);
+    this.setState({ amount: value }) // Todo: remove local state
+    this.props.updateAmount(this.props.token.info, value);
   }
 
   render(): Node {
@@ -101,18 +101,16 @@ export default class SingleTokenRow extends Component<Props, State> {
               <AmountInputRevamp
                 value={this.state.amount}
                 onChange={this.onAmountUpdate.bind(this)}
-                onFocus={() => this.props.onAddToken(token.info)}
                 amountFieldRevamp
                 placeholder='0.0'
               />
-
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
               {!isValidAmount(token.info) && intl.formatMessage(messages.notEnoughMoneyToSendError)}
             </p>
           </div>
-           )}
+        )}
       </div>
     )
   }
