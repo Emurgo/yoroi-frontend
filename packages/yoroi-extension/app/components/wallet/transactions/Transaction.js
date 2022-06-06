@@ -220,7 +220,7 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -334,22 +334,6 @@ export default class Transaction extends Component<Props, State> {
     const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
-      const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(request.entry.identifier, currency);
-      if (price != null) {
-        const tokenName = tokenInfo != null ? getTokenName(tokenInfo)
-          : assetNameFromIdentifier(request.entry.identifier);
-        return (
-          <>
-            {calculateAndFormatValue(shiftedAmount, price) + ' ' + currency}
-            <div className={styles.amountSmall}>
-              {shiftedAmount.toString()} {tokenName}
-            </div>
-          </>
-        );
-      }
-    }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
       numberOfDecimals
@@ -368,41 +352,150 @@ export default class Transaction extends Component<Props, State> {
     );
   };
 
-  renderFeeDisplay: ({|
-    amount: MultiToken,
-    type: TransactionDirectionType,
-  |}) => Node = request => {
-    if (this.props.shouldHideBalance) {
-      return <span>{hiddenAmount}</span>;
-    }
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
+  renderAmountWithUnitOfAccount: ({|
+    entry: TokenEntry,
+    timestamp: number,
+  |}) => ?Node = request => {
+    const { currency } = this.props.unitOfAccountSetting;
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
-      const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(defaultEntry.identifier, currency);
-      if (price != null) {
-        const tokenName = tokenInfo != null ? getTokenName(tokenInfo)
-          : assetNameFromIdentifier(defaultEntry.identifier);
+    if (this.props.unitOfAccountSetting.enabled) {
+      if (this.props.shouldHideBalance) {
         return (
           <>
-            {calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency}
-            <div className={styles.amountSmall}>
-              {shiftedAmount.abs().toString()} {tokenName}
-            </div>
+            <span>{hiddenAmount}</span>
+            {currency}
           </>
         );
       }
+
+      const tokenInfo = this.props.getTokenInfo(request.entry);
+      if (!tokenInfo) {
+        throw new Error('missing token info');
+      }
+
+      const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      if (currency == null) {
+        throw new Error(`unexpected unit of account ${String(currency)}`);
+      }
+      const price = this.props.getHistoricalPrice(
+        ticker,
+        currency,
+        request.timestamp,
+      );
+      let fiatDisplay;
+      if (price != null) {
+        const amount = calculateAndFormatValue(shiftedAmount, price);
+        const [beforeDecimal, afterDecimal] = amount.split('.');
+        const beforeDecimalWithSign = beforeDecimal.startsWith('-')
+          ? beforeDecimal
+              : '+' + beforeDecimal;
+        fiatDisplay = (
+          <>
+            {beforeDecimalWithSign}
+            {afterDecimal && (
+              <span className={styles.afterDecimal}>
+                .{afterDecimal}
+              </span>
+            )}
+          </>
+        );
+      } else {
+        fiatDisplay = '-';
+      }
+      return (
+        <>
+          <div>
+            {fiatDisplay}&nbsp;{currency}
+          </div>
+          <div className={styles.amountSmall}>
+            {this.renderAmountDisplay({ entry: request.entry })}
+            {' '}
+            {this.getTicker(request.entry)}
+          </div>
+        </>
+      );
     }
+
+    return (
+      <>
+        {this.renderAmountDisplay({ entry: request.entry })}
+        {' '}
+        {this.getTicker(request.entry)}
+      </>
+    );
+  }
+
+  renderFeeDisplay: ({|
+    amount: MultiToken,
+    type: TransactionDirectionType,
+    timestamp: number,
+  |}) => Node = request => {
     if (request.type === transactionTypes.INCOME) {
       return <span>-</span>;
     }
+    if (this.props.shouldHideBalance) {
+      return <span>{hiddenAmount}</span>;
+    }
+
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    if (!tokenInfo) {
+      throw new Error('missing token info');
+    }
+
+    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
+
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount.abs(),
-      numberOfDecimals
+      numberOfDecimals,
     );
+
+    if (this.props.unitOfAccountSetting.enabled) {
+      const { currency } = this.props.unitOfAccountSetting;
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getHistoricalPrice(
+        ticker,
+        currency,
+        request.timestamp,
+      );
+
+      let fiatDisplay;
+      if (price != null) {
+        const amount = calculateAndFormatValue(shiftedAmount, price);
+        const [beforeDecimal, afterDecimal] = amount.split('.');
+        fiatDisplay = (
+          <>
+            {beforeDecimal}
+            {afterDecimal && (
+              <span className={styles.afterDecimal}>
+                .{afterDecimal}
+              </span>
+            )}
+          </>
+        );
+      } else {
+        fiatDisplay = '-';
+      }
+      return (
+        <>
+          <div>{fiatDisplay}&nbsp;{currency}</div>
+          <div className={styles.amountSmall}>
+            {beforeDecimalRewards}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+            {' '}
+            {this.getTicker(defaultEntry)}
+          </div>
+        </>
+      );
+    }
 
     return (
       <>
@@ -413,13 +506,10 @@ export default class Transaction extends Component<Props, State> {
   };
 
   getTicker: TokenEntry => string = tokenEntry => {
-    if (this.props.unitOfAccountSetting.enabled === true) {
-      return this.props.unitOfAccountSetting.currency;
-    }
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
     return tokenInfo != null ? truncateToken(getTokenName(tokenInfo))
       : assetNameFromIdentifier(tokenEntry.identifier);
-  };
+  }
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
@@ -439,7 +529,7 @@ export default class Transaction extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })}{' '}{this.getTicker(entry)}
         </div>
       );
     }
@@ -466,7 +556,9 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length}
+        {' '}
+        {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
   };
@@ -618,14 +710,15 @@ export default class Transaction extends Component<Props, State> {
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
+                  timestamp: data.date.valueOf(),
                 })}
               </div>
               <div className={classnames([styles.amount])}>
                 <div className={classnames([styles.currency])}>
-                  {this.renderAmountDisplay({
+                  {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
-                  })}{' '}
-                  {this.getTicker(data.amount.getDefaultEntry())}
+                    timestamp: data.date.valueOf(),
+                  })}
                 </div>
                 {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
               </div>

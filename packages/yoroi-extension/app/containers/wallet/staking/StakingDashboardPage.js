@@ -772,7 +772,7 @@ export default class StakingDashboardPage extends Component<Props> {
             .shiftedBy(-tokenRow.Metadata.numberOfDecimals);
 
           const coinPrice = this.generated.stores.coinPriceStore.getCurrentPrice(
-            tokenRow.Identifier,
+            getTokenName(tokenRow),
             currency
           );
           if (coinPrice == null) return undefined;

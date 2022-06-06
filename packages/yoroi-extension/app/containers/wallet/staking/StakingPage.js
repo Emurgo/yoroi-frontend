@@ -50,6 +50,7 @@ import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../tra
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
+import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -107,24 +108,7 @@ class StakingPage extends Component<AllProps> {
             dialog: OverviewModal,
           })
         }
-        unitOfAccount={entry => {
-          const tokenRow = stores.tokenInfoStore.tokenInfo
-            .get(entry.networkId.toString())
-            ?.get(entry.identifier);
-          if (tokenRow == null) return undefined;
-
-          if (!stores.profile.unitOfAccount.enabled) return undefined;
-          const currency = stores.profile.unitOfAccount.currency;
-
-          const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
-
-          const coinPrice = stores.coinPriceStore.getCurrentPrice(tokenRow.Identifier, currency);
-          if (coinPrice == null) return undefined;
-          return {
-            currency,
-            amount: calculateAndFormatValue(shiftedAmount, coinPrice),
-          };
-        }}
+        unitOfAccount={this.toUnitOfAccount}
         getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={stores.profile.shouldHideBalance}
         totalRewards={
@@ -231,6 +215,29 @@ class StakingPage extends Component<AllProps> {
     );
   };
 
+  toUnitOfAccount: TokenEntry => void | {| currency: string, amount: string |} = entry => {
+    const { stores } = this.generated;
+    const tokenRow = stores.tokenInfoStore.tokenInfo
+          .get(entry.networkId.toString())
+          ?.get(entry.identifier);
+    if (tokenRow == null) return undefined;
+
+    if (!stores.profile.unitOfAccount.enabled) return undefined;
+    const currency = stores.profile.unitOfAccount.currency;
+
+    const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
+    const ticker = tokenRow.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const coinPrice = stores.coinPriceStore.getCurrentPrice(ticker, currency);
+    if (coinPrice == null) return { currency, amount: '-' };
+    return {
+      currency,
+      amount: calculateAndFormatValue(shiftedAmount, coinPrice),
+    };
+  };
+
   render(): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -308,27 +315,7 @@ class StakingPage extends Component<AllProps> {
                   : delegationRequests.getDelegatedBalance.result.accountPart
               }
               shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-              unitOfAccount={entry => {
-                const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
-                  .get(entry.networkId.toString())
-                  ?.get(entry.identifier);
-                if (tokenRow == null) return undefined;
-
-                if (!this.generated.stores.profile.unitOfAccount.enabled) return undefined;
-                const currency = this.generated.stores.profile.unitOfAccount.currency;
-
-                const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
-
-                const coinPrice = this.generated.stores.coinPriceStore.getCurrentPrice(
-                  tokenRow.Identifier,
-                  currency
-                );
-                if (coinPrice == null) return undefined;
-                return {
-                  currency,
-                  amount: calculateAndFormatValue(shiftedAmount, coinPrice),
-                };
-              }}
+              unitOfAccount={this.toUnitOfAccount}
               withdrawRewards={
                 this._isRegistered(delegationRequests.publicDeriver) === true
                   ? () => {

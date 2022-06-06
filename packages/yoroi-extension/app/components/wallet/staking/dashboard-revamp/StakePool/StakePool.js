@@ -79,7 +79,7 @@ export const SocialMediaStakePool = ({ socialLinks, websiteUrl, color }: Props):
 };
 
 type HelperTooltipProps = {|
-  +message: string,
+  +message: string | Node,
 |};
 export const HelperTooltip = ({ message }: HelperTooltipProps): Node => {
   return (
