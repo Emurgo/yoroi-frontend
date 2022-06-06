@@ -180,6 +180,8 @@ export default class WalletListDialog extends Component<Props, State> {
 
     const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
 
+    const walletsTotal = this.renderWalletsTotal();
+
     return (
       <Dialog
         className={styles.component}
@@ -190,12 +192,14 @@ export default class WalletListDialog extends Component<Props, State> {
       >
         <div className={styles.header}>
           <div className={styles.totalInfo}>
-            <div className={styles.amount}>
-              <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-              <p className={styles.value}>
-                {this.renderWalletsTotal()}
-              </p>
-            </div>
+            {walletsTotal && (
+              <div className={styles.amount}>
+                <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
+                <p className={styles.value}>
+                  {walletsTotal}
+                </p>
+              </div>
+            )}
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
