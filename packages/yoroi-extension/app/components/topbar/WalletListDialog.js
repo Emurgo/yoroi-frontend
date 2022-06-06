@@ -363,7 +363,14 @@ export default class WalletListDialog extends Component<Props, State> {
     */
     for (let i = 1; i < wallets.length; i ++ ) {
       if (wallets[i].walletAmount) {
-        sum.joinAddMutable(wallets[i].walletAmount);
+        sum.joinAddMutable(new MultiToken(
+          // treat TADA as ADA
+          wallets[i].walletAmount.values.map(v => ({
+            ...v,
+            networkId: sum.getDefaults().defaultNetworkId,
+          })),
+          sum.getDefaults(),
+        ));
       } else {
         return { sum: null, fiat: null };
       }
