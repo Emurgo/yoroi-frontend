@@ -285,23 +285,21 @@ export default class WalletListDialog extends Component<Props, State> {
       getCurrentPrice,
     } = this.props;
     if (unitOfAccountSetting.enabled) {
-      let totalFiat;
       const adaFiat = this.sumWallets(cardanoWallets).fiat;
       const ergFiat = this.sumWallets(ergoWallets).fiat;
-      if (adaFiat == null || ergFiat == null) {
-        totalFiat = null;
-      } else {
-        totalFiat = adaFiat.plus(ergFiat);
+      if (adaFiat != null && ergFiat != null) {
+        const totalFiat = adaFiat.plus(ergFiat);
+        const { currency } = unitOfAccountSetting;
+        return (
+          <FiatDisplay
+            shouldHideBalance={shouldHideBalance}
+            amount={totalFiat}
+            currency={currency}
+          />
+        );
       }
-      const { currency } = unitOfAccountSetting;
-      return (
-        <FiatDisplay
-          shouldHideBalance={shouldHideBalance}
-          amount={totalFiat}
-          currency={currency}
-        />
-      );
     }
+    // either unit of account is not enabled, or fails to convert to fiat
     if (ergoWallets.length === 0) {
       // only have Cardano wallets
       const amount = this.sumWallets(cardanoWallets).sum;
