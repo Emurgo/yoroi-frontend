@@ -50,7 +50,7 @@ type Props = {|
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 @observer

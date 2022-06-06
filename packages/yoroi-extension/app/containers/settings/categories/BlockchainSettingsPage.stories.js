@@ -50,7 +50,7 @@ const defaultSettingsPageProps: {|
       selected: request.selected,
     },
     coinPriceStore: {
-      getCurrentPrice: (_from, _to) => 5,
+      getCurrentPrice: (_from, _to) => '5',
       lastUpdateTimestamp: request.lastUpdatedTimestamp,
       refreshCurrentUnit: {
         isExecuting: false,

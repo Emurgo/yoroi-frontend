@@ -119,7 +119,7 @@ export default class BaseCoinPriceStore
    * Since a ticker isn't enough to know which currency to to lookup
    * Since multiple tokens can have the same ticker
    */
-  getCurrentPrice: (from: string, to: string) => ?number = (
+  getCurrentPrice: (from: string, to: string) => ?string = (
     from: string, to: string
   ) => {
     if (this.lastUpdateTimestamp === null) {
@@ -130,17 +130,17 @@ export default class BaseCoinPriceStore
       return null;
     }
     const normalizedFrom = from === 'TADA' ? 'ADA' : from;
-    return getPrice(normalizedFrom, to, this.currentPriceTickers);
+    return String(getPrice(normalizedFrom, to, this.currentPriceTickers));
   }
 
-  getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number = (
+  getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string = (
     from: string, to: string, timestamp: number,
   ) => {
     const normalizedFrom = from === 'TADA' ? 'ADA' : from;
     const price = this.priceMap.get(
       getPriceKey(normalizedFrom, to, new Date(timestamp))
     );
-    return price?.Price;
+    return String(price?.Price);
   }
 
   _pollRefresh: void => Promise<void> = async () => {

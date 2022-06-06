@@ -39,7 +39,7 @@ type Props = {|
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
 |};
 
 @observer
