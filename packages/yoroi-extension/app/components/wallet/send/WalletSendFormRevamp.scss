@@ -95,6 +95,17 @@
                 line-height: 22px;
             }
 
+            .sendError {
+                position: absolute;
+                top: 25px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: var(--yoroi-palette-error-100);
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 22px;
+            }
+
             .amountInput {
                 position: relative;
                 border: 1px solid #A7AFC0;
@@ -175,7 +186,7 @@
                     position: absolute;
                     bottom: -19px;
                     left: 17px;
-                    color: #FF1351;
+                    color: var(--yoroi-palette-error-100);
                     font-size: 12px;
                     letter-spacing: 0.4px;
                     line-height: 16px;

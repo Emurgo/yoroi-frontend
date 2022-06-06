@@ -477,6 +477,12 @@ export default class WalletSendForm extends Component<Props, State> {
                   {intl.formatMessage(messages.calculatingFee)}
                 </p>
               )}
+
+              {!isDefaultIncluded && (
+                <p className={styles.sendError}>
+                  {transactionFeeError}
+                </p>
+              )}
               <div className={classnames(
                 [styles.amountInput,
                   amountInputError && isDefaultIncluded && styles.amountInputError,
