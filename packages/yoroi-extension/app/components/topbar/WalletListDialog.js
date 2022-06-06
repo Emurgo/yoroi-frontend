@@ -354,22 +354,26 @@ export default class WalletListDialog extends Component<Props, State> {
     } else {
       return { sum: null, fiat: null };
     }
+    /* fixme
     if (wallets[0].rewards) {
       sum.joinAddMutable(wallets[0].rewards);
     } else {
       return { sum: null, fiat: null };
     }
+    */
     for (let i = 1; i < wallets.length; i ++ ) {
       if (wallets[i].walletAmount) {
         sum.joinAddMutable(wallets[i].walletAmount);
       } else {
         return { sum: null, fiat: null };
       }
+      /* fixme
       if (wallets[i].rewards) {
         sum.joinAddMutable(wallets[i].rewards);
       } else {
         return { sum: null, fiat: null };
       }
+      */
     }
     if (!unitOfAccountSetting.enabled) {
       return { sum, fiat: null };
