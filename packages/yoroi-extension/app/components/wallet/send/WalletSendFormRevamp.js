@@ -74,7 +74,7 @@ const messages = defineMessages({
   },
   calculatingFee: {
     id: 'wallet.send.form.calculatingFee',
-    defaultMessage: '!!!Calculating fee...',
+    defaultMessage: '!!!Calculating the fee, please wait.',
   },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
