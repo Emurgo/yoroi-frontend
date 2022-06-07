@@ -760,6 +760,9 @@ export default class StakingDashboardPage extends Component<Props> {
             : undefined
         }
         unitOfAccount={entry => {
+          // temporarily disabled
+          return undefined;
+          /*
           const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
             .get(entry.networkId.toString())
             ?.get(entry.identifier);
@@ -780,6 +783,7 @@ export default class StakingDashboardPage extends Component<Props> {
             currency,
             amount: calculateAndFormatValue(shiftedAmount, coinPrice),
           };
+          */
         }}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
         isDelegated={
