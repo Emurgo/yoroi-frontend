@@ -125,26 +125,39 @@ export default class NavWalletDetails extends Component<Props> {
                     amount: totalAmount
                   })}
                 </div>
-                {showsRewards &&
-                <div className={styles.details}>
-                  <div>
-                    <p className={styles.label}>
-                      {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                    </p>
-                    {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
-                  </div>
-                  <div>
-                    <p className={styles.label}>
-                      {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                    </p>
-                    {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-                  </div>
-                </div>
-                }
-                {this.props.rewards === undefined && (
-                <div className={styles.info}>
-                  {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-                </div>
+                {this.props.unitOfAccountSetting.enabled ? (
+                      <div className={styles.details}>
+                    {this.renderAmountDisplay({
+                      shouldHideBalance,
+                      amount: totalAmount,
+                      convertToFiat: true,
+                    })}
+                    </div>
+
+                ) : (
+                  <>
+                    {showsRewards &&
+                    <div className={styles.details}>
+                      <div>
+                        <p className={styles.label}>
+                          {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                        </p>
+                        {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                      </div>
+                      <div>
+                        <p className={styles.label}>
+                          {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                        </p>
+                        {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                      </div>
+                    </div>
+                    }
+                    {this.props.rewards === undefined && (
+                    <div className={styles.info}>
+                      {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+                    </div>
+                    )}
+                  </>
                 )}
               </div>
             </>
@@ -180,7 +193,8 @@ export default class NavWalletDetails extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: ?MultiToken
+    amount: ?MultiToken,
+    convertToFiat?: ?boolean,
   |} => Node = (request) => {
     if (request.amount == null) {
       throw new Error('Amount is required to be rendered')
@@ -197,8 +211,11 @@ export default class NavWalletDetails extends Component<Props> {
 
     let unit = truncateToken(getTokenName(tokenInfo));
 
-    if (this.props.unitOfAccountSetting.enabled) {
+    if (request.convertToFiat) {
       const { currency } = this.props.unitOfAccountSetting;
+      if (!currency) {
+        throw new Error('expect unit of account currency setting');
+      }
       const ticker = tokenInfo.Metadata.ticker;
       if (ticker == null) {
         throw new Error('unexpected main token type');
@@ -206,8 +223,10 @@ export default class NavWalletDetails extends Component<Props> {
       const price = this.props.getCurrentPrice(ticker, currency);
       if (price != null) {
         balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
-        unit = currency;
+      } else {
+        balanceDisplay = '-';
       }
+      unit = currency;
     }
 
     if (request.shouldHideBalance) {
