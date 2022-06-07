@@ -220,7 +220,7 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -447,7 +447,7 @@ export default class Transaction extends Component<Props, State> {
       throw new Error('missing token info');
     }
 
-    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const numberOfDecimals = tokenInfo.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(

@@ -6,16 +6,10 @@ export function calculateAndFormatValue(
   // Note: make sure you pass the right denomination
   // ex: pass ADA instead of lovelaces
   coinAmount: BigNumber,
-  price: number
+  price: string
 ): string {
   try {
-    /*
-      Have to convert the number to string first because when BigNumber.DEBUG is
-      true, which is set by ../../chrome/extension/index.js, BigNumber throws if
-      the number has more than 15 significant digits.
-     */
-    const priceString = String(price);
-    return formatValue(coinAmount.multipliedBy(priceString));
+    return formatValue(coinAmount.multipliedBy(price));
   } catch (error) {
     /*
       Not that we expect any exception. just be defensive to avoid crashing the UI.

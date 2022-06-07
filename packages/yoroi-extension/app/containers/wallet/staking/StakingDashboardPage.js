@@ -980,7 +980,7 @@ export default class StakingDashboardPage extends Component<Props> {
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

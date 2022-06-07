@@ -19,7 +19,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   unitOfAccountTitle: {
     id: 'settings.unitOfAccount.title',
-    defaultMessage: '!!!Currency Conversion',
+    defaultMessage: '!!!Fiat pairing',
   },
   note: {
     id: 'settings.unitOfAccount.note',
