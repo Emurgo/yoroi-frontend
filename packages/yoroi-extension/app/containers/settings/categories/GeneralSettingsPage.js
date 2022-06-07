@@ -3,20 +3,65 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
+import { defineMessages, intlShape  } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
+import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
 import type { Theme } from '../../../styles/utils';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencies/ADA.inline.svg';
+import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+
+const currencyLabels = defineMessages({
+  USD: {
+    id: 'settings.unitOfAccount.currency.usd',
+    defaultMessage: '!!!US dollar',
+  },
+  JPY: {
+    id: 'settings.unitOfAccount.currency.jpy',
+    defaultMessage: '!!!Japanese yen',
+  },
+  EUR: {
+    id: 'settings.unitOfAccount.currency.eur',
+    defaultMessage: '!!!Euro',
+  },
+  CNY: {
+    id: 'settings.unitOfAccount.currency.cny',
+    defaultMessage: '!!!Chinese Renminbi yuan',
+  },
+  KRW: {
+    id: 'settings.unitOfAccount.currency.krw',
+    defaultMessage: '!!!South Korean won',
+  },
+  BTC: {
+    id: 'settings.unitOfAccount.currency.btc',
+    defaultMessage: '!!!Bitcoin',
+  },
+  ETH: {
+    id: 'settings.unitOfAccount.currency.eth',
+    defaultMessage: '!!!Ethereum',
+  },
+  BRL: {
+    id: 'settings.unitOfAccount.currency.brl',
+    defaultMessage: '!!!Brazilian real',
+  },
+});
 
 type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
+
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
+
   switchWallet: (PublicDeriver<>) => void = publicDeriver => {
     this.generated.actions.router.goToRoute.trigger({
       route: this.generated.stores.app.currentRoute,
@@ -33,10 +78,43 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     }
   };
 
+  onSelectUnitOfAccount: string => Promise<void> = async (value) => {
+    const unitOfAccount = (value === 'ADA')
+      ? unitOfAccountDisabledValue
+      : { enabled: true, currency: value };
+    await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+  };
+
   render(): Node {
     const profileStore = this.generated.stores.profile;
+    const coinPriceStore = this.generated.stores.coinPriceStore;
+
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
+    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting
+      || coinPriceStore.refreshCurrentUnit.isExecuting;
     const { currentTheme } = profileStore;
+
+    const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
+      const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
+      return {
+        value: c.symbol,
+        label: `${c.symbol} - ${name}`,
+        name,
+        price: coinPriceStore.getCurrentPrice('ADA', c.symbol),
+        svg: c.svg
+      };
+    });
+    currencies.unshift({
+      value: 'ADA',
+      label: 'ADA - Cardano',
+      name: 'Cardano',
+      native: true,
+      svg: AdaCurrency,
+    });
+
+    const unitOfAccountValue = profileStore.unitOfAccount.enabled
+      ? profileStore.unitOfAccount.currency
+      : 'ADA';
 
     return (
       <>
@@ -54,6 +132,14 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           exportTheme={this.generated.actions.profile.exportTheme.trigger}
           hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
           onExternalLinkClick={handleExternalLinkClick}
+        />
+        <UnitOfAccountSettings
+          onSelect={this.onSelectUnitOfAccount}
+          isSubmitting={isSubmittingUnitOfAccount}
+          currencies={currencies}
+          currentValue={unitOfAccountValue}
+          error={profileStore.setUnitOfAccountRequest.error}
+          lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <AboutYoroiSettingsBlock
           wallet={this.generated.stores.wallets.selected}
@@ -78,6 +164,11 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
             theme: string,
           |}) => Promise<void>,
         |},
+        updateUnitOfAccount: {|
+          trigger: (
+            params: UnitOfAccountSettingType
+          ) => Promise<void>
+        |}
       |},
       router: {|
         goToRoute: {|
@@ -100,10 +191,27 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           error: ?LocalizableError,
           isExecuting: boolean,
         |},
+        UNIT_OF_ACCOUNT_OPTIONS: Array<{|
+          svg: string,
+          symbol: string
+        |}>,
+        setUnitOfAccountRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |},
+        unitOfAccount: UnitOfAccountSettingType
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
         publicDerivers: Array<PublicDeriver<>>,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (
+          from: string,
+          to: string
+        ) => ?string,
+        lastUpdateTimestamp: null | number,
+        refreshCurrentUnit: {| isExecuting: boolean |}
       |},
     |},
   |} {
@@ -129,10 +237,23 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentLocale: profileStore.currentLocale,
           currentTheme: profileStore.currentTheme,
           hasCustomTheme: profileStore.hasCustomTheme,
+          UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
+          unitOfAccount: profileStore.unitOfAccount,
+          setUnitOfAccountRequest: {
+            error: profileStore.setUnitOfAccountRequest.error,
+            isExecuting: profileStore.setUnitOfAccountRequest.isExecuting,
+          },
         },
         wallets: {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+          lastUpdateTimestamp: stores.coinPriceStore.lastUpdateTimestamp,
+          refreshCurrentUnit: {
+            isExecuting: stores.coinPriceStore.refreshCurrentUnit.isExecuting,
+          },
         },
       },
       actions: {
@@ -140,6 +261,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           updateLocale: { trigger: actions.profile.updateLocale.trigger },
           updateTheme: { trigger: actions.profile.updateTheme.trigger },
           exportTheme: { trigger: actions.profile.exportTheme.trigger },
+          updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

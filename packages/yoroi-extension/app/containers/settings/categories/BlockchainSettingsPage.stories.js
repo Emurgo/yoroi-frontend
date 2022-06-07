@@ -4,7 +4,6 @@ import type { Node } from 'react';
 
 import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
-import { SUPPORTED_CURRENCIES } from '../../../config/unitOfAccount';
 import { withScreenshot } from 'storycap';
 import { walletLookup, } from '../../../../stories/helpers/WalletCache';
 import { genShelleyCip1852DummyWithCache } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
@@ -35,34 +34,13 @@ const defaultSettingsPageProps: {|
       selectedExplorer: defaultToSelectedExplorer(),
       allExplorers: prepackagedExplorers,
     },
-    profile: {
-      UNIT_OF_ACCOUNT_OPTIONS: SUPPORTED_CURRENCIES,
-      unitOfAccount: {
-        enabled: false,
-        currency: undefined,
-      },
-      setUnitOfAccountRequest: {
-        error: null,
-        isExecuting: boolean('setUnitOfAccountRequest_isExecuting'),
-      },
-    },
     wallets: {
       selected: request.selected,
-    },
-    coinPriceStore: {
-      getCurrentPrice: (_from, _to) => '5',
-      lastUpdateTimestamp: request.lastUpdatedTimestamp,
-      refreshCurrentUnit: {
-        isExecuting: false,
-      },
     },
   },
   actions: {
     explorers: {
       updateSelectedExplorer: { trigger: async (req) => action('updateSelectedExplorer')(req) },
-    },
-    profile: {
-      updateUnitOfAccount: { trigger: async (req) => action('updateUnitOfAccount')(req) },
     },
   },
   canRegisterProtocol: () => boolean('canRegisterProtocol', true),
