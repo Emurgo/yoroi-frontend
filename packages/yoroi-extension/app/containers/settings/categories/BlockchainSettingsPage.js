@@ -106,7 +106,6 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       throw new Error(`${nameof(BlockchainSettingsPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const profileStore = stores.profile;
     return Object.freeze({
       stores: {
         explorers: {
