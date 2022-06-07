@@ -598,7 +598,7 @@ class WalletSummaryPage extends Component<AllProps> {
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
+        getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
       |},
       memos: {|
         error: ?LocalizableError,
