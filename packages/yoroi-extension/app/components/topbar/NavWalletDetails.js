@@ -88,6 +88,7 @@ export default class NavWalletDetails extends Component<Props> {
       showDetails === true
     );
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
+    const { unitOfAccountSetting } = this.props;
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
@@ -108,7 +109,7 @@ export default class NavWalletDetails extends Component<Props> {
               <div
                 className={classnames([
                   styles.currency,
-                  showsRewards && styles.currencyAlign
+                  (!unitOfAccountSetting.enabled && showsRewards) && styles.currencyAlign
                 ])}
               >
                 <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
@@ -125,7 +126,7 @@ export default class NavWalletDetails extends Component<Props> {
                     amount: totalAmount
                   })}
                 </div>
-                {this.props.unitOfAccountSetting.enabled ? (
+                {unitOfAccountSetting.enabled ? (
                   <div className={styles.fiat}>
                     {this.renderAmountDisplay({
                       shouldHideBalance,
