@@ -33,6 +33,7 @@ import AssetsDropdown from './AssetsDropdown';
 import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
+import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 
 type Props = {|
   +staleTx: boolean,
@@ -67,6 +68,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  state = {
+    passwordError: null,
+    txError: null
+  }
+
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletPassword: {
@@ -100,7 +106,17 @@ export default class WalletSendPreviewStep extends Component<Props> {
         const transactionData = {
           password: walletPassword,
         };
-        await this.props.onSubmit(transactionData);
+        try {
+
+          await this.props.onSubmit(transactionData);
+        } catch (error) {
+          const errorMessage = this.context.intl.formatMessage(error, error.values)
+          if (error instanceof IncorrectWalletPasswordError) {
+            this.setState({ passwordError: errorMessage })
+          } else {
+            this.setState({ txError: errorMessage })
+          }
+        }
       },
       onError: () => {}
     });
@@ -207,6 +223,8 @@ export default class WalletSendPreviewStep extends Component<Props> {
       receivers,
       isSubmitting,
     } = this.props;
+    const { passwordError, txError } = this.state;
+
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -293,7 +311,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
             className={styles.walletPassword}
             {...walletPasswordField.bind()}
             disabled={isSubmitting}
-            error={walletPasswordField.error}
+            onFocus={() => {
+              this.setState({ passwordError: null })
+            }}
+            error={walletPasswordField.error || passwordError}
           />
         </div>
 
