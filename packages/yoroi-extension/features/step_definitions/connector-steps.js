@@ -33,6 +33,7 @@ const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
 
 const connectorPopUpIsDisplayed = async (customWorld: Object) => {
+  await customWorld.driver.sleep(1000);
   await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await customWorld.driver.getTitle();
   expect(windowTitle).to.equal('Yoroi dApp Connector');
@@ -209,7 +210,7 @@ Then(/^I see the error Incorrect wallet password$/, async function () {
     "The error isn't displayed"
   ).to.be.true;
   const errorText = await this.getText(spendingPasswordErrorField);
-  expect(errorText).to.equal('Incorrect wallet password.');
+  expect(errorText).to.equal('Incorrect spending password. Please retype.');
 });
 
 Then(/^I should see no password errors$/, async function () {
