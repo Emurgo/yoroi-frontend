@@ -104,7 +104,7 @@ export default class Loading extends Component<Props> {
     const supportRequestLink = (
       <a
         className={styles.link}
-        href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
+        href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'
         onClick={event => onExternalLinkClick(event)}
       >
         {intl.formatMessage(globalMessages.contactSupport)}

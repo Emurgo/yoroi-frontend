@@ -38,15 +38,15 @@ type Props = {|
 const messages: * = defineMessages({
   mainTitle: {
     id: 'wallet.registrationOver.mainTitle',
-    defaultMessage: '!!!Registration has ended',
+    defaultMessage: '!!!Registration is now closed.',
   },
   mainSubtitle: {
     id: 'wallet.registrationOver.mainSubtitle',
-    defaultMessage: '!!!Registration for fund {roundNumber} is over. Open the Catalyst app for more information',
+    defaultMessage: '!!!The registration period for fund {roundNumber} has ended. For more information, check the Catalyst app.',
   },
   unavailableTitle: {
     id: 'wallet.registrationOver.unavailableTitle',
-    defaultMessage: '!!!Catalyst Round Info unavailable',
+    defaultMessage: '!!!Catalyst Round information is currently unavailable.',
   },
   unavailableSubtitle: {
     id: 'wallet.registrationOver.unavailableSubtitle',
@@ -54,11 +54,11 @@ const messages: * = defineMessages({
   },
   earlyForRegistrationTitle: {
     id: 'wallet.registrationOver.earlyForRegistrationTitle',
-    defaultMessage: '!!!Registration hasn\'t started yet'
+    defaultMessage: '!!!Registration hasn\'t started yet.'
   },
   earlyForRegistrationSubTitle: {
     id: 'wallet.registrationOver.earlyForRegistrationSubTitle',
-    defaultMessage: '!!!Round {roundNumber} registration starts at {registrationStart}'
+    defaultMessage: '!!!Registration for Round {roundNumber} begins at {registrationStart}.'
   },
   beforeVotingSubtitle: {
     id: 'wallet.registrationOver.beforeVotingSubtitle',
