@@ -10,11 +10,11 @@ import BigNumber from 'bignumber.js';
 export const messages: * = defineMessages({
   title: {
     id: 'wallet.insufficientFunds.title',
-    defaultMessage: '!!!Insufficient funds',
+    defaultMessage: '!!!Insufficient funds.',
   },
   subtitle: {
     id: 'wallet.insufficientFunds.subtitle',
-    defaultMessage: '!!!Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount',
+    defaultMessage: '!!!Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount.'
   },
 });
 
