@@ -13,7 +13,7 @@ import { MockDAppWebpage } from '../mock-dApp-webpage';
 import { testRunsLogsDir } from './helpers/common-constants';
 
 const fs = require('fs');
-const simpleNodeLogger = require('simple-node-logger');
+const simpleNodeLogger= require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -72,11 +72,7 @@ function getChromeBuilder() {
 
 function getFirefoxBuilder() {
   const options = new firefox.Options()
-    /**
-     * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
-     * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
-     */
-    .setBinary(process.env.FIREFOX_DEV)
+    // .setBinary(firefox.Channel.NIGHTLY)
     .addExtensions(path.resolve(__dirname, '../../yoroi-test.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
@@ -114,32 +110,36 @@ export type LocatorObject = {|
 |};
 
 function CustomWorld(cmdInput: WorldInput) {
-  let builder = null;
   switch (cmdInput.parameters.browser) {
     case 'brave': {
-      builder = getBraveBuilder();
-      this.driver = builder.build();
+      const braveBuilder = getBraveBuilder();
+      this.driver = braveBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     case 'firefox': {
-      builder = getFirefoxBuilder();
-      this.driver = builder.build();
+      const firefoxBuilder = getFirefoxBuilder();
+      this.driver = firefoxBuilder.build();
+      this.windowManager = new WindowManager(this.driver);
+      this.windowManager.init().then().catch();
+      this.mockDAppPage = new MockDAppWebpage(this.driver);
       break;
     }
     default: {
-      builder = getChromeBuilder();
-      this.driver = builder.build();
+      this._allLoggers = [];
+      const chromeBuilder = getChromeBuilder();
+      this.driver = chromeBuilder.build();
+      const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
+      const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
+      this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
+      this.windowManager.init().then().catch();
+      this._allLoggers.push(mockAndWMLogger);
+      this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
       break;
     }
   }
-
-  this._allLoggers = [];
-  const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
-  const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
-  this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
-  this.windowManager.init().then().catch();
-  this._allLoggers.push(mockAndWMLogger);
-  this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
@@ -275,19 +275,16 @@ function CustomWorld(cmdInput: WorldInput) {
   this.saveToLocalStorage = (key, value) =>
     this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 
-  this.intl = (key, lang = 'en-US') =>
-    this.driver.executeAsyncScript(
-      (k, l, callback) => {
-        window.yoroi.translations[l]
-          .then(translation => callback(translation[k]))
-          // eslint-disable-next-line no-console
-          .catch(e => {
-            console.error('Intl fail: ', e);
-          });
-      },
-      key,
-      lang
-    );
+  this.intl = (key, lang = 'en-US') => this.driver.executeAsyncScript(
+    (k, l, callback) => {
+      window.yoroi.translations[l]
+        .then(translation => callback(translation[k]))
+        // eslint-disable-next-line no-console
+        .catch(e => { console.error('Intl fail: ', e); });
+    },
+    key,
+    lang
+  );
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
