@@ -126,7 +126,7 @@ export default class NavWalletDetails extends Component<Props> {
                   })}
                 </div>
                 {this.props.unitOfAccountSetting.enabled ? (
-                  <div className={styles.details}>
+                  <div className={styles.fiat}>
                     {this.renderAmountDisplay({
                       shouldHideBalance,
                       amount: totalAmount,
