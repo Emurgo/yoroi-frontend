@@ -32,7 +32,7 @@ import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/Dele
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+//tmp import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
@@ -759,7 +759,7 @@ export default class StakingDashboardPage extends Component<Props> {
               }
             : undefined
         }
-        unitOfAccount={entry => {
+        unitOfAccount={_entry => {
           // temporarily disabled
           return undefined;
           /*
