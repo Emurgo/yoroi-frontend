@@ -17,6 +17,7 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const currencyLabels = defineMessages({
   USD: {
