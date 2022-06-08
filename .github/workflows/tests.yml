@@ -150,6 +150,8 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      - name: Clean cache
+        run: npm cache clean -f
       - name: npm install
         run: |
           . install-all.sh
