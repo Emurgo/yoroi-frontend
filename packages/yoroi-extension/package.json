@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.14.100",
+  "version": "4.14.200",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
