@@ -124,7 +124,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         getCurrentPrice: (
           from: string,
           to: string
-        ) => ?number,
+        ) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

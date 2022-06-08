@@ -418,7 +418,7 @@ class StakingPage extends Component<AllProps> {
         isOpen: any => boolean,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       substores: {|
         ada: {|

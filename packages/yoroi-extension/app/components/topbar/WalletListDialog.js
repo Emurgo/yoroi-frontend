@@ -47,7 +47,7 @@ type Props = {|
   +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
   +ergoWallets: Array<Object>,
   +cardanoWallets: Array<Object>,
@@ -180,6 +180,8 @@ export default class WalletListDialog extends Component<Props, State> {
 
     const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
 
+    const walletsTotal = this.renderWalletsTotal();
+
     return (
       <Dialog
         className={styles.component}
@@ -190,12 +192,14 @@ export default class WalletListDialog extends Component<Props, State> {
       >
         <div className={styles.header}>
           <div className={styles.totalInfo}>
-            <div className={styles.amount}>
-              <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-              <p className={styles.value}>
-                {this.renderWalletsTotal()}
-              </p>
-            </div>
+            {(walletsTotal !== undefined) && (
+              <div className={styles.amount}>
+                <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
+                <p className={styles.value}>
+                  {walletsTotal}
+                </p>
+              </div>
+            )}
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
@@ -272,7 +276,7 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   }
 
-  renderWalletsTotal(): Node {
+  renderWalletsTotal(): ?Node {
     const {
       unitOfAccountSetting,
       cardanoWallets,
@@ -281,23 +285,21 @@ export default class WalletListDialog extends Component<Props, State> {
       getCurrentPrice,
     } = this.props;
     if (unitOfAccountSetting.enabled) {
-      let totalFiat;
       const adaFiat = this.sumWallets(cardanoWallets).fiat;
       const ergFiat = this.sumWallets(ergoWallets).fiat;
-      if (adaFiat == null || ergFiat == null) {
-        totalFiat = null;
-      } else {
-        totalFiat = adaFiat.plus(ergFiat);
+      if (adaFiat != null && ergFiat != null) {
+        const totalFiat = adaFiat.plus(ergFiat);
+        const { currency } = unitOfAccountSetting;
+        return (
+          <FiatDisplay
+            shouldHideBalance={shouldHideBalance}
+            amount={totalFiat}
+            currency={currency}
+          />
+        );
       }
-      const { currency } = unitOfAccountSetting;
-      return (
-        <FiatDisplay
-          shouldHideBalance={shouldHideBalance}
-          amount={totalFiat}
-          currency={currency}
-        />
-      );
     }
+    // either unit of account is not enabled, or fails to convert to fiat
     if (ergoWallets.length === 0) {
       // only have Cardano wallets
       const amount = this.sumWallets(cardanoWallets).sum;
@@ -328,7 +330,7 @@ export default class WalletListDialog extends Component<Props, State> {
       );
     }
     // there are both ADAs and ERGs, don't show total
-    return null;
+    return undefined;
   }
 
   sumWallets(
@@ -354,21 +356,27 @@ export default class WalletListDialog extends Component<Props, State> {
     } else {
       return { sum: null, fiat: null };
     }
+
     if (wallets[0].rewards) {
       sum.joinAddMutable(wallets[0].rewards);
-    } else {
-      return { sum: null, fiat: null };
     }
+
     for (let i = 1; i < wallets.length; i ++ ) {
       if (wallets[i].walletAmount) {
-        sum.joinAddMutable(wallets[i].walletAmount);
+        sum.joinAddMutable(new MultiToken(
+          // treat TADA as ADA
+          wallets[i].walletAmount.values.map(v => ({
+            ...v,
+            networkId: sum.getDefaults().defaultNetworkId,
+          })),
+          sum.getDefaults(),
+        ));
       } else {
         return { sum: null, fiat: null };
       }
+
       if (wallets[i].rewards) {
         sum.joinAddMutable(wallets[i].rewards);
-      } else {
-        return { sum: null, fiat: null };
       }
     }
     if (!unitOfAccountSetting.enabled) {
@@ -387,7 +395,7 @@ export default class WalletListDialog extends Component<Props, State> {
       throw new Error(`unexpected unit of account ${String(currency)}`);
     }
     const price = getCurrentPrice(ticker, currency);
-    if (price) {
+    if (price != null) {
       return { sum, fiat: shiftedAmount.multipliedBy(price) };
     }
     return { sum, fiat: null };

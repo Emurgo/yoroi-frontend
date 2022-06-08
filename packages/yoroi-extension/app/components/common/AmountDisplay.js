@@ -18,7 +18,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +amount: null | MultiToken,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |}
 export default class AmountDisplay extends Component<Props> {
   static defaultProps: {| showAmount: boolean, showFiat: boolean |} = {
@@ -64,7 +64,7 @@ export default class AmountDisplay extends Component<Props> {
         </>
       );
 
-      if (unitOfAccountSetting.enabled && showFiat) {
+      if (unitOfAccountSetting.enabled && Boolean(showFiat)) {
         const ticker = tokenInfo.Metadata.ticker;
         if (ticker == null) {
           throw new Error('unexpected main token type');

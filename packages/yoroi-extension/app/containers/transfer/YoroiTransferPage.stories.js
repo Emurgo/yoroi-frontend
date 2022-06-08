@@ -122,7 +122,7 @@ const genBaseProps: {|
       })
     },
     coinPriceStore: {
-      getCurrentPrice: (_from, _to) => 5,
+      getCurrentPrice: (_from, _to) => '5',
     },
     tokenInfoStore: {
       tokenInfo: mockFromDefaults(defaultAssets),
@@ -180,7 +180,7 @@ const genBaseProps: {|
               },
             },
             coinPriceStore: {
-              getCurrentPrice: (_from, _to) => 5,
+              getCurrentPrice: (_from, _to) => '5',
             },
             tokenInfoStore: {
               tokenInfo: mockFromDefaults(defaultAssets),

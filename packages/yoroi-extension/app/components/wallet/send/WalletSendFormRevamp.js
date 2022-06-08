@@ -136,7 +136,7 @@ type Props = {|
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 type State = {|
@@ -596,7 +596,7 @@ export default class WalletSendForm extends Component<Props, State> {
       }
       const price = this.props.getCurrentPrice(ticker, currency);
 
-      if (price) {
+      if (price != null) {
         convertedAmount = calculateAndFormatValue(amount, price);
       } else {
         convertedAmount = '-';
