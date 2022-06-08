@@ -39,7 +39,7 @@ jobs:
         run: |
           npm run test
 
-  E2E_tests_dApp:
+  E2E_tests_dApp_Chrome:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
     runs-on: macos-10.15
     steps:
@@ -97,6 +97,78 @@ jobs:
       - name: Run dapp connector tests
         working-directory: ./packages/yoroi-extension
         run: npm run test:run:e2e:dApp:chrome
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: testRunsData
+          path: ./packages/yoroi-extension/testRunsData
+
+  E2E_tests_dApp_FF:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check' || || contains(github.event.review.body, '/checkFF'))
+    runs-on: macos-10.15
+    needs: E2E_tests_dApp_Chrome
+    steps:
+      - uses: actions/checkout@v2
+      - name: Forcefully install Firefox for Developers browser
+        run: brew update && brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
+      - name: Get FF path
+        run: type -a firefox
+      - name: Get FF DEV path
+        run: type -a firefox-developer-edition
+      - name: Set up env variable for FF
+        run: echo "FIREFOX_DEV=value" >> $GITHUB_ENV
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: Cache extension node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yoroi-extension-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-extension/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Cache connector node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yoroi-connector-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-ergo-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: npm install
+        run: |
+          . install-all.sh
+      - name: Build the test version
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:build
+      - name: Create the report's folder
+        working-directory: ./packages/yoroi-extension
+        run: |
+          mkdir reports
+          touch ./reports/cucumberReports.json
+      - name: Run dapp connector tests
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:run:e2e:dApp:firefox
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
