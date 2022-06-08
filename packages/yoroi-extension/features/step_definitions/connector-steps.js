@@ -33,7 +33,7 @@ const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
 
 const connectorPopUpIsDisplayed = async (customWorld: Object) => {
-  await customWorld.driver.sleep(1000);
+  await customWorld.driver.sleep(2000);
   await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await customWorld.driver.getTitle();
   expect(windowTitle).to.equal('Yoroi dApp Connector');
