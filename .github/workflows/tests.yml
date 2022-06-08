@@ -105,7 +105,7 @@ jobs:
           path: ./packages/yoroi-extension/testRunsData
 
   E2E_tests_dApp_FF:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check' || contains(github.event.review.body, '/checkFF'))
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/run_dapp_ff'))
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
