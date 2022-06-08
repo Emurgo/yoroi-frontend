@@ -380,7 +380,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         selected: null | PublicDeriver<>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
     |},
     getReceiveAddress: typeof getReceiveAddress,

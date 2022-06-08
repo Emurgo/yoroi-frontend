@@ -34,7 +34,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 @observer
@@ -83,22 +83,20 @@ class CardanoUtxoDetails extends Component<Props> {
   renderAmountDisplay: ({|
     entry: TokenEntry,
   |}) => Node = request => {
-    const tokenInfo = this._resolveTokenInfo(request.entry);
-    if (!tokenInfo) {
-      throw new Error('missing token info');
-    }
+
+    const nameFromIdentifier = assetNameFromIdentifier(request.entry.identifier);
+    const tokenInfo: ?$ReadOnly<TokenRow> = this._resolveTokenInfo(request.entry);
 
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
-    const ticker = tokenInfo ? this.getTicker(tokenInfo)
-      : assetNameFromIdentifier(request.entry.identifier);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo) : nameFromIdentifier;
 
     let fiatAmountDisplay = null;
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(
-        getTokenName(tokenInfo),
+        tokenInfo ? getTokenName(tokenInfo) : nameFromIdentifier,
         currency
       );
       if (price != null) {

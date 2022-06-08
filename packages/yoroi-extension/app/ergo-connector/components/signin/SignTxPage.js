@@ -50,7 +50,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +shouldHideBalance: boolean,
   +selectedWallet: PublicDeriverCache,
   +connectedWebsite: ?WhitelistEntry,

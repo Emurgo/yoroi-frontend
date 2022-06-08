@@ -10,7 +10,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   notProdLabel: {
     id: 'notprod.label.message',
-    defaultMessage: '!!!WARNING: non-production build. If unexpected, double-check Yoroi installation.',
+    defaultMessage: '!!!WARNING: this is a non-production build. If something unusual occurs, double-check Yoroi\'s installation.',
   },
 });
 

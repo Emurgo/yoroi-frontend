@@ -107,23 +107,23 @@ export function isValidReceiveAddress(
   const messages = defineMessages({
     invalidAddress: {
       id: 'wallet.send.form.errors.invalidAddress',
-      defaultMessage: '!!!Please enter a valid address.',
+      defaultMessage: '!!!Invalid address. Please retype.',
     },
     cannotSendToLegacy: {
       id: 'wallet.send.form.cannotSendToLegacy',
-      defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
+      defaultMessage: '!!!Unable to send funds to legacy addresses (any address created before July 29th, 2020).',
     },
     cannotSendToReward: {
       id: 'wallet.send.form.cannotSendToReward',
-      defaultMessage: '!!!You cannot send to a reward account',
+      defaultMessage: '!!!Unable to send funds to a reward account.',
     },
     cannotSendToP2SH: {
       id: 'wallet.send.form.cannotSendToP2SH',
-      defaultMessage: '!!!You cannot send to pay-to-script-hash addresses',
+      defaultMessage: '!!!Unable to send funds to pay-to-script-hash addresses.',
     },
     wrongNetwork: {
       id: 'global.wrongNetwork.address',
-      defaultMessage: '!!!Wrong network for address.',
+      defaultMessage: '!!!This address is on a different network. Please retype.',
     },
   });
 

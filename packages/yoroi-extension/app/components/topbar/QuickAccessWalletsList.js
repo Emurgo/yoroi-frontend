@@ -10,7 +10,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 type Props = {|
   +wallets: Array<Object>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |}
 @observer
 export default class QuickAccessWalletsList extends Component<Props> {

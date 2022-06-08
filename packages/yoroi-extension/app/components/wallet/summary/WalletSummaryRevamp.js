@@ -39,7 +39,7 @@ type Props = {|
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
 |};
 
 @observer
@@ -124,14 +124,14 @@ export default class WalletSummaryRevamp extends Component<Props> {
             currency,
             timestamp
           );
-          if (!price) {
+          if (price == null) {
             totalFiatAmount = null;
             break;
           }
           totalFiatAmount = totalFiatAmount.plus(
             tokenEntry.amount
               .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-              .multipliedBy(String(price))
+              .multipliedBy(price)
           );
         }
         if (totalFiatAmount) {

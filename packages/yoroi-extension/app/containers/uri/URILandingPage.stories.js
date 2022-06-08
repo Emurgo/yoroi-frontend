@@ -93,7 +93,7 @@ export const GettingMnemonics = (): Node => {
                 tokenInfo: mockFromDefaults(defaultAssets),
               },
               coinPriceStore: {
-                getCurrentPrice: (_from, _to) => 5,
+                getCurrentPrice: (_from, _to) => '5',
               },
               loading: {
                 uriParams,
