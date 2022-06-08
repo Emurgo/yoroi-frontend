@@ -191,6 +191,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onAddAll = () => {
     for (const { tokenInfo, amount } of this.state.selectedTokens) {
+      if (!amount) continue
       this.props.onAddToken({
             token: tokenInfo, shouldReset: false, maxAmount: this.getMaxAmount(tokenInfo),
       })
@@ -226,7 +227,10 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   isValidAmounts = () => {
     for (const tokenEntry of this.state.selectedTokens) {
-      if (!this.isValidAmount(tokenEntry.tokenInfo)) return false;
+      if (
+        !this.isValidAmount(tokenEntry.tokenInfo) ||
+        !tokenEntry.amount
+      ) return false;
     }
     return true
   }
