@@ -112,9 +112,7 @@ jobs:
       - name: Forcefully install Firefox for Developers browser
         run: brew update && brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
       - name: Get FF path
-        run: type -a firefox
-      - name: Get FF DEV path
-        run: type -a firefox-developer-edition
+        run: find / -name firefox*
       - name: Set up env variable for FF
         run: echo "FIREFOX_DEV=value" >> $GITHUB_ENV
       - name: Read .nvmrc
