@@ -236,6 +236,13 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        {
+          txError && (
+            <div className={styles.txError}>
+              {txError}
+            </div>
+          )
+        }
         <div className={styles.staleTxWarning}>
           {this.props.staleTx && staleTxWarning}
         </div>
@@ -311,8 +318,9 @@ export default class WalletSendPreviewStep extends Component<Props> {
             className={styles.walletPassword}
             {...walletPasswordField.bind()}
             disabled={isSubmitting}
-            onFocus={() => {
+            onChange={(e) => {
               this.setState({ passwordError: null })
+              walletPasswordField.set('value', e.target.value)
             }}
             error={walletPasswordField.error || passwordError}
           />
