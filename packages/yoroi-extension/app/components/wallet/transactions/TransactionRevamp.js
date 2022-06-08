@@ -70,7 +70,7 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,

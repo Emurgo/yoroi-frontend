@@ -19,7 +19,7 @@ import { bech32, } from 'bech32';
 const messages = defineMessages({
   invalidPoolId: {
     id: 'wallet.delegate.form.invalidPoolId',
-    defaultMessage: '!!!Invalid pool id',
+    defaultMessage: '!!!Invalid pool ID. Please retype.',
   },
 });
 

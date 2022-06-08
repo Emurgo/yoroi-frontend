@@ -159,7 +159,7 @@ export const Loading = (): Node => {
             selected: wallet.publicDeriver,
           },
           coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
+            getCurrentPrice: (_from, _to) => '5',
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),
@@ -280,7 +280,7 @@ const genPropsForTransactions: {|
     selected: request.wallet.publicDeriver,
   },
   coinPriceStore: {
-    getCurrentPrice: (_from, _to) => 5,
+    getCurrentPrice: (_from, _to) => '5',
   },
   tokenInfoStore: {
     tokenInfo: mockFromDefaults(defaultAssets),

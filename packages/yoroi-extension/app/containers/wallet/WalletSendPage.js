@@ -527,7 +527,7 @@ class WalletSendPage extends Component<AllProps> {
     initialShowMemoState: boolean,
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       loading: {|
         resetUriParams: void => void,

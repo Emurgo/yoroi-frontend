@@ -189,11 +189,17 @@ async function takePageSnapshot(driver, name) {
 }
 
 async function getConsoleLogs(driver, name) {
+  const cap = await driver.getCapabilities();
+  const browserName = cap.getBrowserName();
+  if (browserName === 'firefox'){
+    return;
+  }
   const dir = createDirInTestRunsData('consoleLogs');
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
   const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
+
 }
 
 async function inputMnemonicForWallet(

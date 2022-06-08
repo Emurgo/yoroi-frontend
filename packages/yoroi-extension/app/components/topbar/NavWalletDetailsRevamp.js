@@ -41,7 +41,7 @@ type Props = {|
     conceptualWalletName: string,
   |},
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 function constructPlate(

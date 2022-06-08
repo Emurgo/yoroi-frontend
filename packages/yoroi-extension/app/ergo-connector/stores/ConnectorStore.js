@@ -720,7 +720,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           ).to_bytes()).toString('hex'),
           value,
         });
-        amount.joinAddMutable(value);
       }
     }
 

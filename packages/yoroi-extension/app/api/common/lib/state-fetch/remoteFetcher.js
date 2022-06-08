@@ -22,10 +22,17 @@ import { networks } from '../../../ada/lib/storage/database/prepackaged/networks
 
 import type { ConfigType } from '../../../../../config/config-types';
 
+import { environment } from '../../../../environment';
+
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const priceBackendUrl = (() => {
-  const endpoint = networks.CardanoTestnet.Backend.BackendService;
+  let endpoint;
+  if (environment.isNightly()) {
+    endpoint = networks.CardanoTestnet.Backend.BackendService;
+  } else {
+    endpoint = networks.CardanoMainnet.Backend.BackendService;
+  }
   if (endpoint == null) {
     throw new Error();
   }

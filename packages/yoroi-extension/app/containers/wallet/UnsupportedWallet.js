@@ -9,7 +9,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 export const messages: * = defineMessages({
   title: {
     id: 'wallet.unsupported.title',
-    defaultMessage: '!!!Wallet type not supported',
+    defaultMessage: '!!!This wallet type is incompatible.',
   },
   subtitle: {
     id: 'wallet.unsupported.subtitle',

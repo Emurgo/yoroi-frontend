@@ -420,9 +420,11 @@ export function coinSelectionForValues(
     const requiredAda = totalRequiredValue.getDefault();
     const requiredNotTooSmall = requiredAda.gt(ONE_ADA_LOVELACES);
     const availableEnoughOverRequired =
-      availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5));
+      availableExtraAda.isGreaterThan(requiredAda.multipliedBy('1.5'));
     if (requiredNotTooSmall && availableEnoughOverRequired) {
-      recommendedChange.push(createMultiToken(requiredAda, [], networkId));
+      recommendedChange.push(createMultiToken(
+        requiredAda.multipliedBy('1.1').integerValue(),
+        [], networkId));
     }
   }
   return {
