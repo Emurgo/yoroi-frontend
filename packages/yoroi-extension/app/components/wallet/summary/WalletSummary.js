@@ -118,7 +118,7 @@ export default class WalletSummary extends Component<Props> {
     } = this.props;
 
     let pendingAmount = null;
-    if (unitOfAccountSetting.enabled) {
+    if (false /* temporarily disabled */ && unitOfAccountSetting.enabled) {
       const { currency } = unitOfAccountSetting;
       if (!currency) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
