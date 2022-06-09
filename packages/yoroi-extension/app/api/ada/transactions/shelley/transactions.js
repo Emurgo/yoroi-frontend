@@ -222,47 +222,47 @@ function addUtxoInput(
       'Failed to add a regular input',
     );
   } else if (witness.nativeScript != null) {
-    const nativeScript = logErr(
-      // $FlowFixMe[prop-missing]
-      () => RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(witness.nativeScript)),
-      `Failed to parse witness.nativeScript: ${JSON.stringify(witness)}`,
-    );
-    logErr(
-      () => {
-        txBuilder.add_native_script_input(
-          nativeScript,
-          txInput,
-          wasmAmount,
-        );
-      },
-      'Failed to add a native script input',
-    );
+    // const nativeScript = logErr(
+    //   // $FlowFixMe[prop-missing]
+    //   () => RustModule.WalletV4.NativeScript.from_bytes(hexToBytes(witness.nativeScript)),
+    //   `Failed to parse witness.nativeScript: ${JSON.stringify(witness)}`,
+    // );
+    // logErr(
+    //   () => {
+    //     txBuilder.add_native_script_input(
+    //       nativeScript,
+    //       txInput,
+    //       wasmAmount,
+    //     );
+    //   },
+    //   'Failed to add a native script input',
+    // );
   } else if (witness.plutusScript != null) {
-    const plutusScript = logErr(
-      // $FlowFixMe[prop-missing]
-      () => RustModule.WalletV4.PlutusScript.from_bytes(hexToBytes(witness.plutusScript)),
-      `Failed to parse witness.plutusScript: ${JSON.stringify(witness)}`,
-    );
-    const datum = logErr(
-      // $FlowFixMe[prop-missing]
-      () => RustModule.WalletV4.PlutusData.from_bytes(hexToBytes(witness.datum)),
-      `Failed to parse witness.datum: ${JSON.stringify(witness)}`,
-    );
-    const redeemer = logErr(
-      // $FlowFixMe[prop-missing]
-      () => RustModule.WalletV4.Redeemer.from_bytes(hexToBytes(witness.redeemer)),
-      `Failed to parse witness.redeemer: ${JSON.stringify(witness)}`,
-    );
-    logErr(
-      () => {
-        txBuilder.add_plutus_script_input(
-          RustModule.WalletV4.PlutusWitness.new(plutusScript, datum, redeemer),
-          txInput,
-          wasmAmount,
-        );
-      },
-      'Failed to add a plutus script input',
-    );
+    // const plutusScript = logErr(
+    //   // $FlowFixMe[prop-missing]
+    //   () => RustModule.WalletV4.PlutusScript.from_bytes(hexToBytes(witness.plutusScript)),
+    //   `Failed to parse witness.plutusScript: ${JSON.stringify(witness)}`,
+    // );
+    // const datum = logErr(
+    //   // $FlowFixMe[prop-missing]
+    //   () => RustModule.WalletV4.PlutusData.from_bytes(hexToBytes(witness.datum)),
+    //   `Failed to parse witness.datum: ${JSON.stringify(witness)}`,
+    // );
+    // const redeemer = logErr(
+    //   // $FlowFixMe[prop-missing]
+    //   () => RustModule.WalletV4.Redeemer.from_bytes(hexToBytes(witness.redeemer)),
+    //   `Failed to parse witness.redeemer: ${JSON.stringify(witness)}`,
+    // );
+    // logErr(
+    //   () => {
+    //     txBuilder.add_plutus_script_input(
+    //       RustModule.WalletV4.PlutusWitness.new(plutusScript, datum, redeemer),
+    //       txInput,
+    //       wasmAmount,
+    //     );
+    //   },
+    //   'Failed to add a plutus script input',
+    // );
   }
   return AddInputResult.VALID;
 }
@@ -882,7 +882,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
   );
 
   function addInputFromUtxo(
-    inputBuilder: RustModule.WalletV4.TransactionBuilder | RustModule.WalletV4.TxInputsBuilder,
+    inputBuilder: RustModule.WalletV4.TransactionBuilder,// | RustModule.WalletV4.TxInputsBuilder,
     utxo: RemoteUnspentOutput,
     ): void {
     const wasmAddr = normalizeToAddress(utxo.receiver);
@@ -918,15 +918,15 @@ function newAdaUnsignedTxFromUtxoForConnector(
       // <todo:call_reorg_for_collateral>
       throw new Error(`${nameof(_newAdaUnsignedTxFromUtxo)} no collateral reserve inputs are available`);
     }
-    const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
-    for (let i = 0; i < collateralReserve.length && i < 3; i++) {
-      addInputFromUtxo(collateralBuilder, collateralReserve[i]);
-    }
-    txBuilder.set_collateral(collateralBuilder);
+    // const collateralBuilder = RustModule.WalletV4.TxInputsBuilder.new();
+    // for (let i = 0; i < collateralReserve.length && i < 3; i++) {
+    //   addInputFromUtxo(collateralBuilder, collateralReserve[i]);
+    // }
+    // txBuilder.set_collateral(collateralBuilder);
     // script data hash
-    txBuilder.calc_script_data_hash(
-      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
-    );
+    // txBuilder.calc_script_data_hash(
+    //   RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
+    // );
   }
 
   /*
@@ -939,8 +939,8 @@ function newAdaUnsignedTxFromUtxoForConnector(
     }
     if (str.length === 56) {
       // Ed25519KeyHash is 28 bytes long
-      let keyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(str));
-      txBuilder.add_required_signer(keyHash);
+      // let keyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(str));
+      // txBuilder.add_required_signer(keyHash);
     } else {
       const address = normalizeToAddress(str);
       if (address == null) {
@@ -955,7 +955,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
            or a valid address with a payment key-hash, got: ${reqSigner}`
         );
       }
-      txBuilder.add_required_signer(keyHash);
+      // txBuilder.add_required_signer(keyHash);
     }
   }
 

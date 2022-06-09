@@ -106,16 +106,16 @@ class Module {
         .coins_per_utxo_word(coinsPerUtxoWord)
         .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
         .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
-        .ex_unit_prices(w4.ExUnitPrices.new(
-          w4.UnitInterval.new(
-            w4.BigNum.from_str('577'),
-            w4.BigNum.from_str('10000'),
-          ),
-          w4.UnitInterval.new(
-            w4.BigNum.from_str('721'),
-            w4.BigNum.from_str('10000000'),
-          ),
-        ))
+        // .ex_unit_prices(w4.ExUnitPrices.new(
+        //   w4.UnitInterval.new(
+        //     w4.BigNum.from_str('577'),
+        //     w4.BigNum.from_str('10000'),
+        //   ),
+        //   w4.UnitInterval.new(
+        //     w4.BigNum.from_str('721'),
+        //     w4.BigNum.from_str('10000000'),
+        //   ),
+        // ))
         .prefer_pure_change(true)
         .build()
     );
