@@ -583,7 +583,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         new AssetIdsReducer(),
       ];
 
-      for (;;) {
+      for (let i = 0; ; i++) {
         const batchRequest = {
           ...request,
           skip: cursor,
@@ -592,7 +592,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
         const batchResult =
           await this.stores.substores[apiType].transactions.refreshTransactions(
-            batchRequest
+            {
+              ...batchRequest,
+              // only the first call should update from remote
+              isLocalRequest: i > 0,
+            }
           );
         if (batchResult.transactions.length === 0) {
           break;
