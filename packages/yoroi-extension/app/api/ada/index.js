@@ -1272,7 +1272,7 @@ export default class AdaApi {
       const policyId = bytesToHex(
         RustModule.WalletV4.NativeScript
           .from_bytes(hexToBytes(script))
-          .hash(0)
+          .hash()
           .to_bytes()
       );
       const assetId = `${policyId}.${assetName}`;
