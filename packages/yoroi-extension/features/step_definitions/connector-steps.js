@@ -26,6 +26,10 @@ import {
   cancelButton,
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
+import {
+  getSigningData,
+  signMessageTitle,
+} from '../pages/connector-signingDataPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
@@ -74,6 +78,11 @@ Then(/^I should see the connector popup for connection$/, async function () {
 Then(/^I should see the connector popup for signing$/, async function () {
   await connectorPopUpIsDisplayed(this);
   await this.waitForElement(transactionTotalAmountField);
+});
+
+Then(/^I should see the connector popup for signing data$/, async function () {
+  await connectorPopUpIsDisplayed(this);
+  await this.waitForElement(signMessageTitle);
 });
 
 Then(/^There is no the connector popup$/, async function () {
@@ -290,3 +299,20 @@ Then(/^The pop-up is closed and the extension tab is opened$/, async function ()
 Then(/^I cancel signing the transaction$/, async function () {
   await this.click(cancelButton);
 });
+
+When(/^I request signing the data:$/, async function (table) {
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  const payload = fields.payload;
+  await this.mockDAppPage.requestSigningData(payload);
+});
+
+Then(/^I should see the data to sign:$/, async function (table) {
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  const payload = fields.payload;
+  const actualSigningData = await getSigningData(this);
+  expect(actualSigningData, 'Signing Data is different').to.equal(payload);
+});
+
+

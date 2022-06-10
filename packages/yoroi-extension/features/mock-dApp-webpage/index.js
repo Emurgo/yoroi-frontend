@@ -70,6 +70,10 @@ export class MockDAppWebpage {
     await this.driver.executeScript(scriptString);
   }
 
+  _addressToCbor(address) {
+    return bytesToHex(CardanoWasm.Address.from_bech32(address).to_bytes());
+  }
+
   _addressesFromCborIfNeeded(addresses: Array<string>): Array<string> {
     this.logger.info(`MockDApp: Converting the addresses "${JSON.stringify(addresses)}" from CBOR`);
     const resultOfConverting = addresses.map(a =>
@@ -195,6 +199,58 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
   }
 
+  async _getUsedAddresses(): Promise<Array<string>> {
+    this.logger.info(`MockDApp: Getting Used Addresses`);
+
+    const usedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.api
+        .getUsedAddresses({ page: 0, limit: 5 })
+        .then(addresses => {
+          if (addresses.length === 0) {
+            callback({ success: false, errMsg: 'No used addresses' });
+          }
+          callback({ success: true, retValue: addresses });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (usedAddressesResponse.success) {
+      const usedAddresses = this._addressesFromCborIfNeeded(usedAddressesResponse.retValue);
+      this.logger.info(`MockDApp: -> The used addresses are ${usedAddresses.concat(',')}`);
+      return usedAddresses;
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${usedAddressesResponse.errMsg}`);
+    throw new MockDAppWebpageError(usedAddressesResponse.errMsg);
+  }
+
+  async _getUnusedAddresses(): Promise<Array> {
+    this.logger.info(`MockDApp: Getting Unused Addresses`);
+
+    const unusedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.api
+        .getUnusedAddresses()
+        .then(addresses => {
+          if (addresses.length === 0) {
+            callback({ success: false, errMsg: 'No unused addresses' });
+          }
+          callback({ success: true, retValue: addresses });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (unusedAddressesResponse.success) {
+      const unusedAddresses = this._addressesFromCborIfNeeded(unusedAddressesResponse.retValue);
+      this.logger.info(`MockDApp: -> The used addresses are ${unusedAddresses.concat(',')}`);
+      return unusedAddresses;
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${unusedAddressesResponse.errMsg}`);
+    throw new MockDAppWebpageError(unusedAddressesResponse.errMsg);
+  }
+
   async requestNonAuthAccess() {
     await this._requestAccess();
   }
@@ -291,11 +347,15 @@ export class MockDAppWebpage {
       this.logger.info(`MockDApp: -> Try ${i + 1} to get the connection state`);
       await this.driver.sleep(100);
       const walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
-      this.logger.info(`MockDApp: -> Try ${i + 1} the connection state is ${JSON.stringify(walletConnectedState)}`);
+      this.logger.info(
+        `MockDApp: -> Try ${i + 1} the connection state is ${JSON.stringify(walletConnectedState)}`
+      );
       states.push(walletConnectedState);
     }
-    const resultConnectionState = states.every((walletState) => walletState === true);
-    this.logger.info(`MockDApp: -> The connection state is ${JSON.stringify(resultConnectionState)}`);
+    const resultConnectionState = states.every(walletState => walletState === true);
+    this.logger.info(
+      `MockDApp: -> The connection state is ${JSON.stringify(resultConnectionState)}`
+    );
     return resultConnectionState;
   }
 
@@ -398,5 +458,35 @@ export class MockDAppWebpage {
     });
     this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
     return signingResult;
+  }
+
+  async requestSigningData(payload: Bytes) {
+    this.logger.info(`MockDApp: Requesting signing the data: data="${payload}"`);
+
+    const unusedAddresses = await this._getUnusedAddresses();
+
+    let address;
+    if (unusedAddresses && unusedAddresses.length > 0) {
+      address = unusedAddresses[0];
+    } else {
+      this.logger.error(`MockDApp: -> The error is received: No unused Addresses`);
+      throw new MockDAppWebpageError('No Unused Addresses');
+    }
+
+    address = this._addressToCbor(address);
+
+    this.logger.info(`MockDApp: -> Signing address: ${address}`);
+
+    let payloadHex;
+    if (payload.startsWith('0x')) {
+      payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+    } else {
+      payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+    }
+    this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
+
+    this.driver.executeScript((addr, plHex) => {
+      window.api.signData(addr, plHex);
+    }, address, payloadHex);
   }
 }
