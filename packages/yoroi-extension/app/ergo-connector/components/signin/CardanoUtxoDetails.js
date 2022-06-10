@@ -34,7 +34,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 @observer
@@ -83,22 +83,38 @@ class CardanoUtxoDetails extends Component<Props> {
   renderAmountDisplay: ({|
     entry: TokenEntry,
   |}) => Node = request => {
-    const tokenInfo = this._resolveTokenInfo(request.entry);
+
+    const nameFromIdentifier = assetNameFromIdentifier(request.entry.identifier);
+    const tokenInfo: ?$ReadOnly<TokenRow> = this._resolveTokenInfo(request.entry);
+
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
-    const ticker = tokenInfo ? this.getTicker(tokenInfo)
-      : assetNameFromIdentifier(request.entry.identifier);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo) : nameFromIdentifier;
+
+    let fiatAmountDisplay = null;
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(request.entry.identifier, currency);
+      const price = this.props.getCurrentPrice(
+        tokenInfo ? getTokenName(tokenInfo) : nameFromIdentifier,
+        currency
+      );
       if (price != null) {
-        return (
+        const fiatAmount = calculateAndFormatValue(shiftedAmount, price);
+        const [beforeDecimal, afterDecimal] = fiatAmount.split('.');
+        let beforeDecimalSigned;
+        if (beforeDecimal.startsWith('-')) {
+          beforeDecimalSigned = beforeDecimal;
+        } else {
+          beforeDecimalSigned = '+' + beforeDecimal;
+        }
+        fiatAmountDisplay = (
           <>
-            <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
-            <div>
-              {shiftedAmount.toString()} {ticker}
-            </div>
+            <span>{beforeDecimalSigned}</span>
+            {afterDecimal && (
+              <span>.{afterDecimal}</span>
+            )}
+            {' '}{currency}
           </>
         );
       }
@@ -113,13 +129,33 @@ class CardanoUtxoDetails extends Component<Props> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    return (
+    const cryptoAmountDisplay = (
       <>
         <span>{adjustedBefore}</span>
         <span>{afterDecimalRewards}</span> {ticker}
       </>
     );
-  };
+
+    if (fiatAmountDisplay) {
+      return (
+        <>
+          <div>
+            {fiatAmountDisplay}
+          </div>
+          <div>
+            {cryptoAmountDisplay}
+          </div>
+        </>
+      );
+    }
+    return (
+      <>
+        <div>
+          {cryptoAmountDisplay}
+        </div>
+      </>
+    );
+  }
 
   renderRow: ({|
     kind: string,

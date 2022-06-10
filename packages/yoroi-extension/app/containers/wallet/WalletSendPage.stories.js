@@ -115,7 +115,7 @@ const genBaseProps: {|
       ),
     },
     coinPriceStore: {
-      getCurrentPrice: (_from, _to) => 5,
+      getCurrentPrice: (_from, _to) => '5',
     },
     memos: {
       hasSetSelectedExternalStorageProvider: false,
@@ -216,7 +216,7 @@ const genBaseProps: {|
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         coinPriceStore: {
-          getCurrentPrice: (_from, _to) => 5,
+          getCurrentPrice: (_from, _to) => '5',
         },
         tokenInfoStore: {
           tokenInfo: genTokenInfoMap(

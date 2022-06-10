@@ -82,19 +82,26 @@ function SummaryCard({
         </div>
       );
     }
+
+    return formatTokenEntry(token.getDefaultEntry());
+  };
+
+  const renderAmountWithUnitOfAccount: (void | MultiToken) => Node = token => {
+    if (token == null) {
+      return null;
+    }
+
     const unitOfAccountCalculated = unitOfAccount(token.getDefaultEntry());
 
-    const entryNode = formatTokenEntry(token.getDefaultEntry());
-    const unitOfAccountNode = unitOfAccountCalculated
-      ? `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`
-      : null;
+    if (!unitOfAccountCalculated) {
+      return null;
+    }
 
-    return (
-      <>
-        {unitOfAccountNode}
-        {entryNode}
-      </>
-    );
+    if (shouldHideBalance) {
+      return `${hiddenAmount}  ${unitOfAccountCalculated.currency}`;
+    }
+
+    return `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`;
   };
 
   return (
@@ -123,7 +130,7 @@ function SummaryCard({
                 {renderAmount(totalRewards)}
               </Typography>
               <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-                {renderAmount(totalRewards)} USD
+                {renderAmountWithUnitOfAccount(totalRewards)}
               </Typography>
             </InfoDetails>
             <OverviewButton color="secondary" onClick={onOverviewClick}>
@@ -142,7 +149,7 @@ function SummaryCard({
                 {renderAmount(totalDelegated)}
               </Typography>
               <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-                {renderAmount(totalDelegated)} USD
+                {renderAmountWithUnitOfAccount(totalDelegated)}
               </Typography>
             </InfoDetails>
           </InfoRow>

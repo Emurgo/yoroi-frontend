@@ -7,11 +7,11 @@ import type { MessageDescriptor } from 'react-intl';
 const messages = defineMessages({
   unknownError: {
     id: 'app.errors.unknowError',
-    defaultMessage: '!!!Unknown error.',
+    defaultMessage: '!!!Unknown error occurred. Please retry.',
   },
   unexpectedError: {
     id: 'app.errors.unexpectedError',
-    defaultMessage: '!!!Something unexpected happened. Please retry.',
+    defaultMessage: '!!!Unexpected error occurred. Please retry.',
   },
 });
 

@@ -124,7 +124,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         getCurrentPrice: (
           from: string,
           to: string
-        ) => ?number,
+        ) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

@@ -147,7 +147,7 @@ const genBaseProps: {|
         selected: request.wallet.publicDeriver,
       },
       coinPriceStore: {
-        getCurrentPrice: (_from, _to) => 5,
+        getCurrentPrice: (_from, _to) => '5',
       },
       uiDialogs: {
         isOpen: (dialog) => dialog === request.openDialog,
@@ -294,7 +294,7 @@ const genBaseProps: {|
                 addressSubgroupMap: genDefaultGroupMap(),
               },
               coinPriceStore: {
-                getCurrentPrice: (_from, _to) => 5,
+                getCurrentPrice: (_from, _to) => '5',
               },
               tokenInfoStore: {
                 tokenInfo: mockFromDefaults(defaultAssets),
@@ -964,7 +964,7 @@ export const AdaWithdrawDialog = (): Node => {
                     },
                   },
                   coinPriceStore: {
-                    getCurrentPrice: (_from, _to) => 5,
+                    getCurrentPrice: (_from, _to) => '5',
                   },
                   tokenInfoStore: {
                     tokenInfo: mockFromDefaults(defaultAssets),

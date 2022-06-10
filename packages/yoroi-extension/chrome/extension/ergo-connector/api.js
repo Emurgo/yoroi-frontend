@@ -81,6 +81,7 @@ import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelle
 import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/ergo-connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
+import type { ForeignUtxoFetcher } from '../../../app/ergo-connector/stores/ConnectorStore';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -695,6 +696,20 @@ function getScriptRequiredSigningKeys(
   return set;
 }
 
+function getTxRequiredSigningKeys(
+  txBody: RustModule.WalletV4.TransactionBody,
+): Set<string> {
+  const set = new Set<string>();
+  const requiredSigners: ?RustModule.WalletV4.Ed25519KeyHashes = txBody.required_signers();
+  if (requiredSigners != null && requiredSigners.len() > 0) {
+    for (let i = 0; i < requiredSigners.len(); i++) {
+      const requiredKeyHash = requiredSigners.get(i);
+      set.add(bytesToHex(requiredKeyHash.to_bytes()));
+    }
+  }
+  return set;
+}
+
 export async function connectorSignCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: string,
@@ -731,11 +746,18 @@ export async function connectorSignCardanoTx(
     throw new Error(`missing chains functionality`);
   }
 
-  const requiredScriptSignAddresses = new Set<string>();
+  const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
   const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet);
-  const scriptSignaturesRequired = requiredScriptSignKeys.size > 0;
+  const totalAdditionalRequiredSignKeys = new Set<string>([
+    ...requiredTxSignKeys,
+    ...requiredScriptSignKeys,
+  ]);
+
+  console.log('totalAdditionalRequiredSignKeys', JSON.stringify(totalAdditionalRequiredSignKeys));
+  const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
+
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
-    if (scriptSignaturesRequired) {
+    if (additionalSignaturesRequired) {
       return getAllAddressesForDisplay({
         publicDeriver,
         type: CoreAddressTypes.CARDANO_BASE,
@@ -749,9 +771,10 @@ export async function connectorSignCardanoTx(
     queryAllBaseAddresses(),
   ]);
 
+  const requiredTxSignAddresses = new Set<string>();
   const otherRequiredSigners = [];
 
-  if (scriptSignaturesRequired) {
+  if (additionalSignaturesRequired) {
     if (allBaseAddresses.length === 0) {
       throw new Error('Cannot sign transaction script - no base addresses are available in the wallet!');
     }
@@ -763,27 +786,30 @@ export async function connectorSignCardanoTx(
     if (parsedStakingCred == null) {
       throw new Error('Cannot sign transaction script - failed to parse the base address staking cred!');
     }
-    for (const scriptKeyHash of requiredScriptSignKeys) {
+    for (const signingKeyHash of totalAdditionalRequiredSignKeys) {
       const requiredKeyHash = RustModule.WalletV4.Ed25519KeyHash
-        .from_bytes(hexToBytes(scriptKeyHash));
+        .from_bytes(hexToBytes(signingKeyHash));
       const requiredPaymentCred = RustModule.WalletV4.StakeCredential
         .from_keyhash(requiredKeyHash);
-      const requiredAddressBytes = RustModule.WalletV4.BaseAddress.new(
+      const requiredAddress = RustModule.WalletV4.BaseAddress.new(
         parsedNetworkId,
         requiredPaymentCred,
         parsedStakingCred,
-      ).to_address().to_bytes();
-      requiredScriptSignAddresses.add(bytesToHex(requiredAddressBytes))
+      ).to_address();
+      console.log('requiredAddress', requiredAddress.to_bech32());
+      requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
+    console.log('requiredTxSignAddresses', JSON.stringify(requiredTxSignAddresses));
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
-      if (requiredScriptSignAddresses.delete(address)) {
+      if (requiredTxSignAddresses.delete(address)) {
         otherRequiredSigners.push({ address, addressing });
       }
-      if (requiredScriptSignAddresses.size === 0) {
+      if (requiredTxSignAddresses.size === 0) {
         break;
       }
     }
+    console.log('otherRequiredSigners', JSON.stringify(otherRequiredSigners));
   }
 
   const submittedTxs = loadSubmittedTransactions() || [];
@@ -809,10 +835,19 @@ export async function connectorSignCardanoTx(
     password,
   });
   const utxoIdSet: Set<string> = new Set();
-  for (let i = 0; i < txBody.inputs().len(); i++) {
-    const input = txBody.inputs().get(i);
+  const txBodyInputs = txBody.inputs();
+  for (let i = 0; i < txBodyInputs.len(); i++) {
+    const input = txBodyInputs.get(i);
     const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
     utxoIdSet.add(`${txHash}${String(input.index())}`);
+  }
+  const txBodyCollateralInputs = txBody.collateral();
+  if (txBodyCollateralInputs != null) {
+    for (let i = 0; i < txBodyCollateralInputs.len(); i++) {
+      const input = txBodyCollateralInputs.get(i);
+      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+      utxoIdSet.add(`${txHash}${String(input.index())}`);
+    }
   }
   const usedUtxos = addressedUtxos.filter(utxo =>
     utxoIdSet.has(utxo.utxo_id)
@@ -838,6 +873,7 @@ export async function connectorCreateCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: ?string,
   cardanoTxRequest: CardanoTxRequest,
+  foreignUtxoFetcher: ForeignUtxoFetcher,
 ): Promise<string> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -863,14 +899,17 @@ export async function connectorCreateCardanoTx(
   );
 
   const adaApi = new AdaApi();
-  const signRequest = await adaApi.createUnsignedTxForConnector({
-    publicDeriver,
-    absSlotNumber,
-    // $FlowFixMe[incompatible-exact]
-    cardanoTxRequest,
-    submittedTxs,
-    utxos,
-  });
+  const signRequest = await adaApi.createUnsignedTxForConnector(
+    {
+      publicDeriver,
+      absSlotNumber,
+      // $FlowFixMe[incompatible-exact]
+      cardanoTxRequest,
+      submittedTxs,
+      utxos,
+    },
+    foreignUtxoFetcher,
+  );
 
   if (password == null) {
     return Buffer.from(
@@ -1294,21 +1333,24 @@ export async function connectorGenerateReorgTx(
   }
   const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
-  const unsignedTx = await adaApi.createUnsignedTxForConnector({
-    publicDeriver: withHasUtxoChains,
-    absSlotNumber,
-    cardanoTxRequest: {
-      includeTargets,
+  const unsignedTx = await adaApi.createUnsignedTxForConnector(
+    {
+      publicDeriver: withHasUtxoChains,
+      absSlotNumber,
+      cardanoTxRequest: {
+        includeTargets,
+      },
+      utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
+        utxos,
+        publicDeriver,
+        submittedTxs,
+      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+      // we already factored in submitted transactions above, no need to handle it
+      // any more, so just use an empty array here
+      submittedTxs: [],
     },
-    utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
-      utxos,
-      publicDeriver,
-      submittedTxs,
-    )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-    // we already factored in submitted transactions above, no need to handle it
-    // any more, so just use an empty array here
-    submittedTxs: [],
-  });
+    null,
+  );
   return { unsignedTx, collateralOutputAddressSet };
 }
 

@@ -40,6 +40,8 @@ import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -72,7 +74,7 @@ const messages = defineMessages({
   },
   calculatingFee: {
     id: 'wallet.send.form.calculatingFee',
-    defaultMessage: '!!!Calculating fee...',
+    defaultMessage: '!!!Calculating the fee, please wait.',
   },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
@@ -133,6 +135,8 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 type State = {|
@@ -462,7 +466,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 </div>
 
                 <div className={styles.usd}>
-                  <p>$0</p>
+                  {this.renderUnitOfAccountAmount(amountFieldProps.value)}
                 </div>
               </div>
 
@@ -567,5 +571,38 @@ export default class WalletSendForm extends Component<Props, State> {
       >
         {intl.formatMessage(globalMessages.nextButtonLabel)}
       </Button>);
+  }
+
+  renderUnitOfAccountAmount(value: string): Node {
+    if (!this.props.unitOfAccountSetting.enabled) {
+      return null;
+    }
+    let convertedAmount;
+
+    const { currency } = this.props.unitOfAccountSetting;
+
+    let amount;
+    try{
+      amount = new BigNumber(value);
+    } catch {
+      amount = null;
+    }
+    if (!amount || amount.isNaN()) {
+      convertedAmount = '-';
+    } else {
+      const ticker = this.props.defaultToken.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getCurrentPrice(ticker, currency);
+
+      if (price != null) {
+        convertedAmount = calculateAndFormatValue(amount, price);
+      } else {
+        convertedAmount = '-';
+      }
+    }
+
+    return `${convertedAmount} ${currency}`;
   }
 }
