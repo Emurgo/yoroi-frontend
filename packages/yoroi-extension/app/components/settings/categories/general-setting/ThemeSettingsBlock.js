@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { Button, IconButton, Typography } from '@mui/material';
+import { Button, FormControlLabel, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import { THEMES } from '../../../../styles/utils';
@@ -55,6 +55,18 @@ const messages = defineMessages({
     id: 'settings.backYoroiClassic',
     defaultMessage: '!!!Back to Yoroi Classic',
   },
+  version: {
+    id: 'settings.theme.version',
+    defaultMessage: '!!!Version'
+  },
+  currentVersion: {
+    id: 'settings.theme.currentVersion',
+    defaultMessage: '!!!Yoroi current version'
+  },
+  newVersion: {
+    id: 'settings.theme.newVersion',
+    defaultMessage: '!!!Yoroi new version'
+  },
 });
 
 type Props = {|
@@ -70,6 +82,8 @@ type InjectedProps = {|
 |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
+const NEW_THEME = THEMES.YOROI_REVAMP
+const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`
 @observer
 class ThemeSettingsBlock extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -132,11 +146,41 @@ class ThemeSettingsBlock extends Component<AllProps> {
       || environment.isTest();
 
     const themeBlockClassicComponent = (
-      <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingTop: '30px' }}>
-        {commonHeader}
+      <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingY: '24px' }}>
+        <Typography>
+          {intl.formatMessage(messages.version)}
+        </Typography>
+        <Box>
+          <RadioGroup
+            aria-labelledby="theme-switch-buttons"
+            value={currentTheme === NEW_THEME ? NEW_THEME : OLD_THEME}
+            onChange={(e) => {
+              const theme = e.target.value === NEW_THEME ? NEW_THEME : THEMES.YOROI_MODERN
+              selectTheme({ theme })
+            }}
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
+            <FormControlLabel
+              value={OLD_THEME}
+              control={<Radio size='small' />}
+              label={intl.formatMessage(messages.currentVersion)}
+              sx={{
+                marginRight: '20px'
+              }}
+            />
+            <FormControlLabel
+              value={NEW_THEME}
+              control={<Radio size='small' />}
+              label={intl.formatMessage(messages.newVersion)}
+            />
+          </RadioGroup>
+        </Box>
+        {/* {commonHeader}
         <Box sx={{ maxWidth: '1300px', textAlign: 'center', marginTop: '20px' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-            {/* Modern Theme */}
             <ThemeButton
               variant={null}
               onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
@@ -155,7 +199,6 @@ class ThemeSettingsBlock extends Component<AllProps> {
                 {intl.formatMessage(messages.themeYoroiModern)}
               </Typography>
             </ThemeButton>
-            {/* Classic Theme */}
             <ThemeButton
               variant={null}
               isActive={currentTheme === THEMES.YOROI_CLASSIC}
@@ -212,7 +255,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
               {intl.formatMessage(messages.tryYoroiRevamp)}
             </Button>
           </Box>
-        )}
+        )} */}
       </Box>
     );
 
