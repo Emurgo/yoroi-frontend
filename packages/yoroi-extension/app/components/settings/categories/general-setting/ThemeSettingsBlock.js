@@ -191,6 +191,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
               fontWeight: 500,
               marginBottom: '8px',
               color: 'var(--yoroi-support-settings-text)',
+              fontSize: '18px',
             }}
           >
             {intl.formatMessage(messages.selectColorTheme)}
