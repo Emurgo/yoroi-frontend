@@ -13,6 +13,8 @@ import globalMessages from '../../../../i18n/global-messages';
 import { withLayout } from '../../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../../styles/context/layout';
 import environment from '../../../../environment';
+import { ReactComponent as YoroiModernTheme } from '../../../../assets/images/yoroi-modern-theme.inline.svg';
+import { ReactComponent as YoroiClassicTheme } from '../../../../assets/images/yoroi-classic-theme.inline.svg';
 
 const messages = defineMessages({
   themeLabel: {
@@ -66,6 +68,10 @@ const messages = defineMessages({
   newVersion: {
     id: 'settings.theme.newVersion',
     defaultMessage: '!!!Yoroi new version'
+  },
+  selectColorTheme: {
+    id: 'settings.theme.selectColorTheme',
+    defaultMessage: '!!!Select color theme for old version'
   },
 });
 
@@ -147,7 +153,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
 
     const themeBlockClassicComponent = (
       <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingY: '24px' }}>
-        <Typography>
+        <Typography color='var(--yoroi-palette-gray-900)' fontSize='18px' fontWeight='500' marginBottom='10px'>
           {intl.formatMessage(messages.version)}
         </Typography>
         <Box>
@@ -177,6 +183,28 @@ class ThemeSettingsBlock extends Component<AllProps> {
               label={intl.formatMessage(messages.newVersion)}
             />
           </RadioGroup>
+        </Box>
+        <Box sx={{ marginTop: '20px' }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 500,
+              marginBottom: '8px',
+              color: 'var(--yoroi-support-settings-text)',
+            }}
+          >
+            {intl.formatMessage(messages.selectColorTheme)}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="var(--yoroi-support-settings-text)"
+            sx={{ marginBottom: '2px' }}
+          >
+            <FormattedHTMLMessage {...messages.themeNote} />
+          </Typography>
+          <Typography variant="body2" color="var(--yoroi-support-settings-text)">
+            <FormattedMessage {...messages.blog} values={{ blogLink }} />
+          </Typography>
         </Box>
         {/* {commonHeader}
         <Box sx={{ maxWidth: '1300px', textAlign: 'center', marginTop: '20px' }}>
