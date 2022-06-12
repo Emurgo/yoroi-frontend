@@ -184,29 +184,56 @@ class ThemeSettingsBlock extends Component<AllProps> {
             />
           </RadioGroup>
         </Box>
-        <Box sx={{ marginTop: '20px' }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 500,
-              marginBottom: '8px',
-              color: 'var(--yoroi-support-settings-text)',
-              fontSize: '18px',
-            }}
-          >
-            {intl.formatMessage(messages.selectColorTheme)}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="var(--yoroi-support-settings-text)"
-            sx={{ marginBottom: '2px' }}
-          >
-            <FormattedHTMLMessage {...messages.themeNote} />
-          </Typography>
-          <Typography variant="body2" color="var(--yoroi-support-settings-text)">
-            <FormattedMessage {...messages.blog} values={{ blogLink }} />
-          </Typography>
-        </Box>
+        {
+          currentTheme !== THEMES.YOROI_REVAMP && (
+            <Box>
+              <Box sx={{ marginTop: '20px' }}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 500,
+                    marginBottom: '8px',
+                    color: 'var(--yoroi-support-settings-text)',
+                    fontSize: '18px',
+                  }}
+                >
+                  {intl.formatMessage(messages.selectColorTheme)}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="var(--yoroi-support-settings-text)"
+                  sx={{ marginBottom: '2px' }}
+                >
+                  <FormattedHTMLMessage {...messages.themeNote} />
+                </Typography>
+                <Typography variant="body2" color="var(--yoroi-support-settings-text)">
+                  <FormattedMessage {...messages.blog} values={{ blogLink }} />
+                </Typography>
+              </Box>
+
+              <Box sx={{ marginTop: '16px' }}>
+                <RadioGroup
+                  row
+                  value={currentTheme}
+                  onChange={(e) => {
+                    selectTheme({ theme: e.target.value })
+                  }}
+                >
+                  <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginRight: '24px' }}>
+                    <Box>
+                      <YoroiClassicTheme />
+                    </Box>
+                    <FormControlLabel value={THEMES.YOROI_MODERN} control={<Radio size='small' />} label='Modern' />
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                    <YoroiClassicTheme />
+                    <FormControlLabel value={THEMES.YOROI_CLASSIC} control={<Radio size='small' />} label='classic' />
+                  </Box>
+                </RadioGroup>
+              </Box>
+            </Box>
+          )
+        }
         {/* {commonHeader}
         <Box sx={{ maxWidth: '1300px', textAlign: 'center', marginTop: '20px' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
@@ -316,7 +343,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
     );
     return this.props.renderLayoutComponent({
       CLASSIC: themeBlockClassicComponent,
-      REVAMP: themeBlockRevampComponent,
+      REVAMP: themeBlockClassicComponent, // Todo: remove renderLayoutComponent
     });
   }
 }
@@ -343,3 +370,9 @@ const ThemeButton = styled(IconButton)(({ isActive }) => ({
   marginBottom: '32px',
   ':hover': { background: 'transparent' },
 }));
+
+const RadioButton = styled(Radio)({
+  '&.Mui-checked': {
+    color: '#4B6DDE',
+  },
+})
