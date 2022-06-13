@@ -221,7 +221,7 @@ export default class ThemeSettingsBlock extends Component<AllProps> {
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginRight: '24px' }}>
                     <Box>
-                      <YoroiClassicTheme />
+                      <YoroiModernTheme />
                     </Box>
                     <FormControlLabel value={THEMES.YOROI_MODERN} control={<Radio size='small' />} label='Modern' />
                   </Box>
@@ -411,7 +411,7 @@ export default class ThemeSettingsBlock extends Component<AllProps> {
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginRight: '24px' }}>
                     <Box>
-                      <YoroiClassicTheme />
+                      <YoroiModernTheme />
                     </Box>
                     <FormControlLabel value={THEMES.YOROI_MODERN} control={<Radio size='small' />} label='Modern' />
                   </Box>
@@ -424,84 +424,6 @@ export default class ThemeSettingsBlock extends Component<AllProps> {
             </Box>
           )
         }
-        {/* {commonHeader}
-        <Box sx={{ maxWidth: '1300px', textAlign: 'center', marginTop: '20px' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-            <ThemeButton
-              variant={null}
-              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
-              isActive={currentTheme === THEMES.YOROI_MODERN}
-            >
-              {currentTheme === THEMES.YOROI_MODERN && hasCustomTheme() && (
-                <WarningMessage variant="body2">
-                  {intl.formatMessage(messages.themeWarning)}
-                </WarningMessage>
-              )}
-              <ThemeThumbnail theme={THEMES.YOROI_MODERN} themeKey="modern" />
-              <Typography
-                variant="body2"
-                sx={{ textalign: 'center', color: 'var(--yoroi-support-settings-text)' }}
-              >
-                {intl.formatMessage(messages.themeYoroiModern)}
-              </Typography>
-            </ThemeButton>
-            <ThemeButton
-              variant={null}
-              isActive={currentTheme === THEMES.YOROI_CLASSIC}
-              onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
-            >
-              {currentTheme === THEMES.YOROI_CLASSIC && hasCustomTheme() && (
-                <WarningMessage variant="body2">
-                  {intl.formatMessage(messages.themeWarning)}
-                </WarningMessage>
-              )}
-              <ThemeThumbnail theme={THEMES.YOROI_CLASSIC} themeKey="classic" />
-              <Typography sx={{ textalign: 'center', color: 'var(--yoroi-support-settings-text)' }}>
-                {intl.formatMessage(messages.themeYoroiClassic)}
-              </Typography>
-            </ThemeButton>
-          </Box>
-
-          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
-            {intl.formatMessage(messages.themeExportButton)}
-          </Button>
-        </Box>
-
-        {shouldDisplayRevampButton && (
-          <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
-            <Button
-              sx={{
-                width: '400px',
-                background: 'white',
-                color: '#6b7384',
-                border: '1px solid #6b7384',
-                '&:hover': {
-                  color: '#383838',
-                  background: 'white',
-                },
-                position: 'relative',
-                '&::after': {
-                  content: '"new"',
-                  top: '50%',
-                  right: '30px',
-                  transform: 'translateY(-50%)',
-                  position: 'absolute',
-                  color: 'var(--yoroi-comp-button-primary-text)',
-                  backgroundColor: 'var(--yoroi-comp-button-primary-background)',
-                  padding: '4px 10px',
-                  borderRadius: '777px',
-                },
-              }}
-              onClick={() => {
-                selectTheme({ theme: THEMES.YOROI_REVAMP });
-                this.props.switchToFirstWallet();
-              }}
-              id='switchToRevampButton'
-            >
-              {intl.formatMessage(messages.tryYoroiRevamp)}
-            </Button>
-          </Box>
-        )} */}
       </Box>
     )
   }
