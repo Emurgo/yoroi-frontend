@@ -93,7 +93,7 @@ class CardanoUtxoDetails extends Component<Props> {
 
     let fiatAmountDisplay = null;
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
+    if (false && this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(
         tokenInfo ? getTokenName(tokenInfo) : nameFromIdentifier,

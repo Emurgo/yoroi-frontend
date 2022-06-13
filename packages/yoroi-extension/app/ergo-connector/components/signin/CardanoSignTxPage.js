@@ -212,7 +212,7 @@ class SignTxPage extends Component<Props, State> {
 
     let fiatAmountDisplay = null;
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
+    if (false && this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(
         getTokenName(tokenInfo),
