@@ -374,6 +374,7 @@ export default class ThemeSettingsBlock extends Component<AllProps> {
             />
           </RadioGroup>
         </Box>
+        
         {
           currentTheme !== THEMES.YOROI_REVAMP && (
             <Box>
@@ -428,31 +429,3 @@ export default class ThemeSettingsBlock extends Component<AllProps> {
     )
   }
 }
-
-const WarningMessage = styled(Typography)({
-  position: 'absolute',
-  top: 'calc(50% - 37px)',
-  left: 0,
-  backgroundColor: 'var(--yoroi-palette-background-banner-warning)',
-  color: 'var(--yoroi-palette-common-white)',
-  padding: '10px',
-});
-
-const ThemeButton = styled(IconButton)(({ isActive }) => ({
-  borderRadius: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  opacity: isActive ? 1 : 0.5,
-  svg: {
-    width: '300px',
-    boxShadow: '0 5px 30px 0px rgba(24, 26, 30, 0.12)',
-  },
-  marginBottom: '32px',
-  ':hover': { background: 'transparent' },
-}));
-
-const RadioButton = styled(Radio)({
-  '&.Mui-checked': {
-    color: '#4B6DDE',
-  },
-})
