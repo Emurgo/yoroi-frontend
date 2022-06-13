@@ -126,14 +126,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
         />
-        <ThemeSettingsBlock
-          currentTheme={currentTheme}
-          switchToFirstWallet={this.handleSwitchToFirstWallet}
-          selectTheme={this.generated.actions.profile.updateTheme.trigger}
-          exportTheme={this.generated.actions.profile.exportTheme.trigger}
-          hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
-          onExternalLinkClick={handleExternalLinkClick}
-        />
         <UnitOfAccountSettings
           onSelect={this.onSelectUnitOfAccount}
           isSubmitting={isSubmittingUnitOfAccount}
@@ -141,6 +133,14 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentValue={unitOfAccountValue}
           error={profileStore.setUnitOfAccountRequest.error}
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+        />
+        <ThemeSettingsBlock
+          currentTheme={currentTheme}
+          switchToFirstWallet={this.handleSwitchToFirstWallet}
+          selectTheme={this.generated.actions.profile.updateTheme.trigger}
+          exportTheme={this.generated.actions.profile.exportTheme.trigger}
+          hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <AboutYoroiSettingsBlock
           wallet={this.generated.stores.wallets.selected}
