@@ -377,16 +377,6 @@ test('Create Ledger transaction', async () => {
           44 + HARD_DERIVATION_START,
           1815 + HARD_DERIVATION_START,
           0 + HARD_DERIVATION_START,
-          1,
-          2,
-        ],
-        txHashHex: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
-        outputIndex: 1,
-      }, {
-        path: [
-          44 + HARD_DERIVATION_START,
-          1815 + HARD_DERIVATION_START,
-          0 + HARD_DERIVATION_START,
           0,
           7,
         ],
@@ -402,6 +392,16 @@ test('Create Ledger transaction', async () => {
         ],
         txHashHex: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3658',
         outputIndex: 0,
+      }, {
+        path: [
+          44 + HARD_DERIVATION_START,
+          1815 + HARD_DERIVATION_START,
+          0 + HARD_DERIVATION_START,
+          1,
+          2,
+        ],
+        txHashHex: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
+        outputIndex: 1,
       }],
       outputs: [{
         destination: {

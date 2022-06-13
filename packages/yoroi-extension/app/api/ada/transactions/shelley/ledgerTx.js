@@ -133,6 +133,16 @@ export async function createLedgerSignTxPayload(request: {|
   };
 }
 
+/**
+ * Canonical inputs sorting: by tx hash and then by index
+ */
+function compareInputs(a: TxInput, b: TxInput): number {
+  if (a.txHashHex !== b.txHashHex) {
+    return a.txHashHex < b.txHashHex ? -1 : 1;
+  }
+  return a.outputIndex - b.outputIndex;
+}
+
 function _transformToLedgerInputs(
   inputs: Array<CardanoAddressedUtxo>
 ): Array<TxInput> {
@@ -143,7 +153,7 @@ function _transformToLedgerInputs(
     txHashHex: input.tx_hash,
     outputIndex: input.tx_index,
     path: input.addressing.path,
-  }));
+  })).sort(compareInputs);
 }
 
 function toLedgerTokenBundle(
