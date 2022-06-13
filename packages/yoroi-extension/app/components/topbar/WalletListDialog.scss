@@ -1,3 +1,5 @@
+@import '../../themes/mixins/loading-spinner';
+
 .component {
   font-size: 16px;
   min-width: 673px !important;
@@ -66,3 +68,4 @@
     }
   }
 }
+

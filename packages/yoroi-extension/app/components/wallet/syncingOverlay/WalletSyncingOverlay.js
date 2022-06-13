@@ -21,7 +21,7 @@ const messages = defineMessages({
   },
   explanation: {
     id: 'wallet.syncingOverlay.explanation',
-    defaultMessage: '!!!We are processing your wallet data. This may take time. Please wait...'
+    defaultMessage: '!!!Please wait while we process wallet data. This may take some time.'
   },
   returnBtnLabel: {
     id: 'wallet.syncingOverlay.return',

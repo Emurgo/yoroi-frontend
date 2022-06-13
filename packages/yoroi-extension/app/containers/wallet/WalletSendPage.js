@@ -195,6 +195,8 @@ class WalletSendPage extends Component<AllProps> {
             onAddToken={txBuilderActions.updateToken.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
+            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
           />
           {this.renderDialog()}
         </>
@@ -525,7 +527,7 @@ class WalletSendPage extends Component<AllProps> {
     initialShowMemoState: boolean,
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       loading: {|
         resetUriParams: void => void,

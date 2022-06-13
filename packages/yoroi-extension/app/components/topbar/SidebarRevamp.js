@@ -5,8 +5,10 @@ import { observer } from 'mobx-react';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
-
+import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
   +children?: ?Node,
@@ -17,6 +19,10 @@ type Props = {|
 
 @observer
 export default class SidebarRevamp extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
   static defaultProps: {|
     categories: void,
     children: void,
@@ -30,8 +36,8 @@ export default class SidebarRevamp extends Component<Props> {
   };
 
   render(): Node {
+    const { intl } = this.context;
     const { categories, isActiveCategory, onCategoryClicked } = this.props;
-
     const YoroiLogo = yoroiLogo;
 
     return (
@@ -60,6 +66,14 @@ export default class SidebarRevamp extends Component<Props> {
               })
             : null}
         </div>
+        <a
+          className={styles.faq}
+          href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
+          target='_blank'
+          rel="noreferrer"
+        >
+          {intl.formatMessage(globalMessages.sidebarFaq)}
+        </a>
       </div>
     );
   }

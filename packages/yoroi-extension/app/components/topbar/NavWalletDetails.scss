@@ -1,5 +1,3 @@
-@import '../../themes/mixins/loading-spinner';
-
 .wrapper {
   flex: 1;
   display: flex;
@@ -38,19 +36,7 @@
   max-width: max-content;
 }
 
-.isLoading {
-  position: relative;
-  display: inline-block;
-  margin-left: 15px;
-  margin-bottom: 4px;
-}
-
 .amount {
-    .isLoading {
-        margin-left: 9px;
-        margin-bottom: 6px;
-        @include loading-spinner("../../assets/images/spinner-dark.svg", 16);
-    }
     font-family: var(--font-medium);
     font-size: 16px;
     line-height: 20px;
@@ -75,15 +61,24 @@
 }
 
 .details {
-    .isLoading {
-      @include loading-spinner("../../assets/images/spinner-dark.svg", 8);
-    }
     font-size: 10px;
     line-height: 14px;
     margin-top: -2px;
 
   .afterDecimal {
     font-size: 10px;
+    font-weight: 300;
+  }
+}
+
+.fiat {
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: -2px;
+    color: var(--yoroi-palette-gray-600);
+
+  .afterDecimal {
+    font-size: 12px;
     font-weight: 300;
   }
 }

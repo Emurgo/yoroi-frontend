@@ -47,7 +47,7 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -157,7 +157,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   key={`${transaction.uniqueKey}`}
                   memo={this.props.memoMap.get(transaction.txid)}
                   unitOfAccountSetting={this.props.unitOfAccountSetting}
-                  getCurrentPrice={this.props.getCurrentPrice}
+                  getHistoricalPrice={this.props.getHistoricalPrice}
                   getTokenInfo={this.props.getTokenInfo}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}

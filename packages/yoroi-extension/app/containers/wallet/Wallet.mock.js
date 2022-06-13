@@ -108,12 +108,16 @@ export const mockWalletProps: {
           },
           profile: {
             shouldHideBalance: false,
+            unitOfAccount: { enabled: false, currency: null },
           },
           delegation: {
             getDelegationRequests: request.getDelegation,
           },
           transactions: {
             getTxRequests: request.getTransactions,
+          },
+          coinPriceStore: {
+            getCurrentPrice: (_from, _to) => null,
           },
         },
         actions: {

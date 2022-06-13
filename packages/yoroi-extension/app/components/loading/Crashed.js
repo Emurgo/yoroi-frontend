@@ -68,8 +68,10 @@ export default class Crashed extends Component<Props> {
     const supportRequestLink = (
       <a
         className={styles.link}
-        href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
+        href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'
         onClick={event => onExternalLinkClick(event)}
+        target='_blank'
+        rel="noreferrer"
       >
         {intl.formatMessage(globalMessages.contactSupport)}
       </a>
