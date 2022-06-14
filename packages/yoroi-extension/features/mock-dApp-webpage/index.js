@@ -486,7 +486,40 @@ export class MockDAppWebpage {
     this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
 
     this.driver.executeScript((addr, plHex) => {
-      window.api.signData(addr, plHex);
+      window.signDataPromise = window.api.signData(addr, plHex);
     }, address, payloadHex);
+  }
+
+  async getCollateralUtxos(): Promise<string> {
+    this.logger.info(`MockDApp: Getting Collateral Utxos`);
+
+    const amount = '4900000';
+
+    const ll = Buffer.from(
+      CardanoWasm.Value.new(
+        CardanoWasm.BigNum.from_str(amount)
+      ).to_bytes()
+    ).toString('hex')
+
+    this.logger.info(`MockDApp: Collateral: ` + ll);
+
+    const usedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+
+      window.api.getCollateralUtxos("1a004ac4a0")
+        .then(utxosResponse => {
+          callback({ success: true, retValue: utxosResponse });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (usedAddressesResponse.success) {
+      const utxos = this._mapCborUtxos(usedAddressesResponse.retValue);
+      return JSON.stringify(utxos, undefined, 2);
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${usedAddressesResponse.errMsg}`);
+    throw new MockDAppWebpageError(usedAddressesResponse.errMsg);
+
   }
 }

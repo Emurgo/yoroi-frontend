@@ -26,10 +26,7 @@ import {
   cancelButton,
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
-import {
-  getSigningData,
-  signMessageTitle,
-} from '../pages/connector-signingDataPage';
+import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
@@ -315,4 +312,14 @@ Then(/^I should see the data to sign:$/, async function (table) {
   expect(actualSigningData, 'Signing Data is different').to.equal(payload);
 });
 
+Then(/^The signing data API should return (.+)$/, async function (dataHex) {
+  const result = await this.mockDAppPage.getSigningDataResult();
+  expect(result).to.equal(dataHex);
+});
 
+Then(/^The dApp should see collateral: (.+)$/, async function (expectedCollateral) {
+  const collateral = await this.mockDAppPage.getCollateralUtxos();
+  const collateralJson = JSON.parse(collateral)[0];
+  const expectedUtxos = JSON.parse(expectedCollateral);
+  expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
+});
