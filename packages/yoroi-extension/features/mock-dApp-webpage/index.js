@@ -207,6 +207,7 @@ export class MockDAppWebpage {
       window.api
         .getUsedAddresses({ page: 0, limit: 5 })
         .then(addresses => {
+          // eslint-disable-next-line promise/always-return
           if (addresses.length === 0) {
             callback({ success: false, errMsg: 'No used addresses' });
           }
@@ -232,6 +233,7 @@ export class MockDAppWebpage {
       window.api
         .getUnusedAddresses()
         .then(addresses => {
+          // eslint-disable-next-line promise/always-return
           if (addresses.length === 0) {
             callback({ success: false, errMsg: 'No unused addresses' });
           }
@@ -528,6 +530,7 @@ export class MockDAppWebpage {
 
       window.api
         .getCollateralUtxos('1a004ac4a0')
+        // eslint-disable-next-line promise/always-return
         .then(utxosResponse => {
           callback({ success: true, retValue: utxosResponse });
         })
