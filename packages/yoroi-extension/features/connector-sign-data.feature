@@ -46,37 +46,6 @@ Feature: dApp connector data signing
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
 
-  @dApp-sign
-  Scenario: dApp, anonymous wallet, signing data, cancel signing
-    And I request anonymous access to Yoroi
-    Then I should see the connector popup for connection
-    And I select the only wallet named shelley-simple-15 with 5.5 balance
-    Then The popup window should be closed
-    And The access request should succeed
-    And The wallet shelley-simple-15 is connected to the website localhost
-    Then I request signing the data:
-    | payload   |
-    | sign data anonymous wallet |
-    Then I should see the connector popup for signing
-    Then I cancel signing the transaction
-    And The user reject for signing is received
-
-  @dApp-sign
-  Scenario: dApp, authorized wallet, signing data, cancel signing
-    And I request access to Yoroi
-    Then I should see the connector popup for connection
-    And I select the only wallet named shelley-simple-15 with 5.5 balance
-    Then I enter the spending password asdfasdfasdf and click confirm
-    Then The popup window should be closed
-    And The access request should succeed
-    And The wallet shelley-simple-15 is connected to the website localhost
-    Then I request signing the data:
-    | payload   |
-    | sign data anonymous wallet |
-    Then I should see the connector popup for signing
-    Then I cancel signing the transaction
-    And The user reject for signing is received
-
   @dApp-collateral
   Scenario: dApp, anonymous wallet, get collateral
     And I request anonymous access to Yoroi

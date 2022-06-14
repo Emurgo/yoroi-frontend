@@ -317,6 +317,13 @@ Then(/^The signing data API should return (.+)$/, async function (dataHex) {
   expect(result).to.equal(dataHex);
 });
 
+Then(/^The user reject for signing data is received$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
+  const signingResult = await this.mockDAppPage.getSigningDataResult();
+  expect(signingResult.code, `The reject signing code is different`).to.equal(2);
+  expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
+});
+
 Then(/^The dApp should see collateral: (.+)$/, async function (expectedCollateral) {
   const collateral = await this.mockDAppPage.getCollateralUtxos();
   const collateralJson = JSON.parse(collateral)[0];
