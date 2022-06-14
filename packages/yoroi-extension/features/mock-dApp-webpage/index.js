@@ -70,7 +70,7 @@ export class MockDAppWebpage {
     await this.driver.executeScript(scriptString);
   }
 
-  _addressToCbor(address) {
+  _addressToCbor(address: string): string {
     return bytesToHex(CardanoWasm.Address.from_bech32(address).to_bytes());
   }
 
@@ -218,14 +218,13 @@ export class MockDAppWebpage {
     });
     if (usedAddressesResponse.success) {
       const usedAddresses = this._addressesFromCborIfNeeded(usedAddressesResponse.retValue);
-      this.logger.info(`MockDApp: -> The used addresses are ${usedAddresses.concat(',')}`);
       return usedAddresses;
     }
     this.logger.error(`MockDApp: -> The error is received: ${usedAddressesResponse.errMsg}`);
     throw new MockDAppWebpageError(usedAddressesResponse.errMsg);
   }
 
-  async _getUnusedAddresses(): Promise<Array> {
+  async _getUnusedAddresses(): Promise<Array<string>> {
     this.logger.info(`MockDApp: Getting Unused Addresses`);
 
     const unusedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
@@ -244,7 +243,6 @@ export class MockDAppWebpage {
     });
     if (unusedAddressesResponse.success) {
       const unusedAddresses = this._addressesFromCborIfNeeded(unusedAddressesResponse.retValue);
-      this.logger.info(`MockDApp: -> The used addresses are ${unusedAddresses.concat(',')}`);
       return unusedAddresses;
     }
     this.logger.error(`MockDApp: -> The error is received: ${unusedAddressesResponse.errMsg}`);
@@ -460,7 +458,7 @@ export class MockDAppWebpage {
     return signingResult;
   }
 
-  async requestSigningData(payload: Bytes) {
+  async requestSigningData(payload: string) {
     this.logger.info(`MockDApp: Requesting signing the data: data="${payload}"`);
 
     const unusedAddresses = await this._getUnusedAddresses();
@@ -485,9 +483,13 @@ export class MockDAppWebpage {
     }
     this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
 
-    this.driver.executeScript((addr, plHex) => {
-      window.signDataPromise = window.api.signData(addr, plHex);
-    }, address, payloadHex);
+    this.driver.executeScript(
+      (addr, plHex) => {
+        window.signDataPromise = window.api.signData(addr, plHex);
+      },
+      address,
+      payloadHex
+    );
   }
 
   async getSigningDataResult(): Promise<string> {
@@ -516,17 +518,16 @@ export class MockDAppWebpage {
     const amount = '4900000';
 
     const ll = Buffer.from(
-      CardanoWasm.Value.new(
-        CardanoWasm.BigNum.from_str(amount)
-      ).to_bytes()
-    ).toString('hex')
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
+    ).toString('hex');
 
     this.logger.info(`MockDApp: Collateral: ` + ll);
 
     const usedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
 
-      window.api.getCollateralUtxos("1a004ac4a0")
+      window.api
+        .getCollateralUtxos('1a004ac4a0')
         .then(utxosResponse => {
           callback({ success: true, retValue: utxosResponse });
         })
@@ -540,6 +541,5 @@ export class MockDAppWebpage {
     }
     this.logger.error(`MockDApp: -> The error is received: ${usedAddressesResponse.errMsg}`);
     throw new MockDAppWebpageError(usedAddressesResponse.errMsg);
-
   }
 }

@@ -1,6 +1,7 @@
 // @flow
 
 import { By, WebElement } from 'selenium-webdriver';
+import type { LocatorObject } from '../support/webdriver';
 
 export const signMessageTitle: LocatorObject = {
   locator: '//h5[contains(text(), "Sign Message")]',
