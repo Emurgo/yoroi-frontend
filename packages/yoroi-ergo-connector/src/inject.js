@@ -258,7 +258,12 @@ class CardanoAPI {
       return this._cardano_rpc_call("sign_data", [address, payload]);
     }
 
+    // DEPRECATED
     getCollateralUtxos(requiredAmount) {
+      return this._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
+    }
+
+    getCollateral(requiredAmount) {
       return this._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
     }
 }
