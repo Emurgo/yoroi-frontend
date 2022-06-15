@@ -35,6 +35,7 @@ import { getTokens } from '../../../../utils/wallet';
 import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
+import MaxAssetsError from '../MaxAssetsError';
 
 type Props = {|
   +onClose: void => void,
@@ -325,6 +326,7 @@ export default class AddTokenDialog extends Component<Props, State> {
             />
           </div>
           )}
+          <MaxAssetsError />
           {
             currentTokensList.length === 0 ? (
               <div className={styles.noAssetFound}>

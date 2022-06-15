@@ -34,6 +34,7 @@ import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
+import MaxAssetsError from '../MaxAssetsError';
 
 type Props = {|
   +staleTx: boolean,
@@ -236,6 +237,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        <MaxAssetsError />
         {
           txError && (
             <div className={styles.txError}>
