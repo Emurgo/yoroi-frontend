@@ -128,7 +128,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   @computed get maxAssetsAllowed(): number {
     // Note: the exact number might change in the future
-    return this.isDefaultIncluded ? 3 : 2
+    return this.isDefaultIncluded ? 11 : 10
   }
 
   // ================

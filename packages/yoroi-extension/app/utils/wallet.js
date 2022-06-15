@@ -61,7 +61,6 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         entry,
         info: getTokenInfo(entry),
     }))
-    // Todo: Revert this change
     .filter(token => token.info.Metadata.assetMintMetadata?.[0]?.['721'])
     .map(token => {
         const policyId = token.entry.identifier.split('.')[0];
