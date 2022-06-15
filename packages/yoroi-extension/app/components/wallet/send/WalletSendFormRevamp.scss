@@ -140,8 +140,8 @@
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    padding: 16px 0px;
-                    margin: 0px 15px;
+                    padding-top: 16px;
+                    margin: 16px 16px 0px 16px;
                     border-top: 1px solid var(--yoroi-palette-gray-200);
                     .value {
                         color: var(--yoroi-palette-gray-600);

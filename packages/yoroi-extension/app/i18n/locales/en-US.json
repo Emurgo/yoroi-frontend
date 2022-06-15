@@ -169,7 +169,7 @@
   "wallet.send.form.dialog.noNFTYet": "There are no NFTs in your wallet yet",
   "wallet.send.form.dialog.nNft": "NFT ({number})",
   "wallet.send.form.dialog.nToken": "Tokens ({number})",
-  "wallet.send.form.dialog.maxNumberAllowed": "<bold>10 Assets</bold> is maximum number allowed to be send in one transaction",
+  "wallet.send.form.dialog.maxNumberAllowed": "<strong>{number} Assets</strong> is maximum number allowed to be send in one transaction",
   "wallet.send.form.qrDialog.title": "Scan QR code",
   "wallet.send.form.qrDialog.noDevices": "Webcam not found or permission is not given",
   "global.labels.processing": "Processing...",

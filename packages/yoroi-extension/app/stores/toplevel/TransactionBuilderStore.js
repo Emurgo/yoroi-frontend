@@ -91,7 +91,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.addToken.listen(this._addToken);
     actions.deselectToken.listen(this._deselectToken)
     actions.removeToken.listen(this._removeToken);
-    actions.filterTokensWithNoAmount.listen(this._filterTokensWithNoAmount)
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.updateSendAllStatus.listen(this._updateSendAllStatus);
     actions.initialize.listen(this._initialize);
@@ -127,9 +126,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return !!this.plannedTxInfoMap.find(({ token }) => token.IsDefault)
   }
 
-  @computed get maxAssetsAllowed(): boolean {
+  @computed get maxAssetsAllowed(): number {
     // Note: the exact number might change in the future
-    return this.isDefaultIncluded ? 11 : 10
+    return this.isDefaultIncluded ? 3 : 2
   }
 
   // ================
@@ -431,14 +430,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     this.selectedToken = token;
-  }
-
-  @action
-  _filterTokensWithNoAmount: void => void = () => {
-    // Filter out tokens with invalid amount
-    this.plannedTxInfoMap = this.plannedTxInfoMap.filter(({
-      token, shouldSendAll, isValidAmount
-    }) => token.IsDefault || shouldSendAll || isValidAmount);
   }
 
   @action

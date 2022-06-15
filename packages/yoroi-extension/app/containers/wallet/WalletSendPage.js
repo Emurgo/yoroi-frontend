@@ -498,7 +498,6 @@ class WalletSendPage extends Component<AllProps> {
     const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
-
     return (
       <AddNFTDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
@@ -510,6 +509,8 @@ class WalletSendPage extends Component<AllProps> {
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
         isTokenIncluded={this.isTokenIncluded}
+        maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
+        numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
         fee={transactionBuilderStore.fee}
         totalInput={transactionBuilderStore.totalInput}
         isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
@@ -533,7 +534,6 @@ class WalletSendPage extends Component<AllProps> {
       <AddTokenDialog
         onClose={() => {
           txBuilderActions.deselectToken.trigger()
-          txBuilderActions.filterTokensWithNoAmount.trigger()
           this.generated.actions.dialogs.closeActiveDialog.trigger()
         }}
         spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
@@ -621,9 +621,6 @@ class WalletSendPage extends Component<AllProps> {
         |},
         removeToken: {|
           trigger: (params: void | $ReadOnly<TokenRow>) => void,
-        |},
-        filterTokensWithNoAmount: {|
-          trigger: (params: void) => void,
         |},
         updateMemo: {|
           trigger: (params: void | string) => void
@@ -828,9 +825,6 @@ class WalletSendPage extends Component<AllProps> {
           addToken: { trigger: actions.txBuilderActions.addToken.trigger },
           deselectToken: { trigger: actions.txBuilderActions.deselectToken.trigger },
           removeToken: { trigger: actions.txBuilderActions.removeToken.trigger },
-          filterTokensWithNoAmount: {
-            trigger: actions.txBuilderActions.filterTokensWithNoAmount.trigger
-          },
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },

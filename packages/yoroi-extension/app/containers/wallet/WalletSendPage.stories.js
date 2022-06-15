@@ -192,7 +192,6 @@ const genBaseProps: {|
       updateAmount: { trigger: action('updateAmount') },
       addToken: { trigger: action('addToken') },
       removeToken: { trigger: action('removeToken') },
-      filterTokensWithNoAmount: { trigger: action('filterTokensWithNoAmount') },
       updateSendAllStatus: { trigger: action('updateSendAllStatus') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },

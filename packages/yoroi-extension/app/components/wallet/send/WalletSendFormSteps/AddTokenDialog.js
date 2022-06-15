@@ -339,7 +339,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           )}
           {!shouldAddMoreAssets && (
             <Box sx={{ marginTop: '10px' }}>
-              <MaxAssetsError />
+              <MaxAssetsError maxAssetsAllowed={maxAssetsAllowed} />
             </Box>)}
           {
             currentTokensList.length === 0 ? (

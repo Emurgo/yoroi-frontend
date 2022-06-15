@@ -11,11 +11,15 @@ import globalMessages from '../../../i18n/global-messages';
 const messages = defineMessages({
     maxNumberAllowed: {
       id: 'wallet.send.form.dialog.maxNumberAllowed',
-      defaultMessage: '!!!<bold>10 Assets</bold> is maximum number allowed to be send in one transaction',
+      defaultMessage: '!!!<strong>{number} Assets</strong> is maximum number allowed to be send in one transaction',
     }
 });
 
-export default class MaxAssetsError extends Component<{||}> {
+type Props = {|
+  maxAssetsAllowed: number,
+|}
+
+export default class MaxAssetsError extends Component<Props> {
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,
     };
@@ -33,11 +37,14 @@ export default class MaxAssetsError extends Component<{||}> {
               borderRadius: '8px'
             }}
           >
-            <Typography variant='h5'>
+            <Typography variant='h5' marginBottom='3px'>
               {intl.formatMessage(globalMessages.errorLabel)}
             </Typography>
-            <Typography>
-              <FormattedHTMLMessage {...messages.maxNumberAllowed} />
+            <Typography color='var(--yoroi-palette-gray-900)'>
+              <FormattedHTMLMessage
+                {...messages.maxNumberAllowed}
+                values={{ number: this.props.maxAssetsAllowed }}
+              />
             </Typography>
           </Box>
         )
