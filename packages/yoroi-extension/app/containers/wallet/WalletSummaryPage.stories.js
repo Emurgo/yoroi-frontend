@@ -34,7 +34,7 @@ import {
   SEARCH_SKIP,
 } from '../../stores/toplevel/TransactionsStore';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
-import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
+import WalletTransaction from '../../domain/WalletTransaction';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import JormungandrTransaction from '../../domain/JormungandrTransaction';
 import { transactionTypes } from '../../api/ada/transactions/types';
@@ -159,7 +159,7 @@ export const Loading = (): Node => {
             selected: wallet.publicDeriver,
           },
           coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
+            getCurrentPrice: (_from, _to) => '5',
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),
@@ -280,7 +280,7 @@ const genPropsForTransactions: {|
     selected: request.wallet.publicDeriver,
   },
   coinPriceStore: {
-    getCurrentPrice: (_from, _to) => 5,
+    getCurrentPrice: (_from, _to) => '5',
   },
   tokenInfoStore: {
     tokenInfo: mockFromDefaults(defaultAssets),
@@ -305,18 +305,7 @@ const genPropsForTransactions: {|
       wasExecuted: true,
     },
     lastSyncInfo: request.lastSyncInfo,
-    unconfirmedAmount: calculateUnconfirmedAmount(
-      request.transactions,
-      request.lastSyncInfo.Height,
-      assuranceModes.NORMAL,
-      (timestamp) => ({
-        From: 'ADA',
-        To: 'USD',
-        Price: 5,
-        Time: timestamp,
-      }),
-      request.wallet.publicDeriver.getParent().getDefaultToken()
-    ),
+    unconfirmedAmount: { incoming: [], outgoing: [], },
     isExporting: request.txExport != null ? request.txExport.isExporting : false,
     exportError: request.txExport?.exportError,
     toggleIncludeTxIds: () => {},

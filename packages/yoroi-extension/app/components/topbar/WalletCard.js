@@ -10,7 +10,6 @@ import { ReactComponent as TrezorIcon }  from '../../assets/images/wallet-nav/tr
 import { ReactComponent as LedgerIcon }  from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
-import { truncateToken, splitAmount } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -21,8 +20,6 @@ import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
-import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon }  from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
@@ -30,6 +27,7 @@ import { ReactComponent as StarIcon }  from '../../assets/images/add-wallet/wall
 import { ReactComponent as StaredIcon }  from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
 
 import { Draggable } from 'react-beautiful-dnd';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { Tooltip, Typography } from '@mui/material';
 import AmountDisplay from '../common/AmountDisplay';
 
@@ -58,6 +56,8 @@ type Props = {|
   +onSelect?: void => void,
   +walletId: string,
   +idx: number,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +toggleQuickAccess: string => void,
   +isInQuickAccess: boolean,
 |};
@@ -138,7 +138,13 @@ export default class WalletCard extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { shouldHideBalance, walletId, idx } = this.props;
+    const {
+      shouldHideBalance,
+      walletId,
+      idx,
+      unitOfAccountSetting,
+      getCurrentPrice,
+    } = this.props;
     const { isActionsShow } = this.state;
 
     const [, iconComponent] = this.props.plate
@@ -189,6 +195,8 @@ export default class WalletCard extends Component<Props, State> {
                     getTokenInfo={this.props.getTokenInfo}
                     showFiat
                     showAmount
+                    unitOfAccountSetting={unitOfAccountSetting}
+                    getCurrentPrice={getCurrentPrice}
                   />
                 </div>
                 <div className={styles.extraInfo}>
@@ -238,42 +246,6 @@ export default class WalletCard extends Component<Props, State> {
       </Draggable>
     );
   }
-
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
 
   getTotalAmount: void => null | MultiToken = () => {
     if (this.props.rewards === undefined) {

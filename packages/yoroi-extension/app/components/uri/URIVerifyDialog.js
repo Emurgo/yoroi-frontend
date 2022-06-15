@@ -47,7 +47,7 @@ type Props = {|
   +uriParams: UriParams,
   +selectedExplorer: SelectedExplorer,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
@@ -88,7 +88,7 @@ export default class URIVerifyDialog extends Component<Props> {
         .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
       const coinPrice = this.props.getCurrentPrice(
-        tokenInfo.Identifier,
+        getTokenName(tokenInfo),
         toCurrency
       );
 
@@ -136,11 +136,14 @@ export default class URIVerifyDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <>
               <div className={styles.amount}>
-                {convertedToUnitOfAccount(amount, unitOfAccountSetting.currency)}&nbsp;
+                {convertedToUnitOfAccount(amount, unitOfAccountSetting.currency)}
+                &nbsp;
                 {unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>
-                {formatValue(amount.getDefaultEntry())} {truncateToken(getTokenName(
+                {formatValue(amount.getDefaultEntry())}
+                &nbsp;
+                {truncateToken(getTokenName(
                   this.props.getTokenInfo(
                     amount.getDefaultEntry()
                   )))
@@ -149,7 +152,9 @@ export default class URIVerifyDialog extends Component<Props> {
             </>
           ) : (
             <div className={styles.amount}>
-              {formatValue(amount.getDefaultEntry())} {truncateToken(getTokenName(
+              {formatValue(amount.getDefaultEntry())}
+              &nbsp;
+              {truncateToken(getTokenName(
                 this.props.getTokenInfo(
                   amount.getDefaultEntry()
                 )))

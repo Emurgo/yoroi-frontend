@@ -262,7 +262,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,

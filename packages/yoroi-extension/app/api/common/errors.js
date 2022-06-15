@@ -6,27 +6,27 @@ import LocalizableError from '../../i18n/LocalizableError';
 const messages = defineMessages({
   serverStatusError: {
     id: 'api.errors.serverStatusError',
-    defaultMessage: '!!!Connection to the server failed. Please check your internet connection or our Twitter account (https://twitter.com/YoroiWallet).',
+    defaultMessage: '!!!Server connection failed. Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
   },
   currentCoinPriceError: {
     id: 'api.errors.currentCoinPriceError',
-    defaultMessage: '!!!Current coin price data not available now.',
+    defaultMessage: '!!!There is no current coin price data available.',
   },
   historicalCoinPriceError: {
     id: 'api.errors.histoicalCoinPriceError',
-    defaultMessage: '!!!Historical coin price data not available now.',
+    defaultMessage: '!!!There is no historical coin price data available.',
   },
   genericApiError: {
     id: 'api.errors.GenericApiError',
-    defaultMessage: '!!!An error occurred, please try again later.',
+    defaultMessage: '!!!An error occurred. Please retry.',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
+    defaultMessage: '!!!Incorrect spending password. Please retype.',
   },
   walletAlreadyRestoredError: {
     id: 'api.errors.WalletAlreadyRestoredError',
-    defaultMessage: '!!!Wallet you are trying to restore already exists.',
+    defaultMessage: '!!!The wallet you are trying to restore already exists.',
   },
   reportRequestError: {
     id: 'api.errors.ReportRequestError',
@@ -40,13 +40,9 @@ const messages = defineMessages({
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
   },
-  walletFileImportError: {
-    id: 'api.errors.WalletFileImportError',
-    defaultMessage: '!!!Wallet could not be imported, please make sure you are providing a correct file.',
-  },
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough funds to make this transaction.',
+    defaultMessage: '!!!Insufficient funds to complete this transaction.',
   },
   cannotSendBelowMinimumValueError: {
     id: 'api.errors.CannotSendBelowMinimumValueError',
@@ -56,45 +52,25 @@ const messages = defineMessages({
     id: 'api.errors.assetOverflowError',
     defaultMessage: '!!!Maximum value of a token inside a UTXO exceeded (overflow).',
   },
-  updateAdaWalletError: {
-    id: 'api.errors.updateAdaWalletError',
-    defaultMessage: '!!!Error while updating ada wallet.',
-  },
-  getBalanceError: {
-    id: 'api.errors.getBalanceError',
-    defaultMessage: '!!!Error while getting Balance.',
-  },
-  updateAdaTxsHistoryError: {
-    id: 'api.errors.updateAdaTxsHistoryError',
-    defaultMessage: '!!!Error while updating ada transactions history.',
-  },
-  transactionError: {
-    id: 'api.errors.transactionError',
-    defaultMessage: '!!!Error while creating transaction.',
-  },
-  pendingTransactionError: {
-    id: 'api.errors.pendingTransactionError',
-    defaultMessage: '!!!Error while updating pending transactions.',
-  },
   getAddressesKeysError: {
     id: 'api.errors.getAddressesWithFundsError',
-    defaultMessage: '!!!Error while getting addresses with funds.',
+    defaultMessage: '!!!An error occurred while getting addresses with funds. Please retry.',
   },
   noInputsError: {
     id: 'api.errors.noInputsError',
-    defaultMessage: '!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.',
+    defaultMessage: '!!!Your recovered wallet is empty. Please check your recovery phrase and restore again.',
   },
   rewardAddressEmptyError: {
     id: 'api.errors.rewardAddressEmpty',
-    defaultMessage: '!!!Reward address is empty.',
+    defaultMessage: '!!!Reward address is not visible until users get any reward.',
   },
   noOutputsError: {
     id: 'api.errors.noOutputsError',
-    defaultMessage: '!!!Transaction requires at least 1 output, but no output was added',
+    defaultMessage: '!!!The transaction requires at least 1 output, but none was provided.',
   },
   generateTransferTxError: {
     id: 'api.errors.generateTransferTxError',
-    defaultMessage: '!!!Error while generating transfer transaction.',
+    defaultMessage: '!!!An error occurred while generating the transfer transaction. Please retry.',
   },
   sendTransactionError: {
     id: 'api.errors.sendTransactionError',
@@ -170,7 +146,7 @@ const messages = defineMessages({
   },
   poolMissingApiError: {
     id: 'api.errors.poolMissingApiError',
-    defaultMessage: '!!!Could not find this pool. Double-check the ID and make sure the pool was not deregistered.',
+    defaultMessage: '!!!Pool could not be found. Please check the pool ID and ensure the pool was not deregistered.',
   },
   getReputationError: {
     id: 'api.errors.getReputationError',
@@ -186,7 +162,7 @@ const messages = defineMessages({
   },
   hardwareUnsupportedError: {
     id: 'api.errors.hardwareUnsupportedError',
-    defaultMessage: '!!!This action is not supported for the currently selected hardware.',
+    defaultMessage: '!!!This action is incompatible with the hardware.',
   },
   getUtxoDataError: {
     id: 'api.errors.getUtxoDataError',
@@ -275,15 +251,6 @@ export class WalletAlreadyImportedError extends LocalizableError {
   }
 }
 
-export class WalletFileImportError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.walletFileImportError.id,
-      defaultMessage: messages.walletFileImportError.defaultMessage || '',
-    });
-  }
-}
-
 export class NotEnoughMoneyToSendError extends LocalizableError {
   constructor() {
     super({
@@ -306,33 +273,6 @@ export class AssetOverflowError extends LocalizableError {
     super({
       id: messages.assetOverflowError.id,
       defaultMessage: messages.assetOverflowError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetBalanceError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getBalanceError.id,
-      defaultMessage: messages.getBalanceError.defaultMessage || '',
-    });
-  }
-}
-
-export class TransactionError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.transactionError.id,
-      defaultMessage: messages.transactionError.defaultMessage || '',
-    });
-  }
-}
-
-export class PendingTransactionError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.pendingTransactionError.id,
-      defaultMessage: messages.pendingTransactionError.defaultMessage || '',
     });
   }
 }

@@ -84,6 +84,8 @@ import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
+import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
 
 /*::
 declare var chrome;
@@ -1407,10 +1409,16 @@ function handleInjectorConnect(port) {
                 await withDb(async (db, localStorageApi) => {
                   return await withSelectedWallet(tabId,
                     async (wallet) => {
+                      const stateFetcher: CardanoIFetcher =
+                        await getCardanoStateFetcher(localStorageApi);
+                      const networkInfo = wallet.getParent().getNetworkInfo();
+                      const foreignUtxoFetcher: ForeignUtxoFetcher =
+                        ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
                       const resp = await connectorCreateCardanoTx(
                         wallet,
                         null,
                         message.params[0],
+                        foreignUtxoFetcher,
                       );
                       rpcResponse({
                         ok: resp,
@@ -1485,9 +1493,16 @@ function handleInjectorConnect(port) {
             try {
               checkParamCount(1);
               await RustModule.load();
-              const requiredAmount = RustModule.WalletV4.Value.from_bytes(
-                Buffer.from(message.params[0], 'hex')
-              ).coin().to_str();
+              let requiredAmount: string = message.params[0];
+              if (!/^\d+$/.test(requiredAmount)) {
+                try {
+                  requiredAmount = RustModule.WalletV4.Value.from_bytes(
+                    Buffer.from(requiredAmount, 'hex')
+                  ).coin().to_str();
+                } catch (e) {
+                  throw new Error(`Failed to parse the required collateral amount: "${requiredAmount}"`);
+                }
+              }
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,

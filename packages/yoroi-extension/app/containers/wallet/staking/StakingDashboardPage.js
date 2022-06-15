@@ -32,7 +32,7 @@ import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/Dele
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+//tmp import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
@@ -759,7 +759,10 @@ export default class StakingDashboardPage extends Component<Props> {
               }
             : undefined
         }
-        unitOfAccount={entry => {
+        unitOfAccount={_entry => {
+          // temporarily disabled
+          return undefined;
+          /*
           const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
             .get(entry.networkId.toString())
             ?.get(entry.identifier);
@@ -772,7 +775,7 @@ export default class StakingDashboardPage extends Component<Props> {
             .shiftedBy(-tokenRow.Metadata.numberOfDecimals);
 
           const coinPrice = this.generated.stores.coinPriceStore.getCurrentPrice(
-            tokenRow.Identifier,
+            getTokenName(tokenRow),
             currency
           );
           if (coinPrice == null) return undefined;
@@ -780,6 +783,7 @@ export default class StakingDashboardPage extends Component<Props> {
             currency,
             amount: calculateAndFormatValue(shiftedAmount, coinPrice),
           };
+          */
         }}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
         isDelegated={
@@ -980,7 +984,7 @@ export default class StakingDashboardPage extends Component<Props> {
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

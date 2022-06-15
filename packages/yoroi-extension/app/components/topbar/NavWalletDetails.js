@@ -1,3 +1,4 @@
+
 // @flow
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -18,7 +19,9 @@ import type {
   TokenLookupKey,
 } from '../../api/common/lib/MultiToken';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { Box } from '@mui/system';
 
@@ -38,6 +41,8 @@ type Props = {|
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +purpose: 'allWallets' | 'topBar',
 |};
 
@@ -83,6 +88,7 @@ export default class NavWalletDetails extends Component<Props> {
       showDetails === true
     );
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
+    const { unitOfAccountSetting } = this.props;
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
@@ -103,7 +109,7 @@ export default class NavWalletDetails extends Component<Props> {
               <div
                 className={classnames([
                   styles.currency,
-                  showsRewards && styles.currencyAlign
+                  (!unitOfAccountSetting.enabled && showsRewards) && styles.currencyAlign
                 ])}
               >
                 <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
@@ -120,26 +126,38 @@ export default class NavWalletDetails extends Component<Props> {
                     amount: totalAmount
                   })}
                 </div>
-                {showsRewards &&
-                <div className={styles.details}>
-                  <div>
-                    <p className={styles.label}>
-                      {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                    </p>
-                    {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                {unitOfAccountSetting.enabled ? (
+                  <div className={styles.fiat}>
+                    {this.renderAmountDisplay({
+                      shouldHideBalance,
+                      amount: totalAmount,
+                      convertToFiat: true,
+                    })}
                   </div>
-                  <div>
-                    <p className={styles.label}>
-                      {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                    </p>
-                    {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-                  </div>
-                </div>
-                }
-                {this.props.rewards === undefined && (
-                <div className={styles.info}>
-                  {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-                </div>
+                ) : (
+                  <>
+                    {showsRewards &&
+                    <div className={styles.details}>
+                      <div>
+                        <p className={styles.label}>
+                          {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                        </p>
+                        {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                      </div>
+                      <div>
+                        <p className={styles.label}>
+                          {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                        </p>
+                        {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                      </div>
+                    </div>
+                    }
+                    {this.props.rewards === undefined && (
+                    <div className={styles.info}>
+                      {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+                    </div>
+                    )}
+                  </>
                 )}
               </div>
             </>
@@ -175,7 +193,8 @@ export default class NavWalletDetails extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: ?MultiToken
+    amount: ?MultiToken,
+    convertToFiat?: ?boolean,
   |} => Node = (request) => {
     if (request.amount == null) {
       throw new Error('Amount is required to be rendered')
@@ -184,21 +203,36 @@ export default class NavWalletDetails extends Component<Props> {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    let balanceDisplay = shiftedAmount
       .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
       .toString();
 
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = (<span>{hiddenAmount}</span>);
-    } else {
-      balanceDisplay = (
-        <>
-          {shiftedAmount}
-        </>
-      );
+    let unit = truncateToken(getTokenName(tokenInfo));
+
+    if (request.convertToFiat) {
+      const { currency } = this.props.unitOfAccountSetting;
+      if (!currency) {
+        throw new Error('expect unit of account currency setting');
+      }
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getCurrentPrice(ticker, currency);
+      if (price != null) {
+        balanceDisplay = calculateAndFormatValue(shiftedAmount, price);
+      } else {
+        balanceDisplay = '-';
+      }
+      unit = currency;
     }
 
-    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>{hiddenAmount}</span>);
+    }
+
+    return (<>{balanceDisplay} {unit}</>);
   }
 }

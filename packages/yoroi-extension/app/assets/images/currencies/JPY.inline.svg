@@ -1,40 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Yen</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <rect id="path-1" x="0" y="0" width="38" height="38" rx="19"></rect>
-        <filter x="-46.1%" y="-40.8%" width="192.1%" height="192.1%" filterUnits="objectBoundingBox" id="filter-2">
-            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
-        </filter>
-        <circle id="path-3" cx="8.88888889" cy="8.88888889" r="8.88888889"></circle>
-    </defs>
-    <g id="Yen" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="JPY" transform="translate(2.000000, 2.000000)">
-            <g id="Rectangle-11-Copy">
-                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                <use fill="#F0F3F5" fill-rule="evenodd" xlink:href="#path-1"></use>
-            </g>
-            <g id="japanese" transform="translate(9.000000, 9.000000)">
-                <circle id="Oval" stroke-opacity="0.3" stroke="#4A4A4A" stroke-width="0.5" cx="10" cy="10" r="9.16666667"></circle>
-                <g id="if_127_Ensign_Flag_Nation_japan_2634321-Copy-Clipped" transform="translate(1.111111, 1.111111)">
-                    <mask id="mask-4" fill="white">
-                        <use xlink:href="#path-3"></use>
-                    </mask>
-                    <g id="path-1"></g>
-                    <g id="if_127_Ensign_Flag_Nation_japan_2634321-Copy" mask="url(#mask-4)">
-                        <g transform="translate(-7.777778, 0.000000)" id="Group">
-                            <g>
-                                <polygon id="Rectangle" fill="#FFFFFF" points="0 0 31.1111111 0 31.1111111 17.7777778 0 17.7777778"></polygon>
-                                <path d="M16.6666667,4.44444444 C19.1220238,4.44444444 21.1111111,6.43353174 21.1111111,8.88888889 C21.1111111,11.344246 19.1220238,13.3333333 16.6666667,13.3333333 C14.2113096,13.3333333 12.2222222,11.344246 12.2222222,8.88888889 C12.2222222,6.43353174 14.2113096,4.44444444 16.6666667,4.44444444" id="Path" fill="#AD1F23"></path>
-                            </g>
-                        </g>
-                    </g>
-                </g>
-            </g>
-        </g>
-    </g>
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 20C0 8.95431 8.95431 0 20 0V0C31.0457 0 40 8.95431 40 20V20C40 31.0457 31.0457 40 20 40V40C8.95431 40 0 31.0457 0 20V20Z" fill="#F0F3F5"/>
+<path d="M20 29C24.9706 29 29 24.9706 29 20C29 15.0294 24.9706 11 20 11C15.0294 11 11 15.0294 11 20C11 24.9706 15.0294 29 20 29Z" stroke="#4A4A4A" stroke-opacity="0.3" stroke-width="0.5"/>
+<mask id="mask0_319_29879" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="11" y="11" width="18" height="18">
+<path d="M20 28.7273C24.8199 28.7273 28.7273 24.8199 28.7273 20C28.7273 15.1801 24.8199 11.2727 20 11.2727C15.18 11.2727 11.2727 15.1801 11.2727 20C11.2727 24.8199 15.18 28.7273 20 28.7273Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_319_29879)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.63672 11.2728H34.1822V28.7273H3.63672V11.2728Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M20.0004 15.6364C22.4111 15.6364 24.364 17.5893 24.364 20.0001C24.364 22.4108 22.4111 24.3637 20.0004 24.3637C17.5896 24.3637 15.6367 22.4108 15.6367 20.0001C15.6367 17.5893 17.5896 15.6364 20.0004 15.6364Z" fill="#AD1F23"/>
+</g>
 </svg>
