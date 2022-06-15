@@ -37,6 +37,7 @@ import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import { Box } from '@mui/system';
+import OutlinedInput from '@mui/material/OutlinedInput';
 
 type Props = {|
   +onClose: void => void,
@@ -323,10 +324,14 @@ export default class AddTokenDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
       >
         <div className={styles.component}>
-          <div className={styles.search}>
-            <SearchIcon />
-            <input onChange={this.search} className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
-          </div>
+          <Box sx={{ position: 'relative', width: '100%' }}>
+            <Box sx={{ position: 'absolute', top: '55%', left: '10px', transform: 'translateY(-50%)' }}> <SearchIcon /> </Box>
+            <OutlinedInput
+              onChange={this.search}
+              sx={{ padding: '0px 0px 0px 30px', height: '40px', width: '100%', fontSize: '14px', lineHeight: '22px', }}
+              placeholder={intl.formatMessage(messages.search)}
+            />
+          </Box>
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda

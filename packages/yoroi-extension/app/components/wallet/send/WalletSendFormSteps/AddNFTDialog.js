@@ -21,7 +21,7 @@ import type {
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import classnames from 'classnames';
-import { Button } from '@mui/material';
+import { Button, OutlinedInput } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import MinAda from './MinAda';
 import NFTImage from './NFTImage';
@@ -180,10 +180,14 @@ export default class AddNFTDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
       >
         <div className={styles.component}>
-          <div className={styles.search}>
-            <SearchIcon />
-            <input onChange={this.search} className={styles.searchInput} type="text" placeholder={intl.formatMessage(messages.search)} />
-          </div>
+          <Box sx={{ position: 'relative', width: '100%' }}>
+            <Box sx={{ position: 'absolute', top: '55%', left: '10px', transform: 'translateY(-50%)' }}> <SearchIcon /> </Box>
+            <OutlinedInput
+              onChange={this.search}
+              sx={{ padding: '0px 0px 0px 30px', height: '40px', width: '100%', fontSize: '14px', lineHeight: '22px', }}
+              placeholder={intl.formatMessage(messages.search)}
+            />
+          </Box>
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda
