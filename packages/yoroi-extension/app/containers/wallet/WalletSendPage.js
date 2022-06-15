@@ -558,6 +558,8 @@ class WalletSendPage extends Component<AllProps> {
         onRemoveToken={txBuilderActions.removeToken.trigger}
         getTokenAmount={this.getTokenAmount}
         isTokenIncluded={this.isTokenIncluded}
+        maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
+        numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
         isValidAmount={(token) => {
           const tokenInfo = this._getTokenFromTxInfo(token);
           if (!tokenInfo || !tokenInfo.amount) return true
@@ -689,6 +691,7 @@ class WalletSendPage extends Component<AllProps> {
         totalInput: ?MultiToken,
         txMismatch: boolean,
         selectedToken: void | $ReadOnly<TokenRow>,
+        maxAssetsAllowed: number,
         plannedTxInfoMap: Array<{|
           token: $ReadOnly<TokenRow>,
           amount?: string,
@@ -785,7 +788,8 @@ class WalletSendPage extends Component<AllProps> {
             error: stores.transactionBuilderStore.createUnsignedTx.error,
           },
           selectedToken: stores.transactionBuilderStore.selectedToken,
-          plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap
+          plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap,
+          maxAssetsAllowed: stores.transactionBuilderStore.maxAssetsAllowed,
         },
         substores: {
           ada: {

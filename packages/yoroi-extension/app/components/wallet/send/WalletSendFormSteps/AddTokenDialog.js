@@ -36,6 +36,7 @@ import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers'
 import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
+import { Box } from '@mui/system';
 
 type Props = {|
   +onClose: void => void,
@@ -70,7 +71,8 @@ type State = {|
   currentTokensList: FormattedTokenDisplay[],
   fullTokensList: FormattedTokenDisplay[],
   sortingDirection: null | 'UP' | 'DOWN',
-  sortingColumn: string
+  sortingColumn: string,
+  shouldAddMoreAssets: boolean,
 |}
 
 
@@ -298,8 +300,17 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onClose, totalInput, fee, isCalculatingFee, getTokenInfo } = this.props;
+    const {
+      onClose,
+      totalInput,
+      fee,
+      isCalculatingFee,
+      getTokenInfo,
+      maxAssetsAllowed,
+      numOfTokensIncluded
+    } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
+    const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed
     return (
       <Dialog
         title={
@@ -326,7 +337,10 @@ export default class AddTokenDialog extends Component<Props, State> {
             />
           </div>
           )}
-          <MaxAssetsError />
+          {!shouldAddMoreAssets && (
+            <Box sx={{ marginTop: '10px' }}>
+              <MaxAssetsError />
+            </Box>)}
           {
             currentTokensList.length === 0 ? (
               <div className={styles.noAssetFound}>
@@ -401,7 +415,7 @@ export default class AddTokenDialog extends Component<Props, State> {
               borderRadius: '0px',
               color: 'var(--yoroi-palette-secondary-300)',
             }}
-            disabled={selectedTokens.length === 0 || !this.isValidAmounts()}
+            disabled={selectedTokens.length === 0 || !this.isValidAmounts() || !shouldAddMoreAssets}
             onClick={this.onAddAll}
             variant='ternary'
           >

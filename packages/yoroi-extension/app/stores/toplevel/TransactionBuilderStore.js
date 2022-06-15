@@ -127,6 +127,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return !!this.plannedTxInfoMap.find(({ token }) => token.IsDefault)
   }
 
+  @computed get maxAssetsAllowed(): boolean {
+    // Note: the exact number might change in the future
+    return this.isDefaultIncluded ? 11 : 10
+  }
+
   // ================
   //   tentative tx
   // ================
@@ -198,6 +203,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return true;
   }
 
+  // Todo: Should be removed
   _isValidAmounts(): boolean  {
     // Validate non-default tokens amount
     let isValidAmounts = Boolean(this.plannedTxInfoMap.length)
