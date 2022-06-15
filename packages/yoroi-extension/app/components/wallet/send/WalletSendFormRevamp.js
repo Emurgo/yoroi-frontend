@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import TextField from '../../common/TextField'
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, } from '../../../utils/validations';
@@ -493,9 +493,19 @@ export default class WalletSendForm extends Component<Props, State> {
                   shouldSendAll && styles.disabled
                 ])}
               >
-                <span className={classnames([styles.label, shouldSendAll && styles.labelDisabled])}>
+                <Typography
+                  sx={{
+                    position: 'absolute',
+                    top: '-10px',
+                    left: '6px',
+                    backgroundColor: 'var(--yoroi-palette-common-white)',
+                    paddingX: '4px',
+                    color: shouldSendAll && 'var(--yoroi-comp-input-text-disabled)'
+                  }}
+                  fontSize='12px'
+                >
                   {intl.formatMessage(globalMessages.amountLabel)}
-                </span>
+                </Typography>
                 <div className={styles.amountInputGrid}>
                   <AmountInputRevamp
                     {...amountFieldProps}
@@ -564,13 +574,14 @@ export default class WalletSendForm extends Component<Props, State> {
                    </p>
                  </div>
                  )}
-                <div className={styles.usd}>
+                {this.props.unitOfAccountSetting.enabled && (
+                <div className={styles.fiat}>
                   {this.renderUnitOfAccountAmount(amountFieldProps.value)}
-                </div>
-                {isDefaultIncluded ? (
+                </div>)}
+                {isDefaultIncluded && (
                   <p className={styles.amountError}>
                     {amountInputError}
-                  </p>): null}
+                  </p>)}
               </div>
 
               <IncludedTokens
@@ -682,9 +693,6 @@ export default class WalletSendForm extends Component<Props, State> {
   }
 
   renderUnitOfAccountAmount(value: string): Node {
-    if (!this.props.unitOfAccountSetting.enabled) {
-      return null;
-    }
     let convertedAmount;
 
     const { currency } = this.props.unitOfAccountSetting;
