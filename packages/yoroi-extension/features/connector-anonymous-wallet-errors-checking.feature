@@ -54,7 +54,7 @@ Feature: dApp connector anonymous wallet errors checking
     Then I cancel signing the transaction
     And The user reject for signing is received
   
-  @dApp-sign
+  @dApp-1015
   Scenario: dApp, anonymous wallet, signing data, cancel signing
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection

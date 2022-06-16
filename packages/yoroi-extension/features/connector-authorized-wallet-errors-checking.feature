@@ -73,7 +73,7 @@ Feature: dApp connector errors checking
     Then I cancel signing the transaction
     And The user reject for signing is received
 
-  @dApp-sign
+  @dApp-1016
   Scenario: dApp, authorized wallet, signing data, cancel signing
     And I request access to Yoroi
     Then I should see the connector popup for connection

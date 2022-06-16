@@ -199,56 +199,16 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
   }
 
-  async _getUsedAddresses(): Promise<Array<string>> {
-    this.logger.info(`MockDApp: Getting Used Addresses`);
-
-    const usedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
-      const callback = args[args.length - 1];
-      window.api
-        .getUsedAddresses({ page: 0, limit: 5 })
-        .then(addresses => {
-          // eslint-disable-next-line promise/always-return
-          if (addresses.length === 0) {
-            callback({ success: false, errMsg: 'No used addresses' });
-          }
-          callback({ success: true, retValue: addresses });
-        })
-        .catch(error => {
-          callback({ success: false, errMsg: error.message });
-        });
+  async requestUsedAddresses() {
+    await this.driver.executeScript(() => {
+      window.addressesPromise = window.api.getUsedAddresses({ page: 0, limit: 5 });
     });
-    if (usedAddressesResponse.success) {
-      const usedAddresses = this._addressesFromCborIfNeeded(usedAddressesResponse.retValue);
-      return usedAddresses;
-    }
-    this.logger.error(`MockDApp: -> The error is received: ${usedAddressesResponse.errMsg}`);
-    throw new MockDAppWebpageError(usedAddressesResponse.errMsg);
   }
 
-  async _getUnusedAddresses(): Promise<Array<string>> {
-    this.logger.info(`MockDApp: Getting Unused Addresses`);
-
-    const unusedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
-      const callback = args[args.length - 1];
-      window.api
-        .getUnusedAddresses()
-        .then(addresses => {
-          // eslint-disable-next-line promise/always-return
-          if (addresses.length === 0) {
-            callback({ success: false, errMsg: 'No unused addresses' });
-          }
-          callback({ success: true, retValue: addresses });
-        })
-        .catch(error => {
-          callback({ success: false, errMsg: error.message });
-        });
+  async requestUnusedAddresses() {
+    await this.driver.executeScript(() => {
+      window.addressesPromise = window.api.getUnusedAddresses();
     });
-    if (unusedAddressesResponse.success) {
-      const unusedAddresses = this._addressesFromCborIfNeeded(unusedAddressesResponse.retValue);
-      return unusedAddresses;
-    }
-    this.logger.error(`MockDApp: -> The error is received: ${unusedAddressesResponse.errMsg}`);
-    throw new MockDAppWebpageError(unusedAddressesResponse.errMsg);
   }
 
   async requestNonAuthAccess() {
@@ -463,13 +423,32 @@ export class MockDAppWebpage {
   async requestSigningData(payload: string) {
     this.logger.info(`MockDApp: Requesting signing the data: data="${payload}"`);
 
-    const unusedAddresses = await this._getUnusedAddresses();
+    let addresses;
+
+    const addressesResponse = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.addressesPromise
+        .then(addresses => {
+          // eslint-disable-next-line promise/always-return
+          if (addresses.length === 0) {
+            callback({ success: false, errMsg: 'No unused addresses' });
+          }
+          callback({ success: true, retValue: addresses });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (addressesResponse.success) {
+      addresses = this._addressesFromCborIfNeeded(addressesResponse.retValue);
+    }
 
     let address;
-    if (unusedAddresses && unusedAddresses.length > 0) {
-      address = unusedAddresses[0];
+    if (addresses && addresses.length > 0) {
+      address = addresses[0];
+      this.logger.info(`MockDApp: Using used address`);
     } else {
-      this.logger.error(`MockDApp: -> The error is received: No unused Addresses`);
+      this.logger.error(`MockDApp: -> The error is received: No used or unused Addresses`);
       throw new MockDAppWebpageError('No Unused Addresses');
     }
 
@@ -514,18 +493,10 @@ export class MockDAppWebpage {
     return signingResult;
   }
 
-  async getCollateralUtxos(): Promise<string> {
+  async getCollateralUtxos(amount: string): Promise<string> {
     this.logger.info(`MockDApp: Getting Collateral Utxos`);
 
-    const amount = '4900000';
-
-    const ll = Buffer.from(
-      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
-    ).toString('hex');
-
-    this.logger.info(`MockDApp: Collateral: ` + ll);
-
-    const usedAddressesResponse = await this.driver.executeAsyncScript((...args) => {
+    const collateralResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
 
       window.api
@@ -538,11 +509,26 @@ export class MockDAppWebpage {
           callback({ success: false, errMsg: error.message });
         });
     });
-    if (usedAddressesResponse.success) {
-      const utxos = this._mapCborUtxos(usedAddressesResponse.retValue);
+    if (collateralResponse.success) {
+      const utxos = this._mapCborUtxos(collateralResponse.retValue);
       return JSON.stringify(utxos, undefined, 2);
     }
-    this.logger.error(`MockDApp: -> The error is received: ${usedAddressesResponse.errMsg}`);
-    throw new MockDAppWebpageError(usedAddressesResponse.errMsg);
+    this.logger.error(`MockDApp: -> The error is received: ${collateralResponse.errMsg}`);
+    throw new MockDAppWebpageError(collateralResponse.errMsg);
+  }
+
+  async addCollateral(amount: string) {
+    this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
+
+    //const utxosHex = '1a004ac4a0'
+    const utxosHex = Buffer.from(
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
+    ).toString('hex');
+
+    console.info(utxosHex);
+
+    this.driver.executeScript(utxos => {
+      window.collateralPromise = window.api.getCollateralUtxos(utxos);
+    }, utxosHex);
   }
 }

@@ -27,6 +27,7 @@ import {
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
 import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
+import { addCollateralTitle } from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
@@ -324,9 +325,78 @@ Then(/^The user reject for signing data is received$/, async function () {
   expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });
 
-Then(/^The dApp should see collateral: (.+)$/, async function (expectedCollateral) {
-  const collateral = await this.mockDAppPage.getCollateralUtxos();
-  const collateralJson = JSON.parse(collateral)[0];
-  const expectedUtxos = JSON.parse(expectedCollateral);
-  expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
+When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
+  await this.mockDAppPage.addCollateral(utxos);
+});
+
+Then(
+  /^The dApp should see collateral: (.+) for (.+)$/,
+  async function (expectedCollateral, utxosAmount) {
+    const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+    const collateralJson = JSON.parse(collateral)[0];
+    const expectedUtxos = JSON.parse(expectedCollateral);
+    expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
+  }
+);
+
+Then(/^I should see the connector popup to Add Collateral$/, async function () {
+  await connectorPopUpIsDisplayed(this);
+  await this.waitForElement(addCollateralTitle);
+});
+
+Then(/^I should see the collateral fee data:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const fields = table.hashes()[0];
+  const realFee = await getCollateralFee(this);
+  const expectedFee = `-${fields.fee}`;
+  const realFullAmount = await getCollateralTotalAmount(this);
+  expect(realFee, 'Fee is different').to.equal(expectedFee);
+  expect(realFullAmount, 'Total amount is different').to.equal(expectedFee);
+});
+
+Then(/^I should see the collateral addresses info:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  await this.click(utxoAddressesTabButton);
+
+  const expectedFromAddress = fields.fromAddress;
+  const expectedFromAddressAmount = fields.fromAddressAmount;
+  const expectedToAddresses = fields.toAddresses;
+  const expectedToAddressesAmount = fields.toAddressesAmount;
+
+  const actualAddresses = await getUTXOAddresses(this);
+  const actualFromAddresses = actualAddresses.fromAddresses;
+  const foundFromAddresses = actualFromAddresses.filter(
+    addr =>
+      addr.address === expectedFromAddress && addr.amount === parseFloat(expectedFromAddressAmount)
+  );
+  expect(
+    foundFromAddresses.length,
+    `Expected fromAddress:
+  address:${expectedFromAddress}, amount: ${expectedFromAddressAmount}
+  Received:\n${JSON.stringify(actualFromAddresses)}`
+  ).to.equal(1);
+
+  const actualToAddresses = actualAddresses.toAddresses;
+  const foundToAddresses = actualToAddresses.filter(
+    addr =>
+      addr.address === expectedToAddress && addr.amount === parseFloat(expectedToAddressAmount)
+  );
+  expect(
+    foundToAddresses.length,
+    `Expected toAddress:
+  address: ${expectedToAddress}, amount: ${expectedToAddressAmount}
+  Received:\n${JSON.stringify(realFromAddresses)}`
+  ).to.equal(12);
+  await this.click(overviewTabButton);
+  await this.waitForElement(transactionFeeTitle);
+});
+
+When(/^I request unused addresses$/, async function () {
+  await this.mockDAppPage.requestUnusedAddresses();
+});
+
+When(/^I request used addresses$/, async function () {
+  await this.mockDAppPage.requestUsedAddresses();
 });
