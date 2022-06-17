@@ -190,6 +190,16 @@ function formatTrezorCertificates(
   return result;
 }
 
+/**
+ * Canonical inputs sorting: by tx hash and then by index
+ */
+function compareInputs(a: CardanoInput, b: CardanoInput): number {
+  if (a.prev_hash !== b.prev_hash) {
+    return a.prev_hash < b.prev_hash ? -1 : 1;
+  }
+  return a.prev_index - b.prev_index;
+}
+
 function _transformToTrezorInputs(
   inputs: Array<CardanoAddressedUtxo>
 ): Array<CardanoInput> {
@@ -200,7 +210,7 @@ function _transformToTrezorInputs(
     prev_hash: input.tx_hash,
     prev_index: input.tx_index,
     path: toDerivationPathString(input.addressing.path),
-  }));
+  })).sort(compareInputs);
 }
 
 function toTrezorTokenBundle(
