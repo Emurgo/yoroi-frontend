@@ -37,7 +37,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver)
-      throw new Error(`Active wallet requiTokenDetails)}d for ${nameof(NFTDetailPageRevamp)}.`);
+      throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
     const network = publicDeriver.getParent().getNetworkInfo();
@@ -85,7 +85,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
             }));
 
     const { nftId } = this.props.match.params;
-    const nftInfo = nftsList.find(nft => nft.name === nftId);
+    const nftInfo = nftsList.find(nft => nft.id === nftId);
 
     return (
       <Box height="100%" overflow="overlay">

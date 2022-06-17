@@ -50,6 +50,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           };
         })
         .map(item => ({
+          id: item.id,
           name: item.name,
           image: item.nftMetadata?.image,
         }));

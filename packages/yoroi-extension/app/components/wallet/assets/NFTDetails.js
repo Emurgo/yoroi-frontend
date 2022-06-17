@@ -46,7 +46,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
           <Typography
             as={Link}
             replace
-            to={ROUTES.ASSETS.NFTS}
+            to={ROUTES.NFTS.ROOT}
             variant="h5"
             sx={{
               color: 'var(--yoroi-palette-gray-600)',
