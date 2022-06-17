@@ -25,11 +25,11 @@ export default class AssetsMenu extends Component<Props> {
     const settingOptions: Array<Object> = [
       {
         label: intl.formatMessage(globalMessages.tokens),
-        route: ROUTES.ASSETS.TOKENS,
+        route: ROUTES.ASSETS.ROOT,
       },
       {
         label: 'NFTs',
-        route: ROUTES.ASSETS.NFTS,
+        route: ROUTES.NFTS.ROOT,
       },
     ];
 

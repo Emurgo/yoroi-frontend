@@ -318,7 +318,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
             variant="body1"
             sx={{ textDecoration: 'none' }}
             color="var(--yoroi-palette-primary-300)"
-            to={ROUTES.ASSETS.TOKEN_DETAILS.replace(':tokenId', id)}
+            to={ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>

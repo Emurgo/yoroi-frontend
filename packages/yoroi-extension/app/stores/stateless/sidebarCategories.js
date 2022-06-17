@@ -143,7 +143,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'nfts',
-    route: ROUTES.ASSETS.NFTS,
+    route: ROUTES.NFTS.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
     isVisible: _request => _request.selected !== null,

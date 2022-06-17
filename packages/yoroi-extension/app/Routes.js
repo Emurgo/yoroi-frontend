@@ -229,7 +229,7 @@ export const Routes = (
       />
 
       <Route
-        path={ROUTES.ASSETS.NFTS}
+        path={ROUTES.NFTS.ROOT}
         component={(props) => (
           wrapNFTs(
             { ...props, stores, actions },
@@ -400,12 +400,12 @@ const AssetsSubpages = (stores, actions) => (
   <Switch>
     <Route
       exact
-      path={ROUTES.ASSETS.TOKENS}
+      path={ROUTES.ASSETS.ROOT}
       component={(props) => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
-      path={ROUTES.ASSETS.TOKEN_DETAILS}
+      path={ROUTES.ASSETS.DETAILS}
       component={(props) => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
     />
   </Switch>
@@ -415,12 +415,12 @@ const NFTsSubPages = (stores, actions) => (
   <Switch>
     <Route
       exact
-      path={ROUTES.ASSETS.NFTS}
+      path={ROUTES.NFTS.ROOT}
       component={(props) => <NFTsPageRevamp {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
-      path={ROUTES.ASSETS.NFT_DETAILS}
+      path={ROUTES.NFTS.DETAILS}
       component={(props) => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
     />
   </Switch>

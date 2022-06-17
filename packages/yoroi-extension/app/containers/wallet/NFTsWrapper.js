@@ -70,8 +70,7 @@ export default class NFTsWrapper extends Component<Props> {
         navbar={
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarAssets)} />}
-            menu={menu}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarNfts)} />}
           />
         }
         showInContainer

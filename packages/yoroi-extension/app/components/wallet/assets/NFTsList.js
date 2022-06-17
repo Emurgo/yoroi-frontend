@@ -95,7 +95,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         <ImageList sx={{ width: '100%' }} cols={columns.count} rowHeight="100%" gap={columns.gap}>
           {nftList.map(nft => {
             return (
-              <SLink key={nft.name} to={ROUTES.ASSETS.NFT_DETAILS.replace(':nftId', nft.name)}>
+              <SLink key={nft.name} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.name)}>
                 <NftCardImage ipfsUrl={nft.image} name={nft.name} />
               </SLink>
             );

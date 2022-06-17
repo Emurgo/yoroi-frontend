@@ -90,7 +90,7 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           <Typography
             as={Link}
             replace
-            to={ROUTES.ASSETS.TOKENS}
+            to={ROUTES.ASSETS.ROOT}
             variant="h5"
             sx={{
               color: 'var(--yoroi-palette-gray-600)',
