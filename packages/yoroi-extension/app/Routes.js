@@ -41,59 +41,88 @@ const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 const LoadingPagePromise = () => import('./containers/LoadingPage');
 const LoadingPage = React.lazy(LoadingPagePromise);
+
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
+
 const WalletPromise = () => import('./containers/wallet/Wallet');
 const Wallet = React.lazy(WalletPromise);
+
 const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
 const MyWalletsPage = React.lazy(MyWalletsPagePromise);
+
 const WalletSummaryPagePromise = () => import('./containers/wallet/WalletSummaryPage');
 const WalletSummaryPage = React.lazy(WalletSummaryPagePromise);
+
 const WalletSendPagePromise = () => import('./containers/wallet/WalletSendPage');
 const WalletSendPage = React.lazy(WalletSendPagePromise);
+
 const WalletAssetsPagePromise = () => import('./containers/wallet/WalletAssetsPage');
 const WalletAssetsPage = React.lazy(WalletAssetsPagePromise);
+
 const WalletReceivePagePromise = () => import('./containers/wallet/WalletReceivePage');
 const WalletReceivePage = React.lazy(WalletReceivePagePromise);
+
 const URILandingPagePromise = () => import('./containers/uri/URILandingPage');
 const URILandingPage = React.lazy(URILandingPagePromise);
+
 const TransferPromise = () => import('./containers/transfer/Transfer');
 const Transfer = React.lazy(TransferPromise);
+
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
+
 const StakingDashboardPagePromise = () => import('./containers/wallet/staking/StakingDashboardPage');
 const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
+
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
+
 const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
 const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
+
 const VotingPagePromise = () => import('./containers/wallet/voting/VotingPage');
 const VotingPage = React.lazy(VotingPagePromise);
 
 const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
+
 const ComplexityLevelPagePromise = () => import('./containers/profile/ComplexityLevelPage');
 const ComplexityLevelPage = React.lazy(ComplexityLevelPagePromise);
+
 const BlockchainSettingsPagePromise = () => import('./containers/settings/categories/BlockchainSettingsPage');
 const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
+
 const WalletSwitchPromise = () => import('./containers/WalletSwitch');
 const WalletSwitch = React.lazy(WalletSwitchPromise);
+
 const StakingPagePromise = () => import('./containers/wallet/staking/StakingPage');
 const StakingPage = React.lazy(StakingPagePromise);
+
 const AssetsWrapperPromise = () => import('./containers/wallet/AssetsWrapper');
 const AssetsWrapper = React.lazy(AssetsWrapperPromise);
+
+const NFTsWrapperPromise = () => import('./containers/wallet/NFTsWrapper');
+const NFTsWrapper = React.lazy(NFTsWrapperPromise);
+
 const TokensPageRevampPromise = () => import('./containers/wallet/TokensPageRevamp');
 const TokensPageRevamp = React.lazy(TokensPageRevampPromise);
+
 const TokensDetailPageRevampPromise = () => import('./containers/wallet/TokenDetailPageRevamp');
 const TokensDetailPageRevamp = React.lazy(TokensDetailPageRevampPromise);
+
 const NFTsPageRevampPromise = () => import('./containers/wallet/NFTsPageRevamp');
 const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
+
 const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
 const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
+
 const ConnectedWebsitesPagePromise = () => import('./containers/dapp-connector/ConnectedWebsitesContainer');
 const ConnectedWebsitesPage = React.lazy(ConnectedWebsitesPagePromise);
+
 const YoroiPalettePagePromise = () => import('./containers/experimental/YoroiPalette');
 const YoroiPalettePage = React.lazy(YoroiPalettePagePromise);
+
 const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThemes');
 const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 
@@ -198,6 +227,17 @@ export const Routes = (
           )
         )}
       />
+
+      <Route
+        path={ROUTES.ASSETS.NFTS}
+        component={(props) => (
+          wrapNFTs(
+            { ...props, stores, actions },
+            NFTsSubPages(stores, actions)
+          )
+        )}
+      />
+
       <Route
         exact
         path={ROUTES.WALLETS.ADD}
@@ -368,6 +408,11 @@ const AssetsSubpages = (stores, actions) => (
       path={ROUTES.ASSETS.TOKEN_DETAILS}
       component={(props) => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
     />
+  </Switch>
+);
+
+const NFTsSubPages = (stores, actions) => (
+  <Switch>
     <Route
       exact
       path={ROUTES.ASSETS.NFTS}
@@ -378,9 +423,8 @@ const AssetsSubpages = (stores, actions) => (
       path={ROUTES.ASSETS.NFT_DETAILS}
       component={(props) => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
     />
-    <Redirect to={ROUTES.ASSETS.TOKENS} />
   </Switch>
-);
+)
 /* eslint-enable max-len */
 
 export function wrapSettings(
@@ -406,6 +450,19 @@ export function wrapAssets(
     >
       {children}
     </AssetsWrapper>
+  );
+}
+
+export function wrapNFTs(
+  assetsProps: InjectedOrGenerated<AssetsData>,
+  children: Node,
+): Node {
+  return (
+    <NFTsWrapper
+      {...assetsProps}
+    >
+      {children}
+    </NFTsWrapper>
   );
 }
 

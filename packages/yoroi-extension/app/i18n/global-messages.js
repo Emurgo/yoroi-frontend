@@ -634,6 +634,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.assets',
     defaultMessage: '!!!Assets',
   },
+  sidebarNfts: {
+    id: 'sidebar.nfts',
+    defaultMessage: '!!!NFTs',
+  },
   sidebarVoting: {
     id: 'sidebar.voting',
     defaultMessage: '!!!Voting',
