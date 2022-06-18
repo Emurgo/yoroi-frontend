@@ -335,7 +335,6 @@ Feature: Restore Wallet
     | plate    |
     | ZDDC-9858 |
     | EAJD-7036 |
-    | TSEK-7426 |
     Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen

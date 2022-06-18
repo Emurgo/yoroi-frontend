@@ -67,7 +67,7 @@ type Props = {|
   +form: ?Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +addressToDisplayString: string => string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +header?: Node,
@@ -303,7 +303,7 @@ export default class TransferSummaryPage extends Component<Props> {
         .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
       const coinPrice = this.props.getCurrentPrice(
-        tokenInfo.Identifier,
+        getTokenName(tokenInfo),
         toCurrency
       );
 

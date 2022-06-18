@@ -17,9 +17,9 @@ import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load.gif';
-import ConnectErrorSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error.inline.svg';
+import { ReactComponent as ConnectErrorSVG }  from '../../../../assets/images/hardware-wallet/ledger/connect-error.inline.svg';
 
-import ConnectErrorLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error-modern.inline.svg';
+import { ReactComponent as ConnectErrorLedgerSVG }  from '../../../../assets/images/hardware-wallet/ledger/connect-error-modern.inline.svg';
 import connectLoadLedgerGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load-modern.inline.gif';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';

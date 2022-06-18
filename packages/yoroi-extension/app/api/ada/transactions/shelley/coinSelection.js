@@ -332,6 +332,7 @@ export function coinSelectionForValues(
   networkId: number,
 ): {|
   selectedUtxo: Array<RemoteUnspentOutput>,
+  collateralReserve: Array<RemoteUnspentOutput>,
   recommendedChange: Array<MultiToken>,
 |} {
   if (utxos.length === 0) {
@@ -399,8 +400,11 @@ export function coinSelectionForValues(
   ).joinSubtractCopyWithLimitZero(totalRequiredValue);
   const minRequiredAda =
     calculateMinRequiredAda(totalExtraValue, coinsPerUtxoWord);
-  let availableExtraAda =
-    totalExtraValue.getDefault().minus(minRequiredAda);
+  let availableExtraAda = totalExtraValue.getDefault()
+    // Subtract the min ada required to store any dirt in the change
+    .minus(minRequiredAda)
+    // Subtract 2 ADA buffer to guarantee fee is possible
+    .minus(ONE_ADA_LOVELACES * 2);
   const recommendedChange = [];
   {
     // Adding recommended collaterals
@@ -416,13 +420,16 @@ export function coinSelectionForValues(
     const requiredAda = totalRequiredValue.getDefault();
     const requiredNotTooSmall = requiredAda.gt(ONE_ADA_LOVELACES);
     const availableEnoughOverRequired =
-      availableExtraAda.isGreaterThan(requiredAda.multipliedBy(1.5));
+      availableExtraAda.isGreaterThan(requiredAda.multipliedBy('1.5'));
     if (requiredNotTooSmall && availableEnoughOverRequired) {
-      recommendedChange.push(createMultiToken(requiredAda, [], networkId));
+      recommendedChange.push(createMultiToken(
+        requiredAda.multipliedBy('1.1').integerValue(),
+        [], networkId));
     }
   }
   return {
     selectedUtxo: improvedTakenUtxo,
     recommendedChange,
+    collateralReserve: collateralReserve.map(({ utxo }) => utxo),
   };
 }

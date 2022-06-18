@@ -10,7 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletBackupPrivacyWarningDialog.scss';
-import RecoveryWatchingSvg from '../../../assets/images/recovery-watching.inline.svg';
+import { ReactComponent as RecoveryWatchingSvg }  from '../../../assets/images/recovery-watching.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({

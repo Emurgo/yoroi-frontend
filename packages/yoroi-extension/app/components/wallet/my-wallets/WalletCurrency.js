@@ -4,11 +4,11 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './WalletCurrency.scss';
 
-import SymbolADA from '../../../assets/images/my-wallets/symbol_ada.inline.svg';
-import SymbolTADA from '../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg';
-import SymbolERG from '../../../assets/images/my-wallets/symbol_ergo.inline.svg';
-import SymbolBTC from '../../../assets/images/my-wallets/symbol_bitcoin.inline.svg';
-import SymbolETH from '../../../assets/images/my-wallets/symbol_ethereum.inline.svg';
+import { ReactComponent as SymbolADA }  from '../../../assets/images/my-wallets/symbol_ada.inline.svg';
+import { ReactComponent as SymbolTADA }  from '../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg';
+import { ReactComponent as SymbolERG }  from '../../../assets/images/my-wallets/symbol_ergo.inline.svg';
+import { ReactComponent as SymbolBTC }  from '../../../assets/images/my-wallets/symbol_bitcoin.inline.svg';
+import { ReactComponent as SymbolETH }  from '../../../assets/images/my-wallets/symbol_ethereum.inline.svg';
 
 type Props = {|
   +currency: string,

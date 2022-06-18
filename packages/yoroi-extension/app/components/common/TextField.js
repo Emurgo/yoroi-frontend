@@ -2,10 +2,10 @@
 // @flow
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
-import ErrorIcon from '../../assets/images/forms/error.inline.svg';
-import DoneIcon from '../../assets/images/forms/done.inline.svg';
-import EyeIcon from '../../assets/images/forms/password-eye-close.inline.svg';
-import CloseEyeIcon from '../../assets/images/forms/password-eye.inline.svg';
+import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
+import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inline.svg';
+import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
+import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
 import React from 'react';
 
 type Props = {|
@@ -39,6 +39,7 @@ function TextField({
   onChange,
   autoFocus,
   revamp,
+  placeholder,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -54,7 +55,7 @@ function TextField({
     <TextFieldBase
       className={className}
       error={Boolean(error)}
-      label={!revamp && label}
+      label={!Boolean(revamp) && label}
       value={value}
       disabled={disabled}
       autoFocus={autoFocus}
@@ -63,7 +64,7 @@ function TextField({
       onBlur={onBlur}
       onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
-      variant={revamp ? 'standard' : 'outlined'}
+      variant={Boolean(revamp) ? 'standard' : 'outlined'}
       /*
         In order to show placeholders for classic theme we dont' need to override
         'shrink' and 'notched' prop status so we pass an empty object
@@ -95,7 +96,7 @@ function TextField({
             </InputAdornment>
           ),
           disableUnderline: revamp,
-          placeholder: revamp ? '0.0' : '',
+          placeholder: placeholder != null ? placeholder : (Boolean(revamp) ? '0.0' : ''),
       }}
       {...props}
     />
@@ -114,6 +115,7 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
   revamp: false,
+  placeholder: undefined,
 };
 
 export default TextField;

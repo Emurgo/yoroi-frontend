@@ -94,11 +94,11 @@ export async function validateAmount(
   const messages = defineMessages({
     invalidAmount: {
       id: 'wallet.send.form.errors.invalidAmount',
-      defaultMessage: '!!!Please enter a valid amount.',
+      defaultMessage: '!!!Invalid amount. Please retype.',
     },
     tooSmallUtxo: {
       id: 'wallet.send.form.errors.tooSmallUtxo',
-      defaultMessage: '!!!Cannot send less than {minUtxo} {ticker}.',
+      defaultMessage: '!!!{minUtxo} {ticker} is minimum.',
     },
   });
 

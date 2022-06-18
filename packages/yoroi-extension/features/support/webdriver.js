@@ -7,11 +7,13 @@ import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 // eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { getMethod } from './helpers/helpers';
+import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
+import { testRunsLogsDir } from './helpers/common-constants';
 
 const fs = require('fs');
+const simpleNodeLogger = require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -53,23 +55,29 @@ function getBraveBuilder() {
 }
 
 function getChromeBuilder() {
-  return new Builder().forBrowser('chrome').setChromeOptions(
-    new chrome.Options()
-      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
-      .addArguments(
-        '--no-sandbox',
-        '--disable-gpu',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--start-maximized'
-      )
-  );
+  return new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(
+      new chrome.Options()
+        .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+        .addArguments(
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--start-maximized'
+        )
+    );
 }
 
 function getFirefoxBuilder() {
   const options = new firefox.Options()
-    // .setBinary(firefox.Channel.NIGHTLY)
-    .addExtensions(path.resolve(__dirname, '../../yoroi-test.xpi'))
+    /**
+     * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
+     * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
+     */
+    .setBinary(process.env.FIREFOX_DEV)
+    .addExtensions(path.resolve(__dirname, '../../yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
@@ -105,34 +113,36 @@ export type LocatorObject = {|
     | 'tagName',
 |};
 
-// TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
+  let builder = null;
   switch (cmdInput.parameters.browser) {
     case 'brave': {
-      const braveBuilder = getBraveBuilder();
-      this.driver = braveBuilder.build();
-      this.windowManager = new WindowManager(this.driver);
-      this.windowManager.init().then().catch();
-      this.mockDAppPage = new MockDAppWebpage(this.driver);
+      builder = getBraveBuilder();
       break;
     }
     case 'firefox': {
-      const firefoxBuilder = getFirefoxBuilder();
-      this.driver = firefoxBuilder.build();
-      this.windowManager = new WindowManager(this.driver);
-      this.windowManager.init().then().catch();
-      this.mockDAppPage = new MockDAppWebpage(this.driver);
+      builder = getFirefoxBuilder();
       break;
     }
     default: {
-      const chromeBuilder = getChromeBuilder();
-      this.driver = chromeBuilder.build();
-      this.windowManager = new WindowManager(this.driver);
-      this.windowManager.init().then().catch();
-      this.mockDAppPage = new MockDAppWebpage(this.driver);
+      builder = getChromeBuilder();
       break;
     }
   }
+  this.driver = builder.build();
+  this._allLoggers = [];
+  const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
+  const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
+  this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
+  this.windowManager.init().then().catch();
+  this._allLoggers.push(mockAndWMLogger);
+  this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
+
+  this.sendToAllLoggers = (message: string, level: string = 'info') => {
+    for (const someLogger of this._allLoggers) {
+      someLogger[level](message);
+    }
+  };
 
   this.getBrowser = (): string => cmdInput.parameters.browser;
 
@@ -263,7 +273,18 @@ function CustomWorld(cmdInput: WorldInput) {
     this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
 
   this.intl = (key, lang = 'en-US') =>
-    this.driver.executeScript((k, l) => window.yoroi.translations[l][k], key, lang);
+    this.driver.executeAsyncScript(
+      (k, l, callback) => {
+        window.yoroi.translations[l]
+          .then(translation => callback(translation[k]))
+          // eslint-disable-next-line no-console
+          .catch(e => {
+            console.error('Intl fail: ', e);
+          });
+      },
+      key,
+      lang
+    );
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 

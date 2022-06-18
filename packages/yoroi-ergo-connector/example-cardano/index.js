@@ -22,6 +22,7 @@ const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
 const createTx = document.querySelector('#create-tx')
 const getCollateralUtxos = document.querySelector('#get-collateral-utxos')
+const signData = document.querySelector('#sign-data')
 const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
@@ -30,6 +31,7 @@ let cardanoApi
 let returnType = 'cbor'
 let utxos
 let usedAddresses
+let unusedAddresses
 let changeAddress
 let unsignedTransactionHex
 let transactionHex
@@ -199,6 +201,10 @@ function addressesFromCborIfNeeded(addresses) {
     CardanoWasm.Address.from_bytes(hexToBytes(a)).to_bech32()) : addresses;
 }
 
+function addressToCbor(address) {
+  return bytesToHex(CardanoWasm.Address.from_bech32(address).to_bytes());
+}
+
 getUnUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
        alertError('Should request access first')
@@ -211,6 +217,7 @@ getUnUsedAddresses.addEventListener('click', () => {
           return;
         }
         addresses = addressesFromCborIfNeeded(addresses)
+        unusedAddresses = addresses
         alertSuccess(`Address: `)
         alertEl.innerHTML = '<h2>Unused addresses:</h2><pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
       });
@@ -562,14 +569,119 @@ createTx.addEventListener('click', () => {
     ).to_bytes()
   );
 
-  const txReq = {
-    validityIntervalStart: 42,
-    includeInputs: [randomUtxo.utxo_id],
-    includeOutputs: [outputHex],
-    includeTargets: [
+  const includeInputs = [];
+  const includeOutputs = [];
+  const includeTargets = [];
+
+  let targetAddress = randomUtxo.receiver;
+  let targetDataHash = null;
+
+  /****** FLAGS ******/
+  let includeDefaultInputs = true;
+  let includeDefaultOutputs = true;
+  let includeDefaultTargets = true;
+  let includeAssetTargets = true;
+  //-----------------//
+  const nativeScriptInputUtxoId = null;
+  const plutusScriptInputUtxoId = null;
+  const createPlutusTarget = false;
+  /****** </FLAGS> ******/
+
+  if (includeDefaultInputs) {
+    includeInputs.push(randomUtxo.utxo_id);
+  }
+
+  // noinspection StatementWithEmptyBodyJS
+  if (includeDefaultOutputs) {
+    includeOutputs.push(outputHex);
+  }
+
+  // noinspection PointlessBooleanExpressionJS
+  if (nativeScriptInputUtxoId != null) {
+
+    const nscripts = CardanoWasm.NativeScripts.new();
+    nscripts.add(
+      CardanoWasm.NativeScript.new_timelock_start(
+        CardanoWasm.TimelockStart.new(1234)
+      ),
+    );
+    nscripts.add(
+      CardanoWasm.NativeScript.new_timelock_start(
+        CardanoWasm.TimelockStart.new(1)
+      ),
+    );
+    const nativeScript = CardanoWasm.NativeScript.new_script_all(
+      CardanoWasm.ScriptAll.new(nscripts),
+    );
+
+    const scriptHash = nativeScript.hash();
+    console.log(`[createTx] Native script hash: ${bytesToHex(scriptHash.to_bytes())}`);
+    const nativeScriptAddress = CardanoWasm.EnterpriseAddress.new(
+      0,
+      CardanoWasm.StakeCredential.from_scripthash(scriptHash),
+    ).to_address().to_bech32();
+    console.log(`[createTx] Native script address: ${nativeScriptAddress}`);
+
+    includeInputs.push({
+      id: nativeScriptInputUtxoId,
+      witness: {
+        nativeScript: bytesToHex(nativeScript.to_bytes()),
+      },
+    });
+  }
+
+  // noinspection PointlessBooleanExpressionJS
+  if (plutusScriptInputUtxoId != null || createPlutusTarget) {
+
+    const plutusScript = CardanoWasm.PlutusScript
+      .from_bytes(hexToBytes('4e4d01000033222220051200120011'));
+
+    const plutusScriptHash = plutusScript.hash();
+    console.log(`[createTx] Plutus script hash: ${bytesToHex(plutusScriptHash.to_bytes())}`);
+    const plutusScriptAddress = CardanoWasm.EnterpriseAddress.new(
+      0,
+      CardanoWasm.StakeCredential.from_scripthash(plutusScriptHash),
+    ).to_address().to_bech32();
+    console.log(`[createTx] Plutus script address: ${plutusScriptAddress}`);
+
+    const datum = CardanoWasm.PlutusData.new_empty_constr_plutus_data(CardanoWasm.BigNum.zero());
+    const datumHash = bytesToHex(CardanoWasm.hash_plutus_data(datum).to_bytes());
+    console.log(`[createTx] Plutus datum hash: ${datumHash}`);
+
+    if (createPlutusTarget) {
+      targetAddress = plutusScriptAddress;
+      targetDataHash = datumHash;
+    }
+
+    // noinspection PointlessBooleanExpressionJS
+    if (plutusScriptInputUtxoId != null) {
+      const redeemer = CardanoWasm.Redeemer.new(
+        CardanoWasm.RedeemerTag.new_spend(),
+        CardanoWasm.BigNum.zero(),
+        CardanoWasm.PlutusData.new_empty_constr_plutus_data(CardanoWasm.BigNum.zero()),
+        CardanoWasm.ExUnits.new(
+          CardanoWasm.BigNum.from_str('1700'),
+          CardanoWasm.BigNum.from_str('476468'),
+        ),
+      );
+
+      includeInputs.push({
+        id: plutusScriptInputUtxoId,
+        witness: {
+          plutusScript: bytesToHex(plutusScript.to_bytes()),
+          datum: bytesToHex(datum.to_bytes()),
+          redeemer: bytesToHex(redeemer.to_bytes()),
+        },
+      });
+    }
+  }
+
+  if (includeDefaultTargets) {
+    includeTargets.push(
       {
-        address: randomUtxo.receiver,
+        address: targetAddress,
         value: '2000000',
+        dataHash: targetDataHash,
         mintRequest: [{
           script: mintScriptHex,
           assetName: tokenAssetNameHex,
@@ -594,23 +706,32 @@ createTx.addEventListener('click', () => {
           }
         }]
       }
-    ]
+    )
   }
 
-  const utxosWithAssets = utxos.filter(u => u.assets.length > 0);
-  const utxoWithAssets = utxosWithAssets[Math.floor(Math.random() * utxosWithAssets.length)];
+  const txReq = {
+    validityIntervalStart: 2000,
+    includeInputs,
+    includeOutputs,
+    includeTargets,
+  }
 
-  if (utxoWithAssets) {
-    const asset = utxoWithAssets.assets[0];
-    console.log('[createTx] Including asset:', asset);
-    txReq.includeTargets.push({
-      // do not specify value, the connector will use minimum value
-      address: randomUtxo.receiver,
-      assets: {
-        [asset.assetId]: '1',
-      },
-      ensureRequiredMinimalValue: true,
-    })
+  if (includeAssetTargets) {
+    const utxosWithAssets = utxos.filter(u => u.assets.length > 0);
+    const utxoWithAssets = utxosWithAssets[Math.floor(Math.random() * utxosWithAssets.length)];
+
+    if (utxoWithAssets) {
+      const asset = utxoWithAssets.assets[0];
+      console.log('[createTx] Including asset:', asset);
+      txReq.includeTargets.push({
+        // do not specify value, the connector will use minimum value
+        address: randomUtxo.receiver,
+        assets: {
+          [asset.assetId]: '1',
+        },
+        ensureRequiredMinimalValue: true,
+      })
+    }
   }
   
   cardanoApi.experimental.createTx(txReq, true).then(txHex => {
@@ -626,11 +747,12 @@ createTx.addEventListener('click', () => {
 
 getCollateralUtxos.addEventListener('click', () => {
   toggleSpinner('show');
-  
+
   if (!accessGranted) {
     alertError('Should request access first');
     return;
   }
+
   const amount = '4900000';
   cardanoApi.getCollateralUtxos(
     Buffer.from(
@@ -648,6 +770,47 @@ getCollateralUtxos.addEventListener('click', () => {
     alertWarrning(`Getting collateral UTXOs tx fails: ${JSON.stringify(error)}`)
   })
 })
+
+signData.addEventListener('click', () => {
+  toggleSpinner('show');
+
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+
+  let address;
+  if (usedAddresses && usedAddresses.length > 0) {
+    address = usedAddresses[0];
+  } else if (unusedAddresses && unusedAddresses.length > 0) {
+    address = unusedAddresses[0];
+  } else {
+    alertError('Should request used or unused addresses first');
+    return;
+  }
+
+  if (isCBOR()) {
+    address = addressToCbor(address);
+  }
+
+  const payload = document.querySelector('#sign-data-payload').value;
+  let payloadHex;
+  if (payload.startsWith('0x')) {
+    payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+  } else {
+    payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+  }
+
+  console.log('[signData][address] ', address);
+  cardanoApi.signData(address, payloadHex).then(sig => {
+    alertSuccess('Signature:' + JSON.stringify(sig))
+  }).catch(error => {
+    console.error(error);
+    alertError(error.info);
+  }).then(() => {
+    toggleSpinner('hide');
+  });
+});
 
 function alertError (text) {
     toggleSpinner('hide');

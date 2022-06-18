@@ -50,7 +50,7 @@ type Props = {|
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 const messages = defineMessages({
@@ -112,10 +112,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
     const shiftedAmount = token.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    const coinPrice = this.props.getCurrentPrice(
-      tokenInfo.Identifier,
-      toCurrency
-    );
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const coinPrice = this.props.getCurrentPrice(ticker, toCurrency);
 
     if (coinPrice == null) return '-';
 

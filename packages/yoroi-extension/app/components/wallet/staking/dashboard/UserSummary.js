@@ -1,20 +1,15 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from '@mui/material';
 import Card from './Card';
 import styles from './UserSummary.scss';
-import IconAda from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
-import IconRewards from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
-import IconDelegated from '../../../../assets/images/dashboard/grey-total-delegated.inline.svg';
+import { ReactComponent as IconAda }  from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
+import { ReactComponent as IconRewards }  from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
-import TooltipBox from '../../../widgets/TooltipBox';
-import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
-import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
@@ -25,6 +20,9 @@ import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { hiddenAmount } from '../../../../utils/strings';
 import { truncateToken } from '../../../../utils/formatters';
+import { ReactComponent as InfoIcon }  from '../../../../assets/images/attention-big-light.inline.svg';
+import Skeleton from '@mui/material/Skeleton';
+import { Box } from '@mui/system';
 
 const messages = defineMessages({
   title: {
@@ -39,19 +37,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.adaAmountNote',
     defaultMessage: '!!!This balance includes rewards (withdrawal required to be able to send this full amount)',
   },
-  mangledPopupDialogLine1: {
-    id: 'wallet.dashboard.summary.mangled.line1',
-    defaultMessage:
-      '!!!Your wallet has {adaAmount} {ticker} with a different delegation preference.',
-  },
-  canUnmangleLine: {
-    id: 'wallet.dashboard.summary.mangled.can',
-    defaultMessage: '!!!{adaAmount} {ticker} can be corrected',
-  },
-  cannotUnmangleLine: {
-    id: 'wallet.dashboard.summary.mangled.cannot',
-    defaultMessage: '!!!{adaAmount} {ticker} cannot be corrected',
-  },
   mangledPopupDialogLine2: {
     id: 'wallet.dashboard.summary.mangled.line2',
     defaultMessage: '!!!We recommend to {transactionMessage} to delegate the {ticker}',
@@ -60,6 +45,10 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.mangled.makeTx',
     defaultMessage: '!!!make a transaction',
   },
+  delegated: {
+    id: 'wallet.dashboard.summary.delegated',
+    defaultMessage: '!!!Delegated'
+  }
 });
 
 type Props = {|
@@ -68,7 +57,7 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +totalSum: void | MultiToken,
   +totalRewards: void | MultiToken,
-  +totalDelegated: void | MultiToken,
+  +isDelegated: boolean,
   +unitOfAccount: TokenEntry => (void | {| currency: string, amount: string |}),
   +shouldHideBalance: boolean,
   +openLearnMore: void => void,
@@ -78,18 +67,10 @@ type Props = {|
   +withdrawRewards: void | (void => void),
 |};
 
-type State = {|
-  mangledPopupOpen: boolean,
-|};
-
 @observer
-export default class UserSummary extends Component<Props, State> {
+export default class UserSummary extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
-  };
-
-  state: State = {
-    mangledPopupOpen: false,
   };
 
   render(): Node {
@@ -99,7 +80,6 @@ export default class UserSummary extends Component<Props, State> {
         <div className={styles.wrapper}>
           {this.getTotal()}
           {this.getTotalRewards()}
-          {this.getTotalDelegated()}
         </div>
       </Card>
     );
@@ -109,21 +89,31 @@ export default class UserSummary extends Component<Props, State> {
     const { intl } = this.context;
 
     return (
-      <div className={classnames([styles.card, styles.mr20])}>
-        <div className={styles.cardContent}>
-          <div>
-            <h3 className={styles.label}>
-              {intl.formatMessage(globalMessages.totalTokenLabel, {
-                ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
-              })}
-              :
-            </h3>
-            {this.renderAmount(this.props.totalSum)}
-          </div>
-          <div className={styles.amountNote}>
-            {intl.formatMessage(messages.adaAmountNote)}
-          </div>
-        </div>
+      <div className={styles.card}>
+        {
+          !this.props.totalSum ? this.getCardSkeleton('total') : (
+            <div className={styles.cardContent}>
+              <div>
+                <h3 className={styles.label}>
+                  <span>
+                    {intl.formatMessage(globalMessages.totalTokenLabel, {
+                      ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
+                    })}:
+                    {this.props.isDelegated && (
+                      <span className={styles.delegated}>
+                        {intl.formatMessage(messages.delegated)}
+                      </span>
+                    )}
+                  </span>
+                </h3>
+                {this.renderAmount(this.props.totalSum)}
+              </div>
+              <div className={styles.amountNote}>
+                {intl.formatMessage(messages.adaAmountNote)}
+              </div>
+            </div>
+          )
+        }
         <div className={styles.icon}>
           <IconAda />
         </div>
@@ -134,36 +124,35 @@ export default class UserSummary extends Component<Props, State> {
   getTotalRewards: void => Node = () => {
     const { intl } = this.context;
     return (
-      <div className={classnames([styles.card, styles.mr20])}>
-        <div className={styles.cardContent}>
-          <div>
-            <h3 className={styles.label}>
-              {intl.formatMessage(globalMessages.totalRewardsLabel)}:
-            </h3>
-            {this.renderAmount(this.props.totalRewards)}
-          </div>
-          <div className={styles.footer}>
-            {this.props.withdrawRewards != null && (
-              <Button
-                className="withdrawButton"
-                variant="secondary"
-                onClick={this.props.withdrawRewards}
-                sx={{ height: '46px', width: '144px' }}
-              >
-                {intl.formatMessage(globalMessages.withdrawLabel)}
-              </Button>
-            )}
-            <div
-              className={styles.note}
-              role="button"
-              tabIndex={0}
-              onKeyPress={() => null}
-              onClick={this.props.openLearnMore}
-            >
-              {intl.formatMessage(messages.note)}
+      <div className={styles.card}>
+        {
+          !this.props.totalRewards ? this.getCardSkeleton('rewards') : (
+            <div className={styles.cardContent}>
+              <div>
+                <h3 className={styles.label}>
+                  <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
+                  <button className={styles.infoIcon} type='button' onClick={this.props.openLearnMore}>
+                    <InfoIcon />
+                  </button>
+                </h3>
+                {this.renderAmount(this.props.totalRewards)}
+              </div>
+              <div className={styles.footer}>
+                {this.props.withdrawRewards != null && (
+                  <Button
+                    className="withdrawButton"
+                    variant="secondary"
+                    onClick={this.props.withdrawRewards}
+                    sx={{ height: '46px', width: '144px' }}
+                  >
+                    {intl.formatMessage(globalMessages.withdrawLabel)}
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
+          )
+        }
+
         <div className={styles.icon}>
           <IconRewards />
         </div>
@@ -171,114 +160,42 @@ export default class UserSummary extends Component<Props, State> {
     );
   };
 
-  getTotalDelegated: void => Node = () => {
-    const { intl } = this.context;
-
-    const mangledWarningIcon =
-      !this.props.canUnmangleSum.isEmpty() || !this.props.cannotUnmangleSum.isEmpty() ? (
-        <div className={styles.mangledWarningIcon}>
-          <WarningIcon
-            width="24"
-            height="24"
-            onClick={() =>
-              this.setState(prevState => ({
-                mangledPopupOpen: !prevState.mangledPopupOpen,
-              }))
-            }
-          />
-        </div>
-      ) : (
-        []
-      );
-
+  getSkeleton(layout: {|
+    width: string,
+    height: string,
+    marginBottom: string,
+  |}): Node {
     return (
-      <div className={styles.wrapperCard}>
-        <div className={styles.popupSection}>
-          {this.state.mangledPopupOpen && (
-            <div className={styles.mangledPopup}>
-              <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
-                <p>
-                  {this.formatWithAmount(
-                    messages.mangledPopupDialogLine1,
-                    this.props.canUnmangleSum
-                      .joinAddCopy(this.props.cannotUnmangleSum)
-                      .getDefaultEntry(),
-                  )}
-                </p>
-                {!this.props.cannotUnmangleSum.isEmpty() && (
-                  <ul>
-                    <li>
-                      {this.formatWithAmount(
-                        messages.canUnmangleLine,
-                        this.props.canUnmangleSum.getDefaultEntry(),
-                      )}
-                    </li>
-                    <li>
-                      {this.formatWithAmount(
-                        messages.cannotUnmangleLine,
-                        this.props.cannotUnmangleSum.getDefaultEntry(),
-                      )}
-                    </li>
-                  </ul>
-                )}
-                {!this.props.canUnmangleSum.isEmpty() && (
-                  <p>
-                    <FormattedMessage
-                      {...messages.mangledPopupDialogLine2}
-                      values={{
-                        ticker: truncateToken(getTokenName(this.props.getTokenInfo(
-                          this.props.canUnmangleSum.getDefaultEntry()
-                        ))),
-                        transactionMessage: (
-                          <span
-                            className={styles.link}
-                            onClick={this.props.onUnmangle}
-                            role="button"
-                            tabIndex={0}
-                            onKeyPress={this.props.onUnmangle}
-                          >
-                            {intl.formatMessage(messages.makeTransaction)}
-                          </span>
-                        ),
-                      }}
-                    />
-                  </p>
-                )}
-              </TooltipBox>
-            </div>
-          )}
-        </div>
-        <div className={styles.subCard}>
-          <div className={styles.cardContent}>
-            <div>
-              <div className={styles.delegatedHeader}>
-                <h3 className={styles.label}>
-                  {intl.formatMessage(globalMessages.totalDelegated)}:
-                </h3>
-                <div className={styles.mangledSection}>
-                  {mangledWarningIcon}
-                </div>
-              </div>
-              {this.renderAmount(this.props.totalDelegated)}
-            </div>
-            <div />
-          </div>
-          <div className={styles.icon}>
-            <IconDelegated />
-          </div>
-        </div>
-      </div>
-    );
-  };
+      <Skeleton
+        variant="rectangular"
+        width={layout.width}
+        height={layout.height}
+        animation='wave'
+        sx={{
+          backgroundColor: 'var(--yoroi-palette-gray-50)',
+          borderRadius: '4px',
+          marginBottom: layout.marginBottom,
+        }}
+      />
+    )
+  }
+
+  getCardSkeleton(card: 'rewards' | 'total'): Node {
+    const skeletons = [
+      { width: '50%', height: '15px', marginBottom: '5px' }, // Label
+      { width: '85%', height: '32px', marginBottom: card === 'rewards' ? '25px' : '16px' }, // Amount
+      { width: card === 'rewards' ? '43%' : '70%', height: '57px', marginBottom: '0px' } // Text / Button
+    ]
+    return (
+      <Box>
+        {skeletons.map(skeleton => this.getSkeleton(skeleton))}
+      </Box>
+    )
+  }
 
   renderAmount: (void | MultiToken) => Node = (token) => {
-    if (token == null) {
-      return (
-        <div className={styles.loadingSpinner}>
-          <LoadingSpinner small />
-        </div>
-      );
-    }
+
+    if (!token) throw new Error('Token is not defined - Should never happend')
     const unitOfAccount = this.props.unitOfAccount(
       token.getDefaultEntry()
     );
@@ -330,13 +247,11 @@ export default class UserSummary extends Component<Props, State> {
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
       .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
       .toString();
-    const splitAmount = tokenAmount.split('.');
     const amountNode = this.props.shouldHideBalance
       ? <>{hiddenAmount}</>
       : (
         <>
-          {splitAmount[0]}
-          <span className={styles.decimal}>{splitAmount[1] ? '.' + splitAmount[1] : null} </span>
+          {tokenAmount}
         </>
       );
     return (

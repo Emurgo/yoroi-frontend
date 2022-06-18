@@ -10,7 +10,7 @@ import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { AmountInput } from '../../common/NumericInputRP';
-import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as AddMemoSvg }  from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
@@ -72,7 +72,7 @@ const messages = defineMessages({
   },
   calculatingFee: {
     id: 'wallet.send.form.calculatingFee',
-    defaultMessage: '!!!Calculating fee...',
+    defaultMessage: '!!!Calculating the fee, please wait.',
   },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
@@ -80,7 +80,7 @@ const messages = defineMessages({
   },
   willSendAll: {
     id: 'wallet.send.form.willSendAll',
-    defaultMessage: '!!!Will Send All Tokens!'
+    defaultMessage: '!!!ATTENTION! You will send all of your tokens below:'
   }
 });
 

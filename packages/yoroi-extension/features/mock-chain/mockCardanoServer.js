@@ -189,12 +189,28 @@ export function getMockServer(
       // $FlowFixMe[incompatible-call]
       res.send(`
                <!doctype html>
-               <html>
+               <html lang="en">
+                 <head>
+                   <title>MockDApp</title>
+                 </head>
                  <body>
                  </body>
                </html>
                `
       );
+    });
+
+    server.get('/api/txs/io/:txHash/o/:txIndex', (req, res) => {
+      const result = mockImporter.getUtxoData(
+        req.params.txHash,
+        Number(req.params.txIndex)
+      );
+      if (result) {
+        res.send(result);
+        return;
+      }
+      res.status(404);
+      res.send('Transaction not found');
     });
 
     installCoinPriceRequestHandlers(server);
