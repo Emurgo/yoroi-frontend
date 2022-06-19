@@ -1,6 +1,6 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import { Box, styled } from '@mui/system';
+import { Box, minHeight, styled } from '@mui/system';
 import {
   IconButton,
   ImageList,
@@ -9,14 +9,17 @@ import {
   InputAdornment,
   Stack,
   Typography,
+  Skeleton
 } from '@mui/material';
 import { assetsMessage } from './AssetsList';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
+
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ListEmpty } from './ListEmpty';
 
 type Props = {|
@@ -108,12 +111,48 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
-function NftCardImage({ ipfsUrl, name }) {
-  const ipfsHash = ipfsUrl != null ? ipfsUrl.replace('ipfs://', '') : '';
+function isImageExist(imageSrc, onload, onerror) {
+  const img = new Image();
+  img.onload = onload;
+  img.onerror = onerror;
+  img.src = imageSrc;
+}
 
+function NftImage({ ipfsUrl, name }) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  if (error || !ipfsUrl) return (
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'var(--yoroi-palette-gray-100)',
+      width: '100%',
+      height: '100%',
+      minWidth: '250px',
+      minHeight: '200px',
+    }}
+    >
+      <DefaultNFT />
+    </Box>
+  )
+  ipfsUrl = ipfsUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  useEffect(() => {
+    isImageExist(
+      ipfsUrl,
+      () => { setLoading(false); setError(false) }, // on-success
+      () => { setLoading(false); setError(true) }, // on-error
+    )
+  }, [ipfsUrl])
+
+  if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ minWidth: '250px' }} height={250} />
+  return  <img style={{ width: '100%', height: 'auto', flex: '1', minWidth: '250px', objectFit: 'cover' }} src={ipfsUrl} alt={name} loading="lazy" />
+}
+
+function NftCardImage({ ipfsUrl, name }) {
   return (
     <ImageItem sx={{ height: '100%' }}>
-      <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={name} loading="lazy" />
+      <NftImage ipfsUrl={ipfsUrl} name={name} />
       <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
         {name}
       </Typography>

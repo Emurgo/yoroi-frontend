@@ -53,7 +53,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
               textDecoration: 'none',
             }}
           >
-            NFTs ({nftsCount}) -&gt;{' '}
+            NFTs ({nftsCount}){' '}/{' '}
           </Typography>
           <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
             {nftInfo.name}
