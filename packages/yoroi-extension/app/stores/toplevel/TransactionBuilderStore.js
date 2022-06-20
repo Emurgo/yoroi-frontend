@@ -41,8 +41,6 @@ export type PlannedTxInfoMap = Array<{|
   token: $ReadOnly<TokenRow>,
   shouldSendAll?: boolean,
   amount?: string,
-  maxAmount?: string,
-  isValidAmount?: boolean,
 |}>
 
 /**
@@ -119,11 +117,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @computed get
-  minAda(): BigNumber {
+  minAda(): MultiToken {
     const plannedTxInfoMap = this.plannedTxInfoMap
     const publicDeriver = this.stores.wallets.selected;
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
+    if (!isCardanoHaskell(network)) return;
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
@@ -451,8 +450,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _addToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
-    maxAmount?: string,
-  |}) => void = ({ token, shouldReset, maxAmount }) => {
+  |}) => void = ({ token, shouldReset }) => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
@@ -460,7 +458,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const selectedToken = (
       token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     );
-    const tokensToAdd = [{ token: selectedToken, maxAmount }]
+    const tokensToAdd = [{ token: selectedToken }]
     if (shouldReset) {
       this.plannedTxInfoMap = tokensToAdd;
     } else {

@@ -463,8 +463,6 @@ class WalletSendPage extends Component<AllProps> {
   _getTokenFromTxInfo(token: $ReadOnly<TokenRow>) : {|
     token: $ReadOnly<TokenRow>,
     amount?: string,
-    maxAmount?: string,
-    isValidAmount?: boolean,
     shouldSendAll?: boolean,
   |} | void {
     const { transactionBuilderStore } = this.generated.stores;
@@ -614,7 +612,6 @@ class WalletSendPage extends Component<AllProps> {
           trigger: (params: {|
             token?: $ReadOnly<TokenRow>,
             shouldReset?: boolean,
-            maxAmount?: string,
           |}) => void
         |},
         deselectToken: {|
@@ -695,8 +692,6 @@ class WalletSendPage extends Component<AllProps> {
         plannedTxInfoMap: Array<{|
           token: $ReadOnly<TokenRow>,
           amount?: string,
-          maxAmount?: string,
-          isValidAmount?: boolean,
           shouldSendAll?: boolean,
         |}>,
       |},

@@ -112,7 +112,6 @@ type Props = {|
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
-    maxAmount?: string,
   |}) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,

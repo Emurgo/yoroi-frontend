@@ -40,7 +40,6 @@ type Props = {|
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
-    maxAmount?: string,
   |}) => void,
   +totalInput: ?MultiToken,
   +fee: ?MultiToken,
@@ -145,7 +144,7 @@ export default class AddNFTDialog extends Component<Props, State> {
     const amount = new BigNumber('1');
     for (const token of this.state.selectedTokens) {
       this.props.onAddToken({
-        token, shouldReset: false, maxAmount: amount.toString(),
+        token, shouldReset: false
       })
       this.props.updateAmount(amount)
     }

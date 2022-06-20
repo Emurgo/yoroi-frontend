@@ -61,7 +61,6 @@ type Props = {|
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
-    maxAmount?: string,
   |}) => void,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
   +getTokenAmount: ($ReadOnly<TokenRow>) => ?string,
@@ -197,7 +196,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     for (const { tokenInfo, amount } of this.state.selectedTokens) {
       if (!amount) continue
       this.props.onAddToken({
-            token: tokenInfo, shouldReset: false, maxAmount: this.getMaxAmount(tokenInfo),
+            token: tokenInfo, shouldReset: false
       })
 
       this.props.updateAmount(new BigNumber(amount))
@@ -233,7 +232,8 @@ export default class AddTokenDialog extends Component<Props, State> {
     for (const tokenEntry of this.state.selectedTokens) {
       if (
         !this.isValidAmount(tokenEntry.tokenInfo) ||
-        !tokenEntry.amount
+        !tokenEntry.amount ||
+        Number(tokenEntry.amount) === 0
       ) return false;
     }
     return true

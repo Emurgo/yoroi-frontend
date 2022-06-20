@@ -15,7 +15,6 @@ export default class TxBuilderActions {
   addToken: Action<{|
     token?: $ReadOnly<TokenRow>,
     shouldReset?: boolean,
-    maxAmount?: string,
   |}> = new Action();
   deselectToken: Action<void> = new Action();
   removeToken: Action<void | $ReadOnly<TokenRow>> = new Action();
