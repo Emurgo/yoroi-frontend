@@ -64,7 +64,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
               : intl.formatMessage(messages.nftsCount, { number: nftsCount })}
           </Typography>
           <Typography variant="h5" color='var(--yoroi-palette-gray-900)' marginX='8px'>/</Typography>
-          <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-600)" ml="4px">
+          <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-600)">
             {nftInfo.name}
           </Typography>
         </Typography>
