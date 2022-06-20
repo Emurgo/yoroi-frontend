@@ -18,7 +18,7 @@ import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/image
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../../assets/images/assets-page/info.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
-import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg'
 import SingleTokenRow from './SingleTokenRow';
 import { Button } from '@mui/material';
 import type {
@@ -109,9 +109,9 @@ export const messages: Object = defineMessages({
     id: 'wallet.assets.search',
     defaultMessage: '!!!Search',
   },
-  noAssetFound: {
-    id: 'wallet.assets.noAssetFound',
-    defaultMessage: '!!!No Asset Found',
+  noTokensFound: {
+    id: 'wallet.send.form.dialog.noTokensFound',
+    defaultMessage: '!!!No tokens found',
   },
   noTokensYet: {
     id: 'wallet.send.form.dialog.noTokensYet',
@@ -352,7 +352,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                 <NoItemsFoundImg />
                 <h1 className={styles.text}>
                   {intl.formatMessage(
-                    fullTokensList.length === 0 ? messages.noTokensYet : messages.noAssetFound
+                    fullTokensList.length === 0 ? messages.noTokensYet : messages.noTokensFound
                   )}
                 </h1>
               </div>

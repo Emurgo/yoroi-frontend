@@ -47,6 +47,7 @@ import type { FormattedNFTDisplay, FormattedTokenDisplay, } from '../../../utils
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -89,10 +90,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.willSendAll',
     defaultMessage: '!!!Will Send All Tokens!'
   },
-  amountMinAdaIncluded: {
-    id: 'wallet.send.form.revamp.amountMinAdaIncluded',
-    defaultMessage: '!!!Amount (includes min-ADA)'
-  },
   transactionFee: {
     id: 'wallet.send.form.revamp.transactionFee',
     defaultMessage: '!!!Transaction fee',
@@ -109,13 +106,9 @@ const messages = defineMessages({
     id: 'wallet.send.form.max',
     defaultMessage: '!!!MAX',
   },
-  minAdaLabel: {
-    id: 'wallet.send.form.amount.minAdaLabel',
-    defaultMessage: '!!!Min ADA'
-  },
   minimumRequiredADA: {
     id: 'wallet.send.form.amount.minimumRequiredADA',
-    defaultMessage: '!!!The minimum required is 1 ADA'
+    defaultMessage: '!!!The minimum required is {number} ADA'
   }
 });
 
@@ -319,13 +312,8 @@ export default class WalletSendForm extends Component<Props, State> {
             amountValue,
             this.getNumDecimals(),
           ));
-          const isValidAmount = await this.validateDefaultTokenAmount(formattedAmount);
-          if (isValidAmount[0]) {
-            this.props.updateAmount(formattedAmount);
-          } else {
-            this.props.updateAmount();
-          }
-          return isValidAmount;
+          this.props.updateAmount(formattedAmount);
+          return [true, null];
         }],
       }
     },
@@ -384,13 +372,21 @@ export default class WalletSendForm extends Component<Props, State> {
     return [tokens, nfts]
   }
 
-  renderMinAda(): string {
-    const { totalInput, fee, isCalculatingFee } = this.props
-    if (isCalculatingFee) return '...';
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    if (!totalInput || !fee) return '0.0';
-    const amount = totalInput.joinSubtractCopy(fee);
-    return formatValue(amount.getDefaultEntry());
+  getError() {
+    const { error, minAda, getTokenInfo } = this.props;
+    let errMsg; let values;
+    if (!error) return;
+    if (error instanceof CannotSendBelowMinimumValueError) {
+      const formatValue = genFormatTokenAmount(getTokenInfo);
+      const amount = formatValue(minAda.getDefaultEntry());
+      errMsg = messages.minimumRequiredADA;
+      values = { number: amount }
+    } else {
+      errMsg = error;
+      values = error.values;
+    }
+
+    return this.context.intl.formatMessage(errMsg, values);
   }
 
   renderCurrentStep(step: number): Node {
@@ -400,17 +396,15 @@ export default class WalletSendForm extends Component<Props, State> {
     const {
       shouldSendAll,
       isCalculatingFee,
-      error,
       getTokenInfo,
       isDefaultIncluded,
-      plannedTxInfoMap
     } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
     const formatValue = genFormatTokenAmount(getTokenInfo);
 
-    const transactionFeeError = error && intl.formatMessage(error, error.values);
+    const transactionFeeError = this.getError();
 
     const transactionFee = this.props.fee ?? new MultiToken([], {
       defaultIdentifier: this.props.defaultToken.Identifier,
@@ -565,15 +559,6 @@ export default class WalletSendForm extends Component<Props, State> {
                     {intl.formatMessage(messages.max)}
                   </Button>
                 </div>
-                {isCardanoHaskell(this.props.selectedNetwork) &&
-                 !isDefaultIncluded && plannedTxInfoMap.length > 0 && (
-                 <div className={styles.minAda}>
-                   <p className={styles.value}>{this.renderMinAda()}</p>
-                   <p className={styles.lable}>
-                     {intl.formatMessage(messages.minAdaLabel)}
-                   </p>
-                 </div>
-                 )}
                 {this.props.unitOfAccountSetting.enabled && (
                 <div className={styles.fiat}>
                   {this.renderUnitOfAccountAmount(amountFieldProps.value)}

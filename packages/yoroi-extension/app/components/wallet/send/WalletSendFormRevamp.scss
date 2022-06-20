@@ -136,27 +136,6 @@
                     margin-right: 12px;
                 }
 
-                .minAda {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding-top: 16px;
-                    margin: 16px 16px 0px 16px;
-                    border-top: 1px solid var(--yoroi-palette-gray-200);
-                    .value {
-                        color: var(--yoroi-palette-gray-600);
-                        line-height: 24px;
-                    }
-
-                    .label {
-                        color: #6B7384;
-                        font-size: 14px;
-                        font-weight: 500;
-                        letter-spacing: 0.5px;
-                        letter-spacing: 0;
-                    }
-                }
-
                 .fiat {
                     margin: 16px 16px 0px 16px;
                     padding-top: 16px;
@@ -178,7 +157,7 @@
             }
 
             .amountInputError {
-                border: 1px solid #FF1351;
+                border: 2px solid var(--yoroi-palette-error-100);
             }
 
             .disabled {

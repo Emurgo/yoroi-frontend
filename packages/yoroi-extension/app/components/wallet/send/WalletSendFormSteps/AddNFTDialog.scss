@@ -65,6 +65,7 @@
             letter-spacing: 0;
             line-height: 26px;
             text-align: center;
+            margin-top: 16px;
         }
 
     }
@@ -84,7 +85,7 @@
             width: 180px;
             height: 250px;
             overflow: hidden;
-            border: 1.5px solid #EAEDF2;
+            border: 1px solid var(--yoroi-palette-gray-50);
             border-radius: 8px;
             background-color: #FFFFFF;
             img, svg {
@@ -110,6 +111,7 @@
 
         .selected {
             border: 1px solid var(--yoroi-palette-secondary-300);
+            transition: border 100ms;
         }
     }
 }

@@ -3,6 +3,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 25px;
     margin-top: 45px;
+    margin-bottom: 30px;
 
     .header {
         color: var(--var-yoroi-gray-900);
@@ -25,7 +26,7 @@
             height: 55px;
             color: #242838;
             line-height: 24px;
-            border: 1.5px solid #F0F3F5;
+            border: 2px solid var(--yoroi-palette-gray-50);
             border-radius: 8px;
             padding: 12px 16px;
 
@@ -49,7 +50,7 @@
     .remove {
         height: 32px;
         width: 32px;
-        background-color: #F0F3F5;
+        background-color: var(--yoroi-palette-gray-50);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -76,7 +77,7 @@
             height: 55px;
             color: #242838;
             line-height: 24px;
-            border: 1.5px solid #F0F3F5;
+            border: 2px solid var(--yoroi-palette-gray-50);
             border-radius: 8px;
             padding: 12px 16px;
 

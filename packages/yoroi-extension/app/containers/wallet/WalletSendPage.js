@@ -178,6 +178,7 @@ class WalletSendPage extends Component<AllProps> {
             isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
             reset={txBuilderActions.reset.trigger}
             error={transactionBuilderStore.createUnsignedTx.error}
+            minAda={transactionBuilderStore.minAda}
             uriParams={this.generated.stores.loading.uriParams}
             resetUriParams={this.generated.stores.loading.resetUriParams}
             showMemo={this.showMemo}
@@ -778,6 +779,7 @@ class WalletSendPage extends Component<AllProps> {
         transactionBuilderStore: {
           totalInput: stores.transactionBuilderStore.totalInput,
           fee: stores.transactionBuilderStore.fee,
+          minAda: stores.transactionBuilderStore.minAda,
           shouldSendAll: stores.transactionBuilderStore.shouldSendAll,
           tentativeTx: stores.transactionBuilderStore.tentativeTx,
           txMismatch: stores.transactionBuilderStore.txMismatch,

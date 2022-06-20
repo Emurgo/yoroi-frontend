@@ -12,7 +12,7 @@ import {
   MultiToken,
 } from '../../../../api/common/lib/MultiToken';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-nfts.inline.svg';
 import { getNFTs } from '../../../../utils/wallet';
 import type { FormattedNFTDisplay } from '../../../../utils/wallet';
 import BigNumber from 'bignumber.js';
@@ -73,12 +73,12 @@ export const messages: Object = defineMessages({
     id: 'wallet.assets.search',
     defaultMessage: '!!!Search',
   },
-  noAssetFound: {
-    id: 'wallet.assets.noAssetFound',
-    defaultMessage: '!!!No Asset Found',
+  noNFTsFound: {
+    id: 'wallet.send.form.dialog.noNFTsFound',
+    defaultMessage: '!!!No NFTs found',
   },
-  noTokensYet: {
-    id: 'wallet.send.form.dialog.noNFTYet',
+  noNFTsYet: {
+    id: 'wallet.send.form.dialog.noNFTsYet',
     defaultMessage: '!!!There are no NFTs in your wallet yet'
   },
   add: {
@@ -210,7 +210,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                 <NoItemsFoundImg />
                 <h1 className={styles.text}>
                   {intl.formatMessage(
-                    fullNftsList.length === 0 ? messages.noTokensYet : messages.noAssetFound
+                    fullNftsList.length === 0 ? messages.noNFTsYet : messages.noNFTsFound
                   )}
                 </h1>
               </div>
@@ -219,7 +219,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                 <div className={styles.nftsGrid}>
                   {
                     currentNftsList.map(nft => {
-                      const isInclude = this.isTokenIncluded(nft.info)
+                      const isIncluded = this.isTokenIncluded(nft.info)
                       return (
                         <button
                           type="button"
@@ -227,7 +227,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                           className={
                           classnames([
                             styles.nftCard,
-                            isInclude && styles.selected])
+                            isIncluded && styles.selected])
                           }
                           onClick={() => this.onSelect(nft.info)}
                         >

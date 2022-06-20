@@ -34,6 +34,7 @@ import { Button } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
+import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +staleTx: boolean,
@@ -107,7 +108,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
           password: walletPassword,
         };
         try {
-
           await this.props.onSubmit(transactionData);
         } catch (error) {
           const errorMessage = this.context.intl.formatMessage(error, error.values)
@@ -222,6 +222,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
       amount,
       receivers,
       isSubmitting,
+      selectedNetwork
     } = this.props;
     const { passwordError, txError } = this.state;
 
@@ -274,7 +275,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
             />)}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(globalMessages.amountWithMinADA)}
+                {intl.formatMessage(
+                  isCardanoHaskell(selectedNetwork) ?
+                    globalMessages.amountWithMinADA : globalMessages.amountLabel
+                )}
               </div>
               <div className={styles.amountValue}>
                 {this.renderSingleAmount(amount.getDefaultEntry())}
