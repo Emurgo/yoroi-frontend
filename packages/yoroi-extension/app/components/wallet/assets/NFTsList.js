@@ -13,13 +13,13 @@ import {
 } from '@mui/material';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
+import { ReactComponent as NotFound }  from '../../../assets/images/assets-page/no-nft-found.inline.svg';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { useState, useEffect } from 'react';
-import { ListEmpty } from './ListEmpty';
 
 type Props = {|
   list: Array<{| name: string, image: string | void |}> | void,
@@ -32,6 +32,10 @@ const messages = defineMessages({
   noResultsFound: {
     id: 'wallet.assets.nft.noResultsFound',
     defaultMessage: '!!!No NFTs found',
+  },
+  noNFTsAdded: {
+    id: 'wallet.nftGallary.noNFTsAdded',
+    defaultMessage: '!!!No NFTs added to your wallet',
   },
   searchNFTs: {
     id: 'wallet.nftGallary.search',
@@ -49,7 +53,7 @@ const getDefaultColumnsView = () => listColumnViews[1];
 function NfTsList({ list, intl }: Props & Intl): Node {
   if (list == null) return null;
   const [columns, setColumns] = useState(getDefaultColumnsView());
-  const [nftList, setNftList] = useState(list);
+  const [nftList, setNftList] = useState([...list]);
 
   const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
     event: SyntheticEvent<HTMLInputElement>
@@ -96,7 +100,20 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         </Box>
       </Box>
       {!nftList.length ? (
-        <ListEmpty message={intl.formatMessage(messages.noResultsFound)} />
+        <Stack
+          sx={{
+            height: '90%',
+            flex: '1',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          spacing={2}
+        >
+          <NotFound />
+          <Typography variant="h3" color="var(--yoroi-palette-gray-900)">
+            {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
+          </Typography>
+        </Stack>
       ) : (
         <ImageList sx={{ width: '100%' }} cols={columns.count} rowHeight="100%" gap={columns.gap}>
           {nftList.map(nft => {
