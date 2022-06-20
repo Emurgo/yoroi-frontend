@@ -23,7 +23,6 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { UriParams } from '../../../../utils/URIHandling';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
     +token: FormattedTokenDisplay,
@@ -31,16 +30,9 @@ type Props = {|
     +updateAmount: (?BigNumber) => void,
     +uriParams: ?UriParams,
     +selectedToken: void | $ReadOnly<TokenRow>,
-    +validateAmount: (
-      amountInNaturalUnits: BigNumber,
-      tokenRow: $ReadOnly<TokenRow>,
-    ) => Promise<[boolean, void | string]>,
-    +defaultToken: $ReadOnly<TokenRow>,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +fee: ?MultiToken,
-    +isCalculatingFee: boolean,
     +error: ?LocalizableError,
-    +totalInput: ?MultiToken,
     +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
     +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
     +onAddToken: $ReadOnly<TokenRow> => void,
@@ -73,8 +65,6 @@ export default class SingleTokenRow extends Component<Props, State> {
     if (amount) {
       amount = new BigNumber(this.props.getTokenAmount(this.props.token.info))
       .shiftedBy(-this.getNumDecimals()).toString();
-
-      console.log({amount: amount.toString()})
     }
     this.setState({ amount });
   }

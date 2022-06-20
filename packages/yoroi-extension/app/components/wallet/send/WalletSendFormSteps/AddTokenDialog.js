@@ -32,7 +32,6 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
-import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
@@ -48,14 +47,7 @@ type Props = {|
   +updateAmount: (?BigNumber) => void,
   +uriParams: ?UriParams,
   +selectedToken: void | $ReadOnly<TokenRow>,
-  +validateAmount: (
-    amountInNaturalUnits: BigNumber,
-    tokenRow: $ReadOnly<TokenRow>,
-  ) => Promise<[boolean, void | string]>,
   +defaultToken: $ReadOnly<TokenRow>,
-  +fee: ?MultiToken,
-  +totalInput: ?MultiToken,
-  +isCalculatingFee: boolean,
   +error: ?LocalizableError,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
@@ -65,7 +57,6 @@ type Props = {|
   |}) => void,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
   +getTokenAmount: ($ReadOnly<TokenRow>) => ?string,
-  +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
 type State = {|
@@ -120,7 +111,11 @@ export const messages: Object = defineMessages({
   add: {
     id: 'wallet.send.form.dialog.add',
     defaultMessage: '!!!add'
-  }
+  },
+  minAda: {
+    id: 'wallet.send.form.dialog.minAda',
+    defaultMessage: '!!!Min-ADA: {minAda}'
+},
 });
 
 @observer
@@ -145,59 +140,59 @@ export default class AddTokenDialog extends Component<Props, State> {
     error: false,
   };
 
-  onSelect: $ReadOnly<TokenRow> => void = (tokenInfo) => {
-    this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, { tokenInfo }] }))
+  onSelect: $ReadOnly<TokenRow> => void = (token) => {
+    this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, { token }] }))
   }
 
-  onRemoveToken = (tokenInfo) => {
+  onRemoveToken = (token) => {
     this.setState(prev => ({ ...prev,  selectedTokens: [...prev.selectedTokens].filter(
-      ({ tokenInfo: t }) => t.Identifier !== tokenInfo.Identifier) }))
-    this.props.onRemoveToken(tokenInfo)
+      ({ token: t }) => t.Identifier !== token.Identifier) }))
+    this.props.onRemoveToken(token)
   }
 
-  isTokenIncluded = (tokenInfo) => {
+  isTokenIncluded = (token) => {
     const isIncluded = this.state.selectedTokens.find(
-      ({ tokenInfo: t }) => t.Identifier === tokenInfo?.Identifier
+      ({ token: t }) => t.Identifier === token?.Identifier
     )
-    return isIncluded || this.props.isTokenIncluded(tokenInfo)
+    return isIncluded || this.props.isTokenIncluded(token)
   }
 
-  updateAmount = (tokenInfo, amount) => {
+  updateAmount = (token, amount) => {
     const tokenEntry = this.state.selectedTokens.find(
-      ({ tokenInfo: t }) => t.Identifier === tokenInfo.Identifier
+      ({ token: t }) => t.Identifier === token.Identifier
     )
 
     const tokenEntryCopy = { ...tokenEntry };
     tokenEntryCopy.amount = amount;
-    tokenEntryCopy.tokenInfo = tokenInfo;
+    tokenEntryCopy.tokenInfo = token;
 
     const filteredTokens = this.state.selectedTokens.filter(
-      ({ tokenInfo: t }) => t.Identifier !== tokenInfo.Identifier
+      ({ token: t }) => t.Identifier !== token.Identifier
     );
 
     this.setState({ selectedTokens: [...filteredTokens, tokenEntryCopy] });
   }
 
-  getCurrentAmount = (tokenInfo) => {
-    const token = this.getSelectedToken(tokenInfo);
+  getCurrentAmount = (token) => {
+    const tokenEntry = this.getSelectedToken(token);
 
-    if (!token) return this.props.getTokenAmount(tokenInfo);
+    if (!tokenEntry) return this.props.getTokenAmount(token);
 
-    return token.amount;
+    return tokenEntry.amount;
   }
 
-  getSelectedToken = (tokenInfo) => {
+  getSelectedToken = (token) => {
     return this.state.selectedTokens.find(
-      ({ tokenInfo: t }) => t.Identifier === tokenInfo.Identifier
+      ({ token: t }) => t.Identifier === token.Identifier
     )
   }
 
 
   onAddAll = () => {
-    for (const { tokenInfo, amount } of this.state.selectedTokens) {
+    for (const { token, amount } of this.state.selectedTokens) {
       if (!amount) continue
       this.props.onAddToken({
-            token: tokenInfo, shouldReset: false
+            token, shouldReset: false
       })
 
       this.props.updateAmount(new BigNumber(amount))
@@ -219,13 +214,13 @@ export default class AddTokenDialog extends Component<Props, State> {
     return amount
   }
 
-  isValidAmount = (tokenInfo) => {
-    const token = this.state.selectedTokens.find(
-      ({ tokenInfo: t }) => t.Identifier === tokenInfo.Identifier
+  isValidAmount = (token) => {
+    const tokenEntry = this.state.selectedTokens.find(
+      ({ token: t }) => t.Identifier === token.Identifier
     )
 
-    if (token) {
-      const maxAmount = this.getMaxAmount(tokenInfo);
+    if (tokenEntry) {
+      const maxAmount = this.getMaxAmount(token);
       if (maxAmount.lt(token.amount || 0) || token.amount < 0) {
         return false
       }
@@ -236,7 +231,7 @@ export default class AddTokenDialog extends Component<Props, State> {
   isValidAmounts = () => {
     for (const tokenEntry of this.state.selectedTokens) {
       if (
-        !this.isValidAmount(tokenEntry.tokenInfo) ||
+        !this.isValidAmount(tokenEntry.token) ||
         !tokenEntry.amount ||
         Number(tokenEntry.amount) === 0
       ) return false;
@@ -295,28 +290,17 @@ export default class AddTokenDialog extends Component<Props, State> {
     return <ArrowsList />;
   }
 
-  renderMinAda(): string {
-    const { totalInput, fee, isCalculatingFee } = this.props
-    if (isCalculatingFee) return '...';
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    if (!totalInput || !fee) return '0.0';
-    const amount = totalInput.joinSubtractCopy(fee);
-    return formatValue(amount.getDefaultEntry());
-  }
-
   render(): Node {
     const { intl } = this.context;
     const {
       onClose,
-      totalInput,
-      fee,
-      isCalculatingFee,
-      getTokenInfo,
       maxAssetsAllowed,
-      numOfTokensIncluded
+      numOfTokensIncluded,
+      calculateMinAda,
     } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
-    const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed
+    const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed;
+
     return (
       <Dialog
         title={
@@ -340,10 +324,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda
-              totalInput={totalInput}
-              fee={fee}
-              isCalculatingFee={isCalculatingFee}
-              getTokenInfo={getTokenInfo}
+              minAda={calculateMinAda(selectedTokens)}
             />
           </div>
           )}
@@ -398,15 +379,11 @@ export default class AddTokenDialog extends Component<Props, State> {
                       getTokenAmount={this.getCurrentAmount}
                       uriParams={this.props.uriParams}
                       selectedToken={this.props.selectedToken}
-                      validateAmount={this.props.validateAmount}
                       defaultToken={this.props.defaultToken}
                       getTokenInfo={this.props.getTokenInfo}
                       onAddToken={this.onSelect}
                       onRemoveToken={this.onRemoveToken}
-                      fee={this.props.fee}
                       error={this.props.error}
-                      isCalculatingFee={this.props.isCalculatingFee}
-                      totalInput={this.props.totalInput}
                       isTokenIncluded={this.isTokenIncluded}
                       isValidAmount={this.isValidAmount}
                     />

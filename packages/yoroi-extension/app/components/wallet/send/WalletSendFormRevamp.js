@@ -346,12 +346,18 @@ export default class WalletSendForm extends Component<Props, State> {
     const { plannedTxInfoMap } = this.props;
     const tokens = plannedTxInfoMap.filter(
       ({ token }) => !token.IsNFT && !token.IsDefault
-    ).map(({ token, amount }) => ({
-      label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
-      amount,
-      info: token,
-      id: (getTokenIdentifierIfExists(token) ?? '-'),
-    }));
+    ).map(({ token, amount }) => {
+      const formattedAmount = (new BigNumber(amount))
+        .shiftedBy(-token.Metadata.numberOfDecimals)
+        .decimalPlaces(token.Metadata.numberOfDecimals)
+        .toString()
+      return {
+        label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
+        amount: formattedAmount,
+        info: token,
+        id: (getTokenIdentifierIfExists(token) ?? '-'),
+      };
+    });
 
     const nfts = plannedTxInfoMap.filter(
       ({ token }) => token.IsNFT
@@ -387,7 +393,7 @@ export default class WalletSendForm extends Component<Props, State> {
   }
 
   renderCurrentStep(step: number): Node {
-    const { form } = this
+    const { form } = this;
     const { intl } = this.context;
     const { showMemoWarning, invalidMemo } = this.state
     const {
@@ -420,7 +426,6 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const amountInputError = transactionFeeError || amountField.error
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
-    console.log({val: amountFieldProps.value})
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (

@@ -8,8 +8,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as NoAssetLogo  }from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as RemoveIcon  }from '../../../../assets/images/forms/close-small.inline.svg';
-import { ReactComponent as DefaultNFTIcon  }from '../../../../assets/images/nft-no.inline.svg';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import NFTImage from './NFTImage';
 
 type Props = {|
   +shouldSendAll: boolean,
@@ -46,13 +46,11 @@ export default class IncludedTokens extends Component<Props> {
     renderNfts(nfts: FormattedNFTDisplay[]): Node {
       return (
         nfts.map(nft => {
-          const image = nft.image != null ? nft.image.replace('ipfs://', '') : '';
-
           return (
             <div className={styles.nftRow} key={nft.name}>
               <div className={styles.nft}>
                 <div className={styles.nftImg}>
-                  {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <DefaultNFTIcon />}
+                  <NFTImage image={nft.image} name={nft.name} width={36} height={40} />
                 </div>
                 <p className={styles.name}>{nft.name}</p>
               </div>

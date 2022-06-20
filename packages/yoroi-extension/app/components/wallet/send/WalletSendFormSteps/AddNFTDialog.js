@@ -35,17 +35,13 @@ type Props = {|
   +classicTheme: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
-  +defaultToken: $ReadOnly<TokenRow>,
   +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}) => void,
-  +totalInput: ?MultiToken,
-  +fee: ?MultiToken,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
-  +isCalculatingFee: boolean,
 |};
 
 type State = {|
@@ -156,12 +152,9 @@ export default class AddNFTDialog extends Component<Props, State> {
     const { intl } = this.context;
     const {
       onClose,
-      totalInput,
-      fee,
-      isCalculatingFee,
-      getTokenInfo,
       numOfTokensIncluded,
-      maxAssetsAllowed
+      maxAssetsAllowed,
+      calculateMinAda,
     } = this.props
     const { currentNftsList, fullNftsList, selectedTokens } = this.state
     const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed
@@ -190,10 +183,7 @@ export default class AddNFTDialog extends Component<Props, State> {
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda
-              totalInput={totalInput}
-              fee={fee}
-              isCalculatingFee={isCalculatingFee}
-              getTokenInfo={getTokenInfo}
+              minAda={calculateMinAda(selectedTokens.map(token => ({ token })))}
             />
           </div>
          )}

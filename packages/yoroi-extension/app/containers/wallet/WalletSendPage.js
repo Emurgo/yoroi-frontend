@@ -120,6 +120,19 @@ class WalletSendPage extends Component<AllProps> {
     });
   }
 
+  _getNumDecimals(): number {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+    const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
+    const info = getTokenInfo({
+      identifier: defaultToken.Identifier,
+      networkId: defaultToken.NetworkId,
+    });
+    return info.Metadata.numberOfDecimals;
+  }
+
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
@@ -487,6 +500,16 @@ class WalletSendPage extends Component<AllProps> {
     return null;
   }
 
+  calculateMinAda = (selectedTokens) => {
+    const { transactionBuilderStore } = this.generated.stores;
+    const { plannedTxInfoMap, calculateMinAda } = transactionBuilderStore
+    const minAdaAmount = calculateMinAda(
+      [...plannedTxInfoMap, ...selectedTokens].map(({ token }) => ({ token }))
+    )
+
+    return (new BigNumber(minAdaAmount)).shiftedBy(-this._getNumDecimals()).toString()
+  }
+
   renderNFTDialog: void => Node = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
@@ -494,9 +517,6 @@ class WalletSendPage extends Component<AllProps> {
     const { transactionBuilderStore } = this.generated.stores;
     const { txBuilderActions } = this.generated.actions;
 
-    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-      publicDeriver.getParent().getNetworkInfo().NetworkId
-    );
     return (
       <AddNFTDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
@@ -504,16 +524,13 @@ class WalletSendPage extends Component<AllProps> {
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         classicTheme={this.generated.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-        defaultToken={defaultToken}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
         isTokenIncluded={this.isTokenIncluded}
         maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
         numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
-        fee={transactionBuilderStore.fee}
-        totalInput={transactionBuilderStore.totalInput}
-        isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+        calculateMinAda={this.calculateMinAda}
       />
     )
   }
@@ -524,10 +541,6 @@ class WalletSendPage extends Component<AllProps> {
 
     const { transactionBuilderStore } = this.generated.stores;
     const { txBuilderActions } = this.generated.actions;
-
-    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-      publicDeriver.getParent().getNetworkInfo().NetworkId
-    );
 
     return (
       <AddTokenDialog
@@ -541,19 +554,10 @@ class WalletSendPage extends Component<AllProps> {
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         uriParams={this.generated.stores.loading.uriParams}
         selectedToken={transactionBuilderStore.selectedToken}
-        validateAmount={(amount) => validateAmount(
-          amount,
-          transactionBuilderStore.selectedToken ?? defaultToken,
-          getMinimumValue(
-            publicDeriver.getParent().getNetworkInfo(),
-            transactionBuilderStore.selectedToken?.IsDefault ?? true
-          ),
-          this.context.intl,
-        )}
-        defaultToken={defaultToken}
         fee={transactionBuilderStore.fee}
         totalInput={transactionBuilderStore.totalInput}
         isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+        calculateMinAda={this.calculateMinAda}
         error={transactionBuilderStore.createUnsignedTx.error}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
@@ -561,11 +565,6 @@ class WalletSendPage extends Component<AllProps> {
         isTokenIncluded={this.isTokenIncluded}
         maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
         numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
-        isValidAmount={(token) => {
-          const tokenInfo = this._getTokenFromTxInfo(token);
-          if (!tokenInfo || !tokenInfo.amount) return true
-          return tokenInfo.isValidAmount === true;
-        }}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
       />
     )
@@ -786,6 +785,7 @@ class WalletSendPage extends Component<AllProps> {
           selectedToken: stores.transactionBuilderStore.selectedToken,
           plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap,
           maxAssetsAllowed: stores.transactionBuilderStore.maxAssetsAllowed,
+          calculateMinAda: stores.transactionBuilderStore.calculateMinAda,
         },
         substores: {
           ada: {

@@ -129,7 +129,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       // Should be rounded to be 1 ADA
       minAmount = String(1_000_000);
     } else {
-      minAmount = this._minAda(this.plannedTxInfoMap.map(({ token }) => ({ token })));
+      minAmount = this.calculateMinAda(this.plannedTxInfoMap.map(({ token }) => ({ token })));
     }
 
     return new MultiToken([{
@@ -223,7 +223,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return true;
   }
 
-  _minAda: (tokens:{| token: $ReadOnly<TokenRow> |}) => string = (tokens) => {
+  calculateMinAda: (tokens:{| token: $ReadOnly<TokenRow> |}) => string = (tokens) => {
     const publicDeriver = this.stores.wallets.selected;
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
