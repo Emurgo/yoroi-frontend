@@ -626,6 +626,7 @@
   "wallet.nowallet.subtitle": "Please select a wallet from the dropdown menu on the top right.",
   "wallet.nowallet.title": "No wallet selected.",
   "wallet.nftGallary.title": "NFT Gallary",
+  "wallet.nftGallary.search": "Search NFTs",
   "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Verify address",
   "wallet.receive.confirmationDialog.addressLabel": "Address",

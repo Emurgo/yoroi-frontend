@@ -1,17 +1,16 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import { Box, minHeight, styled } from '@mui/system';
+import { Box, styled } from '@mui/system';
 import {
   IconButton,
   ImageList,
   ImageListItem,
-  Input,
   InputAdornment,
   Stack,
   Typography,
-  Skeleton
+  Skeleton,
+  OutlinedInput
 } from '@mui/material';
-import { assetsMessage } from './AssetsList';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
 
@@ -34,6 +33,10 @@ const messages = defineMessages({
     id: 'wallet.assets.nft.noResultsFound',
     defaultMessage: '!!!No NFTs found',
   },
+  searchNFTs: {
+    id: 'wallet.nftGallary.search',
+    defaultMessage: '!!!Search NFTs'
+  }
 });
 
 const listColumnViews = [
@@ -59,7 +62,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
   };
 
   return (
-    <Box>
+    <Box sx={{ height: '100%' }}>
       <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px">
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
           NFTs ({list.length})
@@ -83,7 +86,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           <SearchInput
             disableUnderline
             onChange={search}
-            placeholder={intl.formatMessage(assetsMessage.search)}
+            placeholder={intl.formatMessage(messages.searchNFTs)}
             startAdornment={
               <InputAdornment position="start">
                 <Search />
@@ -160,7 +163,7 @@ function NftCardImage({ ipfsUrl, name }) {
   );
 }
 
-const SearchInput = styled(Input)({
+const SearchInput = styled(OutlinedInput)({
   border: '1px solid var(--yoroi-palette-gray-300)',
   borderRadius: '8px',
   width: '370px',
