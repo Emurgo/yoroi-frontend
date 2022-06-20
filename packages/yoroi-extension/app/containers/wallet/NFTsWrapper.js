@@ -16,12 +16,11 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import globalMessages from '../../i18n/global-messages';
 import SidebarContainer from '../SidebarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import { buildRoute } from '../../utils/routing';
-import AssetsMenu from '../../components/wallet/assets/AssetsMenu';
 import { matchPath } from 'react-router';
 
 export type GeneratedData = typeof NFTsWrapper.prototype.generated;
@@ -29,6 +28,13 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children?: Node,
 |};
+
+const messages = defineMessages({
+  NFTGallery: {
+    id: 'wallet.nftGallary.title',
+    defaultMessage: '!!!NFT Gallary',
+  },
+})
 @observer
 export default class NFTsWrapper extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -50,19 +56,10 @@ export default class NFTsWrapper extends Component<Props> {
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AssetsWrapper)}.`);
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(NFTsWrapper)}.`);
 
     const { intl } = this.context;
-    const { actions } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
-
-    const menu = (
-      <AssetsMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={this.isActivePage}
-      />
-    );
-
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -70,7 +67,7 @@ export default class NFTsWrapper extends Component<Props> {
         navbar={
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarNfts)} />}
+            title={<NavBarTitle title={intl.formatMessage(messages.NFTGallery)} />}
           />
         }
         showInContainer
