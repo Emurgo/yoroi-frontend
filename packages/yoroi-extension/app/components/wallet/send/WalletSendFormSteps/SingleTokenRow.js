@@ -2,8 +2,12 @@
 import { Component } from 'react';
 import type { Node } from 'react'
 import styles from './SingleTokenRow.scss'
-import { ReactComponent as NoAssetLogo} from '../../../../assets/images/assets-page/asset-no.inline.svg';
-import { truncateAddressShort } from '../../../../utils/formatters';
+import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
+import {
+  truncateAddressShort,
+  formattedAmountToNaturalUnits,
+  formattedAmountToBigNumber,
+} from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
@@ -19,6 +23,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { UriParams } from '../../../../utils/URIHandling';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../../i18n/LocalizableError';
+import { genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
     +token: FormattedTokenDisplay,
@@ -64,7 +69,14 @@ export default class SingleTokenRow extends Component<Props, State> {
   }
 
   componentDidMount() {
-    this.setState({ amount: this.props.getTokenAmount(this.props.token.info) })
+    let amount = this.props.getTokenAmount(this.props.token.info)
+    if (amount) {
+      amount = new BigNumber(this.props.getTokenAmount(this.props.token.info))
+      .shiftedBy(-this.getNumDecimals()).toString();
+
+      console.log({amount: amount.toString()})
+    }
+    this.setState({ amount });
   }
 
   getNumDecimals(): number {
@@ -72,13 +84,21 @@ export default class SingleTokenRow extends Component<Props, State> {
   }
 
   onAmountUpdate(value: string): void {
-    this.setState({ amount: value }) // Todo: remove local state
-    this.props.updateAmount(this.props.token.info, value);
+    let formattedAmount = value
+    if (value) {
+      formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
+        value,
+        this.getNumDecimals(),
+      ));
+    }
+    this.setState({ amount: value });
+    this.props.updateAmount(this.props.token.info, formattedAmount);
   }
 
   render(): Node {
     const { intl } = this.context;
     const { token, isValidAmount } = this.props;
+    const { amount } = this.state;
 
     return (
       <div className={styles.component}>
@@ -99,8 +119,10 @@ export default class SingleTokenRow extends Component<Props, State> {
             </div>
             <div className={styles.amountInput}>
               <AmountInputRevamp
-                value={this.state.amount}
+                value={!amount ? null
+                : formattedAmountToBigNumber(amount)}
                 onChange={this.onAmountUpdate.bind(this)}
+                decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp
                 placeholder='0.0'
               />

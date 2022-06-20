@@ -361,7 +361,7 @@ export default class WalletSendForm extends Component<Props, State> {
       return {
           name,
           // $FlowFixMe[prop-missing]
-          image: token.Metadata.assetMintMetadata?.[0]['721'][policyId][name]?.image,
+          image: token.Metadata.assetMintMetadata?.[0]?.['721']?.[policyId]?.[name]?.image,
           info: token,
       };
     });
@@ -420,7 +420,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const amountInputError = transactionFeeError || amountField.error
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
-
+    console.log({val: amountFieldProps.value})
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (

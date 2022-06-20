@@ -118,40 +118,18 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   @computed get
   minAda(): MultiToken {
-    const plannedTxInfoMap = this.plannedTxInfoMap
     const publicDeriver = this.stores.wallets.selected;
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return;
-    const fullConfig = getCardanoHaskellBaseConfig(network);
-    const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
-    const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
 
     let minAmount;
     if (this.isDefaultIncluded && this.plannedTxInfoMap.length === 1) {
       // When sending only ADA the min amount is  0.999978 ADA
       // Should be rounded to be 1 ADA
-      minAmount = '1000000';
+      minAmount = String(1_000_000);
     } else {
-      const fakeMultitoken = new MultiToken(
-        [{
-          identifier: defaultToken.Identifier,
-          networkId: defaultToken.NetworkId,
-          amount: fakeAmount,
-        },
-        ...plannedTxInfoMap.filter(({ token }) => !token.IsDefault).map(({ token }) => ({
-          identifier: token.Identifier,
-          networkId: token.NetworkId,
-          amount: fakeAmount,
-        }))],
-        getDefaultEntryToken(defaultToken)
-      );
-
-      minAmount = RustModule.WalletV4.min_ada_required(
-        cardanoValueFromMultiToken(fakeMultitoken),
-        false,
-        RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
-      ).to_str();
+      minAmount = this._minAda(this.plannedTxInfoMap.map(({ token }) => ({ token })));
     }
 
     return new MultiToken([{
@@ -243,6 +221,37 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     return true;
+  }
+
+  _minAda: (tokens:{| token: $ReadOnly<TokenRow> |}) => string = (tokens) => {
+    const publicDeriver = this.stores.wallets.selected;
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
+    if (!isCardanoHaskell(network)) return;
+    const fullConfig = getCardanoHaskellBaseConfig(network);
+    const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+    const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
+    const fakeMultitoken = new MultiToken(
+      [{
+        identifier: defaultToken.Identifier,
+        networkId: defaultToken.NetworkId,
+        amount: fakeAmount,
+      },
+      ...tokens.filter(({ token }) => !token.IsDefault).map(({ token }) => ({
+        identifier: token.Identifier,
+        networkId: token.NetworkId,
+        amount: fakeAmount,
+      }))],
+      getDefaultEntryToken(defaultToken)
+    );
+
+    const minAmount = RustModule.WalletV4.min_ada_required(
+      cardanoValueFromMultiToken(fakeMultitoken),
+      false,
+      RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
+    );
+
+    return minAmount.to_str();
   }
 
   /**

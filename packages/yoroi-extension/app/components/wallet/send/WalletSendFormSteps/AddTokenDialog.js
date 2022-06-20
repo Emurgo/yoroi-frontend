@@ -38,6 +38,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import { Box } from '@mui/system';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 
 type Props = {|
   +onClose: void => void,
@@ -211,7 +212,11 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     if (!token) throw new Error('Token not found.')
 
-    return token.amount
+    const amount = new BigNumber(formattedAmountToNaturalUnits(
+      token.amount,
+      token.info.Metadata.numberOfDecimals,
+    ));
+    return amount
   }
 
   isValidAmount = (tokenInfo) => {
@@ -220,7 +225,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     )
 
     if (token) {
-      const maxAmount = new BigNumber(this.getMaxAmount(tokenInfo))
+      const maxAmount = this.getMaxAmount(tokenInfo);
       if (maxAmount.lt(token.amount || 0) || token.amount < 0) {
         return false
       }
