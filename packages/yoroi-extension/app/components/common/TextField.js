@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 // @flow
+import React from 'react';
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
 import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
@@ -7,7 +8,6 @@ import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inli
 import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo }  from '../../assets/images/qr-code.inline.svg';
-import React from 'react';
 
 type Props = {|
   error?: boolean | string,
