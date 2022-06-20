@@ -138,10 +138,10 @@ function isImageExist(imageSrc, onload, onerror) {
   img.src = imageSrc;
 }
 
-function NftImage({ ipfsUrl, name }) {
+export function NftImage({ imageUrl, name }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  if (error || !ipfsUrl) return (
+  if (error || !imageUrl) return (
     <Box sx={{
       display: 'flex',
       alignItems: 'center',
@@ -156,23 +156,23 @@ function NftImage({ ipfsUrl, name }) {
       <DefaultNFT />
     </Box>
   )
-  ipfsUrl = ipfsUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  imageUrl = imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
   useEffect(() => {
     isImageExist(
-      ipfsUrl,
+      imageUrl,
       () => { setLoading(false); setError(false) }, // on-success
       () => { setLoading(false); setError(true) }, // on-error
     )
-  }, [ipfsUrl])
+  }, [imageUrl])
 
-  if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ minWidth: '250px' }} height={250} />
-  return  <img style={{ width: '100%', height: 'auto', flex: '1', minWidth: '250px', objectFit: 'cover' }} src={ipfsUrl} alt={name} loading="lazy" />
+  if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ minWidth: '250px', minHeight: '250px', height: '100%' }} />
+  return  <img style={{ width: '100%', height: 'auto', flex: '1', minWidth: '250px', objectFit: 'cover' }} src={imageUrl} alt={name} loading="lazy" />
 }
 
 function NftCardImage({ ipfsUrl, name }) {
   return (
     <ImageItem sx={{ height: '100%' }}>
-      <NftImage ipfsUrl={ipfsUrl} name={name} />
+      <NftImage imageUrl={ipfsUrl} name={name} />
       <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
         {name}
       </Typography>

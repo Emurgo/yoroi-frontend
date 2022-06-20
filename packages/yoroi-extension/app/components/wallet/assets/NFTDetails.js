@@ -12,6 +12,7 @@ import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { NftImage } from './NFTsList';
 
 type Props = {|
   nftInfo: void | {|
@@ -71,7 +72,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
         }}
       >
         <ImageItem flex="1">
-          <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={nftInfo.name} loading="lazy" />
+          <NftImage imageUrl={nftInfo.image} name={nftInfo.name} />
         </ImageItem>
         <Box flex="1" backgroundColor="var(--yoroi-palette-common-white)" borderRadius="8px">
           <Box borderBottom="1px solid var(--yoroi-palette-gray-50)" px="24px" py="22px">
@@ -145,7 +146,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
               />
             </Box>
             <Box marginTop="22px">
-              <LabelWithValue label="Description" value={nftInfo.description ?? ''} />
+              <LabelWithValue label="Description" value={nftInfo.description || '-'} />
             </Box>
           </Box>
         </Box>
@@ -157,7 +158,10 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
 export default (injectIntl(NFTDetails): ComponentType<Props>);
 
 const ImageItem = styled(Box)({
-  padding: '40px',
+  padding: '24px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   img: {
