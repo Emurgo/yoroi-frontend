@@ -39,6 +39,14 @@ import {
 import type { LocatorObject } from '../support/webdriver';
 import { walletButton } from '../pages/sidebarPage';
 import { getWalletButtonByPlate } from '../pages/walletsListPage';
+import {
+  connectHwButton,
+  restoreWalletButton,
+  getCurrencyButton,
+  pickUpCurrencyDialog,
+  hwOptionsDialog,
+  trezorWalletButton,
+} from '../pages/newWalletPages';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -191,7 +199,7 @@ async function takePageSnapshot(driver, name) {
 async function getConsoleLogs(driver, name) {
   const cap = await driver.getCapabilities();
   const browserName = cap.getBrowserName();
-  if (browserName === 'firefox'){
+  if (browserName === 'firefox') {
     return;
   }
   const dir = createDirInTestRunsData('consoleLogs');
@@ -199,7 +207,6 @@ async function getConsoleLogs(driver, name) {
   const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
-
 }
 
 async function inputMnemonicForWallet(
@@ -281,10 +288,10 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
+  await this.click(restoreWalletButton);
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton('cardano'));
 
   await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
@@ -405,6 +412,14 @@ async function setTrezorWallet(client, deviceId) {
 }
 Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
   await setTrezorWallet(this, deviceId);
+});
+
+Given(/^I connected Trezor emulator$/, async function () {
+  await this.click(connectHwButton);
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton('cardano'));
+  await this.waitForElement(hwOptionsDialog);
+  await this.click(trezorWalletButton);
 });
 
 async function restoreWalletsFromStorage(client) {
