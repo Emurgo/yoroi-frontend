@@ -628,6 +628,7 @@
   "wallet.nftGallary.title": "NFT Gallary",
   "wallet.nftGallary.search": "Search NFTs",
   "wallet.nftGallary.noNFTsAdded": "No NFTs added to your wallet",
+  "wallet.nftGallary.details.nftsCount": "NFTs ({number})",
   "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Verify address",
   "wallet.receive.confirmationDialog.addressLabel": "Address",

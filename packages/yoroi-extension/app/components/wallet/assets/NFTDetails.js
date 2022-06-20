@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 import { Link as LinkMui, Grid, Typography, Stack } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
-import { injectIntl } from 'react-intl';
+import { injectIntl, defineMessages } from 'react-intl';
 import { ReactComponent as LinkSvg }  from '../../../assets/images/link.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -34,29 +34,37 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
+const messages = defineMessages({
+  nftsCount: {
+    id: 'wallet.nftGallary.details.nftsCount',
+    defaultMessage: '!!!NFTs ({number})',
+  },
+})
+
 function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
-  const ipfsHash = nftInfo.image != null ? nftInfo.image.replace('ipfs://', '') : '';
   const networkUrl = getNetworkUrl(network);
 
   return (
     <Box>
       <Box>
-        <Typography variant="h5" color="var(--yoroi-palette-gray-600)">
-          {/* eslint-disable-next-line react/no-unescaped-entities */}
+        <Typography variant="h5" color="var(--yoroi-palette-gray-600)" sx={{ display: 'flex' }}>
           <Typography
             as={Link}
             replace
             to={ROUTES.NFTS.ROOT}
             variant="h5"
             sx={{
-              color: 'var(--yoroi-palette-gray-600)',
+              color: 'var(--yoroi-palette-gray-900)',
               textDecoration: 'none',
             }}
           >
-            NFTs ({nftsCount}){' '}/{' '}
+            {!nftsCount ?
+              intl.formatMessage(globalMessages.sidebarNfts)
+              : intl.formatMessage(messages.nftsCount, { number: nftsCount })}
           </Typography>
-          <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
+          <Typography variant="h5" color='var(--yoroi-palette-gray-900)' marginX='8px'>/</Typography>
+          <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-600)" ml="4px">
             {nftInfo.name}
           </Typography>
         </Typography>

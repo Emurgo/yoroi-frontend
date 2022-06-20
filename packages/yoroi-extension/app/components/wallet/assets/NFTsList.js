@@ -20,6 +20,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { useState, useEffect } from 'react';
+import globalMessages from '../../../i18n/global-messages';
 
 type Props = {|
   list: Array<{| name: string, image: string | void |}> | void,
@@ -40,7 +41,11 @@ const messages = defineMessages({
   searchNFTs: {
     id: 'wallet.nftGallary.search',
     defaultMessage: '!!!Search NFTs'
-  }
+  },
+  nftsCount: {
+    id: 'wallet.nftGallary.details.nftsCount',
+    defaultMessage: '!!!NFTs ({number})',
+  },
 });
 
 const listColumnViews = [
@@ -69,7 +74,9 @@ function NfTsList({ list, intl }: Props & Intl): Node {
     <Box sx={{ height: '100%' }}>
       <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px">
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-          NFTs ({list.length})
+          {!list.length ?
+            intl.formatMessage(globalMessages.sidebarNfts)
+            : intl.formatMessage(messages.nftsCount, { number: list.length })}
         </Typography>
         <Box display="flex" alignItems="center">
           <Stack direction="row" spacing={1} marginRight="30px">
