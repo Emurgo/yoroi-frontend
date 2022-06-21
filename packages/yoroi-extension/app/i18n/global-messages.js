@@ -904,6 +904,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.syncing',
     defaultMessage: '!!!Syncing...',
   },
+  loading: {
+    id: 'wallet.loading',
+    defaultMessage: '!!!Loading...',
+  },
 });
 export default globalMessages;
 
