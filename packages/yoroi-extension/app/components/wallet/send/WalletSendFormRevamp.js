@@ -439,28 +439,17 @@ export default class WalletSendForm extends Component<Props, State> {
                 QRHandler={() => this.props.openDialog(QRScannerDialog)}
               />
             </div>
-            <div className={styles.memo}>
-              <div className={styles.memoInput}>
-                <input
-                  type="text"
-                  onFocus={() => this.setState({ showMemoWarning: true })}
-                  placeholder={intl.formatMessage(memoMessages.addMemo)}
-                  onChange={(e) => this.onUpdateMemo(e.target.value)}
-                />
-              </div>
-              {invalidMemo ? (
-                <p className={styles.memoError}>
-                  {intl.formatMessage(messages.memoInvalidOptional,{ maxMemo: MAX_MEMO_SIZE, })}
-                </p>
-              ):
-                <p className={classnames(
-                [ styles.memoWarning, !showMemoWarning && styles.hide]
-                )}
-                >
-                  {intl.formatMessage(memoMessages.memoWarning)}
-                </p>
+            <TextField
+              label={intl.formatMessage(memoMessages.addMemo)}
+              onChange={(e) => this.onUpdateMemo(e.target.value)}
+              onFocus={() => this.setState({ showMemoWarning: true })}
+              onBlur={() => this.setState({ showMemoWarning: false })}
+              helperText={invalidMemo ?
+                intl.formatMessage(messages.memoInvalidOptional,{ maxMemo: MAX_MEMO_SIZE }) :
+                showMemoWarning && intl.formatMessage(memoMessages.memoWarning)
               }
-            </div>
+              error={invalidMemo}
+            />
             <div>
               {this._nextStepButton(
                 invalidMemo || !receiverField.isValid,
