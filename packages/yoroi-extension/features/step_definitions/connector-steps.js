@@ -344,16 +344,6 @@ Then(/^I should see the connector popup to Add Collateral$/, async function () {
   await this.waitForElement(addCollateralTitle);
 });
 
-Then(/^I should see the collateral fee data:$/, async function (table) {
-  await this.waitForElement(overviewTabButton);
-  const fields = table.hashes()[0];
-  const realFee = await getCollateralFee(this);
-  const expectedFee = `-${fields.fee}`;
-  const realFullAmount = await getCollateralTotalAmount(this);
-  expect(realFee, 'Fee is different').to.equal(expectedFee);
-  expect(realFullAmount, 'Total amount is different').to.equal(expectedFee);
-});
-
 Then(/^I should see the collateral addresses info:$/, async function (table) {
   await this.waitForElement(overviewTabButton);
   const tableHashes = table.hashes();
