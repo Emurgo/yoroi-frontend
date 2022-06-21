@@ -45,6 +45,7 @@ import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -141,6 +142,8 @@ type Props = {|
   +openDialog: any => void,
   +isOpen: any => boolean,
   +closeDialog: void => void,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 type State = {|
