@@ -125,36 +125,45 @@ export default class AddTokenDialog extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
 
-  componentDidMount(): void {
-    const { spendableBalance, getTokenInfo } = this.props;
-    const tokensList = getTokens(spendableBalance, getTokenInfo)
-    this.setState({ currentTokensList: tokensList, fullTokensList: tokensList })
-  }
-
   state: State = {
     currentTokensList: [],
     fullTokensList: [],
     sortingDirection: null,
     sortingColumn: '',
     selectedTokens: [],
-    error: false,
   };
 
+  componentDidMount(): void {
+    const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
+    const tokensList = getTokens(spendableBalance, getTokenInfo)
+    const selectedTokens = plannedTxInfoMap.filter(({ token }) => !token.IsNFT && !token.IsDefault)
+      .map(({ token, amount }) => ({ token, amount, included: true }));
+
+    this.setState({ currentTokensList: tokensList, fullTokensList: tokensList, selectedTokens })
+  }
+
+
   onSelect: $ReadOnly<TokenRow> => void = (token) => {
-    this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, { token }] }))
+    // Remove if it already in the list
+    this.onRemoveToken(token);
+    this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, { token, included: true }] }));
   }
 
   onRemoveToken = (token) => {
-    this.setState(prev => ({ ...prev,  selectedTokens: [...prev.selectedTokens].filter(
-      ({ token: t }) => t.Identifier !== token.Identifier) }))
-    this.props.onRemoveToken(token)
+    const tokenEntry = this.getSelectedToken(token);
+    if (!tokenEntry) return;
+    const tokenEntryCopy = { ...tokenEntry };
+    tokenEntryCopy.included = false;
+    const selectedTokens = [...this.state.selectedTokens].filter(
+      ({ token: t }) => t.Identifier !== token.Identifier);
+
+    this.setState({ selectedTokens: [...selectedTokens, tokenEntryCopy] });
   }
 
   isTokenIncluded = (token) => {
-    const isIncluded = this.state.selectedTokens.find(
+    return !!this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token?.Identifier
-    )
-    return isIncluded || this.props.isTokenIncluded(token)
+    )?.included;
   }
 
   updateAmount = (token, amount) => {
@@ -165,6 +174,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     const tokenEntryCopy = { ...tokenEntry };
     tokenEntryCopy.amount = amount;
     tokenEntryCopy.token = token;
+    tokenEntryCopy.included = true;
 
     const filteredTokens = this.state.selectedTokens.filter(
       ({ token: t }) => t.Identifier !== token.Identifier
@@ -175,21 +185,22 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   getCurrentAmount = (token) => {
     const tokenEntry = this.getSelectedToken(token);
-
-    if (!tokenEntry) return this.props.getTokenAmount(token);
-
-    return tokenEntry.amount;
+    return tokenEntry?.amount;
   }
 
   getSelectedToken = (token) => {
     return this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
-    )
+    );
   }
 
 
   onAddAll = () => {
-    for (const { token, amount } of this.state.selectedTokens) {
+    for (const { token, amount, included } of this.state.selectedTokens) {
+      if (!included) {
+        this.props.onRemoveToken(token)
+        continue
+      }
       if (!amount) continue;
       this.props.onAddToken({
             token, shouldReset: false
@@ -298,12 +309,13 @@ export default class AddTokenDialog extends Component<Props, State> {
     const {
       onClose,
       maxAssetsAllowed,
-      numOfTokensIncluded,
+      plannedTxInfoMap,
       calculateMinAda,
     } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
+    const numOfTokensIncluded = plannedTxInfoMap.length;
     const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed;
-
+    console.log({ selectedTokens })
     return (
       <Dialog
         title={

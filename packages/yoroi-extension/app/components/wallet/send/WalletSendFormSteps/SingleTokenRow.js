@@ -50,7 +50,7 @@ export default class SingleTokenRow extends Component<Props, State> {
   componentDidMount() {
     let amount = this.props.getTokenAmount(this.props.token.info)
     if (amount) {
-      amount = new BigNumber(this.props.getTokenAmount(this.props.token.info))
+      amount = new BigNumber(amount)
       .shiftedBy(-this.getNumDecimals()).toString();
     }
     this.setState({ amount });

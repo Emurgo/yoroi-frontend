@@ -94,9 +94,12 @@ export default class AddNFTDialog extends Component<Props, State> {
   };
 
   componentDidMount(): void {
-    const { spendableBalance, getTokenInfo } = this.props;
-    const nftsList = getNFTs(spendableBalance, getTokenInfo)
-    this.setState({ fullNftsList: nftsList,  currentNftsList: nftsList })
+    const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
+    const nftsList = getNFTs(spendableBalance, getTokenInfo);
+    const selectedTokens = plannedTxInfoMap.filter(({ token }) => token.IsNFT)
+    .map(({ token }) => ({ token, included: true }));
+
+    this.setState({ fullNftsList: nftsList,  currentNftsList: nftsList, selectedTokens })
   }
 
 
@@ -117,28 +120,45 @@ export default class AddNFTDialog extends Component<Props, State> {
       this.setState({ currentNftsList: filteredNftsList })
     };
 
-  onSelect: $ReadOnly<TokenRow> => void = (tokenInfo) => {
-    if (this.isTokenIncluded(tokenInfo)) {
-      this.onRemoveToken(tokenInfo)
+  onSelect: $ReadOnly<TokenRow> => void = (token) => {
+    if (this.isTokenIncluded(token)) {
+      this.onRemoveToken(token);
     } else {
-      this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, tokenInfo] }))
+      this.setState(prev =>({
+        selectedTokens: [...prev.selectedTokens, { token, included: true }]
+      }))
     }
   }
 
-  onRemoveToken = (tokenInfo) => {
-    this.setState(prev => ({ ...prev,  selectedTokens: [...prev.selectedTokens].filter(
-      t => t.Identifier !== tokenInfo.Identifier) }))
-    this.props.onRemoveToken(tokenInfo)
+  onRemoveToken = (token) => {
+    const tokenEntry = this.state.selectedTokens.find(
+      ({ token: t }) => t.Identifier === token.Identifier
+    )
+
+    if (!tokenEntry) return;
+
+    const tokenEntryCopy = { ...tokenEntry };
+    tokenEntryCopy.included = false;
+
+    const selectedTokens = [...this.state.selectedTokens].filter(
+      ({ token: t }) => t.Identifier !== token.Identifier
+    );
+    this.setState({ selectedTokens: [...selectedTokens, tokenEntryCopy] });
   }
 
   isTokenIncluded = (token) => {
-    const isIncluded = this.state.selectedTokens.find(t => t.Identifier === token.Identifier)
-    return isIncluded || this.props.isTokenIncluded(token)
+    return !!this.state.selectedTokens.find(
+      ({ token: t }) => t.Identifier === token.Identifier
+    )?.included;
   }
 
   onAddAll = () => {
     const amount = new BigNumber('1');
-    for (const token of this.state.selectedTokens) {
+    for (const { token, included } of this.state.selectedTokens) {
+      if (!included) {
+        this.props.onRemoveToken(token);
+        continue;
+      }
       this.props.onAddToken({
         token, shouldReset: false
       })
@@ -183,7 +203,7 @@ export default class AddNFTDialog extends Component<Props, State> {
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda
-              minAda={calculateMinAda(selectedTokens.map(token => ({ token })))}
+              minAda={calculateMinAda(selectedTokens.map(({ token }) => ({ token })))}
             />
           </div>
          )}

@@ -531,6 +531,7 @@ class WalletSendPage extends Component<AllProps> {
         numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
         calculateMinAda={this.calculateMinAda}
+        plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
       />
     )
   }
@@ -564,7 +565,7 @@ class WalletSendPage extends Component<AllProps> {
         getTokenAmount={this.getTokenAmount}
         isTokenIncluded={this.isTokenIncluded}
         maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
-        numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
+        plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
       />
     )
