@@ -436,7 +436,6 @@ export default class WalletSendForm extends Component<Props, State> {
                 {...receiverField.bind()}
                 error={receiverField.error}
                 done={receiverField.isValid}
-                QRHandler={() => this.props.openDialog(QRScannerDialog)}
               />
             </div>
             <TextField
@@ -680,7 +679,7 @@ export default class WalletSendForm extends Component<Props, State> {
       amount = null;
     }
     if (!amount || amount.isNaN()) {
-      convertedAmount = '-';
+      convertedAmount = '0';
     } else {
       const ticker = this.props.defaultToken.Metadata.ticker;
       if (ticker == null) {
@@ -691,7 +690,7 @@ export default class WalletSendForm extends Component<Props, State> {
       if (price != null) {
         convertedAmount = calculateAndFormatValue(amount, price);
       } else {
-        convertedAmount = '-';
+        convertedAmount = '0';
       }
     }
 

@@ -11,28 +11,15 @@ import {
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
-import {
-  MultiToken,
-} from '../../../../api/common/lib/MultiToken';
-import { ReactComponent as CloseIcon} from '../../../../assets/images/forms/close.inline.svg';
+import { ReactComponent as CloseIcon} from '../../../../assets/images/forms/close-small.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
-import type {
-  TokenLookupKey
-} from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { UriParams } from '../../../../utils/URIHandling';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import LocalizableError from '../../../../i18n/LocalizableError';
+import classnames from 'classnames';
 
 type Props = {|
     +token: FormattedTokenDisplay,
-    +classicTheme: boolean,
     +updateAmount: (?BigNumber) => void,
-    +uriParams: ?UriParams,
-    +selectedToken: void | $ReadOnly<TokenRow>,
-    +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-    +fee: ?MultiToken,
-    +error: ?LocalizableError,
     +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
     +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
     +onAddToken: $ReadOnly<TokenRow> => void,
@@ -89,7 +76,7 @@ export default class SingleTokenRow extends Component<Props, State> {
     const { intl } = this.context;
     const { token, isValidAmount } = this.props;
     const { amount } = this.state;
-
+    const isValid = isValidAmount(token.info);
     return (
       <div className={styles.component}>
         {!this.props.isTokenIncluded(token.info) ? (
@@ -102,7 +89,7 @@ export default class SingleTokenRow extends Component<Props, State> {
             <p className={styles.amount}>{token.amount}</p>
           </button>
         ): (
-          <div className={styles.amountWrapper}>
+          <div className={classnames([styles.amountWrapper, !isValid && styles.amountError])}>
             <div className={styles.amountTokenName}>
               <div className={styles.logo}><NoAssetLogo /></div>
               <p className={styles.label}>{token.label}</p>
@@ -114,12 +101,12 @@ export default class SingleTokenRow extends Component<Props, State> {
                 onChange={this.onAmountUpdate.bind(this)}
                 decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp
-                placeholder='0.0'
+                placeholder={token.amount}
               />
             </div>
             <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
             <p className={styles.error}>
-              {!isValidAmount(token.info) && intl.formatMessage(messages.notEnoughMoneyToSendError)}
+              {!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
             </p>
           </div>
         )}

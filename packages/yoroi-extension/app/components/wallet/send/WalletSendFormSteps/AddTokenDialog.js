@@ -164,7 +164,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     const tokenEntryCopy = { ...tokenEntry };
     tokenEntryCopy.amount = amount;
-    tokenEntryCopy.tokenInfo = token;
+    tokenEntryCopy.token = token;
 
     const filteredTokens = this.state.selectedTokens.filter(
       ({ token: t }) => t.Identifier !== token.Identifier
@@ -190,12 +190,12 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onAddAll = () => {
     for (const { token, amount } of this.state.selectedTokens) {
-      if (!amount) continue
+      if (!amount) continue;
       this.props.onAddToken({
             token, shouldReset: false
-      })
+      });
 
-      this.props.updateAmount(new BigNumber(amount))
+      this.props.updateAmount(amount);
     }
     this.props.onClose();
   }
@@ -217,14 +217,14 @@ export default class AddTokenDialog extends Component<Props, State> {
   isValidAmount = (token) => {
     const tokenEntry = this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
-    )
+    );
 
     if (tokenEntry) {
       const maxAmount = this.getMaxAmount(token);
-      if (maxAmount.lt(token.amount || 0) || token.amount < 0) {
+      if (maxAmount.lt(tokenEntry.amount || 0) || token.amount < 0) {
         return false
       }
-    }
+    };
     return true
   }
 
@@ -246,7 +246,10 @@ export default class AddTokenDialog extends Component<Props, State> {
       if(!keyword) return
       const regExp = new RegExp(keyword, 'gi')
       const tokensListCopy = [...this.state.fullTokensList]
-      const filteredTokensList = tokensListCopy.filter(a => a.label.match(regExp))
+
+      const filteredTokensList = tokensListCopy.filter(
+        a => a.label.match(regExp) || a.id.match(regExp)
+      )
       this.setState({ currentTokensList: filteredTokensList })
     };
 

@@ -48,7 +48,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border: 1px solid #242838;
+        border: 2px solid var(--yoroi-palette-gray-900);
         border-radius: 8px;
         padding: 12px 16px;
         position: relative;
@@ -101,12 +101,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            top: -10px;
-            right: -10px;
+            top: -12px;
+            right: -12px;
         }
 
         .close:hover {
             background-color: lighten($color: #F0F3F5, $amount: 0.90);
         }
+    }
+
+    .amountError {
+        border: 2px solid var(--yoroi-palette-error-100);
     }
 }
