@@ -602,6 +602,7 @@
   "wallet.includeKey.withoutKeyLabel": "Without key",
   "wallet.insufficientFunds.subtitle": "Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount.",
   "wallet.insufficientFunds.title": "Insufficient funds",
+  "wallet.loading": "Loading...",
   "wallet.nav.addButton": "Add new wallet",
   "wallet.nav.addWallet": "Add Wallet",
   "wallet.nav.allWalletsLabel": "All wallets",
