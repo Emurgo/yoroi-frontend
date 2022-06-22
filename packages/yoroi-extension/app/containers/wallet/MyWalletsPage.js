@@ -258,6 +258,10 @@ class MyWalletsPage extends Component<AllProps> {
       publicDeriver
     );
 
+    const isLoading = this.generated.stores.transactions.isWalletLoading(
+      publicDeriver
+    );
+
     return (
       <WalletRow
         isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
@@ -288,6 +292,7 @@ class MyWalletsPage extends Component<AllProps> {
                 : null
             }
             isRefreshing={isRefreshing}
+            isLoading={isLoading}
           />
         }
         onSettings={() => this.openToSettings(publicDeriver)}
@@ -432,6 +437,7 @@ class MyWalletsPage extends Component<AllProps> {
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests,
         isWalletRefreshing: (PublicDeriver<>) => boolean,
+        isWalletLoading: (PublicDeriver<>) => boolean,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
@@ -471,6 +477,7 @@ class MyWalletsPage extends Component<AllProps> {
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,
           isWalletRefreshing: stores.transactions.isWalletRefreshing,
+          isWalletLoading: stores.transactions.isWalletLoading,
         },
         walletSettings: {
           getConceptualWalletSettingsCache:

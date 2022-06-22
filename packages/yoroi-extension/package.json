@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.14.400",
+  "version": "4.14.500",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -225,6 +225,7 @@
     "react-markdown": "5.0.3",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
+    "react-webcam-qr-scanner": "^1.0.8",
     "recharts": "1.8.5",
     "ringbufferjs": "2.0.0",
     "route-parser": "0.0.5",
