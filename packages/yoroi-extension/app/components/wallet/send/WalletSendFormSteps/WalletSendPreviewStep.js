@@ -6,7 +6,7 @@ import type { Node } from 'react';
 import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import TextField from '../../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../../i18n/global-messages';
@@ -30,11 +30,13 @@ import type {
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
-import { Button } from '@mui/material';
+import { Button, Link, Tooltip, Typography } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Box } from '@mui/system';
+import { ReactComponent as InfoIcon }  from '../../../../assets/images/attention-big-light.inline.svg';
 
 type Props = {|
   +staleTx: boolean,
@@ -59,6 +61,14 @@ const messages = defineMessages({
   nAssets: {
     id: 'wallet.send.form.preview.nAssets',
     defaultMessage: '!!!{number} Assets',
+  },
+  minAdaHelp: {
+    id: 'wallet.send.form.preview.minAdaHelp',
+    defaultMessage: '!!!Minimum ADA required to send these assets. {moreDetails}'
+  },
+  moreDetails: {
+    id: 'wallet.send.form.preview.moreDetails',
+    defaultMessage: '!!!More details here',
   }
 });
 
@@ -214,6 +224,73 @@ export default class WalletSendPreviewStep extends Component<Props> {
     );
   }
 
+  _amountLabel = () => {
+    const {
+      selectedNetwork,
+      isDefaultIncluded,
+    } = this.props;
+    const { intl } = this.context;
+    const isCardano = isCardanoHaskell(selectedNetwork);
+
+    if (
+      (isCardano && isDefaultIncluded) ||
+      !isCardano // Ergo
+    ) {
+      return (
+        <Box>
+          {intl.formatMessage(globalMessages.amountLabel)}
+        </Box>
+      );
+    }
+
+    if (isCardano && !isDefaultIncluded) {
+
+      const moreDetailsLink = (
+        <Link
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/5008187102351-What-is-the-locked-assets-deposit-"
+          target='_blank'
+          rel="noreferrer noopener"
+        >
+          {intl.formatMessage(messages.moreDetails)}
+        </Link>
+      )
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {intl.formatMessage(globalMessages.minAda)}
+
+          <Tooltip
+            placement='top'
+            title={
+              <Typography>
+                <FormattedMessage
+                  {...messages.minAdaHelp}
+                  values={{ moreDetails: moreDetailsLink }}
+                />
+              </Typography>
+            }
+          >
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: '10px',
+              '& > svg': {
+                  width: 20,
+                  height: 20,
+                }
+              }}
+            >
+              <InfoIcon />
+            </Box>
+          </Tooltip>
+        </Box>
+      )
+    }
+
+    return null;
+
+  }
+
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
@@ -222,7 +299,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
       amount,
       receivers,
       isSubmitting,
-      selectedNetwork
     } = this.props;
     const { passwordError, txError } = this.state;
 
@@ -275,10 +351,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
             />)}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(
-                  isCardanoHaskell(selectedNetwork) ?
-                    globalMessages.amountWithMinADA : globalMessages.amountLabel
-                )}
+                {this._amountLabel()}
               </div>
               <div className={styles.amountValue}>
                 {this.renderSingleAmount(amount.getDefaultEntry())}

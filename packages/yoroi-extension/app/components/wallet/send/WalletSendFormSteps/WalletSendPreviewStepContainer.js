@@ -93,6 +93,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
           addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
         }
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+        isDefaultIncluded={this.props.isDefaultIncluded}
       />
     );
   }

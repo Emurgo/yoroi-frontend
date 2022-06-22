@@ -209,9 +209,9 @@ class WalletSendPage extends Component<AllProps> {
             previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}
             plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+            isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
             closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
             isOpen={uiDialogs.isOpen}
-            isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
           />
@@ -328,6 +328,7 @@ class WalletSendPage extends Component<AllProps> {
       {...this.generated.WalletSendConfirmationDialogContainerProps}
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
+      isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
       unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
       openTransactionSuccessDialog={this.openTransactionSuccessDialog}
     />);

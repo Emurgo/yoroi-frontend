@@ -231,8 +231,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     const tokenEntry = this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
     );
-
-    if (tokenEntry) {
+    if (tokenEntry && tokenEntry.included) {
       const maxAmount = this.getMaxAmount(token);
       if (maxAmount.lt(tokenEntry.amount || 0) || token.amount < 0) {
         return false
@@ -243,6 +242,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   isValidAmounts = () => {
     for (const tokenEntry of this.state.selectedTokens) {
+      if (!tokenEntry.included) continue;
       if (
         !this.isValidAmount(tokenEntry.token) ||
         !tokenEntry.amount ||
