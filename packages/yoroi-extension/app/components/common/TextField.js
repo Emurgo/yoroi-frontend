@@ -7,7 +7,7 @@ import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.in
 import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inline.svg';
 import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
-import { ReactComponent as QRLogo }  from '../../assets/images/qr-code.inline.svg';
+import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
 
 type Props = {|
   error?: boolean | string,

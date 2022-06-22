@@ -211,9 +211,9 @@ export default class NavWalletDetails extends Component<Props> {
 
     let unit = truncateToken(getTokenName(tokenInfo));
 
-    if (request.convertToFiat) {
+    if (Boolean(request.convertToFiat)) {
       const { currency } = this.props.unitOfAccountSetting;
-      if (!currency) {
+      if (currency == null || currency.trim().length === 0) {
         throw new Error('expect unit of account currency setting');
       }
       const ticker = tokenInfo.Metadata.ticker;
