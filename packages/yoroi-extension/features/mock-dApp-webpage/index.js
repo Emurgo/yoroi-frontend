@@ -423,22 +423,22 @@ export class MockDAppWebpage {
   async requestSigningData(payload: string) {
     this.logger.info(`MockDApp: Requesting signing the data: data="${payload}"`);
 
-    let addresses;
-
     const addressesResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.addressesPromise
-        .then(addresses => {
+        .then(addrs => {
           // eslint-disable-next-line promise/always-return
-          if (addresses.length === 0) {
+          if (addrs.length === 0) {
             callback({ success: false, errMsg: 'No unused addresses' });
           }
-          callback({ success: true, retValue: addresses });
+          callback({ success: true, retValue: addrs });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
     });
+
+    let addresses;
     if (addressesResponse.success) {
       addresses = this._addressesFromCborIfNeeded(addressesResponse.retValue);
     }
@@ -495,6 +495,10 @@ export class MockDAppWebpage {
 
   async getCollateralUtxos(amount: string): Promise<string> {
     this.logger.info(`MockDApp: Getting Collateral Utxos`);
+
+    Buffer.from(
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
+    ).toString('hex');
 
     const collateralResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];

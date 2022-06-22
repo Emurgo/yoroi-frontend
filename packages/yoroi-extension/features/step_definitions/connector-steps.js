@@ -382,7 +382,6 @@ Then(/^I should see the collateral from address info:$/, async function (table) 
 Then(/^I should see the collateral to addresses info:$/, async function (table) {
   await this.waitForElement(overviewTabButton);
   const tableHashes = table.hashes();
-  const fields = tableHashes[0];
   await this.click(utxoAddressesTabButton);
 
   const actualAddresses = await getUTXOAddresses(this);
