@@ -117,11 +117,6 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     plate: 'ZDDC-9858',
   }),
   createWallet({
-    name: ('shelley-simple-15-2': WalletNames),
-    mnemonic: 'attract ankle file license toy height again pupil cook report market inherit august fall curious',
-    plate: 'TEDB-1068',
-  }),
-  createWallet({
     name: ('shelley-delegated': WalletNames),
     mnemonic: 'parrot offer switch thank film high drop salute task train squirrel coral consider coyote evolve',
     plate: 'PALP-0076',

@@ -27,7 +27,7 @@ import {
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
 import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
-import { addCollateralTitle, getCollateralFee } from '../pages/connector-getCollateralPage';
+import { addCollateralTitle } from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
