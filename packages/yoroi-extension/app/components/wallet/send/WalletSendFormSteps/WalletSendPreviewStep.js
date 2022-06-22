@@ -235,8 +235,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
 
     if (isCardano) {
-      const amount = plannedTxInfoMap.find(({ token }) => token.IsDefault)?.amount
-      if (!amount || minAda.getDefaultEntry().amount.gt(amount)) {
+      const tokenInfo = plannedTxInfoMap.find(({ token }) => token.IsDefault);
+      if (
+        (!tokenInfo || !tokenInfo.amount || minAda.getDefaultEntry().amount.gt(tokenInfo.amount)) &&
+        !tokenInfo?.shouldSendAll
+      ) {
         const moreDetailsLink = (
           <Link
             href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/5008187102351-What-is-the-locked-assets-deposit-"
