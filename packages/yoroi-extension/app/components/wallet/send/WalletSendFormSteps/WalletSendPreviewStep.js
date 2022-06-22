@@ -227,72 +227,68 @@ export default class WalletSendPreviewStep extends Component<Props> {
   _amountLabel = () => {
     const {
       selectedNetwork,
-      isDefaultIncluded,
+      plannedTxInfoMap,
+      minAda
     } = this.props;
     const { intl } = this.context;
     const isCardano = isCardanoHaskell(selectedNetwork);
 
-    if (
-      (isCardano && isDefaultIncluded) ||
-      !isCardano // Ergo
-    ) {
-      return (
-        <Box>
-          {intl.formatMessage(globalMessages.amountLabel)}
-        </Box>
-      );
-    }
 
-    if (isCardano && !isDefaultIncluded) {
-
-      const moreDetailsLink = (
-        <Link
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/5008187102351-What-is-the-locked-assets-deposit-"
-          target='_blank'
-          rel="noreferrer noopener"
-          sx={{
-            color: 'inherit',
-            textDecoration: 'underline'
-          }}
-        >
-          {intl.formatMessage(messages.moreDetails)}
-        </Link>
-      )
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {intl.formatMessage(globalMessages.minAda)}
-
-          <Tooltip
-            placement='top'
-            title={
-              <Typography>
-                <FormattedMessage
-                  {...messages.minAdaHelp}
-                  values={{ moreDetails: moreDetailsLink }}
-                />
-              </Typography>
-            }
+    if (isCardano) {
+      const amount = plannedTxInfoMap.find(({ token }) => token.IsDefault)?.amount
+      if (!amount || minAda.getDefaultEntry().amount.gt(amount)) {
+        const moreDetailsLink = (
+          <Link
+            href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/5008187102351-What-is-the-locked-assets-deposit-"
+            target='_blank'
+            rel="noreferrer noopener"
+            sx={{
+              color: 'inherit',
+              textDecoration: 'underline'
+            }}
           >
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginLeft: '10px',
-              '& > svg': {
-                  width: 20,
-                  height: 20,
-                }
-              }}
+            {intl.formatMessage(messages.moreDetails)}
+          </Link>
+        )
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {intl.formatMessage(globalMessages.minAda)}
+
+            <Tooltip
+              placement='top'
+              title={
+                <Typography>
+                  <FormattedMessage
+                    {...messages.minAdaHelp}
+                    values={{ moreDetails: moreDetailsLink }}
+                  />
+                </Typography>
+              }
             >
-              <InfoIcon />
-            </Box>
-          </Tooltip>
-        </Box>
-      )
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: '10px',
+                '& > svg': {
+                    width: 20,
+                    height: 20,
+                  }
+                }}
+              >
+                <InfoIcon />
+              </Box>
+            </Tooltip>
+          </Box>
+        )
+      }
     }
 
-    return null;
-
+    return (
+      <Box>
+        {intl.formatMessage(globalMessages.amountLabel)}
+      </Box>
+    );
   }
 
   render(): Node {

@@ -331,6 +331,8 @@ class WalletSendPage extends Component<AllProps> {
       isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
       unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
       openTransactionSuccessDialog={this.openTransactionSuccessDialog}
+      minAda={transactionBuilderStore.minAda}
+      plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
     />);
   };
 

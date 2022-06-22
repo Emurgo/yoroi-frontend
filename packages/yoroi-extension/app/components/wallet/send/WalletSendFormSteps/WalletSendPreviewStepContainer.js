@@ -94,6 +94,8 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         }
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
         isDefaultIncluded={this.props.isDefaultIncluded}
+        plannedTxInfoMap={this.props.plannedTxInfoMap}
+        minAda={this.props.minAda}
       />
     );
   }
