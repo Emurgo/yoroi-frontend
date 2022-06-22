@@ -27,7 +27,7 @@ import {
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
 import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
-import { addCollateralTitle } from '../pages/connector-getCollateralPage';
+import { addCollateralTitle, getCollateralFee } from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
@@ -347,14 +347,15 @@ Then(/^I should see the connector popup to Add Collateral$/, async function () {
 Then(/^I should see the collateral fee data:$/, async function (table) {
   await this.waitForElement(overviewTabButton);
   const fields = table.hashes()[0];
-  const realFee = await getCollateralFee(this);
+  const realFee = await getTransactionFee(this);
   const expectedFee = `-${fields.fee}`;
-  const realFullAmount = await getCollateralTotalAmount(this);
+  const realFullAmount = await getTransactionAmount(this);
   expect(realFee, 'Fee is different').to.equal(expectedFee);
   expect(realFullAmount, 'Total amount is different').to.equal(expectedFee);
 });
 
-Then(/^I should see the collateral addresses info:$/, async function (table) {
+Then(/^I should see the collateral from address info:$/, async function (table) {
+  
   await this.waitForElement(overviewTabButton);
   const tableHashes = table.hashes();
   const fields = tableHashes[0];
@@ -362,8 +363,6 @@ Then(/^I should see the collateral addresses info:$/, async function (table) {
 
   const expectedFromAddress = fields.fromAddress;
   const expectedFromAddressAmount = fields.fromAddressAmount;
-  const expectedToAddresses = fields.toAddresses;
-  const expectedToAddressesAmount = fields.toAddressesAmount;
 
   const actualAddresses = await getUTXOAddresses(this);
   const actualFromAddresses = actualAddresses.fromAddresses;
@@ -378,17 +377,21 @@ Then(/^I should see the collateral addresses info:$/, async function (table) {
   Received:\n${JSON.stringify(actualFromAddresses)}`
   ).to.equal(1);
 
+});
+
+Then(/^I should see the collateral to addresses info:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  await this.click(utxoAddressesTabButton);
+
+  const actualAddresses = await getUTXOAddresses(this);
   const actualToAddresses = actualAddresses.toAddresses;
-  const foundToAddresses = actualToAddresses.filter(
-    addr =>
-      addr.address === expectedToAddress && addr.amount === parseFloat(expectedToAddressAmount)
+  actualToAddresses.forEach((addr, index) => {
+    expect(addr.address).to.equal(tableHashes[index].toAddresses);
+    expect(addr.amount).to.equal(parseFloat(tableHashes[index].toAddressesAmount));
+  }
   );
-  expect(
-    foundToAddresses.length,
-    `Expected toAddress:
-  address: ${expectedToAddress}, amount: ${expectedToAddressAmount}
-  Received:\n${JSON.stringify(realFromAddresses)}`
-  ).to.equal(12);
   await this.click(overviewTabButton);
   await this.waitForElement(transactionFeeTitle);
 });

@@ -9,7 +9,7 @@ Feature: dApp connector data signing
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
 
-  @dApp-1017
+  @dApp-1019
   Scenario: dApp, anonymous wallet, unused address, sign Cardano data
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
@@ -28,7 +28,7 @@ Feature: dApp connector data signing
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
 
-  @dApp-1018
+  @dApp-1020
   Scenario: dApp, anonymous wallet, used address, sign Cardano data
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
@@ -47,7 +47,7 @@ Feature: dApp connector data signing
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
 
-  @dApp-1019
+  @dApp-1021
   Scenario: dApp, authorised wallet, unused address, sign Cardano data
     And I request access to Yoroi
     Then I should see the connector popup for connection
@@ -67,7 +67,7 @@ Feature: dApp connector data signing
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
 
-  @dApp-1020
+  @dApp-1022
   Scenario: dApp, authorised wallet, unused address, sign Cardano data
     And I request access to Yoroi
     Then I should see the connector popup for connection

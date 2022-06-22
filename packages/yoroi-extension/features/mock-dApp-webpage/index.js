@@ -519,13 +519,9 @@ export class MockDAppWebpage {
 
   async addCollateral(amount: string) {
     this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
-
-    //const utxosHex = '1a004ac4a0'
     const utxosHex = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
-
-    console.info(utxosHex);
 
     this.driver.executeScript(utxos => {
       window.collateralPromise = window.api.getCollateralUtxos(utxos);
