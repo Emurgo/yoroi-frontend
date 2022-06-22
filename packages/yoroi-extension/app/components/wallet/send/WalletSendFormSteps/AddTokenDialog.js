@@ -315,7 +315,6 @@ export default class AddTokenDialog extends Component<Props, State> {
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
     const numOfTokensIncluded = plannedTxInfoMap.length;
     const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed;
-    console.log({ selectedTokens })
     return (
       <Dialog
         title={

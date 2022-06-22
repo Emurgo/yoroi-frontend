@@ -191,7 +191,10 @@ class WalletSendPage extends Component<AllProps> {
             isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
             reset={txBuilderActions.reset.trigger}
             error={transactionBuilderStore.createUnsignedTx.error}
+            // Min ADA for all tokens that is already included in the tx
             minAda={transactionBuilderStore.minAda}
+            // Calculate Min ADA for given tokens
+            calculateMinAda={transactionBuilderStore.calculateMinAda}
             uriParams={this.generated.stores.loading.uriParams}
             resetUriParams={this.generated.stores.loading.resetUriParams}
             showMemo={this.showMemo}
@@ -505,7 +508,7 @@ class WalletSendPage extends Component<AllProps> {
     const { plannedTxInfoMap, calculateMinAda } = transactionBuilderStore
     const minAdaAmount = calculateMinAda(
       [...plannedTxInfoMap, ...selectedTokens].map(({ token }) => ({ token }))
-    )
+    );
 
     return (new BigNumber(minAdaAmount)).shiftedBy(-this._getNumDecimals()).toString()
   }

@@ -379,6 +379,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const { error, minAda, getTokenInfo } = this.props;
     let errMsg; let values;
     if (!error) return;
+
     if (error instanceof CannotSendBelowMinimumValueError) {
       const formatValue = genFormatTokenAmount(getTokenInfo);
       const amount = formatValue(minAda.getDefaultEntry());
@@ -401,6 +402,8 @@ export default class WalletSendForm extends Component<Props, State> {
       isCalculatingFee,
       getTokenInfo,
       isDefaultIncluded,
+      spendableBalance,
+      calculateMinAda
     } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
@@ -426,6 +429,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
     const amountInputError = transactionFeeError || amountField.error
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
+
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (

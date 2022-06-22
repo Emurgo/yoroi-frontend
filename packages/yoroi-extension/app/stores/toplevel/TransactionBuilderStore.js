@@ -323,6 +323,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
           });
         } else if (
           token &&
+          !token.shouldSendAll &&
           (new BigNumber(token.amount)).lt(minAmount) &&
           plannedTxInfoMap.length > 1
         ) {
