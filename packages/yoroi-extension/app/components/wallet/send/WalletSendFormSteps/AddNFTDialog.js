@@ -35,7 +35,6 @@ type Props = {|
   +classicTheme: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
-  +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,

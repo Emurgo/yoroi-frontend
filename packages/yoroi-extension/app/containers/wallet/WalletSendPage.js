@@ -479,33 +479,6 @@ class WalletSendPage extends Component<AllProps> {
     />);
   }
 
-  _getTokenFromTxInfo(token: $ReadOnly<TokenRow>) : {|
-    token: $ReadOnly<TokenRow>,
-    amount?: string,
-    shouldSendAll?: boolean,
-  |} | void {
-    const { transactionBuilderStore } = this.generated.stores;
-    return transactionBuilderStore.plannedTxInfoMap.find(
-      ({ token: t }) => t.Identifier === token.Identifier)
-  }
-
-  isTokenIncluded: ($ReadOnly<TokenRow>) => boolean = (token) => {
-    const { transactionBuilderStore } = this.generated.stores;
-    return (
-      !!this._getTokenFromTxInfo(token) ||
-      transactionBuilderStore.selectedToken?.Identifier === token.Identifier
-    );
-  }
-
-  getTokenAmount: ($ReadOnly<TokenRow>) => ?string = (token) => {
-    const { transactionBuilderStore } = this.generated.stores;
-    const tokenInfo = transactionBuilderStore.plannedTxInfoMap.find(
-      ({ token: t }) => t.Identifier === token.Identifier
-    );
-    if (tokenInfo && tokenInfo.amount) return tokenInfo.amount.toString();
-    return null;
-  }
-
   calculateMinAda = (selectedTokens) => {
     const { transactionBuilderStore } = this.generated.stores;
     const { plannedTxInfoMap, calculateMinAda } = transactionBuilderStore
@@ -532,7 +505,6 @@ class WalletSendPage extends Component<AllProps> {
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
-        isTokenIncluded={this.isTokenIncluded}
         maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
         numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
@@ -568,8 +540,6 @@ class WalletSendPage extends Component<AllProps> {
         error={transactionBuilderStore.createUnsignedTx.error}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
-        getTokenAmount={this.getTokenAmount}
-        isTokenIncluded={this.isTokenIncluded}
         maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}

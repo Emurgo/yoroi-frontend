@@ -402,8 +402,6 @@ export default class WalletSendForm extends Component<Props, State> {
       isCalculatingFee,
       getTokenInfo,
       isDefaultIncluded,
-      spendableBalance,
-      calculateMinAda
     } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
