@@ -145,19 +145,21 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onSelect: $ReadOnly<TokenRow> => void = (token) => {
     // Remove if it already in the list
-    this.onRemoveToken(token);
-    this.setState(prev =>({ selectedTokens: [...prev.selectedTokens, { token, included: true }] }));
+    const selectedTokens = this.state.selectedTokens.filter(
+      ({ token: t }) => t.Identifier !== token.Identifier
+    );
+    this.setState({ selectedTokens: [...selectedTokens, { token, included: true }] });
   }
 
   onRemoveToken = (token) => {
     const tokenEntry = this.getSelectedToken(token);
     if (!tokenEntry) return;
-    const tokenEntryCopy = { ...tokenEntry };
-    tokenEntryCopy.included = false;
     const selectedTokens = [...this.state.selectedTokens].filter(
       ({ token: t }) => t.Identifier !== token.Identifier);
 
-    this.setState({ selectedTokens: [...selectedTokens, tokenEntryCopy] });
+    this.setState({
+      selectedTokens: [...selectedTokens, { token, included: false, amount: null }]
+    });
   }
 
   isTokenIncluded = (token) => {
@@ -344,7 +346,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           )}
           {!shouldAddMoreAssets && (
             <Box sx={{ marginTop: '10px' }}>
-              <MaxAssetsError maxAssetsAllowed={maxAssetsAllowed} />
+              <MaxAssetsError maxAssetsAllowed={10} />
             </Box>)}
           {
             currentTokensList.length === 0 ? (

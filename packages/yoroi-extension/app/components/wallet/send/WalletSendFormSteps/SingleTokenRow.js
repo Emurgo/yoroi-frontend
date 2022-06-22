@@ -27,9 +27,6 @@ type Props = {|
     +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
-type State = {|
-  amount: ?string,
-|}
 
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
@@ -37,23 +34,13 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough funds to make this transaction.',
   },
 })
-export default class SingleTokenRow extends Component<Props, State> {
+export default class SingleTokenRow extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state: State = {
-    amount: null,
-  }
-
   componentDidMount() {
-    let amount = this.props.getTokenAmount(this.props.token.info)
-    if (amount) {
-      amount = new BigNumber(amount)
-      .shiftedBy(-this.getNumDecimals()).toString();
-    }
-    this.setState({ amount });
   }
 
   getNumDecimals(): number {
@@ -68,15 +55,20 @@ export default class SingleTokenRow extends Component<Props, State> {
         this.getNumDecimals(),
       ));
     }
-    this.setState({ amount: value });
     this.props.updateAmount(this.props.token.info, formattedAmount);
   }
 
   render(): Node {
     const { intl } = this.context;
     const { token, isValidAmount } = this.props;
-    const { amount } = this.state;
     const isValid = isValidAmount(token.info);
+
+    let amount = this.props.getTokenAmount(this.props.token.info);
+    if (amount) {
+      amount = new BigNumber(amount)
+      .shiftedBy(-this.getNumDecimals()).toString();
+    }
+
     return (
       <div className={styles.component}>
         {!this.props.isTokenIncluded(token.info) ? (

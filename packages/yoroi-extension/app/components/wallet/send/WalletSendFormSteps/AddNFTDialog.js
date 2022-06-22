@@ -210,7 +210,7 @@ export default class AddNFTDialog extends Component<Props, State> {
 
           {!shouldAddMoreAssets && (
           <Box marginTop='10px'>
-            <MaxAssetsError maxAssetsAllowed={maxAssetsAllowed} />
+            <MaxAssetsError maxAssetsAllowed={10} />
           </Box>
          )}
           {
