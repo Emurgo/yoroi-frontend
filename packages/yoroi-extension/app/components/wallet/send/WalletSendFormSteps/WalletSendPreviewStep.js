@@ -250,6 +250,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
           href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/5008187102351-What-is-the-locked-assets-deposit-"
           target='_blank'
           rel="noreferrer noopener"
+          sx={{
+            color: 'inherit',
+            textDecoration: 'underline'
+          }}
         >
           {intl.formatMessage(messages.moreDetails)}
         </Link>
