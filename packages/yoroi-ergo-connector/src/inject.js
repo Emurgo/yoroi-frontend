@@ -112,7 +112,7 @@ const initialInject = `
   window.cardano = {
     ...(window.cardano||{}),
     '${WALLET_NAME}': {
-      icon: '$ICON_URL$',
+      icon: '${ICON_URL}',
       enable: cardano_request_read_access,
       isEnabled: cardano_check_read_access,
       apiVersion: '${API_VERSION}',
@@ -120,7 +120,7 @@ const initialInject = `
     }
   };
 })();
-`.replace('$ICON_URL$', ICON_URL);
+`;
 
 const cardanoApiInject = `
 class CardanoAuth {
