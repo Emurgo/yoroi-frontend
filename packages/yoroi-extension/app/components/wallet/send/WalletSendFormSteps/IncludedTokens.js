@@ -36,7 +36,7 @@ export default class IncludedTokens extends Component<Props> {
             </div>
 
             <div>
-              {!this.props.shouldSendAll && <button onClick={() => this.props.onRemoveToken(token.info)} type='button' className={styles.remove}> <RemoveIcon /> </button>}
+              {!this.props.shouldSendAll && <button onClick={() => this.props.onRemoveTokens([token.info])} type='button' className={styles.remove}> <RemoveIcon /> </button>}
             </div>
           </div>
         ))
@@ -56,7 +56,7 @@ export default class IncludedTokens extends Component<Props> {
               </div>
 
               <div>
-                {!this.props.shouldSendAll && <button type='button' onClick={() => this.props.onRemoveToken(nft.info)} className={styles.remove}> <RemoveIcon /> </button>}
+                {!this.props.shouldSendAll && <button type='button' onClick={() => this.props.onRemoveTokens([nft.info])} className={styles.remove}> <RemoveIcon /> </button>}
               </div>
             </div>
           )

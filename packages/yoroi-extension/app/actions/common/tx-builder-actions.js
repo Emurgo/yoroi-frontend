@@ -17,7 +17,7 @@ export default class TxBuilderActions {
     shouldReset?: boolean,
   |}> = new Action();
   deselectToken: Action<void> = new Action();
-  removeToken: Action<void | $ReadOnly<TokenRow>> = new Action();
+  removeTokens: Action<Array<$ReadOnly<TokenRow>>> = new Action();
   updateTentativeTx: Action<void> = new Action();
   setFilter: Action<(ElementOf<IGetAllUtxosResponse> => boolean)> = new Action();
   updateMetadata: Action<Array<TransactionMetadata> | void> = new Action();

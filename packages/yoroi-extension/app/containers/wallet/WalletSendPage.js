@@ -204,7 +204,7 @@ class WalletSendPage extends Component<AllProps> {
             })}
             spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
             onAddToken={txBuilderActions.addToken.trigger}
-            onRemoveToken={txBuilderActions.removeToken.trigger}
+            onRemoveTokens={txBuilderActions.removeTokens.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
             previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}
@@ -549,7 +549,7 @@ class WalletSendPage extends Component<AllProps> {
         classicTheme={this.generated.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         onAddToken={txBuilderActions.addToken.trigger}
-        onRemoveToken={txBuilderActions.removeToken.trigger}
+        onRemoveTokens={txBuilderActions.removeTokens.trigger}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
         calculateMinAda={this.calculateMinAda}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
@@ -583,7 +583,7 @@ class WalletSendPage extends Component<AllProps> {
         calculateMinAda={this.calculateMinAda}
         error={transactionBuilderStore.createUnsignedTx.error}
         onAddToken={txBuilderActions.addToken.trigger}
-        onRemoveToken={txBuilderActions.removeToken.trigger}
+        onRemoveTokens={txBuilderActions.removeTokens.trigger}
         shouldAddMoreTokens={this.shouldAddMoreTokens}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
@@ -637,8 +637,8 @@ class WalletSendPage extends Component<AllProps> {
         deselectToken: {|
           trigger: void => void
         |},
-        removeToken: {|
-          trigger: (params: void | $ReadOnly<TokenRow>) => void,
+        removeTokens: {|
+          trigger: (params: Array<$ReadOnly<TokenRow>>) => void,
         |},
         updateMemo: {|
           trigger: (params: void | string) => void
@@ -842,7 +842,7 @@ class WalletSendPage extends Component<AllProps> {
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
           addToken: { trigger: actions.txBuilderActions.addToken.trigger },
           deselectToken: { trigger: actions.txBuilderActions.deselectToken.trigger },
-          removeToken: { trigger: actions.txBuilderActions.removeToken.trigger },
+          removeTokens: { trigger: actions.txBuilderActions.removeTokens.trigger },
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },

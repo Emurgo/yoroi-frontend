@@ -141,7 +141,7 @@ type Props = {|
     token?: $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}) => void,
-  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +onRemoveToken: (Array<$ReadOnly<TokenRow>>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
@@ -302,7 +302,7 @@ export default class WalletSendForm extends Component<Props, State> {
               networkId: this.props.defaultToken.NetworkId,
             })
 
-            this.props.onRemoveToken(defaultTokenInfo)
+            this.props.onRemoveTokens([defaultTokenInfo])
             return true
           }
           const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
@@ -428,6 +428,11 @@ export default class WalletSendForm extends Component<Props, State> {
     const amountInputError = transactionFeeError || amountField.error
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
 
+    const defaultTokenInfo = this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    })
+
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
@@ -516,7 +521,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     }}
                     onBlur={() => {
                       // Remove default token if now amount entered
-                      if (!amountField.value) this.props.onRemoveToken();
+                      if (!amountField.value) this.props.onRemoveTokens([defaultTokenInfo]);
                     }}
                     amountFieldRevamp
                     placeholder='0.0'
@@ -539,7 +544,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     onClick={() => {
                       if (shouldSendAll) {
                         amountField.reset();
-                        this.props.onRemoveToken(); // remove default token
+                        this.props.onRemoveToken([defaultTokenInfo]);
                       } else {
                         this.props.onAddToken({
                           shouldReset: true,
@@ -564,7 +569,7 @@ export default class WalletSendForm extends Component<Props, State> {
               <IncludedTokens
                 tokens={tokens}
                 nfts={nfts}
-                onRemoveToken={this.props.onRemoveToken}
+                onRemoveTokens={this.props.onRemoveTokens}
                 shouldSendAll={shouldSendAll}
               />
 

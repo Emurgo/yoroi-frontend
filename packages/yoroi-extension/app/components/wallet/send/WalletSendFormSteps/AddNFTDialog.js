@@ -40,7 +40,7 @@ type Props = {|
     shouldReset?: boolean,
   |}) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,
-  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
 |};
 
 type State = {|
@@ -153,17 +153,18 @@ export default class AddNFTDialog extends Component<Props, State> {
 
   onAddAll = () => {
     const amount = new BigNumber('1');
+    const toRemove = [];
     for (const { token, included } of this.state.selectedTokens) {
       if (!included) {
-        this.props.onRemoveToken(token);
-        continue;
+        toRemove.push(token)
+        continue
       }
       this.props.onAddToken({
         token, shouldReset: false
       })
       this.props.updateAmount(amount)
     }
-
+    this.props.onRemoveTokens(toRemove);
     this.props.onClose();
   }
 

@@ -197,18 +197,21 @@ export default class AddTokenDialog extends Component<Props, State> {
 
 
   onAddAll = () => {
+    const toRemove = [];
     for (const { token, amount, included } of this.state.selectedTokens) {
       if (!included) {
-        this.props.onRemoveToken(token)
+        toRemove.push(token);
         continue
       }
       if (!amount) continue;
+      // Todo: combine add token + amount into one step
       this.props.onAddToken({
             token, shouldReset: false
       });
 
       this.props.updateAmount(amount);
     }
+    this.props.onRemoveTokens(toRemove);
     this.props.onClose();
   }
 

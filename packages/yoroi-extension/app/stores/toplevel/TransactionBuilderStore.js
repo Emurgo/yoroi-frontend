@@ -88,7 +88,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateMemo.listen(this._updateMemo);
     actions.addToken.listen(this._addToken);
     actions.deselectToken.listen(this._deselectToken)
-    actions.removeToken.listen(this._removeToken);
+    actions.removeTokens.listen(this._removeTokens);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.updateSendAllStatus.listen(this._updateSendAllStatus);
     actions.initialize.listen(this._initialize);
@@ -481,17 +481,16 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _removeToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+  _removeTokens: (tokens: Array<$ReadOnly<TokenRow>>) => void = (tokens) => {
+    // Todo: Fix removing the default asset
     const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._removeTokens)} requires wallet to be selected`);
 
-    if (!publicDeriver) throw new Error(`${nameof(this._removeToken)} requires wallet to be selected`);
-    if (!token) {
-      const network = publicDeriver.getParent().getNetworkInfo();
-      token = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
-    }
+    const tokenIds = new Set();
+    tokens.forEach(token => tokenIds.add(token.Identifier))
 
     this.plannedTxInfoMap = this.plannedTxInfoMap.filter(
-      ({ token: t }) => t.Identifier !== token?.Identifier
+      ({ token: t }) => !tokenIds.has(t.Identifier)
     );
 
     // Deselect the token
