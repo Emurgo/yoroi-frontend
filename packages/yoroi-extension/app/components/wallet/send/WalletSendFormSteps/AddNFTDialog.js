@@ -99,8 +99,7 @@ export default class AddNFTDialog extends Component<Props, State> {
     .map(({ token }) => ({ token, included: true }));
 
     this.setState({ fullNftsList: nftsList,  currentNftsList: nftsList, selectedTokens })
-  }
-
+  };
 
   state: State = {
     currentNftsList: [],
@@ -123,9 +122,10 @@ export default class AddNFTDialog extends Component<Props, State> {
     if (this.isTokenIncluded(token)) {
       this.onRemoveToken(token);
     } else {
-      this.setState(prev =>({
-        selectedTokens: [...prev.selectedTokens, { token, included: true }]
-      }))
+      const selectedTokens = [...this.state.selectedTokens].filter(
+        ({ token: t }) => t.Identifier !== token.Identifier
+      );
+      this.setState({ selectedTokens: [...selectedTokens, { token, included: true }] });
     }
   }
 
@@ -171,13 +171,11 @@ export default class AddNFTDialog extends Component<Props, State> {
     const { intl } = this.context;
     const {
       onClose,
-      numOfTokensIncluded,
-      maxAssetsAllowed,
       calculateMinAda,
+      shouldAddMoreTokens
     } = this.props
-    const { currentNftsList, fullNftsList, selectedTokens } = this.state
-    const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed
-
+    const { currentNftsList, fullNftsList, selectedTokens } = this.state;
+    const shouldAddMore = shouldAddMoreTokens(selectedTokens);
     return (
       <Dialog
         title={
@@ -202,12 +200,12 @@ export default class AddNFTDialog extends Component<Props, State> {
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda
-              minAda={calculateMinAda(selectedTokens.map(({ token }) => ({ token })))}
+              minAda={calculateMinAda(selectedTokens)}
             />
           </div>
          )}
 
-          {!shouldAddMoreAssets && (
+          {!shouldAddMore && (
           <Box marginTop='10px'>
             <MaxAssetsError maxAssetsAllowed={10} />
           </Box>
@@ -258,7 +256,7 @@ export default class AddNFTDialog extends Component<Props, State> {
               borderRadius: '0px',
               color: 'var(--yoroi-palette-secondary-300)',
             }}
-            disabled={selectedTokens.length === 0 || !shouldAddMoreAssets}
+            disabled={selectedTokens.length === 0 || !shouldAddMore}
             onClick={this.onAddAll}
             variant='ternary'
           >

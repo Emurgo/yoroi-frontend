@@ -481,12 +481,57 @@ class WalletSendPage extends Component<AllProps> {
 
   calculateMinAda = (selectedTokens) => {
     const { transactionBuilderStore } = this.generated.stores;
-    const { plannedTxInfoMap, calculateMinAda } = transactionBuilderStore
-    const minAdaAmount = calculateMinAda(
-      [...plannedTxInfoMap, ...selectedTokens].map(({ token }) => ({ token }))
-    );
+    const { plannedTxInfoMap, calculateMinAda } = transactionBuilderStore;
+
+    const tokens = {};
+    const shouldNotInclude = new Set();
+    // Remove duplicated tokens
+    selectedTokens.forEach(entry => {
+      if (entry.included) {
+        tokens[entry.token.Identifier] = { token: entry.token };
+      } else {
+        shouldNotInclude.add(entry.token.Identifier)
+      }
+    });
+    plannedTxInfoMap.forEach(entry => {
+      const id = entry.token.Identifier;
+      if (!shouldNotInclude.has(id))
+        tokens[entry.token.Identifier] = { token: entry.token };
+    });
+
+    const minAdaAmount = calculateMinAda(Object.values(tokens));
 
     return (new BigNumber(minAdaAmount)).shiftedBy(-this._getNumDecimals()).toString()
+  }
+
+  _mergeToken = (selectedTokens) => {
+    const { transactionBuilderStore } = this.generated.stores;
+    const { plannedTxInfoMap } = transactionBuilderStore;
+    const tokens = {};
+    const shouldNotInclude = new Set();
+    // Remove duplicated tokens
+    selectedTokens.forEach(entry => {
+      if (entry.included) {
+        tokens[entry.token.Identifier] = { token: entry.token };
+      } else {
+        shouldNotInclude.add(entry.token.Identifier)
+      }
+    });
+    plannedTxInfoMap.forEach(entry => {
+      const id = entry.token.Identifier;
+      if (!shouldNotInclude.has(id))
+        tokens[entry.token.Identifier] = { token: entry.token };
+    });
+
+    return Object.values(tokens)
+  }
+
+  shouldAddMoreTokens = (tokens) => {
+    const { maxAssetsAllowed } = this.generated.stores.transactionBuilderStore;
+
+    const allTokens = this._mergeToken(tokens);
+
+    return allTokens.length <= maxAssetsAllowed;
   }
 
   renderNFTDialog: void => Node = () => {
@@ -505,11 +550,10 @@ class WalletSendPage extends Component<AllProps> {
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
-        maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
-        numOfTokensIncluded={transactionBuilderStore.plannedTxInfoMap.length}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
         calculateMinAda={this.calculateMinAda}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+        shouldAddMoreTokens={this.shouldAddMoreTokens}
       />
     )
   }
@@ -540,7 +584,7 @@ class WalletSendPage extends Component<AllProps> {
         error={transactionBuilderStore.createUnsignedTx.error}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveToken={txBuilderActions.removeToken.trigger}
-        maxAssetsAllowed={transactionBuilderStore.maxAssetsAllowed}
+        shouldAddMoreTokens={this.shouldAddMoreTokens}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
       />

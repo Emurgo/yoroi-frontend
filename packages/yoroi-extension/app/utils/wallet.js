@@ -34,9 +34,7 @@ export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo) => {
         ].map(entry => ({
             entry,
             info: getTokenInfo(entry),
-        })).filter(token => (
-            !token.info.Metadata.assetMintMetadata?.[0]?.['721']
-        )).map(token => {
+        })).filter(token => !token.info.IsNFT).map(token => {
             const amount = genFormatTokenAmount(getTokenInfo)(token.entry)
             return {
                 value: token.info.TokenId,
@@ -61,7 +59,7 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         entry,
         info: getTokenInfo(entry),
     }))
-    .filter(token => token.info.Metadata.assetMintMetadata?.[0]?.['721'])
+    .filter(token => token.info.IsNFT)
     .map(token => {
         const policyId = token.entry.identifier.split('.')[0];
         const name = truncateToken(getTokenStrictName(token.info) ?? '-');
@@ -71,7 +69,7 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
             amount: genFormatTokenAmount(getTokenInfo)(token.entry),
             policyId,
             // $FlowFixMe[prop-missing]
-            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]?.['721'][policyId][name],
+            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]?.['721']?.[policyId][name],
             info: token.info,
         };
     })
@@ -83,7 +81,7 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
     }));
 }
 
-export function checkNFTImage(imageSrc, onload, onerror) {
+export function checkNFTImage(imageSrc: string, onload: void => void, onerror: void => void): void {
     const img = new Image();
     img.onload = onload;
     img.onerror = onerror;

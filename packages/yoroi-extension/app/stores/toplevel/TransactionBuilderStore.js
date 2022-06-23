@@ -223,7 +223,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return true;
   }
 
-  calculateMinAda: (tokens:{| token: $ReadOnly<TokenRow> |}) => string = (tokens) => {
+  calculateMinAda: (tokens: Array<{| token: $ReadOnly<TokenRow> |}>) => string = (tokens) => {
     const publicDeriver = this.stores.wallets.selected;
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
@@ -270,7 +270,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       return;
     }
 
-    const plannedTxInfoMap = this.plannedTxInfoMap
+    const plannedTxInfoMap = this.plannedTxInfoMap;
+    console.log({plannedTxInfoMap: plannedTxInfoMap.length})
     const receiver = this.receiver;
     if (receiver == null) return;
 

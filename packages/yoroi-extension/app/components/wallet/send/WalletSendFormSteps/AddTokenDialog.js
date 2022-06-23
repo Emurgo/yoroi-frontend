@@ -309,13 +309,11 @@ export default class AddTokenDialog extends Component<Props, State> {
     const { intl } = this.context;
     const {
       onClose,
-      maxAssetsAllowed,
-      plannedTxInfoMap,
       calculateMinAda,
+      shouldAddMoreTokens
     } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
-    const numOfTokensIncluded = plannedTxInfoMap.length;
-    const shouldAddMoreAssets = numOfTokensIncluded + selectedTokens.length <= maxAssetsAllowed;
+    const shouldAddMore = shouldAddMoreTokens(selectedTokens);
     return (
       <Dialog
         title={
@@ -343,7 +341,7 @@ export default class AddTokenDialog extends Component<Props, State> {
             />
           </div>
           )}
-          {!shouldAddMoreAssets && (
+          {!shouldAddMore && (
             <Box sx={{ marginTop: '10px' }}>
               <MaxAssetsError maxAssetsAllowed={10} />
             </Box>)}
@@ -417,7 +415,7 @@ export default class AddTokenDialog extends Component<Props, State> {
               borderRadius: '0px',
               color: 'var(--yoroi-palette-secondary-300)',
             }}
-            disabled={selectedTokens.length === 0 || !this.isValidAmounts() || !shouldAddMoreAssets}
+            disabled={selectedTokens.length === 0 || !this.isValidAmounts() || !shouldAddMore}
             onClick={this.onAddAll}
             variant='ternary'
           >
