@@ -55,7 +55,7 @@ Feature: dApp connector anonymous wallet errors checking
     And The user reject for signing is received
   
   @dApp-1015
-  Scenario: dApp, anonymous wallet, unused adress, signing data, cancel signing
+  Scenario: dApp, anonymous wallet, unused address, signing data, cancel signing
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -71,7 +71,7 @@ Feature: dApp connector anonymous wallet errors checking
     And The user reject for signing data is received
 
   @dApp-1016
-  Scenario: dApp, anonymous wallet, used adress, signing data, cancel signing
+  Scenario: dApp, anonymous wallet, used address, signing data, cancel signing
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance

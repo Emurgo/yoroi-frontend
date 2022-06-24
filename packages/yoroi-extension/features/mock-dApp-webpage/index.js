@@ -200,12 +200,14 @@ export class MockDAppWebpage {
   }
 
   async requestUsedAddresses() {
+    this.logger.info(`MockDApp: Getting used addresses`);
     await this.driver.executeScript(() => {
       window.addressesPromise = window.api.getUsedAddresses({ page: 0, limit: 5 });
     });
   }
 
   async requestUnusedAddresses() {
+    this.logger.info(`MockDApp: Getting unused addresses`);
     await this.driver.executeScript(() => {
       window.addressesPromise = window.api.getUnusedAddresses();
     });
@@ -429,7 +431,7 @@ export class MockDAppWebpage {
         .then(addrs => {
           // eslint-disable-next-line promise/always-return
           if (addrs.length === 0) {
-            callback({ success: false, errMsg: 'No unused addresses' });
+            callback({ success: false, errMsg: 'No addresses found' });
           }
           callback({ success: true, retValue: addrs });
         })
@@ -446,10 +448,10 @@ export class MockDAppWebpage {
     let address;
     if (addresses && addresses.length > 0) {
       address = addresses[0];
-      this.logger.info(`MockDApp: Using used address`);
+      this.logger.info(`MockDApp: Using the address ${address}`);
     } else {
       this.logger.error(`MockDApp: -> The error is received: No used or unused Addresses`);
-      throw new MockDAppWebpageError('No Unused Addresses');
+      throw new MockDAppWebpageError('There are no addresses to proceed');
     }
 
     address = this._addressToCbor(address);
