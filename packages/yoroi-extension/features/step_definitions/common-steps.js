@@ -46,6 +46,10 @@ import {
   pickUpCurrencyDialog,
   hwOptionsDialog,
   trezorWalletButton,
+  eraOptionsDialog,
+  shelleyEraButton,
+  trezorConnectDialog,
+  trezorConfirmButton,
 } from '../pages/newWalletPages';
 
 const { promisify } = require('util');
@@ -414,12 +418,23 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
   await setTrezorWallet(this, deviceId);
 });
 
-Given(/^I connected Trezor emulator$/, async function () {
+Given(/^I should see connected Trezor emulator$/, async function () {
   await this.click(connectHwButton);
   await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(getCurrencyButton('cardano'));
+  await this.click(getCurrencyButton('cardanoTestnet'));
   await this.waitForElement(hwOptionsDialog);
   await this.click(trezorWalletButton);
+  await this.waitForElement(eraOptionsDialog);
+  await this.click(shelleyEraButton);
+  await this.waitForElement(trezorConnectDialog);
+  await this.click(trezorConfirmButton);
+  await this.click(trezorConfirmButton);
+  await this.driver.sleep(10000);
+  // wait for a new tab
+  // tick the checkbox on the page and press Allow button
+  // press the Export button
+  // wait for closing the new tab
+  // save the emulator as is
 });
 
 async function restoreWalletsFromStorage(client) {
