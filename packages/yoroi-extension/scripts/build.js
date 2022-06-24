@@ -15,6 +15,7 @@ const exec = cmd => {
 // override NODE_ENV for ConfigWebpackPlugin
 process.env.NODE_CONFIG_ENV = argv.env;
 const isNightly = argv.nightly != null;
+const useEmulator = argv.emulator != null;
 const shouldInjectConnector = argv.dontInjectConnector === undefined;
 
 const buildAndCopyInjector = (destDir: string, buildType: string) => {
@@ -52,7 +53,7 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()}`);
+  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env emulator=${useEmulator.toString()} --env isLight=${(!shouldInjectConnector).toString()}`);
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');

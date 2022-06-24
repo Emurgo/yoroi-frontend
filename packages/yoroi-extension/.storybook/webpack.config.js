@@ -1,6 +1,5 @@
 // @flow
 
-const path = require('path');
 const webpack = require('webpack');
 const ConfigWebpackPlugin = require('config-webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
@@ -17,12 +16,14 @@ module.exports = async ({ config, mode } /*: {|
   config: any,
 |}*/) /*: * */ => {
   const isNightly = "false";
+  const useEmulator = "false";
   const isLight = "false";
   const isProduction = mode === 'PRODUCTION';
   const customConfig = isProduction
     ? baseProdConfig({
       networkName: ENV,
       nightly: isNightly,
+      emulator: useEmulator,
       publicPath: './',
       isLight
     })
