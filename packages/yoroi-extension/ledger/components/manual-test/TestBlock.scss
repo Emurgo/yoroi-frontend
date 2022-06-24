@@ -1,0 +1,57 @@
+.component {
+  position: absolute;
+  display: flex;
+  z-index: 1;
+  top: 4px;
+  left: 4px;
+  padding: 10px;
+  background-color: rgb(170, 233, 119);
+  border: 3px solid red;
+  border-radius: 5px;
+  .column1 {
+    padding: 6px;
+    margin-right: 5px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(214, 180, 136);
+  }
+  .column2 {
+    .transportSelection,
+    .deviceSelection {
+      border-radius: 5px;
+      margin-bottom: 5px;
+      background-color: rgb(245, 182, 215);
+      .tranportLabel,
+      .deviceLabel {
+        font-size: 14px;
+      }
+    }
+    .deviceSelection {
+      display: flex;
+      justify-content: space-evenly;
+    }
+    .operationSelection {
+      margin-bottom: 5px;
+      border-radius: 5px;      
+      display: flex;
+      flex-direction: column;
+      background-color: rgb(175, 165, 221);
+      button {
+        width: 200px;
+        height: 26px;
+        margin: 8px;
+      }
+    }
+    .visibilityInfo {
+      text-align: center;
+      font-size: 10px;
+    }    
+  }  
+}
+.visible {
+  opacity: 1;
+}
+.hidden {
+  opacity: 0;
+}
