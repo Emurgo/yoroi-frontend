@@ -84,18 +84,6 @@ export default class App extends React.Component<Props> {
           <HashRouter basename={process.env.PUBLIC_URL}>
             <Switch>
               <Route exact path="/">
-                <ComingSoon />
-              </Route>
-              <Route path="/v2">
-                <Maintenance />
-              </Route>
-              <Route path="/v3.1">
-                <Maintenance />
-              </Route>
-              <Route path="/v4.1">
-                <Maintenance />
-              </Route>
-              <Route path="/v5">
                 <ConnectPage rootStore={this.props.rootStore} />
               </Route>
               <Redirect to="/" />

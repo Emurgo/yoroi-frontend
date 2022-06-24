@@ -82,7 +82,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         // Showing - Operation cancelled by user.
         localizableError = new LocalizableError(ledgerErrors.cancelOnLedgerConnectError102);
         break;
-      case 'TransportStatusError: Ledger device: Device is locked':
+      case 'DeviceStatusError: Device is locked':
         // Showing - Ledger device is locked, please unlock it and retry.
         localizableError = new LocalizableError(ledgerErrors.deviceLockedError103);
         break;

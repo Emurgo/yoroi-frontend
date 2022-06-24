@@ -63,9 +63,13 @@ export default class ConnectStore {
   @observable expectedSerial: ?string;
   @observable extension: ?string;
   userInteractableRequest: RequestType;
+  sendResponseFunc: ?(any) => void;
 
   constructor(transportId: TransportIdType) {
+    // message from the test panel
     window.addEventListener('message', this._onMessage);
+    // message from Yoroi extension main tab
+    chrome.runtime.onMessage.addListener(this._onMessage);
 
     runInAction(() => {
       this.wasDeviceLocked = false;
@@ -73,6 +77,8 @@ export default class ConnectStore {
       this.progressState = PROGRESS_STATE.LOADING;
       this.deviceCode = convertStringToDeviceCodeType(getKnownDeviceCode());
     });
+
+    chrome.runtime.sendMessage('ledger-ready');
   }
 
   @computed
@@ -148,6 +154,7 @@ export default class ConnectStore {
     const adaApp = new AdaApp(transport);
     const versionResp = await adaApp.getVersion();
     const currentSerial = await adaApp.getSerial();
+
     if (this.expectedSerial != null) {
       if (currentSerial.serialHex !== this.expectedSerial) {
         throw new Error(`Incorrect hardware wallet. This wallet was created with a device with serial ID ${this.expectedSerial ?? 'undefined'}, but you are currently using ${currentSerial.serialHex}.`);
@@ -404,25 +411,33 @@ export default class ConnectStore {
   };
 
   // #==============================================#
-  //  Website <==> Content Script communications
+  //  Yoroi extension main tab <==> this tab communications
   // #==============================================#
 
   /**
    * Handle message from Content Script [ Website <== Content Script ]
    * @param {*} req request message object
    */
-  _onMessage = (req: {
-    origin?: string,
-    data?: ?{
-      serial?: ?string,
-      params?: any,
-      target?: string,
-      action?: OperationNameType,
-      extension?: ?string,
-      ...,
+  _onMessage = (
+    req: {
+      origin?: string,
+      data?: ?{
+        serial?: ?string,
+        params?: any,
+        target?: string,
+        action?: OperationNameType,
+        extension?: ?string,
+          ...,
+      },
+      ...
     },
-    ...
-  }): void => {
+    // present if the message is sent from Yoroi extension main tab
+    _sender?: any,
+    sendResponse?: ?(any) => void,
+  ): void => {
+    if (sendResponse) {
+      this.sendResponseFunc = sendResponse;
+    }
     const { data } = req;
     if (data == null) {
       console.error(`Missing data in req ${JSON.stringify(req)}`);
@@ -486,6 +501,8 @@ export default class ConnectStore {
         console.error(`[YLC] Unexpected action requested: ${actn}`);
         break;
     }
+    // this lets Chrome keeps the port open so that we can send the reponse
+    return true;
   }
 
   /**
@@ -524,8 +541,14 @@ export default class ConnectStore {
     if (ENV.isDevelopment) {
       this.setResponse(msg);
       this.setProgressState(PROGRESS_STATE.DEVICE_RESPONSE);
+    } else {
+      window.close();
     }
     msg.action = `${msg.action}-reply`;
-    window.postMessage(msg, '*');
+    if (this.sendResponseFunc != null) {
+      this.sendResponseFunc(msg);
+    } else {
+      window.postMessage(msg, '*');
+    }
   }
 }
