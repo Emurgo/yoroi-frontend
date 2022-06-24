@@ -568,8 +568,8 @@ class WalletSendPage extends Component<AllProps> {
     return (
       <AddTokenDialog
         onClose={() => {
-          txBuilderActions.deselectToken.trigger()
-          this.generated.actions.dialogs.closeActiveDialog.trigger()
+          txBuilderActions.deselectToken.trigger();
+          this.generated.actions.dialogs.closeActiveDialog.trigger();
         }}
         spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}

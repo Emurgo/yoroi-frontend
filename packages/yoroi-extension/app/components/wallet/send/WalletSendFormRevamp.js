@@ -544,7 +544,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     onClick={() => {
                       if (shouldSendAll) {
                         amountField.reset();
-                        this.props.onRemoveToken([defaultTokenInfo]);
+                        this.props.onRemoveTokens([defaultTokenInfo]);
                       } else {
                         this.props.onAddToken({
                           shouldReset: true,
