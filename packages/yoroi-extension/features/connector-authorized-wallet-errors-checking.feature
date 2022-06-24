@@ -72,3 +72,37 @@ Feature: dApp connector errors checking
     Then I should see the connector popup for signing
     Then I cancel signing the transaction
     And The user reject for signing is received
+
+  @dApp-1017
+  Scenario: dApp, authorized wallet, unused address, signing data, cancel signing
+    And I request access to Yoroi
+    Then I should see the connector popup for connection
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
+    Then I enter the spending password asdfasdfasdf and click confirm
+    Then The popup window should be closed
+    And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    Then I request unused addresses
+    Then I request signing the data:
+    | payload   |
+    | sign data anonymous wallet |
+    Then I should see the connector popup for signing data
+    Then I cancel signing the transaction
+    And The user reject for signing data is received
+
+  @dApp-1018
+  Scenario: dApp, authorized wallet, used address, signing data, cancel signing
+    And I request access to Yoroi
+    Then I should see the connector popup for connection
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
+    Then I enter the spending password asdfasdfasdf and click confirm
+    Then The popup window should be closed
+    And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    Then I request used addresses
+    Then I request signing the data:
+    | payload   |
+    | sign data anonymous wallet |
+    Then I should see the connector popup for signing data
+    Then I cancel signing the transaction
+    And The user reject for signing data is received

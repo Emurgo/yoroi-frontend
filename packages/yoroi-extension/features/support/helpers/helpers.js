@@ -42,6 +42,7 @@ export function getMethod(
 }
 
 export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
+
   const recoveryPhrase = phrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const recoveryPhraseElement = await customWorld.findElement(recoveryPhraseField);
