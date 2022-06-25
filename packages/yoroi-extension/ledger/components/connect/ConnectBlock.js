@@ -1,5 +1,6 @@
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import type {
@@ -50,7 +51,7 @@ export default class ConnectBlock extends React.Component<Props> {
   // Yoroi styled loading spinner
   loadingSpinner: ?LoadingSpinner;
 
-  render() {
+  render(): Node {
     const {
       isWebAuthn,
       isFirefox,

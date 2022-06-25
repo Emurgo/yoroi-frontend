@@ -1,7 +1,9 @@
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import imgWarningIcon from '../../../assets/img/warning-icon.svg';
 import styles from './WebAuthnTopBlock.scss';
@@ -20,9 +22,11 @@ type Props = {|
 
 @observer
 export default class WebAuthnTopBlock extends React.Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired
+  };
 
-  render() {
+  render(): Node {
     const {
       showWebAuthnTop,
       isFirefox

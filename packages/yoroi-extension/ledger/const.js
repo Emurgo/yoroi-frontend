@@ -1,5 +1,6 @@
 // @flow //
 import { TRANSPORT_ID } from './types/enum';
+import type { TransportIdType } from './types/enum';
 
 export const YOROI_LEDGER_CONNECT_TARGET_NAME = 'YOROI-LEDGER-CONNECT';
 export const DEFAULT_LOCALE = 'en-US';
@@ -8,7 +9,7 @@ export const ENV = {
   isDevelopment: process.env.NODE_ENV === 'development',
   isFirefox: !!window.InstallTrigger
 };
-export const DEFAULT_TRANSPORT_PROTOCOL = ENV.isFirefox
+export const DEFAULT_TRANSPORT_PROTOCOL: TransportIdType = ENV.isFirefox
   ? TRANSPORT_ID.WEB_AUTHN
   : TRANSPORT_ID.WEB_HID;
 export const DEVICE_LOCK_CHECK_TIMEOUT_MS = 500; // In milli-seconds

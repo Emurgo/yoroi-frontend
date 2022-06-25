@@ -25,7 +25,7 @@ type Props = {|
 
 @observer
 export default class Layout extends React.Component<Props> {
-  render() {
+  render(): Node {
     const {
       setTransport,
       setLocale,

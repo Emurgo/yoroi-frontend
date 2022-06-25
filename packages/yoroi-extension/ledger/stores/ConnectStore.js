@@ -1,4 +1,6 @@
 // @flow //
+declare var chrome;
+
 import { observable, action, runInAction, computed } from 'mobx';
 import AdaApp, {
   TxAuxiliaryDataType
@@ -97,49 +99,49 @@ export default class ConnectStore {
   }
 
   @action('Changing Transport')
-  setTransport = (transportId: TransportIdType): void => {
+  setTransport: (TransportIdType) => void = (transportId) => {
     this.transportId = transportId;
   }
 
   @action('Changing Progress State')
-  setProgressState = (progressState: ProgressStateType): void => {
+  setProgressState: (ProgressStateType) => void = (progressState) => {
     this.progressState = progressState;
   }
 
   @action('Changing Current Operation Name')
-  setCurrentOperationName = (currentOperationName: OperationNameType): void => {
+  setCurrentOperationName: (OperationNameType) => void = (currentOperationName) => {
     this.currentOperationName = currentOperationName;
   }
 
   @action('Changing device name')
-  setDeviceCode = (deviceCode: DeviceCodeType): void => {
+  setDeviceCode: (DeviceCodeType) => void = (deviceCode) => {
     this.deviceCode = deviceCode;
   }
 
   @action('Change Sign Tx Info')
-  setSignTxInfo = (signTxInfo: SignTransactionRequest): void => {
+  setSignTxInfo: (SignTransactionRequest) => void = (signTxInfo) => {
     this.signTxInfo = signTxInfo;
   }
 
   @action('Change Verify Address Info')
-  setVerifyAddressInfo = (verifyAddressInfo: ShowAddressRequestWrapper): void => {
+  setVerifyAddressInfo: (ShowAddressRequestWrapper) => void = (verifyAddressInfo) => {
     this.verifyAddressInfo = verifyAddressInfo;
   }
 
   @action('Change Derive Address Info')
-  setDeriveAddressInfo = (deriveAddressInfo: DeriveAddressRequest): void => {
+  setDeriveAddressInfo: (DeriveAddressRequest) => void = (deriveAddressInfo) => {
     this.deriveAddressInfo = deriveAddressInfo;
   }
 
   @action('Set response')
-  setResponse = (response: MessageType): void => {
+  setResponse: (MessageType) => void = (response) => {
     this.response = response;
   }
 
-  _detectLedgerDevice = async (transport: any): Promise<{|
+  _detectLedgerDevice: (any) => Promise<{|
     version: GetVersionResponse,
     serial: GetSerialResponse,
-  |}> => {
+  |}> = async (transport) => {
 
     setTimeout(() => {
       // Device is not detected till now so we assume that it's locked
@@ -176,15 +178,14 @@ export default class ConnectStore {
     };
   }
 
-  executeActionWithCustomRequest = (
-    deviceCode: DeviceCodeType,
-    request: RequestType
+  executeActionWithCustomRequest: (DeviceCodeType, RequestType) => void = (
+    deviceCode, request
   ) => {
     this.userInteractableRequest = request;
     this.executeAction(deviceCode);
   }
 
-  executeAction = (deviceCode: DeviceCodeType) => {
+  executeAction: (DeviceCodeType) => void = (deviceCode) => {
     runInAction(() => {
       setKnownDeviceCode(deviceCode);
       this.setDeviceCode(deviceCode);
@@ -378,7 +379,7 @@ export default class ConnectStore {
     }
   };
 
-  getVersion = async (actn: OperationNameType): Promise<void> => {
+  getVersion: (OperationNameType) => Promise<void> = async (actn) => {
     let transport;
     try {
       transport = await makeTransport(this.transportId);
@@ -394,7 +395,7 @@ export default class ConnectStore {
     }
   };
 
-  getSerial = async (actn: OperationNameType): Promise<void> => {
+  getSerial: (OperationNameType) => Promise<void> = async (actn)=> {
     let transport;
     try {
       transport = await makeTransport(this.transportId);
@@ -418,7 +419,7 @@ export default class ConnectStore {
    * Handle message from Content Script [ Website <== Content Script ]
    * @param {*} req request message object
    */
-  _onMessage = (
+  _onMessage: (
     req: {
       origin?: string,
       data?: ?{
@@ -434,7 +435,7 @@ export default class ConnectStore {
     // present if the message is sent from Yoroi extension main tab
     _sender?: any,
     sendResponse?: ?(any) => void,
-  ): void => {
+  ) => ?boolean = (req, _sender, sendResponse) => {
     if (sendResponse) {
       this.sendResponseFunc = sendResponse;
     }
@@ -511,7 +512,7 @@ export default class ConnectStore {
    * @param {*} success success status boolean
    * @param {*} payload payload object
    */
-  _replyMessageWrap = (actn: string, success: boolean, payload: any): void => {
+  _replyMessageWrap: (string, boolean, any) => void = (actn, success, payload) => {
     this._replyMessage({
       success,
       payload,
@@ -525,7 +526,7 @@ export default class ConnectStore {
    * @param {*} actn action string
    * @param {*} err Error object
    */
-  _replyError = (actn: string, err: Error): void => {
+  _replyError: (string, Error) => void = (actn, err) => {
     console.error(`[YLC] ${actn}${formatError(err)}`);
     const payload = {
       error: ledgerErrToMessage(err).toString()
@@ -537,7 +538,7 @@ export default class ConnectStore {
    * Reply message to Content Script  [ Website ==> Content Script ]
    * @param {*} msg MessageType object as reply
    */
-  _replyMessage = (msg: MessageType): void => {
+  _replyMessage: (MessageType) => void = (msg) => {
     if (ENV.isDevelopment) {
       this.setResponse(msg);
       this.setProgressState(PROGRESS_STATE.DEVICE_RESPONSE);

@@ -36,7 +36,7 @@ TUTORIAL_LINK[DEVICE_CODE.NANO_X + OPERATION_NAME.GET_SERIAL] = 'https://youtu.b
  * Converts hardened BIP32Path to it's string version
  * @param {*} hdPath hardened BIP32Path
  */
-export const pathToString = (hdPath: BIP32Path) => {
+export const pathToString: (BIP32Path) => string = (hdPath) => {
   return `m/${hdPath
     .map((item) => (item % HARDENED) + (item >= HARDENED ? "'" : ''))
     .join('/')}`;

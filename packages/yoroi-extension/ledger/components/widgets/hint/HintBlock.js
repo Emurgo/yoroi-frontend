@@ -1,23 +1,26 @@
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './HintBlock.scss';
 
 type Props = {|
   number: number,
   text: any,
-  secondaryText?: string,
+  secondaryText?: ?string,
   imagePath: string,
 |};
 
 @observer
 export default class HintBlock extends React.Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
-  static defaultProps = { secondaryText: undefined }
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired
+  };
+  static defaultProps: {| secondaryText: ?string |}  = { secondaryText: undefined }
 
-  render() {
+  render(): Node {
     const {
       number,
       text,

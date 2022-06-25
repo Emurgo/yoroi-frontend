@@ -4,6 +4,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import {
   utils,
@@ -66,19 +67,19 @@ export default class TestBlock extends React.Component<Props, State> {
     };
   }
 
-  onCompClicked = (): void => {
+  onCompClicked: () => void = () => {
     this.setState({ visible: `${styles.visible}` });
   }
 
-  onCompDoubleClicked = () => {
+  onCompDoubleClicked: () => void = () => {
     this.setState({ visible: `${styles.hidden}` });
   }
 
-  setStartedQuery = () => {
+  setStartedQuery: () => void = () => {
     this.setState({ startedQuery: true });
   }
 
-  onLangSelectionChange = (locale: string): void => {
+  onLangSelectionChange: (string) => void = (locale) => {
     if (this.props.currentTransportId !== locale &&
       this.state.visible === `${styles.visible}`
     ) {
@@ -87,7 +88,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
   };
 
-  onTransportSelectionChange = (transportId: TransportIdType): void => {
+  onTransportSelectionChange: (TransportIdType) => void  = (transportId) => {
     if (this.props.currentLocale !== transportId &&
       this.state.visible === `${styles.visible}`
     ) {
@@ -96,7 +97,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
   };
 
-  render() {
+  render(): Node {
     const supportedLocals = (
       SUPPORTED_LOCALS.map(locale => {
         return (
@@ -204,7 +205,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test getVersion
    */
-  onLogVersion = (): void => {
+  onLogVersion: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.GET_LEDGER_VERSION,
@@ -218,7 +219,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test getSerial
    */
-  onLogSerial = (): void => {
+  onLogSerial: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.GET_SERIAL,
@@ -232,7 +233,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test getExtendedPublicKey
    */
-  onExtendedByronPublicKey = (): void => {
+  onExtendedByronPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const path = utils.str_to_path("44'/1815'/0'");
 
@@ -244,7 +245,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onExtendedByronPublicKey`);
   }
-  onExtendedShelleyPublicKey = (): void => {
+  onExtendedShelleyPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const path = utils.str_to_path("1852'/1815'/0'");
 
@@ -260,7 +261,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test getExtendedPublicKey
    */
-  onExtendedMultiByronPublicKey = (): void => {
+  onExtendedMultiByronPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const paths = [
         utils.str_to_path("44'/1815'/0'"),
@@ -275,7 +276,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onExtendedMultiByronPublicKey`);
   }
-  onExtendedMultiShelleyPublicKey = (): void => {
+  onExtendedMultiShelleyPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const paths = [
         utils.str_to_path("1852'/1815'/0'"),
@@ -294,7 +295,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test signTransaction
    */
-  onSignTransaction = (): void => {
+  onSignTransaction: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const inputs = [
         {
@@ -406,7 +407,7 @@ export default class TestBlock extends React.Component<Props, State> {
     console.debug(`[YLC] TEST:onSignTransaction`);
   }
 
-  onCatalystRegistrationSignTransaction = (): void => {
+  onCatalystRegistrationSignTransaction: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const inputs = [
         {
@@ -494,7 +495,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test showAddress = Verify Address
    */
-  onShowByronAddress = (): void => {
+  onShowByronAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.SHOW_ADDRESS,
@@ -517,7 +518,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onShowAddress`);
   }
-  onShowBasePathAddress = (): void => {
+  onShowBasePathAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.SHOW_ADDRESS,
@@ -540,7 +541,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onShowBaseHexAddress = (): void => {
+  onShowBaseHexAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.SHOW_ADDRESS,
@@ -563,7 +564,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onShowPointerAddress = (): void => {
+  onShowPointerAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.SHOW_ADDRESS,
@@ -590,7 +591,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onShowEnterpriseAddress = (): void => {
+  onShowEnterpriseAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.SHOW_ADDRESS,
@@ -612,7 +613,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onShowRewardAddress = (): void => {
+  onShowRewardAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.SHOW_ADDRESS,
@@ -638,7 +639,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Test deriveAddress
    */
-  onDeriveByronAddress = (): void => {
+  onDeriveByronAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.DERIVE_ADDRESS,
@@ -659,7 +660,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onDeriveBasePathAddress = (): void => {
+  onDeriveBasePathAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.DERIVE_ADDRESS,
@@ -681,7 +682,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onDeriveBaseHexAddress = (): void => {
+  onDeriveBaseHexAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.DERIVE_ADDRESS,
@@ -703,7 +704,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onDerivePointerAddress = (): void => {
+  onDerivePointerAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.DERIVE_ADDRESS,
@@ -729,7 +730,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onDeriveEnterpriseAddress = (): void => {
+  onDeriveEnterpriseAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.DERIVE_ADDRESS,
@@ -750,7 +751,7 @@ export default class TestBlock extends React.Component<Props, State> {
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
   }
-  onDeriveRewardAddress = (): void => {
+  onDeriveRewardAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
         OPERATION_NAME.DERIVE_ADDRESS,
@@ -775,7 +776,7 @@ export default class TestBlock extends React.Component<Props, State> {
   /**
    * Makes Request object
    */
-  makeRequest = (action: string, params: any) => {
+  makeRequest: (string, any) => any = (action, params) => {
     this.setStartedQuery();
     return {
       action,

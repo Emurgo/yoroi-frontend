@@ -25,7 +25,7 @@ export default class RootStore {
     this.connectStore = new ConnectStore(urlParams.transportId);
   }
 
-  parseURLParams = (): URLParams => {
+  parseURLParams: () => URLParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
 
     // Parse Transport

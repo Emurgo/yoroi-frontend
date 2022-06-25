@@ -3,6 +3,7 @@ import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import semverGte from 'semver/functions/gte';
 
 import type { DeviceCodeType }  from '../../../../types/enum';
@@ -18,7 +19,7 @@ import {
 import {
   pathToString,
 } from '../../../../utils/cmn';
-import { encode, toWords } from 'bech32';
+import { bech32 } from 'bech32';
 import { getAddressHintBlock } from '../../../widgets/hint/AddressHintBlock';
 
 import styles from './SendTxHintBlock.scss';
@@ -187,7 +188,9 @@ type Props = {|
 
 @observer
 export default class SendTxHintBlock extends React.Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired
+  };
 
   renderCertificate: {|
     cert: Certificate,
@@ -251,9 +254,9 @@ export default class SendTxHintBlock extends React.Component<Props> {
       // Starting from version 2.4.1, the Ledger Cardano app show the pool ID
       // in bech32, complying with CIP0005
       if (semverGte(request.deviceVersion, '2.4.1')) {
-        poolId = encode(
+        poolId = bech32.encode(
           'pool',
-          toWords(Buffer.from(params.poolKeyHashHex, 'hex'))
+          bech32.toWords(Buffer.from(params.poolKeyHashHex, 'hex'))
         );
       } else {
         poolId = params.poolKeyHashHex;
@@ -329,7 +332,7 @@ export default class SendTxHintBlock extends React.Component<Props> {
     return [];
   }
 
-  render() {
+  render(): Node {
     const {
       deviceCode,
       signTxInfo,

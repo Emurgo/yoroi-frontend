@@ -1,5 +1,6 @@
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import _ from 'lodash'; // is this really needed?
 
 type Props = {|variables: { [key: string]: string }|};
@@ -26,5 +27,5 @@ export default class StyleVariableLoader extends React.Component<Props> {
     });
   }
 
-  render() { return (null); }
+  render(): Node { return (null); }
 }

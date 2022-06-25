@@ -1,5 +1,6 @@
 // @flow //
 import React, { Suspense, lazy } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -17,8 +18,7 @@ import pt from 'react-intl/locale-data/pt';
 import RootStore from './stores';
 
 import LoadingSpinner from './components/widgets/LoadingSpinner';
-import ComingSoon from './components/widgets/ComingSoon';
-import Maintenance from './components/widgets/Maintenance';
+
 import {
   HashRouter,
   Switch,
@@ -48,16 +48,16 @@ addLocaleData([
 const ConnectPage = lazy(() => import('./containers/ConnectPage'));
 const StyleVariableLoader = lazy(() => import('./containers/StyleVariableLoader'));
 
-type Props = {
+type Props = {|
   rootStore: RootStore
-}
+|}
 
 @observer
 export default class App extends React.Component<Props> {
   // Yoroi styled loading spinner
   loadingSpinner: ?LoadingSpinner;
 
-  render() {
+  render(): Node {
     const { profileStore } = this.props.rootStore;
 
     const locale = profileStore.currentLocale;

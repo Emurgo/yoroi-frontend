@@ -1,7 +1,7 @@
 // @flow //
 import React from 'react';
 import { observer } from 'mobx-react';
-
+import type { Node } from 'react';
 import type { InjectedContainerProps } from '../types/injected-props';
 import { ENV } from '../const';
 import Layout from '../components/Layout';
@@ -11,7 +11,7 @@ type Props = InjectedContainerProps
 
 @observer
 export default class ConnectPage extends React.Component<Props> {
-  render() {
+  render(): Node {
     const {
       connectStore,
       profileStore

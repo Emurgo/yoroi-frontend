@@ -1,7 +1,9 @@
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type { DeviceCodeType } from '../../../../types/enum';
 import HintBlock from '../../../widgets/hint/HintBlock';
@@ -40,9 +42,11 @@ type Props = {|
 
 @observer
 export default class DeriveAddressHintBlock extends React.Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired
+  };
 
-  render() {
+  render(): Node {
     const {
       deviceCode,
       deriveAddressInfo,

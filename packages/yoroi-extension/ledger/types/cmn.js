@@ -8,22 +8,22 @@ import type {
   ShowAddressRequest,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-export type MessageType = {
+export type MessageType = {|
   action: string,
   extension: ?string,
   success: boolean,
   payload: any
-};
+|};
 
-export type RequestType = {
+export type RequestType = {|
   action: OperationNameType,
   params: any,
-}
+|}
 
-export type URLParams = {
+export type URLParams = {|
   transportId: TransportIdType,
   locale: string
-}
+|}
 
 export type GetVersionRequest = void;
 export type GetSerialRequest = void;

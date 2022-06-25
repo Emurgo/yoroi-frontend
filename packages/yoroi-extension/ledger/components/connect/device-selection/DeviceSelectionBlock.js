@@ -1,7 +1,9 @@
 // @flow //
 import React from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type {
   DeviceCodeType,
@@ -77,17 +79,19 @@ type Props = {|
 
 @observer
 export default class DeviceSelectionBlock extends React.Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired
+  };
 
-  onExecuteActionClicked = (deviceCode: DeviceCodeType): void => {
+  onExecuteActionClicked: (DeviceCodeType) => void  = (deviceCode) => {
     this.props.executeAction(deviceCode);
   };
 
-  onDeviceSelectionClicked = (): void => {
+  onDeviceSelectionClicked: () => void  = () => {
     this.props.setDeviceCode(DEVICE_CODE.NONE);
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       knownDeviceCode,
