@@ -71,9 +71,10 @@ class App extends Component<Props, State> {
 
   componentDidMount: () => void = () => {
     autorun(async () => {
+      const locale = this.props.stores.profile.currentLocale;
       const _mergedMessages = {
         ...await translations['en-US'],
-        ...await translations[this.props.stores.profile.currentLocale]
+        ...await translations[locale]
       };
       runInAction(() => {
         this.mergedMessages = _mergedMessages;
