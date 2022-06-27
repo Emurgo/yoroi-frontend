@@ -203,7 +203,7 @@ export async function copyDbToMemory(
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaVersion = 16;
+  const schemaVersion = 17;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
