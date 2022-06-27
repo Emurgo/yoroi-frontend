@@ -19,7 +19,6 @@ export default ({
   iconOverride,
   version,
   enableProtocolHandlers,
-  ledgerScript,
   shouldInjectConnector,
 } /*: {|
   description: string,
@@ -32,7 +31,6 @@ export default ({
   iconOverride?: Icons,
   version: string,
   enableProtocolHandlers: boolean,
-  ledgerScript?: string,
   shouldInjectConnector: boolean,
 |} */
 )/* : * */ => { // eslint-disable-line function-paren-newline

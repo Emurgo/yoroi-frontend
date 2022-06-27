@@ -1,6 +1,4 @@
 // @flow
-declare var chrome;
-
 import { YOROI_LEDGER_CONNECT_TARGET_NAME } from '../../ledger/const';
 import { OPERATION_NAME } from '../../ledger/types/enum';
 import type {
@@ -15,6 +13,8 @@ import type {
   GetSerialResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { MessageType } from '../../ledger/types/cmn';
+
+declare var chrome;
 
 export type ExtendedPublicKeyResp<Response> = {|
   response: Response,
@@ -78,13 +78,14 @@ export class LedgerConnect {
     );
   }
 
-  _requestLedger(
+  async _requestLedger(
     action: string,
     params: any,
     serial: ?string,
   ): any {
-    return new Promise(async (resolve, reject) => {
-      const tabId = await this._createLedgerTab();
+    const tabId = await this._createLedgerTab();
+
+    return new Promise((resolve, reject) => {
       chrome.tabs.sendMessage(
         tabId,
         {
