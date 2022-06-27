@@ -278,7 +278,7 @@ const GetAllUtxosMixin = (
           if (i === 0) {
             amount = utxo.amount;
           } else {
-            amount = utxo.assets[i].amount;
+            amount = utxo.assets[i-1].amount;
           }
           const token = tokenMap.get(tokenId);
           if (!token) {
