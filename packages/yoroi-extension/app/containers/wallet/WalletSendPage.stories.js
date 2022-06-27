@@ -150,6 +150,7 @@ const genBaseProps: {|
     transactionBuilderStore: request.dialogInfo == null
       ? {
         totalInput: undefined,
+        maxAssetsAllowed: 10,
         fee: undefined,
         shouldSendAll: boolean('shouldSendAll', false),
         tentativeTx: null,
@@ -160,6 +161,9 @@ const genBaseProps: {|
         },
         selectedToken: undefined,
         plannedTxInfoMap: [],
+        calculateMinAda: () => '1',
+        isDefaultIncluded: false,
+        minAda: undefined,
       }
       : request.dialogInfo.transactionBuilderStore,
     substores: {
@@ -191,10 +195,11 @@ const genBaseProps: {|
       updateReceiver: { trigger: action('updateReceiver') },
       updateAmount: { trigger: action('updateAmount') },
       addToken: { trigger: action('addToken') },
-      removeToken: { trigger: action('removeToken') },
+      removeTokens: { trigger: action('removeTokens') },
       updateSendAllStatus: { trigger: action('updateSendAllStatus') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
+      deselectToken: { trigger: action('deselectToken') }
     },
     ada: {
       ledgerSend: {
@@ -388,6 +393,10 @@ export const RegularConfirmationDialog = (): Node => {
             },
             selectedToken: undefined,
             plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}
@@ -443,6 +452,10 @@ export const MultiAssetConfirmationDialog = (): Node => {
             },
             selectedToken: undefined,
             plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}
@@ -502,6 +515,10 @@ export const LedgerConfirmationDialog = (): Node => {
             },
             selectedToken: undefined,
             plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}
@@ -561,6 +578,10 @@ export const TrezorConfirmationDialog = (): Node => {
             },
             selectedToken: undefined,
             plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}

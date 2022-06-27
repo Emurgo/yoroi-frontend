@@ -13,7 +13,7 @@ import NFTImage from './NFTImage';
 
 type Props = {|
   +shouldSendAll: boolean,
-  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +onRemoveTokens:  Array<$ReadOnly<TokenRow>> => void,
   +tokens: FormattedTokenDisplay[],
   +nfts: FormattedNFTDisplay[],
 |}
@@ -50,7 +50,7 @@ export default class IncludedTokens extends Component<Props> {
             <div className={styles.nftRow} key={nft.name}>
               <div className={styles.nft}>
                 <div className={styles.nftImg}>
-                  <NFTImage image={nft.image} name={nft.name} width={36} height={40} />
+                  <NFTImage image={nft.image ?? null} name={nft.name} width={36} height={40} />
                 </div>
                 <p className={styles.name}>{nft.name}</p>
               </div>

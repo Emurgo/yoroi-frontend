@@ -5,15 +5,13 @@ import styles from './AssetsDropdown.scss'
 import { ReactComponent as DefaultAssetIcon }  from '../../../../assets/images/assets-page/asset-no.inline.svg'
 import { ReactComponent as ArrowUpIcon }  from '../../../../assets/images/arrow-up.inline.svg'
 import { ReactComponent as ArrowDownIcon }  from '../../../../assets/images/arrow-down.inline.svg'
-import type { Asset } from '../../assets/AssetsList'
 import globalMessages from '../../../../i18n/global-messages';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as DefaultNFTIcon  }from '../../../../assets/images/nft-no.inline.svg';
-
+import type { FormattedNFTDisplay, FormattedTokenDisplay, } from '../../../../utils/wallet';
 
 type Props = {|
-    +assets: Asset[],
     +tokens: FormattedTokenDisplay[],
     +nfts: FormattedNFTDisplay[],
 |}

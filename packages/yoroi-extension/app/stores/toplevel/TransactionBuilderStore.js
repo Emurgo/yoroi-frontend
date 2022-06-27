@@ -117,8 +117,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @computed get
-  minAda(): MultiToken {
+  minAda(): ?MultiToken {
     const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return;
@@ -225,6 +226,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   calculateMinAda: (tokens: Array<{| token: $ReadOnly<TokenRow> |}>) => string = (tokens) => {
     const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return '0';
@@ -271,7 +273,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     const plannedTxInfoMap = this.plannedTxInfoMap;
-    console.log({plannedTxInfoMap: plannedTxInfoMap.length})
     const receiver = this.receiver;
     if (receiver == null) return;
 
@@ -324,7 +325,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
           });
         } else if (
           token &&
-          !token.shouldSendAll &&
+          token.shouldSendAll === false &&
+          token.amount &&
           (new BigNumber(token.amount)).lt(minAmount) &&
           plannedTxInfoMap.length > 1
         ) {
@@ -465,7 +467,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     );
     const tokensToAdd = [{ token: selectedToken }]
-    if (shouldReset) {
+    if (shouldReset === true) {
       this.plannedTxInfoMap = tokensToAdd;
     } else {
         const tokenTxInfo = this.plannedTxInfoMap.find(

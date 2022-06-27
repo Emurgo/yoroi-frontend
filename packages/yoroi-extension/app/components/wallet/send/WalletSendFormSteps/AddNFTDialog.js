@@ -41,11 +41,22 @@ type Props = {|
   |}) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
+  +shouldAddMoreTokens: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => boolean,
+  +calculateMinAda: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => string,
+  +plannedTxInfoMap: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>,
 |};
 
 type State = {|
   currentNftsList: FormattedNFTDisplay[],
   fullNftsList: FormattedNFTDisplay[],
+  selectedTokens: Array<{|
+    token: $ReadOnly<TokenRow>,
+    included: boolean,
+  |}>
 |}
 
 
@@ -129,29 +140,20 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
   }
 
-  onRemoveToken = (token) => {
-    const tokenEntry = this.state.selectedTokens.find(
-      ({ token: t }) => t.Identifier === token.Identifier
-    )
-
-    if (!tokenEntry) return;
-
-    const tokenEntryCopy = { ...tokenEntry };
-    tokenEntryCopy.included = false;
-
-    const selectedTokens = [...this.state.selectedTokens].filter(
+  onRemoveToken: $ReadOnly<TokenRow> => void = (token) => {
+    const filteredTokens = [...this.state.selectedTokens].filter(
       ({ token: t }) => t.Identifier !== token.Identifier
     );
-    this.setState({ selectedTokens: [...selectedTokens, tokenEntryCopy] });
+    this.setState({ selectedTokens: [...filteredTokens, { token, included: false }] });
   }
 
-  isTokenIncluded = (token) => {
+  isTokenIncluded: $ReadOnly<TokenRow> => boolean = (token) => {
     return !!this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
     )?.included;
   }
 
-  onAddAll = () => {
+  onAddAll: void => void = () => {
     const amount = new BigNumber('1');
     const toRemove = [];
     for (const { token, included } of this.state.selectedTokens) {
@@ -238,7 +240,12 @@ export default class AddNFTDialog extends Component<Props, State> {
                           }
                           onClick={() => this.onSelect(nft.info)}
                         >
-                          <NFTImage image={nft.image} name={nft.name} width={155} height={190} />
+                          <NFTImage
+                            image={nft.image ?? null}
+                            name={nft.name}
+                            width={155}
+                            height={190}
+                          />
                           <p className={styles.nftName}>{nft.name}</p>
                         </button>
                       )

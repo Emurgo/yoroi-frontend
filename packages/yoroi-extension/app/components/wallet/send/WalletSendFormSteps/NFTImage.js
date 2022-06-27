@@ -3,24 +3,29 @@ import { Skeleton } from '@mui/material';
 import { Component } from 'react';
 import { ReactComponent as DefaultNFT } from '../../../../assets/images/nft-no.inline.svg';
 import { checkNFTImage } from '../../../../utils/wallet';
+import type { Node } from 'react';
 
 type Props = {|
     name: string,
-    image: null | string,
+    image: string | null,
     width: number,
     height: number,
 |}
 
-export default class NFTImage extends Component<Props> {
+type State = {|
+    loading: boolean,
+    error: boolean,
+|}
+export default class NFTImage extends Component<Props, State> {
 
-    state = {
+    state: State = {
         loading: true,
         error: false,
     }
 
     componentDidMount() {
         const { image } = this.props;
-        if (!image) return
+        if (image === null) return
         const imageUrl = image.replace('ipfs://', 'https://ipfs.io/ipfs/');
         checkNFTImage(
             imageUrl,
@@ -29,10 +34,10 @@ export default class NFTImage extends Component<Props> {
         )
     }
 
-    render() {
+    render(): Node {
         const { image, name, width, height } = this.props;
         const { loading, error } = this.state;
-        if (!image || error) return <DefaultNFT />
+        if (image === null || error) return <DefaultNFT />
         const imageUrl = image.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
         return (

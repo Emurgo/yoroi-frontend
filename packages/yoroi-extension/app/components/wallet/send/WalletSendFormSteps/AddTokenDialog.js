@@ -25,10 +25,8 @@ import type {
   TokenLookupKey,
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { UriParams } from '../../../../utils/URIHandling';
 import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
-import LocalizableError from '../../../../i18n/LocalizableError';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
@@ -42,20 +40,21 @@ import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 type Props = {|
   +onClose: void => void,
   +spendableBalance: ?MultiToken,
-  +classicTheme: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
-  +uriParams: ?UriParams,
-  +selectedToken: void | $ReadOnly<TokenRow>,
-  +defaultToken: $ReadOnly<TokenRow>,
-  +error: ?LocalizableError,
   +selectedNetwork: $ReadOnly<NetworkRow>,
-  +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}) => void,
-  +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+  +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
+  +plannedTxInfoMap: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>,
+  +shouldAddMoreTokens: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => boolean,
+  +calculateMinAda: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => string,
 |};
 
 type State = {|
@@ -63,7 +62,11 @@ type State = {|
   fullTokensList: FormattedTokenDisplay[],
   sortingDirection: null | 'UP' | 'DOWN',
   sortingColumn: string,
-  shouldAddMoreAssets: boolean,
+  selectedTokens: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount: BigNumber | null,
+    included: boolean,
+  |}>
 |}
 
 
@@ -135,8 +138,10 @@ export default class AddTokenDialog extends Component<Props, State> {
   componentDidMount(): void {
     const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
     const tokensList = getTokens(spendableBalance, getTokenInfo)
-    const selectedTokens = plannedTxInfoMap.filter(({ token }) => !token.IsNFT && !token.IsDefault)
-      .map(({ token, amount }) => ({ token, amount, included: true }));
+    const selectedTokens = plannedTxInfoMap.filter(
+      ({ token }) => token.IsNFT === false && token.IsDefault === false
+    )
+      .map(({ token, amount }) => ({ token, amount: new BigNumber(amount ?? 0), included: true }));
 
     this.setState({ currentTokensList: tokensList, fullTokensList: tokensList, selectedTokens })
   }
@@ -147,10 +152,10 @@ export default class AddTokenDialog extends Component<Props, State> {
     const selectedTokens = this.state.selectedTokens.filter(
       ({ token: t }) => t.Identifier !== token.Identifier
     );
-    this.setState({ selectedTokens: [...selectedTokens, { token, included: true }] });
+    this.setState({ selectedTokens: [...selectedTokens, { token, included: true, amount: null }] });
   }
 
-  onRemoveToken = (token) => {
+  onRemoveToken: $ReadOnly<TokenRow> => void = (token) => {
     const tokenEntry = this.getSelectedToken(token);
     if (!tokenEntry) return;
     const selectedTokens = [...this.state.selectedTokens].filter(
@@ -161,42 +166,37 @@ export default class AddTokenDialog extends Component<Props, State> {
     });
   }
 
-  isTokenIncluded = (token) => {
+  isTokenIncluded: $ReadOnly<TokenRow> => boolean = (token) => {
     return !!this.state.selectedTokens.find(
-      ({ token: t }) => t.Identifier === token?.Identifier
+      ({ token: t }) => t.Identifier === token.Identifier
     )?.included;
   }
 
-  updateAmount = (token, amount) => {
-    const tokenEntry = this.state.selectedTokens.find(
-      ({ token: t }) => t.Identifier === token.Identifier
-    )
-
-    const tokenEntryCopy = { ...tokenEntry };
-    tokenEntryCopy.amount = amount;
-    tokenEntryCopy.token = token;
-    tokenEntryCopy.included = true;
-
+  updateAmount: ($ReadOnly<TokenRow>, BigNumber | null) => void = (token, amount) => {
     const filteredTokens = this.state.selectedTokens.filter(
       ({ token: t }) => t.Identifier !== token.Identifier
     );
 
-    this.setState({ selectedTokens: [...filteredTokens, tokenEntryCopy] });
+    this.setState({ selectedTokens: [...filteredTokens, { token, amount, included: true }] });
   }
 
-  getCurrentAmount = (token) => {
+  getCurrentAmount: $ReadOnly<TokenRow> => ?BigNumber = (token) => {
     const tokenEntry = this.getSelectedToken(token);
     return tokenEntry?.amount;
   }
 
-  getSelectedToken = (token) => {
+  getSelectedToken: $ReadOnly<TokenRow> => {|
+    token: $ReadOnly<TokenRow>,
+    amount: BigNumber | null,
+    included: boolean,
+  |} | null = (token) => {
     return this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
-    );
+    ) ?? null;
   }
 
 
-  onAddAll = () => {
+  onAddAll: void => void = () => {
     const toRemove = [];
     for (const { token, amount, included } of this.state.selectedTokens) {
       if (!included) {
@@ -215,34 +215,36 @@ export default class AddTokenDialog extends Component<Props, State> {
     this.props.onClose();
   }
 
-  getMaxAmount = (tokenInfo) => {
+  getMaxAmount: $ReadOnly<TokenRow> => BigNumber = (tokenInfo) => {
     const token = this.state.fullTokensList.find(
       entry => entry.info.Identifier === tokenInfo.Identifier
-    )
+    );
 
-    if (!token) throw new Error('Token not found.')
-
+    if (!token) throw new Error('Token not found.');
     const amount = new BigNumber(formattedAmountToNaturalUnits(
-      token.amount,
+      token.amount ?? '0',
       token.info.Metadata.numberOfDecimals,
     ));
     return amount
   }
 
-  isValidAmount = (token) => {
+  isValidAmount: $ReadOnly<TokenRow> => boolean = (token) => {
     const tokenEntry = this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
     );
     if (tokenEntry && tokenEntry.included) {
+      // Should not show any error if no amount entered
+      // Will disable the `ADD` button only
+      if (tokenEntry.amount === null) return true
       const maxAmount = this.getMaxAmount(token);
-      if (maxAmount.lt(tokenEntry.amount || 0) || token.amount < 0) {
+      if (tokenEntry.amount && maxAmount.lt(tokenEntry.amount)) {
         return false
       }
     };
     return true
   }
 
-  isValidAmounts = () => {
+  isValidAmounts: void => boolean = () => {
     for (const tokenEntry of this.state.selectedTokens) {
       if (!tokenEntry.included) continue;
       if (
@@ -316,7 +318,9 @@ export default class AddTokenDialog extends Component<Props, State> {
       shouldAddMoreTokens
     } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
-    const shouldAddMore = shouldAddMoreTokens(selectedTokens);
+    const shouldAddMore = shouldAddMoreTokens(
+      selectedTokens.map(({ token, included }) => ({ token, included }))
+    );
     return (
       <Dialog
         title={
@@ -340,7 +344,9 @@ export default class AddTokenDialog extends Component<Props, State> {
           {isCardanoHaskell(this.props.selectedNetwork) && (
           <div className={styles.minAda}>
             <MinAda
-              minAda={calculateMinAda(selectedTokens)}
+              minAda={calculateMinAda(
+                selectedTokens.map(({ token, included }) => ({ token, included }))
+              )}
             />
           </div>
           )}
@@ -390,16 +396,10 @@ export default class AddTokenDialog extends Component<Props, State> {
                     <SingleTokenRow
                       key={token.id}
                       token={token}
-                      classicTheme={this.props.classicTheme}
                       updateAmount={this.updateAmount}
                       getTokenAmount={this.getCurrentAmount}
-                      uriParams={this.props.uriParams}
-                      selectedToken={this.props.selectedToken}
-                      defaultToken={this.props.defaultToken}
-                      getTokenInfo={this.props.getTokenInfo}
                       onAddToken={this.onSelect}
                       onRemoveToken={this.onRemoveToken}
-                      error={this.props.error}
                       isTokenIncluded={this.isTokenIncluded}
                       isValidAmount={this.isValidAmount}
                     />

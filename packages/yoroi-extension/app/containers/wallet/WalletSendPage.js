@@ -122,6 +122,7 @@ class WalletSendPage extends Component<AllProps> {
 
   _getNumDecimals(): number {
     const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
     const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
@@ -193,8 +194,6 @@ class WalletSendPage extends Component<AllProps> {
             error={transactionBuilderStore.createUnsignedTx.error}
             // Min ADA for all tokens that is already included in the tx
             minAda={transactionBuilderStore.minAda}
-            // Calculate Min ADA for given tokens
-            calculateMinAda={transactionBuilderStore.calculateMinAda}
             uriParams={this.generated.stores.loading.uriParams}
             resetUriParams={this.generated.stores.loading.resetUriParams}
             showMemo={this.showMemo}
@@ -479,57 +478,47 @@ class WalletSendPage extends Component<AllProps> {
     />);
   }
 
-  calculateMinAda = (selectedTokens) => {
+  calculateMinAda: Array<{|
+    token: $ReadOnly<TokenRow>, included: boolean
+  |}> => string = (selectedTokens) => {
     const { transactionBuilderStore } = this.generated.stores;
-    const { plannedTxInfoMap, calculateMinAda } = transactionBuilderStore;
-
-    const tokens = {};
-    const shouldNotInclude = new Set();
-    // Remove duplicated tokens
-    selectedTokens.forEach(entry => {
-      if (entry.included) {
-        tokens[entry.token.Identifier] = { token: entry.token };
-      } else {
-        shouldNotInclude.add(entry.token.Identifier)
-      }
-    });
-    plannedTxInfoMap.forEach(entry => {
-      const id = entry.token.Identifier;
-      if (!shouldNotInclude.has(id))
-        tokens[entry.token.Identifier] = { token: entry.token };
-    });
-
-    const minAdaAmount = calculateMinAda(Object.values(tokens));
-
+    const {  calculateMinAda } = transactionBuilderStore;
+    const tokens = this._mergeTokens(selectedTokens);
+    const minAdaAmount = calculateMinAda(tokens.map(token => ({ token })));
     return (new BigNumber(minAdaAmount)).shiftedBy(-this._getNumDecimals()).toString()
   }
 
-  _mergeToken = (selectedTokens) => {
+  _mergeTokens: Array<{|
+    token: $ReadOnly<TokenRow>, included: boolean
+  |}> => Array<$ReadOnly<TokenRow>> = (selectedTokens) => {
     const { transactionBuilderStore } = this.generated.stores;
     const { plannedTxInfoMap } = transactionBuilderStore;
-    const tokens = {};
+    const tokens = new Map<string, $ReadOnly<TokenRow>>();
     const shouldNotInclude = new Set();
     // Remove duplicated tokens
     selectedTokens.forEach(entry => {
+      const id = entry.token.Identifier;
       if (entry.included) {
-        tokens[entry.token.Identifier] = { token: entry.token };
+        tokens.set(id, entry.token);
       } else {
-        shouldNotInclude.add(entry.token.Identifier)
+        shouldNotInclude.add(id);
       }
     });
     plannedTxInfoMap.forEach(entry => {
       const id = entry.token.Identifier;
       if (!shouldNotInclude.has(id))
-        tokens[entry.token.Identifier] = { token: entry.token };
+        tokens.set(id, entry.token);
     });
 
-    return Object.values(tokens)
+    return [...tokens.values()]
   }
 
-  shouldAddMoreTokens = (tokens) => {
+  shouldAddMoreTokens: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => boolean = (
+    tokens
+  ) => {
     const { maxAssetsAllowed } = this.generated.stores.transactionBuilderStore;
 
-    const allTokens = this._mergeToken(tokens);
+    const allTokens = this._mergeTokens(tokens);
 
     return allTokens.length <= maxAssetsAllowed;
   }
@@ -573,15 +562,8 @@ class WalletSendPage extends Component<AllProps> {
         }}
         spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-        classicTheme={this.generated.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-        uriParams={this.generated.stores.loading.uriParams}
-        selectedToken={transactionBuilderStore.selectedToken}
-        fee={transactionBuilderStore.fee}
-        totalInput={transactionBuilderStore.totalInput}
-        isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
         calculateMinAda={this.calculateMinAda}
-        error={transactionBuilderStore.createUnsignedTx.error}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveTokens={txBuilderActions.removeTokens.trigger}
         shouldAddMoreTokens={this.shouldAddMoreTokens}
@@ -707,6 +689,7 @@ class WalletSendPage extends Component<AllProps> {
         tentativeTx: null | ISignRequest<any>,
         totalInput: ?MultiToken,
         txMismatch: boolean,
+        isDefaultIncluded: boolean,
         selectedToken: void | $ReadOnly<TokenRow>,
         maxAssetsAllowed: number,
         plannedTxInfoMap: Array<{|
@@ -714,6 +697,8 @@ class WalletSendPage extends Component<AllProps> {
           amount?: string,
           shouldSendAll?: boolean,
         |}>,
+        minAda: ?MultiToken,
+        calculateMinAda: Array<{| token: $ReadOnly<TokenRow> |}> => string
       |},
       substores: {|
         ada: {|

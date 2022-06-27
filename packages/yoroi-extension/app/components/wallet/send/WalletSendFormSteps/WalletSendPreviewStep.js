@@ -10,7 +10,6 @@ import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../../i18n/global-messages';
-import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './WalletSendPreviewStep.scss';
 import config from '../../../../config';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
@@ -27,7 +26,7 @@ import {
 import type {
   TokenLookupKey, TokenEntry,
 } from '../../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
 import { Button, Link, Tooltip, Typography } from '@mui/material';
@@ -48,14 +47,25 @@ type Props = {|
   +transactionSize: ?string,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +addressToDisplayString: string => string,
-  +onCancel: void => void,
   +isSubmitting: boolean,
-  +error: ?LocalizableError,
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  +isDefaultIncluded: boolean,
+  +minAda: ?MultiToken,
+  +plannedTxInfoMap: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>,
+  +selectedNetwork: $ReadOnly<NetworkRow>
 |};
+
+type State = {|
+  passwordError: string | null,
+  txError: string | null,
+|}
 
 const messages = defineMessages({
   nAssets: {
@@ -73,13 +83,13 @@ const messages = defineMessages({
 });
 
 @observer
-export default class WalletSendPreviewStep extends Component<Props> {
+export default class WalletSendPreviewStep extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     passwordError: null,
     txError: null
   }
@@ -120,11 +130,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
         try {
           await this.props.onSubmit(transactionData);
         } catch (error) {
-          const errorMessage = this.context.intl.formatMessage(error, error.values)
+          const errorMessage = this.context.intl.formatMessage(error, error.values);
           if (error instanceof IncorrectWalletPasswordError) {
-            this.setState({ passwordError: errorMessage })
+            this.setState({ passwordError: errorMessage });
           } else {
-            this.setState({ txError: errorMessage })
+            this.setState({ txError: errorMessage });
           }
         }
       },
@@ -224,7 +234,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
     );
   }
 
-  _amountLabel = () => {
+  _amountLabel: void => Node = () => {
     const {
       selectedNetwork,
       plannedTxInfoMap,
@@ -237,7 +247,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
     if (isCardano) {
       const tokenInfo = plannedTxInfoMap.find(({ token }) => token.IsDefault);
       if (
-        (!tokenInfo || !tokenInfo.amount || minAda.getDefaultEntry().amount.gt(tokenInfo.amount)) &&
+        (
+          !tokenInfo || // Show Min-Ada label if the ADA is not included
+          // Or if included ADA less than Min-ADA
+          minAda?.getDefaultEntry().amount.gt(tokenInfo.amount ?? 0)
+        ) &&
         !tokenInfo?.shouldSendAll
       ) {
         const moreDetailsLink = (
@@ -317,7 +331,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
     return (
       <div className={styles.component}>
         {
-          txError && (
+          txError !== null && (
             <div className={styles.txError}>
               {txError}
             </div>

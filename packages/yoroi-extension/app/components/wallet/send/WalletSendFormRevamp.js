@@ -3,8 +3,8 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import { Button, Typography } from '@mui/material';
-import TextField from '../../common/TextField'
+import { Button, Typography, TextField as MemoTextField } from '@mui/material';
+import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -37,7 +37,7 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import { isCardanoHaskell, isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as PlusIcon } from '../../../assets/images/plus.inline.svg'
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
@@ -115,10 +115,6 @@ const messages = defineMessages({
 type Props = {|
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +hasAnyPending: boolean,
-  +validateAmount: (
-    amountInNaturalUnits: BigNumber,
-    tokenRow: $ReadOnly<TokenRow>,
-  ) => Promise<[boolean, void | string]>,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
   +classicTheme: boolean,
@@ -141,7 +137,7 @@ type Props = {|
     token?: $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}) => void,
-  +onRemoveToken: (Array<$ReadOnly<TokenRow>>) => void,
+  +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
   +previewStep: () => Node,
@@ -151,6 +147,8 @@ type Props = {|
     amount?: string,
     shouldSendAll?: boolean,
   |}>,
+  +isDefaultIncluded: boolean,
+  +minAda: ?MultiToken,
   +isOpen: any => boolean,
   +closeDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -160,7 +158,6 @@ type Props = {|
 type State = {|
   showMemoWarning: boolean,
   invalidMemo: boolean,
-  memo: string,
   currentStep: number,
 |}
 
@@ -225,20 +222,6 @@ export default class WalletSendForm extends Component<Props, State> {
     if (this.amountFieldReactionDisposer != null) {
       this.amountFieldReactionDisposer();
     }
-  }
-
-  validateDefaultTokenAmount(amount: BigNumber) {
-    const MIN_ADA = 1_000_000;
-    const { plannedTxInfoMap } = this.props;
-    if (
-      isCardanoHaskell(this.props.selectedNetwork) &&
-      amount.lt(MIN_ADA) &&
-      plannedTxInfoMap.length < 2 // when sending only ADA without any additional tokens
-    ) {
-      return [false, this.context.intl.formatMessage(messages.minimumRequiredADA)]
-    }
-
-    return [true, null]
   }
 
   // FORM VALIDATION
@@ -345,12 +328,13 @@ export default class WalletSendForm extends Component<Props, State> {
     ];
     const { plannedTxInfoMap } = this.props;
     const tokens = plannedTxInfoMap.filter(
-      ({ token }) => !token.IsNFT && !token.IsDefault
+      ({ token }) => token.IsNFT === false && token.IsDefault === false
     ).map(({ token, amount }) => {
-      const formattedAmount = (new BigNumber(amount))
+      const formattedAmount = amount ? new BigNumber(amount)
         .shiftedBy(-token.Metadata.numberOfDecimals)
         .decimalPlaces(token.Metadata.numberOfDecimals)
-        .toString()
+        .toString(): undefined;
+
       return {
         label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
         amount: formattedAmount,
@@ -360,7 +344,7 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     const nfts = plannedTxInfoMap.filter(
-      ({ token }) => token.IsNFT
+      ({ token }) => token.IsNFT === true
     ).map(({ token }) => {
       const policyId = token.Identifier.split('.')[0];
       const name = truncateToken(getTokenStrictName(token) ?? '-');
@@ -375,12 +359,12 @@ export default class WalletSendForm extends Component<Props, State> {
     return [tokens, nfts]
   }
 
-  getError() {
+  getError(): string | null {
     const { error, minAda, getTokenInfo } = this.props;
-    let errMsg; let values;
-    if (!error) return;
+    if (!error) return null;
 
-    if (error instanceof CannotSendBelowMinimumValueError) {
+    let errMsg; let values;
+    if (error instanceof CannotSendBelowMinimumValueError && minAda) {
       const formatValue = genFormatTokenAmount(getTokenInfo);
       const amount = formatValue(minAda.getDefaultEntry());
       errMsg = messages.minimumRequiredADA;
@@ -445,7 +429,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 done={receiverField.isValid}
               />
             </div>
-            <TextField
+            <MemoTextField
               label={intl.formatMessage(memoMessages.addMemo)}
               onChange={(e) => this.onUpdateMemo(e.target.value)}
               onFocus={() => this.setState({ showMemoWarning: true })}
@@ -556,7 +540,8 @@ export default class WalletSendForm extends Component<Props, State> {
                     {intl.formatMessage(messages.max)}
                   </Button>
                 </div>
-                {this.props.unitOfAccountSetting.enabled && (
+                {this.props.unitOfAccountSetting.enabled
+                && this.props.unitOfAccountSetting.currency && (
                 <div className={styles.fiat}>
                   {this.renderUnitOfAccountAmount(amountFieldProps.value)}
                 </div>)}
@@ -678,6 +663,8 @@ export default class WalletSendForm extends Component<Props, State> {
     let convertedAmount;
 
     const { currency } = this.props.unitOfAccountSetting;
+
+    if (currency == null) throw new Error('No currency selected')
 
     let amount;
     try{

@@ -19,11 +19,11 @@ import classnames from 'classnames';
 
 type Props = {|
     +token: FormattedTokenDisplay,
-    +updateAmount: (?BigNumber) => void,
-    +onRemoveToken: (void | $ReadOnly<TokenRow>) => void,
+    +updateAmount: ($ReadOnly<TokenRow>, BigNumber | null) => void,
+    +onRemoveToken: $ReadOnly<TokenRow> => void,
     +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
     +onAddToken: $ReadOnly<TokenRow> => void,
-    +getTokenAmount: ($ReadOnly<TokenRow>) => ?string,
+    +getTokenAmount: ($ReadOnly<TokenRow>) => ?BigNumber,
     +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
@@ -40,21 +40,17 @@ export default class SingleTokenRow extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentDidMount() {
-  }
-
   getNumDecimals(): number {
     return this.props.token.info.Metadata.numberOfDecimals;
   }
 
-  onAmountUpdate(value: string): void {
-    let formattedAmount = value
-    if (value) {
-      formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
+  onAmountUpdate(value: string | null): void {
+    const formattedAmount = value !== null && value !== '' ? new BigNumber(
+      formattedAmountToNaturalUnits(
         value,
         this.getNumDecimals(),
-      ));
-    }
+      )) : null;
+    if (formattedAmount && formattedAmount.isNegative()) return;
     this.props.updateAmount(this.props.token.info, formattedAmount);
   }
 
@@ -65,8 +61,7 @@ export default class SingleTokenRow extends Component<Props> {
 
     let amount = this.props.getTokenAmount(this.props.token.info);
     if (amount) {
-      amount = new BigNumber(amount)
-      .shiftedBy(-this.getNumDecimals()).toString();
+      amount = amount.shiftedBy(-this.getNumDecimals()).toString();
     }
 
     return (
