@@ -268,7 +268,15 @@ const GetAllUtxosMixin = (
       );
 
       const addressedUtxos = utxosInStorage.map(utxo => {
-        const addressingInfo = addressingMap.get(utxo.receiver);
+        let addressHash;
+        try {
+          addressHash = Buffer.from(
+            RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
+          ).toString('hex')
+        } catch {
+          addressHash = utxo.receiver;
+        }
+        const addressingInfo = addressingMap.get(addressHash);
         if (addressingInfo == null) {
           throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)} should never happen`);
         }
