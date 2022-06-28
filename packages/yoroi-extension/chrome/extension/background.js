@@ -1464,7 +1464,7 @@ function handleInjectorConnect(port) {
                       const assetName = Buffer.from(ident[1], 'hex').toString();
                       const metadata = metadataIsValid(policyId, assetName, metadatas);
                       if (metadata !== null) {
-                        nfts[key] = metadata;
+                        nfts[key] = { metadata };
                       }
                     }
                     rpcResponse({ ok: nfts });
