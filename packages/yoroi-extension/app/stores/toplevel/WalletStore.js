@@ -368,6 +368,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         );
       }
       stores.delegation.addObservedWallet(request.publicDeriver);
+      stores.delegation.refreshDelegation(request.publicDeriver);
     }
   };
 
