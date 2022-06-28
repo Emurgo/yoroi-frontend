@@ -4,7 +4,7 @@ import { When, Then } from 'cucumber';
 import { By, error, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
-import { checkErrorByTranslationId } from './common-steps';
+import { checkErrorByTranslationId, getPlates } from './common-steps';
 import { enterRecoveryPhrase } from '../support/helpers/helpers';
 import {
   cleanRecoverInput,
@@ -143,19 +143,6 @@ Then(/^I should see a plates$/, async function (table) {
     expect(plateText).to.be.equal(rows[i].plate);
   }
 });
-
-export async function getPlates(customWorld: any): Promise<any> {
-  // check plate in confirmation dialog
-  let plateElements = await customWorld.driver.findElements(
-    By.css('.WalletRestoreVerifyDialog_plateIdSpan')
-  );
-
-  // this makes this function also work for wallets that already exist
-  if (plateElements.length === 0) {
-    plateElements = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
-  }
-  return plateElements;
-}
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, {
