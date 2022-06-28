@@ -176,7 +176,7 @@
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
     "@emurgo/ledger-connect-handler": "7.0.1",
-    "@emurgo/yoroi-lib-core": "0.7.3-alpha.38",
+    "@emurgo/yoroi-lib-core": "0.7.4-alpha.39",
     "@mui/lab": "^5.0.0-alpha.51",
     "@mui/material": "^5.0.4",
     "@svgr/webpack": "5.5.0",
