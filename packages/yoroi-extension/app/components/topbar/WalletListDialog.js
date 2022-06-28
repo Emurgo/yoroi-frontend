@@ -364,7 +364,7 @@ export default class WalletListDialog extends Component<Props, State> {
     for (let i = 1; i < wallets.length; i ++ ) {
       if (wallets[i].walletAmount) {
         sum.joinAddMutable(new MultiToken(
-          // treat TADA as ADA
+          // treat TADA as ADA or vice versa
           wallets[i].walletAmount.values.map(v => ({
             ...v,
             networkId: sum.getDefaults().defaultNetworkId,
@@ -376,7 +376,14 @@ export default class WalletListDialog extends Component<Props, State> {
       }
 
       if (wallets[i].rewards) {
-        sum.joinAddMutable(wallets[i].rewards);
+        sum.joinAddMutable(new MultiToken(
+          // treat TADA as ADA or vice versa
+          wallets[i].rewards.values.map(v => ({
+            ...v,
+            networkId: sum.getDefaults().defaultNetworkId,
+          })),
+          sum.getDefaults(),
+        ));
       }
     }
     if (!unitOfAccountSetting.enabled) {
