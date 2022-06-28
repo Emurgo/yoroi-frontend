@@ -19,7 +19,8 @@ import type {
   UtxoSumFunc,
   RemoteTransaction,
   MultiAssetMintMetadataRequest,
-  MultiAssetMintMetadataResponse
+  MultiAssetMintMetadataResponse,
+  GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -122,6 +123,10 @@ export class BatchedFetcher implements IFetcher {
 
   getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = (body) => (
     batchGetCatalystRoundInfo(this.baseFetcher.getCatalystRoundInfo)(body)
+  )
+
+  getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = (body) => (
+    batchGetUtxoData(this.baseFetcher.getUtxoData)(body)
   )
 }
 
@@ -489,5 +494,22 @@ export function batchGetTokenInfo(
       if (error instanceof LocalizableError) throw error;
       throw new GetTokenInfoApiError();
     }
+  };
+}
+
+function batchGetUtxoData(
+  getUtxoData: GetUtxoDataFunc,
+): GetUtxoDataFunc {
+  return async function (body: GetUtxoDataRequest): Promise<GetUtxoDataResponse> {
+    return (await Promise.all(
+      body.utxos.map(
+        ({ txHash, txIndex }) => getUtxoData(
+          {
+            network: body.network,
+            utxos: [ { txHash, txIndex } ],
+          }
+        )
+      )
+    )).flat();
   };
 }

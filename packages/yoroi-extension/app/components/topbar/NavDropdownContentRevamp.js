@@ -6,6 +6,7 @@ import styles from './NavDropdownContentRevamp.scss';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
+import { Button } from '@mui/material';
 
 type Props = {|
   +openWalletInfoDialog: void => void,
@@ -32,10 +33,10 @@ export default class NavDropdownContentRevamp extends Component<Props> {
         <div className={styles.card}>
           {contentComponents}
           <div className={styles.footer}>
-            <button type="button" onClick={() => openWalletInfoDialog()}>
+            <Button sx={{ width: '100%' }} onClick={() => openWalletInfoDialog()}>
               {intl.formatMessage(globalMessages.allWalletsLabel)}{' '}
               {walletsCount != null ? <span> ({walletsCount})</span> : null}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

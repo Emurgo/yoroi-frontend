@@ -1,17 +1,17 @@
 // @flow
 import type { Node } from 'react';
-import TwitterIcon from '../../../../../assets/images/social/revamp/twitter.inline.svg';
-import TelegramIcon from '../../../../../assets/images/social/revamp/telegram.inline.svg';
-import FbIcon from '../../../../../assets/images/social/revamp/facebook.inline.svg';
-import YoutubeIcon from '../../../../../assets/images/social/revamp/youtube.inline.svg';
-import TwitchIcon from '../../../../../assets/images/social/revamp/twitch.inline.svg';
-import DiscordIcon from '../../../../../assets/images/social/revamp/discord.inline.svg';
-import GithubIcon from '../../../../../assets/images/social/revamp/github.inline.svg';
-import PersonalIcon from '../../../../../assets/images/social/revamp/personal.inline.svg';
+import { ReactComponent as TwitterIcon }  from '../../../../../assets/images/social/revamp/twitter.inline.svg';
+import { ReactComponent as TelegramIcon }  from '../../../../../assets/images/social/revamp/telegram.inline.svg';
+import { ReactComponent as FbIcon }  from '../../../../../assets/images/social/revamp/facebook.inline.svg';
+import { ReactComponent as YoutubeIcon }  from '../../../../../assets/images/social/revamp/youtube.inline.svg';
+import { ReactComponent as TwitchIcon }  from '../../../../../assets/images/social/revamp/twitch.inline.svg';
+import { ReactComponent as DiscordIcon }  from '../../../../../assets/images/social/revamp/discord.inline.svg';
+import { ReactComponent as GithubIcon }  from '../../../../../assets/images/social/revamp/github.inline.svg';
+import { ReactComponent as PersonalIcon }  from '../../../../../assets/images/social/revamp/personal.inline.svg';
 import { List, StyledLink } from './StakePool.styles';
 import { Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import QuestionMarkIcon from '../../../../../assets/images/question-mark.inline.svg';
+import { ReactComponent as QuestionMarkIcon }  from '../../../../../assets/images/question-mark.inline.svg';
 import type { SocialLinks } from '../../../../../containers/wallet/staking/SeizaFetcher';
 
 // eslint-disable-next-line react/require-default-props
@@ -79,7 +79,7 @@ export const SocialMediaStakePool = ({ socialLinks, websiteUrl, color }: Props):
 };
 
 type HelperTooltipProps = {|
-  +message: string,
+  +message: string | Node,
 |};
 export const HelperTooltip = ({ message }: HelperTooltipProps): Node => {
   return (

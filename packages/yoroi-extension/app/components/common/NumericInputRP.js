@@ -10,10 +10,10 @@ import BigNumber, { BigNumber as BigNumberType } from 'bignumber.js';
 import type { ElementRef, Node, Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
 import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
+import styles from './AmountInput.scss'
 
 type NumericInputValue = null | number | string | BigNumber;
 
@@ -25,6 +25,7 @@ export type NumericInputProps = {|
   onBlur?: Function,
   autoFocus?: any,
   error?: string,
+  amountFieldRevamp?: boolean,
   allowSigns?: boolean,
   allowOnlyIntegers?: boolean,
   bigNumberFormat?: BigNumber,
@@ -411,6 +412,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       onChange,
       value,
       error,
+      amountFieldRevamp,
       ...rest
     } = this.props;
 
@@ -425,7 +427,8 @@ class NumericInputRP extends Component<NumericInputProps, State> {
         onChange={this.onChange}
         onBlur={this.onBlur}
         value={inputValue}
-        error={error}
+        error={Boolean(amountFieldRevamp) ? '' : error}
+        revamp={amountFieldRevamp}
         {...rest}
       />
     );
@@ -451,6 +454,7 @@ type AmountInputProps = {
   +inputRef?: Ref<'input'>,
   +value: any,
   +type?: string,
+  +amountFieldRevamp?: boolean,
   ...
 };
 
@@ -510,4 +514,26 @@ class AmountInput extends Component<AmountInputProps> {
     );
   }
 }
-export { AmountInput };
+
+class AmountInputRevamp extends Component<AmountInputProps> {
+  static defaultProps: {| error: void |} = {
+    error: undefined,
+  };
+
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
+  render(): Node {
+    const { error, fees, total, currency } = this.props;
+    const { intl } = this.context;
+
+    return (
+      <div className={styles.component}>
+        <NumericInputRP {...this.props} />
+      </div>
+    );
+  }
+}
+
+export { AmountInput, AmountInputRevamp };

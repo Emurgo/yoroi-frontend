@@ -6,8 +6,8 @@ import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
-import IconEyeOpen from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen }  from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed }  from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -29,6 +29,7 @@ type Props = {|
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +isRefreshing: boolean,
 |};
 
 @observer
@@ -122,6 +123,11 @@ export default class WalletDetails extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
+    return (
+      <>
+        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
+        {this.props.isRefreshing && <div className={styles.isSyncing} />}
+      </>
+    );
   }
 }

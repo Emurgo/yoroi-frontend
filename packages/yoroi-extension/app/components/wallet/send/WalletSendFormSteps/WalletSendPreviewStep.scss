@@ -1,0 +1,92 @@
+.component {
+    width: 100%;
+    padding-top: 40px;
+    padding-right: 40px;
+    padding-bottom: 20px;
+    padding-left: 40px;
+
+    .staleTxWarning {
+        margin-bottom: 20px;
+    }
+
+    .wrapper {
+        width: 65%;
+        height: auto;
+    }
+
+    .addressToLabel {
+        font-size: 16px;
+        letter-spacing: 0;
+        color: #6B7384;
+        margin-bottom: 8px;
+    }
+
+    .receiverAddress {
+        overflow-wrap: break-word;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+        color: var(--yoroi-palette-gray-900);
+    }
+
+    .amountWrapper {
+        padding: 12px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Rubik;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+
+        .amountLabel {
+            color: #6B7384;
+        }
+
+        .amountValue {
+            color: #242838;
+        }
+    }
+    
+    .feesWrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Rubik;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+        margin-bottom: 12px;
+
+        .feesLabel {
+            color: #6B7384;
+        }
+
+        .feesValue {
+            color: #242838;
+        }
+    }
+    
+    .totalAmountWrapper {
+        margin-top: 17px;
+        margin-bottom: 40px;
+        border-radius: 8px;
+        background-color: #3154CB;
+        padding: 29px 24px;
+        display: flex;
+        justify-content: space-between;
+        color: #ffffff;
+
+        .assetsCount {
+            text-align: right;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 28px;
+        }
+
+        .totalAmountValue {
+            text-align: right;
+            margin-top: 4px;
+        }
+    }
+}

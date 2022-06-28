@@ -255,11 +255,6 @@ export default class BaseProfileStore
   // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): Theme {
-    // TODO: Tests were written for the old theme so we need to use it for testing
-    if (environment.isTest()) {
-      return THEMES.YOROI_CLASSIC;
-    }
-
     let { result } = this.getThemeRequest;
     if (result == null) {
       result = this.getThemeRequest.execute().result;
@@ -273,6 +268,10 @@ export default class BaseProfileStore
     }
 
     // THEMES.YOROI_MODERN is the default theme
+    // TODO: Tests were written for the old theme so we need to use it for testing
+    if (environment.isTest()) {
+      return THEMES.YOROI_CLASSIC;
+    }
     return THEMES.YOROI_MODERN;
   }
 
@@ -434,6 +433,17 @@ export default class BaseProfileStore
       result = this.getUnitOfAccountRequest.execute().result;
     }
     return result || unitOfAccountDisabledValue;
+  }
+
+  getUnitOfAccountBlock: () => Promise<UnitOfAccountSettingType> = async () => {
+    const { result } = this.getUnitOfAccountRequest;
+    if (result == null) {
+      await this.getUnitOfAccountRequest.execute();
+    }
+    if (this.getUnitOfAccountRequest.result == null) {
+      throw new Error('failed to load unit of account setting');
+    }
+    return this.getUnitOfAccountRequest.result;
   }
 
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {

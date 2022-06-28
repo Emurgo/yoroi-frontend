@@ -1,61 +1,143 @@
 // @flow
+import React, { Suspense } from 'react';
 import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import type { InjectedOrGenerated } from './types/injectedPropsType';
+import type { GeneratedData as SettingsData } from './containers/settings/Settings';
+import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
+import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
+import type { ConfigType } from '../config/config-types';
+import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
 
 // PAGES
-import WalletAddPage from './containers/wallet/WalletAddPage';
-import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
-import TermsOfUsePage from './containers/profile/TermsOfUsePage';
-import UriPromptPage from './containers/profile/UriPromptPage';
+const WalletAddPagePromise = () => import('./containers/wallet/WalletAddPage');
+const WalletAddPage = React.lazy(WalletAddPagePromise);
+const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
+const LanguageSelectionPage = React.lazy(LanguageSelectionPagePromise);
+const TermsOfUsePagePromise = () => import('./containers/profile/TermsOfUsePage');
+const TermsOfUsePage = React.lazy(TermsOfUsePagePromise);
+const UriPromptPagePromise = () => import('./containers/profile/UriPromptPage');
+const UriPromptPage = React.lazy(UriPromptPagePromise);
 
 // SETTINGS
-import Settings from './containers/settings/Settings';
-import type { GeneratedData as SettingsData } from './containers/settings/Settings';
-import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
-import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
-import ExternalStorageSettingsPage from './containers/settings/categories/ExternalStorageSettingsPage';
-import OAuthDropboxPage from './containers/settings/categories/OAuthDropboxPage';
-import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
-import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
+const SettingsPromise = () => import('./containers/settings/Settings');
+const Settings = React.lazy(SettingsPromise);
+const GeneralSettingsPagePromise = () => import('./containers/settings/categories/GeneralSettingsPage');
+const GeneralSettingsPage = React.lazy(GeneralSettingsPagePromise);
+const WalletSettingsPagePromise = () => import('./containers/settings/categories/WalletSettingsPage');
+const WalletSettingsPage = React.lazy(WalletSettingsPagePromise);
+const ExternalStorageSettingsPagePromise = () => import('./containers/settings/categories/ExternalStorageSettingsPage');
+const ExternalStorageSettingsPage = React.lazy(ExternalStorageSettingsPagePromise);
+const OAuthDropboxPagePromise = () => import('./containers/settings/categories/OAuthDropboxPage');
+const OAuthDropboxPage = React.lazy(OAuthDropboxPagePromise);
+const TermsOfUseSettingsPagePromise = () => import('./containers/settings/categories/TermsOfUseSettingsPage');
+const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
+const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
+const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
-import LoadingPage from './containers/LoadingPage';
-import NightlyPage from './containers/profile/NightlyPage';
-import Wallet from './containers/wallet/Wallet';
-import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
-import MyWalletsPage from './containers/wallet/MyWalletsPage';
-import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
-import WalletSendPage from './containers/wallet/WalletSendPage';
-import WalletAssetsPage from './containers/wallet/WalletAssetsPage';
-import WalletReceivePage from './containers/wallet/WalletReceivePage';
-import URILandingPage from './containers/uri/URILandingPage';
-import Transfer from './containers/transfer/Transfer';
-import Receive from './containers/wallet/Receive';
-import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
-import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
-import CardanoStakingPage from './containers/wallet/staking/CardanoStakingPage';
-import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
-import VotingPage from './containers/wallet/voting/VotingPage';
+const LoadingPagePromise = () => import('./containers/LoadingPage');
+const LoadingPage = React.lazy(LoadingPagePromise);
+const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
+const NightlyPage = React.lazy(NightlyPagePromise);
+const WalletPromise = () => import('./containers/wallet/Wallet');
+const Wallet = React.lazy(WalletPromise);
+const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
+const MyWalletsPage = React.lazy(MyWalletsPagePromise);
+const WalletSummaryPagePromise = () => import('./containers/wallet/WalletSummaryPage');
+const WalletSummaryPage = React.lazy(WalletSummaryPagePromise);
+const WalletSendPagePromise = () => import('./containers/wallet/WalletSendPage');
+const WalletSendPage = React.lazy(WalletSendPagePromise);
+const WalletAssetsPagePromise = () => import('./containers/wallet/WalletAssetsPage');
+const WalletAssetsPage = React.lazy(WalletAssetsPagePromise);
+const WalletReceivePagePromise = () => import('./containers/wallet/WalletReceivePage');
+const WalletReceivePage = React.lazy(WalletReceivePagePromise);
+const URILandingPagePromise = () => import('./containers/uri/URILandingPage');
+const URILandingPage = React.lazy(URILandingPagePromise);
+const TransferPromise = () => import('./containers/transfer/Transfer');
+const Transfer = React.lazy(TransferPromise);
+const ReceivePromise = () => import('./containers/wallet/Receive');
+const Receive = React.lazy(ReceivePromise);
+const StakingDashboardPagePromise = () => import('./containers/wallet/staking/StakingDashboardPage');
+const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
+const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
+const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
+const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
+const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
+const VotingPagePromise = () => import('./containers/wallet/voting/VotingPage');
+const VotingPage = React.lazy(VotingPagePromise);
 
-import type { ConfigType } from '../config/config-types';
-import ComplexityLevelSettingsPage from './containers/settings/categories/ComplexityLevelSettingsPage';
-import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
-import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
-import WalletSwitch from './containers/WalletSwitch';
-import StakingPage from './containers/wallet/staking/StakingPage';
-import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
-import AssetsWrapper from './containers/wallet/AssetsWrapper';
-import TokensPageRevamp from './containers/wallet/TokensPageRevamp';
-import TokensDetailPageRevamp from './containers/wallet/TokenDetailPageRevamp';
-import NFTsPageRevamp from './containers/wallet/NFTsPageRevamp';
-import NFTDetailPageRevamp from './containers/wallet/NFTDetailPageRevamp';
-import ConnectedWebsitesPage from './containers/dapp-connector/ConnectedWebsitesContainer';
-import YoroiPalettePage from './containers/experimental/YoroiPalette';
-import YoroiThemesPage from './containers/experimental/yoroiThemes';
+const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
+const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
+const ComplexityLevelPagePromise = () => import('./containers/profile/ComplexityLevelPage');
+const ComplexityLevelPage = React.lazy(ComplexityLevelPagePromise);
+const BlockchainSettingsPagePromise = () => import('./containers/settings/categories/BlockchainSettingsPage');
+const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
+const WalletSwitchPromise = () => import('./containers/WalletSwitch');
+const WalletSwitch = React.lazy(WalletSwitchPromise);
+const StakingPagePromise = () => import('./containers/wallet/staking/StakingPage');
+const StakingPage = React.lazy(StakingPagePromise);
+const AssetsWrapperPromise = () => import('./containers/wallet/AssetsWrapper');
+const AssetsWrapper = React.lazy(AssetsWrapperPromise);
+const TokensPageRevampPromise = () => import('./containers/wallet/TokensPageRevamp');
+const TokensPageRevamp = React.lazy(TokensPageRevampPromise);
+const TokensDetailPageRevampPromise = () => import('./containers/wallet/TokenDetailPageRevamp');
+const TokensDetailPageRevamp = React.lazy(TokensDetailPageRevampPromise);
+const NFTsPageRevampPromise = () => import('./containers/wallet/NFTsPageRevamp');
+const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
+const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
+const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
+const ConnectedWebsitesPagePromise = () => import('./containers/dapp-connector/ConnectedWebsitesContainer');
+const ConnectedWebsitesPage = React.lazy(ConnectedWebsitesPagePromise);
+const YoroiPalettePagePromise = () => import('./containers/experimental/YoroiPalette');
+const YoroiPalettePage = React.lazy(YoroiPalettePagePromise);
+const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThemes');
+const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
+
+export const LazyLoadPromises: Array<() => any> = [
+  WalletAddPagePromise,
+  LanguageSelectionPagePromise,
+  TermsOfUsePagePromise,
+  UriPromptPagePromise,
+  SettingsPromise,
+  GeneralSettingsPagePromise,
+  WalletSettingsPagePromise,
+  ExternalStorageSettingsPagePromise,
+  OAuthDropboxPagePromise,
+  TermsOfUseSettingsPagePromise,
+  SupportSettingsPagePromise,
+  LoadingPagePromise,
+  NightlyPagePromise,
+  WalletPromise,
+  MyWalletsPagePromise,
+  WalletSummaryPagePromise,
+  WalletSendPagePromise,
+  WalletAssetsPagePromise,
+  WalletReceivePagePromise,
+  URILandingPagePromise,
+  TransferPromise,
+  ReceivePromise,
+  StakingDashboardPagePromise,
+  CardanoStakingPagePromise,
+  NoticeBoardPagePromise,
+  VotingPagePromise,
+  ComplexityLevelSettingsPagePromise,
+  ComplexityLevelPagePromise,
+  BlockchainSettingsPagePromise,
+  WalletSwitchPromise,
+  StakingPagePromise,
+  AssetsWrapperPromise,
+  TokensPageRevampPromise,
+  TokensDetailPageRevampPromise,
+  NFTsPageRevampPromise,
+  NFTDetailPageRevampPromise,
+  ConnectedWebsitesPagePromise,
+  YoroiPalettePagePromise,
+  YoroiThemesPagePromise,
+];
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -65,7 +147,7 @@ export const Routes = (
   stores: StoresMap,
   actions: ActionsMap
 ): Node => (
-  <div style={{ height: '100%' }}>
+  <Suspense fallback={null}>
     <Switch>
       <Route
         exact
@@ -180,7 +262,7 @@ export const Routes = (
       />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
-  </div>
+  </Suspense>
 );
 
 const WalletsSubpages = (stores, actions) => (
@@ -188,7 +270,9 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.TRANSACTIONS}
-      component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
+      component={(props) => {
+        return <WalletSummaryPage {...props} stores={stores} actions={actions} />
+      }}
     />
     <Route
       exact

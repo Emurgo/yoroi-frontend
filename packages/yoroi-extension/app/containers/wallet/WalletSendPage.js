@@ -2,12 +2,14 @@
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, computed, observable, runInAction } from 'mobx';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
-import WalletSendForm from '../../components/wallet/send/WalletSendForm';
+import WalletSendFormClassic from '../../components/wallet/send/WalletSendForm';
+import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
+
 // Web Wallet Confirmation
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
 import type {
@@ -38,10 +40,15 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
+import { withLayout } from '../../styles/context/layout';
+import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
+import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
+import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -64,8 +71,17 @@ const messages = defineMessages({
 
 export type GeneratedData = typeof WalletSendPage.prototype.generated;
 
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+|};
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+  +selectedLayout: string,
+|};
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class WalletSendPage extends Component<InjectedOrGenerated<GeneratedData>> {
+class WalletSendPage extends Component<AllProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -96,6 +112,13 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     this.showMemo = !this.showMemo;
     this.generated.actions.memos.closeMemoDialog.trigger();
   };
+
+  openDialog: any => void = (dialog) => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger()
+    this.generated.actions.dialogs.push.trigger({
+      dialog,
+    });
+  }
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -135,9 +158,59 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
 
+    if (this.props.selectedLayout === 'REVAMP') {
+      return (
+        <>
+          <WalletSendFormRevamp
+            selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+            validateAmount={(amount) => validateAmount(
+              amount,
+              transactionBuilderStore.selectedToken ?? defaultToken,
+              getMinimumValue(
+                publicDeriver.getParent().getNetworkInfo(),
+                transactionBuilderStore.selectedToken?.IsDefault ?? true
+              ),
+              this.context.intl,
+            )}
+            defaultToken={defaultToken}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            onSubmit={txBuilderActions.updateTentativeTx.trigger}
+            totalInput={transactionBuilderStore.totalInput}
+            hasAnyPending={hasAnyPending}
+            classicTheme={profile.isClassicTheme}
+            updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
+            updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
+            shouldSendAll={transactionBuilderStore.shouldSendAll}
+            updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
+            fee={transactionBuilderStore.fee}
+            isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+            reset={txBuilderActions.reset.trigger}
+            error={transactionBuilderStore.createUnsignedTx.error}
+            uriParams={this.generated.stores.loading.uriParams}
+            resetUriParams={this.generated.stores.loading.resetUriParams}
+            showMemo={this.showMemo}
+            onAddMemo={() => this.showMemoDialog({
+              dialog: MemoNoExternalStorageDialog,
+              continuation: this.toggleShowMemo,
+            })}
+            spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+            onAddToken={txBuilderActions.updateToken.trigger}
+            selectedToken={transactionBuilderStore.selectedToken}
+            previewStep={this.renderTxPreviewStep}
+            openDialog={this.openDialog}
+            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+            isOpen={uiDialogs.isOpen}
+          />
+          {this.renderDialog()}
+        </>
+      );
+    }
     return (
       <>
-        <WalletSendForm
+        <WalletSendFormClassic
           selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
           validateAmount={(amount) => validateAmount(
             amount,
@@ -197,6 +270,15 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         classicTheme={this.generated.stores.profile.isClassicTheme}
       />)
     }
+
+    if (uiDialogs.isOpen(AddNFTDialog)) {
+      return this.renderNFTDialog()
+    }
+
+    if (uiDialogs.isOpen(AddTokenDialog)) {
+      return this.renderAddTokenDialog()
+    }
+
     return '';
   }
 
@@ -220,6 +302,26 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       openTransactionSuccessDialog={this.openTransactionSuccessDialog}
     />);
   };
+
+  renderTxPreviewStep: (() => Node) = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    if (!transactionBuilderStore.tentativeTx) {
+      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
+    }
+    const signRequest = transactionBuilderStore.tentativeTx;
+
+    return (<WalletSendPreviewStepContainer
+      {...this.generated.WalletSendConfirmationDialogContainerProps}
+      signRequest={signRequest}
+      staleTx={transactionBuilderStore.txMismatch}
+      unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+      openTransactionSuccessDialog={this.openTransactionSuccessDialog}
+    />);
+  };
+
 
   /** Hardware Wallet (Trezor or Ledger) Confirmation dialog
     * Callback that creates a component to avoid the component knowing about actions/stores
@@ -363,6 +465,78 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     />);
   }
 
+  renderNFTDialog: void => Node = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    const { txBuilderActions } = this.generated.actions;
+
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+
+    return (
+      <AddNFTDialog
+        onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+        uriParams={this.generated.stores.loading.uriParams}
+        selectedToken={transactionBuilderStore.selectedToken}
+        validateAmount={(amount) => validateAmount(
+          amount,
+          transactionBuilderStore.selectedToken ?? defaultToken,
+          getMinimumValue(
+            publicDeriver.getParent().getNetworkInfo(),
+            transactionBuilderStore.selectedToken?.IsDefault ?? true
+          ),
+          this.context.intl,
+        )}
+        defaultToken={defaultToken}
+      />
+    )
+  }
+
+  renderAddTokenDialog: void => Node = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
+
+    const { transactionBuilderStore } = this.generated.stores;
+    const { txBuilderActions } = this.generated.actions;
+
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+
+    return (
+      <AddTokenDialog
+        onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+        uriParams={this.generated.stores.loading.uriParams}
+        selectedToken={transactionBuilderStore.selectedToken}
+        validateAmount={(amount) => validateAmount(
+          amount,
+          transactionBuilderStore.selectedToken ?? defaultToken,
+          getMinimumValue(
+            publicDeriver.getParent().getNetworkInfo(),
+            transactionBuilderStore.selectedToken?.IsDefault ?? true
+          ),
+          this.context.intl,
+        )}
+        defaultToken={defaultToken}
+        fee={transactionBuilderStore.fee}
+        totalInput={transactionBuilderStore.totalInput}
+        isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+        error={transactionBuilderStore.createUnsignedTx.error}
+      />
+    )
+  }
+
   @computed get generated(): {|
     WalletSendConfirmationDialogContainerProps:
       InjectedOrGenerated<WalletSendConfirmationDialogContainerData>,
@@ -440,7 +614,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     initialShowMemoState: boolean,
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       loading: {|
         resetUriParams: void => void,
@@ -618,3 +792,5 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     });
   }
 }
+
+export default (withLayout(WalletSendPage): ComponentType<Props>);

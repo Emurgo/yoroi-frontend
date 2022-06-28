@@ -1,35 +1,34 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
 
 When(/^I go to the delegation by id screen$/, async function () {
-  await this.click('.cardanoStake');
+  await this.click({ locator: '.cardanoStake', method: 'css' });
 });
 
 When(/^I fill the delegation id form:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input("input[name='poolId']", fields.stakePoolId);
+  await this.input({ locator: "input[name='poolId']", method: 'css' }, fields.stakePoolId);
 });
 
 Then(/^I see the stakepool ticker "([^"]*)"$/, async function (ticker) {
-  await this.waitUntilText('.StakePool_userTitle', ticker);
+  await this.waitUntilText({ locator: '.StakePool_userTitle', method: 'css' }, ticker);
 });
 
 When(/^I click on the next button in the delegation by id$/, async function () {
-  await this.click('.DelegationSendForm_component .MuiButton-primary');
+  await this.click({ locator: '.DelegationSendForm_component .MuiButton-primary', method: 'css' });
 });
 
 When(/^I see the delegation confirmation dialog$/, async function () {
-  await this.waitForElement('.DelegationTxDialog_dialog');
+  await this.waitForElement({ locator: '.DelegationTxDialog_dialog', method: 'css' });
 });
 
 Given(/^I click on see dashboard$/, async function () {
-  await this.waitForElement('.SuccessPage_component');
-  await this.click("//button[contains(text(), 'Dashboard page')]", By.xpath);
+  await this.waitForElement({ locator: '.SuccessPage_component', method: 'css' });
+  await this.click({ locator: "//button[contains(text(), 'Dashboard page')]", method: 'xpath' });
 });
 
 When(/^I should see the dashboard screen$/, async function () {
-  await this.waitForElement('.StakingDashboard_page');
+  await this.waitForElement({ locator: '.StakingDashboard_page', method: 'css' });
 });
 

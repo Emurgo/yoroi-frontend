@@ -7,7 +7,7 @@ import CheckboxLabel from '../../common/CheckboxLabel';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
 import globalMessages from '../../../i18n/global-messages';
-import NightlyIcon from '../../../assets/images/yoroi-nightly-icon.inline.svg';
+import { ReactComponent as NightlyIcon }  from '../../../assets/images/yoroi-nightly-icon.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({

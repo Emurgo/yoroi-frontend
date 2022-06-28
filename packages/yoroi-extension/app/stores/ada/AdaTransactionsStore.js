@@ -50,7 +50,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       defaultNetworkId,
     );
-    const transaction = await this.api.ada.createSubmittedTransactionData(
+    const { usedUtxos, transaction } = await this.api.ada.createSubmittedTransactionData(
       publicDeriver,
       signRequest,
       txId,
@@ -61,6 +61,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     this.stores.transactions.recordSubmittedTransaction(
       publicDeriver,
       transaction,
+      usedUtxos,
     );
   }
 }

@@ -8,18 +8,7 @@
   padding: 40px 36px;
   text-align: center;
 }
-.header {
-  display: flex;
-  align-items: center;
-  svg {
-    margin-right: 8px;
-  }
-  h3 {
-    font-size: 24px;
-    color: var(--yoroi-palette-gray-900);
-    line-height: 30px;
-  }
-}
+
 .content {
   padding: 60px 0;
 }
