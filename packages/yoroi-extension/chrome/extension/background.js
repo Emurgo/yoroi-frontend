@@ -1442,21 +1442,23 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const assets = await connectorGetAssets(wallet);
                     const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
-                    const fetcher = await getCardanoStateFetcher(CardanoRemoteFetcher, localStorageApi);
+                    const fetcher = await getCardanoStateFetcher(localStorageApi);
                     const metadatasList = await fetcher.getMultiAssetMintMetadata({
-                      body: {
-                        assets: potentialNFTAssets.map(asset => {
-                          const ident = asset.identifier.split('.');
-                          return {
-                            policy: ident[0],
-                            name: Buffer.from(ident[1], 'hex').toString(),
-                          };
-                        }),
-                      }
+                      assets: potentialNFTAssets.map(asset => {
+                        const ident = asset.identifier.split('.');
+                        return {
+                          policy: ident[0],
+                          name: Buffer.from(ident[1], 'hex').toString(),
+                        };
+                      }),
+                      network: wallet.getParent().getNetworkInfo(),
                     });
                     const nfts = {};
-                    for (let key in metadatas) {
-                      const metadatas = metadatas[key];
+                    for (let key in metadatasList) {
+                      if(!Object.prototype.hasOwnProperty.call(metadatasList, key)) {
+                        continue;
+                      }
+                      const metadatas = metadatasList[key];
                       const ident = key.split('.');
                       const policyId = ident[0];
                       const assetName = Buffer.from(ident[1], 'hex').toString();
