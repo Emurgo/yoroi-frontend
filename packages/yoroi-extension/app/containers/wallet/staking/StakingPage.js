@@ -335,17 +335,22 @@ class StakingPage extends Component<AllProps> {
     const currentEpoch = currTimeRequests.currentEpoch;
     const epochLength = getEpochLength();
 
-    const endEpochTime = toRealTime({
-      absoluteSlotNum: toAbsoluteSlot({
-        epoch: currentEpoch,
-        // in Jormungandr, rewards were distributed at the start of the epoch
-        // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
-        slot: isJormungandr(publicDeriver.getParent().getNetworkInfo()) ? 0 : epochLength,
-      }),
-      timeSinceGenesisFunc: timeSinceGenesis,
-    });
+    const getDateFromEpoch = epoch => {
+      const epochTime = toRealTime({
+        absoluteSlotNum: toAbsoluteSlot({
+          epoch,
+          // in Jormungandr, rewards were distributed at the start of the epoch
+          // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
+          slot: isJormungandr(publicDeriver.getParent().getNetworkInfo()) ? 0 : getEpochLength(),
+        }),
+        timeSinceGenesisFunc: timeSinceGenesis,
+      });
+      const epochMoment = moment(epochTime).format('lll');
+      return epochMoment;
+    };
 
-    const endEpochDate = moment(endEpochTime).format('lll');
+    const endEpochDate = getDateFromEpoch(currentEpoch);
+    const previousEpochDate = getDateFromEpoch(currentEpoch - 1);
 
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -416,6 +421,7 @@ class StakingPage extends Component<AllProps> {
             }),
         }}
         epochProgress={{
+          startEpochDate: previousEpochDate,
           currentEpoch,
           endEpochDate,
           percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
