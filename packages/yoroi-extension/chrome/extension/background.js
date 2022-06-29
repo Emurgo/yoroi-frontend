@@ -1461,7 +1461,7 @@ function handleInjectorConnect(port) {
                       const metadatas = metadatasList[key];
                       const ident = key.split('.');
                       const policyId = ident[0];
-                      const assetName = Buffer.from(ident[1], 'hex').toString();
+                      const assetName = ident[1];
                       const metadata = metadataIsValid(policyId, assetName, metadatas);
                       if (metadata !== null) {
                         nfts[key] = { metadata };
