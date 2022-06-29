@@ -269,9 +269,9 @@ export default class GraphWrapper extends Component<Props, State> {
               height='256px'
               animation='wave'
               sx={{
-            backgroundColor: 'var(--yoroi-palette-gray-50)',
-            borderRadius: '4px',
-          }}
+                backgroundColor: 'var(--yoroi-palette-gray-50)',
+                borderRadius: '4px',
+              }}
             />
           ) : (
             <CardShadow>

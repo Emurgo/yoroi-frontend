@@ -41,8 +41,8 @@ function TextField({
   onChange,
   autoFocus,
   revamp,
-  placeholder,
   QRHandler,
+  placeholder,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -113,7 +113,7 @@ function TextField({
             </InputAdornment>
           ),
           disableUnderline: revamp,
-          placeholder: placeholder != null ? placeholder : (Boolean(revamp) ? '0.0' : ''),
+          placeholder: placeholder != null ? placeholder : '',
       }}
       {...props}
     />
@@ -132,8 +132,8 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
   revamp: false,
-  placeholder: undefined,
   QRHandler: null,
+  placeholder: undefined,
 };
 
 export default TextField;

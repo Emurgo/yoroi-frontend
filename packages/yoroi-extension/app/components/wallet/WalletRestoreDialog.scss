@@ -85,3 +85,31 @@
     }
   }
 }
+
+
+
+:global(.YoroiRevamp) {
+  .component {
+    .walletName {
+      margin-bottom: 0;
+    }
+
+    .walletPassword {
+      .walletPasswordFields {
+        &.show {
+          max-height: 600px;
+          opacity: 1;
+        }
+
+        & > div {
+          margin-top: 0;
+          width: 100%;
+        }
+      }
+    }
+
+    :global(.Dialog_actions) {
+      margin-top: 10px;
+    }
+  }
+}

@@ -446,9 +446,9 @@ function escapedGlobalRegExp(regex) {
 // This type should be kept open (not "exact") because it is a react-polymorph skin
 // and should be able to pass any extra properties from react-polymorph down.
 type AmountInputProps = {
-  +currency: string,
-  +fees: BigNumber | string,
-  +total: BigNumber | string,
+  +currency?: string,
+  +fees?: BigNumber | string,
+  +total?: BigNumber | string,
   +error?: string,
   // inherited from RP
   +inputRef?: Ref<'input'>,
@@ -507,7 +507,7 @@ class AmountInput extends Component<AmountInputProps> {
             textTransform: 'uppercase',
           }}
         >
-          {error === null || error === '' ? `= ${total.toString()} ` : null}
+          {(error === null || error === '') && total ? `= ${total.toString()} ` : null}
           {currency}
         </Typography>
       </Box>
