@@ -213,6 +213,93 @@ export function getMockServer(
       res.send('Transaction not found');
     });
 
+    server.get('/api/v2/tipStatus', async (req, res) => {
+      const bestBlockHash = await mockImporter.mockUtxoApi.getBestBlock();
+      const safeBlockHash = await mockImporter.mockUtxoApi.getSafeBlock();
+      res.send({
+        safeBlocK: { hash: safeBlockHash },
+        bestBlock: { hash: bestBlockHash },
+      });
+    });
+
+    server.post('/api/v2/tipStatus', async (req, res) => {
+      const { bestBlocks } = req.body.reference;
+      const tipStatus = await mockImporter.mockUtxoApi.getTipStatusWithReference(
+        bestBlocks
+      );
+      if (tipStatus.result !== 'SUCCESS') {
+        res.status(500);
+        res.send({ error: { response: 'REFERENCE_POINT_BLOCK_NOT_FOUND' } });
+      } else {
+        const value = tipStatus.value;
+        if (!value) {
+          throw new Error('unpected null value');
+        }
+        const bestBlockHash = await mockImporter.mockUtxoApi.getBestBlock();
+        const safeBlockHash = await mockImporter.mockUtxoApi.getSafeBlock();
+        res.send({
+          safeBlock: safeBlockHash,
+          bestBlock: bestBlockHash,
+          reference: value.reference,
+        });
+      }
+    });
+
+    server.post('/api/v2/txs/utxoAtPoint', async (req, res) => {
+      const { addresses, referenceBlockHash } = req.body;
+      const { value } = await mockImporter.mockUtxoApi.getUtxoAtPoint(
+        { addresses, referenceBlockHash }
+      );
+      if (!value) {
+        throw new Error('unpected null value');
+      }
+      res.send(
+        value.map(v => (
+          {
+            utxo_id: v.utxoId,
+            tx_hash: v.txHash,
+            tx_index: v.txIndex,
+            block_num: v.blockNum,
+            receiver: v.receiver,
+            amount: v.amount,
+            assets: v.assets,
+          }
+        ))
+      );
+    });
+
+    server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
+      const { addresses, untilBlockHash, afterBestBlock } = req.body;
+      const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint(
+        { addresses, untilBlockHash, afterBestBlock }
+      );
+      if (result !== 'SUCCESS') {
+        res.status(500);
+        res.send({ error: { response: 'REFERENCE_POINT_BLOCK_NOT_FOUND' } });
+      } else {
+        if (!value) {
+          throw new Error('unpected null value');
+        }
+        // casting `value` to `any` is the only way to pass flow check
+        const diffItems = (value: any).diffItems.map(item => {
+          if (item.type === 'input') {
+            return item;
+          }
+          return {
+            type: 'output',
+            id: item.utxo.utxoId,
+            receiver: item.utxo.receiver,
+            amount: item.utxo.amount,
+            assets: item.utxo.assets,
+            block_num: item.utxo.blockNum,
+            tx_hash: item.utxo.txHash,
+            tx_index: item.utxo.txIndex,
+          };
+        });
+        res.send({ diffItems });
+      }
+    });
+
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {

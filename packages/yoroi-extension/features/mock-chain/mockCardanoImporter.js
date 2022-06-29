@@ -34,6 +34,7 @@ import {
   getAddressForType,
   getMangledAddressString,
   toRemoteByronTx,
+  MockUtxoApi,
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import {
   networks,
@@ -2037,6 +2038,7 @@ export const generateTransaction = (): {|
 // =================
 
 const transactions: Array<MockTx> = [];
+const mockUtxoApi: MockUtxoApi = new MockUtxoApi(transactions, 1);
 
 export function addTransaction(tx: MockTx): void {
   // need to insert txs in order they appear in the blockchain
@@ -2329,4 +2331,5 @@ export default {
   getRewardHistory,
   getAccountState,
   getUtxoData,
+  mockUtxoApi,
 };
