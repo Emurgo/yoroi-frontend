@@ -22,3 +22,9 @@ export const byronEraButton: LocatorObject = { locator: '.WalletEraOptionDialog_
 export const trezorConnectDialog: LocatorObject = { locator: '.CheckDialog', method: 'css' };
 export const trezorWalletName: LocatorObject = { locator: '//input[@name="walletName"]', method: 'xpath' };
 export const trezorConfirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
+export const trezorSaveWalletButton: LocatorObject = { locator: '', method: '' };
+
+// Common elements
+export const walletNameInput: LocatorObject = { locator: '//input[@name="walletName"]', method: 'xpath' };
+export const saveDialog: LocatorObject = { locator: '.SaveDialog', method: 'css' };
+export const saveButton: LocatorObject = { locator: '//button[@id="primaryButton"]', method: 'xpath' };

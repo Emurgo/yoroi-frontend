@@ -6,4 +6,4 @@ Feature: Trezor wallet emulator
 
   @hw-trezor-001
   Scenario: Connect wallet
-    Given I should see connected Trezor emulator
+    Given I connected Trezor emulator device

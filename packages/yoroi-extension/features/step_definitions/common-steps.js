@@ -50,7 +50,12 @@ import {
   shelleyEraButton,
   trezorConnectDialog,
   trezorConfirmButton,
+  walletNameInput,
+  saveDialog,
+  saveButton
 } from '../pages/newWalletPages';
+import { confirmUsingTrezorButton, dontAskAgainCheckbox, exportTrezorButton } from '../pages/trezorConnectPage';
+import { extensionTabName, trezorConnectTabName } from '../support/windowManager';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -418,23 +423,39 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
   await setTrezorWallet(this, deviceId);
 });
 
-Given(/^I should see connected Trezor emulator$/, async function () {
+Given(/^I connected Trezor emulator device$/, async function () {
+  // select connecting a HW wallet
   await this.click(connectHwButton);
+  // pick up currency
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardanoTestnet'));
+  // select the trezor wallet
   await this.waitForElement(hwOptionsDialog);
   await this.click(trezorWalletButton);
+  // select the Shelley era
   await this.waitForElement(eraOptionsDialog);
   await this.click(shelleyEraButton);
+  // Confirm action twice
   await this.waitForElement(trezorConnectDialog);
   await this.click(trezorConfirmButton);
   await this.click(trezorConfirmButton);
-  await this.driver.sleep(10000);
   // wait for a new tab
-  // tick the checkbox on the page and press Allow button
+  await this.windowManager.findNewWindowAndSwitchTo(trezorConnectTabName);
+  // tick the checkbox on the Trezor page and press Allow button
+  await this.driver.sleep(2000);
+  await this.waitForElement(dontAskAgainCheckbox);
+  await this.click(dontAskAgainCheckbox);
+  await this.waitForElement(confirmUsingTrezorButton);
+  await this.click(confirmUsingTrezorButton);
   // press the Export button
+  await this.click(exportTrezorButton);
   // wait for closing the new tab
+  await this.windowManager.waitForClosingAndSwitchTo(trezorConnectTabName, extensionTabName);
   // save the emulator as is
+  await this.waitForElement(saveDialog);
+  const name = await this.getValue(walletNameInput);
+  expect(name).to.be.equal('Emulator');
+  await this.click(saveButton);
 });
 
 async function restoreWalletsFromStorage(client) {
