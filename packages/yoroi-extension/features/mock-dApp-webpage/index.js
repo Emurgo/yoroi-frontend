@@ -70,6 +70,10 @@ export class MockDAppWebpage {
     await this.driver.executeScript(scriptString);
   }
 
+  _addressToCbor(address: string): string {
+    return bytesToHex(CardanoWasm.Address.from_bech32(address).to_bytes());
+  }
+
   _addressesFromCborIfNeeded(addresses: Array<string>): Array<string> {
     this.logger.info(`MockDApp: Converting the addresses "${JSON.stringify(addresses)}" from CBOR`);
     const resultOfConverting = addresses.map(a =>
@@ -195,6 +199,20 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
   }
 
+  async requestUsedAddresses() {
+    this.logger.info(`MockDApp: Getting used addresses`);
+    await this.driver.executeScript(() => {
+      window.addressesPromise = window.api.getUsedAddresses({ page: 0, limit: 5 });
+    });
+  }
+
+  async requestUnusedAddresses() {
+    this.logger.info(`MockDApp: Getting unused addresses`);
+    await this.driver.executeScript(() => {
+      window.addressesPromise = window.api.getUnusedAddresses();
+    });
+  }
+
   async requestNonAuthAccess() {
     await this._requestAccess();
   }
@@ -291,11 +309,15 @@ export class MockDAppWebpage {
       this.logger.info(`MockDApp: -> Try ${i + 1} to get the connection state`);
       await this.driver.sleep(100);
       const walletConnectedState = await this.driver.executeScript(`return window.walletConnected`);
-      this.logger.info(`MockDApp: -> Try ${i + 1} the connection state is ${JSON.stringify(walletConnectedState)}`);
+      this.logger.info(
+        `MockDApp: -> Try ${i + 1} the connection state is ${JSON.stringify(walletConnectedState)}`
+      );
       states.push(walletConnectedState);
     }
-    const resultConnectionState = states.every((walletState) => walletState === true);
-    this.logger.info(`MockDApp: -> The connection state is ${JSON.stringify(resultConnectionState)}`);
+    const resultConnectionState = states.every(walletState => walletState === true);
+    this.logger.info(
+      `MockDApp: -> The connection state is ${JSON.stringify(resultConnectionState)}`
+    );
     return resultConnectionState;
   }
 
@@ -398,5 +420,117 @@ export class MockDAppWebpage {
     });
     this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
     return signingResult;
+  }
+
+  async requestSigningData(payload: string) {
+    this.logger.info(`MockDApp: Requesting signing the data: data="${payload}"`);
+
+    const addressesResponse = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.addressesPromise
+        .then(addrs => {
+          // eslint-disable-next-line promise/always-return
+          if (addrs.length === 0) {
+            callback({ success: false, errMsg: 'No addresses found' });
+          }
+          callback({ success: true, retValue: addrs });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+
+    let addresses;
+    if (addressesResponse.success) {
+      addresses = this._addressesFromCborIfNeeded(addressesResponse.retValue);
+    }
+
+    let address;
+    if (addresses && addresses.length > 0) {
+      address = addresses[0];
+      this.logger.info(`MockDApp: Using the address ${address}`);
+    } else {
+      this.logger.error(`MockDApp: -> The error is received: No used or unused Addresses`);
+      throw new MockDAppWebpageError('There are no addresses to proceed');
+    }
+
+    address = this._addressToCbor(address);
+
+    this.logger.info(`MockDApp: -> Signing address: ${address}`);
+
+    let payloadHex;
+    if (payload.startsWith('0x')) {
+      payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+    } else {
+      payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+    }
+    this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
+
+    this.driver.executeScript(
+      (addr, plHex) => {
+        window.signDataPromise = window.api.signData(addr, plHex);
+      },
+      address,
+      payloadHex
+    );
+  }
+
+  async getSigningDataResult(): Promise<string> {
+    this.logger.info(`MockDApp: Getting signing data result`);
+    const signingResult = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.signDataPromise
+        .then(
+          // eslint-disable-next-line promise/always-return
+          onSuccess => {
+            callback(onSuccess);
+          },
+          onReject => {
+            callback(onReject);
+          }
+        )
+        .catch(callback);
+    });
+    this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
+    return signingResult;
+  }
+
+  async getCollateralUtxos(amount: string): Promise<string> {
+    this.logger.info(`MockDApp: Getting Collateral Utxos`);
+
+    Buffer.from(
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
+    ).toString('hex');
+
+    const collateralResponse = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+
+      window.api
+        .getCollateralUtxos('1a004ac4a0')
+        // eslint-disable-next-line promise/always-return
+        .then(utxosResponse => {
+          callback({ success: true, retValue: utxosResponse });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (collateralResponse.success) {
+      const utxos = this._mapCborUtxos(collateralResponse.retValue);
+      return JSON.stringify(utxos, undefined, 2);
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${collateralResponse.errMsg}`);
+    throw new MockDAppWebpageError(collateralResponse.errMsg);
+  }
+
+  async addCollateral(amount: string) {
+    this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
+    const utxosHex = Buffer.from(
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
+    ).toString('hex');
+
+    this.driver.executeScript(utxos => {
+      window.collateralPromise = window.api.getCollateralUtxos(utxos);
+    }, utxosHex);
   }
 }

@@ -379,7 +379,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

@@ -14,7 +14,6 @@ import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By, logging } from 'selenium-webdriver';
 import { enterRecoveryPhrase } from '../support/helpers/helpers';
-import { getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
@@ -137,6 +136,19 @@ After(async function (scenario) {
   await this.driver.quit();
 });
 
+export async function getPlates(customWorld: any): Promise<any> {
+  // check plate in confirmation dialog
+  let plateElements = await customWorld.driver.findElements(
+    By.css('.WalletRestoreVerifyDialog_plateIdSpan')
+  );
+
+  // this makes this function also work for wallets that already exist
+  if (plateElements.length === 0) {
+    plateElements = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
+  }
+  return plateElements;
+}
+
 const writeFile = promisify(fs.writeFile);
 
 // Steps that contain these patterns will trigger screenshots:
@@ -189,11 +201,17 @@ async function takePageSnapshot(driver, name) {
 }
 
 async function getConsoleLogs(driver, name) {
+  const cap = await driver.getCapabilities();
+  const browserName = cap.getBrowserName();
+  if (browserName === 'firefox'){
+    return;
+  }
   const dir = createDirInTestRunsData('consoleLogs');
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
   const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
+
 }
 
 async function inputMnemonicForWallet(

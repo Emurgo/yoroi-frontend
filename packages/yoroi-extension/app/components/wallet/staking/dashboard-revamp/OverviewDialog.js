@@ -3,12 +3,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HelperTooltip } from './StakePool/StakePool';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
@@ -33,8 +33,12 @@ const messages = defineMessages({
   availableTotalRewardsHelper: {
     id: 'wallet.staking.availableTotalRewardsHelper',
     defaultMessage:
-      '!!!If the Reward amount is different than expected, see possible reasons of that on our FAQ page.',
+      '!!!If the Reward amount is different than expected, see possible reasons of that on our {faqLink}.',
   },
+  FAQPage: {
+    id: 'wallet.staking.FAQPage',
+    defaultMessage: '!!!FAQ page'
+  }
 });
 
 type Props = {|
@@ -70,6 +74,19 @@ export default class OverviewModal extends Component<Props> {
       },
     ];
 
+    const faqLink = (
+      <Link
+        href="https://emurgohelpdesk.zendesk.com"
+        target='_blank'
+        rel="noreferrer noopener"
+        sx={{
+          color: 'inherit',
+          textDecoration: 'underline',
+        }}
+      >
+        {intl.formatMessage(messages.FAQPage)}
+      </Link>
+    )
     return (
       <Dialog
         title={this.context.intl.formatMessage(globalMessages.overview)}
@@ -84,7 +101,14 @@ export default class OverviewModal extends Component<Props> {
         <Box display="flex" alignItems="center" py="50px">
           <Box display="flex" alignItems="center" flex="1">
             <Typography mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
-            <HelperTooltip message={intl.formatMessage(messages.availableTotalRewardsHelper)} />
+            <HelperTooltip
+              message={
+                <FormattedMessage
+                  {...messages.availableTotalRewardsHelper}
+                  values={{ faqLink }}
+                />
+              }
+            />
           </Box>
 
           <Box flex="1">
@@ -92,7 +116,7 @@ export default class OverviewModal extends Component<Props> {
               {this.renderAmount(totalRewards)}
             </Typography>
             <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-              {this.renderAmount(totalRewards)} USD
+              {this.renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </Box>
         </Box>
@@ -131,18 +155,25 @@ export default class OverviewModal extends Component<Props> {
         </div>
       );
     }
+
+    return this.formatTokenEntry(token.getDefaultEntry());
+  };
+
+  renderAmountWithUnitOfAccount: (void | MultiToken) => Node = token => {
+    if (token == null) {
+      return null;
+    }
+
     const unitOfAccountCalculated = this.props.unitOfAccount(token.getDefaultEntry());
 
-    const entryNode = this.formatTokenEntry(token.getDefaultEntry());
-    const unitOfAccountNode = unitOfAccountCalculated
-      ? `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`
-      : null;
+    if (!unitOfAccountCalculated) {
+      return null;
+    }
 
-    return (
-      <>
-        {unitOfAccountNode}
-        {entryNode}
-      </>
-    );
+    if (this.props.shouldHideBalance) {
+      return `${hiddenAmount}  ${unitOfAccountCalculated.currency}`;
+    }
+
+    return `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`;
   };
 }

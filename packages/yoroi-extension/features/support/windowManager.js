@@ -50,7 +50,9 @@ export class WindowManager {
   _getHandleByTitle(title: string): Array<CustomWindowHandle> {
     this.logger.info(`WindowManager: Getting a handle by the title "${title}"`);
     const handles = this.windowHandles.filter(customHandle => customHandle.title === title);
-    this.logger.info(`WindowManager: -> The handles for title "${title}" are ${JSON.stringify(handles)}`);
+    this.logger.info(
+      `WindowManager: -> The handles for title "${title}" are ${JSON.stringify(handles)}`
+    );
     return handles;
   }
 
@@ -153,7 +155,9 @@ export class WindowManager {
       this.logger.info(`WindowManager: -> oldHandles: ${JSON.stringify(this.windowHandles)}`);
       if (newWindowHandles.length > this.windowHandles.length) {
         const newHandle = this._filterHandles(newWindowHandles);
-        this.logger.info(`WindowManager: -> The new window handle is "${JSON.stringify(newHandle)}"`);
+        this.logger.info(
+          `WindowManager: -> The new window handle is "${JSON.stringify(newHandle)}"`
+        );
         return newHandle;
       }
     }
@@ -175,7 +179,9 @@ export class WindowManager {
     this.windowHandles.push(popUpCustomHandle);
 
     await this.driver.switchTo().window(popupWindowHandle);
-    this.logger.info(`WindowManager: -> Switched to the new window ${JSON.stringify(popUpCustomHandle)}`);
+    this.logger.info(
+      `WindowManager: -> Switched to the new window ${JSON.stringify(popUpCustomHandle)}`
+    );
 
     return popUpCustomHandle;
   }

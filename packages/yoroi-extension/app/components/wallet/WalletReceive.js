@@ -52,11 +52,11 @@ const messages = defineMessages({
   },
   noResultsFoundLabel: {
     id: 'wallet.receive.page.noResultsFoundLabel',
-    defaultMessage: '!!!No results found',
+    defaultMessage: '!!!No results found.',
   },
   notFoundAnyAddresses: {
     id: 'wallet.receive.page.notFoundAnyAddresses',
-    defaultMessage: '!!!We couldn\'t find any addresses matching your filter.',
+    defaultMessage: '!!!No wallet addresses have been used yet.',
   },
   label: {
     id: 'wallet.receive.page.label',
@@ -109,10 +109,7 @@ export default class WalletReceive extends Component<Props> {
         {adjustedBefore}
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
         {' '}
-        {this.props.unitOfAccountSetting.enabled
-          ? this.props.unitOfAccountSetting.currency
-          : truncateToken(getTokenName(tokenInfo))
-        }
+        {truncateToken(getTokenName(tokenInfo))}
       </>
     );
   }

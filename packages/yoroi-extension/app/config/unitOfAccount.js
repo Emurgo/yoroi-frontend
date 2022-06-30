@@ -7,6 +7,7 @@ import { ReactComponent as CNY }  from '../assets/images/currencies/CNY.inline.s
 import { ReactComponent as KRW }  from '../assets/images/currencies/KRW.inline.svg';
 import { ReactComponent as BTC }  from '../assets/images/currencies/BTC.inline.svg';
 import { ReactComponent as ETH }  from '../assets/images/currencies/ETH.inline.svg';
+import { ReactComponent as BRL }  from '../assets/images/currencies/BRL.inline.svg';
 
 export const SUPPORTED_CURRENCIES = [
   { symbol: 'USD', svg: USD },
@@ -16,4 +17,5 @@ export const SUPPORTED_CURRENCIES = [
   { symbol: 'KRW', svg: KRW },
   { symbol: 'BTC', svg: BTC },
   { symbol: 'ETH', svg: ETH },
+  { symbol: 'BRL', svg: BRL },
 ];

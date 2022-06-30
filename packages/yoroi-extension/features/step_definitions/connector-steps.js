@@ -26,6 +26,8 @@ import {
   cancelButton,
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
+import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
+import { addCollateralTitle } from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 
 const userRejectMsg = 'user reject';
@@ -33,6 +35,7 @@ const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
 
 const connectorPopUpIsDisplayed = async (customWorld: Object) => {
+  await customWorld.driver.sleep(2000);
   await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await customWorld.driver.getTitle();
   expect(windowTitle).to.equal('Yoroi dApp Connector');
@@ -73,6 +76,11 @@ Then(/^I should see the connector popup for connection$/, async function () {
 Then(/^I should see the connector popup for signing$/, async function () {
   await connectorPopUpIsDisplayed(this);
   await this.waitForElement(transactionTotalAmountField);
+});
+
+Then(/^I should see the connector popup for signing data$/, async function () {
+  await connectorPopUpIsDisplayed(this);
+  await this.waitForElement(signMessageTitle);
 });
 
 Then(/^There is no the connector popup$/, async function () {
@@ -209,7 +217,7 @@ Then(/^I see the error Incorrect wallet password$/, async function () {
     "The error isn't displayed"
   ).to.be.true;
   const errorText = await this.getText(spendingPasswordErrorField);
-  expect(errorText).to.equal('Incorrect wallet password.');
+  expect(errorText).to.equal('Incorrect spending password. Please retype.');
 });
 
 Then(/^I should see no password errors$/, async function () {
@@ -288,4 +296,109 @@ Then(/^The pop-up is closed and the extension tab is opened$/, async function ()
 
 Then(/^I cancel signing the transaction$/, async function () {
   await this.click(cancelButton);
+});
+
+When(/^I request signing the data:$/, async function (table) {
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  const payload = fields.payload;
+  await this.mockDAppPage.requestSigningData(payload);
+});
+
+Then(/^I should see the data to sign:$/, async function (table) {
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  const payload = fields.payload;
+  const actualSigningData = await getSigningData(this);
+  expect(actualSigningData, 'Signing Data is different').to.equal(payload);
+});
+
+Then(/^The signing data API should return (.+)$/, async function (dataHex) {
+  const result = await this.mockDAppPage.getSigningDataResult();
+  expect(result).to.equal(dataHex);
+});
+
+Then(/^The user reject for signing data is received$/, async function () {
+  await this.windowManager.switchTo(mockDAppName);
+  const signingResult = await this.mockDAppPage.getSigningDataResult();
+  expect(signingResult.code, `The reject signing code is different`).to.equal(2);
+  expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
+});
+
+When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
+  await this.mockDAppPage.addCollateral(utxos);
+});
+
+Then(
+  /^The dApp should see collateral: (.+) for (.+)$/,
+  async function (expectedCollateral, utxosAmount) {
+    const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+    const collateralJson = JSON.parse(collateral)[0];
+    const expectedUtxos = JSON.parse(expectedCollateral);
+    expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
+  }
+);
+
+Then(/^I should see the connector popup to Add Collateral$/, async function () {
+  await connectorPopUpIsDisplayed(this);
+  await this.waitForElement(addCollateralTitle);
+});
+
+Then(/^I should see the collateral fee data:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const fields = table.hashes()[0];
+  const realFee = await getTransactionFee(this);
+  const expectedFee = `-${fields.fee}`;
+  const realFullAmount = await getTransactionAmount(this);
+  expect(realFee, 'Fee is different').to.equal(expectedFee);
+  expect(realFullAmount, 'Total amount is different').to.equal(expectedFee);
+});
+
+Then(/^I should see the collateral from address info:$/, async function (table) {
+  
+  await this.waitForElement(overviewTabButton);
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+  await this.click(utxoAddressesTabButton);
+
+  const expectedFromAddress = fields.fromAddress;
+  const expectedFromAddressAmount = fields.fromAddressAmount;
+
+  const actualAddresses = await getUTXOAddresses(this);
+  const actualFromAddresses = actualAddresses.fromAddresses;
+  const foundFromAddresses = actualFromAddresses.filter(
+    addr =>
+      addr.address === expectedFromAddress && addr.amount === parseFloat(expectedFromAddressAmount)
+  );
+  expect(
+    foundFromAddresses.length,
+    `Expected fromAddress:
+  address:${expectedFromAddress}, amount: ${expectedFromAddressAmount}
+  Received:\n${JSON.stringify(actualFromAddresses)}`
+  ).to.equal(1);
+
+});
+
+Then(/^I should see the collateral to addresses info:$/, async function (table) {
+  await this.waitForElement(overviewTabButton);
+  const tableHashes = table.hashes();
+  await this.click(utxoAddressesTabButton);
+
+  const actualAddresses = await getUTXOAddresses(this);
+  const actualToAddresses = actualAddresses.toAddresses;
+  actualToAddresses.forEach((addr, index) => {
+    expect(addr.address).to.equal(tableHashes[index].toAddresses);
+    expect(addr.amount).to.equal(parseFloat(tableHashes[index].toAddressesAmount));
+  }
+  );
+  await this.click(overviewTabButton);
+  await this.waitForElement(transactionFeeTitle);
+});
+
+When(/^I request unused addresses$/, async function () {
+  await this.mockDAppPage.requestUnusedAddresses();
+});
+
+When(/^I request used addresses$/, async function () {
+  await this.mockDAppPage.requestUsedAddresses();
 });

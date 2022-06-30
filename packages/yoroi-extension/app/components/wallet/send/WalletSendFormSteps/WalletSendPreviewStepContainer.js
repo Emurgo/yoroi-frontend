@@ -13,6 +13,8 @@ import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/u
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
 import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
+import type { TokenRow, } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { MultiToken } from '../../../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof WalletSendPreviewStepContainer.prototype.generated;
 
@@ -24,6 +26,13 @@ type DialogProps = {|
   +signRequest: ISignRequest<any>,
   +staleTx: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
+  +isDefaultIncluded: boolean,
+  +plannedTxInfoMap: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>,
+  +minAda: ?MultiToken
 |};
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -87,16 +96,15 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
           });
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
-        onCancel={() => {
-          actions.dialogs.closeActiveDialog.trigger();
-          sendMoneyRequest.reset();
-        }}
-        error={sendMoneyRequest.error}
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={
           addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
         }
+        selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+        isDefaultIncluded={this.props.isDefaultIncluded}
+        plannedTxInfoMap={this.props.plannedTxInfoMap}
+        minAda={this.props.minAda}
       />
     );
   }
@@ -124,7 +132,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         getCurrentPrice: (
           from: string,
           to: string
-        ) => ?number,
+        ) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

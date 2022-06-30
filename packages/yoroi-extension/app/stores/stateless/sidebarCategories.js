@@ -18,7 +18,6 @@ import { ReactComponent as assetsIcon }  from '../../assets/images/sidebar/revam
 import { ReactComponent as votingIcon }  from '../../assets/images/sidebar/revamp/voting.inline.svg';
 // import { ReactComponent as swapIcon }  from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon }  from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import { ReactComponent as faqIcon }  from '../../assets/images/sidebar/revamp/faq.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -164,13 +163,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/settings',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
-    isVisible: _request => true,
-  },
-  {
-    className: 'faq',
-    route: 'https://yoroi-wallet.com/faq',
-    icon: faqIcon,
-    label: globalMessages.sidebarFaq,
     isVisible: _request => true,
   },
   // {

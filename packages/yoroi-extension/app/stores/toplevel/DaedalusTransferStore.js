@@ -313,11 +313,11 @@ const messages = defineMessages({
   },
   noTransferTxError: {
     id: 'daedalusTransfer.error.noTransferTxError',
-    defaultMessage: '!!!There is no transfer transaction to send.',
+    defaultMessage: '!!!There is no transaction to be sent.',
   },
   webSocketRestoreError: {
     id: 'daedalusTransfer.error.webSocketRestoreError',
-    defaultMessage: '!!!Error while restoring blockchain addresses',
+    defaultMessage: '!!!An error occurred while restoring blockchain addresses. Please retry.',
   }
 });
 

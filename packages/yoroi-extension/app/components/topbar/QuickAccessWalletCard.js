@@ -13,6 +13,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 type Props = {|
   +plate: null | WalletChecksum,
@@ -24,6 +25,8 @@ type Props = {|
   +shouldHideBalance: boolean,
   +walletAmount: null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |}
 
 @observer
@@ -34,7 +37,11 @@ export default class QuickAccessWalletCard extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { shouldHideBalance } = this.props;
+    const {
+      shouldHideBalance,
+      unitOfAccountSetting,
+      getCurrentPrice,
+    } = this.props;
 
     const [, iconComponent] = this.props.plate
       ? constructPlate(this.props.plate, 0, styles.main)
@@ -62,6 +69,8 @@ export default class QuickAccessWalletCard extends Component<Props> {
                 amount={totalAmount}
                 getTokenInfo={this.props.getTokenInfo}
                 showFiat
+                unitOfAccountSetting={unitOfAccountSetting}
+                getCurrentPrice={getCurrentPrice}
               />
             </div>
           </div>

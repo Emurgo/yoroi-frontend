@@ -1,5 +1,5 @@
 // @flow
-
+import { BigNumber } from 'bignumber.js';
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -16,7 +16,8 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
-import AmountDisplay from '../common/AmountDisplay';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import type { WalletsNavigation } from '../../api/localStorage';
 
 const messages = defineMessages({
@@ -45,6 +46,9 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletAmount: ?MultiToken,
   +onAddWallet: void => void,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
+  +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
   +ergoWallets: Array<Object>,
   +cardanoWallets: Array<Object>,
   +walletsNavigation: WalletsNavigation,
@@ -167,13 +171,16 @@ export default class WalletListDialog extends Component<Props, State> {
     const {
       shouldHideBalance,
       onAddWallet,
-      walletAmount,
       onUpdateHideBalance,
       ergoWallets,
-      cardanoWallets
+      cardanoWallets,
+      unitOfAccountSetting,
+      getCurrentPrice,
     } = this.props;
 
     const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
+
+    const walletsTotal = this.renderWalletsTotal();
 
     return (
       <Dialog
@@ -183,26 +190,21 @@ export default class WalletListDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
       >
-        {walletAmount &&
         <div className={styles.header}>
           <div className={styles.totalInfo}>
-            <div className={styles.amount}>
-              <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-              <p className={styles.value}>
-                <AmountDisplay
-                  shouldHideBalance={shouldHideBalance}
-                  amount={walletAmount}
-                  getTokenInfo={this.props.getTokenInfo}
-                  showFiat
-                  showAmount={false}
-                />
-              </p>
-            </div>
+            {(walletsTotal !== undefined) && (
+              <div className={styles.amount}>
+                <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
+                <p className={styles.value}>
+                  {walletsTotal}
+                </p>
+              </div>
+            )}
             <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
               {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
             </button>
           </div>
-        </div>}
+        </div>
         {cardanoWalletsIdx.length > 0 &&
         <div className={styles.sectionHeader}>
           <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -224,7 +226,10 @@ export default class WalletListDialog extends Component<Props, State> {
                         toggleQuickAccess={this.toggleQuickAccess}
                         isInQuickAccess={quickAccessList.has(walletId)}
                         {...wallet}
-                      />);
+                        unitOfAccountSetting={unitOfAccountSetting}
+                        getCurrentPrice={getCurrentPrice}
+                      />
+                    );
                   }).filter(Boolean)}
                 {provided.placeholder}
               </div>
@@ -252,6 +257,8 @@ export default class WalletListDialog extends Component<Props, State> {
                         toggleQuickAccess={this.toggleQuickAccess}
                         isInQuickAccess={quickAccessList.has(walletId)}
                         {...wallet}
+                        unitOfAccountSetting={unitOfAccountSetting}
+                        getCurrentPrice={getCurrentPrice}
                       />
                     );
                   }).filter(Boolean)}
@@ -267,5 +274,137 @@ export default class WalletListDialog extends Component<Props, State> {
         </div>
       </Dialog>
     );
+  }
+
+  renderWalletsTotal(): ?Node {
+    const {
+      unitOfAccountSetting,
+      cardanoWallets,
+      ergoWallets,
+      shouldHideBalance,
+      getCurrentPrice,
+    } = this.props;
+    if (unitOfAccountSetting.enabled) {
+      const adaFiat = this.sumWallets(cardanoWallets).fiat;
+      const ergFiat = this.sumWallets(ergoWallets).fiat;
+      if (adaFiat != null && ergFiat != null) {
+        const totalFiat = adaFiat.plus(ergFiat);
+        const { currency } = unitOfAccountSetting;
+        return (
+          <FiatDisplay
+            shouldHideBalance={shouldHideBalance}
+            amount={totalFiat}
+            currency={currency}
+          />
+        );
+      }
+    }
+    // either unit of account is not enabled, or fails to convert to fiat
+    if (ergoWallets.length === 0) {
+      // only have Cardano wallets
+      const amount = this.sumWallets(cardanoWallets).sum;
+      return (
+        <AmountDisplay
+          shouldHideBalance={shouldHideBalance}
+          amount={amount}
+          getTokenInfo={this.props.getTokenInfo}
+          showFiat={false}
+          showAmount
+          unitOfAccountSetting={unitOfAccountSetting}
+          getCurrentPrice={getCurrentPrice}
+        />
+      );
+    }
+    if (cardanoWallets.length === 0) {
+      const amount = this.sumWallets(ergoWallets).sum;
+      return (
+        <AmountDisplay
+          shouldHideBalance={shouldHideBalance}
+          amount={amount}
+          getTokenInfo={this.props.getTokenInfo}
+          showFiat={false}
+          showAmount
+          unitOfAccountSetting={unitOfAccountSetting}
+          getCurrentPrice={getCurrentPrice}
+        />
+      );
+    }
+    // there are both ADAs and ERGs, don't show total
+    return undefined;
+  }
+
+  sumWallets(
+    wallets: Array<Object>
+  ): {|
+    sum: MultiToken | null,
+    fiat: BigNumber | null,
+  |} {
+    const {
+      unitOfAccountSetting,
+      getTokenInfo,
+      getCurrentPrice,
+    } = this.props;
+    if (wallets.length === 0) {
+      return { sum: null, fiat: new BigNumber('0') };
+    }
+    let sum;
+    if (wallets[0].walletAmount) {
+      sum = new MultiToken(
+        wallets[0].walletAmount.values,
+        wallets[0].walletAmount.defaults,
+      );
+    } else {
+      return { sum: null, fiat: null };
+    }
+
+    if (wallets[0].rewards) {
+      sum.joinAddMutable(wallets[0].rewards);
+    }
+
+    for (let i = 1; i < wallets.length; i ++ ) {
+      if (wallets[i].walletAmount) {
+        sum.joinAddMutable(new MultiToken(
+          // treat TADA as ADA or vice versa
+          wallets[i].walletAmount.values.map(v => ({
+            ...v,
+            networkId: sum.getDefaults().defaultNetworkId,
+          })),
+          sum.getDefaults(),
+        ));
+      } else {
+        return { sum: null, fiat: null };
+      }
+
+      if (wallets[i].rewards) {
+        sum.joinAddMutable(new MultiToken(
+          // treat TADA as ADA or vice versa
+          wallets[i].rewards.values.map(v => ({
+            ...v,
+            networkId: sum.getDefaults().defaultNetworkId,
+          })),
+          sum.getDefaults(),
+        ));
+      }
+    }
+    if (!unitOfAccountSetting.enabled) {
+      return { sum, fiat: null };
+    }
+    const defaultEntry = sum.getDefaultEntry();
+    const tokenInfo = getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+          .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const { currency } = unitOfAccountSetting;
+    if (!currency) {
+      throw new Error(`unexpected unit of account ${String(currency)}`);
+    }
+    const price = getCurrentPrice(ticker, currency);
+    if (price != null) {
+      return { sum, fiat: shiftedAmount.multipliedBy(price) };
+    }
+    return { sum, fiat: null };
   }
 }
