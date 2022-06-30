@@ -68,7 +68,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
       const walletType = getWalletType(this.props.publicDeriver)
       const newWalletsNavigation = {
         ...walletsNavigation,
-        // $FlowFixMe
+        // $FlowFixMe[invalid-computed-prop]
         [walletType]: walletsNavigation[walletType].filter(
           walletId => walletId !== selectedWalletId
         ),
