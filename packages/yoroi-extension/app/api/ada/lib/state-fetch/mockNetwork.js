@@ -2,53 +2,64 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  HistoryRequest, HistoryResponse, HistoryFunc,
-  BestBlockRequest, BestBlockResponse, BestBlockFunc,
-  AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
-  UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
-  RewardHistoryFunc,
-  AccountStateRequest, AccountStateResponse, AccountStateFunc,
-  PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
-  RemoteTransaction, RemoteUnspentOutput,
-  SignedRequestInternal,
+  AccountStateFunc,
+  AccountStateRequest,
+  AccountStateResponse,
+  AddressUtxoFunc,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  BestBlockFunc,
+  BestBlockRequest,
+  BestBlockResponse,
+  HistoryFunc,
+  HistoryRequest,
+  HistoryResponse,
+  MultiAssetMintMetadataFunc,
+  PoolInfoFunc,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  RemoteTransaction,
   RemoteTransactionInput,
+  RemoteUnspentOutput,
+  RewardHistoryFunc,
+  SignedRequestInternal,
   TokenInfoFunc,
-  MultiAssetMintMetadataFunc
+  UtxoSumFunc,
+  UtxoSumRequest,
+  UtxoSumResponse
 } from './types';
 import type {
-  FilterUsedRequest, FilterUsedResponse, FilterFunc,
+  FilterFunc,
+  FilterUsedRequest,
+  FilterUsedResponse
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
-import { RollbackApiError, } from '../../../common/errors';
-import { toEnterprise, addressToKind, toHexOrBase58, } from '../storage/bridge/utils';
-import { CoreAddressTypes } from '../storage/database/primitives/enums';
+import { RollbackApiError } from '../../../common/errors';
+import { addressToKind, toEnterprise, toHexOrBase58 } from '../storage/bridge/utils';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
-import {
-  mnemonicToEntropy
-} from 'bip39';
-import {
-  WalletTypePurpose,
-} from '../../../../config/numbersConfig';
+import { CoreAddressTypes } from '../storage/database/primitives/enums';
+import { mnemonicToEntropy } from 'bip39';
+// eslint-disable-next-line import/named
+import { WalletTypePurpose } from '../../../../config/numbersConfig';
 import type { NetworkRow } from '../storage/database/primitives/tables';
 
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
-import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, networks } from '../storage/database/prepackaged/networks';
 import { bech32 } from 'bech32';
+// eslint-disable-next-line import/named
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
 
 /** convert bech32 address to bytes */
-function fixAddresses(
-  address: string,
-  network: $ReadOnly<NetworkRow>,
-): string {
+function fixAddresses(address: string, network: $ReadOnly<NetworkRow>): string {
   try {
     const bech32Info = bech32.decode(address, 1000);
     if (bech32Info.prefix === Bech32Prefix.PAYMENT_KEY_HASH) {
-      const config = getCardanoHaskellBaseConfig(
-        network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
+      const config = getCardanoHaskellBaseConfig(network).reduce(
+        (acc, next) => Object.assign(acc, next),
+        {}
+      );
 
       const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.new(
         Number.parseInt(config.ChainNetworkId, 10),
@@ -66,11 +77,9 @@ function fixAddresses(
 }
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): FilterFunc {
-  return async (
-    body: FilterUsedRequest,
-  ): Promise<FilterUsedResponse> => {
+  return async (body: FilterUsedRequest): Promise<FilterUsedResponse> => {
     const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const addressSet = new Set(addresses);
     const usedSet = new Set();
@@ -89,10 +98,7 @@ export function genCheckAddressesInUse(
   };
 }
 
-function isOurAddress(
-  address: string,
-  ownAddresses: Set<string>,
-): boolean {
+function isOurAddress(address: string, ownAddresses: Set<string>): boolean {
   if (ownAddresses.has(address)) {
     return true;
   }
@@ -106,10 +112,7 @@ function isOurAddress(
   return false;
 }
 
-function ourAddressesInTx(
-  tx: RemoteTransaction,
-  ownAddresses: Set<string>,
-): Set<string> {
+function ourAddressesInTx(tx: RemoteTransaction, ownAddresses: Set<string>): Set<string> {
   const addresses = [
     ...tx.inputs.map(input => input.address),
     ...tx.outputs.map(output => output.address),
@@ -129,7 +132,7 @@ function ourAddressesInTx(
 function filterForOwn(
   txs: Array<RemoteTransaction>,
   ownAddresses: Set<string>,
-  _network: $ReadOnly<NetworkRow>,
+  _network: $ReadOnly<NetworkRow>
 ): Array<RemoteTransaction> {
   const ownTxs = [];
   for (const tx of txs) {
@@ -143,11 +146,9 @@ function filterForOwn(
 
 export function genGetTransactionsHistoryForAddresses(
   blockchain: Array<RemoteTransaction>,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): HistoryFunc {
-  return async (
-    body: HistoryRequest,
-  ): Promise<HistoryResponse> => {
+  return async (body: HistoryRequest): Promise<HistoryResponse> => {
     const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const untilBlockIndex = blockchain.map(tx => tx.block_hash).lastIndexOf(body.untilBlock);
     if (untilBlockIndex === -1) {
@@ -161,18 +162,14 @@ export function genGetTransactionsHistoryForAddresses(
       }
     }
     const ownAddresses = new Set(addresses);
-    if (body.after == null)  {
-      const filtered = filterForOwn(subChain, ownAddresses, network);
-      return filtered;
+    if (body.after == null) {
+      return filterForOwn(subChain, ownAddresses, network);
     }
     const after = body.after;
 
     let cutoffTx = undefined;
     for (let i = 0; i < subChain.length; i++) {
-      if (
-        subChain[i].hash === after.tx &&
-        subChain[i].block_hash === after.block
-      ) {
+      if (subChain[i].hash === after.tx && subChain[i].block_hash === after.block) {
         cutoffTx = subChain[i];
         break;
       }
@@ -181,7 +178,11 @@ export function genGetTransactionsHistoryForAddresses(
       throw new RollbackApiError();
     }
     if (cutoffTx.height == null || cutoffTx.tx_ordinal == null) {
-      throw new Error(`${nameof(genGetTransactionsHistoryForAddresses)} cutoffTx not in block - should never happen`);
+      throw new Error(
+        `${nameof(
+          genGetTransactionsHistoryForAddresses
+        )} cutoffTx not in block - should never happen`
+      );
     }
     const cutoffBlockNum = cutoffTx.height;
     const cutoffOrdinal = cutoffTx.tx_ordinal;
@@ -191,7 +192,6 @@ export function genGetTransactionsHistoryForAddresses(
       if (tx === cutoffTx) continue;
       if (tx.height == null || tx.tx_ordinal == null) {
         txsToInclude.push(tx);
-        continue;
       } else {
         const blockNum = tx.height;
         const ordinal = tx.tx_ordinal;
@@ -204,17 +204,12 @@ export function genGetTransactionsHistoryForAddresses(
         }
       }
     }
-    const filtered = filterForOwn(txsToInclude, ownAddresses, network);
-    return filtered;
+    return filterForOwn(txsToInclude, ownAddresses, network);
   };
 }
 
-export function genGetBestBlock(
-  blockchain: Array<RemoteTransaction>,
-): BestBlockFunc {
-  return async (
-    _body: BestBlockRequest,
-  ): Promise<BestBlockResponse> => {
+export function genGetBestBlock(blockchain: Array<RemoteTransaction>): BestBlockFunc {
+  return async (_body: BestBlockRequest): Promise<BestBlockResponse> => {
     let bestInNetwork: void | BestBlockResponse = undefined;
     for (let i = blockchain.length - 1; i >= 0; i--) {
       const block = blockchain[i];
@@ -248,11 +243,9 @@ export function genGetBestBlock(
 export function genUtxoForAddresses(
   getHistory: HistoryFunc,
   getBestBlock: BestBlockFunc,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): AddressUtxoFunc {
-  return async (
-    body: AddressUtxoRequest,
-  ): Promise<AddressUtxoResponse> => {
+  return async (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => {
     const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const bestBlock = await getBestBlock({
       network,
@@ -275,14 +268,12 @@ export function genUtxoForAddresses(
         const address = tx.outputs[j].address;
         if (isOurAddress(address, ourAddressSet)) {
           const kind = addressToKind(address, 'bytes', networks.CardanoMainnet);
-          if (
-            kind === CoreAddressTypes.CARDANO_REWARD
-          ) {
+          if (kind === CoreAddressTypes.CARDANO_REWARD) {
             throw new Error(`${nameof(genUtxoForAddresses)} non-utxo address in utxo endpoint`);
           }
           const key = JSON.stringify({
             id: tx.hash,
-            index: j
+            index: j,
           });
           utxoMap.set(key, {
             utxo_id: tx.hash + j,
@@ -305,17 +296,12 @@ export function genUtxoForAddresses(
         utxoMap.delete(key);
       }
     }
-    const result = Array.from(utxoMap.values());
-    return result;
+    return Array.from(utxoMap.values());
   };
 }
 
-export function genUtxoSumForAddresses(
-  getAddressUtxo: AddressUtxoFunc,
-): UtxoSumFunc {
-  return async (
-    body: UtxoSumRequest,
-  ): Promise<UtxoSumResponse> => {
+export function genUtxoSumForAddresses(getAddressUtxo: AddressUtxoFunc): UtxoSumFunc {
+  return async (body: UtxoSumRequest): Promise<UtxoSumResponse> => {
     const utxos = await getAddressUtxo(body);
     if (utxos.length === 0) {
       return {
@@ -330,13 +316,10 @@ export function genUtxoSumForAddresses(
       sum = sum.plus(new BigNumber(partial.amount));
       for (const asset of partial.assets) {
         const currentVal = assetMap.get(asset.assetId)?.amount ?? new BigNumber(0);
-        assetMap.set(
-          asset.assetId,
-          {
-            ...asset,
-            amount: new BigNumber(currentVal).plus(asset.amount).toString(),
-          },
-        );
+        assetMap.set(asset.assetId, {
+          ...asset,
+          amount: new BigNumber(currentVal).plus(asset.amount).toString(),
+        });
       }
     }
     return {
@@ -351,20 +334,22 @@ export function genUtxoSumForAddresses(
 export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
-  isLedger?: boolean = false,
+  isLedger: boolean = false
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
     ? generateLedgerWalletRootKey(mnemonic)
     : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(bip39entropy, 'hex'),
-      EMPTY_PASSWORD
-    );
+        Buffer.from(bip39entropy, 'hex'),
+        EMPTY_PASSWORD
+      );
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce(
+    (acc, next) => Object.assign(acc, next),
+    {}
+  );
 
   if (path[0] === WalletTypePurpose.BIP44) {
     const v2Key = RustModule.WalletV2.PublicKey.from_hex(
@@ -374,15 +359,12 @@ export function getSingleAddressString(
       protocol_magic: baseConfig.ByronNetworkId,
     });
     const addr = v2Key.bootstrap_era_address(settings);
-    const hex = addr.to_base58();
-    return hex;
+    return addr.to_base58();
   }
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.EnterpriseAddress.new(
       Number.parseInt(baseConfig.ChainNetworkId, 10),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
-        derivedKey.to_public().to_raw_key().hash()
-      ),
+      RustModule.WalletV4.StakeCredential.from_keyhash(derivedKey.to_public().to_raw_key().hash())
     );
     return Buffer.from(addr.to_address().to_bytes()).toString('hex');
   }
@@ -393,31 +375,29 @@ export function getMangledAddressString(
   mnemonic: string,
   path: Array<number>,
   stakingKey: Buffer,
-  isLedger?: boolean = false,
+  isLedger: boolean = false
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
     ? generateLedgerWalletRootKey(mnemonic)
     : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(bip39entropy, 'hex'),
-      EMPTY_PASSWORD
-    );
+        Buffer.from(bip39entropy, 'hex'),
+        EMPTY_PASSWORD
+      );
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce(
+    (acc, next) => Object.assign(acc, next),
+    {}
+  );
 
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.BaseAddress.new(
       Number.parseInt(baseConfig.ChainNetworkId, 10),
+      RustModule.WalletV4.StakeCredential.from_keyhash(derivedKey.to_public().to_raw_key().hash()),
       RustModule.WalletV4.StakeCredential.from_keyhash(
-        derivedKey.to_public().to_raw_key().hash()
-      ),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
-        RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-          stakingKey
-        )
+        RustModule.WalletV4.Ed25519KeyHash.from_bytes(stakingKey)
       )
     );
     return Buffer.from(addr.to_address().to_bytes()).toString('hex');
@@ -428,7 +408,7 @@ export function getMangledAddressString(
 export function getAddressForType(
   mnemonic: string,
   path: Array<number>,
-  type: CoreAddressT,
+  type: CoreAddressT
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
@@ -438,8 +418,10 @@ export function getAddressForType(
   );
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce(
+    (acc, next) => Object.assign(acc, next),
+    {}
+  );
 
   switch (type) {
     case CoreAddressTypes.CARDANO_BASE: {
@@ -455,9 +437,7 @@ export function getAddressForType(
         RustModule.WalletV4.StakeCredential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
-          stakingKey.to_public().to_raw_key().hash()
-        ),
+        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().to_raw_key().hash())
       );
       return Buffer.from(addr.to_address().to_bytes()).toString('hex');
     }
@@ -467,22 +447,19 @@ export function getAddressForType(
     case CoreAddressTypes.CARDANO_ENTERPRISE: {
       const addr = RustModule.WalletV4.EnterpriseAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
-          derivedKey.to_public().to_raw_key().hash()
-        ),
+        RustModule.WalletV4.StakeCredential.from_keyhash(derivedKey.to_public().to_raw_key().hash())
       );
       return Buffer.from(addr.to_address().to_bytes()).toString('hex');
     }
     case CoreAddressTypes.CARDANO_REWARD: {
       const addr = RustModule.WalletV4.RewardAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
-          derivedKey.to_public().to_raw_key().hash()
-        ),
+        RustModule.WalletV4.StakeCredential.from_keyhash(derivedKey.to_public().to_raw_key().hash())
       );
       return Buffer.from(addr.to_address().to_bytes()).toString('hex');
     }
-    default: throw new Error(`${nameof(getAddressForType)} unknown type ` + type);
+    default:
+      throw new Error(`${nameof(getAddressForType)} unknown type ` + type);
   }
 }
 
@@ -532,10 +509,11 @@ function getByronInputs(
 
 export function toRemoteByronTx(
   blockchain: Array<RemoteTransaction>,
-  request: SignedRequestInternal,
+  request: SignedRequestInternal
 ): RemoteTransaction {
-  const signedTx = RustModule.WalletV4.Transaction
-    .from_bytes(Buffer.from(request.signedTx, 'base64'));
+  const signedTx = RustModule.WalletV4.Transaction.from_bytes(
+    Buffer.from(request.signedTx, 'base64')
+  );
 
   const body = signedTx.body();
   const hash = Buffer.from(RustModule.WalletV4.hash_transaction(body).to_bytes()).toString('hex');
@@ -551,7 +529,7 @@ export function toRemoteByronTx(
     outputs.push({
       address: toHexOrBase58(output.address()),
       amount: value.coin().to_str(),
-      assets
+      assets,
     });
   }
 
@@ -586,20 +564,21 @@ export function toRemoteByronTx(
 
 export function genGetAccountState(
   blockchain: Array<RemoteTransaction>,
-  getRewardHistory: RewardHistoryFunc,
+  getRewardHistory: RewardHistoryFunc
 ): AccountStateFunc {
-  return async (
-    body: AccountStateRequest,
-  ): Promise<AccountStateResponse> => {
+  return async (body: AccountStateRequest): Promise<AccountStateResponse> => {
     const rewardHistory = await getRewardHistory(body);
 
     // 1) calculate the reward for each address
-    const resultMap = new Map<string, {|
-      rewards: BigNumber,
-      withdrawals: BigNumber,
-    |}>();
+    const resultMap = new Map<
+      string,
+      {|
+        rewards: BigNumber,
+        withdrawals: BigNumber,
+      |}
+    >();
     for (const key of Object.keys(rewardHistory)) {
-      for (const reward of (rewardHistory[key] ?? [])) {
+      for (const reward of rewardHistory[key] ?? []) {
         const currVal = resultMap.get(key) ?? {
           rewards: new BigNumber(0),
           withdrawals: new BigNumber(0),
@@ -644,11 +623,8 @@ export function genGetAccountState(
   };
 }
 
-export function genGetPoolInfo(
-): PoolInfoFunc {
-  return async (
-    body: PoolInfoRequest,
-  ): Promise<PoolInfoResponse> => {
+export function genGetPoolInfo(): PoolInfoFunc {
+  return async (body: PoolInfoRequest): Promise<PoolInfoResponse> => {
     // TODO: scan the chain properly for this information
     const mockPoolId = 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207';
     const result: PoolInfoResponse = {};
@@ -669,12 +645,10 @@ export function genGetPoolInfo(
   };
 }
 
-export function genGetTokenInfo(
-): TokenInfoFunc {
-  return async (_) => ({});
+export function genGetTokenInfo(): TokenInfoFunc {
+  return async _ => ({});
 }
 
-export function genGetMultiAssetMetadata(
-): MultiAssetMintMetadataFunc {
-  return async (_) => ({});
+export function genGetMultiAssetMetadata(): MultiAssetMintMetadataFunc {
+  return async _ => ({});
 }
