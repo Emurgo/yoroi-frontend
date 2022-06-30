@@ -428,7 +428,7 @@ Given(/^I connected Trezor emulator device$/, async function () {
   await this.click(connectHwButton);
   // pick up currency
   await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(getCurrencyButton('cardanoTestnet'));
+  await this.click(getCurrencyButton('cardano'));
   // select the trezor wallet
   await this.waitForElement(hwOptionsDialog);
   await this.click(trezorWalletButton);
@@ -456,8 +456,6 @@ Given(/^I connected Trezor emulator device$/, async function () {
   const name = await this.getValue(walletNameInput);
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
-  await this.driver.sleep(3000);
-  expect(true).to.false;
 });
 
 async function restoreWalletsFromStorage(client) {
