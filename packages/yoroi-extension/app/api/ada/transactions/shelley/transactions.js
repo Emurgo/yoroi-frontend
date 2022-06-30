@@ -933,13 +933,13 @@ function newAdaUnsignedTxFromUtxoForConnector(
    * REQUIRED SIGNERS
    */
   for (const reqSigner of (requiredSigners || [])) {
-    let str = (reqSigner||'').trim();
+    const str = (reqSigner||'').trim();
     if (str.length === 0) {
       throw new Error(`Cannot process an empty required signer! (got: "${reqSigner})"`);
     }
     if (str.length === 56) {
       // Ed25519KeyHash is 28 bytes long
-      let keyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(str));
+      const keyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(str));
       txBuilder.add_required_signer(keyHash);
     } else {
       const address = normalizeToAddress(str);
