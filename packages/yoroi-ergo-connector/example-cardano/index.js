@@ -25,6 +25,7 @@ const getCollateralUtxos = document.querySelector('#get-collateral-utxos');
 const signData = document.querySelector('#sign-data');
 const alertEl = document.querySelector('#alert');
 const spinner = document.querySelector('#spinner');
+const getNFTs = document.getElementById('nfts');
 
 let accessGranted = false;
 let cardanoApi;
@@ -835,6 +836,24 @@ signData.addEventListener('click', () => {
     });
 });
 
+getNFTs.addEventListener('click', async () => {
+  toggleSpinner('show');
+
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+
+  try {
+    const response = await cardanoApi.experimental.listNFTs();
+    renderJonsResponse(`NFTs (${Object.keys(response).length})`, response);
+  } catch (error) {
+    console.error(error);
+    alertError(error.message);
+  }
+  toggleSpinner('hide');
+})
+
 function alertError(text) {
   toggleSpinner('hide');
   alertEl.className = 'alert alert-danger';
@@ -849,6 +868,12 @@ function alertSuccess(text) {
 function alertWarrning(text) {
   alertEl.className = 'alert alert-warning';
   alertEl.innerHTML = text;
+}
+
+function renderJonsResponse (title, response) {
+  alertSuccess(
+    `<h2>${title}:</h2><pre>` + JSON.stringify(response, undefined, 2) + '</pre>'
+  )
 }
 
 function toggleSpinner(status) {
