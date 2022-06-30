@@ -456,6 +456,8 @@ Given(/^I connected Trezor emulator device$/, async function () {
   const name = await this.getValue(walletNameInput);
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
+  await this.driver.sleep(3000);
+  expect(true).to.false;
 });
 
 async function restoreWalletsFromStorage(client) {

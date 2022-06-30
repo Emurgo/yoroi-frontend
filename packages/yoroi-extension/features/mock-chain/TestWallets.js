@@ -104,6 +104,7 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('trezor-wallet': WalletNames),
     mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
     plate: 'CZSA-2051', // shelley plate PXCA-2349
+    plateShelley: 'PXCA-2349',
     deviceId: '6495958994A4025BB5EE1DB0',
   }),
   createWallet({
