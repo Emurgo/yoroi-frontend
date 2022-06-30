@@ -1462,7 +1462,7 @@ function handleInjectorConnect(port) {
                       const ident = key.split('.');
                       const policyId = ident[0];
                       const assetName = ident[1];
-                      const metadata = metadataIsValid(policyId, assetName, metadatas);
+                      const metadata = find721metadata(policyId, assetName, metadatas);
                       if (metadata !== null) {
                         nfts[key] = { metadata };
                       }
@@ -1658,14 +1658,9 @@ function handleInjectorConnect(port) {
   });
 }
 
-function metadataIsValid(policyId, assetName, metadatas): any {
-  let metadataWrapper = null;
-  for (const m of metadatas) {
-    if (m.key === '721') {
-      metadataWrapper = m;
-    }
-  }
-  if (metadataWrapper === null) {
+function find721metadata(policyId: string, assetName: string, metadatas: any): any {
+  const metadataWrapper = metadatas.find(m => m.key === '721');
+  if (metadataWrapper === undefined) {
     return null;
   }
   const metadata = metadataWrapper.metadata;
