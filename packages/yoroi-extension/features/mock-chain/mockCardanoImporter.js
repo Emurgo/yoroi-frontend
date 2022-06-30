@@ -15,6 +15,7 @@ import type {
 } from '../../app/api/ada/lib/state-fetch/types';
 import {
   ShelleyCertificateTypes
+// eslint-disable-next-line import/named
 } from '../../app/api/ada/lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -34,17 +35,21 @@ import {
   getAddressForType,
   getMangledAddressString,
   toRemoteByronTx,
+// eslint-disable-next-line import/named
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import {
   networks,
+// eslint-disable-next-line import/named
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
   ChainDerivations,
+// eslint-disable-next-line import/named
 } from '../../app/config/numbersConfig';
 import { testWallets } from './TestWallets';
+// eslint-disable-next-line import/named
 import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primitives/enums';
 
 // based on abandon x 14 + share
@@ -83,7 +88,6 @@ export const generateTransaction = (): {|
   bip44TrezorTx2: RemoteTransaction,
   bip44TrezorTx3: RemoteTransaction,
   cip1852TrezorTx1: RemoteTransaction,
-  shelleyTrezorTx1: RemoteTransaction,
   shelleySimple15: RemoteTransaction,
   shelleyDelegatedTx1: RemoteTransaction,
   shelleyDelegatedTx2: RemoteTransaction,
@@ -1510,69 +1514,6 @@ export const generateTransaction = (): {|
     last_update: '2019-05-20T23:17:11.899Z',
     tx_state: 'Successful'
   };
-  const shelleyTrezorTx1 = {
-    hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad5bba20',
-    inputs: [
-      {
-        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
-        txHash: distributorTx.hash,
-        id: distributorTx.hash + '14',
-        index: 14,
-        amount: '3000000',
-        assets: [],
-      }
-    ],
-    outputs: [
-      {
-        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ],
-        ),
-        amount: '1',
-        assets: [],
-      },
-      {
-        // Ae2tdPwUPEZ9qgUrkrTqqTa5iKkaURYNFqM1gSbPXicn21LYyF184ZXnQ5R
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ],
-        ),
-        amount: '1000000000',
-        assets: [],
-      },
-    ],
-    height: 304,
-    block_hash: '304',
-    tx_ordinal: 3,
-    time: '2019-04-20T15:15:53.000Z',
-    epoch: 0,
-    slot: 304,
-    last_update: '2019-05-20T23:17:11.899Z',
-    tx_state: 'Successful'
-  };
 
   // =====================
   //   shelley-simple-15
@@ -2085,7 +2026,6 @@ export const generateTransaction = (): {|
     bip44TrezorTx2,
     bip44TrezorTx3,
     cip1852TrezorTx1,
-    shelleyTrezorTx1,
     shelleySimple15,
     shelleyDelegatedTx1,
     shelleyDelegatedTx2,
@@ -2174,7 +2114,6 @@ export function resetChain(
     addTransaction(txs.bip44TrezorTx2);
     addTransaction(txs.bip44TrezorTx3);
     addTransaction(txs.cip1852TrezorTx1);
-    addTransaction(txs.shelleyTrezorTx1);
     // shelley-simple-15
     addTransaction(txs.shelleySimple15);
     // shelley-delegated
