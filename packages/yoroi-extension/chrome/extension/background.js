@@ -1464,7 +1464,7 @@ function handleInjectorConnect(port) {
                       const assetName = ident[1];
                       const metadata = find721metadata(policyId, assetName, metadatas);
                       if (metadata !== null) {
-                        nfts[key] = { metadata };
+                        nfts[`${policyId}.${Buffer.from(assetName).toString('hex')}`] = { metadata };
                       }
                     }
                     rpcResponse({ ok: nfts });
