@@ -47,7 +47,7 @@ import type { FormattedNFTDisplay, FormattedTokenDisplay, } from '../../../utils
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
+import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError } from '../../../api/common/errors';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -171,7 +171,7 @@ export default class WalletSendForm extends Component<Props, State> {
   state: State = {
     showMemoWarning: false,
     invalidMemo: false,
-    currentStep: SEND_FORM_STEP.RECEIVER
+    currentStep: SEND_FORM_STEP.RECEIVER,
   }
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
@@ -214,6 +214,10 @@ export default class WalletSendForm extends Component<Props, State> {
         ));
       },
     );
+
+    if (this.props.maxSendableAmount.result) {
+      this.form.$('amount').set('value', '10');
+    }
   }
 
   componentWillUnmount(): void {
@@ -386,7 +390,9 @@ export default class WalletSendForm extends Component<Props, State> {
       isCalculatingFee,
       getTokenInfo,
       isDefaultIncluded,
-    } = this.props
+      maxSendableAmount
+    } = this.props;
+
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
@@ -415,7 +421,11 @@ export default class WalletSendForm extends Component<Props, State> {
     const defaultTokenInfo = this.props.getTokenInfo({
       identifier: this.props.defaultToken.Identifier,
       networkId: this.props.defaultToken.NetworkId,
-    })
+    });
+
+    if (this.props.maxSendableAmount.result) {
+      this.form.$('amount').set('value', this.props.maxSendableAmount.result.shiftedBy(-6).decimalPlaces(6).toString());
+    }
 
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
@@ -459,7 +469,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
               {!isDefaultIncluded && (
                 <p className={styles.sendError}>
-                  {transactionFeeError}
+                  {transactionFeeError || (maxSendableAmount.error &&intl.formatMessage(maxSendableAmount.error, maxSendableAmount.values))}
                 </p>
               )}
               <div className={classnames(
@@ -515,26 +525,24 @@ export default class WalletSendForm extends Component<Props, State> {
                   </p>
                   <Button
                     variant="ternary"
-                    sx={{
-                      minWidth: '56px',
-                      minHeight: '30px',
-                      border: 'none',
-                      background: `var(--yoroi-palette-gray-${shouldSendAll ? '900' : '50'})`,
-                      color: shouldSendAll && '#FFFFFF',
-                      '&:hover': {
-                        background: `var(--yoroi-palette-gray-${shouldSendAll ? '800' : '100'})`,
-                      }
-                    }}
+                    disabled={isErgo(this.props.selectedNetwork) || maxSendableAmount.isExecuting}
+                    className={classnames([
+                      styles.maxBtn,
+                      maxSendableAmount.isExecuting && styles.maxButtonSpinning
+                    ])}
+                    // onClick={this.sendMaxAmount}
                     onClick={() => {
-                      if (shouldSendAll) {
-                        amountField.reset();
-                        this.props.onRemoveTokens([defaultTokenInfo]);
-                      } else {
-                        this.props.onAddToken({
-                          shouldReset: true,
-                        });
-                        this.props.updateSendAllStatus(true);
-                      }
+                      this.props.calculateMaxAmount()
+                      // this.sendMaxAmount()
+                      // if (shouldSendAll) {
+                      //   amountField.reset();
+                      //   this.props.onRemoveTokens([defaultTokenInfo]);
+                      // } else {
+                      //   this.props.onAddToken({
+                      //     shouldReset: true,
+                      //   });
+                      //   this.props.updateSendAllStatus(true);
+                      // }
                     }}
                   >
                     {intl.formatMessage(messages.max)}

@@ -30,6 +30,7 @@ import { cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IPublicDeriver<>,
@@ -71,6 +72,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
 
+  @observable maxSendableAmount: LocalizedRequest
+    = new LocalizedRequest(async func => await func());
+
   @observable memo: void | string;
 
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
@@ -87,6 +91,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
     actions.addToken.listen(this._addToken);
+    actions.calculateMaxAmount.listen(this._maxSendableAmount)
     actions.deselectToken.listen(this._deselectToken)
     actions.removeTokens.listen(this._removeTokens);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
@@ -264,6 +269,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _updateTxBuilder: void => Promise<void> = async () => {
     runInAction(() => {
       this.createUnsignedTx.reset();
+      this.maxSendableAmount.reset();
       this.plannedTx = null;
     });
 
@@ -303,6 +309,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         // use server time for TTL if connected to server
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
+
       const genTokenList: PlannedTxInfoMap => Array<$ReadOnly<{|
         token: $ReadOnly<TokenRow>,
         amount?: string,
@@ -394,6 +401,22 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     } else {
       throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);
     }
+  }
+
+  @action
+  _maxSendableAmount: void => void = async () =>  {
+    const publicDeriver = this.stores.wallets.selected;
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const fullConfig = getCardanoHaskellBaseConfig(network);
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+    }).slot);
+
+    this.maxSendableAmount.execute(() => maxSendableADA({
+      publicDeriver,
+      absSlotNumber
+    }))
   }
 
   // ===========
@@ -527,6 +550,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.metadata = undefined;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
+    // Todo: remove it
+    this.maxSendableAmount.cancel()
+    this.maxSendableAmount.reset();
     this.plannedTx = null;
     this.tentativeTx = null;
     this.setupSelfTx.cancel();

@@ -14,7 +14,7 @@ import {
   AssetOverflowError,
   CannotSendBelowMinimumValueError,
   NoOutputsError,
-  NotEnoughMoneyToSendError,
+  NotEnoughMoneyToSendError
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -22,12 +22,13 @@ import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/utils';
 
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type { Address, Addressing, } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { getCardanoSpendingKeyHash, normalizeToAddress, } from '../../lib/storage/bridge/utils';
+import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage/bridge/utils';
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
-import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, } from '../utils';
+import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo } from '../utils';
 import { hexToBytes, logErr } from '../../../../coreUtils';
 import { coinSelectionForValues } from './coinSelection';
+import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -713,6 +714,71 @@ function _newAdaUnsignedTxFromUtxo(
     txBuilder,
     changeAddr,
   };
+}
+
+export async function maxSendableADA(request: {||}): Promise<BigNumber> {
+  try {
+    const network = request.publicDeriver.getParent().getNetworkInfo()
+    const config = getCardanoHaskellBaseConfig(network)
+      .reduce((acc, next) => Object.assign(acc, next), {});
+
+    const protocolParams = {
+      keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+      linearFee: RustModule.WalletV4.LinearFee.new(
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+      ),
+      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+      poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+      networkId: network.NetworkId,
+    };
+
+    const utxos = await request.publicDeriver.getAllUtxos();
+    const addressedUtxo = asAddressedUtxo(utxos);
+    const totalBalance = addressedUtxo
+      .map(utxo => new BigNumber(utxo.amount))
+      .reduce(
+        (acc, amount) => acc.plus(amount),
+        new BigNumber(0)
+      );
+    if (totalBalance.isZero()) {
+      throw new NotEnoughMoneyToSendError();
+    }
+
+    const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
+    txBuilder.set_ttl(request.absSlotNumber.plus(defaultTtlOffset).toNumber());
+    const wasmAddr = normalizeToAddress(addressedUtxo[0].receiver);
+    for (const input of addressedUtxo) {
+      if (addUtxoInput(
+        txBuilder,
+        undefined,
+        input,
+        false,
+        { networkId: network.networkId }
+      ) === AddInputResult.OVERFLOW) {
+        throw new AssetOverflowError();
+      }
+    }
+
+    txBuilder.add_change_if_needed(wasmAddr);
+    const outputs = txBuilder.build().outputs();
+    for (let i = 0; i < outputs.len(); i++) {
+      const output = outputs.get(i);
+      const value = output.amount();
+      const assets = value.multiasset();
+      if (assets == null || assets.len() === 0) {
+        return new BigNumber(value.coin().to_str());
+      }
+    }
+    // Reaching this point means user has not enough pure ADA to send.
+    throw new NotEnoughMoneyToSendError()
+  } catch (e) {
+    if (String(e).includes('Not enough ADA')) {
+      throw new NotEnoughMoneyToSendError();
+    }
+
+    throw e;
+  }
 }
 
 function newAdaUnsignedTxFromUtxoForConnector(
