@@ -236,6 +236,12 @@ const genBaseProps: {|
             : request.dialogInfo.sendMoneyRequest,
           selected: request.wallet.publicDeriver,
         },
+        ledgerSend: {
+          error: null,
+        },
+        trezorSend: {
+          error: null,
+        },
       },
       actions: {
         dialogs: {
@@ -246,6 +252,18 @@ const genBaseProps: {|
         wallets: {
           sendMoney: {
             trigger: async (req) => action('sendMoney')(req),
+          },
+        },
+        ada: {
+          ledgerSend: {
+            sendUsingLedger: {
+              trigger: async (req) => action('sendUsingLedger')(req),
+            }
+          },
+          trezorSend: {
+            sendUsingTrezor: {
+              trigger: async (req) => action('sendUsingTrezor')(req),
+            }
           },
         },
       },
