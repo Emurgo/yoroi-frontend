@@ -76,7 +76,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        exclude: /\/ledger\/.*\.png/,
+        include: [ path.resolve(__dirname, '../app') ],
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS

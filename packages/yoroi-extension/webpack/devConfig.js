@@ -102,7 +102,7 @@ const baseDevConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        exclude: /\/ledger\/.*\.png/,
+        include: [ path.resolve(__dirname, '../app') ],
         loader: 'file-loader',
       },
     ]

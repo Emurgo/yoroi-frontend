@@ -148,7 +148,8 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
     ]
   },
   {
-    test: /\/ledger\/.*\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+    test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+    include: [ path.resolve(__dirname, '../ledger') ],
     loader: 'file-loader',
     options: {
       esModule: false,
