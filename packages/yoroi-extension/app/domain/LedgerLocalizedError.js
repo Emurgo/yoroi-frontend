@@ -72,7 +72,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         // Showing - Failed to connect. Please check your ledger device and retry.
         localizableError = new LocalizableError(globalMessages.ledgerError101);
         break;
-      case 'TransportStatusError: Ledger device: Action rejected by user':
+      case 'DeviceStatusError: Action rejected by user':
         // Showing - Operation cancelled on Ledger device.
         localizableError = new LocalizableError(ledgerErrors.cancelOnDeviceError101);
         break;
