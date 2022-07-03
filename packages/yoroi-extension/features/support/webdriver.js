@@ -114,7 +114,7 @@ export type LocatorObject = {|
 |};
 
 function CustomWorld(cmdInput: WorldInput) {
-  let builder = null;
+  let builder;
   switch (cmdInput.parameters.browser) {
     case 'brave': {
       builder = getBraveBuilder();
@@ -137,6 +137,7 @@ function CustomWorld(cmdInput: WorldInput) {
   this.windowManager.init().then().catch();
   this._allLoggers.push(mockAndWMLogger);
   this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
+  this.trezorController = undefined;
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
