@@ -230,7 +230,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return '0';
-    if (tokens.length === 0) return String(1_000_000);
+    const filteredTokens = tokens.filter(({ token }) => !token.IsDefault);
+    if (filteredTokens.length === 0) return String(1_000_000);
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
@@ -240,7 +241,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         networkId: defaultToken.NetworkId,
         amount: fakeAmount,
       },
-      ...tokens.filter(({ token }) => !token.IsDefault).map(({ token }) => ({
+      ...filteredTokens.map(({ token }) => ({
         identifier: token.Identifier,
         networkId: token.NetworkId,
         amount: fakeAmount,
