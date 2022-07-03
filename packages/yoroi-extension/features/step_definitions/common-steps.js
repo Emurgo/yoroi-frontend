@@ -13,7 +13,7 @@ import {
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By, logging } from 'selenium-webdriver';
-import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import { enterRecoveryPhrase, getLogDate } from '../support/helpers/helpers';
 import { getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
@@ -54,8 +54,7 @@ import {
   saveDialog,
   saveButton
 } from '../pages/newWalletPages';
-import { confirmUsingTrezorButton, dontAskAgainCheckbox, exportTrezorButton } from '../pages/trezorConnectPage';
-import { extensionTabName, trezorConnectTabName } from '../support/windowManager';
+import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -439,18 +438,8 @@ Given(/^I connected Trezor emulator device$/, async function () {
   await this.waitForElement(trezorConnectDialog);
   await this.click(trezorConfirmButton);
   await this.click(trezorConfirmButton);
-  // wait for a new tab
-  await this.windowManager.findNewWindowAndSwitchTo(trezorConnectTabName);
-  // tick the checkbox on the Trezor page and press Allow button
-  await this.driver.sleep(2000);
-  await this.waitForElement(dontAskAgainCheckbox);
-  await this.click(dontAskAgainCheckbox);
-  await this.waitForElement(confirmUsingTrezorButton);
-  await this.click(confirmUsingTrezorButton);
-  // press the Export button
-  await this.click(exportTrezorButton);
-  // wait for closing the new tab
-  await this.windowManager.waitForClosingAndSwitchTo(trezorConnectTabName, extensionTabName);
+  await switchToTrezorAndAllow(this);
+  await allowPubKeysAndSwitchToYoroi(this);
   // save the emulator as is
   await this.waitForElement(saveDialog);
   const name = await this.getValue(walletNameInput);
@@ -608,4 +597,16 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
+});
+
+Then(/^Debug. Take screenshot$/,  async function () {
+  const currentTime = getLogDate();
+  await takeScreenshot(this.driver, `debug_${currentTime}`);
+  await takePageSnapshot(this.driver, `debug_${currentTime}`);
+  await getConsoleLogs(this.driver, `debug_${currentTime}`);
+  await getConsoleLogs(this.driver, `debug_${currentTime}`);
+});
+
+Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
+  await this.driver.sleep(2000);
 });
