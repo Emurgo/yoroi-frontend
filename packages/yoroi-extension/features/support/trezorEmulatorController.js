@@ -1,27 +1,46 @@
 // @flow
 
+const WebSocket = require('ws');
+
 export class TrezorEmulatorController {
   websocketUrl = 'ws://localhost:9001/';
   id = 0;
   ws: Object;
 
-  constructor() {
-    // Connect to Web Socket
-    this.ws = new WebSocket(this.websocketUrl);
-    // Set event handlers.
-    this.ws.onopen = function () {
-      // TODO log message
-      // output('Websocket opened');
-    };
-    this.ws.onmessage = this.handleMessage;
-    this.ws.onclose = function () {
-      // TODO log message
-      // output('Websocket closed');
-    };
-    this.ws.onerror = function (e) {
-      // TODO log message
-      // output('onerror - please look into the console');
-    };
+  // constructor() {
+  //   // Connect to Web Socket
+  //   this.ws = new WebSocket(this.websocketUrl);
+  //   // Set event handlers.
+  //   this.ws.onopen = function () {
+  //     // TODO log message
+  //     // output('Websocket opened');
+  //   };
+  //   this.ws.onmessage = this.handleMessage;
+  //   this.ws.onclose = function () {
+  //     // TODO log message
+  //     // output('Websocket closed');
+  //   };
+  //   this.ws.onerror = function (e) {
+  //     // TODO log message
+  //     // output('onerror - please look into the console');
+  //   };
+  // }
+
+  _innerConnect (websocketUrl = this.websocketUrl) {
+    return new Promise((resolve, reject) => {
+      const server = new WebSocket(websocketUrl);
+      server.onopen = function() {
+        resolve(server);
+      };
+      server.onerror = function(err) {
+        reject(err)
+      }
+    });
+  }
+
+  async connect() {
+    this.ws = await this._innerConnect();
+    return this;
   }
 
   currentTime = () => {
@@ -32,9 +51,10 @@ export class TrezorEmulatorController {
     return `${hours}:${minutes}:${seconds}`;
   };
 
-  handleMessage = (event) => {
+  handleMessage = (event): Object|void => {
     if (!event.data || typeof event.data !== 'string') {
       // TODO log message
+      // TODO Throw error
       // output(`Response received without proper data: ${event.data}`, 'red');
       return;
     }
@@ -59,6 +79,7 @@ export class TrezorEmulatorController {
 
     // TODO log message
     // output(`Response received: ${event.data}`, color);
+    return dataObject;
   };
 
   _send(json) {
@@ -71,6 +92,7 @@ export class TrezorEmulatorController {
     this.ws.send(requestToSend);
     this.id++;
     // TODO log message
+    console.log(`Request sent: ${requestToSend}`);
     // output(`Request sent: ${requestToSend}`, 'blue');
   }
 
@@ -83,93 +105,231 @@ export class TrezorEmulatorController {
   }
 
   emulatorStart() {
-    this._send({
-      type: 'emulator-start',
-      version: '2-master',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-start',
+        version: '2-master',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorWipe() {
-    this._send({
-      type: 'emulator-wipe',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-wipe',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorResetDevice() {
-    this._send({
-      type: 'emulator-reset-device',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-reset-device',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorResetDeviceShamir() {
-    this._send({
-      type: 'emulator-reset-device',
-      use_shamir: true,
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-reset-device',
+        use_shamir: true,
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorSetup(mnemonic: string) {
-    this._send({
-      type: 'emulator-setup',
-      mnemonic: mnemonic || 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
-      pin: '',
-      passphrase_protection: false,
-      label: 'Hello!',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-setup',
+        mnemonic: mnemonic || 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
+        pin: '',
+        passphrase_protection: false,
+        label: 'Emulator',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorPressYes() {
-    this._send({
-      type: 'emulator-press-yes',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-press-yes',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorPressNo() {
-    this._send({
-      type: 'emulator-press-no',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-press-no',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorAllowUnsafe() {
-    this._send({
-      type: 'emulator-allow-unsafe-paths',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-allow-unsafe-paths',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   emulatorStop() {
-    this._send({
-      type: 'emulator-stop',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-stop',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   bridgeStart(bridgeVersion: string) {
-    this._send({
-      type: 'bridge-start',
-      version: bridgeVersion || '2.0.31',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'bridge-start',
+        version: bridgeVersion || '2.0.31',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   bridgeStop() {
-    this._send({
-      type: 'bridge-stop',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'bridge-stop',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   exit() {
-    this._send({
-      type: 'exit',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'exit',
+      });
+      this.ws.onclose = () => {
+        resolve(this.ws);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
   ping() {
-    this._send({
-      type: 'ping',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'ping',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 
+  getLastEvent() {
+    return new Promise((resolve, reject) => {
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
+    });
+  }
+
+
   readAndConfirmMnemonic() {
-    this._send({
-      type: 'emulator-read-and-confirm-mnemonic',
+    return new Promise((resolve, reject) => {
+      this._send({
+        type: 'emulator-read-and-confirm-mnemonic',
+      });
+      this.ws.onmessage = (event) => {
+        const dataObject = this.handleMessage(event);
+        resolve(dataObject);
+      };
+      this.ws.onerror = () => {
+        reject(this.ws);
+      };
     });
   }
 }
