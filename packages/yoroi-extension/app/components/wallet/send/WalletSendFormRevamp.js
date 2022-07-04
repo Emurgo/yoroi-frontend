@@ -417,22 +417,19 @@ export default class WalletSendForm extends Component<Props, State> {
       defaultNetworkId: this.props.defaultToken.NetworkId,
     });
 
-    const amountInputError = transactionFeeError || amountField.error
-    const txError = (
-      transactionFeeError ||
-      (maxSendableAmount.error &&
-        intl.formatMessage(maxSendableAmount.error, maxSendableAmount.error.values))
-    )
-    const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
+    const amountInputError = transactionFeeError || amountField.error;
+    const [tokens, nfts] = this.getTokensAndNFTs(totalAmount);
 
     const defaultTokenInfo = this.props.getTokenInfo({
       identifier: this.props.defaultToken.Identifier,
       networkId: this.props.defaultToken.NetworkId,
     });
 
-    if (this.props.maxSendableAmount.result) {
+    if (maxSendableAmount.result) {
       const numberOfDecimals = this.getNumDecimals();
-      this.form.$('amount').set('value', this.props.maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
+      amountField.set('value', maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
+    } else if (maxSendableAmount.error) {
+      amountField.set('value', '0');
     }
 
     switch (step) {
@@ -477,7 +474,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
               {!isDefaultIncluded && (
                 <p className={styles.sendError}>
-                  {txError}
+                  {transactionFeeError}
                 </p>
               )}
               <div className={classnames(
