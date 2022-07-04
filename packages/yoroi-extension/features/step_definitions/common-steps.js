@@ -194,6 +194,11 @@ function createDirInTestRunsData(subdirectoryName) {
   return dir;
 }
 
+async function getBrowserName(driver): Promise<string> {
+  const cap = await driver.getCapabilities();
+  return cap.getBrowserName();
+}
+
 async function takeScreenshot(driver, name) {
   // path logic
   const dir = createDirInTestRunsData('screenshots');
@@ -211,8 +216,7 @@ async function takePageSnapshot(driver, name) {
 }
 
 async function getConsoleLogs(driver, name) {
-  const cap = await driver.getCapabilities();
-  const browserName = cap.getBrowserName();
+  const browserName = await getBrowserName(driver)
   if (browserName === 'firefox') {
     return;
   }
@@ -364,6 +368,10 @@ async function acceptUriPrompt(world: any) {
 
 Given(/^I have opened the extension$/, async function () {
   await this.driver.get(this.getExtensionUrl());
+  const browserName = await getBrowserName(this.driver);
+  if (browserName === 'firefox') {
+    await this.driver.manage().window().maximize();
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
