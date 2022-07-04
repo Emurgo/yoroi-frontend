@@ -37,11 +37,6 @@ export type SetupSelfTxRequest = {|
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
 |};
 export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
-type MaxSendableAmountRequest = {|
-  publicDeriver: IPublicDeriver<>,
-  absSlotNumber: BigNumber,
-|}
-type MaxSendableAmountFunc = MaxSendableAmountRequest => Promise<BigNumber>;
 
 export type PlannedTxInfoMap = Array<{|
   token: $ReadOnly<TokenRow>,
