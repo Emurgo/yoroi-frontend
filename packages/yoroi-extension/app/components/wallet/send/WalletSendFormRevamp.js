@@ -153,6 +153,12 @@ type Props = {|
   +closeDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  +maxSendableAmount: {|
+    error: ?LocalizableError,
+    isExecuting: boolean,
+    result: ?BigNumber,
+  |},
+  +calculateMaxAmount: void => Promise<void>,
 |};
 
 type State = {|
@@ -415,7 +421,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const txError = (
       transactionFeeError ||
       (maxSendableAmount.error &&
-        intl.formatMessage(maxSendableAmount.error, maxSendableAmount.values))
+        intl.formatMessage(maxSendableAmount.error, maxSendableAmount.error.values))
     )
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
 
@@ -426,7 +432,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
     if (this.props.maxSendableAmount.result) {
       const numberOfDecimals = this.getNumDecimals();
-      this.form.$('amount').set('value', this.props.maxSendableAmount.result.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
+      this.form.$('amount').set('value', this.props.maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
     }
 
     switch (step) {

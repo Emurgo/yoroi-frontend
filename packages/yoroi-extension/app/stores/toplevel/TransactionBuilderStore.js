@@ -37,6 +37,11 @@ export type SetupSelfTxRequest = {|
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
 |};
 export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
+type MaxSendableAmountRequest = {|
+  publicDeriver: IPublicDeriver<>,
+  absSlotNumber: BigNumber,
+|}
+type MaxSendableAmountFunc = MaxSendableAmountRequest => Promise<BigNumber>;
 
 export type PlannedTxInfoMap = Array<{|
   token: $ReadOnly<TokenRow>,
@@ -72,8 +77,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
 
-  @observable maxSendableAmount: LocalizedRequest
-    = new LocalizedRequest(async func => await func());
+  @observable maxSendableAmount: LocalizedRequest<DeferredCall<BigNumber>>
+    = new LocalizedRequest<DeferredCall<BigNumber>>(async func => await func());
 
   @observable memo: void | string;
 
@@ -405,8 +410,20 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _maxSendableAmount: void => void = async () =>  {
+  _maxSendableAmount: void => Promise<void> = async () =>  {
     const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._maxSendableAmount)} requires wallet to be selected`);
+
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (withUtxos == null) {
+      throw new Error(`${nameof(this._maxSendableAmount)} missing utxo functionality`);
+    }
+
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`${nameof(this._maxSendableAmount)} missing chains functionality`);
+    }
+
     const network = publicDeriver.getParent().getNetworkInfo();
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const timeToSlot = await genTimeToSlot(fullConfig);
@@ -415,7 +432,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }).slot);
 
     this.maxSendableAmount.execute(() => maxSendableADA({
-      publicDeriver,
+      publicDeriver: withHasUtxoChains,
       absSlotNumber
     }))
   }
