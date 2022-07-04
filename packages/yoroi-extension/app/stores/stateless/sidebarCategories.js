@@ -19,6 +19,7 @@ import { ReactComponent as votingIcon }  from '../../assets/images/sidebar/revam
 // import { ReactComponent as swapIcon }  from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon }  from '../../assets/images/sidebar/revamp/setting.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type SidebarCategory = {|
   +className: string,
@@ -131,7 +132,9 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: _request => _request.selected !== null,
+    isVisible: ({ selected }) => (
+      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
+    ),
   },
   {
     className: 'assets',

@@ -16,7 +16,10 @@ import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import WarningBox from '../../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  $npm$ReactIntl$IntlFormat,
+  $npm$ReactIntl$MessageDescriptor,
+} from 'react-intl';
 import {
   truncateToken,
 } from '../../../../utils/formatters';
@@ -36,6 +39,8 @@ import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { Box } from '@mui/system';
 import { ReactComponent as InfoIcon }  from '../../../../assets/images/attention-big-light.inline.svg';
+import ErrorBlock from '../../../widgets/ErrorBlock';
+import type LocalizableError from '../../../../i18n/LocalizableError';
 
 type Props = {|
   +staleTx: boolean,
@@ -59,7 +64,10 @@ type Props = {|
     amount?: string,
     shouldSendAll?: boolean,
   |}>,
-  +selectedNetwork: $ReadOnly<NetworkRow>
+  +selectedNetwork: $ReadOnly<NetworkRow>,
+  +walletType: 'trezor' | 'ledger' | 'mnemonic',
+  +ledgerSendError: ?LocalizableError,
+  +trezorSendError: ?LocalizableError,
 |};
 
 type State = {|
@@ -79,7 +87,23 @@ const messages = defineMessages({
   moreDetails: {
     id: 'wallet.send.form.preview.moreDetails',
     defaultMessage: '!!!More details here',
-  }
+  },
+  txConfirmationLedgerNanoLine1: {
+    id: 'wallet.send.ledger.confirmationDialog.info.line.1',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
+  },
+  sendUsingLedgerNano: {
+    id: 'wallet.send.ledger.confirmationDialog.submit',
+    defaultMessage: '!!!Send using Ledger',
+  },
+  txConfirmationTrezorTLine1: {
+    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
+  },
+  sendUsingTrezorT: {
+    id: 'wallet.send.trezor.confirmationDialog.submit',
+    defaultMessage: '!!!Send using Trezor',
+  },
 });
 
 @observer
@@ -121,25 +145,29 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
   });
 
   submit(): void {
-    this.form.submit({
-      onSuccess: async (form) => {
-        const { walletPassword } = form.values();
-        const transactionData = {
-          password: walletPassword,
-        };
-        try {
-          await this.props.onSubmit(transactionData);
-        } catch (error) {
-          const errorMessage = this.context.intl.formatMessage(error, error.values);
-          if (error instanceof IncorrectWalletPasswordError) {
-            this.setState({ passwordError: errorMessage });
-          } else {
-            this.setState({ txError: errorMessage });
+    if (this.props.walletType === 'mnemonic') {
+      this.form.submit({
+        onSuccess: async (form) => {
+          const { walletPassword } = form.values();
+          const transactionData = {
+            password: walletPassword,
+          };
+          try {
+            await this.props.onSubmit(transactionData);
+          } catch (error) {
+            const errorMessage = this.context.intl.formatMessage(error, error.values);
+            if (error instanceof IncorrectWalletPasswordError) {
+              this.setState({ passwordError: errorMessage });
+            } else {
+              this.setState({ txError: errorMessage });
+            }
           }
-        }
-      },
-      onError: () => {}
-    });
+        },
+        onError: () => {}
+      });
+    } else { // hw wallets are not using passwords
+      this.props.onSubmit({ password: '' });
+    }
   }
 
   convertedToUnitOfAccount: (TokenEntry, string) => string = (token, toCurrency) => {
@@ -308,6 +336,68 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     );
   }
 
+  renderHWWalletInfo(): Node {
+    const { intl } = this.context;
+    const { walletType } = this.props;
+    if (walletType === 'mnemonic') {
+      return null;
+    }
+
+    let infoLine1;
+    let infoLine2;
+    if (walletType === 'trezor') {
+      infoLine1 = messages.txConfirmationTrezorTLine1;
+      infoLine2 = globalMessages.txConfirmationTrezorTLine2;
+    }
+    if (walletType === 'ledger') {
+      infoLine1 = messages.txConfirmationLedgerNanoLine1;
+      infoLine2 = globalMessages.txConfirmationLedgerNanoLine2;
+    }
+    return (
+      <div className={styles.infoBlock}>
+        <ul>
+          <li key="1"><span>{intl.formatMessage(infoLine1)}</span><br /></li>
+          <li key="2"><span>{intl.formatMessage(infoLine2)}</span><br /></li>
+        </ul>
+      </div>
+    );
+  }
+
+  getSendButtonText(): $npm$ReactIntl$MessageDescriptor {
+    const { walletType } = this.props;
+    if (walletType === 'ledger') {
+      return messages.sendUsingLedgerNano;
+    }
+    if (walletType === 'trezor') {
+      return messages.sendUsingTrezorT;
+    }
+    return globalMessages.sendButtonLabel;
+  }
+
+  renderError(): Node {
+    const { walletType } = this.props;
+    if (walletType === 'mnemonic') {
+      const { txError }  = this.state;
+      if (txError) {
+        return (
+          <div className={styles.txError}>
+            {txError}
+          </div>
+        );
+      }
+      return null;
+    }
+    if (walletType === 'trezor') {
+      const { trezorSendError } = this.props;
+      return (<ErrorBlock error={trezorSendError} />);
+    }
+    if (walletType === 'ledger') {
+      const { ledgerSendError } = this.props;
+      return (<ErrorBlock error={ledgerSendError} />);
+    }
+    throw new Error('unexpected wallet type');
+  }
+
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
@@ -316,8 +406,9 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
       amount,
       receivers,
       isSubmitting,
+      walletType,
     } = this.props;
-    const { passwordError, txError } = this.state;
+    const { passwordError } = this.state;
 
     const staleTxWarning = (
       <div className={styles.warningBox}>
@@ -330,13 +421,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
     return (
       <div className={styles.component}>
-        {
-          txError !== null && (
-            <div className={styles.txError}>
-              {txError}
-            </div>
-          )
-        }
+        {this.renderError()}
         <div className={styles.staleTxWarning}>
           {this.props.staleTx && staleTxWarning}
         </div>
@@ -407,28 +492,37 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             </div>
           </div>
 
-          <TextField
-            type="password"
-            className={styles.walletPassword}
-            {...walletPasswordField.bind()}
-            disabled={isSubmitting}
-            onChange={(e) => {
-              this.setState({ passwordError: null })
-              walletPasswordField.set('value', e.target.value)
-            }}
-            error={walletPasswordField.error || passwordError}
-          />
+          {(walletType === 'mnemonic' && (
+            <TextField
+              type="password"
+              className={styles.walletPassword}
+              {...walletPasswordField.bind()}
+              disabled={isSubmitting}
+              onChange={(e) => {
+                this.setState({ passwordError: null })
+                walletPasswordField.set('value', e.target.value)
+              }}
+              error={walletPasswordField.error || passwordError}
+            />
+          ))}
+        </div>
+
+        <div>
+          {this.renderHWWalletInfo()}
         </div>
 
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid || isSubmitting}
+          disabled={
+            (walletType === 'mnemonic' && !walletPasswordField.isValid) ||
+            isSubmitting
+          }
           sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
           {isSubmitting ?
             <LoadingSpinner light /> :
-            intl.formatMessage(globalMessages.sendButtonLabel)}
+            intl.formatMessage(this.getSendButtonText())}
         </Button>
 
       </div>

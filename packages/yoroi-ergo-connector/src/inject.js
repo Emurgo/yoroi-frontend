@@ -196,6 +196,10 @@ class CardanoAPI {
       createTx: (req) => {
         return this._cardano_rpc_call("create_tx/cardano", [req]);
       },
+
+      listNFTs: () => {
+        return this._cardano_rpc_call("list_nfts/cardano", []);
+      },
       
       onDisconnect: (callback) => {
         if (this._disconnection[0]) {
