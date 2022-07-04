@@ -164,6 +164,7 @@ const genBaseProps: {|
         calculateMinAda: () => '1',
         isDefaultIncluded: false,
         minAda: undefined,
+        maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
       }
       : request.dialogInfo.transactionBuilderStore,
     substores: {
@@ -199,7 +200,8 @@ const genBaseProps: {|
       updateSendAllStatus: { trigger: action('updateSendAllStatus') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
-      deselectToken: { trigger: action('deselectToken') }
+      deselectToken: { trigger: action('deselectToken') },
+      calculateMaxAmount: { trigger: async (req) => action('calculateMaxAmount')(req) },
     },
     ada: {
       ledgerSend: {
@@ -397,6 +399,7 @@ export const RegularConfirmationDialog = (): Node => {
             calculateMinAda: () => '1',
             isDefaultIncluded: false,
             minAda: undefined,
+            maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
           }
         }
       })}
@@ -456,6 +459,7 @@ export const MultiAssetConfirmationDialog = (): Node => {
             calculateMinAda: () => '1',
             isDefaultIncluded: false,
             minAda: undefined,
+            maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
           }
         }
       })}
@@ -519,6 +523,7 @@ export const LedgerConfirmationDialog = (): Node => {
             calculateMinAda: () => '1',
             isDefaultIncluded: false,
             minAda: undefined,
+            maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
           }
         }
       })}
@@ -582,6 +587,7 @@ export const TrezorConfirmationDialog = (): Node => {
             calculateMinAda: () => '1',
             isDefaultIncluded: false,
             minAda: undefined,
+            maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
           }
         }
       })}

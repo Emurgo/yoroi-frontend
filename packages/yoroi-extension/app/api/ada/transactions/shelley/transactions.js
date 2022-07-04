@@ -29,7 +29,8 @@ import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFro
 import { hexToBytes, logErr } from '../../../../coreUtils';
 import { coinSelectionForValues } from './coinSelection';
 import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
-
+import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/models/PublicDeriver/interfaces';
+import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 /**
  * based off what the cardano-wallet team found worked empirically
  * note: slots are 1 second in Shelley mainnet, so this is 2hrs
@@ -716,7 +717,12 @@ function _newAdaUnsignedTxFromUtxo(
   };
 }
 
-export async function maxSendableADA(request: {||}): Promise<BigNumber> {
+export async function maxSendableADA(
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+    absSlotNumber: BigNumber,
+  |}
+): Promise<BigNumber> {
   try {
     const network = request.publicDeriver.getParent().getNetworkInfo()
     const config = getCardanoHaskellBaseConfig(network)
@@ -748,13 +754,25 @@ export async function maxSendableADA(request: {||}): Promise<BigNumber> {
     const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
     txBuilder.set_ttl(request.absSlotNumber.plus(defaultTtlOffset).toNumber());
     const wasmAddr = normalizeToAddress(addressedUtxo[0].receiver);
+
+    if (wasmAddr == null) {
+      throw new Error(`${nameof(maxSendableADA)} receiver not a valid Shelley address`);
+    }
+
     for (const input of addressedUtxo) {
       if (addUtxoInput(
         txBuilder,
         undefined,
-        input,
+        {
+          amount: input.amount,
+          receiver: input.receiver,
+          tx_hash: input.tx_hash,
+          tx_index: input.tx_index,
+          utxo_id: input.utxo_id,
+          assets: input.assets,
+        },
         false,
-        { networkId: network.networkId }
+        { networkId: network.NetworkId }
       ) === AddInputResult.OVERFLOW) {
         throw new AssetOverflowError();
       }
