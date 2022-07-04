@@ -11,6 +11,7 @@ import type {
   Tx,
   TxId,
   Value,
+  Asset,
 } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -163,6 +164,22 @@ export async function connectorGetBalance(
     }
     throw Error('asGetBalance failed in connectorGetBalance');
   }
+}
+
+export async function connectorGetAssets(
+  wallet: PublicDeriver<>,
+): Promise<Array<Asset>> {
+  const canGetBalance = asGetBalance(wallet);
+  if (canGetBalance != null) {
+    const balance = await canGetBalance.getBalance();
+    const nonDefaultEntries = balance.nonDefaultEntries();
+    return Promise.resolve(nonDefaultEntries.map(e => ({
+      identifier: e.identifier,
+      networkId: e.networkId,
+      amount: bigNumberToValue(e.amount),
+    })));
+  }
+  throw Error('asGetBalance failed in connectorGetAssets');
 }
 
 function formatUtxoToBoxErgo(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
