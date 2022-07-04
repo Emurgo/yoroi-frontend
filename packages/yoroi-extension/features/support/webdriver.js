@@ -131,6 +131,8 @@ function CustomWorld(cmdInput: WorldInput) {
   }
   this.driver = builder.build();
   this._allLoggers = [];
+  const trezorEmuLogPath = `${testRunsLogsDir}trezorEmulatorController_${getLogDate()}.log`;
+  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
   const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
   const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
   this.windowManager = new WindowManager(this.driver, mockAndWMLogger);

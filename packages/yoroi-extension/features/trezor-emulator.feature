@@ -4,7 +4,7 @@ Feature: Trezor wallet emulator
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    Then I connect to trezore controler
+    Then I connect to trezor controller
     And I start trezor emulator environment
     Given I connected Trezor emulator device
     Then I should see the dashboard screen

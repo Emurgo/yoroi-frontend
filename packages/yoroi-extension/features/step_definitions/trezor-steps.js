@@ -50,8 +50,8 @@ Then(/^I press Yes on the Trezor emulator$/, async function () {
   await this.windowManager.waitForClosingAndSwitchTo(trezorConnectTabName, extensionTabName);
 });
 
-Then(/^I connect to trezore controler$/, async function () {
-  this.trezorController = new TrezorEmulatorController();
+Then(/^I connect to trezor controller$/, async function () {
+  this.trezorController = new TrezorEmulatorController(this.trezorEmuLogger);
   await this.trezorController.connect();
   const result = await this.trezorController.getLastEvent();
   expect(result.type).to.be.equal('client', 'Something is wrong with connection');
