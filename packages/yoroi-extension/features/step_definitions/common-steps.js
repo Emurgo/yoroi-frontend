@@ -143,6 +143,12 @@ After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({});
 });
 
+After({ tags: '@trezorEmulatorTest' }, async function () {
+  await this.trezorController.bridgeStop();
+  await this.trezorController.emulatorStop();
+  this.trezorController.closeWsConnection();
+});
+
 After(async function (scenario) {
   this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has done ####`);
   if (scenario.result.status === 'failed') {
