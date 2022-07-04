@@ -14,6 +14,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import RewardGraph from './RewardsGraph';
 import type { GraphData } from '../dashboard/StakingDashboard';
+import { EpochProgressCard } from './EpochProgressCard';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -99,8 +100,16 @@ function StakingTabs({
     {
       id: 2,
       label: 'Epoch progress',
-      disabled: true,
-      component: <Box>TODO: Epoch progress!</Box>,
+      disabled: false,
+      component: (
+        <EpochProgressCard
+          percentage={55}
+          days="2.5"
+          currentEpoch={38}
+          epochStartDate="Jun 20 2021 8:30PM"
+          epochEndDate="Dec 10 2021 8:30PM"
+        />
+      ),
     },
   ];
 
