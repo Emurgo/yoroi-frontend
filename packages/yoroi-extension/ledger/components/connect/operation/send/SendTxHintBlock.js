@@ -177,6 +177,14 @@ const message = defineMessages({
     id: 'hint.catalystStep9',
     defaultMessage: '!!!Confirm the auxilliary data hash by pressing <strong>both</strong> buttons.',
   },
+  confirmAssetFingerprint: {
+    id: 'hint.sendTx.confirmAssetFingerprint',
+    defaultMessage: '!!!Confirm the asset fingerprint by pressintg <strong>both</strong> buttons',
+  },
+  confirmAssetAmount: {
+    id: 'hint.sendTx.confirmAssetAmount',
+    defaultMessage: '!!!Confirm the token amount by pressintg <strong>both</strong> buttons',
+  },
 });
 
 type Props = {|
@@ -456,6 +464,8 @@ export default class SendTxHintBlock extends React.Component<Props> {
       const imgTtl = require(`../../../../assets/img/nano-${deviceCode}/hint-ttl.png`);
       const imgWithdrawal = require(`../../../../assets/img/nano-${deviceCode}/hint-withdrawal.png`);
       const imgMetadata = require(`../../../../assets/img/nano-${deviceCode}/hint-metadata.png`);
+      const imgAssetFingerprint = require(`../../../../assets/img/nano-${deviceCode}/hint-asset-fingerprint.png`);
+      const imgTokenAmount = require(`../../../../assets/img/nano-${deviceCode}/hint-token-amount.png`);
 
       const getAndIncrementStep = () => {
         return ++stepNumber;
@@ -488,13 +498,6 @@ export default class SendTxHintBlock extends React.Component<Props> {
               (<HintBlock
                 key={nextStep1}
                 number={nextStep1}
-                text={message[`${deviceCode}ConfirmValue`]}
-                imagePath={imgSend2}
-              />),
-              (<HintGap key={nextStep1 + 'gap'} />),
-              (<HintBlock
-                key={nextStep2}
-                number={nextStep2}
                 text={message[`${deviceCode}ConfirmAddress`]}
                 imagePath={imgSend3}
                 // TODO: this doesn't handle base58 addresses
@@ -504,7 +507,42 @@ export default class SendTxHintBlock extends React.Component<Props> {
                 //   1023, // bech32 can detect errors up this point
                 // )}
               />),
+              (<HintGap key={nextStep1 + 'gap'} />),
+              (<HintBlock
+                key={nextStep2}
+                number={nextStep2}
+                text={message[`${deviceCode}ConfirmValue`]}
+                imagePath={imgSend2}
+              />),
               (<HintGap key={nextStep2 + 'gap'} />),
+              ...(
+                (output.tokenBundle || []).flatMap(
+                  ({ policyIdHex, tokens} ) => {
+                    return tokens.map(token => {
+                      const step1 = ++stepNumber;
+                      const step2 = ++stepNumber;
+                      return (
+                        <>
+                          <HintBlock
+                            key={step1}
+                            number={step1}
+                            text={message.confirmAssetFingerprint}
+                            imagePath={imgAssetFingerprint}
+                          />
+                          <HintGap key={step1 + 'gap'} />
+                          <HintBlock
+                            key={step2}
+                            number={step2}
+                            text={message.confirmAssetAmount}
+                            imagePath={imgTokenAmount}
+                          />
+                          <HintGap key={step2 + 'gap'} />
+                        </>
+                      );
+                    });
+                  }
+                )
+              )
             ];
             if (params.addressHex !== undefined) return result;
 
@@ -523,7 +561,6 @@ export default class SendTxHintBlock extends React.Component<Props> {
             imagePath={imgSend4}
           />
           <HintGap />
-          <HintGap />
           {signTxInfo.tx.ttl != null && (
             <HintBlock
               number={++stepNumber}
@@ -531,6 +568,7 @@ export default class SendTxHintBlock extends React.Component<Props> {
               imagePath={imgTtl}
             />
           )}
+          <HintGap />
           {
             signTxInfo.tx.certificates != null &&
             signTxInfo.tx.certificates.map(
