@@ -47,7 +47,7 @@ import type { FormattedNFTDisplay, FormattedTokenDisplay, } from '../../../utils
 import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError } from '../../../api/common/errors';
+import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -214,10 +214,6 @@ export default class WalletSendForm extends Component<Props, State> {
         ));
       },
     );
-
-    if (this.props.maxSendableAmount.result) {
-      this.form.$('amount').set('value', '10');
-    }
   }
 
   componentWillUnmount(): void {
@@ -416,6 +412,11 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     const amountInputError = transactionFeeError || amountField.error
+    const txError = (
+      transactionFeeError ||
+      (maxSendableAmount.error &&
+        intl.formatMessage(maxSendableAmount.error, maxSendableAmount.values))
+    )
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
 
     const defaultTokenInfo = this.props.getTokenInfo({
@@ -424,7 +425,8 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     if (this.props.maxSendableAmount.result) {
-      this.form.$('amount').set('value', this.props.maxSendableAmount.result.shiftedBy(-6).decimalPlaces(6).toString());
+      const numberOfDecimals = this.getNumDecimals();
+      this.form.$('amount').set('value', this.props.maxSendableAmount.result.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
     }
 
     switch (step) {
@@ -469,7 +471,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
               {!isDefaultIncluded && (
                 <p className={styles.sendError}>
-                  {transactionFeeError || (maxSendableAmount.error &&intl.formatMessage(maxSendableAmount.error, maxSendableAmount.values))}
+                  {txError}
                 </p>
               )}
               <div className={classnames(
@@ -523,30 +525,18 @@ export default class WalletSendForm extends Component<Props, State> {
                   <p className={styles.defaultCoin}>
                     {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
                   </p>
+                  {!isErgo(this.props.selectedNetwork) &&
                   <Button
                     variant="ternary"
-                    disabled={isErgo(this.props.selectedNetwork) || maxSendableAmount.isExecuting}
+                    disabled={maxSendableAmount.isExecuting}
                     className={classnames([
                       styles.maxBtn,
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning
                     ])}
-                    // onClick={this.sendMaxAmount}
-                    onClick={() => {
-                      this.props.calculateMaxAmount()
-                      // this.sendMaxAmount()
-                      // if (shouldSendAll) {
-                      //   amountField.reset();
-                      //   this.props.onRemoveTokens([defaultTokenInfo]);
-                      // } else {
-                      //   this.props.onAddToken({
-                      //     shouldReset: true,
-                      //   });
-                      //   this.props.updateSendAllStatus(true);
-                      // }
-                    }}
+                    onClick={this.props.calculateMaxAmount}
                   >
                     {intl.formatMessage(messages.max)}
-                  </Button>
+                  </Button>}
                 </div>
                 {this.props.unitOfAccountSetting.enabled
                 && this.props.unitOfAccountSetting.currency && (
