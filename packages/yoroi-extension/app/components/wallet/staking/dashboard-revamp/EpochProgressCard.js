@@ -7,8 +7,8 @@ type Props = {|
   +percentage: number,
   +days: string,
   +currentEpoch: number,
-  +epochStartDate: string,
-  +epochEndDate: string,
+  +startEpochDate: string,
+  +endEpochDate: string,
 |};
 
 // TODO: Remove placeholders
@@ -16,16 +16,16 @@ export function EpochProgressCard({
   percentage,
   days,
   currentEpoch,
-  epochStartDate,
-  epochEndDate,
+  startEpochDate,
+  endEpochDate,
 }: Props): Node {
   return (
     <Box>
       <Graph value={percentage} days={days} />
       <Stack direction="row" spacing={4} mt="32px">
         <LabelWithValue label="Current Epoch" value={currentEpoch} />
-        <LabelWithValue label="Epoch started at" value={epochStartDate} />
-        <LabelWithValue label="Epoch end at" value={epochEndDate} />
+        <LabelWithValue label="Epoch started at" value={startEpochDate} />
+        <LabelWithValue label="Epoch end at" value={endEpochDate} />
       </Stack>
     </Box>
   );

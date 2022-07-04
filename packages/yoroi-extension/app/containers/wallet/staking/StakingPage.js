@@ -51,9 +51,13 @@ import type { GeneratedData as DeregisterDialogContainerData } from '../../trans
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { generateGraphData } from '../../../utils/graph';
-import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
-import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
+import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
+import type {
+  CurrentTimeRequests,
+  TimeCalcRequests,
+} from '../../../stores/base/BaseCardanoTimeStore';
+import moment from 'moment';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -168,6 +172,31 @@ class StakingPage extends Component<AllProps> {
 
 
   getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
+    const timeStore = this.generated.stores.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
+    const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
+    if (toAbsoluteSlot == null) return undefined;
+    const toRealTime = timeCalcRequests.requests.toRealTime.result;
+    if (toRealTime == null) return undefined;
+    const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
+    if (timeSinceGenesis == null) return undefined;
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
+    if (getEpochLength == null) return undefined;
+    const currentEpoch = currTimeRequests.currentEpoch;
+
+    const endEpochTime = toRealTime({
+      absoluteSlotNum: toAbsoluteSlot({
+        epoch: currentEpoch,
+        // in Jormungandr, rewards were distributed at the start of the epoch
+        // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
+        slot: isJormungandr(publicDeriver.getParent().getNetworkInfo()) ? 0 : getEpochLength(),
+      }),
+      timeSinceGenesisFunc: timeSinceGenesis,
+    });
+
+    const endEpochDate = moment(endEpochTime).format('lll');
+
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
@@ -215,6 +244,7 @@ class StakingPage extends Component<AllProps> {
 
     return (
       <StakingTabs
+        epochProgress={{ currentEpoch, endEpochDate }}
         delegatedPool={delegatedPool}
         undelegate={
           // don't support undelegation for ratio stake since it's a less intuitive UX
@@ -455,6 +485,10 @@ class StakingPage extends Component<AllProps> {
           |},
         |},
       |},
+      time: {|
+        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
+      |},
       delegation: {|
         selectedPage: number,
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
@@ -507,10 +541,11 @@ class StakingPage extends Component<AllProps> {
       }
       return {
         getTimeCalcRequests: (undefined: any),
-        getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingPage)} api not supported`) },
+        getCurrentTimeRequests: () => {
+          throw new Error(`${nameof(StakingPage)} api not supported`);
+        },
       };
     })();
-
     return Object.freeze({
       stores: {
         wallets: {
@@ -525,6 +560,7 @@ class StakingPage extends Component<AllProps> {
           getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
+        time,
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,

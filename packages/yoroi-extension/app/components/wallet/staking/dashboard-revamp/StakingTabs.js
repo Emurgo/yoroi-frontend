@@ -18,6 +18,10 @@ import { EpochProgressCard } from './EpochProgressCard';
 
 type Props = {|
   delegatedPool: PoolData,
+  epochProgress: {|
+    currentEpoch: number,
+    endEpochDate: string,
+  |},
   +undelegate: void | (void => Promise<void>),
   +epochLength: ?number,
   +graphData: GraphData
@@ -47,6 +51,7 @@ function StakingTabs({
   delegatedPool,
   epochLength,
   undelegate,
+  epochProgress,
   intl,
   graphData
  }: Props & Intl): Node {
@@ -103,11 +108,12 @@ function StakingTabs({
       disabled: false,
       component: (
         <EpochProgressCard
+          // TODO: Remove placeholders
           percentage={55}
           days="2.5"
-          currentEpoch={38}
-          epochStartDate="Jun 20 2021 8:30PM"
-          epochEndDate="Dec 10 2021 8:30PM"
+          currentEpoch={epochProgress.currentEpoch}
+          startEpochDate="-"
+          endEpochDate={epochProgress.endEpochDate}
         />
       ),
     },
