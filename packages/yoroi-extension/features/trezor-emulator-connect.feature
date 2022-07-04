@@ -1,3 +1,4 @@
+@trezorEmulatorTest
 Feature: Trezor wallet emulator
 
   Background:
@@ -25,3 +26,12 @@ Feature: Trezor wallet emulator
     Then I should see the successfully sent page
     And I click the transaction page button
     Then I should see the summary screen
+
+  @hw-trezor-002
+  Scenario: Trezor (emulator). Verify address.
+    When I go to the receive screen
+    Given I should see the Receive screen
+    And I click on the verify address button
+    Then I see the verification address "addr1qyqypeu6872rx9m587ahv0yppjzuhkplzj7qsntrvuka6emyyw9u88yk923gz44ytfrpyymhpkydszyfv7zljtp65nfqhkztup"
+    And I see the derivation path "m/1852'/1815'/0'/0/3"
+    And I verify the address on the trezor emulator
