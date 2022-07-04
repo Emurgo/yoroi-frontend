@@ -1,4 +1,4 @@
-@trezorEmulatorTest
+@trezorEmulatorTest @Trezor
 Feature: Trezor wallet emulator
 
   Background:
@@ -10,7 +10,7 @@ Feature: Trezor wallet emulator
     Then I should see the dashboard screen
     Then I should see a plate PXCA-2349
 
-  @hw-trezor-001
+  @Trezor-001
   Scenario: Trezor (emulator). Send ADA.
     Given I go to the send transaction screen
     And I fill the form:
@@ -27,7 +27,7 @@ Feature: Trezor wallet emulator
     And I click the transaction page button
     Then I should see the summary screen
 
-  @hw-trezor-002
+  @Trezor-002
   Scenario: Trezor (emulator). Verify address.
     When I go to the receive screen
     Given I should see the Receive screen
