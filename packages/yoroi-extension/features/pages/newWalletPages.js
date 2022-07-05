@@ -7,7 +7,7 @@ export const createWalletButton: LocatorObject = { locator: '.WalletAdd_btnCreat
 export const restoreWalletButton: LocatorObject = { locator: '.WalletAdd_btnRestoreWallet', method: 'css' };
 // Currency options dialog
 export const pickUpCurrencyDialog: LocatorObject = { locator: '.PickCurrencyOptionDialog', method: 'css' };
-export const getCurrencyButton: LocatorObject = (currency: string) => {
+export const getCurrencyButton = (currency: string): LocatorObject => {
   return { locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' };
 };
 // HW options dialog
@@ -22,7 +22,6 @@ export const byronEraButton: LocatorObject = { locator: '.WalletEraOptionDialog_
 export const trezorConnectDialog: LocatorObject = { locator: '.CheckDialog', method: 'css' };
 export const trezorWalletName: LocatorObject = { locator: '//input[@name="walletName"]', method: 'xpath' };
 export const trezorConfirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
-export const trezorSaveWalletButton: LocatorObject = { locator: '', method: '' };
 
 // Common elements
 export const walletNameInput: LocatorObject = { locator: '//input[@name="walletName"]', method: 'xpath' };

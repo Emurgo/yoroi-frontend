@@ -27,7 +27,7 @@ module.exports = async ({ config, mode } /*: {|
       publicPath: './',
       isLight
     })
-    : devConfig.baseDevConfig(ENV, isNightly === 'true',);
+    : devConfig.baseDevConfig(ENV, isNightly === 'true', useEmulator === 'true',);
 
   const finalConfig = {
     ...config,
@@ -39,7 +39,7 @@ module.exports = async ({ config, mode } /*: {|
       ...config.plugins,
       new ConfigWebpackPlugin(),
       new ReactRefreshWebpackPlugin(),
-      new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true')),
+      new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true', useEmulator === 'true')),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),

@@ -107,6 +107,7 @@ export function buildDev(env: string) {
     config.baseDevConfig(
       argv.env,
       isNightly,
+      useEmulator,
       argv.ergoConnectorExtensionId,
       !shouldInjectConnector
     ),

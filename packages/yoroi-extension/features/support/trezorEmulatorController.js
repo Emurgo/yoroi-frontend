@@ -5,8 +5,8 @@ const WebSocket = require('ws');
 class TrezorEmulatorControllerError extends Error {}
 
 export class TrezorEmulatorController {
-  websocketUrl = 'ws://localhost:9001/';
-  id = 0;
+  websocketUrl: string = 'ws://localhost:9001/';
+  id: number = 0;
   ws: Object;
   logger: Object;
 
@@ -14,7 +14,7 @@ export class TrezorEmulatorController {
     this.logger = logger;
   }
 
-  _customPromise(json, functionName, logger) {
+  _customPromise(json: Object, functionName: string, logger: Object): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._send(json, logger, functionName);
       this.ws.onmessage = event => {
@@ -29,7 +29,7 @@ export class TrezorEmulatorController {
     });
   }
 
-  _innerConnect(websocketUrl: string, logger: Object) {
+  _innerConnect(websocketUrl: string, logger: Object): Promise<Object> {
     return new Promise((resolve, reject) => {
       const server = new WebSocket(websocketUrl);
       server.onopen = function () {
@@ -43,14 +43,14 @@ export class TrezorEmulatorController {
     });
   }
 
-  async connect() {
+  async connect(): Promise<TrezorEmulatorController> {
     this.logger.info(`connect: Connecting to websocket ${this.websocketUrl}`);
     this.ws = await this._innerConnect(this.websocketUrl, this.logger);
 
     return this;
   }
 
-  handleMessage = (event, logger): Object | void => {
+  handleMessage(event: Object, logger: Object): Object {
     if (!event.data || typeof event.data !== 'string') {
       logger.error(`handleMessage: Response received without proper data: ${event.data}`);
       throw new TrezorEmulatorControllerError(
@@ -62,7 +62,7 @@ export class TrezorEmulatorController {
 
     if ('background_check' in dataObject && dataObject.background_check) {
       logger.info(`handleMessage: Background check`);
-      return;
+      return dataObject;
     }
 
     if ('success' in dataObject) {
@@ -74,9 +74,9 @@ export class TrezorEmulatorController {
     }
 
     return dataObject;
-  };
+  }
 
-  _send(json, logger, functionName) {
+  _send(json: Object, logger: Object, functionName: string): void {
     const tempId = this.id;
     const requestToSend = JSON.stringify(
       Object.assign(json, {
@@ -88,17 +88,17 @@ export class TrezorEmulatorController {
     logger.info(`${functionName}._send: Request sent:\n-> ${requestToSend}`);
   }
 
-  _sendOnBackground(json) {
+  _sendOnBackground(json: Object): void {
     this.ws.send(JSON.stringify(json));
   }
 
-  closeWsConnection() {
+  closeWsConnection(): void {
     this.logger.info(`closeWsConnection: Closing the connection`);
     this.ws.close();
     this.logger.info(`closeWsConnection: The connection is closed`);
   }
 
-  emulatorStart(logger = this.logger) {
+  emulatorStart(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-start',
       version: '2-master',
@@ -107,7 +107,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorStart', logger);
   }
 
-  emulatorWipe(logger = this.logger) {
+  emulatorWipe(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-wipe',
     };
@@ -115,7 +115,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorWipe', logger);
   }
 
-  emulatorResetDevice(logger = this.logger) {
+  emulatorResetDevice(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-reset-device',
     };
@@ -123,7 +123,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorResetDevice', logger);
   }
 
-  emulatorResetDeviceShamir(logger = this.logger) {
+  emulatorResetDeviceShamir(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-reset-device',
       use_shamir: true,
@@ -132,7 +132,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorResetDeviceShamir', logger);
   }
 
-  emulatorSetup(mnemonic: string, logger = this.logger) {
+  emulatorSetup(mnemonic: string, logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-setup',
       mnemonic:
@@ -146,7 +146,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorSetup', logger);
   }
 
-  emulatorPressYes(logger = this.logger) {
+  emulatorPressYes(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-press-yes',
     };
@@ -154,7 +154,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorPressYes', logger);
   }
 
-  emulatorPressNo(logger = this.logger) {
+  emulatorPressNo(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-press-no',
     };
@@ -162,7 +162,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorPressNo', logger);
   }
 
-  emulatorAllowUnsafe(logger = this.logger) {
+  emulatorAllowUnsafe(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-allow-unsafe-paths',
     };
@@ -170,7 +170,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorAllowUnsafe', logger);
   }
 
-  emulatorStop(logger = this.logger) {
+  emulatorStop(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-stop',
     };
@@ -178,7 +178,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'emulatorStop', logger);
   }
 
-  bridgeStart(bridgeVersion: string, logger = this.logger) {
+  bridgeStart(bridgeVersion: string, logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'bridge-start',
       version: bridgeVersion || '2.0.31',
@@ -187,7 +187,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'bridgeStart', logger);
   }
 
-  bridgeStop(logger = this.logger) {
+  bridgeStop(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'bridge-stop',
     };
@@ -195,11 +195,15 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'bridgeStop', logger);
   }
 
-  exit(logger = this.logger) {
+  exit(logger: Object = this.logger): Promise<Object> {
     return new Promise((resolve, reject) => {
-      this._send({
-        type: 'exit',
-      });
+      this._send(
+        {
+          type: 'exit',
+        },
+        logger,
+        'exit'
+      );
       this.ws.onclose = () => {
         resolve(this.ws);
       };
@@ -210,7 +214,7 @@ export class TrezorEmulatorController {
     });
   }
 
-  ping(logger = this.logger) {
+  ping(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'ping',
     };
@@ -218,7 +222,7 @@ export class TrezorEmulatorController {
     return this._customPromise(requestJson, 'ping', logger);
   }
 
-  getLastEvent(logger = this.logger) {
+  getLastEvent(logger: Object = this.logger): Promise<Object> {
     return new Promise((resolve, reject) => {
       this.ws.onmessage = event => {
         const dataObject = this.handleMessage(event, logger);
@@ -231,7 +235,7 @@ export class TrezorEmulatorController {
     });
   }
 
-  readAndConfirmMnemonic(logger = this.logger) {
+  readAndConfirmMnemonic(logger: Object = this.logger): Promise<Object> {
     const requestJson = {
       type: 'emulator-read-and-confirm-mnemonic',
     };

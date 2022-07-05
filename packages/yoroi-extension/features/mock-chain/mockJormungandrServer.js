@@ -1,6 +1,11 @@
 // @flow
 
+import { create, bodyParser, defaults } from 'json-server';
 import type {
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  UtxoSumRequest,
+  UtxoSumResponse,
   HistoryRequest,
   HistoryResponse,
   RewardHistoryRequest,
@@ -23,14 +28,29 @@ import type {
 import type { ServerStatusResponse } from '../../app/api/common/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockJormungandrImporter';
-import {
-  validateAddressesReq,
-  defaultSignedTransaction,
-  txsLimit,
-  getCommonServer,
-} from './mockCommonServer';
 import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
+
 import { Ports } from '../../scripts/connections';
+
+// MockData should always be consistent with the following values
+const addressesLimit = 50;
+const txsLimit = 20;
+
+function _validateAddressesReq({ addresses }: { addresses: Array<string>, ... } = {}): boolean {
+  if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
+    throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
+  }
+  // TODO: Add address validation
+  return true;
+}
+
+function _defaultSignedTransaction(
+  req: { body: SignedRequestInternal, ... },
+  res: { send(arg: SignedResponse): any, ... }
+): void {
+  const response = mockImporter.sendTx(req.body);
+  res.send(response);
+}
 
 // TODO: no type from json-server
 let MockServer: null | any = null;
@@ -49,7 +69,35 @@ export function getMockServer(settings: {
   ...
 }): typeof MockServer {
   if (!MockServer) {
-    const server = getCommonServer(settings);
+    const middlewares = [...defaults({ logger: !!settings.outputLog }), bodyParser];
+
+    const server = create();
+
+    server.use(middlewares);
+
+    server.post(
+      '/api/txs/utxoForAddresses',
+      async (
+        req: { body: AddressUtxoRequest, ... },
+        res: { send(arg: AddressUtxoResponse): any, ... }
+      ): Promise<void> => {
+        chai.assert.isTrue(_validateAddressesReq(req.body));
+        const utxoForAddresses = await mockImporter.utxoForAddresses(req.body);
+        res.send(utxoForAddresses);
+      }
+    );
+
+    server.post(
+      '/api/txs/utxoSumForAddresses',
+      async (
+        req: { body: UtxoSumRequest, ... },
+        res: { send(arg: UtxoSumResponse): any, ... }
+      ): Promise<void> => {
+        chai.assert.isTrue(_validateAddressesReq(req.body));
+        const utxoSumForAddresses = await mockImporter.utxoSumForAddresses(req.body);
+        res.send(utxoSumForAddresses);
+      }
+    );
 
     server.post(
       '/api/v2/txs/history',
@@ -57,7 +105,7 @@ export function getMockServer(settings: {
         req: { body: HistoryRequest, ... },
         res: { send(arg: HistoryResponse): any, ... }
       ): Promise<void> => {
-        chai.assert.isTrue(validateAddressesReq(req.body));
+        chai.assert.isTrue(_validateAddressesReq(req.body));
 
         const history = await mockImporter.history(req.body);
         // Returns a chunk of txs
@@ -71,7 +119,7 @@ export function getMockServer(settings: {
         req: { body: RewardHistoryRequest, ... },
         res: { send(arg: RewardHistoryResponse): any, ... }
       ): Promise<void> => {
-        chai.assert.isTrue(validateAddressesReq(req.body));
+        chai.assert.isTrue(_validateAddressesReq(req.body));
 
         const history = await mockImporter.getRewardHistory(req.body);
         res.send(history);
@@ -102,7 +150,7 @@ export function getMockServer(settings: {
         if (settings.signedTransaction) {
           settings.signedTransaction(req, res);
         } else {
-          defaultSignedTransaction(req, res);
+          _defaultSignedTransaction(req, res);
         }
       }
     );
