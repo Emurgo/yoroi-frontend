@@ -131,7 +131,10 @@ After(async function (scenario) {
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
-    await getConsoleLogs(this.driver, 'failedStep');
+    if (this.getBrowser !== 'firefox') {
+      await getConsoleLogs(this.driver, 'failedStep');
+      await getDriverLogs(this.driver, 'failedStep');
+    }
   }
   await this.driver.quit();
 });
@@ -168,7 +171,12 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);
-      await getConsoleLogs(this.driver, cleanString);
+      const cap = await this.driver.getCapabilities();
+      const browserName = cap.getBrowserName();
+      if (browserName !== 'firefox') {
+        await getConsoleLogs(this.driver, 'failedStep');
+        await getDriverLogs(this.driver, 'failedStep');
+      }
     }
 
     testProgress.step += 1;
@@ -176,8 +184,10 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
   };
 });
 
-function createDirInTestRunsData(subdirectoryName) {
-  const dir = `${testRunsDataDir}/${testProgress.scenarioName}/${subdirectoryName}`;
+async function createDirInTestRunsData(driver, subdirectoryName) {
+  const cap = await driver.getCapabilities();
+  const browserName = cap.getBrowserName();
+  const dir = `${testRunsDataDir}/${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -186,7 +196,7 @@ function createDirInTestRunsData(subdirectoryName) {
 
 async function takeScreenshot(driver, name) {
   // path logic
-  const dir = createDirInTestRunsData('screenshots');
+  const dir = await createDirInTestRunsData(driver, 'screenshots');
   const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}.png`;
 
   const screenshot = await driver.takeScreenshot();
@@ -194,24 +204,26 @@ async function takeScreenshot(driver, name) {
 }
 
 async function takePageSnapshot(driver, name) {
-  const dir = createDirInTestRunsData('pagesSnapshots');
+  const dir = await createDirInTestRunsData(driver, 'pagesSnapshots');
   const htmlLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-dom.html`;
   const html = await driver.executeScript('return document.body.innerHTML;');
   await fsAsync.writeFile(htmlLogPath, html);
 }
 
+async function getDriverLogs(driver, name) {
+  const dir = await createDirInTestRunsData(driver, 'driverLogs');
+  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-driver-log.json`;
+  const logEntries = await driver.manage().logs().get(logging.Type.DRIVER);
+  const jsonLogs = logEntries.map(l => l.toJSON());
+  await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
+}
+
 async function getConsoleLogs(driver, name) {
-  const cap = await driver.getCapabilities();
-  const browserName = cap.getBrowserName();
-  if (browserName === 'firefox'){
-    return;
-  }
-  const dir = createDirInTestRunsData('consoleLogs');
+  const dir = await createDirInTestRunsData(driver, 'consoleLogs');
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
   const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
-
 }
 
 async function inputMnemonicForWallet(
@@ -251,10 +263,12 @@ export async function checkErrorByTranslationId(
 }
 
 Then(/^I pause the test to debug$/, async function () {
+  this.webDriverLogger.info(`Step: I pause the test to debug`);
   await this.waitForElement({ locator: '.element_that_does_not_exist', method: 'css' });
 });
 
 Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: There is an Ergo wallet stored named ${walletName}`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
@@ -272,6 +286,7 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
 });
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
@@ -290,6 +305,7 @@ Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (wallet
 });
 
 Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: There is a Byron wallet stored named ${walletName}`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
@@ -308,6 +324,7 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
 });
 
 Given(/^I have completed the basic setup$/, async function () {
+  this.webDriverLogger.info(`Step: I have completed the basic setup`);
   // language select page
   await this.waitForElement({ locator: '.LanguageSelectionForm_component', method: 'css' });
   await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
@@ -323,6 +340,7 @@ Given(/^I have completed the basic setup$/, async function () {
 });
 
 Given(/^I switched to the advanced level$/, async function () {
+  this.webDriverLogger.info(`Step: I switched to the advanced level`);
   // Navigate to the general settings screen
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
@@ -341,6 +359,7 @@ Given(/^I switched to the advanced level$/, async function () {
 });
 
 Then(/^I accept uri registration$/, async function () {
+  this.webDriverLogger.info(`Step: I accept uri registration`);
   await acceptUriPrompt(this);
 });
 
@@ -354,10 +373,12 @@ async function acceptUriPrompt(world: any) {
 }
 
 Given(/^I have opened the extension$/, async function () {
+  this.webDriverLogger.info(`Step: I have opened the extension`);
   await this.driver.get(this.getExtensionUrl());
 });
 
 Given(/^I refresh the page$/, async function () {
+  this.webDriverLogger.info(`Step: I refresh the page`);
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(500);
@@ -365,6 +386,7 @@ Given(/^I refresh the page$/, async function () {
 });
 
 Given(/^I restart the browser$/, async function () {
+  this.webDriverLogger.info(`Step: I restart the browser`);
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
   // wait for page to refresh
@@ -373,19 +395,23 @@ Given(/^I restart the browser$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
+  this.webDriverLogger.info(`Step: There is no wallet stored`);
   await restoreWalletsFromStorage(this);
   await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {
+  this.webDriverLogger.info(`Step: I click then button labeled ${buttonName}`);
   await this.click({ locator: `//button[contains(text(), ${buttonName})]`, method: 'xpath' });
 });
 
 Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
+  this.webDriverLogger.info(`Step: I export a snapshot named ${snapshotName}`);
   await exportYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
 });
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
+  this.webDriverLogger.info(`Step: I import a snapshot named ${snapshotName}`);
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
 
   // refresh page to trigger migration
@@ -404,6 +430,7 @@ async function setLedgerWallet(client, serial) {
   }, serial);
 }
 Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
+  this.webDriverLogger.info(`Step: I connected Ledger device ${deviceId}`);
   await setLedgerWallet(this, serial);
 });
 
@@ -416,6 +443,7 @@ async function setTrezorWallet(client, deviceId) {
   }, deviceId);
 }
 Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
+  this.webDriverLogger.info(`Step: I connected Trezor device ${deviceId}`);
   await setTrezorWallet(this, deviceId);
 });
 
@@ -545,18 +573,22 @@ async function compareToCapturedDbState(client, excludeSyncTime) {
 }
 
 Given(/^I capture DB state snapshot$/, async function () {
+  this.webDriverLogger.info(`Step: I capture DB state snapshot`);
   await captureDbStae(this);
 });
 
 Then(/^I compare to DB state snapshot$/, async function () {
+  this.webDriverLogger.info(`Step: I compare to DB state snapshot`);
   await compareToCapturedDbState(this, false);
 });
 
 Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
+  this.webDriverLogger.info(`Step: I compare to DB state snapshot excluding sync time`);
   await compareToCapturedDbState(this, true);
 });
 
 Then(/^Revamp. I switch to revamp version$/, async function () {
+  this.webDriverLogger.info(`Step: Revamp. I switch to revamp version`);
   await goToSettings(this);
   await selectSubmenuSettings(this, 'general');
   const revampButton = await this.driver.findElement(By.id('switchToRevampButton'));
@@ -564,6 +596,7 @@ Then(/^Revamp. I switch to revamp version$/, async function () {
 });
 
 Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: Revamp. I go to the wallet ${walletName}`);
   await this.click(walletButton);
 
   const restoreInfo = testWallets[walletName];
