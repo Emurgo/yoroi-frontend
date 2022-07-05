@@ -281,7 +281,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     const walletsNavigation = this.stores.profile.walletsNavigation
     const newWalletsNavigation = {
       ...walletsNavigation,
-      // $FlowFixMe
+      // $FlowFixMe[invalid-computed-prop]
       [walletType]: walletsNavigation[walletType].filter(
         walletId => walletId !== request.publicDeriver.publicDeriverId)
     }

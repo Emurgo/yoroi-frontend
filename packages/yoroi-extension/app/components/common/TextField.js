@@ -1,12 +1,13 @@
 /* eslint-disable no-nested-ternary */
 // @flow
+import React from 'react';
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
 import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
 import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inline.svg';
 import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
-import React from 'react';
+import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
 
 type Props = {|
   error?: boolean | string,
@@ -23,6 +24,7 @@ type Props = {|
   inputRef?: ?{| current: null | ElementRef<'input'> |},
   revamp?: boolean,
   placeholder?: string,
+  QRHandler?: Function,
 |};
 
 function TextField({
@@ -39,6 +41,7 @@ function TextField({
   onChange,
   autoFocus,
   revamp,
+  QRHandler,
   placeholder,
   ...props
 }: Props): Node {
@@ -90,13 +93,27 @@ function TextField({
                 {showPassword ? <EyeIcon /> : <CloseEyeIcon />}
               </IconButton>
             </InputAdornment>
+          ) : QRHandler ? (
+            <InputAdornment
+              position="end"
+              sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
+            >
+              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              <IconButton
+                aria-label="QR Code Scanner"
+                onClick={QRHandler}
+                edge="end"
+              >
+                <QRLogo />
+              </IconButton>
+            </InputAdornment>
           ) : (
             <InputAdornment position="end">
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
             </InputAdornment>
           ),
           disableUnderline: revamp,
-          placeholder: placeholder != null ? placeholder : (Boolean(revamp) ? '0.0' : ''),
+          placeholder: placeholder != null ? placeholder : '',
       }}
       {...props}
     />
@@ -115,6 +132,7 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
   revamp: false,
+  QRHandler: null,
   placeholder: undefined,
 };
 
