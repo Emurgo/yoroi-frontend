@@ -563,7 +563,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.metadata = undefined;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
-    // Todo: remove it
     this.maxSendableAmount.cancel()
     this.maxSendableAmount.reset();
     this.plannedTx = null;
