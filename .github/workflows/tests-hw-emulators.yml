@@ -96,10 +96,10 @@ jobs:
     steps:
       - name: Install Firefox Developer Edition
         run: |
-        wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
-        sudo rm -rf /opt/firefoxdev
-        sudo mv /opt/firefox /opt/firefoxdev
-        export FIREFOX_DEV=/opt/firefoxdev/firefox
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          export FIREFOX_DEV=/opt/firefoxdev/firefox
 
   setup_Chrome_Latest:
     needs: [setup_trezor_usr_env, setup_environment]
