@@ -32,7 +32,6 @@ import { Ports } from '../../scripts/connections';
 
 import { getLogDate } from '../support/helpers/helpers';
 import { testRunsLogsDir } from '../support/helpers/common-constants';
-import { AccountIdentifier } from '@emurgo/js-chain-libs';
 
 const simpleNodeLogger = require('simple-node-logger');
 
@@ -68,7 +67,7 @@ function _defaultSignedTransaction(
 const expectedTxBase64 = [];
 
 export function setExpectedTx(signedTx: void | string): void {
-  logger.info(`mockCardanoServer: Set expected transaction ${signedTx}`);
+  logger.info(`mockCardanoServer: Set expected transaction`);
   if (signedTx == null) {
     // remove all elements from the array
     expectedTxBase64.splice(0, expectedTxBase64.length);
@@ -159,9 +158,9 @@ export function getMockServer(settings: {
         req: { body: BestBlockRequest, ... },
         res: { send(arg: BestBlockResponse): any, ... }
       ): Promise<void> => {
-        const bestBlock = await mockImporter.getBestBlock(req.body);
         logger.info(`mockCardanoServer: /api/v2/getblock-> request`);
         logger.info(JSON.stringify(req.body));
+        const bestBlock = await mockImporter.getBestBlock(req.body);
         logger.info(`mockCardanoServer: /api/v2/getblock -> response`);
         logger.info(JSON.stringify(bestBlock));
         res.send(bestBlock);
@@ -180,6 +179,7 @@ export function getMockServer(settings: {
       ): void => {
         // note: don't use this in practice because ttl makes the tx hash computer-time-sensitive
         if (expectedTxBase64.length !== 0 && expectedTxBase64[0] !== req.body.signedTx) {
+          logger.error(`mockCardanoServer: Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`);
           throw new Error(
             `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           );

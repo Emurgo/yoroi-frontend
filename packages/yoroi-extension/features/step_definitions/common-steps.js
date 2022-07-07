@@ -132,8 +132,8 @@ After(async function (scenario) {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
     if (this.getBrowser !== 'firefox') {
-      await getConsoleLogs(this.driver, 'failedStep');
-      await getDriverLogs(this.driver, 'failedStep');
+      await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
+      await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
     }
   }
   await this.driver.quit();
@@ -157,6 +157,11 @@ const writeFile = promisify(fs.writeFile);
 // Steps that contain these patterns will trigger screenshots:
 const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
 
+async function getBrowserName(driver): Promise<string> {
+  const cap = await driver.getCapabilities();
+  return cap.getBrowserName();
+}
+
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
   if (!pattern) {
@@ -171,11 +176,11 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);
-      const cap = await this.driver.getCapabilities();
-      const browserName = cap.getBrowserName();
+
+      const browserName = await getBrowserName(this.driver);
       if (browserName !== 'firefox') {
-        await getConsoleLogs(this.driver, 'failedStep');
-        await getDriverLogs(this.driver, 'failedStep');
+        await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
+        await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
       }
     }
 
@@ -185,8 +190,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
 });
 
 async function createDirInTestRunsData(driver, subdirectoryName) {
-  const cap = await driver.getCapabilities();
-  const browserName = cap.getBrowserName();
+  const browserName = await getBrowserName(driver);
   const dir = `${testRunsDataDir}/${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -210,18 +214,24 @@ async function takePageSnapshot(driver, name) {
   await fsAsync.writeFile(htmlLogPath, html);
 }
 
-async function getDriverLogs(driver, name) {
-  const dir = await createDirInTestRunsData(driver, 'driverLogs');
-  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-driver-log.json`;
-  const logEntries = await driver.manage().logs().get(logging.Type.DRIVER);
-  const jsonLogs = logEntries.map(l => l.toJSON());
-  await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
-}
+/**
+ * Creates a new log file when a new test starts.
+ *
+ * @param driver The driver.
+ * @param name The name of the test.
+ * @param loggingType The logging type required. Select between logging.Type.DRIVER and logging.Type.BROWSER.
+ */
+async function getLogs(driver, name, loggingType) {
+  let log = '';
+  if (loggingType === logging.Type.DRIVER) {
+    log = 'driver';
+  } else if (loggingType === logging.Type.BROWSER) {
+    log = 'console';
+  }
 
-async function getConsoleLogs(driver, name) {
-  const dir = await createDirInTestRunsData(driver, 'consoleLogs');
-  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
-  const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
+  const dir = await createDirInTestRunsData(driver, `${log}Logs`);
+  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-${log}-log.json`;
+  const logEntries = await driver.manage().logs().get(loggingType);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
@@ -375,6 +385,10 @@ async function acceptUriPrompt(world: any) {
 Given(/^I have opened the extension$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the extension`);
   await this.driver.get(this.getExtensionUrl());
+  const browserName = await getBrowserName(this.driver);
+  if (browserName === 'firefox') {
+    await this.driver.manage().window().maximize();
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
@@ -430,7 +444,7 @@ async function setLedgerWallet(client, serial) {
   }, serial);
 }
 Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
-  this.webDriverLogger.info(`Step: I connected Ledger device ${deviceId}`);
+  this.webDriverLogger.info(`Step: I connected Ledger device ${serial}`);
   await setLedgerWallet(this, serial);
 });
 
