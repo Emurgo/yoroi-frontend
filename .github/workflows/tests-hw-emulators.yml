@@ -118,16 +118,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           working-directory: ./trezor-user-env
-          run: ./run_bg.sh
-
-      - name: Sleep for 2 minutes
-        run: sleep 120
-
-      - name: Run tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          working-directory: ./packages/yoroi-extension
-          run: npm run test:run:e2e:trezor:chrome
+          run: /bin/bash -c "./run_bg.sh" && "sleep 120" && "cd ../packages/yoroi-extension" && "npm run test:run:e2e:trezor:chrome"
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
