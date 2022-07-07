@@ -84,8 +84,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           working-directory: ./trezor-user-env/
-          run: |
-            ./run.sh --no-regtest
+          run: /bin/bash -c "./run.sh --no-regtest" &
 
   setup_Firefox_Dev:
     needs: [setup_environment]
