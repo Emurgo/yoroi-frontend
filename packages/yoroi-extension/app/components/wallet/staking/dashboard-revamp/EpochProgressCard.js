@@ -27,7 +27,7 @@ export function EpochProgressCard({
           <Title label="Current Epoch" value={currentEpoch} />
           <Stack direction="row" spacing={3} mt="50px" justifyContent="space-between">
             <LabelWithValue label="Epoch started at" value={startEpochDate} />
-            <LabelWithValue label="Epoch end at" value={endEpochDate} />
+            <LabelWithValue label="Epoch ends at" value={endEpochDate} />
           </Stack>
         </Stack>
       </Stack>
