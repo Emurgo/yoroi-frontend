@@ -117,9 +117,10 @@ jobs:
         uses: BerniWittmann/background-server-action@v1.0.4
         with:
           command: cd ../packages/yoroi-extension, xvfb-run --auto-servernum npm run test:run:e2e:trezor:firefox
-          build: echo Just a plug
+          build: cd trezor-user-env/
           start: xvfb-run --auto-servernum ./run.sh --no-regtest
           wait-on: 'http://localhost:9002'
+          wait-on-timeout: 180
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
