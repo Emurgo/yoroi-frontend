@@ -94,13 +94,12 @@ jobs:
 
     steps:
       - name: Clone the trezor-usr-env
-        uses: actions/checkout@v3
-        with:
-          repository: trezor/trezor-user-env
-          path: trezor-user-env
+        run: |
+          cd ..
+          git clone https://github.com/trezor/trezor-user-env.git
 
       - name: Edit the file run.sh
-        working-directory: ./trezor-user-env
+        working-directory: ../trezor-user-env
         run: |
           sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
           rm -rf run.sh
@@ -108,7 +107,7 @@ jobs:
           chmod +x run.sh
 
       - name: Run the trezor user environment
-        working-directory: ./trezor-user-env
+        working-directory: ../trezor-user-env
         run: /bin/bash -c "xvfb-run --auto-servernum ./run.sh --no-regtest" &
 
       - name: Sleep for 2 minute
