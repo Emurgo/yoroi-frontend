@@ -100,11 +100,6 @@ jobs:
           repository: trezor/trezor-user-env
           path: trezor-user-env
 
-      - name: Debug info
-        run: |
-          echo $(pwd)
-          echo $(ls)
-
       - name: Edit the file run.sh
         working-directory: ./trezor-user-env
         run: |
@@ -113,14 +108,16 @@ jobs:
           mv run_tmp.sh run.sh
           chmod +x run.sh
 
-      - name: Run the trezor user environment and tests
-        uses: BerniWittmann/background-server-action@v1.0.4
-        with:
-          build: echo Just a plug
-          command: /bin/bash -c "cd ../packages/yoroi-extension", xvfb-run --auto-servernum npm run test:run:e2e:trezor:firefox
-          start: /bin/bash -c "cd ./trezor-user-env", xvfb-run --auto-servernum ./run.sh --no-regtest
-          wait-on: 'http://localhost:9002'
-          wait-on-timeout: 180
+      - name: Run the trezor user environment
+        working-directory: ./trezor-user-env
+        run: /bin/bash -c "xvfb-run --auto-servernum ./run.sh --no-regtest" &
+
+      - name: Sleep for 2 minute
+        run: sleep 120
+
+      - name: Run tests
+        working-directory: ./packages/yoroi-extension
+        run: xvfb-run --auto-servernum npm run test:run:e2e:trezor:chrome
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
