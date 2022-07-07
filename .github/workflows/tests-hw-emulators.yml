@@ -65,27 +65,6 @@ jobs:
           mkdir reports
           touch ./reports/cucumberReports.json
 
-  setup_trezor_usr_env:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone the trezor-usr-env
-        run: git clone https://github.com/trezor/trezor-user-env.git
-
-      - name: Edit the file run.sh
-        run: |
-          cd trezor-user-env/
-          sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
-          rm -rf run.sh
-          mv run_tmp.sh run.sh
-          chmod +x run.sh
-          cd ..
-
-      - name: Run the trezor user environment
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          working-directory: ./trezor-user-env/
-          run: /bin/bash -c "./run.sh --no-regtest" &
-
   setup_Firefox_Dev:
     needs: [setup_environment]
     runs-on: ubuntu-latest
@@ -114,11 +93,23 @@ jobs:
     needs: [setup_Chrome_Latest, setup_trezor_usr_env]
 
     steps:
-      - name: Run tests with the trezor emulator
+      - name: Clone the trezor-usr-env
+        run: git clone https://github.com/trezor/trezor-user-env.git
+      - name: Edit the file run.sh
+        run: |
+          cd trezor-user-env/
+          sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
+          rm -rf run.sh
+          mv run_tmp.sh run.sh
+          chmod +x run.sh
+          cd ..
+
+      - name: Run the trezor user environment and tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          working-directory: ./packages/yoroi-extension
-          run: npm run test:run:e2e:trezor:chrome
+          run: |
+            cd trezor-user-env
+            /bin/bash -c "./run.sh --no-regtest" & "sleep 120" && "cd ../packages/yoroi-extension" && "npm run test:run:e2e:trezor:chrome"
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
