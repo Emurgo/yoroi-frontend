@@ -85,8 +85,7 @@ jobs:
         with:
           working-directory: ./trezor-user-env/
           run: |
-            ./run.sh --no-regtest &
-            sleep 180
+            ./run.sh --no-regtest
 
   setup_Firefox_Dev:
     needs: [setup_environment]
