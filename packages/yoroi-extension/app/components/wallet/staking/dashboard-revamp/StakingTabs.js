@@ -5,8 +5,8 @@ import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { IconButton, Tab, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import { ReactComponent as InfoIconSVG }  from '../../../../assets/images/info-icon.inline.svg';
-import { ReactComponent as CloseIcon }  from '../../../../assets/images/forms/close.inline.svg';
+import { ReactComponent as InfoIconSVG } from '../../../../assets/images/info-icon.inline.svg';
+import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close.inline.svg';
 import DelegatedStakePoolCard from './DelegatedStakePoolCard';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -15,6 +15,7 @@ import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetche
 import RewardGraph from './RewardsGraph';
 import type { GraphData } from '../dashboard/StakingDashboard';
 import { EpochProgressCard } from './EpochProgressCard';
+import moment from 'moment';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -26,7 +27,7 @@ type Props = {|
   |},
   +undelegate: void | (void => Promise<void>),
   +epochLength: ?number,
-  +graphData: GraphData
+  +graphData: GraphData,
 |};
 
 type Intl = {|
@@ -55,8 +56,8 @@ function StakingTabs({
   undelegate,
   epochProgress,
   intl,
-  graphData
- }: Props & Intl): Node {
+  graphData,
+}: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -71,9 +72,9 @@ function StakingTabs({
     return epochLength === 1
       ? intl.formatMessage(messages.singleEpochAxisLabel)
       : intl.formatMessage(messages.epochAxisLabel, { epochLength });
-  }
+  };
 
-  const { hideYAxis, items } = graphData.rewardsGraphData
+  const { hideYAxis, items } = graphData.rewardsGraphData;
   const tabs = [
     {
       id: 0,
@@ -110,9 +111,8 @@ function StakingTabs({
       disabled: false,
       component: (
         <EpochProgressCard
-          // TODO: Remove placeholders
           percentage={epochProgress.percentage}
-          days="2.5"
+          days={moment(epochProgress.endEpochDate).diff(moment(), 'days')}
           currentEpoch={epochProgress.currentEpoch}
           startEpochDate={epochProgress.startEpochDate}
           endEpochDate={epochProgress.endEpochDate}

@@ -11,7 +11,6 @@ type Props = {|
   +endEpochDate: string,
 |};
 
-// TODO: Remove placeholders
 export function EpochProgressCard({
   percentage,
   days,
