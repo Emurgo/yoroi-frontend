@@ -83,10 +83,9 @@ jobs:
       - name: Run the trezor user environment
         uses: GabrielBB/xvfb-action@v1
         with:
+          working-directory: ./trezor-user-env/
           run: |
-            cd trezor-user-env/
             ./run.sh --no-regtest &
-            cd ..
             sleep 180
 
   setup_Firefox_Dev:
