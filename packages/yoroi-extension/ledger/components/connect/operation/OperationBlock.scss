@@ -1,0 +1,15 @@
+.component {
+  width: 100%;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  .performActionText {
+    margin-bottom: 30px;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    color: var(--text-color-4);
+  }  
+}
