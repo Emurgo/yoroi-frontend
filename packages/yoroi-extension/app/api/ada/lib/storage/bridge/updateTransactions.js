@@ -1957,7 +1957,7 @@ export async function getTokenMintMetadata(
       const assetName = parts[1];
       const policyId = parts[0];
       return {
-        name: Buffer.from(assetName, 'hex').toString(),
+        nameHex: assetName,
         policy: policyId
       };
     })
