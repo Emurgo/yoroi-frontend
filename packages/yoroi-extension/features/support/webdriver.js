@@ -170,7 +170,6 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.getText = (locator: LocatorObject) => this.getElementBy(locator).getText();
 
-  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
@@ -181,7 +180,6 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   // Returns a promise that resolves to the element
-  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.waitForElement = this.driver.waitForElement = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be visible`);
     await this.waitForElementLocated(locator);
@@ -199,7 +197,6 @@ function CustomWorld(cmdInput: WorldInput) {
     return element;
   };
 
-  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (
     locator: LocatorObject
   ) => {
