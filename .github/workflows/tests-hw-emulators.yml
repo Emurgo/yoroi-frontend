@@ -66,6 +66,7 @@ jobs:
           touch ./reports/cucumberReports.json
 
   setup_Firefox_Dev:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-check'))
     needs: [setup_environment]
     runs-on: ubuntu-latest
     steps:
@@ -77,6 +78,7 @@ jobs:
           export FIREFOX_DEV=/opt/firefoxdev/firefox
 
   setup_Chrome_Latest:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-check'))
     needs: [setup_environment]
     runs-on: ubuntu-latest
     steps:
@@ -94,28 +96,38 @@ jobs:
     steps:
       - name: Clone the trezor-usr-env
         run: git clone https://github.com/trezor/trezor-user-env.git
+
       - name: Edit the file run.sh
+        working-directory: ./trezor-user-env
         run: |
-          echo $(pwd)
-          echo $(ls)
-          cd trezor-user-env/
           sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
           rm -rf run.sh
           mv run_tmp.sh run.sh
           chmod +x run.sh
+
+      - name: Create dummy file to run in background
+        working-directory: ./trezor-user-env
+        run: |
           cat <<EOF> run_bg.sh
           #!/usr/bin/env bash
           ./run.sh --no-regtest &
           EOF
           chmod +x run_bg.sh
-          cd ..
 
       - name: Run the trezor user environment and tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: |
-            /bin/bash -c "echo $(pwd)"
-            /bin/bash -c "cd trezor-user-env/" && "./run_bg.sh" && "sleep 120" && "cd ../packages/yoroi-extension" && "npm run test:run:e2e:trezor:chrome"
+          working-directory: ./trezor-user-env
+          run: ./run_bg.sh
+
+      - name: Sleep for 2 minutes
+        run: sleep 120
+
+      - name: Run tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          working-directory: ./packages/yoroi-extension
+          run: npm run test:run:e2e:trezor:chrome
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
