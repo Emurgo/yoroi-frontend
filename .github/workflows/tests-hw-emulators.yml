@@ -95,7 +95,10 @@ jobs:
 
     steps:
       - name: Clone the trezor-usr-env
-        run: git clone https://github.com/trezor/trezor-user-env.git
+        uses: actions/checkout@v3
+        with:
+          repository: trezor/trezor-user-env
+          path: trezor-user-env
 
       - name: Debug info
         run: |
