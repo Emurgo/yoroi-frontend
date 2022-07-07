@@ -1,0 +1,16 @@
+.component {
+  background: linear-gradient(22.58deg, #244ABF 0%, #4760FF 100%);
+  display: inline-flex;
+  width: 100%;
+  min-height: 54px;
+  .title {
+    margin: auto;
+    text-transform: uppercase;
+    word-spacing: 2px;
+    color: var(--color-white);
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
+    line-height: 20px;
+  }
+}

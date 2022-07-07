@@ -1,12 +1,7 @@
 // @flow
 import { observable, action, toJS } from 'mobx';
 import Store from '../base/Store';
-
-import {
-  prepareLedgerConnect,
-} from '../../utils/hwConnectHandler';
-
-import LedgerConnect from '@emurgo/ledger-connect-handler';
+import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { wrapWithFrame } from '../lib/TrezorWrapper';
 
 import LocalizableError from '../../i18n/LocalizableError';
@@ -127,9 +122,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     try {
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/ledgerjs5/#/v5',
       });
-      await prepareLedgerConnect(this.ledgerConnect);
 
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
 

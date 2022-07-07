@@ -83,6 +83,12 @@ import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypt
 import { cip8Sign } from '../../../app/ergo-connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/ergo-connector/stores/ConnectorStore';
+import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
+import {
+  getAllSchemaTables,
+  raii,
+} from '../../../app/api/ada/lib/storage/database/utils';
+import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -1469,4 +1475,22 @@ export async function connectorSignData(
     signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
     key: Buffer.from(key.to_bytes()).toString('hex'),
   };
+}
+
+export function getTokenMetadataFromIds(
+  tokenIds: Array<string>,
+  publicDeriver: PublicDeriver<>,
+): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+  const networkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
+  const db = publicDeriver.getDb();
+  return raii(
+    db,
+    getAllSchemaTables(db, GetToken),
+    async (dbTx) => {
+      return (await GetToken.fromIdentifier(
+        db, dbTx,
+        tokenIds
+      )).filter(row => row.NetworkId === networkId);
+    }
+  );
 }
