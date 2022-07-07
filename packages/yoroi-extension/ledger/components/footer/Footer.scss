@@ -1,0 +1,15 @@
+.component {
+  width: 100%;
+  height: 40px;
+  margin-top: -40px;
+  display: flex;
+  justify-content: flex-end;
+  .wrapper {
+    margin-right: 20px;
+    .textLine {
+      color: var(--text-color-1);
+      font-size: 12px;
+      line-height: 14px;    
+    }    
+  }
+}
