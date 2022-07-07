@@ -117,6 +117,7 @@ jobs:
         uses: BerniWittmann/background-server-action@v1.0.4
         with:
           command: cd ../packages/yoroi-extension, xvfb-run --auto-servernum npm run test:run:e2e:trezor:firefox
+          build: echo Just a plug
           start: xvfb-run --auto-servernum ./run.sh --no-regtest
           wait-on: 'http://localhost:9002'
 
