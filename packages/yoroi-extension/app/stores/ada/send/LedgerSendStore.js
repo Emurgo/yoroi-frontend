@@ -1,7 +1,6 @@
 // @flow
 import { action, observable } from 'mobx';
 
-import LedgerConnect from '@emurgo/ledger-connect-handler';
 import { TxAuxiliaryDataSupplementType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -30,9 +29,7 @@ import {
   buildSignedTransaction,
 } from '../../../api/ada/transactions/shelley/ledgerTx';
 
-import {
-  prepareLedgerConnect,
-} from '../../../utils/hwConnectHandler';
+import { LedgerConnect } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asGetPublicKey, asHasLevels, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -208,7 +205,6 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/ledgerjs5/#/v5',
       });
 
       const network = request.publicDeriver.getParent().getNetworkInfo();
@@ -219,7 +215,6 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         addressingMap: request.addressingMap,
       });
 
-      await prepareLedgerConnect(ledgerConnect);
       const ledgerSignTxResp: LedgerSignTxResponse =
         await ledgerConnect.signTransaction({
           serial: request.expectedSerial,
