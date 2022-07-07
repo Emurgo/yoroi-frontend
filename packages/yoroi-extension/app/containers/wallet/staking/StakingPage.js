@@ -240,6 +240,10 @@ class StakingPage extends Component<AllProps> {
         : `${beforeDecimalRewards}${afterDecimalRewards} ${truncateToken(getTokenName(tokenInfo))}`;
     };
 
+    const getCurrency = tokenEntry => {
+      return getTokenName(tokenEntry);
+    };
+
     for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
@@ -251,16 +255,18 @@ class StakingPage extends Component<AllProps> {
           primary: getNormalized(nextReward.getDefaultEntry()),
           poolName: getMiniPoolInfo(poolHash),
           poolId: poolHash,
+          currency: getCurrency(nextReward.getDefaultEntry()),
           date: getDateFromEpoch(i),
         });
         historyIterator++;
       } else {
         perEpochRewards.push({
           name: i,
-          primary: 0,
-          poolName: '',
+          primary: 2,
+          poolName: 'Test',
           poolId: '',
-          date: '',
+          currency: 'ADA',
+          date: 'Jul 7, 2022 1:06 PM',
         });
       }
     }

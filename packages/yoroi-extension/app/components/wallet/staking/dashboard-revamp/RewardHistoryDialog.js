@@ -10,12 +10,14 @@ import { injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Box } from '@mui/system';
 import { RewardHistoryItem } from './RewardHistoryTab';
-// import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { groupByPoolName } from '../utils';
+import styles from './RewardHistoryDialog.scss';
+import string from 'lodash/string';
 
 export type GraphRewardData = {|
   error: ?LocalizableError,
@@ -24,6 +26,7 @@ export type GraphRewardData = {|
     primary: number,
     poolName: string,
     poolId: string,
+    currency: string,
     date: string,
   |}>,
 |};
@@ -48,15 +51,16 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
       closeOnOverlayClick={false}
       closeButton={<DialogCloseButton onClose={onClose} />}
       onClose={onClose}
+      className={styles.dialog}
     >
-      <Typography color="var(--yoroi-palette-gray-600)">
-        {intl.formatMessage(globalMessages.rewardsLabel)} ({rewardList.length})
+      <Typography mb="24px" variant="body1" fontWeight={500}>
+        {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
       </Typography>
       <Box>
         {graphData.error && (
           <div>
             <center>
-              {/* <InvalidURIImg /> */}
+              <InvalidURIImg />
             </center>
             <ErrorBlock error={graphData.error} />
           </div>
@@ -80,6 +84,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
                 type: 'Received',
                 date: item.date,
                 balance: item.primary,
+                currency: item.currency,
               }))}
             />
           ))
