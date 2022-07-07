@@ -90,27 +90,32 @@ jobs:
   Trezor_Model_T_Chrome:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
     runs-on: ubuntu-latest
-    needs: [setup_Chrome_Latest]
 
     steps:
       - name: Clone the trezor-usr-env
         run: git clone https://github.com/trezor/trezor-user-env.git
       - name: Edit the file run.sh
         run: |
+          echo $(pwd)
+          echo $(ls)
           cd trezor-user-env/
           sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
           rm -rf run.sh
           mv run_tmp.sh run.sh
           chmod +x run.sh
+          cat <<EOF> run_bg.sh
+          #!/usr/bin/env bash
+          ./run.sh --no-regtest &
+          EOF
+          chmod +x run_bg.sh
           cd ..
 
       - name: Run the trezor user environment and tests
         uses: GabrielBB/xvfb-action@v1
         with:
           run: |
-            echo $(pwd)
-            cd trezor-user-env
-            /bin/bash -c "./run.sh --no-regtest" & "sleep 120" && "cd ../packages/yoroi-extension" && "npm run test:run:e2e:trezor:chrome"
+            /bin/bash -c "echo $(pwd)"
+            /bin/bash -c "cd trezor-user-env/" && "./run_bg.sh" && "sleep 120" && "cd ../packages/yoroi-extension" && "npm run test:run:e2e:trezor:chrome"
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
