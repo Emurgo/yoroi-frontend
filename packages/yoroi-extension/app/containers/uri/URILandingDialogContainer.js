@@ -96,7 +96,7 @@ export default class URILandingDialogContainer extends Component<Props> {
   @computed get generated(): {|
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       loading: {| uriParams: ?UriParams |},
       explorers: {|

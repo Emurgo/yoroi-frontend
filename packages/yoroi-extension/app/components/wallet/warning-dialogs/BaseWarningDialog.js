@@ -40,7 +40,7 @@ export default class BaseWarningDialog extends Component<Props> {
     const contactSupportLink = (
       <a
         className={styles.link}
-        href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
+        href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'
         onClick={event => this.props.onExternalLinkClick(event)}
       >
         {intl.formatMessage(globalMessages.contactSupport)}

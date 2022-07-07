@@ -29,7 +29,7 @@
   }
 }
 
-:global(.YoroiModern):not(:global(.YoroiShelley)) .component {
+:global(.YoroiModern):not(:global(.YoroiShelley)), :global(.YoroiRevamp) .component {
   .successImg {
     background-image: url('../../assets/images/transfer-success.inline.svg');
     background-size: auto;

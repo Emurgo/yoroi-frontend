@@ -20,7 +20,7 @@ import {
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../../i18n/global-messages';
-import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg }  from '../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';

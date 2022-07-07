@@ -2,8 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import NoticeBoardIcon from '../../assets/images/top-bar/notification.inline.svg';
-import { Box, IconButton } from '@mui/material';
+import { Box } from '@mui/material';
 
 type Props = {|
   +children?: ?Node,
@@ -45,7 +44,7 @@ class NavBarRevamp extends Component<Props> {
             maxWidth: 'calc(1366px - 90px)',
             position: 'relative',
             zIndex: 100,
-            height: menu != null ? '115px' : '90px',
+            height: menu != null ? '125px' : '90px',
             margin: 'auto',
           }}
         >
@@ -72,20 +71,13 @@ class NavBarRevamp extends Component<Props> {
                 sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
               >
                 {children}
+                {this.props.buyButton != null && (
+                  <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
+                )}
                 {this.props.walletDetails != null && (
                   <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
                     {walletDetails}
                   </Box>
-                )}
-                <IconButton
-                  sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '15px' }}
-                  type="button"
-                  onClick={this.props.goToNotifications}
-                >
-                  <NoticeBoardIcon />
-                </IconButton>
-                {this.props.buyButton != null && (
-                  <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
                 )}
               </Box>
             </Box>

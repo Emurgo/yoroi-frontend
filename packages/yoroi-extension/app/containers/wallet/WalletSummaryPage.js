@@ -10,7 +10,7 @@ import NotificationMessage from '../../components/widgets/NotificationMessage';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
-import successIcon from '../../assets/images/success-small.inline.svg';
+import { ReactComponent as successIcon }  from '../../assets/images/success-small.inline.svg';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
@@ -186,7 +186,7 @@ class WalletSummaryPage extends Component<AllProps> {
               })
             }
             unitOfAccountSetting={profile.unitOfAccount}
-            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
             getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               publicDeriver,
@@ -272,6 +272,7 @@ class WalletSummaryPage extends Component<AllProps> {
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
         />
 
         {walletTransactions}
@@ -385,6 +386,7 @@ class WalletSummaryPage extends Component<AllProps> {
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
         />
 
         {walletTransactions}
@@ -596,7 +598,7 @@ class WalletSummaryPage extends Component<AllProps> {
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
       |},
       memos: {|
         error: ?LocalizableError,
@@ -686,7 +688,7 @@ class WalletSummaryPage extends Component<AllProps> {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+          getHistoricalPrice: stores.coinPriceStore.getHistoricalPrice,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

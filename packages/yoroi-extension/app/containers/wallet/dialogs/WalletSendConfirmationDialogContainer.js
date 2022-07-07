@@ -117,14 +117,15 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         closeActiveDialog: {|
           trigger: (params: void) => void
         |}
-      |}
+      |},
+      ada: any // not used here
     |},
     stores: {|
       coinPriceStore: {|
         getCurrentPrice: (
           from: string,
           to: string
-        ) => ?number,
+        ) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -142,7 +143,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           reset: () => void
         |},
         selected: null | PublicDeriver<>
-      |}
+      |},
+      ledgerSend: any, // not used here
+      trezorSend: any, // not used here
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -174,6 +177,8 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             error: stores.wallets.sendMoneyRequest.error,
           },
         },
+        ledgerSend: null,
+        trezorSend: null,
       },
       actions: {
         dialogs: {
@@ -186,6 +191,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             trigger: actions.wallets.sendMoney.trigger,
           },
         },
+        ada: null,
       },
     });
   }

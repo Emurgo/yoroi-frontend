@@ -8,9 +8,25 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  token: {
+    id: 'global.labels.token',
+    defaultMessage: '!!!Token',
+  },
+  nfts: {
+    id: 'global.labels.nft',
+    defaultMessage: '!!!NFTs',
+  },
+  receiverLabel: {
+    id: 'wallet.send.form.receiver.label',
+    defaultMessage: '!!!Receiver',
+  },
   standardWallet: {
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',
+  },
+  transactionFee: {
+    id: 'wallet.send.preview.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
   },
   paperWallet: {
     id: 'wallet.nav.type.paper',
@@ -30,19 +46,19 @@ const globalMessages: * = defineMessages({
   },
   invalidWalletName: {
     id: 'global.errors.invalidWalletName',
-    defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
+    defaultMessage: '!!!Wallet name requires at least 1 and no more than 40 characters.',
   },
   invalidWalletPassword: {
     id: 'global.errors.invalidWalletPassword',
-    defaultMessage: '!!!Invalid password',
+    defaultMessage: '!!!Password requires at least 10 characters.',
   },
   invalidPaperPassword: {
     id: 'global.errors.invalidPaperPassword',
-    defaultMessage: '!!!Invalid Paper Wallet password',
+    defaultMessage: '!!!Password requires at least 10 characters.',
   },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
-    defaultMessage: '!!!Doesn\'t match.',
+    defaultMessage: '!!!Passwords do not match. Please retype.',
   },
   errorLabel: {
     id: 'global.labels.error',
@@ -83,6 +99,10 @@ const globalMessages: * = defineMessages({
   amount: {
     id: 'global.labels.amount',
     defaultMessage: '!!!Amount',
+  },
+  minAda: {
+    id: 'global.labels.minAda',
+    defaultMessage: '!!!Min-ADA',
   },
   id: {
     id: 'global.labels.id',
@@ -330,7 +350,7 @@ const globalMessages: * = defineMessages({
   },
   noTransactionsFound: {
     id: 'wallet.summary.no.transaction',
-    defaultMessage: '!!!No transactions found',
+    defaultMessage: '!!!No transaction history.',
   },
   assetSelect: {
     id: 'global.selectAsset.labael',
@@ -475,7 +495,7 @@ const globalMessages: * = defineMessages({
   },
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
-    defaultMessage: '!!!Cannot send a transaction while there is a pending one',
+    defaultMessage: '!!!Unable to process. Please retry after the previous transaction has been completed.',
   },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
@@ -491,11 +511,11 @@ const globalMessages: * = defineMessages({
   },
   recoveryPhraseNoResults: {
     id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
+    defaultMessage: '!!!Not found',
   },
   invalidRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
+    defaultMessage: '!!!Invalid recovery phrase. Please retype.',
   },
   totalRewardsLabel: {
     id: 'wallet.dashboard.summary.rewardsTitle',
@@ -874,11 +894,11 @@ const globalMessages: * = defineMessages({
   },
   pinDoesNotMatch: {
     id: 'global.errors.pinDoesNotMatch',
-    defaultMessage: '!!!Pin Does Not Match',
+    defaultMessage: '!!!PIN codes do not match. Please retype.',
   },
   invalidPin: {
     id: 'global.errors.invalidPin',
-    defaultMessage: '!!!Invalid Pin',
+    defaultMessage: '!!!Invalid PIN. Please retype.',
   },
   buyAda: {
     id: 'button.buyAda',
@@ -891,6 +911,14 @@ const globalMessages: * = defineMessages({
   txConfirmationTrezorTLine2: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.2',
     defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
+  },
+  syncing: {
+    id: 'wallet.syncing',
+    defaultMessage: '!!!Syncing...',
+  },
+  loading: {
+    id: 'wallet.loading',
+    defaultMessage: '!!!Loading...',
   },
 });
 export default globalMessages;
@@ -915,6 +943,10 @@ export const memoMessages: * = defineMessages({
   optionalMemo: {
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
+  },
+  memoWarning: {
+    id: 'wallet.send.form.memoWarning',
+    defaultMessage: '!!!Memos are stored localy only'
   }
 });
 export const connectorMessages: * = defineMessages({

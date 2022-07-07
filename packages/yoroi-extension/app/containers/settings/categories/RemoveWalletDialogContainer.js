@@ -15,6 +15,8 @@ import DangerousActionDialog from '../../../components/widgets/DangerousActionDi
 import LocalizableError from '../../../i18n/LocalizableError';
 import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
+import { getWalletType } from '../../../stores/toplevel/WalletSettingsStore';
+import type { WalletsNavigation } from '../../../api/localStorage'
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
@@ -61,16 +63,19 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
     const settingsActions = this.generated.actions.walletSettings;
 
     const selectedWalletId = this.props.publicDeriver?.getPublicDeriverId();
-    const walletIdList = this.generated.stores.profile.currentSortedWallets;
-
-    const newSortedWalletIds =
-      walletIdList !== null &&
-      walletIdList !== undefined &&
-      walletIdList.filter(walletId => walletId !== selectedWalletId);
-
-    await this.generated.actions.profile.updateSortedWalletList.trigger({
-      sortedWallets: newSortedWalletIds || [],
-    });
+    const walletsNavigation = this.generated.stores.profile.walletsNavigation;
+    if (this.props.publicDeriver) {
+      const walletType = getWalletType(this.props.publicDeriver)
+      const newWalletsNavigation = {
+        ...walletsNavigation,
+        // $FlowFixMe[invalid-computed-prop]
+        [walletType]: walletsNavigation[walletType].filter(
+          walletId => walletId !== selectedWalletId
+        ),
+        quickAccess: walletsNavigation.quickAccess.filter(walletId => walletId !== selectedWalletId)
+      }
+      await this.generated.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+    }
 
     this.props.publicDeriver &&
       settingsActions.removeWallet.trigger({
@@ -140,7 +145,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
     actions: {|
       profile: {|
         updateSortedWalletList: {|
-          trigger: ({| sortedWallets: Array<number> |}) => Promise<void>,
+          trigger: WalletsNavigation => Promise<void>,
         |},
       |},
       dialogs: {|
@@ -158,7 +163,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
     |},
     stores: {|
       profile: {|
-        currentSortedWallets: ?Array<number>,
+        walletsNavigation: WalletsNavigation,
       |},
       walletSettings: {|
         removeWalletRequest: {|
@@ -187,7 +192,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
           publicDerivers: stores.wallets.publicDerivers,
         },
         profile: {
-          currentSortedWallets: stores.profile.currentSortedWallets,
+          walletsNavigation: stores.profile.walletsNavigation,
         },
         walletSettings: {
           removeWalletRequest: {

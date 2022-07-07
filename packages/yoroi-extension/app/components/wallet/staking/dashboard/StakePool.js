@@ -17,7 +17,7 @@ import styles from './StakePool.scss';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { ReputationObject } from '../../../../api/jormungandr/lib/state-fetch/types';
 import globalMessages from '../../../../i18n/global-messages';
-import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
+import { ReactComponent as WarningIcon }  from '../../../../assets/images/attention-modern.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateStakePool } from '../../../../utils/formatters';
 

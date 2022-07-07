@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import ErrorInfo from '../../assets/images/error-info.inline.svg';
+import { ReactComponent as ErrorInfo }  from '../../assets/images/error-info.inline.svg';
 import styles from './UnavailableDialog.scss';
 import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout';
 

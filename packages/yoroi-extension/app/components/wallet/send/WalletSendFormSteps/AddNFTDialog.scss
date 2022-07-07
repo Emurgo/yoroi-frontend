@@ -1,0 +1,132 @@
+.component {
+    min-height: 485px;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0px 30px;
+
+    .search {
+        border-radius: 8px;
+        background-color: #F0F3F5;
+        display: flex;
+        align-items: center;
+        padding: 0px 20px;
+        margin-bottom: 20px;
+
+        .searchInput {
+            width: 100%;
+            background-color: inherit;
+            border: none;
+            padding: 12px 0px;
+            margin-left: 12px;
+        }
+
+        .searchInput:focus {
+            outline: none;
+        }
+
+        .searchInput::placeholder {
+            color: #A7AFC0;
+            font-size: 14px;
+            letter-spacing: 0;
+            line-height: 22px;
+        }
+
+    }
+
+    .minAda {
+        color: #242838;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+        text-align: center;
+        margin-top: 24px;
+    }
+
+    .noAssetFound {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+
+        img {
+            display: inline-block;
+            width: 130px;
+            height: 100px;
+            margin-bottom: 24px;
+        }
+
+        .text {
+            color: #242838;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0;
+            line-height: 26px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+    }
+
+    .nftsGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 25px;
+        margin-bottom: 20px;
+        height: 360px;
+        overflow-y: scroll;
+        margin-top: 20px;
+
+        .nftCard {
+            cursor: pointer;
+            padding: 10.5px;
+            width: 180px;
+            height: 250px;
+            overflow: hidden;
+            border: 1px solid var(--yoroi-palette-gray-50);
+            border-radius: 8px;
+            background-color: #FFFFFF;
+            img, svg {
+                display: inline-block;
+                width: 100%;
+                height: 190px;
+                width: 160px;
+                border-radius: 8px;
+            }
+
+            .nftName {
+                margin-top: 12px;
+                color: #242838;
+                font-family: Rubik;
+                font-size: 16px;
+                letter-spacing: 0;
+                line-height: 24px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .selected {
+            border: 1px solid var(--yoroi-palette-secondary-300);
+            transition: border 100ms;
+        }
+    }
+}
+
+.dialog {
+    min-width: 690px !important;
+    padding-bottom: 0px !important;
+
+    & > div {
+        padding-left: 0px !important;
+        padding-right: 0px;
+        max-height: unset;
+    }
+
+    h1 {
+        padding: 0px;
+    }
+}

@@ -1,32 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Eth</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <rect id="path-1" x="0" y="0" width="38" height="38" rx="8"></rect>
-        <filter x="-46.1%" y="-40.8%" width="192.1%" height="192.1%" filterUnits="objectBoundingBox" id="filter-2">
-            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
-        </filter>
-    </defs>
-    <g id="Eth" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="eth" transform="translate(2.000000, 2.000000)">
-            <g id="Rectangle-11-Copy">
-                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                <use fill="#F0F3F5" fill-rule="evenodd" xlink:href="#path-1"></use>
-            </g>
-            <g id="Ethereum_logo_2014-Copy" transform="translate(14.000000, 10.000000)" fill="#62688F" fill-rule="nonzero">
-                <g id="Group-2">
-                    <polygon id="Shape" points="5.39835891 0 5.28044484 0.40078125 5.28044484 12.030525 5.39835891 12.1482281 10.7967558 8.95725"></polygon>
-                    <polygon id="Shape" points="5.39839688 0 0 8.95725 5.39839688 12.1482703 5.39839688 6.50354062"></polygon>
-                    <polygon id="Shape" points="5.39835891 13.1703722 5.33191359 13.2513722 5.33191359 17.3941425 5.39835891 17.5882472 10.799962 9.98099719"></polygon>
-                    <polygon id="Shape" points="5.39839688 17.5881881 5.39839688 13.1703131 0 9.98093812"></polygon>
-                    <polygon id="Shape" points="5.39835891 12.1482155 10.7966714 8.95727953 5.39835891 6.50357016"></polygon>
-                    <polygon id="Shape" points="3.79687502e-05 8.95728375 5.39835047 12.1482197 5.39835047 6.50357437"></polygon>
-                </g>
-            </g>
-        </g>
-    </g>
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 8C0 3.58172 3.58172 0 8 0H32C36.4183 0 40 3.58172 40 8V32C40 36.4183 36.4183 40 32 40H8C3.58172 40 0 36.4183 0 32V8Z" fill="#F0F3F5"/>
+<path d="M19.9982 11L19.8672 11.4102V23.3122L19.9982 23.4326L25.9963 20.1669L19.9982 11Z" fill="#62688F"/>
+<path d="M19.9981 11L14 20.1669L19.9981 23.4327V17.6558V11Z" fill="#62688F"/>
+<path d="M19.9984 24.4787L19.9246 24.5616V28.8014L19.9984 29L26.0001 21.2147L19.9984 24.4787Z" fill="#62688F"/>
+<path d="M19.9981 28.9999V24.4786L14 21.2146L19.9981 28.9999Z" fill="#62688F"/>
+<path d="M19.9983 23.4326L25.9963 20.167L19.9983 17.6558V23.4326Z" fill="#62688F"/>
+<path d="M14 20.167L19.998 23.4326V17.6558L14 20.167Z" fill="#62688F"/>
 </svg>

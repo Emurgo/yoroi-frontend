@@ -41,7 +41,9 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
-  getCardanoHaskellBaseConfig, isCardanoHaskell, isJormungandr,
+  getCardanoHaskellBaseConfig,
+  isCardanoHaskell,
+  isJormungandr,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
@@ -49,14 +51,16 @@ import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../tra
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
+import { generateGraphData } from '../../../utils/graph';
+import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import type {
-  CurrentTimeRequests, TimeCalcRequests,
+  CurrentTimeRequests,
+  TimeCalcRequests,
 } from '../../../stores/base/BaseCardanoTimeStore';
 import moment from 'moment';
 import type { GraphRewardData } from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
-import RewardHistoryDialog
-  from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import { hiddenAmount } from '../../../utils/strings';
 
@@ -86,8 +90,9 @@ class StakingPage extends Component<AllProps> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.delegation
-      .getDelegationRequests(publicDeriver);
+    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
+      publicDeriver
+    );
     if (adaDelegationRequests == null) return undefined;
     return adaDelegationRequests.getRegistrationHistory.result?.current;
   };
@@ -116,24 +121,7 @@ class StakingPage extends Component<AllProps> {
             dialog: OverviewModal,
           })
         }
-        unitOfAccount={entry => {
-          const tokenRow = stores.tokenInfoStore.tokenInfo
-            .get(entry.networkId.toString())
-            ?.get(entry.identifier);
-          if (tokenRow == null) return undefined;
-
-          if (!stores.profile.unitOfAccount.enabled) return undefined;
-          const currency = stores.profile.unitOfAccount.currency;
-
-          const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
-
-          const coinPrice = stores.coinPriceStore.getCurrentPrice(tokenRow.Identifier, currency);
-          if (coinPrice == null) return undefined;
-          return {
-            currency,
-            amount: calculateAndFormatValue(shiftedAmount, coinPrice),
-          };
-        }}
+        unitOfAccount={this.toUnitOfAccount}
         getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={stores.profile.shouldHideBalance}
         totalRewards={
@@ -247,10 +235,11 @@ class StakingPage extends Component<AllProps> {
         shiftedAmount,
         tokenInfo.Metadata.numberOfDecimals
       );
-      return this.generated.stores.profile.shouldHideBalance ?
-        hiddenAmount :
-        `${beforeDecimalRewards}${afterDecimalRewards} ${truncateToken(getTokenName(tokenInfo))}`;
+      return this.generated.stores.profile.shouldHideBalance
+        ? hiddenAmount
+        : `${beforeDecimalRewards}${afterDecimalRewards} ${truncateToken(getTokenName(tokenInfo))}`;
     };
+
     for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
@@ -315,13 +304,26 @@ class StakingPage extends Component<AllProps> {
     return undefined;
   };
 
+  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
+    const timeStore = this.generated.stores.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
+    if (getEpochLength == null) return null;
+
+    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
+    if (getSlotLength == null) return null;
+
+    const epochLengthInSeconds = getEpochLength() * getSlotLength();
+    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
+    return epochLengthInDays;
+  };
+
   getStakePools: (PublicDeriver<>, GraphRewardData) => Node | void = (
     publicDeriver,
     rewardsGraphData
   ) => {
     const { actions, stores } = this.generated;
     const timeStore = stores.time;
-
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
@@ -426,8 +428,41 @@ class StakingPage extends Component<AllProps> {
           endEpochDate,
           percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
         }}
+        graphData={generateGraphData({
+          delegationRequests,
+          publicDeriver,
+          currentEpoch: this.generated.stores.time.getCurrentTimeRequests(publicDeriver)
+            .currentEpoch,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
+        })}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
+  };
+
+  toUnitOfAccount: TokenEntry => void | {| currency: string, amount: string |} = entry => {
+    const { stores } = this.generated;
+    const tokenRow = stores.tokenInfoStore.tokenInfo
+      .get(entry.networkId.toString())
+      ?.get(entry.identifier);
+    if (tokenRow == null) return undefined;
+
+    if (!stores.profile.unitOfAccount.enabled) return undefined;
+    const currency = stores.profile.unitOfAccount.currency;
+
+    const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
+    const ticker = tokenRow.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const coinPrice = stores.coinPriceStore.getCurrentPrice(ticker, currency);
+    if (coinPrice == null) return { currency, amount: '-' };
+    return {
+      currency,
+      amount: calculateAndFormatValue(shiftedAmount, coinPrice),
+    };
   };
 
   render(): Node {
@@ -512,27 +547,7 @@ class StakingPage extends Component<AllProps> {
                   : delegationRequests.getDelegatedBalance.result.accountPart
               }
               shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-              unitOfAccount={entry => {
-                const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
-                  .get(entry.networkId.toString())
-                  ?.get(entry.identifier);
-                if (tokenRow == null) return undefined;
-
-                if (!this.generated.stores.profile.unitOfAccount.enabled) return undefined;
-                const currency = this.generated.stores.profile.unitOfAccount.currency;
-
-                const shiftedAmount = entry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
-
-                const coinPrice = this.generated.stores.coinPriceStore.getCurrentPrice(
-                  tokenRow.Identifier,
-                  currency
-                );
-                if (coinPrice == null) return undefined;
-                return {
-                  currency,
-                  amount: calculateAndFormatValue(shiftedAmount, coinPrice),
-                };
-              }}
+              unitOfAccount={this.toUnitOfAccount}
               withdrawRewards={
                 this._isRegistered(delegationRequests.publicDeriver) === true
                   ? () => {
@@ -551,10 +566,11 @@ class StakingPage extends Component<AllProps> {
               onNext={() => {
                 // note: purposely don't await
                 // since the next dialog will properly render the spinner
-                this.generated.actions.ada.delegationTransaction
-                  .createWithdrawalTxForWallet.trigger({
-                      publicDeriver,
-                  });
+                this.generated.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger(
+                  {
+                    publicDeriver,
+                  }
+                );
                 this.generated.actions.dialogs.open.trigger({
                   dialog: WithdrawalTxDialogContainer,
                 });
@@ -638,7 +654,7 @@ class StakingPage extends Component<AllProps> {
         isOpen: any => boolean,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       substores: {|
         ada: {|
@@ -655,6 +671,10 @@ class StakingPage extends Component<AllProps> {
         selectedPage: number,
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
+      |},
+      time: {|
+        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
       |},
       profile: {|
         shouldHideBalance: boolean,
@@ -734,6 +754,7 @@ class StakingPage extends Component<AllProps> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
+        time,
         substores: {
           ada: {
             delegation: {

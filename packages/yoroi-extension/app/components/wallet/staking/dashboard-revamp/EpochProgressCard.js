@@ -21,15 +21,33 @@ export function EpochProgressCard({
 }: Props): Node {
   return (
     <Box>
-      <Graph value={percentage} days={days} />
-      <Stack direction="row" spacing={2} mt="32px" justifyContent="space-between">
-        <LabelWithValue label="Current Epoch" value={currentEpoch} />
-        <LabelWithValue label="Epoch started at" value={startEpochDate} />
-        <LabelWithValue label="Epoch end at" value={endEpochDate} />
+      <Stack direction="row" spacing={2} justifyContent="flex-start">
+        <Graph value={percentage} days={days} />
+        <Stack direction="column" flexGrow="1">
+          <Title label="Current Epoch" value={currentEpoch} />
+          <Stack direction="row" spacing={3} mt="50px" justifyContent="space-between">
+            <LabelWithValue label="Epoch started at" value={startEpochDate} />
+            <LabelWithValue label="Epoch ends at" value={endEpochDate} />
+          </Stack>
+        </Stack>
       </Stack>
     </Box>
   );
 }
+
+type TitleProps = {|
+  +label: string,
+  +value: string | number,
+|};
+const Title = ({ label, value }: TitleProps): Node => {
+  return (
+    <Box>
+      <Typography fontWeight="500" color="var(--yoroi-palette-primary-300)">
+        {label}: {value}
+      </Typography>
+    </Box>
+  );
+};
 
 type InfoColumnProps = {|
   +label: string,
@@ -38,7 +56,12 @@ type InfoColumnProps = {|
 const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
   return (
     <Box>
-      <Typography mb="6px" color="var(--yoroi-palette-gray-600)">
+      <Typography
+        style={{ textTransform: 'uppercase' }}
+        variant="caption"
+        mb="4px"
+        color="var(--yoroi-palette-gray-600)"
+      >
         {label}
       </Typography>
       <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
@@ -48,10 +71,10 @@ const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
 
 const Graph = ({ value, days }): Node => {
   return (
-    <Box position="relative" display="flex" justifyContent="center">
+    <Box mr="8px" position="relative" display="flex" justifyContent="center">
       <CircularProgress
-        size={190}
-        thickness={4}
+        size={120}
+        thickness={7}
         variant="determinate"
         value={value}
         sx={{
@@ -62,8 +85,8 @@ const Graph = ({ value, days }): Node => {
         }}
       />
       <CircularProgress
-        size={190}
-        thickness={4}
+        size={120}
+        thickness={7}
         variant="determinate"
         sx={{
           color: 'var(--yoroi-palette-gray-50)',
@@ -73,16 +96,16 @@ const Graph = ({ value, days }): Node => {
       <Box
         position="absolute"
         sx={{
-          top: '40%',
+          top: '30%',
           left: '50%',
           transform: 'translate(-50%)',
           textAlign: 'center',
         }}
       >
-        <Typography variant="h2" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h4" color="var(--yoroi-palette-gray-900)">
           {value}%
         </Typography>
-        <Typography variant="body2" color="var(--yoroi-palette-gray-600)">
+        <Typography variant="caption1" fontSize="12px" color="var(--yoroi-palette-gray-600)">
           {days} days
         </Typography>
       </Box>

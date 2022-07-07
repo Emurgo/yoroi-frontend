@@ -6,10 +6,13 @@ import SideBarCategory from './SideBarCategory';
 import styles from './Sidebar.scss';
 import type { SidebarCategory } from '../../stores/stateless/sidebarCategories';
 import classnames from 'classnames';
+import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
-import yoroiLogoExpanded from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
-import toggleIcon from '../../assets/images/sidebar/open_sidebar.inline.svg';
+import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as yoroiLogoExpanded }  from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
+import { ReactComponent as toggleIcon }  from '../../assets/images/sidebar/open_sidebar.inline.svg';
+import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
   +children?: ?Node,
@@ -22,6 +25,10 @@ type Props = {|
 
 @observer
 export default class Sidebar extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
   static defaultProps: {|
     categories: void,
     children: void,
@@ -35,6 +42,7 @@ export default class Sidebar extends Component<Props> {
   };
 
   render(): Node {
+    const { intl } = this.context;
     const {
       categories,
       isActiveCategory,
@@ -71,6 +79,15 @@ export default class Sidebar extends Component<Props> {
             );
           }) : null}
         </div>
+
+        <a
+          className={styles.faq}
+          href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
+          target='_blank'
+          rel="noreferrer"
+        >
+          {intl.formatMessage(globalMessages.sidebarFaq)}
+        </a>
         <button
           type="button"
           onClick={onToggleSidebar}

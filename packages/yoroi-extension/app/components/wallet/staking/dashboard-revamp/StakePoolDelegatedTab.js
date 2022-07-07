@@ -45,7 +45,7 @@ const StyledBox = styled(Box)({
   alignItems: 'center',
   marginBottom: '6px',
   borderRadius: '8px',
-  '& > svg:first-child': {
+  '& > svg:first-of-type': {
     minWidth: '24px',
   },
 });

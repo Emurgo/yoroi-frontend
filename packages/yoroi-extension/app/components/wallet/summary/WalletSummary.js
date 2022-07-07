@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import ExportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
+import { ReactComponent as ExportTxToFileSvg }  from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
@@ -22,6 +22,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import BigNumber from 'bignumber.js';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -62,6 +63,7 @@ type Props = {|
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
 |};
 
 @observer
@@ -100,13 +102,104 @@ export default class WalletSummary extends Component<Props> {
     return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
   }
 
+  renderPendingAmount(
+    timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>,
+    label: string,
+  ): Node {
+    if (!timestampedAmount.length) {
+      return null;
+    }
+
+    const {
+      getHistoricalPrice,
+      unitOfAccountSetting,
+      shouldHideBalance,
+      getTokenInfo,
+    } = this.props;
+
+    let pendingAmount = null;
+    if (false /* temporarily disabled */ && unitOfAccountSetting.enabled) {
+      const { currency } = unitOfAccountSetting;
+      if (!currency) {
+        throw new Error(`unexpected unit of account ${String(currency)}`);
+      }
+      if (shouldHideBalance) {
+        pendingAmount = (
+          <>
+            <span>{hiddenAmount}</span>
+            &nbsp;
+            {currency}
+          </>
+        );
+      } else {
+        let totalFiatAmount = new BigNumber('0');
+        for (const { amount, timestamp } of timestampedAmount) {
+          const tokenEntry = amount.getDefaultEntry();
+          const tokenInfo = getTokenInfo(tokenEntry);
+          const ticker = tokenInfo.Metadata.ticker;
+          if (ticker == null) {
+            throw new Error('unexpected main token type');
+          }
+
+          const price = getHistoricalPrice(
+            ticker,
+            currency,
+            timestamp
+          );
+          if (price == null) {
+            totalFiatAmount = null;
+            break;
+          }
+          totalFiatAmount = totalFiatAmount.plus(
+            tokenEntry.amount
+              .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+              .multipliedBy(String(price))
+          );
+        }
+        if (totalFiatAmount) {
+          const [beforeDecimal, afterDecimal] = formatValue(totalFiatAmount).split('.');
+
+          pendingAmount = (
+            <>
+              {beforeDecimal}
+              {afterDecimal && (
+                <span className={styles.afterDecimal}>
+                  .{afterDecimal}
+                </span>
+              )}
+              &nbsp;
+              {currency}
+            </>
+          );
+        }
+      }
+    }
+
+    if (!pendingAmount) {
+      pendingAmount = this.renderAmountDisplay({
+        shouldHideBalance,
+        amount: timestampedAmount.map(({ amount }) => amount).reduce(
+          (accuAmount, curAmount) => accuAmount.joinAddCopy(curAmount)
+        ),
+      });
+    }
+
+    return (
+      <div className={styles.pendingConfirmation}>
+        {label}:&nbsp;
+        <span className={styles.amount}>
+          {pendingAmount}
+        </span>
+      </div>
+    );
+  }
+
   render(): Node {
     const {
       pendingAmount,
       numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
-      unitOfAccountSetting,
     } = this.props;
     const { intl } = this.context;
 
@@ -120,54 +213,16 @@ export default class WalletSummary extends Component<Props> {
                 <div className={styles.numberOfTransactions}>
                   {intl.formatMessage(messages.numOfTxsLabel)}: <span>{numberOfTransactions}</span>
                 </div>
-                {(!pendingAmount.incoming.isEmpty() || !pendingAmount.outgoing.isEmpty()) && (
+                {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && (
                   <div className={styles.pendingSection}>
-                    {!pendingAmount.incoming.isEmpty() &&
-                      <div className={styles.pendingConfirmation}>
-                        {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
-                        :&nbsp;
-                        {pendingAmount.incomingInSelectedCurrency &&
-                        unitOfAccountSetting.enabled
-                          ? (
-                            <span className={styles.amount}>
-                              {formatValue(pendingAmount.incomingInSelectedCurrency)}
-                              {' ' + unitOfAccountSetting.currency}
-                            </span>
-                          ) : (
-                            <>
-                              <span className={styles.amount}>
-                                {this.renderAmountDisplay({
-                                  shouldHideBalance: this.props.shouldHideBalance,
-                                  amount: pendingAmount.incoming,
-                                })}
-                              </span>
-                            </>
-                          )}
-                      </div>
-                    }
-                    {!pendingAmount.outgoing.isEmpty() &&
-                      <div className={styles.pendingConfirmation}>
-                        {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
-                        :&nbsp;
-                        {pendingAmount.outgoingInSelectedCurrency &&
-                          unitOfAccountSetting.enabled
-                          ? (
-                            <span className={styles.amount}>
-                              {formatValue(pendingAmount.outgoingInSelectedCurrency)}
-                              {' ' + unitOfAccountSetting.currency}
-                            </span>
-                          ) : (
-                            <>
-                              <span className={styles.amount}>
-                                {this.renderAmountDisplay({
-                                  shouldHideBalance: this.props.shouldHideBalance,
-                                  amount: pendingAmount.outgoing,
-                                })}
-                              </span>
-                            </>
-                          )}
-                      </div>
-                    }
+                    {this.renderPendingAmount(
+                      pendingAmount.incoming,
+                      intl.formatMessage(messages.pendingIncomingConfirmationLabel)
+                    )}
+                    {this.renderPendingAmount(
+                      pendingAmount.outgoing,
+                      intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
+                    )}
                   </div>
                 )}
               </>

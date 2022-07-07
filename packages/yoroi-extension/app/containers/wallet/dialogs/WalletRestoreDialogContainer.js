@@ -212,6 +212,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
               getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+              isRefreshing={false}
             />}
             openWallet={() => { this.openToTransactions(publicDeriver) }}
             onCancel={walletRestoreActions.back.trigger}
@@ -423,7 +424,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,

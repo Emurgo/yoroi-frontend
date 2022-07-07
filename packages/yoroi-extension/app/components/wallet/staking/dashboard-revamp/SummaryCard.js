@@ -7,8 +7,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import StakingIcon from '../../../../assets/images/dashboard/staking-active.inline.svg';
-import TotalDelegatedIcon from '../../../../assets/images/dashboard/total-delegated.inline.svg';
+import { ReactComponent as StakingIcon }  from '../../../../assets/images/dashboard/staking-active.inline.svg';
+import { ReactComponent as TotalDelegatedIcon }  from '../../../../assets/images/dashboard/total-delegated.inline.svg';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import styles from '../dashboard/UserSummary.scss';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
@@ -82,19 +82,26 @@ function SummaryCard({
         </div>
       );
     }
+
+    return formatTokenEntry(token.getDefaultEntry());
+  };
+
+  const renderAmountWithUnitOfAccount: (void | MultiToken) => Node = token => {
+    if (token == null) {
+      return null;
+    }
+
     const unitOfAccountCalculated = unitOfAccount(token.getDefaultEntry());
 
-    const entryNode = formatTokenEntry(token.getDefaultEntry());
-    const unitOfAccountNode = unitOfAccountCalculated
-      ? `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`
-      : null;
+    if (!unitOfAccountCalculated) {
+      return null;
+    }
 
-    return (
-      <>
-        {unitOfAccountNode}
-        {entryNode}
-      </>
-    );
+    if (shouldHideBalance) {
+      return `${hiddenAmount}  ${unitOfAccountCalculated.currency}`;
+    }
+
+    return `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`;
   };
 
   return (
@@ -123,7 +130,7 @@ function SummaryCard({
                 {renderAmount(totalRewards)}
               </Typography>
               <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-                {renderAmount(totalRewards)} USD
+                {renderAmountWithUnitOfAccount(totalRewards)}
               </Typography>
             </InfoDetails>
             <OverviewButton color="secondary" onClick={onOverviewClick}>
@@ -142,7 +149,7 @@ function SummaryCard({
                 {renderAmount(totalDelegated)}
               </Typography>
               <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-                {renderAmount(totalDelegated)} USD
+                {renderAmountWithUnitOfAccount(totalDelegated)}
               </Typography>
             </InfoDetails>
           </InfoRow>

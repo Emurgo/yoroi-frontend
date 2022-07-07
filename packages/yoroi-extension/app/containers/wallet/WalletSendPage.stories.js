@@ -115,7 +115,7 @@ const genBaseProps: {|
       ),
     },
     coinPriceStore: {
-      getCurrentPrice: (_from, _to) => 5,
+      getCurrentPrice: (_from, _to) => '5',
     },
     memos: {
       hasSetSelectedExternalStorageProvider: false,
@@ -150,6 +150,7 @@ const genBaseProps: {|
     transactionBuilderStore: request.dialogInfo == null
       ? {
         totalInput: undefined,
+        maxAssetsAllowed: 10,
         fee: undefined,
         shouldSendAll: boolean('shouldSendAll', false),
         tentativeTx: null,
@@ -159,6 +160,10 @@ const genBaseProps: {|
           error: undefined,
         },
         selectedToken: undefined,
+        plannedTxInfoMap: [],
+        calculateMinAda: () => '1',
+        isDefaultIncluded: false,
+        minAda: undefined,
       }
       : request.dialogInfo.transactionBuilderStore,
     substores: {
@@ -189,10 +194,12 @@ const genBaseProps: {|
       updateTentativeTx: { trigger: action('updateTentativeTx') },
       updateReceiver: { trigger: action('updateReceiver') },
       updateAmount: { trigger: action('updateAmount') },
-      updateToken: { trigger: action('updateToken') },
+      addToken: { trigger: action('addToken') },
+      removeTokens: { trigger: action('removeTokens') },
       updateSendAllStatus: { trigger: action('updateSendAllStatus') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
+      deselectToken: { trigger: action('deselectToken') }
     },
     ada: {
       ledgerSend: {
@@ -216,7 +223,7 @@ const genBaseProps: {|
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         coinPriceStore: {
-          getCurrentPrice: (_from, _to) => 5,
+          getCurrentPrice: (_from, _to) => '5',
         },
         tokenInfoStore: {
           tokenInfo: genTokenInfoMap(
@@ -229,6 +236,12 @@ const genBaseProps: {|
             : request.dialogInfo.sendMoneyRequest,
           selected: request.wallet.publicDeriver,
         },
+        ledgerSend: {
+          error: null,
+        },
+        trezorSend: {
+          error: null,
+        },
       },
       actions: {
         dialogs: {
@@ -239,6 +252,18 @@ const genBaseProps: {|
         wallets: {
           sendMoney: {
             trigger: async (req) => action('sendMoney')(req),
+          },
+        },
+        ada: {
+          ledgerSend: {
+            sendUsingLedger: {
+              trigger: async (req) => action('sendUsingLedger')(req),
+            }
+          },
+          trezorSend: {
+            sendUsingTrezor: {
+              trigger: async (req) => action('sendUsingTrezor')(req),
+            }
           },
         },
       },
@@ -385,6 +410,11 @@ export const RegularConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}
@@ -439,6 +469,11 @@ export const MultiAssetConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}
@@ -497,6 +532,11 @@ export const LedgerConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}
@@ -555,6 +595,11 @@ export const TrezorConfirmationDialog = (): Node => {
               error: undefined,
             },
             selectedToken: undefined,
+            plannedTxInfoMap: [],
+            maxAssetsAllowed: 10,
+            calculateMinAda: () => '1',
+            isDefaultIncluded: false,
+            minAda: undefined,
           }
         }
       })}

@@ -5,10 +5,15 @@ import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel as TabPanelBase } from '@mui/lab';
 import { Tab } from '@mui/material';
 import { observer } from 'mobx-react';
+import { ReactComponent as InfoIconSVG } from '../../../../assets/images/info-icon.inline.svg';
+import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close.inline.svg';
+import DelegatedStakePoolCard from './DelegatedStakePoolCard';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
+import RewardGraph from './RewardsGraph';
+import type { GraphData } from '../dashboard/StakingDashboard';
 import { EpochProgressCard } from './EpochProgressCard';
 import RewardHistoryTab from './RewardHistoryTab';
 import type { GraphRewardData } from './RewardHistoryDialog';
@@ -29,6 +34,8 @@ type Props = {|
     endEpochDate: string,
     percentage: number,
   |},
+  +epochLength: ?number,
+  +graphData: GraphData,
 |};
 
 type Intl = {|
@@ -41,15 +48,41 @@ const messages = defineMessages({
     defaultMessage:
       '!!!The first reward to receive takes 3-4 epochs which is equal to 15-20 days, learn more.',
   },
+  epochAxisLabel: {
+    id: 'wallet.dashboard.graph.epochAxisLabel',
+    defaultMessage: '!!!Epoch ({epochLength} days)',
+  },
+  singleEpochAxisLabel: {
+    id: 'wallet.dashboard.graph.singleEpochAxisLabel',
+    defaultMessage: '!!!Epoch (1 day)',
+  },
 });
 
-function StakingTabs({ delegatedPool, epochProgress, rewardHistory, intl }: Props & Intl): Node {
+function StakingTabs({
+  delegatedPool,
+  epochLength,
+  epochProgress,
+  rewardHistory,
+  intl,
+  graphData,
+}: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  const getEpochLengthLabel: void => string = () => {
+    if (epochLength == null) {
+      return intl.formatMessage(globalMessages.epochLabel);
+    }
+
+    return epochLength === 1
+      ? intl.formatMessage(messages.singleEpochAxisLabel)
+      : intl.formatMessage(messages.epochAxisLabel, { epochLength });
+  };
+
+  const { hideYAxis, items } = graphData.rewardsGraphData;
   const tabs = [
     {
       id: 0,
@@ -94,12 +127,14 @@ function StakingTabs({ delegatedPool, epochProgress, rewardHistory, intl }: Prop
         <Box sx={{ borderBottom: 1, borderColor: 'var(--yoroi-palette-gray-200)' }}>
           <TabList onChange={handleChange} aria-label="Staking tabs">
             {tabs.map(({ label, id }) => (
-              <StyledTab label={label} value={id} />
+              <StyledTab key={id + label} label={label} value={String(id)} />
             ))}
           </TabList>
         </Box>
         {tabs.map(({ component, id }) => (
-          <TabPanel value={id}>{component}</TabPanel>
+          <TabPanel key={id} value={String(id)}>
+            {component}
+          </TabPanel>
         ))}
       </TabContext>
     </Card>

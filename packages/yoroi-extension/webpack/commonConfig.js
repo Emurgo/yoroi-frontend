@@ -132,7 +132,7 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
   {
     test: /\.svg$/,
     issuer: /\.scss$/,
-    loader: 'url-loader'
+    loader: 'file-loader'
   },
   {
     test: /\.inline\.svg$/,
@@ -146,7 +146,7 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
           }]
         }
       }
-    }]
+    }, 'file-loader']
   },
   {
     test: /\.md$/,

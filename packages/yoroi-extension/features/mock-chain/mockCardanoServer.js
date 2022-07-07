@@ -179,6 +179,40 @@ export function getMockServer(
       res.send(status);
     });
 
+    // To test the dApp connector, we need a no-op mock dApp.
+    server.get('/mock-dapp', (
+      req,
+      res: { send(arg: ServerStatusResponse): any, ... }
+    ): void => {
+      // $FlowFixMe[prop-missing]
+      res.header('content-type', 'text/html');
+      // $FlowFixMe[incompatible-call]
+      res.send(`
+               <!doctype html>
+               <html lang="en">
+                 <head>
+                   <title>MockDApp</title>
+                 </head>
+                 <body>
+                 </body>
+               </html>
+               `
+      );
+    });
+
+    server.get('/api/txs/io/:txHash/o/:txIndex', (req, res) => {
+      const result = mockImporter.getUtxoData(
+        req.params.txHash,
+        Number(req.params.txIndex)
+      );
+      if (result) {
+        res.send(result);
+        return;
+      }
+      res.status(404);
+      res.send('Transaction not found');
+    });
+
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {

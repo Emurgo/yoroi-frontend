@@ -10,7 +10,7 @@ import { injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Box } from '@mui/system';
 import { RewardHistoryItem } from './RewardHistoryTab';
-import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+// import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
@@ -56,7 +56,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
         {graphData.error && (
           <div>
             <center>
-              <InvalidURIImg />
+              {/* <InvalidURIImg /> */}
             </center>
             <ErrorBlock error={graphData.error} />
           </div>

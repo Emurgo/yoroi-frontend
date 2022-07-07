@@ -89,6 +89,7 @@ export default function DialogFn(props: Props): Node {
               ]);
               return (
                 <LoadingButton
+                  id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
                   key={i}
                   variant={
                     action.danger === true
