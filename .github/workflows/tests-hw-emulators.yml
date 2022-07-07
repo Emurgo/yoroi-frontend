@@ -66,8 +66,7 @@ jobs:
           touch ./reports/cucumberReports.json
 
   setup_Firefox_Dev:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-check'))
-    needs: [setup_environment]
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
     runs-on: ubuntu-latest
     steps:
       - name: Install Firefox Developer Edition
@@ -78,8 +77,7 @@ jobs:
           export FIREFOX_DEV=/opt/firefoxdev/firefox
 
   setup_Chrome_Latest:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-check'))
-    needs: [setup_environment]
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
     runs-on: ubuntu-latest
     steps:
       - name: Forcefully update the Chrome browser
@@ -116,19 +114,11 @@ jobs:
           chmod +x run_bg.sh
 
       - name: Run the trezor user environment and tests
-        uses: GabrielBB/xvfb-action@v1
+        uses: BerniWittmann/background-server-action@latest
         with:
-          working-directory: ./trezor-user-env
-          run: run_bg.sh
-
-      - name: Sleep for 2 minutes
-        run: sleep 120
-
-      - name: Run tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          working-directory: ./packages/yoroi-extension
-          run: npm run test:run:e2e:trezor:chrome
+          command: cd ../packages/yoroi-extension, xvfb-run --auto-servernum npm run test:run:e2e:trezor:firefox
+          start: xvfb-run --auto-servernum ./run.sh --no-regtest
+          wait-on: 'http://localhost:9002'
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
