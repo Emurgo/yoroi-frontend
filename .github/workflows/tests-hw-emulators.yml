@@ -97,6 +97,11 @@ jobs:
       - name: Clone the trezor-usr-env
         run: git clone https://github.com/trezor/trezor-user-env.git
 
+      - name: Debug info
+        run: |
+          echo $(pwd)
+          echo $(ls)
+
       - name: Edit the file run.sh
         working-directory: ./trezor-user-env
         run: |
