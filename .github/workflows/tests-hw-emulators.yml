@@ -6,6 +6,7 @@ on:
 
 jobs:
   setup_environment:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-check'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -90,7 +91,7 @@ jobs:
   Trezor_Model_T_Chrome:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
     runs-on: ubuntu-latest
-    needs: [setup_environment, setup_Chrome_Latest]
+    needs: [setup_Chrome_Latest]
 
     steps:
       - name: Clone the trezor-usr-env
@@ -110,8 +111,62 @@ jobs:
         working-directory: ../trezor-user-env
         run: /bin/bash -c "xvfb-run --auto-servernum ./run.sh --no-regtest" &
 
-      - name: Sleep for 2 minute
-        run: sleep 120
+      - uses: actions/checkout@v3
+
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
+      - name: Cache extension node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-yoroi-extension-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-extension/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache connector node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-yoroi-connector-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-ergo-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: npm install
+        run: |
+          . install-all.sh
+
+      - name: Build the test version using emulators
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:build:emulator
+
+      - name: Create the report's folder
+        working-directory: ./packages/yoroi-extension
+        run: |
+          mkdir reports
+          touch ./reports/cucumberReports.json
 
       - name: Run tests
         working-directory: ./packages/yoroi-extension
