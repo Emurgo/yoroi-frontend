@@ -51,12 +51,12 @@ jobs:
           mv emulator_tmp.py emulator.py
 
       - name: Download trezord-go
-        working-directory: ../trezor-user-env/src/binaries/trezord-go/bin
-        run: sudo ./download.sh
+        working-directory: ../trezor-user-env
+        run: sudo ./src/binaries/trezord-go/bin/download.sh
 
       - name: Download firmware
-        working-directory: ../trezor-user-env/src/binaries/firmware/bin
-        run: sudo ./download.sh
+        working-directory: ../trezor-user-env
+        run: sudo ./src/binaries/firmware/bin/download.sh
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
