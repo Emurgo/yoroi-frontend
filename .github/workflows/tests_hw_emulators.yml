@@ -60,11 +60,11 @@ jobs:
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env/src/binaries/trezord-go/bin
-        run: ./download.sh
+        run: sudo ./download.sh
 
       - name: Download firmware
         working-directory: ../trezor-user-env/src/binaries/firmware/bin
-        run: ./download.sh
+        run: sudo ./download.sh
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
