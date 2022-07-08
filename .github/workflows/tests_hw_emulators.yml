@@ -1,0 +1,148 @@
+name: Tests with HW emulators
+
+on:
+  pull_request_review:
+    types: [ submitted ]
+
+jobs:
+  setup_Firefox_Dev:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Firefox Developer Edition
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          export FIREFOX_DEV=/opt/firefoxdev/firefox
+
+  setup_Chrome_Latest:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Forcefully update the Chrome browser
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+
+  Trezor_Model_T_Chrome:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
+    runs-on: ubuntu-latest
+    needs: [setup_Chrome_Latest]
+
+    steps:
+      - name: Clone the trezor-usr-env
+        run: |
+          cd ..
+          git clone https://github.com/trezor/trezor-user-env.git
+
+      - name: Edit the file run.sh
+        working-directory: ../trezor-user-env
+        run: |
+          sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
+          rm -rf run.sh
+          mv run_tmp.sh run.sh
+          chmod +x run.sh
+
+      - name: Edit the file ./src/emulator.py
+        working-directory: ../trezor-user-env/src
+        run: |
+          sed '197 i \ \ \ \ \ \ \ \ \ \ \ \ headless=true,' emulator.py > emulator_tmp.py
+          rm -rf emulator.py
+          mv emulator_tmp.py emulator.py
+
+      - name: Download trezord-go
+        working-directory: ../trezor-user-env/src/binaries/trezord-go/bin
+        run: ./download.sh
+
+      - name: Download firmware
+        working-directory: ../trezor-user-env/src/binaries/firmware/bin
+        run: ./download.sh
+
+      - name: Run the trezor user environment
+        working-directory: ../trezor-user-env
+        run: |
+          poetry shell
+          /bin/bash -c "xvfb-run --auto-servernum nix-shell --run 'poetry run python src/main.py'" &
+
+      - uses: actions/checkout@v3
+
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
+      - name: Cache extension node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-yoroi-extension-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-extension/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache connector node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-yoroi-connector-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-ergo-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: npm install
+        run: |
+          . install-all.sh
+
+      - name: Build the test version using emulators
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:build:emulator
+
+      - name: Create the report's folder
+        working-directory: ./packages/yoroi-extension
+        run: |
+          mkdir reports
+          touch ./reports/cucumberReports.json
+
+      - name: Run tests
+        working-directory: ./packages/yoroi-extension
+        run: xvfb-run --auto-servernum npm run test:run:e2e:trezor:chrome
+
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: testRunsData
+          path: ./packages/yoroi-extension/testRunsData
+
+  Trezor_Model_T_Firefox:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
+    runs-on: ubuntu-latest
+    needs: [setup_environment, setup_Firefox_Dev]
+
+    steps:
+      - name: Run tests with the trezor emulator
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          working-directory: ./packages/yoroi-extension
+          run: npm run test:run:e2e:trezor:firefox
