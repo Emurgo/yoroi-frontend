@@ -172,6 +172,13 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: xvfb-run --auto-servernum npm run test:run:e2e:trezor:chrome
 
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: testRunsData
+          path: ./packages/yoroi-extension/testRunsData
+
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
     runs-on: ubuntu-latest
