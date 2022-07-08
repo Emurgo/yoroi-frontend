@@ -43,14 +43,6 @@ jobs:
           sudo apt update
           sudo apt -y install nix-bin
 
-      - name: Edit the file run.sh
-        working-directory: ../trezor-user-env
-        run: |
-          sed 's/$OPEN $DASHBOARD_URL/echo -e "${GREEN}Everything is ready${CLEAR}"/' run.sh > run_tmp.sh
-          rm -rf run.sh
-          mv run_tmp.sh run.sh
-          chmod +x run.sh
-
       - name: Edit the file ./src/emulator.py
         working-directory: ../trezor-user-env/src
         run: |
