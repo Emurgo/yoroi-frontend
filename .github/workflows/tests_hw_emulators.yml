@@ -60,7 +60,7 @@ jobs:
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: /bin/bash -c "xvfb-run --auto-servernum nix-shell --run 'poetry run python src/main.py'" &
+        run: sudo nix-shell --run 'poetry run python src/main.py' &
 
       - uses: actions/checkout@v3
 
