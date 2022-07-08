@@ -7,7 +7,7 @@ on:
 jobs:
   setup_Firefox_Dev:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Install Firefox Developer Edition
         run: |
@@ -18,7 +18,7 @@ jobs:
 
   setup_Chrome_Latest:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Forcefully update the Chrome browser
         run: |
@@ -29,7 +29,7 @@ jobs:
 
   Trezor_Model_T_Chrome:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [setup_Chrome_Latest]
 
     steps:
@@ -37,6 +37,11 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/trezor/trezor-user-env.git
+
+      - name: Install nix-shell
+        run: |
+          sudo apt update
+          sudo apt -y install nix-bin
 
       - name: Edit the file run.sh
         working-directory: ../trezor-user-env
@@ -63,9 +68,7 @@ jobs:
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: |
-          poetry shell
-          /bin/bash -c "xvfb-run --auto-servernum nix-shell --run 'poetry run python src/main.py'" &
+        run: /bin/bash -c "xvfb-run --auto-servernum nix-shell --run 'poetry run python src/main.py'" &
 
       - uses: actions/checkout@v3
 
@@ -137,7 +140,7 @@ jobs:
 
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: setup_Firefox_Dev
 
     steps:
