@@ -32,7 +32,6 @@ import { Ports } from '../../scripts/connections';
 
 import { getLogDate } from '../support/helpers/helpers';
 import { testRunsLogsDir } from '../support/helpers/common-constants';
-import { AccountIdentifier } from '@emurgo/js-chain-libs';
 
 const simpleNodeLogger = require('simple-node-logger');
 

@@ -1,6 +1,6 @@
 // @flow
 
-import { When, Given, Then } from 'cucumber';
+import { When, Then } from 'cucumber';
 import { expect } from 'chai';
 import { faqButton } from '../pages/sidebarPage';
 import { faqTabName } from '../support/windowManager';
