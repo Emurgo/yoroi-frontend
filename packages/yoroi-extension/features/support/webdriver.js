@@ -10,7 +10,7 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { testRunsLogsDir } from './helpers/common-constants';
+import { testRunsLogsDir, testRunsDataDir } from './helpers/common-constants';
 
 const fs = require('fs');
 const simpleNodeLogger = require('simple-node-logger');
@@ -130,15 +130,29 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   }
   this.driver = builder.build();
+
+  this.getBrowser = (): string => cmdInput.parameters.browser;
+
   this._allLoggers = [];
-  const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
+
+  const logsDir = `${testRunsDataDir}${this.getBrowser()}/Logs/`
+
+  const mockAndWMLogDir = `${logsDir}mockAndWMLogs`;
+  if (!fs.existsSync(mockAndWMLogDir)) {
+    fs.mkdirSync(mockAndWMLogDir, { recursive: true });
+  }
+  const mockAndWMLogPath = `${mockAndWMLogDir}/mockAndWMLog_${getLogDate()}.log`;
   const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
   this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
   this.windowManager.init().then().catch();
   this._allLoggers.push(mockAndWMLogger);
   this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
   
-  const webDriverLogPath = `${testRunsLogsDir}webDriverLog_${getLogDate()}.log`;
+  const webDriverLogDir = `${logsDir}webDriverLogs`;
+  if (!fs.existsSync(webDriverLogDir)) {
+    fs.mkdirSync(webDriverLogDir, { recursive: true });
+  }
+  const webDriverLogPath = `${webDriverLogDir}/webDriverLog_${getLogDate()}.log`;
   this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
   this._allLoggers.push(this.webDriverLogger);
 
@@ -147,8 +161,6 @@ function CustomWorld(cmdInput: WorldInput) {
       someLogger[level](message);
     }
   };
-
-  this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {

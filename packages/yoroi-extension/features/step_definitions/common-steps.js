@@ -53,7 +53,6 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(testRunsDataDir);
   fs.mkdirSync(testRunsDataDir);
-  fs.mkdirSync(testRunsLogsDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -157,11 +156,6 @@ const writeFile = promisify(fs.writeFile);
 // Steps that contain these patterns will trigger screenshots:
 const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
 
-async function getBrowserName(driver): Promise<string> {
-  const cap = await driver.getCapabilities();
-  return cap.getBrowserName();
-}
-
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
   if (!pattern) {
@@ -177,10 +171,10 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);
 
-      const browserName = await getBrowserName(this.driver);
+      const browserName = await this.getBrowser();
       if (browserName !== 'firefox') {
-        await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
-        await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
+        await getLogs(this.driver, cleanString, logging.Type.BROWSER);
+        await getLogs(this.driver, cleanString, logging.Type.DRIVER);
       }
     }
 
@@ -190,7 +184,8 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
 });
 
 async function createDirInTestRunsData(driver, subdirectoryName) {
-  const browserName = await getBrowserName(driver);
+  const cap = await driver.getCapabilities();
+  const browserName = cap.getBrowserName();
   const dir = `${testRunsDataDir}/${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -385,7 +380,7 @@ async function acceptUriPrompt(world: any) {
 Given(/^I have opened the extension$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the extension`);
   await this.driver.get(this.getExtensionUrl());
-  const browserName = await getBrowserName(this.driver);
+  const browserName = await this.getBrowser();
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();
   }
