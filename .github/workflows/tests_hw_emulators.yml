@@ -126,7 +126,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./packages/yoroi-extension
-        run: xvfb-run --auto-servernum npm run test:run:e2e:trezor:chrome
+        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:run:e2e:trezor:chrome
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}

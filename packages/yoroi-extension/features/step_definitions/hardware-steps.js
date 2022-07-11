@@ -85,7 +85,8 @@ When(/^I see the hardware send money confirmation dialog$/, async function () {
 });
 
 When(/^I click on the verify address button$/, async function () {
-  await this.click({ locator: '.WalletReceive_verifyIcon', method: 'css' });
+  const allVerifyAddressButtons = await this.findElements({ locator: '.WalletReceive_verifyIcon', method: 'css' });
+  await allVerifyAddressButtons[0].click();
 });
 
 When(/^I see the verification address "([^"]*)"$/, async function (address) {
