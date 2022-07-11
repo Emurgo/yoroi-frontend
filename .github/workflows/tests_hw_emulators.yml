@@ -43,24 +43,21 @@ jobs:
           sudo apt update
           sudo apt -y install nix-bin
 
-      - name: Edit the file ./src/emulator.py
-        working-directory: ../trezor-user-env/src
-        run: |
-          sed '197 i \ \ \ \ \ \ \ \ \ \ \ \ headless=true,' emulator.py > emulator_tmp.py
-          rm -rf emulator.py
-          mv emulator_tmp.py emulator.py
-
-      - name: Download trezord-go
-        working-directory: ../trezor-user-env
-        run: sudo ./src/binaries/trezord-go/bin/download.sh
-
       - name: Download firmware
         working-directory: ../trezor-user-env
         run: sudo ./src/binaries/firmware/bin/download.sh
 
+      - name: Copy the v2-master firmware to the root of the project
+        working-directory: ../trezor-user-env
+        run: cp -rf src/binaries/firmware/bin/trezor-emu-core-v2-master ./
+
+      - name: Create the logs folder in the root of the trezor-user-env
+        working-directory: ../trezor-user-env
+        run: mkdir logs
+
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: sudo nix-shell --run 'poetry run python src/main.py' &
+        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -v logs:/trezor-user-env/logs/screens -v trezor-emu-core-v2-master:/trezor-user-env/src/binaries/firmware/bin/user_downloaded -d emurgornd/trezor-user-env:latest
 
       - uses: actions/checkout@v3
 
