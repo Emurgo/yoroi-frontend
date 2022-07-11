@@ -3,8 +3,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import type { ExtendedPublicKeyResp } from '@emurgo/ledger-connect-handler';
-import LedgerConnect from '@emurgo/ledger-connect-handler';
+import type { ExtendedPublicKeyResp } from '../../utils/hwConnectHandler';
 
 import Config from '../../config';
 
@@ -31,9 +30,7 @@ import {
 } from '../../types/HWConnectStoreTypes';
 import { StepState } from '../../components/widgets/ProgressSteps';
 
-import {
-  prepareLedgerConnect,
-} from '../../utils/hwConnectHandler';
+import { LedgerConnect } from '../../utils/hwConnectHandler';
 
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
@@ -64,8 +61,6 @@ import type { StoresMap } from '../index';
 import type {
   GetExtendedPublicKeyResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-
-const CONNECTOR_URL = 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/ledgerjs5/#/v5';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
@@ -180,10 +175,8 @@ export default class LedgerConnectStore
     try {
       const ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: CONNECTOR_URL,
       });
       this.ledgerConnect = ledgerConnect;
-      await prepareLedgerConnect(ledgerConnect);
 
       const extendedPublicKeyResp = await ledgerConnect.getExtendedPublicKey({
         params: {
@@ -208,10 +201,8 @@ export default class LedgerConnectStore
     try {
       const ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: CONNECTOR_URL,
       });
       this.ledgerConnect = ledgerConnect;
-      await prepareLedgerConnect(ledgerConnect);
 
       const extendedPublicKeysResp = await ledgerConnect.getExtendedPublicKeys({
         params: {

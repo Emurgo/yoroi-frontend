@@ -31,15 +31,15 @@ import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
 import { Ports } from '../../scripts/connections';
 
 import { getLogDate } from '../support/helpers/helpers';
-import { testRunsLogsDir } from '../support/helpers/common-constants';
+import { testRunsDataDir } from '../support/helpers/common-constants';
 
 const simpleNodeLogger = require('simple-node-logger');
+const fs = require('fs');
 
 // MockData should always be consistent with the following values
 const addressesLimit = 50;
 const txsLimit = 20;
 
-const loggerPath = `${testRunsLogsDir}cardanoMockServerLog_${getLogDate()}.log`;
 let logger;
 
 function _validateAddressesReq({ addresses }: { addresses: Array<string>, ... } = {}): boolean {
@@ -67,7 +67,7 @@ function _defaultSignedTransaction(
 const expectedTxBase64 = [];
 
 export function setExpectedTx(signedTx: void | string): void {
-  logger.info(`mockCardanoServer: Set expected transaction ${signedTx}`);
+  logger.info(`mockCardanoServer: Set expected transaction`);
   if (signedTx == null) {
     // remove all elements from the array
     expectedTxBase64.splice(0, expectedTxBase64.length);
@@ -92,6 +92,9 @@ export function getMockServer(settings: {
   outputLog?: boolean,
   ...
 }): typeof MockServer {
+  const dir = `${testRunsDataDir}cardanoMockServerLogs`;
+  fs.mkdirSync(dir);
+  const loggerPath = `${dir}/cardanoMockServerLog_${getLogDate()}.log`;
 
   logger = simpleNodeLogger.createSimpleFileLogger(loggerPath);
   if (!MockServer) {
@@ -158,9 +161,9 @@ export function getMockServer(settings: {
         req: { body: BestBlockRequest, ... },
         res: { send(arg: BestBlockResponse): any, ... }
       ): Promise<void> => {
-        const bestBlock = await mockImporter.getBestBlock(req.body);
         logger.info(`mockCardanoServer: /api/v2/getblock-> request`);
         logger.info(JSON.stringify(req.body));
+        const bestBlock = await mockImporter.getBestBlock(req.body);
         logger.info(`mockCardanoServer: /api/v2/getblock -> response`);
         logger.info(JSON.stringify(bestBlock));
         res.send(bestBlock);
@@ -179,6 +182,9 @@ export function getMockServer(settings: {
       ): void => {
         // note: don't use this in practice because ttl makes the tx hash computer-time-sensitive
         if (expectedTxBase64.length !== 0 && expectedTxBase64[0] !== req.body.signedTx) {
+          logger.error(
+            `mockCardanoServer: Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
+          );
           throw new Error(
             `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           );

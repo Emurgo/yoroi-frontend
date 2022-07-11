@@ -50,6 +50,9 @@ import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../tra
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
+import { generateGraphData } from '../../../utils/graph';
+import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
+import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
@@ -149,6 +152,21 @@ class StakingPage extends Component<AllProps> {
     return undefined;
   };
 
+  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
+    const timeStore = this.generated.stores.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
+    if (getEpochLength == null) return null;
+
+    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
+    if (getSlotLength == null) return null;
+
+    const epochLengthInSeconds = getEpochLength() * getSlotLength();
+    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
+    return epochLengthInDays;
+  };
+
+
   getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -211,6 +229,16 @@ class StakingPage extends Component<AllProps> {
               }
             : undefined
         }
+        graphData={generateGraphData({
+          delegationRequests,
+          publicDeriver,
+          currentEpoch:
+            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
+        })}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
   };
@@ -432,6 +460,10 @@ class StakingPage extends Component<AllProps> {
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
+      time: {|
+        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
+      |},
       profile: {|
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
@@ -459,6 +491,25 @@ class StakingPage extends Component<AllProps> {
     if (selected == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no wallet selected`);
     }
+    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
+    const time = (() => {
+      if (api === ApiOptions.ada) {
+        return {
+          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+        };
+      }
+      if (api === ApiOptions.jormungandr) {
+        return {
+          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
+        };
+      }
+      return {
+        getTimeCalcRequests: (undefined: any),
+        getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingPage)} api not supported`) },
+      };
+    })();
 
     return Object.freeze({
       stores: {
@@ -489,6 +540,7 @@ class StakingPage extends Component<AllProps> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
+        time,
         substores: {
           ada: {
             delegation: {

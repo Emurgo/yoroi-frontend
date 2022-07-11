@@ -54,6 +54,8 @@ import {
   connectorSignTx,
   getAddressing,
   connectorSignData,
+  connectorGetAssets,
+  getTokenMetadataFromIds,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -86,6 +88,7 @@ import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import type { CardanoAssetMintMetadata } from '../../app/api/ada/lib/storage/database/primitives/tables';
 
 /*::
 declare var chrome;
@@ -1433,6 +1436,45 @@ function handleInjectorConnect(port) {
               handleError(e);
             }
           break;
+          case 'list_nfts/cardano':
+            try {
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const assets = await connectorGetAssets(wallet);
+                    const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
+                    const tokenIds = potentialNFTAssets.map(asset => asset.identifier);
+                    const tokenMetadata = await getTokenMetadataFromIds(tokenIds, wallet);
+
+                    const nfts = {};
+
+                    for (const metadata of tokenMetadata) {
+                      if (!metadata.IsNFT) {
+                        continue;
+                      }
+                      if (metadata.Metadata.type !== 'Cardano') {
+                        throw new Error('this API only supports Cardano');
+                      }
+                      const nftMetadata = find721metadata(
+                        metadata.Metadata.policyId,
+                        metadata.Metadata.assetName,
+                        metadata.Metadata.assetMintMetadata,
+                      );
+                      if (nftMetadata) {
+                        nfts[metadata.Identifier] = { metadata: nftMetadata };
+                      }
+                    }
+                    rpcResponse({ ok: nfts });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch(e) {
+              handleError(e);
+            }
+            break;
           case 'auth_sign_hex_payload/cardano':
             try {
               checkParamCount(1);
@@ -1612,6 +1654,34 @@ function handleInjectorConnect(port) {
       }
     }
   });
+}
+
+function find721metadata(
+  policyId: string,
+  assetNameHex: string,
+  assetMintMetadata: ?Array<CardanoAssetMintMetadata>,
+): any {
+  if (!assetMintMetadata) {
+    return null;
+  }
+  const metadataWrapper = assetMintMetadata.find(m => m['721'] != null);
+  if (metadataWrapper === undefined) {
+    return null;
+  }
+  const metadata = metadataWrapper['721'];
+  if (metadata.version && metadata.version !== '1.0') {
+    return null;
+  }
+
+  const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
+    c => String.fromCharCode(c)
+  ).join('');
+  const asset = metadata[policyId]?.[assetName] || metadata[policyId]?.[assetNameHex];
+  if (!asset) {
+    return null;
+  }
+
+  return asset;
 }
 
 function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {

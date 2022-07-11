@@ -9,6 +9,22 @@
         margin-bottom: 20px;
     }
 
+    .txError {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 0 16px 0;
+        border-radius: 8px;
+        background-color: rgba(255, 19, 81, 0.06);
+        box-shadow: var(--yoroi-warning-box-bg-shadow);      
+        font-weight: 500;
+        color: var(--yoroi-palette-error-200);
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
     .wrapper {
         width: 65%;
         height: auto;
@@ -44,6 +60,7 @@
         }
 
         .amountValue {
+            text-align: right;
             color: #242838;
         }
     }
@@ -59,11 +76,12 @@
         margin-bottom: 12px;
 
         .feesLabel {
-            color: #6B7384;
+            color: var(--yoroi-palette-gray-600);
         }
 
         .feesValue {
-            color: #242838;
+            text-align: right;
+            color: var(--yoroi-palette-gray-900);
         }
     }
     
@@ -71,11 +89,11 @@
         margin-top: 17px;
         margin-bottom: 40px;
         border-radius: 8px;
-        background-color: #3154CB;
-        padding: 29px 24px;
+        background-color: var(--yoroi-palette-primary-200);
+        padding: 24px;
         display: flex;
         justify-content: space-between;
-        color: #ffffff;
+        color: var(--yoroi-palette-common-white);
 
         .assetsCount {
             text-align: right;
@@ -87,6 +105,36 @@
         .totalAmountValue {
             text-align: right;
             margin-top: 4px;
+
+            .totalAmount {
+                font-size: 20px;
+                font-weight: 500;
+                letter-spacing: 0;
+                text-align: right;
+                margin-bottom: 6px;
+            }
+
+            .totalFiatAmount {
+                opacity: 0.5;
+                font-size: 16px;
+                letter-spacing: 0;
+            }
         }
+    }
+
+    .infoBlock {
+      background-color: var(--yoroi-palette-gray-50);
+      font-weight: 400;
+      padding: 10px;
+      margin-bottom: 30px;
+      line-height: 1.38;
+      font-size: 14px;
+      opacity: 0.7;
+      letter-spacing: 0.5px;
+      border-radius: 10px;
+      li {
+        list-style-type: disc;
+        margin-left: 18px;
+      }
     }
 }

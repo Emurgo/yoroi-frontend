@@ -1,8 +1,10 @@
 .component {
+    min-height: 485px;
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
+    padding: 0px 30px;
 
     .search {
         border-radius: 8px;
@@ -10,6 +12,7 @@
         display: flex;
         align-items: center;
         padding: 0px 20px;
+        margin-bottom: 20px;
 
         .searchInput {
             width: 100%;
@@ -25,7 +28,6 @@
 
         .searchInput::placeholder {
             color: #A7AFC0;
-            font-family: Rubik;
             font-size: 14px;
             letter-spacing: 0;
             line-height: 22px;
@@ -35,13 +37,11 @@
 
     .minAda {
         color: #242838;
-        font-family: Rubik;
         font-size: 16px;
         letter-spacing: 0;
         line-height: 24px;
         text-align: center;
-        text-transform: uppercase;
-        margin: 20px 0px;
+        margin-top: 24px;
     }
 
     .noAssetFound {
@@ -49,8 +49,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding-top: 30px;
-        padding-bottom: 30px;
+        flex: 1;
 
         img {
             display: inline-block;
@@ -61,12 +60,12 @@
 
         .text {
             color: #242838;
-            font-family: Rubik;
             font-size: 18px;
             font-weight: 500;
             letter-spacing: 0;
             line-height: 26px;
             text-align: center;
+            margin-top: 16px;
         }
 
     }
@@ -78,6 +77,7 @@
         margin-bottom: 20px;
         height: 360px;
         overflow-y: scroll;
+        margin-top: 20px;
 
         .nftCard {
             cursor: pointer;
@@ -85,7 +85,7 @@
             width: 180px;
             height: 250px;
             overflow: hidden;
-            border: 1.5px solid #EAEDF2;
+            border: 1px solid var(--yoroi-palette-gray-50);
             border-radius: 8px;
             background-color: #FFFFFF;
             img, svg {
@@ -108,33 +108,23 @@
                 text-overflow: ellipsis;
             }
         }
-    }
 
-    .add {
-        border-top: 2px solid#DCE0E9;
-        cursor: pointer;
-        text-transform: uppercase;
-        width: 690px;
-        text-align: center;
-        color: #17D1AA;
-        font-family: Rubik;
-        font-size: 16px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        line-height: 22px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: -40px;
-        margin-top: auto;
-
+        .selected {
+            border: 1px solid var(--yoroi-palette-secondary-300);
+            transition: border 100ms;
+        }
     }
 }
 
 .dialog {
     min-width: 690px !important;
     padding-bottom: 0px !important;
+
+    & > div {
+        padding-left: 0px !important;
+        padding-right: 0px;
+        max-height: unset;
+    }
 
     h1 {
         padding: 0px;
