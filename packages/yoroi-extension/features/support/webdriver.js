@@ -10,7 +10,7 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { testRunsLogsDir, testRunsDataDir } from './helpers/common-constants';
+import { testRunsDataDir } from './helpers/common-constants';
 
 const fs = require('fs');
 const simpleNodeLogger = require('simple-node-logger');

@@ -20,8 +20,7 @@ import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import {
   testRunsDataDir,
   snapshotsDir,
-  testRunsLogsDir,
-} from '../support/helpers/common-constants';
+  } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
