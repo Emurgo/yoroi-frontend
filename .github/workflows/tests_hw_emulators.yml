@@ -5,19 +5,6 @@ on:
     types: [ submitted ]
 
 jobs:
-  setup_Firefox_Dev_Edition:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Install Firefox Developer Edition
-        run: |
-          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
-          sudo rm -rf /opt/firefoxdev
-          sudo mv /opt/firefox /opt/firefoxdev
-      - name: Set up env variable for FF
-        run: echo "FIREFOX_DEV=/opt/firefoxdev/firefox"  >> $GITHUB_ENV
-
   setup_Chrome_Latest:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
     runs-on: ubuntu-22.04
@@ -140,9 +127,18 @@ jobs:
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
     runs-on: ubuntu-22.04
-    needs: setup_Firefox_Dev_Edition
 
     steps:
+
+      - name: Install Firefox Developer Edition
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+
+      - name: Set up env variable for FF
+        run: echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+
       - name: Clone the trezor-usr-env
         run: |
           cd ..
