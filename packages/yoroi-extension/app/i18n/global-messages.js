@@ -5,7 +5,7 @@ import { defineMessages } from 'react-intl';
  * Some messages need to be used in multiple components
  * In order to avoid components depending on each other just to reuse translation messages
  * We instead store the shared messages in this file
-*/
+ */
 
 const globalMessages: * = defineMessages({
   token: {
@@ -290,7 +290,8 @@ const globalMessages: * = defineMessages({
   },
   hwConnectDialogAboutPrerequisite4: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.4',
-    defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
+    defaultMessage:
+      '!!!Your computer must remain connected to the Internet throughout the process.',
   },
   hwConnectDialogAboutPrerequisiteHeader: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.header',
@@ -322,7 +323,8 @@ const globalMessages: * = defineMessages({
   },
   trezorError101: {
     id: 'wallet.connect.trezor.error.101',
-    defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
+    defaultMessage:
+      '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
   },
   hwError101: {
     id: 'wallet.hw.common.error.101',
@@ -362,7 +364,8 @@ const globalMessages: * = defineMessages({
   },
   step1: {
     id: 'transfer.form.instructions.step1.text',
-    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+    defaultMessage:
+      '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
   },
   feeLabel: {
     id: 'wallet.transaction.fee',
@@ -378,7 +381,8 @@ const globalMessages: * = defineMessages({
   },
   languageSelectInfo: {
     id: 'settings.general.languageSelect.info',
-    defaultMessage: '!!!For EMURGO, friendliness in Yoroi is an important topic. We believe understanding blockchain concepts is easier in your native language. We try supporting as many languages as possible, but for a broader selection of languages we need to accept the help from community translators. The selected language translation is fully provided by the community.',
+    defaultMessage:
+      '!!!For EMURGO, friendliness in Yoroi is an important topic. We believe understanding blockchain concepts is easier in your native language. We try supporting as many languages as possible, but for a broader selection of languages we need to accept the help from community translators. The selected language translation is fully provided by the community.',
   },
   translationAcknowledgment: {
     id: 'settings.general.translation.acknowledgment',
@@ -431,7 +435,8 @@ const globalMessages: * = defineMessages({
   },
   logsContent: {
     id: 'settings.support.logs.content',
-    defaultMessage: '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
+    defaultMessage:
+      '!!!If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing. Logs can be attached automatically when using the bug reporting feature.',
   },
   downloadLogsLink: {
     id: 'settings.support.logs.downloadLogsLink',
@@ -467,7 +472,8 @@ const globalMessages: * = defineMessages({
   },
   uriExplanation: {
     id: 'global.uriExplanation',
-    defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
+    defaultMessage:
+      '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
   },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
@@ -475,7 +481,8 @@ const globalMessages: * = defineMessages({
   },
   transferInstructionsText: {
     id: 'transfer.instructions.instructions.text',
-    defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
+    defaultMessage:
+      '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
   },
   transferInstructionsButton: {
     id: 'transfer.instructions.instructions.button.label',
@@ -487,7 +494,7 @@ const globalMessages: * = defineMessages({
   },
   transferTitleText: {
     id: 'daedalusTransfer.instructions.attention.title',
-    defaultMessage: '!!!Transfer all funds from'
+    defaultMessage: '!!!Transfer all funds from',
   },
   invalidMemo: {
     id: 'wallet.transaction.memo.invalid',
@@ -495,11 +502,13 @@ const globalMessages: * = defineMessages({
   },
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
-    defaultMessage: '!!!Unable to process. Please retry after the previous transaction has been completed.',
+    defaultMessage:
+      '!!!Unable to process. Please retry after the previous transaction has been completed.',
   },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
-    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
+    defaultMessage:
+      '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
   },
   recoveryPhraseInputLabel: {
     id: 'wallet.restore.dialog.recovery.phrase.input.label',
@@ -531,7 +540,7 @@ const globalMessages: * = defineMessages({
   },
   walletUpgrade: {
     id: 'wallet.backup.dialog.legacy.upgrade',
-    defaultMessage: `!!!Wallet Upgrade`
+    defaultMessage: `!!!Wallet Upgrade`,
   },
   pdfGenDone: {
     id: 'settings.paperWallet.dialog.createPaper.done',
@@ -551,7 +560,8 @@ const globalMessages: * = defineMessages({
   },
   restoreByronEraWalletDescription: {
     id: 'wallet.add.optionDialog.walletEra.byronEra.description',
-    defaultMessage: '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
+    defaultMessage:
+      '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
   },
   restoreShelleyEraWalletDescription: {
     id: 'wallet.add.optionDialog.walletEra.standard.description',
@@ -559,7 +569,8 @@ const globalMessages: * = defineMessages({
   },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
-    defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+    defaultMessage:
+      '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
   },
   sendButtonLabel: {
     id: 'wallet.send.confirmationDialog.submit',
@@ -680,8 +691,7 @@ const globalMessages: * = defineMessages({
   },
   roa30d: {
     id: 'wallet.staking.banner.roa30d',
-    defaultMessage:
-      '!!!ROA 30d',
+    defaultMessage: '!!!ROA 30d',
   },
   roaHelperMessage: {
     id: 'wallet.staking.banner.roaHelperMessage',
@@ -722,7 +732,8 @@ const globalMessages: * = defineMessages({
   },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
-    defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'
+    defaultMessage:
+      '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.',
   },
   lastSyncMessage: {
     id: 'myWallets.wallets.lastSyncText',
@@ -750,27 +761,28 @@ const globalMessages: * = defineMessages({
   },
   createWalletLabel: {
     id: 'wallet.add.page.create.title',
-    defaultMessage: '!!!Create Wallet'
+    defaultMessage: '!!!Create Wallet',
   },
   paperWalletLabel: {
     id: 'wallet.add.optionDialog.restore.paperWallet.title',
-    defaultMessage: '!!!Paper Wallet'
+    defaultMessage: '!!!Paper Wallet',
   },
   allLabel: {
     id: 'wallet.receive.navigation.allLabel',
-    defaultMessage: '!!!All'
+    defaultMessage: '!!!All',
   },
   noteLabel: {
     id: 'global.labels.note',
-    defaultMessage: '!!!Note:'
+    defaultMessage: '!!!Note:',
   },
   upgradeLabel: {
     id: 'global.labels.upgrade',
-    defaultMessage: '!!!Upgrade'
+    defaultMessage: '!!!Upgrade',
   },
   pendingTxWarning: {
     id: 'wallet.staking.warning.pendingTx',
-    defaultMessage: '!!!You cannot change your delegation preference while a transaction is pending',
+    defaultMessage:
+      '!!!You cannot change your delegation preference while a transaction is pending',
   },
   stakePoolHash: {
     id: 'wallet.delegation.transaction.stakePoolHash',
@@ -794,11 +806,11 @@ const globalMessages: * = defineMessages({
   },
   byronLabel: {
     id: 'wallet.receive.navigation.byronLabel',
-    defaultMessage: '!!!Byron'
+    defaultMessage: '!!!Byron',
   },
   shelleyLabel: {
     id: 'global.labels.shelleyLabel',
-    defaultMessage: '!!!Shelley'
+    defaultMessage: '!!!Shelley',
   },
   spendingKeyLabel: {
     id: 'global.labels.spendingKey',
@@ -846,7 +858,7 @@ const globalMessages: * = defineMessages({
   },
   blogLearnMore: {
     id: 'global.blog.learnMore',
-    defaultMessage: '!!!You can read our {blogLink} to learn more.'
+    defaultMessage: '!!!You can read our {blogLink} to learn more.',
   },
   keyLabel: {
     id: 'global.key.label',
@@ -910,7 +922,8 @@ const globalMessages: * = defineMessages({
   },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
-    defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
+    defaultMessage:
+      '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
   },
   txConfirmationTrezorTLine2: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.2',
@@ -950,8 +963,8 @@ export const memoMessages: * = defineMessages({
   },
   memoWarning: {
     id: 'wallet.send.form.memoWarning',
-    defaultMessage: '!!!Memos are stored localy only'
-  }
+    defaultMessage: '!!!Memos are stored localy only',
+  },
 });
 export const connectorMessages: * = defineMessages({
   connectedWebsites: {
@@ -968,23 +981,19 @@ export const connectorMessages: * = defineMessages({
   },
   signTransaction: {
     id: 'connector.settings.signTransaction',
-    defaultMessage: '!!!Sign transaction'
+    defaultMessage: '!!!Sign transaction',
   },
   connect: {
     id: 'connector.settings.connect',
-    defaultMessage: '!!!Connect'
+    defaultMessage: '!!!Connect',
   },
   dappConnector: {
     id: 'connector.appName',
     defaultMessage: 'Dapp Connector',
-  }
+  },
 });
 
-
-export function listOfTranslators(
-  contributorsList: string,
-  contributorsAck: string,
-): string {
+export function listOfTranslators(contributorsList: string, contributorsAck: string): string {
   let output = '';
   // append name of contributors only if the message is not empty
   if (contributorsList !== globalMessages.translationContributors.defaultMessage) {

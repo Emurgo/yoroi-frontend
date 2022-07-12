@@ -177,6 +177,7 @@
   "global.labels.processing": "Processing...",
   "global.labels.remove": "Remove",
   "global.labels.rewardsLabel": "Rewards",
+  "global.labels.rewardsListLabel": "Rewards List",
   "global.labels.save": "Save",
   "global.labels.shelleyLabel": "Shelley",
   "global.labels.spendingKey": "Spending key",
