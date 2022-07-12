@@ -1,12 +1,13 @@
 // @flow
 import type { ComponentType, Node } from 'react';
+import { useMemo } from 'react';
 import { Box, styled } from '@mui/system';
 import { Stack, Typography } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { getAvatarFromPoolId, groupByPoolName } from '../utils';
-import { useMemo } from 'react';
+import RewardGraph from './RewardsGraph';
 import type { GraphRewardData } from './RewardHistoryDialog';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
