@@ -128,7 +128,6 @@ jobs:
   Trezor_Model_T_Firefox:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
     runs-on: ubuntu-22.04
-    needs: setup_Firefox_Dev
 
     steps:
       - name: Install Firefox Developer Edition
