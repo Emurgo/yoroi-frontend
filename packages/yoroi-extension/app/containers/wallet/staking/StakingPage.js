@@ -240,8 +240,10 @@ class StakingPage extends Component<AllProps> {
         : `${beforeDecimalRewards}${afterDecimalRewards} ${truncateToken(getTokenName(tokenInfo))}`;
     };
 
+    // TODO: get currency of delegated token
     const getCurrency = tokenEntry => {
-      return getTokenName(tokenEntry);
+      // return getTokenName(tokenEntry);
+      return 'ADA';
     };
 
     for (let i = startEpoch; i < endEpoch; i++) {
@@ -255,18 +257,18 @@ class StakingPage extends Component<AllProps> {
           primary: getNormalized(nextReward.getDefaultEntry()),
           poolName: getMiniPoolInfo(poolHash),
           poolId: poolHash,
-          currency: getCurrency(nextReward.getDefaultEntry()),
+          currency: getCurrency(),
           date: getDateFromEpoch(i),
         });
         historyIterator++;
       } else {
         perEpochRewards.push({
           name: i,
-          primary: 2,
-          poolName: 'Test',
+          primary: 0,
+          poolName: '',
           poolId: '',
-          currency: 'ADA',
-          date: 'Jul 7, 2022 1:06 PM',
+          currency: '',
+          date: '',
         });
       }
     }
