@@ -55,6 +55,7 @@ import {
   getAddressing,
   connectorSignData,
   connectorGetAssets,
+  getTokenMetadataFromIds,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -87,6 +88,7 @@ import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import type { CardanoAssetMintMetadata } from '../../app/api/ada/lib/storage/database/primitives/tables';
 
 /*::
 declare var chrome;
@@ -1442,29 +1444,25 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const assets = await connectorGetAssets(wallet);
                     const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
-                    const fetcher = await getCardanoStateFetcher(localStorageApi);
-                    const metadatasList = await fetcher.getMultiAssetMintMetadata({
-                      assets: potentialNFTAssets.map(asset => {
-                        const ident = asset.identifier.split('.');
-                        return {
-                          policy: ident[0],
-                          name: Buffer.from(ident[1], 'hex').toString(),
-                        };
-                      }),
-                      network: wallet.getParent().getNetworkInfo(),
-                    });
+                    const tokenIds = potentialNFTAssets.map(asset => asset.identifier);
+                    const tokenMetadata = await getTokenMetadataFromIds(tokenIds, wallet);
+
                     const nfts = {};
-                    for (let key in metadatasList) {
-                      if(!Object.prototype.hasOwnProperty.call(metadatasList, key)) {
+
+                    for (const metadata of tokenMetadata) {
+                      if (!metadata.IsNFT) {
                         continue;
                       }
-                      const metadatas = metadatasList[key];
-                      const ident = key.split('.');
-                      const policyId = ident[0];
-                      const assetName = ident[1];
-                      const metadata = find721metadata(policyId, assetName, metadatas);
-                      if (metadata !== null) {
-                        nfts[`${policyId}.${Buffer.from(assetName).toString('hex')}`] = { metadata };
+                      if (metadata.Metadata.type !== 'Cardano') {
+                        throw new Error('this API only supports Cardano');
+                      }
+                      const nftMetadata = find721metadata(
+                        metadata.Metadata.policyId,
+                        metadata.Metadata.assetName,
+                        metadata.Metadata.assetMintMetadata,
+                      );
+                      if (nftMetadata) {
+                        nfts[metadata.Identifier] = { metadata: nftMetadata };
                       }
                     }
                     rpcResponse({ ok: nfts });
@@ -1658,16 +1656,27 @@ function handleInjectorConnect(port) {
   });
 }
 
-function find721metadata(policyId: string, assetName: string, metadatas: any): any {
-  const metadataWrapper = metadatas.find(m => m.key === '721');
+function find721metadata(
+  policyId: string,
+  assetNameHex: string,
+  assetMintMetadata: ?Array<CardanoAssetMintMetadata>,
+): any {
+  if (!assetMintMetadata) {
+    return null;
+  }
+  const metadataWrapper = assetMintMetadata.find(m => m['721'] != null);
   if (metadataWrapper === undefined) {
     return null;
   }
-  const metadata = metadataWrapper.metadata;
+  const metadata = metadataWrapper['721'];
   if (metadata.version && metadata.version !== '1.0') {
     return null;
   }
-  const asset = metadata[policyId]?.[assetName];
+
+  const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
+    c => String.fromCharCode(c)
+  ).join('');
+  const asset = metadata[policyId]?.[assetName] || metadata[policyId]?.[assetNameHex];
   if (!asset) {
     return null;
   }

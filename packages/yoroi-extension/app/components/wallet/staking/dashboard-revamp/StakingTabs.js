@@ -18,6 +18,7 @@ import { EpochProgressCard } from './EpochProgressCard';
 import RewardHistoryTab from './RewardHistoryTab';
 import type { GraphRewardData } from './RewardHistoryDialog';
 import { StakePoolDelegatedTab } from './StakePoolDelegatedTab';
+import moment from 'moment';
 
 type Props = {|
   delegatedPool: {|
@@ -110,9 +111,8 @@ function StakingTabs({
       label: intl.formatMessage(globalMessages.epochProgress),
       component: (
         <EpochProgressCard
-          // TODO: Remove placeholders
           percentage={epochProgress.percentage}
-          days="2.5"
+          days={moment(epochProgress.endEpochDate).diff(moment(), 'days')}
           currentEpoch={epochProgress.currentEpoch}
           startEpochDate={epochProgress.startEpochDate}
           endEpochDate={epochProgress.endEpochDate}

@@ -1,0 +1,58 @@
+$CounterSize: 24px;
+
+.component {
+  max-width: 420px;
+  margin-bottom: 50px;
+  .imageBlock {
+    margin-bottom: 12px;
+    border-radius: 6px;
+    background-color: var(--image-block-background-color);
+    display: flex;
+    justify-content: center;
+
+    .image {
+      max-width: 100%;
+    }
+  }
+  .infoBlock {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    .counterBlock {
+      display: flex;
+      justify-content: center;
+      margin-right: 6px;
+      .counter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: var(--image-block-background-color);
+        color: var(--text-color-2);
+        height: $CounterSize;
+        width: $CounterSize;
+        font-size: 14px;
+      }
+    }
+    .textBlock {
+      width: calc(100% - #{$CounterSize});
+      .primaryText,
+      .secondaryText {
+        overflow-wrap: break-word;
+        color: var(--text-color-3);
+        font-size: 14px;
+        line-height: 22px;
+      }
+      .primaryText {
+        text-align: start;
+      }
+      .secondaryText {
+        text-align: center;
+        margin-top: 4px;
+        padding: 6px;
+        background-color: var(--hint-secondary-text-background-color);
+        border-radius: 4px;
+      }
+    }
+  }  
+}
