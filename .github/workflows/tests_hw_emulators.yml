@@ -5,16 +5,6 @@ on:
     types: [ submitted ]
 
 jobs:
-  setup_Firefox_Dev:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-firefox'))
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Install Firefox Developer Edition
-        run: |
-          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
-          sudo rm -rf /opt/firefoxdev
-          sudo mv /opt/firefox /opt/firefoxdev
-          export FIREFOX_DEV=/opt/firefoxdev/firefox
 
   setup_Chrome_Latest:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/trezor-chrome'))
@@ -141,6 +131,13 @@ jobs:
     needs: setup_Firefox_Dev
 
     steps:
+      - name: Install Firefox Developer Edition
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          export FIREFOX_DEV=/opt/firefoxdev/firefox
+
       - name: Clone the trezor-usr-env
         run: |
           cd ..
