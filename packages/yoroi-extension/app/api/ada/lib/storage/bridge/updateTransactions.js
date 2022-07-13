@@ -1960,8 +1960,7 @@ export async function getTokenMintMetadata(
         nameHex: assetName,
         policy: policyId
       };
-    })
-    .filter(a => a.name !== '');
+    });
 
   if (!nativeAssets || nativeAssets.length === 0) return {};
 
