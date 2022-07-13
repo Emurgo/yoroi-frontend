@@ -42,7 +42,7 @@ export type PlannedTxInfoMap = Array<{|
   token: $ReadOnly<TokenRow>,
   shouldSendAll?: boolean,
   amount?: string,
-|}>
+|}>;
 
 /**
  * TODO: we make the following assumptions
