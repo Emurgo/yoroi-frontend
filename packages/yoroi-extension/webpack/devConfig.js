@@ -39,6 +39,11 @@ const baseDevConfig = (
       hotScript,
       path.join(__dirname, '../chrome/extension/ergo-connector/index')
     ],
+    ledger: [
+      customPath,
+      hotScript,
+      path.join(__dirname, '../ledger/index')
+    ],
   },
   devMiddleware: {
     publicPath: `http://${host}:${connections.Ports.WebpackDev}/js`,
@@ -97,6 +102,7 @@ const baseDevConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+        include: [ path.resolve(__dirname, '../app') ],
         loader: 'file-loader',
       },
     ]
