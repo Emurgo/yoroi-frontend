@@ -379,7 +379,7 @@ export type MultiAssetMintMetadataRequest = {|
 |};
 
 export type MultiAssetMintMetadataRequestAsset = {|
-  name: string,
+  nameHex: string,
   policy: string
 |}
 
