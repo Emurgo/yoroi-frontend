@@ -20,6 +20,7 @@ import type {
   RemoteTransaction,
   MultiAssetMintMetadataRequest,
   MultiAssetMintMetadataResponse,
+  MultiAssetMintMetadataFunc,
   GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
 } from './types';
 import type {
@@ -40,6 +41,7 @@ import {
   GetAccountStateApiError,
   GetPoolInfoApiError,
   GetTokenInfoApiError,
+  GetMultiAssetMintMetadataApiError,
 } from '../../../common/errors';
 import {
   Logger,
@@ -102,7 +104,7 @@ export class BatchedFetcher implements IFetcher {
 
   getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
     => Promise<MultiAssetMintMetadataResponse> = (body) => (
-    this.baseFetcher.getMultiAssetMintMetadata(body)
+    batchGetMultiAssetMintMetadata(this.baseFetcher.getMultiAssetMintMetadata)(body)
   )
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
@@ -375,6 +377,28 @@ export function batchCheckAddressesInUse(
       Logger.error(`batchedFetcher::${nameof(batchCheckAddressesInUse)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new CheckAddressesInUseApiError();
+    }
+  };
+}
+
+export function batchGetMultiAssetMintMetadata(
+  getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
+): MultiAssetMintMetadataFunc {
+  return async function (body: MultiAssetMintMetadataRequest): Promise<MultiAssetMintMetadataResponse> {
+    try {
+      const groupsOfAssets = chunk(body.assets, addressesLimit);
+      const groupedAssetPromises = groupsOfAssets.map(
+        assets => getMultiAssetMintMetadata({
+          network: body.network,
+          assets,
+        })
+      );
+      const groupedAssets = await Promise.all(groupedAssetPromises);
+      return groupedAssets.reduce((accum, chunkAssets) => accum.concat(chunkAssets), []);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetMultiAssetMintMetadata)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GetMultiAssetMintMetadataApiError();
     }
   };
 }
