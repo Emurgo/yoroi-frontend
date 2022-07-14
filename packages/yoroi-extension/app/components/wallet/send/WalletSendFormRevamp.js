@@ -201,11 +201,21 @@ export default class WalletSendForm extends Component<Props, State> {
      * so instead we register a reaction to update it
      */
     this.amountFieldReactionDisposer = reaction(
-      () => [this.props.shouldSendAll, this.props.totalInput],
+      () => [this.props.shouldSendAll, this.props.totalInput, this.props.maxSendableAmount],
       () => {
+        const { maxSendableAmount } = this.props;
+        const amountField =  this.form.$('amount');
+        if (maxSendableAmount.result) {
+          const numberOfDecimals = this.getNumDecimals();
+          amountField.set('value', maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
+        } else if (maxSendableAmount.error) {
+          amountField.set('value', '0');
+        }
+
         if (!this.props.totalInput || !this.props.fee) {
           return;
         }
+
         const totalInput = this.props.totalInput;
         const fee = this.props.fee;
         if (!this.props.shouldSendAll) {
@@ -215,7 +225,7 @@ export default class WalletSendForm extends Component<Props, State> {
         // once sendAll is triggered, set the amount field to the total input
         const adjustedInput = totalInput.joinSubtractCopy(fee);
         const relatedEntry = adjustedInput.getDefaultEntry();
-        this.form.$('amount').set('value', formatValue(
+        amountField.set('value', formatValue(
           relatedEntry,
         ));
       },
@@ -425,13 +435,6 @@ export default class WalletSendForm extends Component<Props, State> {
       networkId: this.props.defaultToken.NetworkId,
     });
 
-    if (maxSendableAmount.result) {
-      const numberOfDecimals = this.getNumDecimals();
-      amountField.set('value', maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
-    } else if (maxSendableAmount.error) {
-      amountField.set('value', '0');
-    }
-
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
@@ -536,7 +539,23 @@ export default class WalletSendForm extends Component<Props, State> {
                       styles.maxBtn,
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning
                     ])}
-                    onClick={this.props.calculateMaxAmount}
+                    onClick={() => {
+                      const hasTokens = this.props.spendableBalance.nonDefaultEntries().length !== 0
+                      if (hasTokens) {
+                        this.props.calculateMaxAmount()
+                        return
+                      }
+
+                      if (shouldSendAll) {
+                        amountField.reset();
+                        this.props.onRemoveTokens([defaultTokenInfo]);
+                      } else {
+                        this.props.onAddToken({
+                          shouldReset: true,
+                        });
+                        this.props.updateSendAllStatus(true);
+                      }
+                    }}
                   >
                     {intl.formatMessage(messages.max)}
                   </Button>}
@@ -580,12 +599,20 @@ export default class WalletSendForm extends Component<Props, State> {
                 </Button>
               </div>
 
-              {this._nextStepButton(
-               !this.props.fee || this.props.hasAnyPending || invalidMemo,
-               () => {
-                this.props.onSubmit()
-                this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
-               })}
+              <Button
+                variant="primary"
+                onClick={() => {
+                  this.props.onSubmit()
+                  this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
+                }}
+                disabled={
+                  !this.props.fee || this.props.hasAnyPending ||
+                  invalidMemo || maxSendableAmount.isExecuting
+                }
+                sx={{ margin: '125px 0px 0px 0px', display: 'block' }}
+              >
+                {intl.formatMessage(globalMessages.nextButtonLabel)}
+              </Button>
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
