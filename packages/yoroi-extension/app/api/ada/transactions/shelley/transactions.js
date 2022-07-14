@@ -25,12 +25,13 @@ import type { Address, Addressing, } from '../../lib/storage/models/PublicDerive
 import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage/bridge/utils';
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
-import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo } from '../utils';
+import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
 import { hexToBytes, logErr } from '../../../../coreUtils';
 import { coinSelectionForValues } from './coinSelection';
 import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
+import { builtSendTokenList } from '../../../common';
 /**
  * based off what the cardano-wallet team found worked empirically
  * note: slots are 1 second in Shelley mainnet, so this is 2hrs
@@ -753,10 +754,24 @@ export async function maxSendableADA(
 
     const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
     txBuilder.set_ttl(request.absSlotNumber.plus(defaultTtlOffset).toNumber());
-    const wasmAddr = normalizeToAddress(addressedUtxo[0].receiver);
 
-    if (wasmAddr == null) {
+    const wasmReceiver = normalizeToAddress(request.receiver);
+    if (wasmReceiver == null) {
       throw new Error(`${nameof(maxSendableADA)} receiver not a valid Shelley address`);
+    }
+    const isAssetsSelected = request.tokens.length >= 2 // [ada, ...tokens]
+    if (isAssetsSelected) {
+      const defaultToken = request.publicDeriver.getParent().getDefaultToken()
+      txBuilder.add_output(
+        RustModule.WalletV4.TransactionOutput.new(
+          wasmReceiver,
+          cardanoValueFromMultiToken(builtSendTokenList(
+            defaultToken,
+            request.tokens,
+            addressedUtxo.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId))
+          )),
+        )
+      )
     }
 
     for (const input of addressedUtxo) {
@@ -778,16 +793,24 @@ export async function maxSendableADA(
       }
     }
 
-    txBuilder.add_change_if_needed(wasmAddr);
+    txBuilder.add_change_if_needed(wasmReceiver);
     const outputs = txBuilder.build().outputs();
+    let adaLockedForAssets = 0;
+    if (isAssetsSelected) {
+      const adaStr = outputs.get(0).amount().coin().to_str();
+      adaLockedForAssets = new BigNumber(adaStr);
+    }
+
     for (let i = 0; i < outputs.len(); i++) {
       const output = outputs.get(i);
       const value = output.amount();
       const assets = value.multiasset();
       if (assets == null || assets.len() === 0) {
-        return new BigNumber(value.coin().to_str());
+        return new BigNumber(value.coin().to_str()).plus(adaLockedForAssets);
       }
     }
+    // No pure sendable ADA left
+    if (isAssetsSelected) return adaLockedForAssets
     // Reaching this point means user has not enough pure ADA to send.
     throw new NotEnoughMoneyToSendError()
   } catch (e) {

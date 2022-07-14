@@ -26,7 +26,7 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import { cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
+import {  cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -212,6 +212,54 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     async () => this._updateTxBuilder(),
   )
 
+  // Generate tokens list for cardano tokens
+  _genTokenList(overrightDefaultAmount?: boolean): Array<$ReadOnly<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>> {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._genTokenList)} requires wallet to be selected`);
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+    const plannedTxInfoMap = this.plannedTxInfoMap;
+    let tokens: PlannedTxInfoMap = [...plannedTxInfoMap];
+    /**
+     * When sending multi-asset, if the user entered ada less than MIN-ADA
+     * it should be OVERWRITTEN.
+     */
+    const minAmount = this.calculateMinAda(plannedTxInfoMap.map(({ token }) => ({ token })));
+    const token = plannedTxInfoMap.find(({ token: t }) => t.IsDefault);
+
+    if (!token) {
+      // if the user is sending a token, we need to make sure the resulting utxo
+      // has at least the minimum amount of ADA in it
+      tokens.push({
+        token: defaultToken,
+        amount: minAmount,
+      });
+    } else if (
+      (token &&
+      token.shouldSendAll === false &&
+      token.amount &&
+      (new BigNumber(token.amount)).lt(minAmount) &&
+      plannedTxInfoMap.length > 1) ||
+      overrightDefaultAmount === true
+    ) {
+      tokens = tokens.filter(({ token: t }) => !t.IsDefault);
+      tokens.push({
+        token: defaultToken,
+        amount: minAmount,
+      })
+    }
+
+    return tokens.map((txEntry) => ({
+        token: txEntry.token,
+        amount: txEntry.amount,
+        shouldSendAll: Boolean(txEntry.shouldSendAll),
+    }));
+  }
+
   _canCompute(): boolean {
     if (this.plannedTxInfoMap.length === 0) return false;
     for (const token of this.plannedTxInfoMap) {
@@ -311,51 +359,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
-      const genTokenList: PlannedTxInfoMap => Array<$ReadOnly<{|
-        token: $ReadOnly<TokenRow>,
-        amount?: string,
-        shouldSendAll?: boolean,
-      |}>> = (userInput) => {
-        let tokens: PlannedTxInfoMap = [...userInput];
-        /**
-         * When sending multi-asset, if the user entered ada less than MIN-ADA
-         * it should be OVERWRITTEN.
-         */
-        const minAmount = this.calculateMinAda(plannedTxInfoMap.map(({ token }) => ({ token })));
-        const token = plannedTxInfoMap.find(({ token: t }) => t.IsDefault);
-
-        if (!token) {
-          // if the user is sending a token, we need to make sure the resulting utxo
-          // has at least the minimum amount of ADA in it
-          tokens.push({
-            token: defaultToken,
-            amount: minAmount,
-          });
-        } else if (
-          token &&
-          token.shouldSendAll === false &&
-          token.amount &&
-          (new BigNumber(token.amount)).lt(minAmount) &&
-          plannedTxInfoMap.length > 1
-        ) {
-          tokens = tokens.filter(({ token: t }) => !t.IsDefault);
-          tokens.push({
-            token: defaultToken,
-            amount: minAmount,
-          })
-        }
-
-        return tokens.map((txEntry) => ({
-            token: txEntry.token,
-            amount: txEntry.amount,
-            shouldSendAll: txEntry.shouldSendAll,
-        }));
-      }
-
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver: withHasUtxoChains,
         receiver,
-        tokens: genTokenList(plannedTxInfoMap),
+        tokens: this._genTokenList(),
         filter: this.filter,
         absSlotNumber,
         metadata: this.metadata,
@@ -428,7 +435,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
     this.maxSendableAmount.execute(() => maxSendableADA({
       publicDeriver: withHasUtxoChains,
-      absSlotNumber
+      absSlotNumber,
+      tokens: this._genTokenList(true),
+      receiver: this.receiver,
     }))
   }
 
