@@ -9,7 +9,8 @@ Feature: Wallet UI Support
     And I should see the Support button
 
 @support-1
-  Scenario: Contact Support
+  Scenario: Contact Support successful
     When I click on Support button
-    And I send a new Support request with email address qa@emurgo.io and text "Autotests. This is the test message from the extension."
-    And I pause the test to debug
+    And I send a new Support request with text "Autotests. This is the test message from the extension."
+    Then I see the message was sent to support
+    And I check the email inbox for validation
