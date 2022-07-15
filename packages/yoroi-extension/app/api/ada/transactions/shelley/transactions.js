@@ -729,13 +729,14 @@ export async function maxSendableADA(
     const config = getCardanoHaskellBaseConfig(network)
       .reduce((acc, next) => Object.assign(acc, next), {});
 
+    const coinsPerUtxoWord = RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
     const protocolParams = {
       keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
       linearFee: RustModule.WalletV4.LinearFee.new(
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
       ),
-      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+      coinsPerUtxoWord,
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       networkId: network.NetworkId,
     };
@@ -762,16 +763,18 @@ export async function maxSendableADA(
     const isAssetsSelected = request.tokens.length >= 2 // [ada, ...tokens]
     if (isAssetsSelected) {
       const defaultToken = request.publicDeriver.getParent().getDefaultToken()
+      const wasmMultiasset = cardanoValueFromMultiToken(builtSendTokenList(
+        defaultToken,
+        request.tokens,
+        addressedUtxo.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId))
+      )).multiasset();
       txBuilder.add_output(
-        RustModule.WalletV4.TransactionOutput.new(
-          wasmReceiver,
-          cardanoValueFromMultiToken(builtSendTokenList(
-            defaultToken,
-            request.tokens,
-            addressedUtxo.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId))
-          )),
-        )
-      )
+        RustModule.WalletV4.TransactionOutputBuilder.new()
+          .with_address(wasmReceiver)
+          .next()
+          .with_asset_and_min_required_coin(wasmMultiasset, coinsPerUtxoWord)
+          .build()
+      );
     }
 
     for (const input of addressedUtxo) {
