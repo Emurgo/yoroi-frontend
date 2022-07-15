@@ -402,7 +402,8 @@ export default class WalletSendForm extends Component<Props, State> {
       isCalculatingFee,
       getTokenInfo,
       isDefaultIncluded,
-      maxSendableAmount
+      maxSendableAmount,
+      spendableBalance
     } = this.props;
 
     const amountField = form.$('amount');
@@ -540,8 +541,10 @@ export default class WalletSendForm extends Component<Props, State> {
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning
                     ])}
                     onClick={() => {
-                      const hasTokens = this.props.spendableBalance.nonDefaultEntries().length !== 0
-                      if (hasTokens) {
+                      const hasTokens = (
+                        spendableBalance && spendableBalance.nonDefaultEntries().length !== 0
+                      )
+                      if (hasTokens || !spendableBalance) {
                         this.props.calculateMaxAmount()
                         return
                       }
