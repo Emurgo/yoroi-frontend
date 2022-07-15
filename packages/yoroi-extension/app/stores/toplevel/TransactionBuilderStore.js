@@ -67,7 +67,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
-
+  @observable shouldSendMax: boolean = false;
   // REQUESTS
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
@@ -209,7 +209,13 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       // update if tx history changes
       this.stores.transactions.hash,
     ],
-    async () => this._updateTxBuilder(),
+    async () => {
+      this._updateTxBuilder()
+
+      if (this.plannedTxInfoMap.length !== 0 && this.shouldSendMax === true) {
+        this._maxSendableAmount()
+      }
+    },
   )
 
   // Generate tokens list for cardano tokens
@@ -426,6 +432,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       throw new Error(`${nameof(this._maxSendableAmount)} missing chains functionality`);
     }
 
+    this.shouldSendMax = true;
     const network = publicDeriver.getParent().getNetworkInfo();
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const timeToSlot = await genTimeToSlot(fullConfig);
@@ -525,6 +532,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     this.selectedToken = token;
+    // no `selectedToken` === Selecting the default token.
+    // Editing the default token amount means we are not sending the max amount.
+    if (!token) this.shouldSendMax = false;
   }
 
   @action
