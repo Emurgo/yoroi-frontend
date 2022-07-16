@@ -420,7 +420,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _maxSendableAmount: void => Promise<void> = async () =>  {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this._maxSendableAmount)} requires wallet to be selected`);
+    if (!publicDeriver) throw new Error(`${nameof(this._maxSendableAmount)} requires wallet to be selected.`);
 
     const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
