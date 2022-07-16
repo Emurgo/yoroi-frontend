@@ -32,6 +32,7 @@ import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepacka
 import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 import { builtSendTokenList } from '../../../common';
+import type { TokenRow } from '../../lib/storage/database/primitives/tables';
 /**
  * based off what the cardano-wallet team found worked empirically
  * note: slots are 1 second in Shelley mainnet, so this is 2hrs
@@ -722,6 +723,12 @@ export async function maxSendableADA(
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
     absSlotNumber: BigNumber,
+    receiver: string | null,
+    tokens: Array<$ReadOnly<{|
+      token: $ReadOnly<TokenRow>,
+      shouldSendAll?: boolean,
+      amount?: string,
+    |}>>
   |}
 ): Promise<BigNumber> {
   try {
@@ -755,6 +762,9 @@ export async function maxSendableADA(
     const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
     txBuilder.set_ttl(request.absSlotNumber.plus(defaultTtlOffset).toNumber());
 
+    if (request.receiver == null) {
+      throw new Error(`${nameof(maxSendableADA)} requires wallet address.`);
+    }
     const wasmReceiver = normalizeToAddress(request.receiver);
     if (wasmReceiver == null) {
       throw new Error(`${nameof(maxSendableADA)} receiver not a valid Shelley address`);
@@ -810,9 +820,9 @@ export async function maxSendableADA(
       }
     }
     // No pure sendable ADA left
-    if (isAssetsSelected) return adaLockedForAssets
+    if (isAssetsSelected) return new BigNumber(adaLockedForAssets);
     // Reaching this point means user has not enough pure ADA to send.
-    throw new NotEnoughMoneyToSendError()
+    throw new NotEnoughMoneyToSendError();
   } catch (e) {
     if (String(e).includes('Not enough ADA')) {
       throw new NotEnoughMoneyToSendError();
