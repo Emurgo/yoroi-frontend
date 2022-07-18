@@ -447,7 +447,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     try {
       const wallets = (await getWallets({ db: persistentDb }))
-        .filter(w => w.getParent().getWalletType() === WalletTypeOption.WEB_WALLET);
+        // .filter(w => w.getParent().getWalletType() === WalletTypeOption.WEB_WALLET);
 
       const protocol = this.protocol;
       const isProtocolErgo = protocol === 'ergo';
