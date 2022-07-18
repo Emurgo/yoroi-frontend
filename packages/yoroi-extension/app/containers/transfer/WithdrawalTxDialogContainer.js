@@ -17,6 +17,7 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from '../../stores/toplevel/TokenInfoStore';
+import { trackWithdrawal } from '../../api/analytics';
 
 export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
 
@@ -51,7 +52,9 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
           label: intl.formatMessage(globalMessages.cancel),
         }}
         onSubmit={{
-          trigger: () => {}, // nothing extra to do
+          trigger: () => {
+            trackWithdrawal();
+          },
           label: intl.formatMessage(globalMessages.confirm),
         }}
         transactionRequest={createWithdrawalTx}
