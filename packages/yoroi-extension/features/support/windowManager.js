@@ -12,6 +12,7 @@ class WindowManagerError extends Error {}
 export const mockDAppName = 'MockDApp';
 export const popupConnectorName = 'popupConnectorWindow';
 export const extensionTabName = 'Yoroi';
+export const faqTabName = 'Yoroi - EMURGO';
 
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
