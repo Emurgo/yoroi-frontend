@@ -586,6 +586,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.maxSendableAmount.reset();
     this.plannedTx = null;
     this.tentativeTx = null;
+    this.shouldSendMax = false;
     this.setupSelfTx.cancel();
     this.setupSelfTx.reset();
   }
