@@ -8,6 +8,14 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  token: {
+    id: 'global.labels.token',
+    defaultMessage: '!!!Token',
+  },
+  nfts: {
+    id: 'global.labels.nft',
+    defaultMessage: '!!!NFTs',
+  },
   receiverLabel: {
     id: 'wallet.send.form.receiver.label',
     defaultMessage: '!!!Receiver',
@@ -92,9 +100,9 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.amount',
     defaultMessage: '!!!Amount',
   },
-  amountWithMinADA: {
-    id: 'global.labels.amountWithMinADA',
-    defaultMessage: '!!!Amount (includes min-ADA)',
+  minAda: {
+    id: 'global.labels.minAda',
+    defaultMessage: '!!!Min-ADA',
   },
   id: {
     id: 'global.labels.id',
@@ -899,6 +907,10 @@ const globalMessages: * = defineMessages({
   syncing: {
     id: 'wallet.syncing',
     defaultMessage: '!!!Syncing...',
+  },
+  loading: {
+    id: 'wallet.loading',
+    defaultMessage: '!!!Loading...',
   },
 });
 export default globalMessages;
