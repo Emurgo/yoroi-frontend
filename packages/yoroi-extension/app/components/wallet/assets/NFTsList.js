@@ -2,18 +2,20 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import {
-  IconButton,
   ImageList,
   ImageListItem,
   InputAdornment,
   Stack,
   Typography,
   Skeleton,
-  OutlinedInput
+  OutlinedInput,
+  Button
 } from '@mui/material';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
 import { ReactComponent as NotFound }  from '../../../assets/images/assets-page/no-nft-found.inline.svg';
+import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
+import { ReactComponent as Grid3x3 } from '../../../assets/images/assets-page/grid-3x3.inline.svg';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -49,15 +51,13 @@ const messages = defineMessages({
 });
 
 const listColumnViews = [
-  { count: 2, gap: 32 },
-  { count: 4, gap: 32 },
-  { count: 6, gap: 16 },
+  { count: 4, Icon: Grid2x2 },
+  { count: 6, Icon: Grid3x3 },
 ];
 
-const getDefaultColumnsView = () => listColumnViews[1];
 function NfTsList({ list, intl }: Props & Intl): Node {
   if (list == null) return null;
-  const [columns, setColumns] = useState(getDefaultColumnsView());
+  const [columns, setColumns] = useState(listColumnViews[0]);
   const [nftList, setNftList] = useState([...list]);
 
   const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
@@ -71,8 +71,17 @@ function NfTsList({ list, intl }: Props & Intl): Node {
   };
 
   return (
-    <Box sx={{ height: '100%' }}>
-      <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px">
+    <Box sx={{ height: '100%', bgcolor: 'var(--yoroi-palette-common-white)', borderRadius: '8px', overflow: 'hidden' }}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        marginBottom="30px"
+        sx={{
+          padding: '16px 24px',
+          borderBottom: '1px solid var(--yoroi-palette-gray-200)'
+        }}
+      >
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
           {!list.length ?
             intl.formatMessage(globalMessages.sidebarNfts)
@@ -80,18 +89,25 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         </Typography>
         <Box display="flex" alignItems="center">
           <Stack direction="row" spacing={1} marginRight="30px">
-            {listColumnViews.map(column => (
-              <IconButton
-                key={column.count}
-                onClick={() => setColumns(column)}
+            {listColumnViews.map(Column => (
+              <Button
+                key={Column.count}
+                onClick={() => setColumns(Column)}
                 sx={{
                   width: '40px',
+                  height: '40px',
+                  minHeight: '40px',
+                  minWidth: '40px',
+                  padding: '10px',
                   backgroundColor:
-                    column.count === columns.count ? 'var(--yoroi-palette-gray-300)' : 'none',
+                    Column.count === columns.count ? 'var(--yoroi-palette-gray-200)' : 'none',
+                  '&:hover': {
+                    backgroundColor: Column.count !== columns.count ? 'var(--yoroi-palette-gray-50)' : 'var(--yoroi-palette-gray-200)'
+                  }
                 }}
               >
-                =
-              </IconButton>
+                <Column.Icon />
+              </Button>
             ))}
           </Stack>
           <SearchInput
@@ -122,11 +138,11 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <ImageList sx={{ width: '100%' }} cols={columns.count} rowHeight="100%" gap={columns.gap}>
+        <ImageList sx={{ width: '100%' }} cols={columns.count} rowHeight="100%" gap={24}>
           {nftList.map(nft => {
             return (
               <SLink key={nft.name} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
-                <NftCardImage ipfsUrl={nft.image} name={nft.name} />
+                <NftCardImage ipfsUrl={null} name={nft.name} />
               </SLink>
             );
           })}
