@@ -1,9 +1,7 @@
 // @flow
 
-import { When, Given, Then } from 'cucumber';
+import { When, Then } from 'cucumber';
 import { expect } from 'chai';
-import { faqButton } from '../pages/sidebarPage';
-import { faqTabName } from '../support/windowManager';
 import {
   descriptionTextArea,
   emailInput,
@@ -13,12 +11,11 @@ import {
   successText,
   submitButton,
   platformSelector,
-  acceptCheckbox
+  acceptCheckbox,
 } from '../pages/supportPage';
 import { By } from 'selenium-webdriver';
-import { last } from 'lodash';
 
-const request = require('request');
+const axios = require('axios');
 
 const mailsacAPIKey = 'k_a5fgBik5hsHx2DjoYXGFy8U8dhs3d8XIUzHXt';
 const email = 'emurgoqa@mailsac.com';
@@ -35,38 +32,35 @@ Then(/^I should see the Support button$/, async function () {
   await this.waitForElement(supportButton);
 });
 
-When(
-  /^I send a new Support request with text "(.+)"$/,
-  async function (text) {
-    this.webDriverLogger.info(
-      `Step: I send a new Support request with email address ${email} and text ${text}`
-    );
+When(/^I send a new Support request with text "(.+)"$/, async function (text) {
+  this.webDriverLogger.info(
+    `Step: I send a new Support request with email address ${email} and text ${text}`
+  );
 
-    // Switch to iframe
-    await this.driver.switchTo().frame(this.driver.findElement(By.id('webWidget')));
+  // Switch to iframe
+  await this.driver.switchTo().frame(this.driver.findElement(By.id('webWidget')));
 
-    // enter email address
-    await this.waitForElement(emailInput);
-    await this.input(emailInput, email);
+  // enter email address
+  await this.waitForElement(emailInput);
+  await this.input(emailInput, email);
 
-    // enter description text
-    await this.input(descriptionTextArea, text);
+  // enter description text
+  await this.input(descriptionTextArea, text);
 
-    // select platform depending on test browser
-    await this.click(platformSelector);
-    const browser = this.getBrowser();
-    const capBrowser = browser.charAt(0).toUpperCase() + browser.slice(1);
-    const platformLocator = getPlatformLocator(capBrowser);
-    await this.click(platformLocator);
+  // select platform depending on test browser
+  await this.click(platformSelector);
+  const browser = this.getBrowser();
+  const capBrowser = browser.charAt(0).toUpperCase() + browser.slice(1);
+  const platformLocator = getPlatformLocator(capBrowser);
+  await this.click(platformLocator);
 
-    // check checkbox
-    await this.waitForElement(acceptCheckbox);
-    await this.click(acceptCheckbox);
+  // check checkbox
+  await this.waitForElement(acceptCheckbox);
+  await this.click(acceptCheckbox);
 
-    // submit
-    await this.click(submitButton);
-  }
-);
+  // submit
+  await this.click(submitButton);
+});
 
 Then(/^I see the message was sent to support$/, async function () {
   this.webDriverLogger.info(`Step: I see the message was sent to support`);
@@ -86,44 +80,38 @@ Then(/^I check the email inbox for validation$/, async function () {
 
   this.webDriverLogger.info(`Step: I get the last email received`);
   let options = {
+    method: 'get',
     url: `https://mailsac.com/api/addresses/${email}/messages`,
     headers: { 'Mailsac-Key': mailsacAPIKey },
   };
-  request.get(options, async function (error, response, body) {
-    if (error) throw new Error(error);
-    const lastEmail = JSON.parse(body)[0];
 
-    expect(lastEmail.from[0].address).to.be.equal('support@emurgohelpdesk.zendesk.com');
-    expect(lastEmail.subject).to.be.equal('[Request received]');
+  this.webDriverLogger.info(`Get emails list`);
+  let res = await axios(options);
+  this.webDriverLogger.info(`Data: ${JSON.stringify(res.data)}`);
 
-    const emailId = lastEmail._id;
+  const lastEmail = res.data[0];
+  expect(lastEmail.from[0].address).to.be.equal('support@emurgohelpdesk.zendesk.com');
+  expect(lastEmail.subject).to.be.equal('[Request received]');
 
-    // get the last email body
-    request.get(
-      {
-        url: `https://mailsac.com/api/text/${email}/${emailId}`,
-        headers: { 'Mailsac-Key': mailsacAPIKey },
-      },
-      function (error, response, body) {
-        if (error) throw new Error(error);
+  const emailId = lastEmail._id;
 
-        const bodyList = body.split('\n');
-        expect(bodyList[0]).to.match(
-          /Your request (.+) has been received and is being reviewed by our support staff./
-        );
-        expect(bodyList[2]).to.equal('To add additional comments, reply to this email.');
-        expect(bodyList[5]).to.equal('This email is a service from EMURGO.');
-
-        request.delete(
-          {
-            url: `https://mailsac.com/api/addresses/${email}/messages/${emailId}`,
-            headers: { 'Mailsac-Key': mailsacAPIKey },
-          },
-          function (error, response, body) {
-            if (error) throw new Error(error);
-          }
-        );
-      }
-    );
+  res = await axios({
+    method: 'get',
+    url: `https://mailsac.com/api/text/${email}/${emailId}`,
+    headers: { 'Mailsac-Key': mailsacAPIKey },
   });
+  this.webDriverLogger.info(`Data: Get last email body: ${res.data}`);
+
+  const bodyList = res.data.split('\n');
+  expect(bodyList[0]).to.match(
+    /Your request (.+) has been received and is being reviewed by our support staff./
+  );
+  expect(bodyList[2]).to.equal('To add additional comments, reply to this email.');
+  expect(bodyList[5]).to.equal('This email is a service from EMURGO.');
+
+  this.webDriverLogger.info(`Delete email`);
+  res = await axios.delete(`https://mailsac.com/api/addresses/${email}/messages/${emailId}`, {
+    headers: { 'Mailsac-Key': mailsacAPIKey },
+  });
+  this.webDriverLogger.info(`Data: ${JSON.stringify(res.data)}`);
 });
