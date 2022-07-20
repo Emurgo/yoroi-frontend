@@ -55,7 +55,7 @@ export function getLogDate(): string {
   return new Date().toISOString().replace(/:/g, '_');
 }
 
-export const getCircularReplacer = () => {
+export function getCircularReplacer(): Object {
   const seen = new WeakSet();
   return (key, value) => {
     if (typeof value === 'object' && value !== null) {
@@ -66,4 +66,4 @@ export const getCircularReplacer = () => {
     }
     return value;
   };
-};
+}
