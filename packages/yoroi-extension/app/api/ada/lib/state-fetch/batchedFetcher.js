@@ -53,6 +53,8 @@ import config from '../../../../config';
 declare var CONFIG: ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
 
+const MINT_METADATA_REQUEST_PAGE_SIZE = 100;
+
 /**
  * Makes calls to Yoroi backend service
  * https://github.com/Emurgo/yoroi-graphql-migration-backend
@@ -100,10 +102,22 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.sendTx(body)
   )
 
-  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
-    => Promise<MultiAssetMintMetadataResponse> = (body) => (
-    this.baseFetcher.getMultiAssetMintMetadata(body)
-  )
+  getMultiAssetMintMetadata
+  : MultiAssetMintMetadataRequest => Promise<MultiAssetMintMetadataResponse>
+    = async (body) => {
+      const { network, assets } = body;
+      const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
+      const responses = await Promise.all(assetChunks.map(
+        batch => this.baseFetcher.getMultiAssetMintMetadata({ network, assets: batch })
+      ));
+      const result = {};
+      for (const response of responses) {
+        for (const [key, value] of Object.entries(response)) {
+          result[key] = value;
+        }
+      }
+      return result;
+    }
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
     batchGetAccountState(this.baseFetcher.getAccountState)(body)
