@@ -3,6 +3,7 @@
 import { When, Then, } from 'cucumber';
 import { testWallets } from '../mock-chain/TestWallets';
 import { truncateAddress, } from '../../app/utils/formatters';
+import { addressField, derivationField, verifyButton } from '../pages/verifyAddressPage';
 
 When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
@@ -83,11 +84,11 @@ When(/^I click on the verify address button$/, async function () {
 });
 
 When(/^I see the verification address "([^"]*)"$/, async function (address) {
-  await this.waitUntilText({ locator: '.verificationAddress', method: 'css' }, truncateAddress(address));
+  await this.waitUntilText(addressField, truncateAddress(address));
 });
 
 When(/^I see the derivation path "([^"]*)"$/, async function (path) {
-  await this.waitUntilText({ locator: '.VerifyAddressDialog_derivation', method: 'css' }, path);
+  await this.waitUntilText(derivationField, path);
 });
 
 Then(/^I verify the address on my ledger device$/, async function () {
@@ -99,7 +100,7 @@ Then(/^I verify the address on my ledger device$/, async function () {
 });
 
 Then(/^I verify the address on my trezor device$/, async function () {
-  await this.click({ locator: '.Dialog_actions .primary', method: 'css' });
+  await this.click(verifyButton);
   // we should have this disable while the action is processing, but we don't show a spinner on this
   await this.waitForElementNotPresent({ locator: '.ErrorBlock_component', method: 'css' });
 });
