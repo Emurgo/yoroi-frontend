@@ -108,7 +108,7 @@ export class BatchedFetcher implements IFetcher {
       const { network, assets } = body;
       const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
       const responses = await Promise.all(assetChunks.map(
-        chunk => this.baseFetcher.getMultiAssetMintMetadata({ network, assets: chunk })
+        assets => this.baseFetcher.getMultiAssetMintMetadata({ network, assets })
       ));
       const result = {};
       for (const response of responses) {
