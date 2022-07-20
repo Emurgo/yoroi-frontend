@@ -114,7 +114,7 @@ export type LocatorObject = {|
 |};
 
 function CustomWorld(cmdInput: WorldInput) {
-  let builder = null;
+  let builder;
   switch (cmdInput.parameters.browser) {
     case 'brave': {
       builder = getBraveBuilder();
@@ -147,7 +147,7 @@ function CustomWorld(cmdInput: WorldInput) {
   this.windowManager.init().then().catch();
   this._allLoggers.push(mockAndWMLogger);
   this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
-  
+
   const webDriverLogDir = `${logsDir}webDriverLogs`;
   if (!fs.existsSync(webDriverLogDir)) {
     fs.mkdirSync(webDriverLogDir, { recursive: true });
@@ -155,6 +155,10 @@ function CustomWorld(cmdInput: WorldInput) {
   const webDriverLogPath = `${webDriverLogDir}/webDriverLog_${getLogDate()}.log`;
   this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
   this._allLoggers.push(this.webDriverLogger);
+
+  const trezorEmuLogPath = `${logsDir}trezorEmulatorController_${getLogDate()}.log`;
+  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
+  this.trezorController = undefined;
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
@@ -288,7 +292,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.executeLocalStorageScript = script => {
     this.webDriverLogger.info(`Webdriver: Executing Local Storage Script`);
-    this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+    return this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
   };
 
   this.getFromLocalStorage = async key => {
