@@ -88,6 +88,7 @@ Then(/^I should see the Receive screen$/, async function () {
   const receiveTitle = await i18n.formatMessage(this.driver,
     { id: 'wallet.navigation.receive' });
   await this.waitUntilText({ locator: '.WalletNavButton_active', method: 'css' }, receiveTitle);
+  await this.driver.sleep(1000);
 });
 
 Then(/^I should see an Error screen$/, async function () {
