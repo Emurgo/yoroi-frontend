@@ -13,6 +13,7 @@ const defaultPublicPath = '/js/';
 type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
+  emulator: "true" | "false",
   publicPath?: string,
   ergoConnectorExtensionId?: ?string,
   isLight: "true" | "false"
@@ -22,7 +23,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
-  resolve: commonConfig.resolve(env.networkName),
+  resolve: commonConfig.resolve(env.networkName, env.emulator === 'true'),
   entry: {
     yoroi: [
       customPath,
@@ -53,6 +54,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
+      JSON.parse(env.emulator),
       env.ergoConnectorExtensionId,
       JSON.parse(env.isLight)
     )),

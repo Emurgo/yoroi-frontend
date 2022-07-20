@@ -50,7 +50,7 @@ getMockServer({ outputLog: true });
 resetChain(MockChain.Standard);
 
 createWebpackServer(
-  config.baseDevConfig(ENV, false, undefined),
+  config.baseDevConfig(ENV, false, false, undefined),
   webpack,
   webpackDevMiddleware,
   webpackHotMiddleware,
