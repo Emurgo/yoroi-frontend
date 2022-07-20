@@ -54,3 +54,16 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
 export function getLogDate(): string {
   return new Date().toISOString().replace(/:/g, '_');
 }
+
+export const getCircularReplacer = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+};
