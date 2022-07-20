@@ -196,7 +196,7 @@ const optimization = {
   }
 };
 
-const resolve = (networkName /*: string */) /*: * */ => ({
+const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
     fs: false,
@@ -206,15 +206,7 @@ const resolve = (networkName /*: string */) /*: * */ => ({
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
   },
-  alias: (networkName === 'test')
-    ? {
-      'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
-      '@emurgo/ledger-connect-handler': path.resolve(__dirname, '../features/mock-ledger-connect/'),
-       process: 'process/browser',
-    }
-    : {
-      process: 'process/browser',
-    },
+  alias: { process: 'process/browser', }
 });
 
 const definePlugin = (
