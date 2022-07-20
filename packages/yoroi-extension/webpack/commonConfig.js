@@ -196,7 +196,7 @@ const optimization = {
   }
 };
 
-const resolve = (networkName /*: string */, emulator /*: boolean */) /*: * */ => ({
+const resolve = (networkName /*: string */) /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
     fs: false,
@@ -206,7 +206,7 @@ const resolve = (networkName /*: string */, emulator /*: boolean */) /*: * */ =>
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
   },
-  alias: (networkName === 'test' && emulator === false)
+  alias: (networkName === 'test')
     ? {
       'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
       '@emurgo/ledger-connect-handler': path.resolve(__dirname, '../features/mock-ledger-connect/'),
@@ -221,7 +221,6 @@ const definePlugin = (
   networkName /*: string */,
   isProd /*: boolean */,
   isNightly /*: boolean */,
-  emulator /*: boolean */,
   ergoConnectorExtensionId /*: ?string */,
   isLight /*: boolean */ = false
 ) /*: * */ => {

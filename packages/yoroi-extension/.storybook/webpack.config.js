@@ -1,5 +1,6 @@
 // @flow
 
+const path = require('path');
 const webpack = require('webpack');
 const ConfigWebpackPlugin = require('config-webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
@@ -16,18 +17,16 @@ module.exports = async ({ config, mode } /*: {|
   config: any,
 |}*/) /*: * */ => {
   const isNightly = "false";
-  const useEmulator = "false";
   const isLight = "false";
   const isProduction = mode === 'PRODUCTION';
   const customConfig = isProduction
     ? baseProdConfig({
       networkName: ENV,
       nightly: isNightly,
-      emulator: useEmulator,
       publicPath: './',
       isLight
     })
-    : devConfig.baseDevConfig(ENV, isNightly === 'true', useEmulator === 'true',);
+    : devConfig.baseDevConfig(ENV, isNightly === 'true',);
 
   const finalConfig = {
     ...config,
@@ -39,7 +38,7 @@ module.exports = async ({ config, mode } /*: {|
       ...config.plugins,
       new ConfigWebpackPlugin(),
       new ReactRefreshWebpackPlugin(),
-      new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true', useEmulator === 'true')),
+      new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true')),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),

@@ -15,14 +15,13 @@ const hotScript =
 const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  useEmulator /*: boolean */,
   ergoConnectorExtensionId /*: ?string */,
   isLight /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
-  resolve: commonConfig.resolve(networkName, useEmulator),
+  resolve: commonConfig.resolve(networkName),
   devtool: 'eval-source-map',
   entry: {
     yoroi: [
@@ -69,7 +68,6 @@ const baseDevConfig = (
       networkName,
       false,
       isNightly,
-      useEmulator,
       ergoConnectorExtensionId,
       Boolean(isLight)
     )),
