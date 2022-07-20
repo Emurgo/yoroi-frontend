@@ -1,3 +1,5 @@
+@import '../../../themes/mixins/loading-spinner';
+
 .component {
     display: flex;
     justify-content: center;
@@ -153,6 +155,35 @@
                     font-size: 12px;
                     letter-spacing: 0.4px;
                     line-height: 16px;
+                }
+
+                .maxButtonSpinning {
+                    @include loading-spinner('../../../assets/images/spinner-dark.svg', 25);
+                }
+
+                .maxBtn {
+                    min-width: 51px;
+                    min-height: 32px;
+                    padding: 8px 12px;
+                    border: none;
+                    color: var(--yoroi-palette-gray-600);
+                    background-color: var(--yoroi-palette-gray-50);
+                    font-weight: 500;
+                    font-size: 16px;
+                    line-height: 24px;
+                    border-radius: 8px;
+
+                    &:hover {
+                        background: var(--yoroi-palette-gray-200);
+                        color: #000000;
+                    }
+                    &:active {
+                        background: var(--yoroi-palette-gray-300);
+                    }
+
+                    &:disabled {
+                        cursor: not-allowed;
+                    }
                 }
             }
 
