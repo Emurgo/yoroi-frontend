@@ -1,12 +1,14 @@
 // @flow
 import { Node, ComponentType, useState } from 'react';
 import { Box, styled } from '@mui/system';
-import { Link as LinkMui, Grid, Typography, Stack, Tab, Tabs, ThemeProvider, createTheme } from '@mui/material';
+import { Link as LinkMui, Grid, Typography, Stack, Tab, Tabs, ThemeProvider, createTheme, Button } from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl, defineMessages } from 'react-intl';
 import { ReactComponent as LinkSvg }  from '../../../assets/images/link.inline.svg';
 import { ReactComponent as BackArrow }  from '../../../assets/images/assets-page/backarrow.inline.svg';
+import { ReactComponent as IconCopy }  from '../../../assets/images/copy.inline.svg';
+import { ReactComponent as IconCopied }  from '../../../assets/images/copied.inline.svg';
 
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -16,6 +18,7 @@ import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
+import CopyableAddress from '../../widgets/CopyableAddress';
 
 // Overwrite primary current theme
 // Temporary solution untill the new design system.
@@ -52,26 +55,52 @@ const messages = defineMessages({
     id: 'wallet.nftGallary.details.back',
     defaultMessage: '!!!back to gallery',
   },
+  overview: {
+    id: 'wallet.nftGallary.details.overview',
+    defaultMessage: '!!!Overview'
+  },
+  metadata: {
+    id: 'wallet.nftGallary.details.metadata',
+    defaultMessage: '!!!Metadata'
+  },
+  copyMetadata: {
+    id: 'wallet.nftGallary.details.copyMetadata',
+    defaultMessage: '!!!Copy metadata'
+  },
+  missingMetadata: {
+    id: 'wallet.nftGallary.details.missingMetadata',
+    defaultMessage: '!!!Metadata is missing'
+  }
 })
 
 function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(1);
+  const [isCopied, setCopy] = useState(false);
+
   const tabs = [
     {
       id: 0,
-      label: 'Overview',
-      component: <h1>TAB 1</h1>,
+      label: intl.formatMessage(messages.overview),
     },
     {
       id: 1,
-      label: 'Metadata',
-      component: <h1>TAB 2</h1>,
+      label: intl.formatMessage(messages.metadata),
     },
   ];
+
+  const onCopyMetadata = async () => {
+    try {
+      await navigator.clipboard.writeText(nftInfo.nftMetadata)
+      setCopy(true)
+    } catch (error) {
+      setCopy(false)
+    }
+  }
+
   return (
-    <Box>
+    <Box sx={{ overflow: 'hidden' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -102,10 +131,10 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
           borderRadius: '8px',
         }}
       >
-        <ImageItem flex="1">
+        <ImageItem flex="1" flexShrink={0}>
           <NftImage imageUrl={nftInfo.image} name={nftInfo.name} width='532px' height='510px' />
         </ImageItem>
-        <Box flex="1">
+        <Box flex="1" sx={{ width: '50%' }}>
           <Box px="24px" paddingBottom="22px">
             <Typography variant="h2" color="var(--yoroi-palette-gray-900)">
               {nftInfo.name}
@@ -119,13 +148,15 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
                     boxShadow: 'none',
                     borderRadius: '0px',
                     marginX: '24px',
+                    borderBottom: 1,
+                    borderColor: 'divider'
                   }}
                   onChange={(_, newValue) =>  setValue(newValue)}
                   aria-label="NFTs tabs"
                 >
                   {tabs.map(({ label, id }) => (
-                    <Tab sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === 0 && '24px' }} label={label} value={id} />
-                ))}
+                    <Tab sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === 0 && '24px', textTransform: 'none', fontWeight: 500 }} label={label} value={id} />
+                  ))}
                 </TabList>
               </Box>
               <TabPanel
@@ -177,7 +208,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
                     />
                   </Grid>
                 </Grid>
-                <Box p="24px">
+                <Box>
                   <LabelWithValue
                     label={intl.formatMessage(globalMessages.fingerprint)}
                     value={
@@ -201,11 +232,27 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
               </TabPanel>
 
               <TabPanel
-                sx={{ boxShadow: 'none', bgcolor: 'transparent' }}
+                sx={{ boxShadow: 'none', bgcolor: 'transparent', height: '100%', maxHeight: '400px', overflow: 'auto' }}
                 value={1}
               >
+                {nftInfo.nftMetadata &&
+                <Button
+                  onClick={onCopyMetadata}
+                  variant="text"
+                  color='inherit'
+                  sx={{ ml: '-8px', mb: '24px' }}
+                  startIcon={isCopied ? <IconCopied /> : <IconCopy />}
+                >
+                  <Typography variant='h7' sx={{ textTransform: 'none' }}>
+                    {intl.formatMessage(messages.copyMetadata)}
+                  </Typography>
+                </Button>}
                 <Box component='pre'>
-                  {JSON.stringify(nftInfo, null, 2)}
+                  <Typography variant='body2' lineHeight='22px'>
+                    {nftInfo.nftMetadata ?
+                      JSON.stringify(nftInfo.nftMetadata, null, 2):
+                      intl.formatMessage(messages.missingMetadata)}
+                  </Typography>
                 </Box>
               </TabPanel>
             </TabContext>

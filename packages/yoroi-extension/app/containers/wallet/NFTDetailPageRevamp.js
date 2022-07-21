@@ -70,6 +70,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                   && token.info.Metadata.assetMintMetadata[0]['721'][policyId][name]
                   ? token.info.Metadata.assetMintMetadata[0]['721'][policyId][name]
                   : undefined,
+                assetMintMetadata: token.info.Metadata.assetMintMetadata[0]
               };
             })
             .map(item => ({
@@ -82,6 +83,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
               name: item.name,
               image: item.nftMetadata?.image ?? '',
               description: item.nftMetadata?.description ?? '',
+              nftMetadata: item.assetMintMetadata,
             }));
 
     const { nftId } = this.props.match.params;
@@ -89,7 +91,11 @@ class NFTDetailPageRevamp extends Component<AllProps> {
 
     return (
       <Box width="100%" height="100%">
-        <NFTDetails nftInfo={nftInfo} nftsCount={nftsList.length} network={network} />
+        <NFTDetails
+          nftInfo={nftInfo}
+          nftsCount={nftsList.length}
+          network={network}
+        />
       </Box>
     );
   }
