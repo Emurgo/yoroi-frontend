@@ -1,7 +1,7 @@
 // @flow
 import { Node, ComponentType, useState } from 'react';
 import { Box, styled } from '@mui/system';
-import { Link as LinkMui, Grid, Typography, Stack, Tab, Tabs, ThemeProvider, createTheme, Button } from '@mui/material';
+import { Link as LinkMui, Grid, Typography, Stack, Tab, Modal, ThemeProvider, createTheme, Button } from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -18,9 +18,8 @@ import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
-import CopyableAddress from '../../widgets/CopyableAddress';
 
-// Overwrite primary current theme
+// Overwrite current theme
 // Temporary solution untill the new design system.
 const theme = createTheme({
   palette: {
@@ -77,6 +76,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
   const [value, setValue] = useState(1);
+  const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
 
   const tabs = [
@@ -98,6 +98,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
       setCopy(false)
     }
   }
+  const onClose = () => setOpen(false)
 
   return (
     <Box sx={{ overflow: 'hidden' }}>
@@ -131,7 +132,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
           borderRadius: '8px',
         }}
       >
-        <ImageItem flex="1" flexShrink={0}>
+        <ImageItem sx={{ cursor: nftInfo.image && 'pointer' }} onClick={() => nftInfo.image && setOpen(true)} flex="1" flexShrink={0}>
           <NftImage imageUrl={nftInfo.image} name={nftInfo.name} width='532px' height='510px' />
         </ImageItem>
         <Box flex="1" sx={{ width: '50%' }}>
@@ -259,6 +260,19 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
           </ThemeProvider>
         </Box>
       </Stack>
+      <Modal onClose={onClose} open={open} sx={{ background: 'rgba(18, 31, 77, 0.7)', backdropFilter: 'blur(10px)' }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+          onClick={onClose}
+        >
+          <img src={nftInfo.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')} alt={nftInfo.name} loading='lazy' />
+        </Box>
+      </Modal>
     </Box>
   );
 }
