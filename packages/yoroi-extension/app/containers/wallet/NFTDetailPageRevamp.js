@@ -88,7 +88,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const nftInfo = nftsList.find(nft => nft.id === nftId);
 
     return (
-      <Box height="100%" overflow="overlay">
+      <Box width="100%" height="100%">
         <NFTDetails nftInfo={nftInfo} nftsCount={nftsList.length} network={network} />
       </Box>
     );

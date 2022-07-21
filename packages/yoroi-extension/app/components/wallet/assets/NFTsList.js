@@ -51,8 +51,8 @@ const messages = defineMessages({
 });
 
 const listColumnViews = [
-  { count: 4, Icon: Grid2x2 },
-  { count: 6, Icon: Grid3x3 },
+  { count: 4, Icon: Grid2x2, imageDims: '264px' },
+  { count: 6, Icon: Grid3x3, imageDims: '165px' },
 ];
 
 function NfTsList({ list, intl }: Props & Intl): Node {
@@ -71,7 +71,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
   };
 
   return (
-    <Box sx={{ height: '100%', bgcolor: 'var(--yoroi-palette-common-white)', borderRadius: '8px', overflow: 'hidden' }}>
+    <Box sx={{ height: 'content', width: '100%', bgcolor: 'var(--yoroi-palette-common-white)', borderRadius: '8px' }}>
       <Box
         display="flex"
         alignItems="center"
@@ -125,7 +125,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       {!nftList.length ? (
         <Stack
           sx={{
-            height: '90%',
+            height: '518px',
             flex: '1',
             alignItems: 'center',
             justifyContent: 'center',
@@ -138,11 +138,16 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <ImageList sx={{ width: '100%' }} cols={columns.count} rowHeight="100%" gap={24}>
+        <ImageList sx={{ width: '100%', padding: '0px 24px 30px' }} cols={columns.count} gap={24}>
           {nftList.map(nft => {
             return (
               <SLink key={nft.name} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
-                <NftCardImage ipfsUrl={null} name={nft.name} />
+                <NftCardImage
+                  ipfsUrl={nft.image}
+                  name={nft.name}
+                  width={columns.imageDims}
+                  height={columns.imageDims}
+                />
               </SLink>
             );
           })}
@@ -161,7 +166,7 @@ function isImageExist(imageSrc, onload, onerror) {
   img.src = imageSrc;
 }
 
-export function NftImage({ imageUrl, name }) {
+export function NftImage({ imageUrl, name, width, height }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   if (error || !imageUrl) return (
@@ -170,10 +175,8 @@ export function NftImage({ imageUrl, name }) {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: 'var(--yoroi-palette-gray-100)',
-      width: '100%',
-      height: '100%',
-      minWidth: '250px',
-      minHeight: '200px',
+      width,
+      height,
     }}
     >
       <DefaultNFT />
@@ -188,18 +191,29 @@ export function NftImage({ imageUrl, name }) {
     )
   }, [imageUrl])
 
-  if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ minWidth: '250px', minHeight: '250px', height: '100%' }} />
-  return  <img style={{ width: '100%', height: 'auto', flex: '1', minWidth: '250px', objectFit: 'cover' }} src={imageUrl} alt={name} loading="lazy" />
+  if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ width, height }} />
+  return  (
+    <img
+      style={{
+        width, height,
+        minWidth: width, minHeight: height,
+        maxWidth: width, maxHeight: height,
+        flex: '1', objectFit: 'cover', display: 'inline-block' }}
+      src={imageUrl}
+      alt={name}
+      loading="lazy"
+    />
+  )
 }
 
-function NftCardImage({ ipfsUrl, name }) {
+function NftCardImage({ ipfsUrl, name, width, height }) {
   return (
-    <ImageItem sx={{ height: '100%' }}>
-      <NftImage imageUrl={ipfsUrl} name={name} />
+    <ImageListItem sx={{ height: '100%' }}>
+      <NftImage imageUrl={ipfsUrl} name={name} width={width} height={height} />
       <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
         {name}
       </Typography>
-    </ImageItem>
+    </ImageListItem>
   );
 }
 
@@ -212,13 +226,4 @@ const SearchInput = styled(OutlinedInput)({
 });
 const SLink = styled(Link)({
   textDecoration: 'none',
-});
-const ImageItem = styled(ImageListItem)({
-  padding: '16px',
-  paddingBottom: '12px',
-  backgroundColor: 'var(--yoroi-palette-common-white)',
-  borderRadius: '8px',
-  img: {
-    borderRadius: '8px',
-  },
 });
