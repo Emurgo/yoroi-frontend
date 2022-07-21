@@ -35,7 +35,10 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
+    const {
+      createWithdrawalTx,
+      shouldDeregister,
+    } = this.generated.stores.substores.ada.delegationTransaction;
 
     if (this.generated.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawalTxDialogContainer)} no selected network`);
@@ -53,7 +56,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
         }}
         onSubmit={{
           trigger: () => {
-            trackWithdrawal();
+            trackWithdrawal(shouldDeregister);
           },
           label: intl.formatMessage(globalMessages.confirm),
         }}
@@ -100,6 +103,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
               error: ?LocalizableError,
               result: ?ISignRequest<any>
             |},
+            shouldDeregister: boolean,
           |},
         |},
       |},
@@ -131,6 +135,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
                 result: stores.substores.ada.delegationTransaction.createWithdrawalTx.result,
                 reset: stores.substores.ada.delegationTransaction.createWithdrawalTx.reset,
               },
+              shouldDeregister: stores.substores.ada.delegationTransaction.shouldDeregister,
             },
           },
         },

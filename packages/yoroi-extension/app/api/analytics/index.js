@@ -62,11 +62,15 @@ export function trackDelegation(): void {
   emitEvent(INSTANCE_ID, 'delegation');
 }
 
-export function trackWithdrawal(): void {
+export function trackWithdrawal(shouldDeregister: boolean): void {
   if (INSTANCE_ID == null) {
     return;
   }
-  emitEvent(INSTANCE_ID, 'withdrawal');
+  if (shouldDeregister) {
+    emitEvent(INSTANCE_ID, 'deregister');
+  } else {
+    emitEvent(INSTANCE_ID, 'withdrawal');
+  }
 }
 
 export function trackCatalystRegistration(): void {
@@ -81,6 +85,13 @@ export function trackSetLocale(locale: string): void {
     return;
   }
   emitEvent(INSTANCE_ID, 'set-locale/' + locale);
+}
+
+export function trackSetUnitOfAccount(unitOfAccount: string): void {
+  if (INSTANCE_ID == null) {
+    return;
+  }
+  emitEvent(INSTANCE_ID, 'unit-of-account/' + unitOfAccount);
 }
 
 export function trackUpdateTheme(theme: string): void {
