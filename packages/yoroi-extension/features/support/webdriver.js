@@ -382,14 +382,20 @@ function CustomWorld(cmdInput: WorldInput) {
     return await element.isDisplayed();
   };
 
-  this.findElement = async (locator: LocatorObject) =>
-    await this.driver.findElement(getMethod(locator.method)(locator.locator));
+  this.findElement = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver:findElement: Finding element "${JSON.stringify(locator)}"`);
 
-  this.findElements = async (locator: LocatorObject) =>
-    await this.driver.findElements(getMethod(locator.method)(locator.locator));
+    return await this.driver.findElement(getMethod(locator.method)(locator.locator));
+  }
+
+  this.findElements = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver:findElements: Finding elements "${JSON.stringify(locator)}"`);
+
+    return await this.driver.findElements(getMethod(locator.method)(locator.locator));
+  }
 
   this.hoverOnElement = async (locator: WebElement) => {
-    this.webDriverLogger.info(`Webdriver: Hovering on element "${JSON.stringify(locator)}"`);
+    this.webDriverLogger.info(`Webdriver:hoverOnElement: Hovering on element "${JSON.stringify(locator)}"`);
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
   };

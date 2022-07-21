@@ -4,6 +4,7 @@ import { When, Then, } from 'cucumber';
 import { testWallets } from '../mock-chain/TestWallets';
 import { truncateAddress, } from '../../app/utils/formatters';
 import { addressField, derivationField, verifyButton } from '../pages/verifyAddressPage';
+import { expect } from 'chai';
 
 When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
@@ -84,8 +85,10 @@ When(/^I click on the verify address button$/, async function () {
   await allVerifyAddressButtons[0].click();
 });
 
-When(/^I see the verification address "([^"]*)"$/, async function (address) {
-  await this.waitUntilText(addressField, truncateAddress(address));
+When(/^I see the verification address "([^"]*)"$/, async function (expectAddress) {
+  await this.waitForElement(addressField);
+  const actualAddressStr = await this.getText(addressField);
+  expect(actualAddressStr).to.equal(truncateAddress(expectAddress), `The actual verification address is different from expected.`);
 });
 
 When(/^I see the derivation path "([^"]*)"$/, async function (path) {
