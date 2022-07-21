@@ -115,6 +115,27 @@ export function trackBuySellDialog(): void {
   emitEvent(INSTANCE_ID, 'buy-sell-ada');
 }
 
+export function trackExportWallet(): void {
+  if (INSTANCE_ID == null) {
+    return;
+  }
+  emitEvent(INSTANCE_ID, 'export-wallet');
+}
+
+export function trackRemoveWallet(): void {
+  if (INSTANCE_ID == null) {
+    return;
+  }
+  emitEvent(INSTANCE_ID, 'remove-wallet');
+}
+
+export function trackResyncWallet(): void {
+  if (INSTANCE_ID == null) {
+    return;
+  }
+  emitEvent(INSTANCE_ID, 'remove-wallet');
+}
+
 function generateAnalyticsInstanceId(): string {
   // Matomo requires 16 character hex string
   return cryptoRandomString({ length: 16 });
