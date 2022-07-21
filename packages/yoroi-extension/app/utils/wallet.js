@@ -18,7 +18,7 @@ export type FormattedTokenDisplay = {|
 
 export type FormattedNFTDisplay = {|
     id?: string,
-    image?: string,
+    image: string | null,
     name: string,
     info: $ReadOnly<TokenRow>,
 |}

@@ -12,6 +12,7 @@ import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { ReactComponent as DefaultNFT } from '../../../assets/images/nft-no.inline.svg';
 
 type Props = {|
   nftInfo: void | {|
@@ -22,7 +23,7 @@ type Props = {|
     name: string | void,
     id: string,
     amount: string,
-    image?: string,
+    image: string | null,
     description: ?string
   |},
   network: $ReadOnly<NetworkRow>,
@@ -35,8 +36,14 @@ type Intl = {|
 
 function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
-  const ipfsHash = nftInfo.image != null ? nftInfo.image.replace('ipfs://', '') : '';
   const networkUrl = getNetworkUrl(network);
+  let nftImage;
+  if (nftInfo.image != null) {
+    const ipfsHash = nftInfo.image.replace('ipfs://', '');
+    nftImage = (<img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={nftInfo.name} loading="lazy" />);
+  } else {
+    nftImage = <DefaultNFT />;
+  }
 
   return (
     <Box>
@@ -71,7 +78,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
         }}
       >
         <ImageItem flex="1">
-          <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={nftInfo.name} loading="lazy" />
+          {nftImage}
         </ImageItem>
         <Box flex="1" backgroundColor="var(--yoroi-palette-common-white)" borderRadius="8px">
           <Box borderBottom="1px solid var(--yoroi-palette-gray-50)" px="24px" py="22px">

@@ -80,9 +80,9 @@ export function getImageFromTokenMetadata(
   policyId: string,
   name: string,
   tokenMetadata: TokenMetadata,
-): string {
+): string | null {
   if (tokenMetadata.type !== 'Cardano') {
-    return '';
+    return null;
   }
   const nftMetadata = find721metadata(
     policyId,
@@ -91,7 +91,7 @@ export function getImageFromTokenMetadata(
   );
 
   if (!nftMetadata) {
-    return '';
+    return null;
   }
   if (typeof nftMetadata.image === 'string') {
     return nftMetadata.image;
@@ -99,7 +99,7 @@ export function getImageFromTokenMetadata(
   if (typeof nftMetadata.image?.[0] === 'string') {
     return nftMetadata.image[0];
   }
-  return '';
+  return null;
 }
 
 
