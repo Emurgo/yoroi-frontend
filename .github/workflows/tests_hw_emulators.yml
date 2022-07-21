@@ -100,7 +100,7 @@ jobs:
 
       - name: Build the test version using emulators
         working-directory: ./packages/yoroi-extension
-        run: npm run test:build:emulator
+        run: npm run test:build
 
       - name: Create the report's folder
         working-directory: ./packages/yoroi-extension
@@ -216,7 +216,7 @@ jobs:
 
       - name: Build the test version using emulators
         working-directory: ./packages/yoroi-extension
-        run: npm run test:build:emulator
+        run: npm run test:build
 
       - name: Create the report's folder
         working-directory: ./packages/yoroi-extension
