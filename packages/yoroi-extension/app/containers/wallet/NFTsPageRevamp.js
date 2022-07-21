@@ -46,7 +46,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
             amount: genFormatTokenAmount(getTokenInfo)(token.entry),
             policyId,
             // $FlowFixMe[prop-missing]
-            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]?.['721']?.[policyId]?.[name],
           };
         })
         .map(item => ({
