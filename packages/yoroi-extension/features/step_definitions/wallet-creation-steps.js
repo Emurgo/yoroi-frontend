@@ -5,19 +5,24 @@ import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect, assert } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
+import {
+  createWalletButton,
+  getCurrencyButton,
+  pickUpCurrencyDialog
+} from '../pages/newWalletPages';
 
 When(/^I click the create button$/, async function () {
-  await this.click({ locator: '.WalletAdd_btnCreateWallet', method: 'css' });
+  await this.click(createWalletButton);
 });
 
 When(/^I select the currency ([^"]*)$/, async function (currency) {
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton(currency));
 });
 
 When(/^I select Create Wallet$/, async function () {
-  await this.waitForElement({ locator: '.WalletCreateOptionDialog', method: 'css' });
-  await this.click({ locator: '.WalletCreateOptionDialog_createWallet', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(createWalletButton);
 });
 When(/^I select Paper Wallet$/, async function () {
   await this.waitForElement({ locator: '.WalletCreateOptionDialog', method: 'css' });
