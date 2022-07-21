@@ -16,6 +16,7 @@ export default class TxBuilderActions {
     token?: $ReadOnly<TokenRow>,
     shouldReset?: boolean,
   |}> = new Action();
+  calculateMaxAmount: AsyncAction<void> = new AsyncAction();
   deselectToken: Action<void> = new Action();
   removeTokens: Action<Array<$ReadOnly<TokenRow>>> = new Action();
   updateTentativeTx: Action<void> = new Action();

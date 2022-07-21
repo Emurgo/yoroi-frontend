@@ -154,6 +154,12 @@ type Props = {|
   +closeDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  +maxSendableAmount: {|
+    error: ?LocalizableError,
+    isExecuting: boolean,
+    result: ?BigNumber,
+  |},
+  +calculateMaxAmount: void => Promise<void>,
 |};
 
 type State = {|
@@ -172,7 +178,7 @@ export default class WalletSendForm extends Component<Props, State> {
   state: State = {
     showMemoWarning: false,
     invalidMemo: false,
-    currentStep: SEND_FORM_STEP.RECEIVER
+    currentStep: SEND_FORM_STEP.RECEIVER,
   }
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
@@ -196,11 +202,21 @@ export default class WalletSendForm extends Component<Props, State> {
      * so instead we register a reaction to update it
      */
     this.amountFieldReactionDisposer = reaction(
-      () => [this.props.shouldSendAll, this.props.totalInput],
+      () => [this.props.shouldSendAll, this.props.totalInput, this.props.maxSendableAmount],
       () => {
+        const { maxSendableAmount } = this.props;
+        const amountField =  this.form.$('amount');
+        if (maxSendableAmount.result) {
+          const numberOfDecimals = this.getNumDecimals();
+          amountField.set('value', maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString());
+        } else if (maxSendableAmount.error) {
+          amountField.set('value', '0');
+        }
+
         if (!this.props.totalInput || !this.props.fee) {
           return;
         }
+
         const totalInput = this.props.totalInput;
         const fee = this.props.fee;
         if (!this.props.shouldSendAll) {
@@ -210,7 +226,7 @@ export default class WalletSendForm extends Component<Props, State> {
         // once sendAll is triggered, set the amount field to the total input
         const adjustedInput = totalInput.joinSubtractCopy(fee);
         const relatedEntry = adjustedInput.getDefaultEntry();
-        this.form.$('amount').set('value', formatValue(
+        amountField.set('value', formatValue(
           relatedEntry,
         ));
       },
@@ -386,7 +402,10 @@ export default class WalletSendForm extends Component<Props, State> {
       isCalculatingFee,
       getTokenInfo,
       isDefaultIncluded,
-    } = this.props
+      maxSendableAmount,
+      spendableBalance
+    } = this.props;
+
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
@@ -409,13 +428,13 @@ export default class WalletSendForm extends Component<Props, State> {
       defaultNetworkId: this.props.defaultToken.NetworkId,
     });
 
-    const amountInputError = transactionFeeError || amountField.error
-    const [tokens, nfts] = this.getTokensAndNFTs(totalAmount)
+    const amountInputError = transactionFeeError || amountField.error;
+    const [tokens, nfts] = this.getTokensAndNFTs(totalAmount);
 
     const defaultTokenInfo = this.props.getTokenInfo({
       identifier: this.props.defaultToken.Identifier,
       networkId: this.props.defaultToken.NetworkId,
-    })
+    });
 
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
@@ -513,19 +532,23 @@ export default class WalletSendForm extends Component<Props, State> {
                   <p className={styles.defaultCoin}>
                     {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
                   </p>
+                  {!isErgo(this.props.selectedNetwork) &&
                   <Button
                     variant="ternary"
-                    sx={{
-                      minWidth: '56px',
-                      minHeight: '30px',
-                      border: 'none',
-                      background: `var(--yoroi-palette-gray-${shouldSendAll ? '900' : '50'})`,
-                      color: shouldSendAll && '#FFFFFF',
-                      '&:hover': {
-                        background: `var(--yoroi-palette-gray-${shouldSendAll ? '800' : '100'})`,
-                      }
-                    }}
+                    disabled={maxSendableAmount.isExecuting}
+                    className={classnames([
+                      styles.maxBtn,
+                      maxSendableAmount.isExecuting && styles.maxButtonSpinning
+                    ])}
                     onClick={() => {
+                      const hasTokens = (
+                        spendableBalance && spendableBalance.nonDefaultEntries().length !== 0
+                      )
+                      if (hasTokens || !spendableBalance) {
+                        this.props.calculateMaxAmount()
+                        return
+                      }
+
                       if (shouldSendAll) {
                         amountField.reset();
                         this.props.onRemoveTokens([defaultTokenInfo]);
@@ -538,7 +561,7 @@ export default class WalletSendForm extends Component<Props, State> {
                     }}
                   >
                     {intl.formatMessage(messages.max)}
-                  </Button>
+                  </Button>}
                 </div>
                 {this.props.unitOfAccountSetting.enabled
                 && this.props.unitOfAccountSetting.currency && (
@@ -579,12 +602,20 @@ export default class WalletSendForm extends Component<Props, State> {
                 </Button>
               </div>
 
-              {this._nextStepButton(
-               !this.props.fee || this.props.hasAnyPending || invalidMemo,
-               () => {
-                this.props.onSubmit()
-                this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
-               })}
+              <Button
+                variant="primary"
+                onClick={() => {
+                  this.props.onSubmit()
+                  this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
+                }}
+                disabled={
+                  !this.props.fee || this.props.hasAnyPending ||
+                  invalidMemo || maxSendableAmount.isExecuting
+                }
+                sx={{ margin: '125px 0px 0px 0px', display: 'block' }}
+              >
+                {intl.formatMessage(globalMessages.nextButtonLabel)}
+              </Button>
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:

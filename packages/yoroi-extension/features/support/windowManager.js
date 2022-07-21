@@ -13,6 +13,7 @@ export const mockDAppName = 'MockDApp';
 export const popupConnectorName = 'popupConnectorWindow';
 export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
+export const trezorConnectTabName = 'Trezor';
 
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
@@ -196,7 +197,7 @@ export class WindowManager {
       this.logger.error(`WindowManager: -> There is no handle for the title ${title}`);
       throw new WindowManagerError(`There is no handle for the title ${title}`);
     }
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
       const windowHandles = await this.getAllWindowHandles();
       if (windowHandles.includes(expectToBeClosedHandle[0].handle)) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -209,5 +210,18 @@ export class WindowManager {
     }
     this.logger.info(`WindowManager: -> The window with the title "${title}" is still opened`);
     return false;
+  }
+
+  async waitForClosingAndSwitchTo(
+      titleToClose: string,
+      titleSwitchTo: string
+  ): Promise<CustomWindowHandle> {
+    const result = await this.isClosed(titleToClose);
+    if (!result) {
+      throw new WindowManagerError(`The window with the title "${titleToClose}" is still opened`);
+    }
+    await this.switchTo(titleSwitchTo);
+
+    return this._getHandleByTitle(titleSwitchTo)[0];
   }
 }
