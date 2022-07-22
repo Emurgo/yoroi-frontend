@@ -118,6 +118,7 @@ export default class TransferSummaryPage extends Component<Props> {
   getHeader: void => Node = () => {
     const { intl } = this.context;
     const { transferTx, } = this.props;
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
     if (transferTx.withdrawals != null || transferTx.deregistrations != null) {
       const { withdrawals, deregistrations } = transferTx;
@@ -195,10 +196,10 @@ export default class TransferSummaryPage extends Component<Props> {
                   ticker: truncateToken(getTokenName(this.props.getTokenInfo(
                     this.props.transferTx.recoveredBalance.getDefaultEntry()
                   ))),
-                  refundAmount: deregistrations.reduce(
+                  refundAmount: formatValue(deregistrations.reduce(
                     (sum, curr) => (curr.refund == null ? sum : sum.joinAddCopy(curr.refund)),
                     new MultiToken([], this.props.transferTx.recoveredBalance.defaults)
-                  ).toString()
+                  ).getDefaultEntry())
                 })}
               </div>
             </div>
