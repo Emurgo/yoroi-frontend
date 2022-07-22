@@ -324,6 +324,14 @@ export default class TransferSummaryPage extends Component<Props> {
     const finalBalance = formatValue(
       this.getTotalBalance().getDefaultEntry()
     );
+    const cryptoSymbol = (
+      <span className={styles.currencySymbol}>
+        &nbsp;
+        {truncateToken(getTokenName(this.props.getTokenInfo(
+          transferTx.recoveredBalance.getDefaultEntry()
+        )))}
+      </span>
+    );
 
     return this.wrapInDialog(
       <div className={styles.body}>
@@ -347,21 +355,15 @@ export default class TransferSummaryPage extends Component<Props> {
                     {unitOfAccountSetting.currency}
                   </span>
                 </div>
-                <div className={styles.amountSmall}>{recoveredBalance}
-                  <span className={styles.currencySymbol}>
-                    &nbsp;{unitOfAccountSetting.currency}
-                  </span>
+                <div className={styles.amountSmall}>
+                  {recoveredBalance}
+                  {cryptoSymbol}
                 </div>
               </>
             ) : (
-              <div className={styles.amount}>{recoveredBalance}
-                <span className={styles.currencySymbol}>
-                  &nbsp;{
-                    truncateToken(getTokenName(this.props.getTokenInfo(
-                      transferTx.recoveredBalance.getDefaultEntry()
-                    )))
-                  }
-                </span>
+              <div className={styles.amount}>
+                {recoveredBalance}
+                {cryptoSymbol}
               </div>
             )}
           </div>
@@ -373,7 +375,7 @@ export default class TransferSummaryPage extends Component<Props> {
             {unitOfAccountSetting.enabled ? (
               <>
                 <div className={styles.fees}>
-                  +{convertedToUnitOfAccount(
+                  {convertedToUnitOfAccount(
                     transferTx.fee,
                     unitOfAccountSetting.currency
                   )}
@@ -381,21 +383,15 @@ export default class TransferSummaryPage extends Component<Props> {
                     {unitOfAccountSetting.currency}
                   </span>
                 </div>
-                <div className={styles.feesSmall}>{transactionFee}
-                  <span className={styles.currencySymbol}>
-                    &nbsp;{unitOfAccountSetting.currency}
-                  </span>
+                <div className={styles.feesSmall}>
+                  {transactionFee}
+                  {cryptoSymbol}
                 </div>
               </>
             ) : (
-              <div className={styles.fees}>{transactionFee}
-                <span className={styles.currencySymbol}>
-                  &nbsp;{
-                    truncateToken(getTokenName(this.props.getTokenInfo(
-                      transferTx.fee.getDefaultEntry()
-                    )))
-                  }
-                </span>
+              <div className={styles.fees}>
+                {transactionFee}
+                {cryptoSymbol}
               </div>
             )}
           </div>
@@ -417,21 +413,15 @@ export default class TransferSummaryPage extends Component<Props> {
                   {unitOfAccountSetting.currency}
                 </span>
               </div>
-              <div className={styles.totalAmountSmall}>{finalBalance}
-                <span className={styles.currencySymbol}>
-                  &nbsp;{unitOfAccountSetting.currency}
-                </span>
+              <div className={styles.totalAmountSmall}>
+                {finalBalance}
+                {cryptoSymbol}
               </div>
             </>
           ) : (
-            <div className={styles.totalAmount}>{finalBalance}
-              <span className={styles.currencySymbol}>
-                &nbsp;{
-                  truncateToken(getTokenName(this.props.getTokenInfo(
-                    transferTx.recoveredBalance.getDefaultEntry()
-                  )))
-                }
-              </span>
+            <div className={styles.totalAmount}>
+              {finalBalance}
+              {cryptoSymbol}
             </div>
           )}
         </div>
