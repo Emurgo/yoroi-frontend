@@ -48,6 +48,7 @@ import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
+import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -365,10 +366,9 @@ export default class WalletSendForm extends Component<Props, State> {
       const policyId = token.Identifier.split('.')[0];
       const name = truncateToken(getTokenStrictName(token) ?? '-');
       return {
-          name,
-          // $FlowFixMe[prop-missing]
-          image: token.Metadata.assetMintMetadata?.[0]?.['721']?.[policyId]?.[name]?.image,
-          info: token,
+        name,
+        image: getImageFromTokenMetadata(policyId, name, token.Metadata),
+        info: token,
       };
     });
 

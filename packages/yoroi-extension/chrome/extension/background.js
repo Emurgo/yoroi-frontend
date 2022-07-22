@@ -88,7 +88,7 @@ import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
-import type { CardanoAssetMintMetadata } from '../../app/api/ada/lib/storage/database/primitives/tables';
+import { find721metadata } from '../../app/utils/nftMetadata';
 
 /*::
 declare var chrome;
@@ -1654,34 +1654,6 @@ function handleInjectorConnect(port) {
       }
     }
   });
-}
-
-function find721metadata(
-  policyId: string,
-  assetNameHex: string,
-  assetMintMetadata: ?Array<CardanoAssetMintMetadata>,
-): any {
-  if (!assetMintMetadata) {
-    return null;
-  }
-  const metadataWrapper = assetMintMetadata.find(m => m['721'] != null);
-  if (metadataWrapper === undefined) {
-    return null;
-  }
-  const metadata = metadataWrapper['721'];
-  if (metadata.version && metadata.version !== '1.0') {
-    return null;
-  }
-
-  const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
-    c => String.fromCharCode(c)
-  ).join('');
-  const asset = metadata[policyId]?.[assetName] || metadata[policyId]?.[assetNameHex];
-  if (!asset) {
-    return null;
-  }
-
-  return asset;
 }
 
 function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
