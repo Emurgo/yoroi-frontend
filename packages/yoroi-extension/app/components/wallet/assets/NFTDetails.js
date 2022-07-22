@@ -12,7 +12,6 @@ import { ReactComponent as IconCopied }  from '../../../assets/images/copied.inl
 import { ReactComponent as Chevron }  from '../../../assets/images/assets-page/chevron-right.inline.svg';
 
 import moment from 'moment';
-import querystring from 'querystring';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
