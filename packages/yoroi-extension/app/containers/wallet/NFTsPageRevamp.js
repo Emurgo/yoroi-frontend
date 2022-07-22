@@ -4,9 +4,7 @@ import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { Node } from 'react';
 import {
-  genFormatTokenAmount,
   genLookupOrFail,
-  getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
