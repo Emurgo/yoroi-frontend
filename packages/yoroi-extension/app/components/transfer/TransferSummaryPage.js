@@ -345,7 +345,7 @@ export default class TransferSummaryPage extends Component<Props> {
             <div className={styles.amountLabel}>
               {intl.formatMessage(messages.recoveredBalanceLabel)}
             </div>
-            {unitOfAccountSetting.enabled ? (
+            {unitOfAccountSetting.enabled /* tmp */ && false ? (
               <>
                 <div className={styles.amount}>
                   {convertedToUnitOfAccount(
@@ -373,7 +373,7 @@ export default class TransferSummaryPage extends Component<Props> {
             <div className={styles.feesLabel}>
               {intl.formatMessage(messages.transactionFeeLabel)}
             </div>
-            {unitOfAccountSetting.enabled ? (
+            {unitOfAccountSetting.enabled /* tmp */ && false ? (
               <>
                 <div className={styles.fees}>
                   {convertedToUnitOfAccount(
@@ -402,7 +402,7 @@ export default class TransferSummaryPage extends Component<Props> {
           <div className={styles.totalAmountLabel}>
             {intl.formatMessage(globalMessages.finalBalanceLabel)}
           </div>
-          {unitOfAccountSetting.enabled ? (
+          {unitOfAccountSetting.enabled /* tmp */ && false ? (
             <>
               <div className={styles.totalAmount}>
                 {convertedToUnitOfAccount(
