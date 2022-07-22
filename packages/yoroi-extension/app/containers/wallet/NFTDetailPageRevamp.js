@@ -73,21 +73,38 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 assetMintMetadata: token.info.Metadata.assetMintMetadata[0]
               };
             })
-            .map(item => ({
-              policyId: item.policyId,
-              lastUpdatedAt: item.lastUpdatedAt,
-              ticker: item.ticker,
-              assetName: item.assetName,
-              id: item.id,
-              amount: item.amount,
-              name: item.name,
-              image: item.nftMetadata?.image ?? '',
-              description: item.nftMetadata?.description ?? '',
-              nftMetadata: item.assetMintMetadata,
-            }));
+            .map(item => {
+              const { nftMetadata } = item
+              const author = nftMetadata?.author || nftMetadata?.authors;
+
+              return {
+                policyId: item.policyId,
+                lastUpdatedAt: item.lastUpdatedAt,
+                ticker: item.ticker,
+                assetName: item.assetName,
+                id: item.id,
+                amount: item.amount,
+                name: item.name,
+                image: item.nftMetadata?.image ?? '',
+                description: item.nftMetadata?.description ?? '',
+                nftMetadata: item.assetMintMetadata,
+                author,
+              }
+            });
 
     const { nftId } = this.props.match.params;
-    const nftInfo = nftsList.find(nft => nft.id === nftId);
+    const currentNftIdx = nftsList.findIndex(nft => nft.id === nftId);
+    const nftsCount = nftsList.length;
+    const nftInfo = nftsList[currentNftIdx];
+
+    const nextNftId = currentNftIdx === nftsCount - 1 ?
+    nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id
+
+    const prevNftId = currentNftIdx === 0 ?
+    nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id
+
+    const urlPrams = new URLSearchParams(this.props.location.search);
+    const tab = urlPrams.get('tab') === null ? 'overview' : urlPrams.get('tab');
 
     return (
       <Box width="100%" height="100%">
@@ -95,6 +112,9 @@ class NFTDetailPageRevamp extends Component<AllProps> {
           nftInfo={nftInfo}
           nftsCount={nftsList.length}
           network={network}
+          nextNftId={nextNftId}
+          prevNftId={prevNftId}
+          tab={tab}
         />
       </Box>
     );

@@ -208,9 +208,9 @@ export function NftImage({ imageUrl, name, width, height }) {
 
 function NftCardImage({ ipfsUrl, name, width, height }) {
   return (
-    <ImageListItem sx={{ height: '100%' }}>
+    <ImageListItem sx={{ height: '100%', width, }}>
       <NftImage imageUrl={ipfsUrl} name={name} width={width} height={height} />
-      <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
+      <Typography mt="16px" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} minHeight="48px" color="var(--yoroi-palette-gray-900)">
         {name}
       </Typography>
     </ImageListItem>

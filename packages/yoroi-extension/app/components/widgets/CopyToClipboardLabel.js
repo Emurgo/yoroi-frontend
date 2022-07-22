@@ -6,6 +6,8 @@ import { ButtonBase, Tooltip } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { copyableMessages } from './CopyableAddress';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { ReactComponent as IconCopy }  from '../../assets/images/copy.inline.svg';
+import { ReactComponent as IconCopied }  from '../../assets/images/copied.inline.svg';
 
 type Props = {|
   text: string,
