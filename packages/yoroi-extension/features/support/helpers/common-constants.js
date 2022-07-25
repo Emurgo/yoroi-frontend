@@ -13,3 +13,5 @@ export const emailOptions = {
   url: `https://mailsac.com/api/addresses/${mailsacEmail}/messages`,
   headers: { 'Mailsac-Key': mailsacAPIKey },
 };
+
+export const commonWalletPassword = 'asdfasdfasdf';
