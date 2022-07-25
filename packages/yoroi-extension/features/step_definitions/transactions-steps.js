@@ -129,7 +129,7 @@ Then(/^I should see the successfully sent page$/, async function () {
 });
 
 Then(/^I click the transaction page button$/, async function () {
-  await this.click({ locator: "//button[contains(text(), 'Transaction page')]", method: 'xpath' });
+  await this.click({ locator: '.summary', method: 'css' });
 });
 
 Then(/^I should see the summary screen$/, async function () {
