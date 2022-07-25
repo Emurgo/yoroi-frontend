@@ -1436,6 +1436,32 @@ function handleInjectorConnect(port) {
               handleError(e);
             }
           break;
+          case 'get_network_id':
+            try {
+              checkParamCount(0);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - get_network_id could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const networkId = wallet.getParent().getNetworkInfo().BaseConfig[0].ChainNetworkId;
+                      rpcResponse({
+                        ok: parseInt(networkId),
+                      });
+                    },
+                    db,
+                    localStorageApi,
+                    false,
+                  );
+                });
+              }
+            } catch (e) {
+              handleError(e);
+            }
           case 'list_nfts/cardano':
             try {
               await withDb(async (db, localStorageApi) => {
