@@ -197,13 +197,6 @@ const ports: Map<TabId, any> = new Map();
 let pendingTxs: PendingTransaction[] = [];
 
 /**
-* need to make sure JS tasks run in an order where no two of them have different DB instances
-* Otherwise, caching logic may make things go wrong
-* TODO: this doesn't help if the Yoroi Extension or a Web Worker makes a query during this execution
-*/
-const dbAccessMutex = new Mutex();
-
-/**
  * Performs wallet version migration if needed
  * Then calls the continuation with storage objects
  * Note: the DB returns is an IN-MEMORY COPY of the real DB
