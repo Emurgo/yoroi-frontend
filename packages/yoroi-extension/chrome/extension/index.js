@@ -31,7 +31,7 @@ const initializeYoroi: void => Promise<void> = async () => {
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions, router);
-  await trackStartup();
+  await trackStartup(stores);
 
   Logger.debug(`[yoroi] stores created`);
 

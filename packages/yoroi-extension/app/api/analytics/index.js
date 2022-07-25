@@ -8,12 +8,17 @@ import LocalStorageApi, {
 } from '../localStorage';
 import { environment } from '../../environment';
 import { TRACKED_ROUTES } from '../../routes-config';
+import type { StoresMap } from '../../stores';
+import { isTestnet as isTestnetFunc} from '../ada/lib/storage/database/prepackaged/networks';
 
 const MATOMO_URL = 'https://analytics.emurgo-rnd.com/matomo.php';
 const SITE_ID = '4';
 let INSTANCE_ID;
+let stores;
 
-export async function trackStartup(): Promise<void> {
+export async function trackStartup(stores_: StoresMap): Promise<void> {
+  stores = stores_;
+
   let event;
   if (await (new LocalStorageApi()).getUserLocale() != null) {
     INSTANCE_ID = await loadAnalyticsInstanceId();
@@ -141,17 +146,24 @@ function generateAnalyticsInstanceId(): string {
   return cryptoRandomString({ length: 16 });
 }
 
+function getCurrentWalletInfo() {
+}
+
 function emitEvent(instanceId: string, event: string): void {
-  if (environment.isDev() || environment.isTest()) {
+  if (/*fixme environment.isDev() ||*/ environment.isTest()) {
     return;
   }
+
+  const isTestnet = stores.profile.selectedNetwork != null ?
+    isTestnetFunc(stores.profile.selectedNetwork) :
+    false;
 
   // https://developer.matomo.org/api-reference/tracking-api
   const params = {
     idsite: SITE_ID,
     rec: '1',
     action_name: event,
-    url: `yoroi.extension/${event}`,
+    url: `yoroi.extension/${isTestnet ? 'testnet/' : ''}${event}`,
     _id: INSTANCE_ID,
     rand: `${Date.now()}-${Math.random()}`,
     apiv: '1'
