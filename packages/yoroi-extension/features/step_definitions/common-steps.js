@@ -13,17 +13,17 @@ import {
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By, logging } from 'selenium-webdriver';
-import { enterRecoveryPhrase, getLogDate } from '../support/helpers/helpers';
+import { getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import {
   testRunsDataDir,
   snapshotsDir,
-  } from '../support/helpers/common-constants';
+  commonWalletPassword,
+} from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
-// eslint-disable-next-line import/named
 import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
@@ -50,9 +50,34 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  saveButton
+  saveButton,
+  restoreOptionDialog,
+  normalWordWalletButton,
+  byronEraButton,
+  createWalletButton,
+  createOptionDialog,
+  createNormalWalletButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
+import {
+  restoreWalletInputPhraseDialog,
+  inputMnemonicForWallet,
+  walletPasswordInput,
+  repeatPasswordInput,
+} from '../pages/restoreWalletPage';
+import {
+  backupPrivacyWarningDialog,
+  checkRecoveryPhrase2Checkboxes,
+  creationConfirmButton,
+  creationWarningContinueButton,
+  iWrittenDownButton,
+  mnemonicPhraseText,
+  nobodyLooksCheckbox,
+  recoveryPhraseEntryDialog, recoveryPhraseEntryDialogConfirmButton,
+  repeatRecoveryPhrase,
+  walletInfoDialog,
+  walletRecoveryPhraseDisplayDialog
+} from '../pages/createWalletPage';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -159,6 +184,12 @@ After(async function (scenario) {
   await this.driver.quit();
 });
 
+type WalletEra = {|
+  era:
+    | 'shelley'
+    | 'byron',
+|}
+
 export async function getPlates(customWorld: any): Promise<any> {
   // check plate in confirmation dialog
   let plateElements = await customWorld.driver.findElements(
@@ -252,23 +283,40 @@ async function getLogs(driver, name, loggingType) {
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
 
-async function inputMnemonicForWallet(
+async function restoreWallet (
+    customWorld: any,
+    walletEra: WalletEra,
+    walletName: string
+): Promise<void> {
+  const restoreInfo = testWallets[walletName];
+  expect(restoreInfo).to.not.equal(undefined);
+
+  await customWorld.click(restoreWalletButton);
+
+  await customWorld.waitForElement(pickUpCurrencyDialog);
+  await customWorld.click(getCurrencyButton('cardano'));
+
+  await customWorld.waitForElement(restoreOptionDialog);
+
+  await customWorld.click(normalWordWalletButton);
+  if (walletEra === 'shelley') {
+    await customWorld.click(shelleyEraButton);
+  } else if (walletEra === 'byron') {
+    await customWorld.click(byronEraButton);
+  } else {
+    throw new Error(`Unknown wallet era: ${walletEra}.`);
+  }
+  await customWorld.waitForElement(restoreWalletInputPhraseDialog);
+
+  await inputMnemonicForWallet(customWorld, restoreInfo);
+  await checkWalletPlate(customWorld, walletName, restoreInfo);
+}
+
+async function checkWalletPlate(
   customWorld: any,
   walletName: string,
   restoreInfo: RestorationInput
 ): Promise<void> {
-  await customWorld.input({ locator: "input[name='walletName']", method: 'css' }, restoreInfo.name);
-  await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
-  await customWorld.input(
-    { locator: "input[name='walletPassword']", method: 'css' },
-    restoreInfo.password
-  );
-  await customWorld.input(
-    { locator: "input[name='repeatPassword']", method: 'css' },
-    restoreInfo.password
-  );
-  await customWorld.click({ locator: '.WalletRestoreDialog .primary', method: 'css' });
-
   const plateElements = await getPlates(customWorld);
   const plateText = await plateElements[0].getText();
   expect(plateText).to.be.equal(restoreInfo.plate);
@@ -308,46 +356,50 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
   await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
 
-  await inputMnemonicForWallet(this, walletName, restoreInfo);
+  await inputMnemonicForWallet(this, restoreInfo);
+  await checkWalletPlate(this, walletName, restoreInfo);
 });
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
-  const restoreInfo = testWallets[walletName];
-  expect(restoreInfo).to.not.equal(undefined);
-
-  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
-
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
-
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
-
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
-
-  await inputMnemonicForWallet(this, walletName, restoreInfo);
+  await restoreWallet(this, 'shelley', walletName);
 });
 
 Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
   this.webDriverLogger.info(`Step: There is a Byron wallet stored named ${walletName}`);
-  const restoreInfo = testWallets[walletName];
-  expect(restoreInfo).to.not.equal(undefined);
+  await restoreWallet(this, 'byron', walletName);
+});
 
-  await this.click(restoreWalletButton);
+Given(/^I create a new Shelley wallet with the name ([^"]*)$/, async function (walletName) {
+  await this.click(createWalletButton);
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
 
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
+  await this.waitForElement(createOptionDialog);
+  await this.click(createNormalWalletButton);
 
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.waitForElement(walletInfoDialog);
+  await this.input(walletNameInput, walletName);
+  await this.input(walletPasswordInput, commonWalletPassword);
+  await this.input(repeatPasswordInput, commonWalletPassword);
+  await this.click(creationConfirmButton);
 
-  await inputMnemonicForWallet(this, walletName, restoreInfo);
-});
+  await this.waitForElement(backupPrivacyWarningDialog);
+  await this.click(nobodyLooksCheckbox);
+  await this.waitEnable(creationWarningContinueButton);
+  await this.click(creationWarningContinueButton);
+
+  await this.waitForElement(walletRecoveryPhraseDisplayDialog);
+  const rawMnemonicPhrase = (await this.getText(mnemonicPhraseText)).trim();
+  await this.click(iWrittenDownButton);
+
+  // enter recovery phrase
+  await this.waitForElement(recoveryPhraseEntryDialog);
+  await repeatRecoveryPhrase(this, rawMnemonicPhrase);
+  await checkRecoveryPhrase2Checkboxes(this);
+  await this.click(recoveryPhraseEntryDialogConfirmButton);
+})
 
 Given(/^I have completed the basic setup$/, async function () {
   this.webDriverLogger.info(`Step: I have completed the basic setup`);
