@@ -446,7 +446,7 @@ export class RemoteFetcher implements IFetcher {
         {
           method: 'post',
           data: {
-            assets: body.assets
+            assets: body.assets.slice(0, 100) // todo: revese this change
           }
         }
       ).then(response => response.data)

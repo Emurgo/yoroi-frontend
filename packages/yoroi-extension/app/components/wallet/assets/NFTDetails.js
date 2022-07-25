@@ -5,7 +5,6 @@ import { Link as LinkMui, Typography, Stack, Tab, Modal, ThemeProvider, createTh
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl, defineMessages } from 'react-intl';
-import { ReactComponent as LinkSvg }  from '../../../assets/images/link.inline.svg';
 import { ReactComponent as BackArrow }  from '../../../assets/images/assets-page/backarrow.inline.svg';
 import { ReactComponent as IconCopy }  from '../../../assets/images/copy.inline.svg';
 import { ReactComponent as IconCopied }  from '../../../assets/images/copied.inline.svg';
@@ -15,7 +14,6 @@ import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
@@ -70,34 +68,40 @@ const messages = defineMessages({
   missingMetadata: {
     id: 'wallet.nftGallary.details.missingMetadata',
     defaultMessage: '!!!Metadata is missing'
+  },
+  description: {
+    id: 'wallet.nftGallary.details.description',
+    defaultMessage: '!!!Description'
+  },
+  author: {
+    id: 'wallet.nftGallary.details.author',
+    defaultMessage: '!!!Author'
   }
 })
+export const tabs = [
+  {
+    id: 'overview',
+    label: messages.overview,
+  },
+  {
+    id: 'metadata',
+    label: messages.metadata,
+  },
+];
 
 function NFTDetails({
   nftInfo,
-  nftsCount,
   network,
   intl,
   nextNftId,
   prevNftId,
-  tab
+  tab,
 }: Props & Intl): Node {
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
-  const [value, setValue] = useState(tab);
+  const [activeTab, setActiveTab] = useState(tab);
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
-
-  const tabs = [
-    {
-      id: 'overview',
-      label: intl.formatMessage(messages.overview),
-    },
-    {
-      id: 'metadata',
-      label: intl.formatMessage(messages.metadata),
-    },
-  ];
 
   const onCopyMetadata = async () => {
     setCopy(false)
@@ -154,12 +158,12 @@ function NFTDetails({
               px: '24px',
             }}
           >
-            <Typography variant="h2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '75%' }} color="var(--yoroi-palette-gray-900)">
+            <TruncatedText variant="h2" sx={{ width: '75%' }} color="var(--yoroi-palette-gray-900)">
               {nftInfo.name}
-            </Typography>
+            </TruncatedText>
 
             <Stack direction='row' spacing={1}>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${value}`}>
+              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
                 <IconButton
                   aria-label='Previous'
                   sx={{ transform: 'rotate(180deg)', width: '32px' }}
@@ -167,7 +171,7 @@ function NFTDetails({
                   <Chevron />
                 </IconButton>
               </Link>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${value}`}>
+              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
                 <IconButton
                   aria-label='Next'
                   sx={{ width: '32px' }}
@@ -178,7 +182,7 @@ function NFTDetails({
             </Stack>
           </Stack>
           <ThemeProvider theme={theme}>
-            <TabContext value={value}>
+            <TabContext value={activeTab}>
               <Box>
                 <TabList
                   sx={{
@@ -188,11 +192,11 @@ function NFTDetails({
                     borderBottom: 1,
                     borderColor: 'divider'
                   }}
-                  onChange={(_, newValue) =>  setValue(newValue)}
+                  onChange={(_, newValue) =>  setActiveTab(newValue)}
                   aria-label="NFTs tabs"
                 >
                   {tabs.map(({ label, id }) => (
-                    <Tab sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500 }} label={label} value={id} />
+                    <Tab sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500 }} label={intl.formatMessage(label)} value={id} />
                   ))}
                 </TabList>
               </Box>
@@ -205,46 +209,36 @@ function NFTDetails({
                 }}
                 value={tabs[0].id}
               >
-                <LabelWithValue
-                  label={intl.formatMessage(tokenMessages.created)}
-                  value={nftInfo.lastUpdatedAt ? moment(nftInfo.lastUpdatedAt).format('LL') : '-'}
-                />
-
-                <Box marginTop="24px">
-                  <LabelWithValue label="Description" value={nftInfo.description || '-'} />
-                </Box>
-
-                <Box marginTop="24px">
-                  <LabelWithValue label="Author" value={nftInfo.author || '-'} />
-                </Box>
-                <Box marginTop='24px'>
+                <Stack spacing='24px'>
+                  <LabelWithValue
+                    label={intl.formatMessage(tokenMessages.created)}
+                    value={nftInfo.lastUpdatedAt ? moment(nftInfo.lastUpdatedAt).format('LL') : '-'}
+                  />
+                  <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} />
+                  <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} />
                   <LabelWithValue
                     label={intl.formatMessage(globalMessages.fingerprint)}
                     value={
-                      <CopyToClipboardText text={nftInfo.id}>{nftInfo.id}</CopyToClipboardText>
+                      <CopyAddress withButton text={nftInfo.id}>
+                        {nftInfo.id}
+                      </CopyAddress>
                     }
                   />
-                </Box>
-                <Box marginTop="24px">
+
                   <LabelWithValue
                     label={intl.formatMessage(tokenMessages.policyId)}
                     value={
-                      <CopyToClipboardText text={nftInfo.policyId}>
+                      <CopyAddress withButton text={nftInfo.policyId}>
                         {nftInfo.policyId}
-                      </CopyToClipboardText>
-                    }
+                      </CopyAddress>
+                  }
                   />
-                </Box>
 
-                <Box marginTop="24px">
                   <LabelWithValue
                     label={
                       <>
                         <Typography as="span" display="flex">
                           {intl.formatMessage(tokenMessages.detailsOn)}
-                          <Typography as="span" ml="4px">
-                            <LinkSvg />
-                          </Typography>
                         </Typography>
                       </>
                     }
@@ -252,17 +246,17 @@ function NFTDetails({
                       <LinkMui
                         target="_blank"
                         href={
-                            networkUrl != null && `${networkUrl}/${nftInfo.policyId}${nftInfo.assetName}`
+                          networkUrl != null && `${networkUrl}/${nftInfo.policyId}${nftInfo.assetName}`
                         }
                         disabled={networkUrl === null}
                         rel="noopener noreferrer"
                         sx={{ textDecoration: 'none' }}
                       >
-                        Cardanoscan
+                        {intl.formatMessage(globalMessages.cardanoscan)}
                       </LinkMui>
                     }
                   />
-                </Box>
+                </Stack>
               </TabPanel>
 
               <TabPanel
@@ -328,6 +322,45 @@ const ImageItem = styled(Box)({
     borderRadius: '8px',
   },
 });
+
+// Requrie predefined with
+// jone -> jo..
+const TruncatedText = styled(Typography)({
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis'
+})
+
+function CopyAddress({ text }): Node {
+  const [isCopied, setCopy] = useState(false);
+
+  const onCopy = async () => {
+    setCopy(false)
+
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopy(true)
+    } catch (error) {
+      setCopy(false)
+    }
+
+    setTimeout(() => {
+      setCopy(false)
+    }, 2500) // 2.5 sec
+  }
+
+  return (
+    <Stack direction='row' alignItems='center' justifyContent='space-between'>
+      <TruncatedText sx={{ width: '90%' }}>
+        {text}
+      </TruncatedText>
+
+      <IconButton onClick={onCopy}>
+        {isCopied ? <IconCopied /> : <IconCopy />}
+      </IconButton>
+    </Stack>
+  )
+}
 
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (

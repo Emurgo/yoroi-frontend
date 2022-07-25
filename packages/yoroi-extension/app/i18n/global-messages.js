@@ -132,6 +132,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.remove',
     defaultMessage: '!!!Remove',
   },
+  cardanoscan: {
+    id: 'global.explorers.cardanoscan',
+    defaultMessage: '!!!Cardanoscan',
+  },
   exportButtonLabel: {
     id: 'wallet.transaction.export.dialog.exportButton.label',
     defaultMessage: '!!!Export',
