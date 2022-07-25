@@ -1,7 +1,6 @@
 // @flow
 
-import { By, Key } from 'selenium-webdriver';
-import { recoveryPhraseField } from '../../pages/restoreWalletPage';
+import { By } from 'selenium-webdriver';
 
 export const checkIfElementsInArrayAreUnique = function (arr: Array<string>): boolean {
   return new Set(arr).size === arr.length;
@@ -38,16 +37,6 @@ export function getMethod(
     default: {
       return By.css;
     }
-  }
-}
-
-export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
-
-  const recoveryPhrase = phrase.split(' ');
-  for (let i = 0; i < recoveryPhrase.length; i++) {
-    const recoveryPhraseElement = await customWorld.findElement(recoveryPhraseField);
-    await recoveryPhraseElement.sendKeys(recoveryPhrase[i], Key.RETURN);
-    if (i === 0) await customWorld.driver.sleep(500);
   }
 }
 
