@@ -28,8 +28,13 @@ jobs:
           sudo apt -y install nix-bin
 
       - name: Download firmware
-        working-directory: ../trezor-user-env
-        run: sudo ./src/binaries/firmware/bin/download.sh
+        working-directory: ../trezor-user-env/src/binaries/firmware/bin/
+        run: |
+          sed '/^.*R_LATEST_BUILD.*$/d' download.sh | sed '/^.*trezor_r_master.*$/d' > temp_file.sh
+          rm download.sh
+          mv temp_file.sh download.sh
+          chmod +x download.sh
+          sudo ./download.sh
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env
@@ -144,8 +149,13 @@ jobs:
           sudo apt -y install nix-bin
 
       - name: Download firmware
-        working-directory: ../trezor-user-env
-        run: sudo ./src/binaries/firmware/bin/download.sh
+        working-directory: ../trezor-user-env/src/binaries/firmware/bin/
+        run: |
+          sed '/^.*R_LATEST_BUILD.*$/d' download.sh | sed '/^.*trezor_r_master.*$/d' > temp_file.sh
+          rm download.sh
+          mv temp_file.sh download.sh
+          chmod +x download.sh
+          sudo ./download.sh
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env
