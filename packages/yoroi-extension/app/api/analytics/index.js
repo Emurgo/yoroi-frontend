@@ -150,7 +150,7 @@ function getCurrentWalletInfo() {
 }
 
 function emitEvent(instanceId: string, event: string): void {
-  if (/*fixme environment.isDev() ||*/ environment.isTest()) {
+  if (environment.isDev() || environment.isTest()) {
     return;
   }
 
