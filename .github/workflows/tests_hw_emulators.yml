@@ -29,7 +29,12 @@ jobs:
 
       - name: Download firmware
         working-directory: ../trezor-user-env
-        run: sudo ./src/binaries/firmware/bin/download.sh
+        run: |
+          cd src/binaries/firmware/bin/
+          sed '/^.*R_LATEST_BUILD.*$/d' download.sh | sed '/^.*trezor_r_master.*$/d' > temp_file.sh
+          rm download.sh
+          mv temp_file.sh download.sh
+          sudo ./download.sh
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env
@@ -145,7 +150,12 @@ jobs:
 
       - name: Download firmware
         working-directory: ../trezor-user-env
-        run: sudo ./src/binaries/firmware/bin/download.sh
+        run: |
+          cd src/binaries/firmware/bin/
+          sed '/^.*R_LATEST_BUILD.*$/d' download.sh | sed '/^.*trezor_r_master.*$/d' > temp_file.sh
+          rm download.sh
+          mv temp_file.sh download.sh
+          sudo ./download.sh
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env
