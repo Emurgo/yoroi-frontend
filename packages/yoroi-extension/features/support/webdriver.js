@@ -50,7 +50,7 @@ function getBraveBuilder() {
         '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
         '--start-maximized' // Starts the browser maximized, regardless of any previous settings
       )
-      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+      .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
   );
 }
 
@@ -59,7 +59,7 @@ function getChromeBuilder() {
     .forBrowser('chrome')
     .setChromeOptions(
       new chrome.Options()
-        .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+        .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
         .addArguments(
           '--no-sandbox',
           '--disable-gpu',
@@ -77,7 +77,7 @@ function getFirefoxBuilder() {
      * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
      */
     .setBinary(process.env.FIREFOX_DEV)
-    .addExtensions(path.resolve(__dirname, '../../yoroi.xpi'))
+    .addExtensions(path.resolve(__dirname, '../../Yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox

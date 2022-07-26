@@ -38,7 +38,6 @@ jobs:
       - name: tests
         run: |
           npm run test
-
   E2E_tests_dApp_Chrome:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
     runs-on: macos-10.15
@@ -96,6 +95,8 @@ jobs:
           touch ./reports/cucumberReports.json
       - name: Run dapp connector tests
         working-directory: ./packages/yoroi-extension
+        env:
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
         run: npm run test:run:e2e:dApp:chrome
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
@@ -165,6 +166,8 @@ jobs:
           touch ./reports/cucumberReports.json
       - name: Run dapp connector tests
         working-directory: ./packages/yoroi-extension
+        env:
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
         run: npm run test:run:e2e:dApp:firefox
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
