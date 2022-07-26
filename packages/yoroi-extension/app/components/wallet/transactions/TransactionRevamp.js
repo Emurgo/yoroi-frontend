@@ -153,13 +153,20 @@ export default class TransactionRevamp extends Component<Props, State> {
   getStatusString(
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
-    assuranceLevel: AssuranceLevel
+    assuranceLevel: AssuranceLevel,
+    isValid: boolean,
   ): string {
+    if (!isValid) {
+      return intl.formatMessage(stateTranslations.failed);
+    }
     if (state === TxStatusCodes.IN_BLOCK) {
       return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     }
     if (state === TxStatusCodes.PENDING) {
       return intl.formatMessage(stateTranslations.pending);
+    }
+    if (state === TxStatusCodes.SUBMITTED) {
+      return intl.formatMessage(stateTranslations.submitted);
     }
     if (state < 0) {
       return intl.formatMessage(stateTranslations.failed);
@@ -483,8 +490,12 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
-    const isFailedTransaction = state < 0;
-    const isPendingTransaction = state === TxStatusCodes.PENDING;
+    const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
+    const isFailedTransaction = (state < 0) && !isSubmittedTransaction;
+    const isPendingTransaction = (state === TxStatusCodes.PENDING) || isSubmittedTransaction;
+    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
+      data.isValid :
+      true;
 
     const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
@@ -495,7 +506,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel);
+    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
 
     return (
       <Box className={styles.component}>
