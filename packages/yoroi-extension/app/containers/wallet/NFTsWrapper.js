@@ -113,7 +113,7 @@ export default class NFTsWrapper extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(AssetsWrapper)} no way to generated props`);
+      throw new Error(`${nameof(NFTsWrapper)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({

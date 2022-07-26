@@ -15,7 +15,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type { NetworkRow, NFTMetadata } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, NFTMetadata, CardanoAssetMintMetadata } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -40,12 +40,12 @@ type Props = {|
     image: string | null,
     description: ?string,
     author: ?string,
-    metadata: NFTMetadata
+    metadata: CardanoAssetMintMetadata | null,
   |},
   network: $ReadOnly<NetworkRow>,
   nextNftId: string,
   prevNftId: string,
-  tab: string,
+  tab: string | null,
 |};
 
 type Intl = {|
@@ -83,7 +83,7 @@ const messages: Object = defineMessages({
   }
 });
 
-export const tabs = [
+const tabs = [
   {
     id: 'overview',
     label: messages.overview,
@@ -104,11 +104,13 @@ function NFTDetails({
 }: Props & Intl): Node {
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
-  const [activeTab, setActiveTab] = useState(tab);
+  const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
 
   const onCopyMetadata = async () => {
+    if (nftInfo.metadata === null) return;
+
     setCopy(false)
     try {
       await navigator.clipboard.writeText(JSON.stringify(nftInfo.metadata, null, 2))

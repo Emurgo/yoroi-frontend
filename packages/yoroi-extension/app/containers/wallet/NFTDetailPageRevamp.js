@@ -15,10 +15,10 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
-import type { Match } from 'react-router-dom';
+import type { Match, Location } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
-import NFTDetails, { tabs } from '../../components/wallet/assets/NFTDetails';
+import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import {
   getAuthorFromTokenMetadata,
   getDescriptionFromTokenMetadata,
@@ -31,7 +31,7 @@ type Props = {|
 |};
 type MatchProps = {|
   match: Match,
-  location: {| search: string |}
+  location: Location,
 |};
 
 type AllProps = {| ...Props, ...MatchProps |};
@@ -75,7 +75,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 ),
                 author: getAuthorFromTokenMetadata(policyId, name, token.info.Metadata),
                 // $FlowFixMe
-                metadata: token.info.Metadata?.assetMintMetadata?.[0]
+                metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
               };
             });
 
@@ -91,7 +91,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id
 
     const urlPrams = new URLSearchParams(this.props.location.search);
-    const tab = urlPrams.get('tab') === null ? tabs[0].id : urlPrams.get('tab');
+    const tab = urlPrams.get('tab')
 
     return (
       <Box width="100%" height="100%">
