@@ -17,6 +17,7 @@ import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
+import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 // Overwrite current theme
 // Temporary solution untill the new design system.
@@ -231,16 +232,15 @@ function NFTDetails({
                       <CopyAddress withButton text={nftInfo.policyId}>
                         {nftInfo.policyId}
                       </CopyAddress>
-                  }
+                    }
                   />
 
+                  {isCardanoHaskell(network) &&
                   <LabelWithValue
                     label={
-                      <>
-                        <Typography as="span" display="flex">
-                          {intl.formatMessage(tokenMessages.detailsOn)}
-                        </Typography>
-                      </>
+                      <Typography as="span" display="flex">
+                        {intl.formatMessage(tokenMessages.detailsOn)}
+                      </Typography>
                     }
                     value={
                       <LinkMui
@@ -255,7 +255,7 @@ function NFTDetails({
                         {intl.formatMessage(globalMessages.cardanoscan)}
                       </LinkMui>
                     }
-                  />
+                  />}
                 </Stack>
               </TabPanel>
 
@@ -291,9 +291,12 @@ function NFTDetails({
         <Box
           sx={{
             position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'auto',
           }}
           onClick={onClose}
         >
