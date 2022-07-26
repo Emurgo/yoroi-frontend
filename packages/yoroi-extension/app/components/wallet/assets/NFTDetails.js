@@ -38,8 +38,8 @@ type Props = {|
     name: string | void,
     id: string,
     amount: string,
-    image?: string,
-    description?: string
+    image: string | null,
+    description: ?string
   |},
   network: $ReadOnly<NetworkRow>,
   nftsCount: number

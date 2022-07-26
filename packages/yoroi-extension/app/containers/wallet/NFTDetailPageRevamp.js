@@ -20,6 +20,10 @@ import type { Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import NFTDetails, { tabs } from '../../components/wallet/assets/NFTDetails';
+import {
+  getDescriptionFromTokenMetadata,
+  getImageFromTokenMetadata,
+} from '../../utils/nftMetadata';
 
 export type GeneratedData = typeof NFTDetailPageRevamp.prototype.generated;
 type Props = {|
@@ -63,33 +67,13 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
                 amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-                nftMetadata: token.info.Metadata.assetMintMetadata
-                  && token.info.Metadata.assetMintMetadata.length > 0
-                  && token.info.Metadata.assetMintMetadata[0]['721']
-                  && token.info.Metadata.assetMintMetadata[0]['721'][policyId]
-                  && token.info.Metadata.assetMintMetadata[0]['721'][policyId][name]
-                  ? token.info.Metadata.assetMintMetadata[0]['721'][policyId][name]
-                  : undefined,
-                assetMintMetadata: token.info.Metadata.assetMintMetadata[0]
+                image: getImageFromTokenMetadata(policyId, name, token.info.Metadata),
+                description: getDescriptionFromTokenMetadata(
+                  policyId,
+                  name,
+                  token.info.Metadata
+                ),
               };
-            })
-            .map(item => {
-              const { nftMetadata } = item
-              const author = nftMetadata?.author || nftMetadata?.authors;
-
-              return {
-                policyId: item.policyId,
-                lastUpdatedAt: item.lastUpdatedAt,
-                ticker: item.ticker,
-                assetName: item.assetName,
-                id: item.id,
-                amount: item.amount,
-                name: item.name,
-                image: item.nftMetadata?.image ?? '',
-                description: item.nftMetadata?.description ?? '',
-                nftMetadata: item.assetMintMetadata,
-                author,
-              }
             });
 
     const { nftId } = this.props.match.params;

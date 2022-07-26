@@ -25,7 +25,7 @@ import { useState, useEffect } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 
 type Props = {|
-  list: Array<{| name: string, image: string | void |}> | void,
+  list: Array<{| name: string, image: string | null |}> | void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,

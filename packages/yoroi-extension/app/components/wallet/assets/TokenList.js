@@ -3,16 +3,14 @@ import { useState } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { injectIntl } from 'react-intl';
-import styles from './AssetsList.scss';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { ReactComponent as NoAssetLogo }  from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { ReactComponent as ArrowsListFromBottom }  from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop }  from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList }  from '../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
-import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
+import { truncateAddressShort } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
-import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import globalMessages from '../../../i18n/global-messages';
@@ -65,8 +63,6 @@ type State = {|
 |};
 
 function TokenList({
-  assetDeposit,
-  getTokenInfo,
   assetsList: list,
   shouldHideBalance,
   intl,
@@ -123,59 +119,6 @@ function TokenList({
     return <ArrowsList />;
   };
 
-  const renderTokenName: () => Node = () => {
-    if (assetDeposit == null) {
-      return <div className={styles.isLoading} />;
-    }
-    const defaultEntry = assetDeposit.getDefaultEntry();
-    const tokenInfo = getTokenInfo(defaultEntry);
-    return truncateToken(getTokenName(tokenInfo));
-  };
-
-  const renderAmountDisplay: () => Node = () => {
-    if (assetDeposit == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = assetDeposit.getDefaultEntry();
-    const tokenInfo = getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (shouldHideBalance) {
-      balanceDisplay = (
-        <Typography as="span" fontWeight="inherit">
-          {hiddenAmount}
-        </Typography>
-      );
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          <Typography as="span" fontWeight="inherit">
-            {beforeDecimalRewards}
-          </Typography>
-          <Typography as="span" fontWeight="inherit">
-            {afterDecimalRewards}
-          </Typography>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay}
-        <Typography as="span" ml="4px" fontWeight="inherit">
-          {truncateToken(getTokenName(tokenInfo))}
-        </Typography>
-      </>
-    );
-  };
-
   const { assetsList } = state;
 
   return (
@@ -230,22 +173,14 @@ function TokenList({
                 </ButtonBase>
               }
             />
-            {assetDeposit ? (
-              <TokenItemRow
-                avatar={<NoAssetLogo />}
-                name={renderTokenName()}
-                id="-"
-                amount={renderAmountDisplay()}
-                isTotalAmount
-              />
-            ) : null}
+
             {assetsList.map(token => (
               <TokenItemRow
                 key={token.id}
                 avatar={<NoAssetLogo />}
                 name={token.name}
                 id={token.id}
-                amount={token.amount}
+                amount={shouldHideBalance ? hiddenAmount :  token.amount}
               />
             ))}
           </List>
