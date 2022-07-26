@@ -259,6 +259,7 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
     });
   }
 }
+
 export class CannotSendBelowMinimumValueError extends LocalizableError {
   constructor() {
     super({
