@@ -1,5 +1,6 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import { useState } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 import { Link as LinkMui, Typography, Stack, Tab, Modal, ThemeProvider, createTheme, Button, IconButton } from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
@@ -9,13 +10,12 @@ import { ReactComponent as BackArrow }  from '../../../assets/images/assets-page
 import { ReactComponent as IconCopy }  from '../../../assets/images/copy.inline.svg';
 import { ReactComponent as IconCopied }  from '../../../assets/images/copied.inline.svg';
 import { ReactComponent as Chevron }  from '../../../assets/images/assets-page/chevron-right.inline.svg';
-
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, NFTMetadata } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -37,19 +37,22 @@ type Props = {|
     assetName: string,
     name: string | void,
     id: string,
-    amount: string,
     image: string | null,
-    description: ?string
+    description: ?string,
+    author: ?string,
+    metadata: NFTMetadata
   |},
   network: $ReadOnly<NetworkRow>,
-  nftsCount: number
+  nextNftId: string,
+  prevNftId: string,
+  tab: string,
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-const messages = defineMessages({
+const messages: Object = defineMessages({
   back: {
     id: 'wallet.nftGallary.details.back',
     defaultMessage: '!!!back to gallery',
@@ -78,7 +81,8 @@ const messages = defineMessages({
     id: 'wallet.nftGallary.details.author',
     defaultMessage: '!!!Author'
   }
-})
+});
+
 export const tabs = [
   {
     id: 'overview',
@@ -98,8 +102,6 @@ function NFTDetails({
   prevNftId,
   tab,
 }: Props & Intl): Node {
-
-  console.log({where: 'NFTDetails'})
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab);
@@ -150,7 +152,7 @@ function NFTDetails({
         }}
       >
         <ImageItem sx={{ cursor: nftInfo.image !== null ? 'pointer' : 'auto' }} onClick={() => nftInfo.image !== null && setOpen(true)} flex="1" flexShrink={0}>
-          <NftImage imageUrl={nftInfo.image} name={nftInfo.name} width='532px' height='510px' />
+          <NftImage imageUrl={nftInfo.image} name={nftInfo.name || '-'} width='532px' height='510px' />
         </ImageItem>
         <Box flex="1" sx={{ width: '50%' }}>
           <Stack
@@ -199,7 +201,7 @@ function NFTDetails({
                   aria-label="NFTs tabs"
                 >
                   {tabs.map(({ label, id }) => (
-                    <Tab sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500 }} label={intl.formatMessage(label)} value={id} />
+                    <Tab key={id} sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500 }} label={intl.formatMessage(label)} value={id} />
                   ))}
                 </TabList>
               </Box>

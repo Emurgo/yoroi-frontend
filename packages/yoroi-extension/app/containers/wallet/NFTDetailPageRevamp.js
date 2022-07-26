@@ -4,7 +4,6 @@ import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { ComponentType, Node } from 'react';
 import {
-  genFormatTokenAmount,
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenStrictName,
@@ -21,6 +20,7 @@ import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import NFTDetails, { tabs } from '../../components/wallet/assets/NFTDetails';
 import {
+  getAuthorFromTokenMetadata,
   getDescriptionFromTokenMetadata,
   getImageFromTokenMetadata,
 } from '../../utils/nftMetadata';
@@ -31,6 +31,7 @@ type Props = {|
 |};
 type MatchProps = {|
   match: Match,
+  location: {| search: string |}
 |};
 
 type AllProps = {| ...Props, ...MatchProps |};
@@ -66,14 +67,15 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 ticker: token.info.Metadata.ticker ?? '-',
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                amount: genFormatTokenAmount(getTokenInfo)(token.entry),
                 image: getImageFromTokenMetadata(policyId, name, token.info.Metadata),
                 description: getDescriptionFromTokenMetadata(
                   policyId,
                   name,
                   token.info.Metadata
                 ),
-                metadata: token.info.Metadata.assetMintMetadata[0]
+                author: getAuthorFromTokenMetadata(policyId, name, token.info.Metadata),
+                // $FlowFixMe
+                metadata: token.info.Metadata?.assetMintMetadata?.[0]
               };
             });
 
@@ -91,9 +93,6 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const urlPrams = new URLSearchParams(this.props.location.search);
     const tab = urlPrams.get('tab') === null ? tabs[0].id : urlPrams.get('tab');
 
-    console.log({
-      nftInfo: JSON.parse(JSON.stringify(nftInfo)), network, nextNftId, prevNftId, tab
-    })
     return (
       <Box width="100%" height="100%">
         <NFTDetails

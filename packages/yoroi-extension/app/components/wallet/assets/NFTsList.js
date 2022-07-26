@@ -25,7 +25,7 @@ import { useState, useEffect } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 
 type Props = {|
-  list: Array<{| name: string, image: string | null |}> | void,
+  list: Array<{| id: string, name: string, image: string | null |}> | void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -159,17 +159,22 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
-function isImageExist(imageSrc, onload, onerror) {
+function isImageExist(imageSrc: string, onload: void => void, onerror: void => void) {
   const img = new Image();
   img.onload = onload;
   img.onerror = onerror;
   img.src = imageSrc;
 }
 
-export function NftImage({ imageUrl, name, width, height }) {
+export function NftImage({ imageUrl, name, width, height }: {|
+  imageUrl: string | null,
+  name: string,
+  width: string,
+  height: string
+|}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  if (error || !imageUrl) return (
+  if (error || imageUrl === null) return (
     <Box sx={{
       display: 'flex',
       alignItems: 'center',
@@ -185,7 +190,7 @@ export function NftImage({ imageUrl, name, width, height }) {
   imageUrl = imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
   useEffect(() => {
     isImageExist(
-      imageUrl,
+      String(imageUrl),
       () => { setLoading(false); setError(false) }, // on-success
       () => { setLoading(false); setError(true) }, // on-error
     )
@@ -206,7 +211,12 @@ export function NftImage({ imageUrl, name, width, height }) {
   )
 }
 
-function NftCardImage({ ipfsUrl, name, width, height }) {
+function NftCardImage({ ipfsUrl, name, width, height }: {|
+  ipfsUrl: string | null,
+  name: string,
+  width: string,
+  height: string,
+|}) {
   return (
     <ImageListItem sx={{ height: '100%', width, }}>
       <NftImage imageUrl={ipfsUrl} name={name} width={width} height={height} />
