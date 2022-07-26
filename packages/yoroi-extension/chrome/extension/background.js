@@ -1435,7 +1435,7 @@ function handleInjectorConnect(port) {
             } catch (e) {
               handleError(e);
             }
-          break;
+            break;
           case 'get_network_id':
             try {
               checkParamCount(0);
@@ -1448,9 +1448,10 @@ function handleInjectorConnect(port) {
                 await withDb(async (db, localStorageApi) => {
                   return await withSelectedWallet(tabId,
                     async (wallet) => {
-                      const networkId = wallet.getParent().getNetworkInfo().BaseConfig[0].ChainNetworkId;
+                      const networkId = wallet.getParent()
+                        .getNetworkInfo().BaseConfig[0].ChainNetworkId;
                       rpcResponse({
-                        ok: parseInt(networkId),
+                        ok: parseInt(networkId, 10),
                       });
                     },
                     db,
@@ -1462,6 +1463,7 @@ function handleInjectorConnect(port) {
             } catch (e) {
               handleError(e);
             }
+            break;
           case 'list_nfts/cardano':
             try {
               await withDb(async (db, localStorageApi) => {
