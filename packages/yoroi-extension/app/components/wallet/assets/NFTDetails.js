@@ -107,7 +107,7 @@ function NFTDetails({
   const onCopyMetadata = async () => {
     setCopy(false)
     try {
-      await navigator.clipboard.writeText(JSON.stringify(nftInfo.nftMetadata, null, 2))
+      await navigator.clipboard.writeText(JSON.stringify(nftInfo.metadata, null, 2))
       setCopy(true)
     } catch (error) {
       setCopy(false)
@@ -263,7 +263,7 @@ function NFTDetails({
                 sx={{ boxShadow: 'none', bgcolor: 'transparent', height: '100%', maxHeight: '400px', overflow: 'auto' }}
                 value={tabs[1].id}
               >
-                {nftInfo.nftMetadata &&
+                {nftInfo.metadata &&
                 <Button
                   onClick={onCopyMetadata}
                   variant="text"
@@ -277,8 +277,8 @@ function NFTDetails({
                 </Button>}
                 <Box component='pre'>
                   <Typography variant='body2' lineHeight='22px'>
-                    {nftInfo.nftMetadata ?
-                      JSON.stringify(nftInfo.nftMetadata, null, 2):
+                    {nftInfo.metadata ?
+                      JSON.stringify(nftInfo.metadata, null, 2):
                       intl.formatMessage(messages.missingMetadata)}
                   </Typography>
                 </Box>

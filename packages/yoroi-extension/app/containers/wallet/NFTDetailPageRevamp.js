@@ -73,6 +73,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                   name,
                   token.info.Metadata
                 ),
+                metadata: token.info.Metadata.assetMintMetadata[0]
               };
             });
 
