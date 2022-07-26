@@ -90,11 +90,14 @@ class NFTDetailPageRevamp extends Component<AllProps> {
 
     const urlPrams = new URLSearchParams(this.props.location.search);
     const tab = urlPrams.get('tab') === null ? tabs[0].id : urlPrams.get('tab');
+
+    console.log({
+      nftInfo: JSON.parse(JSON.stringify(nftInfo)), network, nextNftId, prevNftId, tab
+    })
     return (
       <Box width="100%" height="100%">
         <NFTDetails
           nftInfo={nftInfo}
-          selectedExplorer={this.generated.stores.explorers.selectedExplorer.get(network.NetworkId)}
           network={network}
           nextNftId={nextNftId}
           prevNftId={prevNftId}
@@ -128,9 +131,6 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const { stores } = this.props;
     return Object.freeze({
       stores: {
-        explorers: {
-          selectedExplorer: stores.explorers.selectedExplorer,
-        },
         wallets: {
           selected: stores.wallets.selected,
         },

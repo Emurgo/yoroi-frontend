@@ -98,6 +98,8 @@ function NFTDetails({
   prevNftId,
   tab,
 }: Props & Intl): Node {
+
+  console.log({where: 'NFTDetails'})
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab);
@@ -147,7 +149,7 @@ function NFTDetails({
           borderRadius: '8px',
         }}
       >
-        <ImageItem sx={{ cursor: nftInfo.image && 'pointer' }} onClick={() => nftInfo.image && setOpen(true)} flex="1" flexShrink={0}>
+        <ImageItem sx={{ cursor: nftInfo.image !== null ? 'pointer' : 'auto' }} onClick={() => nftInfo.image !== null && setOpen(true)} flex="1" flexShrink={0}>
           <NftImage imageUrl={nftInfo.image} name={nftInfo.name} width='532px' height='510px' />
         </ImageItem>
         <Box flex="1" sx={{ width: '50%' }}>
