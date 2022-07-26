@@ -1,0 +1,16 @@
+$footerMargin: 40px;
+
+.component {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-bottom: $footerMargin;
+  .title {
+    height: 58px;
+    text-transform: uppercase;
+    color: var(--text-color-3);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+  }
+}

@@ -4,7 +4,7 @@ const manageTranslations = require('react-intl-translations-manager').default;
 
 const fs = require('fs');
 
-const messagesDirectory = 'translations/messages';
+const messagesDirectory = 'translations/messages/app';
 if (!fs.existsSync(messagesDirectory)) {
   console.log('Run `npm run prod:build` once to build your translation cache');
   throw new Error();

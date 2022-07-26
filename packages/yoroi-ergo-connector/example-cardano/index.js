@@ -25,6 +25,8 @@ const getCollateralUtxos = document.querySelector('#get-collateral-utxos');
 const signData = document.querySelector('#sign-data');
 const alertEl = document.querySelector('#alert');
 const spinner = document.querySelector('#spinner');
+const getNFTs = document.getElementById('nfts');
+const getNetworkId = document.getElementById('get-network-id');
 
 let accessGranted = false;
 let cardanoApi;
@@ -175,6 +177,18 @@ isEnabledBtn.addEventListener('click', () => {
   window.cardano.yoroi.isEnabled().then(function (isEnabled) {
     alertSuccess(`Is Yoroi connection enabled: ${isEnabled}`);
   });
+});
+
+getNetworkId.addEventListener('click', () => {
+  if (!accessGranted) {
+    alertError('Should request access first');
+  } else {
+    toggleSpinner('show');
+    cardanoApi.getNetworkId().then(networkId => {
+      console.log('[getNetworkId]', networkId);
+      toggleSpinner('hide');
+    });
+  }
 });
 
 getAccountBalance.addEventListener('click', () => {
@@ -835,6 +849,24 @@ signData.addEventListener('click', () => {
     });
 });
 
+getNFTs.addEventListener('click', async () => {
+  toggleSpinner('show');
+
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+
+  try {
+    const response = await cardanoApi.experimental.listNFTs();
+    renderJonsResponse(`NFTs (${Object.keys(response).length})`, response);
+  } catch (error) {
+    console.error(error);
+    alertError(error.message);
+  }
+  toggleSpinner('hide');
+})
+
 function alertError(text) {
   toggleSpinner('hide');
   alertEl.className = 'alert alert-danger';
@@ -849,6 +881,12 @@ function alertSuccess(text) {
 function alertWarrning(text) {
   alertEl.className = 'alert alert-warning';
   alertEl.innerHTML = text;
+}
+
+function renderJonsResponse (title, response) {
+  alertSuccess(
+    `<h2>${title}:</h2><pre>` + JSON.stringify(response, undefined, 2) + '</pre>'
+  )
 }
 
 function toggleSpinner(status) {

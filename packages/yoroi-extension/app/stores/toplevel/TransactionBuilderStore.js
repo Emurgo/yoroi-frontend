@@ -26,10 +26,11 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import { cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
+import {  cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IPublicDeriver<>,
@@ -41,7 +42,7 @@ export type PlannedTxInfoMap = Array<{|
   token: $ReadOnly<TokenRow>,
   shouldSendAll?: boolean,
   amount?: string,
-|}>
+|}>;
 
 /**
  * TODO: we make the following assumptions
@@ -66,10 +67,13 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
-
+  @observable shouldSendMax: boolean = false;
   // REQUESTS
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
+
+  @observable maxSendableAmount: LocalizedRequest<DeferredCall<BigNumber>>
+    = new LocalizedRequest<DeferredCall<BigNumber>>(async func => await func());
 
   @observable memo: void | string;
 
@@ -87,6 +91,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
     actions.addToken.listen(this._addToken);
+    actions.calculateMaxAmount.listen(this._maxSendableAmount)
     actions.deselectToken.listen(this._deselectToken)
     actions.removeTokens.listen(this._removeTokens);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
@@ -204,8 +209,62 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       // update if tx history changes
       this.stores.transactions.hash,
     ],
-    async () => this._updateTxBuilder(),
+    async () => {
+      this._updateTxBuilder()
+
+      if (this.plannedTxInfoMap.length !== 0 && this.shouldSendMax === true) {
+        this._maxSendableAmount()
+      }
+    },
   )
+
+  // Generate tokens list for cardano tokens
+  _genTokenList(overrightDefaultAmount?: boolean): Array<$ReadOnly<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>> {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._genTokenList)} requires wallet to be selected`);
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+    const plannedTxInfoMap = this.plannedTxInfoMap;
+    let tokens: PlannedTxInfoMap = [...plannedTxInfoMap];
+    /**
+     * When sending multi-asset, if the user entered ada less than MIN-ADA
+     * it should be OVERWRITTEN.
+     */
+    const minAmount = this.calculateMinAda(plannedTxInfoMap.map(({ token }) => ({ token })));
+    const token = plannedTxInfoMap.find(({ token: t }) => t.IsDefault);
+
+    if (!token) {
+      // if the user is sending a token, we need to make sure the resulting utxo
+      // has at least the minimum amount of ADA in it
+      tokens.push({
+        token: defaultToken,
+        amount: minAmount,
+      });
+    } else if (
+      (token &&
+      token.shouldSendAll === false &&
+      token.amount &&
+      (new BigNumber(token.amount)).lt(minAmount) &&
+      plannedTxInfoMap.length > 1) ||
+      overrightDefaultAmount === true
+    ) {
+      tokens = tokens.filter(({ token: t }) => !t.IsDefault);
+      tokens.push({
+        token: defaultToken,
+        amount: minAmount,
+      })
+    }
+
+    return tokens.map((txEntry) => ({
+        token: txEntry.token,
+        amount: txEntry.amount,
+        shouldSendAll: Boolean(txEntry.shouldSendAll),
+    }));
+  }
 
   _canCompute(): boolean {
     if (this.plannedTxInfoMap.length === 0) return false;
@@ -230,7 +289,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return '0';
-    if (tokens.length === 0) return String(1_000_000);
+    const filteredTokens = tokens.filter(({ token }) => !token.IsDefault);
+    if (filteredTokens.length === 0) return String(1_000_000);
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
@@ -240,7 +300,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         networkId: defaultToken.NetworkId,
         amount: fakeAmount,
       },
-      ...tokens.filter(({ token }) => !token.IsDefault).map(({ token }) => ({
+      ...filteredTokens.map(({ token }) => ({
         identifier: token.Identifier,
         networkId: token.NetworkId,
         amount: fakeAmount,
@@ -264,6 +324,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _updateTxBuilder: void => Promise<void> = async () => {
     runInAction(() => {
       this.createUnsignedTx.reset();
+      this.maxSendableAmount.reset();
       this.plannedTx = null;
     });
 
@@ -303,51 +364,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         // use server time for TTL if connected to server
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
-      const genTokenList: PlannedTxInfoMap => Array<$ReadOnly<{|
-        token: $ReadOnly<TokenRow>,
-        amount?: string,
-        shouldSendAll?: boolean,
-      |}>> = (userInput) => {
-        let tokens: PlannedTxInfoMap = [...userInput];
-        /**
-         * When sending multi-asset, if the user entered ada less than MIN-ADA
-         * it should be OVERWRITTEN.
-         */
-        const minAmount = this.calculateMinAda(plannedTxInfoMap.map(({ token }) => ({ token })));
-        const token = plannedTxInfoMap.find(({ token: t }) => t.IsDefault);
-
-        if (!token) {
-          // if the user is sending a token, we need to make sure the resulting utxo
-          // has at least the minimum amount of ADA in it
-          tokens.push({
-            token: defaultToken,
-            amount: minAmount,
-          });
-        } else if (
-          token &&
-          token.shouldSendAll === false &&
-          token.amount &&
-          (new BigNumber(token.amount)).lt(minAmount) &&
-          plannedTxInfoMap.length > 1
-        ) {
-          tokens = tokens.filter(({ token: t }) => !t.IsDefault);
-          tokens.push({
-            token: defaultToken,
-            amount: minAmount,
-          })
-        }
-
-        return tokens.map((txEntry) => ({
-            token: txEntry.token,
-            amount: txEntry.amount,
-            shouldSendAll: txEntry.shouldSendAll,
-        }));
-      }
 
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver: withHasUtxoChains,
         receiver,
-        tokens: genTokenList(plannedTxInfoMap),
+        tokens: this._genTokenList(),
         filter: this.filter,
         absSlotNumber,
         metadata: this.metadata,
@@ -394,6 +415,37 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     } else {
       throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);
     }
+  }
+
+  @action
+  _maxSendableAmount: void => Promise<void> = async () =>  {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`${nameof(this._maxSendableAmount)} requires wallet to be selected.`);
+
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (withUtxos == null) {
+      throw new Error(`${nameof(this._maxSendableAmount)} missing utxo functionality`);
+    }
+
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`${nameof(this._maxSendableAmount)} missing chains functionality`);
+    }
+
+    this.shouldSendMax = true;
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const fullConfig = getCardanoHaskellBaseConfig(network);
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+    }).slot);
+
+    this.maxSendableAmount.execute(() => maxSendableADA({
+      publicDeriver: withHasUtxoChains,
+      absSlotNumber,
+      tokens: this._genTokenList(true),
+      receiver: this.receiver,
+    }))
   }
 
   // ===========
@@ -480,6 +532,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     this.selectedToken = token;
+    // no `selectedToken` === Selecting the default token.
+    // Editing the default token amount means we are not sending the max amount.
+    if (!token) this.shouldSendMax = false;
   }
 
   @action
@@ -527,8 +582,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.metadata = undefined;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
+    this.maxSendableAmount.cancel()
+    this.maxSendableAmount.reset();
     this.plannedTx = null;
     this.tentativeTx = null;
+    this.shouldSendMax = false;
     this.setupSelfTx.cancel();
     this.setupSelfTx.reset();
   }

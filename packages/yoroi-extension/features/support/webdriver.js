@@ -10,7 +10,7 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { testRunsLogsDir } from './helpers/common-constants';
+import { testRunsDataDir } from './helpers/common-constants';
 
 const fs = require('fs');
 const simpleNodeLogger = require('simple-node-logger');
@@ -50,7 +50,7 @@ function getBraveBuilder() {
         '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
         '--start-maximized' // Starts the browser maximized, regardless of any previous settings
       )
-      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+      .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
   );
 }
 
@@ -59,7 +59,7 @@ function getChromeBuilder() {
     .forBrowser('chrome')
     .setChromeOptions(
       new chrome.Options()
-        .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+        .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
         .addArguments(
           '--no-sandbox',
           '--disable-gpu',
@@ -77,7 +77,7 @@ function getFirefoxBuilder() {
      * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
      */
     .setBinary(process.env.FIREFOX_DEV)
-    .addExtensions(path.resolve(__dirname, '../../yoroi.xpi'))
+    .addExtensions(path.resolve(__dirname, '../../Yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
@@ -114,7 +114,7 @@ export type LocatorObject = {|
 |};
 
 function CustomWorld(cmdInput: WorldInput) {
-  let builder = null;
+  let builder;
   switch (cmdInput.parameters.browser) {
     case 'brave': {
       builder = getBraveBuilder();
@@ -130,21 +130,41 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   }
   this.driver = builder.build();
+
+  this.getBrowser = (): string => cmdInput.parameters.browser;
+
   this._allLoggers = [];
-  const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
+
+  const logsDir = `${testRunsDataDir}${this.getBrowser()}/Logs/`
+
+  const mockAndWMLogDir = `${logsDir}mockAndWMLogs`;
+  if (!fs.existsSync(mockAndWMLogDir)) {
+    fs.mkdirSync(mockAndWMLogDir, { recursive: true });
+  }
+  const mockAndWMLogPath = `${mockAndWMLogDir}/mockAndWMLog_${getLogDate()}.log`;
   const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
   this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
   this.windowManager.init().then().catch();
   this._allLoggers.push(mockAndWMLogger);
   this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
 
+  const webDriverLogDir = `${logsDir}webDriverLogs`;
+  if (!fs.existsSync(webDriverLogDir)) {
+    fs.mkdirSync(webDriverLogDir, { recursive: true });
+  }
+  const webDriverLogPath = `${webDriverLogDir}/webDriverLog_${getLogDate()}.log`;
+  this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
+  this._allLoggers.push(this.webDriverLogger);
+
+  const trezorEmuLogPath = `${logsDir}trezorEmulatorController_${getLogDate()}.log`;
+  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
+  this.trezorController = undefined;
+
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
       someLogger[level](message);
     }
   };
-
-  this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
@@ -170,12 +190,14 @@ function CustomWorld(cmdInput: WorldInput) {
     this.getElementBy(locator).getAttribute('value');
 
   this.waitForElementLocated = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be located`);
     const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
     return await this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
   this.waitForElement = this.driver.waitForElement = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be visible`);
     await this.waitForElementLocated(locator);
     const element = await this.getElementBy(locator);
     const condition = until.elementIsVisible(element);
@@ -183,6 +205,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.waitElementTextMatches = async (regex, locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for text on element "${locator.locator}" matches "${regex}"`);
     await this.waitForElement(locator);
     const element = await this.getElementBy(locator);
     const condition = until.elementTextMatches(element, regex);
@@ -193,6 +216,7 @@ function CustomWorld(cmdInput: WorldInput) {
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (
     locator: LocatorObject
   ) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" not present`);
     await this.driver.wait(async () => {
       const elements = await this.getElementsBy(locator);
       return elements.length === 0;
@@ -200,18 +224,21 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.waitEnable = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting until "${JSON.stringify(locator)}" is enabled`);
     const element = await this.getElementBy(locator);
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
   this.waitDisable = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting Until "${JSON.stringify(locator)}" is disabled`);
     const element = await this.getElementBy(locator);
     const condition = until.elementIsDisabled(element);
     return this.driver.wait(condition);
   };
 
   this.waitUntilText = async (locator: LocatorObject, text, timeout = 75000) => {
+    this.webDriverLogger.info(`Webdriver: Waiting Until "${JSON.stringify(locator)}" contains "${text}"`);
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -223,6 +250,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = 15000) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for "${JSON.stringify(locator)}" to contain text "${text}"`);
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -234,6 +262,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.click = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     await this.waitForElement(locator);
     await this.waitEnable(locator);
     const clickable = await this.getElementBy(locator);
@@ -241,16 +270,19 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.input = async (locator: LocatorObject, value) => {
+    this.webDriverLogger.info(`Webdriver: Input "${value}" into "${JSON.stringify(locator)}"`);
     const input = await this.getElementBy(locator);
     await input.sendKeys(value);
   };
 
   this.clearInput = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clearing Input for "${JSON.stringify(locator)}"`);
     const input = await this.getElementBy(locator);
     await input.clear();
   };
 
   this.clearInputUpdatingForm = async (locator: LocatorObject, textLength) => {
+    this.webDriverLogger.info(`Webdriver: Clearing Input Updating Form for "${JSON.stringify(locator)}"`);
     const input = await this.getElementBy(locator);
     for (let i = 0; i < textLength; i++) {
       // eslint-disable-next-line no-await-in-loop
@@ -258,16 +290,22 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = script =>
-    this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+  this.executeLocalStorageScript = script => {
+    this.webDriverLogger.info(`Webdriver: Executing Local Storage Script`);
+    return this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+  };
 
   this.getFromLocalStorage = async key => {
+    this.webDriverLogger.info(`Webdriver: Getting item "${key}" from Local Storage`);
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
+    this.webDriverLogger.info(`Webdriver: Result ${JSON.stringify(result)}`);
     return JSON.parse(result);
   };
 
-  this.saveToLocalStorage = (key, value) =>
+  this.saveToLocalStorage = (key, value) => {
+    this.webDriverLogger.info(`Webdriver: Saving to Local Storage key: "${key}", value: "${value}"`);
     this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
+  };
 
   this.intl = (key, lang = 'en-US') =>
     this.driver.executeAsyncScript(
@@ -286,6 +324,7 @@ function CustomWorld(cmdInput: WorldInput) {
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
   this.saveLastReceiveAddressIndex = index => {
+    this.webDriverLogger.info(`Webdriver: Saving last Receive Address Index`);
     this.driver.executeScript(i => {
       const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
@@ -301,6 +340,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.checkIfExists = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Checking if element exists "${JSON.stringify(locator)}"`);
     return await this.driver.findElement(getMethod(locator.method)(locator.locator)).then(
       () => true,
       err => {
@@ -328,6 +368,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   // The method is for debugging
   this.highlightElement = async (element: WebElement) => {
+    this.webDriverLogger.info(`Webdriver: Highlighting element "${JSON.stringify(element)}"`);
     await this.driver.executeScript(
       "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');",
       element
@@ -335,18 +376,26 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.isDisplayed = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Checking if element "${JSON.stringify(locator)}" is displayed`);
     const element = await this.driver.findElement(getMethod(locator.method)(locator.locator));
 
     return await element.isDisplayed();
   };
 
-  this.findElement = async (locator: LocatorObject) =>
-    await this.driver.findElement(getMethod(locator.method)(locator.locator));
+  this.findElement = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver:findElement: Finding element "${JSON.stringify(locator)}"`);
 
-  this.findElements = async (locator: LocatorObject) =>
-    await this.driver.findElements(getMethod(locator.method)(locator.locator));
+    return await this.driver.findElement(getMethod(locator.method)(locator.locator));
+  }
+
+  this.findElements = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver:findElements: Finding elements "${JSON.stringify(locator)}"`);
+
+    return await this.driver.findElements(getMethod(locator.method)(locator.locator));
+  }
 
   this.hoverOnElement = async (locator: WebElement) => {
+    this.webDriverLogger.info(`Webdriver:hoverOnElement: Hovering on element "${JSON.stringify(locator)}"`);
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
   };
