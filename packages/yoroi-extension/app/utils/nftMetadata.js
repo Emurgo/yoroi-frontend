@@ -1,0 +1,130 @@
+//@flow
+import { isArray } from 'util';
+
+import type {
+  CardanoAssetMintMetadata,
+  NFTMetadata,
+  TokenMetadata,
+} from '../api/ada/lib/storage/database/primitives/tables';
+
+export function find721metadata(
+  policyId: string,
+  assetNameHex: string,
+  assetMintMetadata: ?Array<CardanoAssetMintMetadata>,
+): NFTMetadata | null {
+  if (!assetMintMetadata) {
+    return null;
+  }
+  const metadataWrapper = assetMintMetadata.find(m => m['721'] != null);
+  if (metadataWrapper === undefined) {
+    return null;
+  }
+  const metadata = metadataWrapper['721'];
+  if (metadata.version && metadata.version !== '1.0') {
+    return null;
+  }
+
+  const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
+    c => String.fromCharCode(c)
+  ).join('');
+  const asset: any = metadata[policyId]?.[assetName] || metadata[policyId]?.[assetNameHex];
+  if (!asset) {
+    return null;
+  }
+
+  // Note that `asset` is from the backend via asset metadata query, which in turn
+  // gets the data from the blockchain, but none of the step actually verifies that
+  // it conforms to the structure defined by CIP 25 - NFT Metadata Standard. In order
+  // to avoid causing error in the user of this data, we normalize the data to
+  // guarentee that the return value conforms to the `NFTMetadata` type.
+  const ret: any = {};
+  if (typeof asset.name === 'string') {
+    ret.name = asset.name;
+  } else {
+    ret.name = '';
+  }
+  if (
+    typeof asset.image === 'string' || (
+      isArray(asset.image) &&  asset.image.every(i => typeof i === 'string')
+    )
+  ) {
+    ret.image = asset.image;
+  }
+  if (typeof asset.mediaType === 'string') {
+    ret.mediaType = asset.mediaType;
+  }
+  if (
+    typeof asset.description === 'string' || (
+      isArray(asset.description) && asset.description.every(i => typeof i === 'string')
+    )
+  ) {
+    ret.description = asset.description;
+  }
+  if (
+    isArray(asset.files) &&
+      asset.files.every(({name, mediaType, src }) => (
+        typeof name === 'string' &&
+          typeof mediaType === 'string' &&
+          (
+            typeof src === 'string' ||
+              (isArray(src) && src.every(s => typeof s === 'string'))
+          )
+      ))
+  ) {
+    ret.files = asset.files;
+  }
+  return ret;
+}
+
+export function getImageFromTokenMetadata(
+  policyId: string,
+  name: string,
+  tokenMetadata: TokenMetadata,
+): string | null {
+  if (tokenMetadata.type !== 'Cardano') {
+    return null;
+  }
+  const nftMetadata = find721metadata(
+    policyId,
+    name,
+    tokenMetadata.assetMintMetadata,
+  );
+
+  if (!nftMetadata) {
+    return null;
+  }
+  if (typeof nftMetadata.image === 'string') {
+    return nftMetadata.image;
+  }
+  if (typeof nftMetadata.image?.[0] === 'string') {
+    return nftMetadata.image[0];
+  }
+  return null;
+}
+
+
+export function getDescriptionFromTokenMetadata(
+  policyId: string,
+  name: string,
+  tokenMetadata: TokenMetadata,
+): string | null {
+  if (tokenMetadata.type !== 'Cardano') {
+    return null;
+  }
+  const nftMetadata = find721metadata(
+    policyId,
+    name,
+    tokenMetadata.assetMintMetadata,
+  );
+
+  if (!nftMetadata) {
+    return null;
+  }
+  if (typeof nftMetadata.description === 'string') {
+    return nftMetadata.description;
+  }
+  if (typeof nftMetadata.description?.[0] === 'string') {
+    return nftMetadata.description[0];
+  }
+  return null;
+}
