@@ -93,7 +93,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-            - name: npm install
+      - name: npm install
         run: |
           . install-all.sh
       - name: Build the test version
