@@ -56,9 +56,8 @@ const listColumnViews = [
 ];
 
 function NfTsList({ list, intl }: Props & Intl): Node {
-  if (list == null) return null;
   const [columns, setColumns] = useState(listColumnViews[0]);
-  const [nftList, setNftList] = useState([...list]);
+  const [nftList, setNftList] = useState(list === null ? [] : [...list]);
 
   const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
     event: SyntheticEvent<HTMLInputElement>
@@ -66,7 +65,9 @@ function NfTsList({ list, intl }: Props & Intl): Node {
     const keyword = event.currentTarget.value;
     const regExp = new RegExp(keyword, 'gi');
     const nftsListCopy = [...list];
-    const filteredAssetsList = nftsListCopy.filter(a => a.name.match(regExp));
+    const filteredAssetsList = nftsListCopy.filter(a => {
+      return [a.name, a.id].some(val => val.match(regExp))
+    });
     setNftList(filteredAssetsList);
   };
 
@@ -83,7 +84,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         }}
       >
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-          {!list.length ?
+          {list === null || list.length === 0 ?
             intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
         </Typography>
@@ -141,7 +142,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         <ImageList sx={{ width: '100%', padding: '0px 24px 30px' }} cols={columns.count} gap={24}>
           {nftList.map(nft => {
             return (
-              <SLink key={nft.name} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
+              <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
                 <NftCardImage
                   ipfsUrl={nft.image}
                   name={nft.name}

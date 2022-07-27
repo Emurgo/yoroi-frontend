@@ -15,7 +15,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type { NetworkRow, NFTMetadata, CardanoAssetMintMetadata } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, CardanoAssetMintMetadata } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -102,7 +102,7 @@ function NFTDetails({
   prevNftId,
   tab,
 }: Props & Intl): Node {
-  if (nftInfo == null) return null;
+
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const [open, setOpen] = useState(false);
@@ -120,6 +120,8 @@ function NFTDetails({
     }
   }
   const onClose = () => setOpen(false)
+  // Todo: Should be handling by displaying an error page
+  if (nftInfo == null) return null;
 
   return (
     <Box sx={{ overflow: 'hidden' }}>
