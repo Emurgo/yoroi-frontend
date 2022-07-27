@@ -45,6 +45,7 @@ jobs:
     strategy:
       matrix:
         browser: ['chrome', 'firefox']
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
