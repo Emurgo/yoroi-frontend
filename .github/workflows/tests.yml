@@ -40,7 +40,7 @@ jobs:
           npm run test
   E2E_tests_dApp_Chrome:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
@@ -107,7 +107,7 @@ jobs:
 
   E2E_tests_dApp_FF:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/run_dapp_ff'))
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - name: Forcefully install Firefox for Developers browser
