@@ -214,6 +214,8 @@ class WalletSendPage extends Component<AllProps> {
             isOpen={uiDialogs.isOpen}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
+            maxSendableAmount={transactionBuilderStore.maxSendableAmount}
           />
           {this.renderDialog()}
         </>
@@ -608,6 +610,9 @@ class WalletSendPage extends Component<AllProps> {
         |},
       |},
       txBuilderActions: {|
+        calculateMaxAmount: {|
+          trigger: (params: void) => Promise<void>,
+        |},
         reset: {|
           trigger: (params: void) => void
         |},
@@ -705,7 +710,12 @@ class WalletSendPage extends Component<AllProps> {
           shouldSendAll?: boolean,
         |}>,
         minAda: ?MultiToken,
-        calculateMinAda: Array<{| token: $ReadOnly<TokenRow> |}> => string
+        calculateMinAda: Array<{| token: $ReadOnly<TokenRow> |}> => string,
+        maxSendableAmount: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          result: ?BigNumber,
+        |},
       |},
       substores: {|
         ada: {|
@@ -799,6 +809,11 @@ class WalletSendPage extends Component<AllProps> {
           plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap,
           maxAssetsAllowed: stores.transactionBuilderStore.maxAssetsAllowed,
           calculateMinAda: stores.transactionBuilderStore.calculateMinAda,
+          maxSendableAmount: {
+            isExecuting: stores.transactionBuilderStore.maxSendableAmount.isExecuting,
+            error: stores.transactionBuilderStore.maxSendableAmount.error,
+            result: stores.transactionBuilderStore.maxSendableAmount.result,
+          },
         },
         substores: {
           ada: {
@@ -838,6 +853,9 @@ class WalletSendPage extends Component<AllProps> {
           updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },
+          calculateMaxAmount: {
+            trigger: actions.txBuilderActions.calculateMaxAmount.trigger
+          },
         },
         ada: {
           ledgerSend: {

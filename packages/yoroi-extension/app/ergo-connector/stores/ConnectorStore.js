@@ -604,7 +604,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const allUsedUtxoIdsSet = new Set(
       submittedTxs.flatMap(({ usedUtxos }) =>
-        usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
+        (usedUtxos||[]).map(({ txHash, index }) => `${txHash}${index}`))
     );
 
     for (let i = 0; i < txBody.inputs().len(); i++) {

@@ -30,7 +30,7 @@ import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
 
 import { Ports } from '../../scripts/connections';
 
-import { getLogDate } from '../support/helpers/helpers';
+import { getCircularReplacer, getLogDate } from '../support/helpers/helpers';
 import { testRunsDataDir } from '../support/helpers/common-constants';
 
 const simpleNodeLogger = require('simple-node-logger');
@@ -200,7 +200,7 @@ export function getMockServer(settings: {
         }
 
         logger.info(`mockCardanoServer: /api/txs/signed-> response`);
-        logger.info(JSON.stringify(res));
+        logger.info(JSON.stringify(res, getCircularReplacer()));
       }
     );
 

@@ -6,6 +6,7 @@ import type {
     TokenLookupKey,
     MultiToken
 } from '../api/common/lib/MultiToken';
+import { getImageFromTokenMetadata } from './nftMetadata';
 
 export type FormattedTokenDisplay = {|
     value?: number,
@@ -17,7 +18,7 @@ export type FormattedTokenDisplay = {|
 
 export type FormattedNFTDisplay = {|
     id?: string,
-    image?: string,
+    image: string | null,
     name: string,
     info: $ReadOnly<TokenRow>,
 |}
@@ -66,19 +67,10 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         return {
             name,
             id: getTokenIdentifierIfExists(token.info) ?? '-',
-            amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-            policyId,
-            // $FlowFixMe[prop-missing]
-            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]?.['721']?.[policyId][name],
+            image: getImageFromTokenMetadata(policyId, name, token.info.Metadata),
             info: token.info,
         };
-    })
-    .map(item => ({
-        name: item.name,
-        image: item.nftMetadata?.image,
-        id: item.id,
-        info: item.info,
-    }));
+    });
 }
 
 export function checkNFTImage(imageSrc: string, onload: void => void, onerror: void => void): void {

@@ -47,7 +47,7 @@ export default ({
     version,
     // the name shown in chrome://extensions
     // we also reuse this to choose the filename on disk
-    name: titleOverride === true ? defaultTitle : 'yoroi',
+    name: titleOverride === true ? defaultTitle : 'Yoroi',
     manifest_version: 2,
     description,
     browser_action: {
