@@ -53,6 +53,8 @@ import {
   saveButton
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
+import * as helpers from '../support/helpers/helpers';
+import { WebDriverError } from 'selenium-webdriver/lib/error';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -157,6 +159,7 @@ After(async function (scenario) {
     }
   }
   await this.driver.quit();
+  await helpers.sleep(500);
 });
 
 export async function getPlates(customWorld: any): Promise<any> {
@@ -400,6 +403,17 @@ async function acceptUriPrompt(world: any) {
 
 Given(/^I have opened the extension$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the extension`);
+  for (let i = 0; i < 4; i++) {
+    try {
+      await this.driver.get(this.getExtensionUrl());
+    } catch (e) {
+      if (e instanceof WebDriverError) {
+        await helpers.sleep(500);
+        continue;
+      }
+    }
+    break;
+  }
   await this.driver.get(this.getExtensionUrl());
   const browserName = await this.getBrowser();
   if (browserName === 'firefox') {
