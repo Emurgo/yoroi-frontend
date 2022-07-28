@@ -123,6 +123,7 @@ jobs:
     strategy:
       matrix:
         browser: [ 'chrome', 'firefox' ]
+      fail-fast: false
     steps:
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
