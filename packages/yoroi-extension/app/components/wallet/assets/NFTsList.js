@@ -58,22 +58,9 @@ const listColumnViews = [
 ];
 
 function NfTsList({ list, intl }: Props & Intl): Node {
-  console.log({list})
   const [columns, setColumns] = useState(listColumnViews[0]);
   const [nftList, setNftList] = useState(list === null ? [] : [...list]);
   const [keyword, setKeyword] = useState('');
-
-  const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
-    event: SyntheticEvent<HTMLInputElement>
-  ) => {
-    // const keyword = event.currentTarget.value;
-    // const regExp = new RegExp(keyword, 'gi');
-    // const nftsListCopy = [...list];
-    // const filteredAssetsList = nftsListCopy.filter(a => {
-    //   return [a.name, a.id].some(val => val.match(regExp))
-    // });
-    // setNftList(filteredAssetsList);
-  };
 
   useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
