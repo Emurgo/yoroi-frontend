@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.15.0",
+  "version": "4.15.100",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -31,6 +31,7 @@
     "test-win": "SET NODE_ENV=jest && jest",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test:build": "npm run prod:build -- --env 'test' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
+    "test:build:mainnet": "npm run prod:build -- --env 'mainnet' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "test:run:base": "NODE_ENV=cucumber cucumber-js --require-module '@babel/register' --compiler es6:@babel/register -f json:./reports/cucumberReport.json ",
     "test:run:e2e:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags 'not @ignore' --tags 'not @dApp'",
     "test:run:e2e:brave": "npm run test:run:base -- --world-parameters '{\"browser\":\"brave\"}' features/*.feature --tags 'not @ignore' --tags 'not @dApp'",
@@ -38,6 +39,8 @@
     "test:run:e2e:dApp:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags '@dApp'",
     "test:run:e2e:dApp:brave": "npm run test:run:base -- --world-parameters '{\"browser\":\"brave\"}' features/*.feature --tags '@dApp'",
     "test:run:e2e:dApp:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags '@dApp'",
+    "test:run:e2e:trezor:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags '@Trezor'",
+    "test:run:e2e:trezor:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags '@Trezor'",
     "test:run:tag:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags",
     "test:run:tag:brave": "npm run test:run:base -- --world-parameters '{\"browser\":\"brave\"}' features/*.feature --tags",
     "test:run:tag:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags",
