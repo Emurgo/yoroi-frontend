@@ -9,13 +9,15 @@ import {
   Typography,
   Skeleton,
   OutlinedInput,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
 import { ReactComponent as NotFound }  from '../../../assets/images/assets-page/no-nft-found.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
 import { ReactComponent as Grid3x3 } from '../../../assets/images/assets-page/grid-3x3.inline.svg';
+import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -59,18 +61,28 @@ function NfTsList({ list, intl }: Props & Intl): Node {
   console.log({list})
   const [columns, setColumns] = useState(listColumnViews[0]);
   const [nftList, setNftList] = useState(list === null ? [] : [...list]);
+  const [keyword, setKeyword] = useState('');
 
   const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
     event: SyntheticEvent<HTMLInputElement>
   ) => {
-    const keyword = event.currentTarget.value;
+    // const keyword = event.currentTarget.value;
+    // const regExp = new RegExp(keyword, 'gi');
+    // const nftsListCopy = [...list];
+    // const filteredAssetsList = nftsListCopy.filter(a => {
+    //   return [a.name, a.id].some(val => val.match(regExp))
+    // });
+    // setNftList(filteredAssetsList);
+  };
+
+  useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
     const nftsListCopy = [...list];
     const filteredAssetsList = nftsListCopy.filter(a => {
       return [a.name, a.id].some(val => val.match(regExp))
     });
     setNftList(filteredAssetsList);
-  };
+  }, [keyword])
 
   return (
     <Box sx={{ height: 'content', width: '100%', bgcolor: 'var(--yoroi-palette-common-white)', borderRadius: '8px' }}>
@@ -114,11 +126,19 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Stack>
           <SearchInput
             disableUnderline
-            onChange={search}
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
             placeholder={intl.formatMessage(messages.searchNFTs)}
             startAdornment={
               <InputAdornment position="start">
                 <Search />
+              </InputAdornment>
+            }
+            endAdornment={keyword !== '' &&
+              <InputAdornment position="end">
+                <IconButton sx={{ mr: '-10px' }} onClick={() => setKeyword('')}>
+                  <Close />
+                </IconButton>
               </InputAdornment>
             }
           />
