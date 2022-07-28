@@ -646,7 +646,7 @@
   "wallet.navigation.voting": "Voting",
   "wallet.nowallet.subtitle": "Please select a wallet from the dropdown menu on the top right.",
   "wallet.nowallet.title": "No wallet selected.",
-  "wallet.nftGallary.title": "NFT Gallary",
+  "wallet.nftGallary.title": "NFT Gallery",
   "wallet.nftGallary.search": "Search NFTs",
   "wallet.nftGallary.noNFTsAdded": "No NFTs added to your wallet",
   "wallet.nftGallary.details.nftsCount": "NFTs ({number})",

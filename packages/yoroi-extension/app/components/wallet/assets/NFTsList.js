@@ -56,6 +56,7 @@ const listColumnViews = [
 ];
 
 function NfTsList({ list, intl }: Props & Intl): Node {
+  console.log({list})
   const [columns, setColumns] = useState(listColumnViews[0]);
   const [nftList, setNftList] = useState(list === null ? [] : [...list]);
 
@@ -175,6 +176,17 @@ export function NftImage({ imageUrl, name, width, height }: {|
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  imageUrl = imageUrl !== null ? imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/'): null;
+
+  useEffect(() => {
+    if (imageUrl !== null)
+      isImageExist(
+        String(imageUrl),
+        () => { setLoading(false); setError(false) }, // on-success
+        () => { setLoading(false); setError(true) }, // on-error
+      )
+  }, [imageUrl])
+
   if (error || imageUrl === null) return (
     <Box sx={{
       display: 'flex',
@@ -188,14 +200,6 @@ export function NftImage({ imageUrl, name, width, height }: {|
       <DefaultNFT />
     </Box>
   )
-  imageUrl = imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
-  useEffect(() => {
-    isImageExist(
-      String(imageUrl),
-      () => { setLoading(false); setError(false) }, // on-success
-      () => { setLoading(false); setError(true) }, // on-error
-    )
-  }, [imageUrl])
 
   if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ width, height }} />
   return  (
