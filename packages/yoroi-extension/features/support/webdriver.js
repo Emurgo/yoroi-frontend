@@ -187,9 +187,9 @@ function CustomWorld(cmdInput: WorldInput) {
       } catch (e) {
         if (e instanceof WebDriverError) {
           this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 1 second and retry`);
-          const newWorld = new CustomWorld(cmdInput);
-          this.driver = newWorld.driver;
-          await helpers.sleep(1000);
+          // const newWorld = new CustomWorld(cmdInput);
+          // this.driver = newWorld.driver;
+          await helpers.sleep(500);
           continue;
         }
       }
