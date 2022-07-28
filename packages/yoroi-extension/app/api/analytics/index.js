@@ -162,7 +162,7 @@ function emitEvent(instanceId: string, event: string): void {
   const params = {
     idsite: SITE_ID,
     rec: '1',
-    action_name: event,
+    action_name: (isTestnet ? 'testnet/' : '') + event,
     url: `yoroi.extension/${isTestnet ? 'testnet/' : ''}${event}`,
     _id: INSTANCE_ID,
     rand: `${Date.now()}-${Math.random()}`,
