@@ -13,7 +13,7 @@ import {
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By, logging } from 'selenium-webdriver';
-import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import { enterRecoveryPhrase, getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
@@ -37,6 +37,22 @@ import {
 import type { LocatorObject } from '../support/webdriver';
 import { walletButton } from '../pages/sidebarPage';
 import { getWalletButtonByPlate } from '../pages/walletsListPage';
+import {
+  connectHwButton,
+  restoreWalletButton,
+  getCurrencyButton,
+  pickUpCurrencyDialog,
+  hwOptionsDialog,
+  trezorWalletButton,
+  eraOptionsDialog,
+  shelleyEraButton,
+  trezorConnectDialog,
+  trezorConfirmButton,
+  walletNameInput,
+  saveDialog,
+  saveButton
+} from '../pages/newWalletPages';
+import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -122,6 +138,12 @@ Before({ tags: '@invalidWitnessTest' }, () => {
 After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.closeMockServer();
   CardanoServer.getMockServer({});
+});
+
+After({ tags: '@trezorEmulatorTest' }, async function () {
+  await this.trezorController.bridgeStop();
+  await this.trezorController.emulatorStop();
+  this.trezorController.closeWsConnection();
 });
 
 After(async function (scenario) {
@@ -313,10 +335,10 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
+  await this.click(restoreWalletButton);
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton('cardano'));
 
   await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
@@ -453,6 +475,31 @@ async function setTrezorWallet(client, deviceId) {
 Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
   this.webDriverLogger.info(`Step: I connected Trezor device ${deviceId}`);
   await setTrezorWallet(this, deviceId);
+});
+
+Given(/^I connected Trezor emulator device$/, async function () {
+  // select connecting a HW wallet
+  await this.click(connectHwButton);
+  // pick up currency
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton('cardano'));
+  // select the trezor wallet
+  await this.waitForElement(hwOptionsDialog);
+  await this.click(trezorWalletButton);
+  // select the Shelley era
+  await this.waitForElement(eraOptionsDialog);
+  await this.click(shelleyEraButton);
+  // Confirm action twice
+  await this.waitForElement(trezorConnectDialog);
+  await this.click(trezorConfirmButton);
+  await this.click(trezorConfirmButton);
+  await switchToTrezorAndAllow(this);
+  await allowPubKeysAndSwitchToYoroi(this);
+  // save the emulator as is
+  await this.waitForElement(saveDialog);
+  const name = await this.getValue(walletNameInput);
+  expect(name).to.be.equal('Emulator');
+  await this.click(saveButton);
 });
 
 async function restoreWalletsFromStorage(client) {
@@ -610,4 +657,16 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
+});
+
+Then(/^Debug. Take screenshot$/,  async function () {
+  const currentTime = getLogDate();
+  await takeScreenshot(this.driver, `debug_${currentTime}`);
+  await takePageSnapshot(this.driver, `debug_${currentTime}`);
+  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
+  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+});
+
+Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
+  await this.driver.sleep(2000);
 });

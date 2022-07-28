@@ -21,7 +21,7 @@ const baseDevConfig = (
   mode: 'development',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
-  resolve: commonConfig.resolve(networkName),
+  resolve: commonConfig.resolve(),
   devtool: 'eval-source-map',
   entry: {
     yoroi: [
