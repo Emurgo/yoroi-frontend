@@ -80,30 +80,32 @@ export default class Sidebar extends Component<Props> {
           }) : null}
         </div>
 
-        <a
-          className={styles.faq}
-          href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
-          target='_blank'
-          rel="noreferrer"
-        >
-          {intl.formatMessage(globalMessages.sidebarFaq)}
-        </a>
-        <button
-          type="button"
-          onClick={onToggleSidebar}
-          className={classnames([
-            styles.toggleButton,
-            isSidebarExpanded ? styles.toggleActive : null
-          ])}
-        >
-          <span
-            className={classnames(
-              isSidebarExpanded ? styles.iconRotate : null
-            )}
+        <div className={styles.footer}>
+          <a
+            className={styles.faq}
+            href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
+            target='_blank'
+            rel="noreferrer"
           >
-            <ToggleIcon />
-          </span>
-        </button>
+            {intl.formatMessage(globalMessages.sidebarFaq)}
+          </a>
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className={classnames([
+              styles.toggleButton,
+              isSidebarExpanded ? styles.toggleActive : null
+            ])}
+          >
+            <span
+              className={classnames(
+                isSidebarExpanded ? styles.iconRotate : null
+              )}
+            >
+              <ToggleIcon />
+            </span>
+          </button>
+        </div>
       </div>
     );
   }
