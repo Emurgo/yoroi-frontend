@@ -19,7 +19,6 @@ import type { NetworkRow, CardanoAssetMintMetadata } from '../../../api/ada/lib/
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
-import { add } from 'lodash';
 
 // Overwrite current theme
 // Temporary solution untill the new design system.
