@@ -138,7 +138,7 @@ export function trackResyncWallet(): void {
   if (INSTANCE_ID == null) {
     return;
   }
-  emitEvent(INSTANCE_ID, 'remove-wallet');
+  emitEvent(INSTANCE_ID, 'resync-wallet');
 }
 
 function generateAnalyticsInstanceId(): string {
