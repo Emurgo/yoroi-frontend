@@ -4,9 +4,7 @@ import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { Node } from 'react';
 import {
-  genFormatTokenAmount,
   genLookupOrFail,
-  getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
@@ -17,6 +15,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import NfTsList from '../../components/wallet/assets/NFTsList';
+import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
 
 export type GeneratedData = typeof NFTsPageRevamp.prototype.generated;
 
@@ -42,17 +41,13 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           const name = truncateToken(getTokenStrictName(token.info) ?? '-');
           return {
             name,
-            id: getTokenIdentifierIfExists(token.info) ?? '-',
-            amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-            policyId,
-            // $FlowFixMe[prop-missing]
-            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+            image: getImageFromTokenMetadata(
+              policyId,
+              name,
+              token.info.Metadata,
+            ),
           };
-        })
-        .map(item => ({
-          name: item.name,
-          image: item.nftMetadata?.image,
-        }));
+        });
     })();
 
     return <NfTsList list={nftsList} />;

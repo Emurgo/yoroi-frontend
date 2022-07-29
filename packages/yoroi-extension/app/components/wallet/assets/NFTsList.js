@@ -18,9 +18,10 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { useState } from 'react';
 import { ListEmpty } from './ListEmpty';
+import { ReactComponent as DefaultNFT } from '../../../assets/images/nft-no.inline.svg';
 
 type Props = {|
-  list: Array<{| name: string, image: string | void |}> | void,
+  list: Array<{| name: string, image: string | null |}> | void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -96,7 +97,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           {nftList.map(nft => {
             return (
               <SLink key={nft.name} to={ROUTES.ASSETS.NFT_DETAILS.replace(':nftId', nft.name)}>
-                <NftCardImage ipfsUrl={nft.image} name={nft.name} />
+                <NftCardImage image={nft.image} name={nft.name} />
               </SLink>
             );
           })}
@@ -108,12 +109,18 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
-function NftCardImage({ ipfsUrl, name }) {
-  const ipfsHash = ipfsUrl != null ? ipfsUrl.replace('ipfs://', '') : '';
+function NftCardImage({ image, name }) {
+  let nftImage
+  if (image != null) {
+    const ipfsHash = image.replace('ipfs://', '');
+    nftImage = (<img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={name} loading="lazy" />);
+  } else {
+    nftImage = (<DefaultNFT />);
+  }
 
   return (
     <ImageItem sx={{ height: '100%' }}>
-      <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={name} loading="lazy" />
+      {nftImage}
       <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
         {name}
       </Typography>

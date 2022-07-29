@@ -26,6 +26,7 @@ const signData = document.querySelector('#sign-data');
 const alertEl = document.querySelector('#alert');
 const spinner = document.querySelector('#spinner');
 const getNFTs = document.getElementById('nfts');
+const getNetworkId = document.getElementById('get-network-id');
 
 let accessGranted = false;
 let cardanoApi;
@@ -176,6 +177,18 @@ isEnabledBtn.addEventListener('click', () => {
   window.cardano.yoroi.isEnabled().then(function (isEnabled) {
     alertSuccess(`Is Yoroi connection enabled: ${isEnabled}`);
   });
+});
+
+getNetworkId.addEventListener('click', () => {
+  if (!accessGranted) {
+    alertError('Should request access first');
+  } else {
+    toggleSpinner('show');
+    cardanoApi.getNetworkId().then(networkId => {
+      console.log('[getNetworkId]', networkId);
+      toggleSpinner('hide');
+    });
+  }
 });
 
 getAccountBalance.addEventListener('click', () => {
