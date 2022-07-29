@@ -32,7 +32,6 @@ const theme = createTheme({
 type Props = {|
   nftInfo: void | {|
     policyId: string,
-    lastUpdatedAt: any,
     ticker: string,
     assetName: string,
     name: string | void,
@@ -219,10 +218,6 @@ function NFTDetails({
                 value={tabs[0].id}
               >
                 <Stack spacing='24px'>
-                  <LabelWithValue
-                    label={intl.formatMessage(tokenMessages.created)}
-                    value={nftInfo.lastUpdatedAt ? moment(nftInfo.lastUpdatedAt).format('LL') : '-'}
-                  />
                   <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} />
                   <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} />
                   <LabelWithValue

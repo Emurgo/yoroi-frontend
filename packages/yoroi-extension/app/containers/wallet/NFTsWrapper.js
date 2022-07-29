@@ -31,7 +31,7 @@ type Props = {|
 const messages = defineMessages({
   NFTGallery: {
     id: 'wallet.nftGallary.title',
-    defaultMessage: '!!!NFT Gallary',
+    defaultMessage: '!!!NFT Gallery',
   },
 })
 @observer
