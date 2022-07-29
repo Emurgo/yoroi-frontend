@@ -204,7 +204,7 @@ function NFTDetails({
                   aria-label="NFTs tabs"
                 >
                   {tabs.map(({ label, id }) => (
-                    <Tab key={id} sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500 }} label={intl.formatMessage(label)} value={id} />
+                    <Tab key={id} sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500, fontFamily: 'Rubik' }} label={intl.formatMessage(label)} value={id} />
                   ))}
                 </TabList>
               </Box>
@@ -300,10 +300,11 @@ function NFTDetails({
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'auto',
+            cursor: 'pointer',
           }}
           onClick={onClose}
         >
-          <img src={nftInfo.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')} alt={nftInfo.name} loading='lazy' />
+          <img style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }} src={nftInfo.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')} alt={nftInfo.name} title={nftInfo.name} loading='lazy' />
         </Box>
       </Modal>
     </Box>

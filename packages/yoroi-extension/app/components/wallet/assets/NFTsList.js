@@ -27,7 +27,7 @@ import { useState, useEffect } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 
 type Props = {|
-  list: Array<{| id: string, name: string, image: string | null |}> | void,
+  list: Array<{| id: string, name: string, image: string | null |}>,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -59,7 +59,7 @@ const listColumnViews = [
 
 function NfTsList({ list, intl }: Props & Intl): Node {
   const [columns, setColumns] = useState(listColumnViews[0]);
-  const [nftList, setNftList] = useState(list === null ? [] : [...list]);
+  const [nftList, setNftList] = useState([...list]);
   const [keyword, setKeyword] = useState('');
 
   useEffect(() => {
@@ -69,7 +69,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       return [a.name, a.id].some(val => val.match(regExp))
     });
     setNftList(filteredAssetsList);
-  }, [keyword])
+  }, [keyword, list])
 
   return (
     <Box sx={{ height: 'content', width: '100%', bgcolor: 'var(--yoroi-palette-common-white)', borderRadius: '8px' }}>
@@ -84,7 +84,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         }}
       >
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-          {list === null || list.length === 0 ?
+          {list.length === 0 ?
             intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
         </Typography>
