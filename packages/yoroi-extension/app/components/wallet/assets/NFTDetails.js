@@ -10,7 +10,7 @@ import { ReactComponent as BackArrow }  from '../../../assets/images/assets-page
 import { ReactComponent as IconCopy }  from '../../../assets/images/copy.inline.svg';
 import { ReactComponent as IconCopied }  from '../../../assets/images/copied.inline.svg';
 import { ReactComponent as Chevron }  from '../../../assets/images/assets-page/chevron-right.inline.svg';
-import moment from 'moment';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
@@ -18,6 +18,8 @@ import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow, CardanoAssetMintMetadata } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
+import { add } from 'lodash';
 
 // Overwrite current theme
 // Temporary solution untill the new design system.
@@ -25,7 +27,10 @@ const theme = createTheme({
   palette: {
     primary: {
       main: '#3154CB'
-    }
+    },
+  },
+  typography: {
+    fontFamily: 'Rubik'
   }
 });
 
@@ -106,6 +111,8 @@ function NFTDetails({
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
+  const below1400 = useMediaQuery('(max-width:1400px)');
+  const below1250 = useMediaQuery('(max-width:1250px)');
 
   const onCopyMetadata = async () => {
     if (nftInfo.metadata === null) return;
@@ -119,11 +126,22 @@ function NFTDetails({
     }
   }
   const onClose = () => setOpen(false)
+  function displayAddr(addr: string): string {
+    if (below1250 === true) {
+      return truncateAddressShort(addr);
+    }
+
+    if (below1400 === true) {
+      return truncateAddress(addr);
+    }
+
+    return addr;
+  }
   // Todo: Should be handling by displaying an error page
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ overflow: 'hidden' }}>
+    <Box sx={{ overflowX: 'hidden' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -140,24 +158,25 @@ function NFTDetails({
             justifyContent: 'flex-start'
           }}
         >
-          <BackArrow /> <Box component='span' marginLeft='10px'>{intl.formatMessage(messages.back)}</Box>
+          <BackArrow />
+          <Box component='span' marginLeft='10px'>{intl.formatMessage(messages.back)}</Box>
         </Typography>
       </Box>
       <Stack
         direction="row"
         sx={{
           margin: '0 auto',
-          padding: '24px 0px',
           minHeight: '520px',
           marginY: '21px',
           backgroundColor: 'var(--yoroi-palette-common-white)',
           borderRadius: '8px',
+          overflowX: 'auto',
         }}
       >
-        <ImageItem sx={{ cursor: nftInfo.image !== null ? 'pointer' : 'auto' }} onClick={() => nftInfo.image !== null && setOpen(true)} flex="1" flexShrink={0}>
+        <ImageItem sx={{ cursor: nftInfo.image !== null ? 'zoom-in' : 'auto', padding: below1400 ? '10px' : '24px' }} onClick={() => nftInfo.image !== null && setOpen(true)}>
           <NftImage imageUrl={nftInfo.image} name={nftInfo.name || '-'} width='532px' height='510px' />
         </ImageItem>
-        <Box flex="1" sx={{ width: '50%' }}>
+        <Box flex={1} sx={{ paddingTop: below1400 ? '10px' : '24px', paddingBottom: '22px' }}>
           <Stack
             justifyContent='space-between'
             flexDirection='row'
@@ -166,7 +185,7 @@ function NFTDetails({
               px: '24px',
             }}
           >
-            <TruncatedText variant="h2" sx={{ width: '75%' }} color="var(--yoroi-palette-gray-900)">
+            <TruncatedText variant="h2" sx={{ width: below1400 ? '50%' : '75%' }} color="var(--yoroi-palette-gray-900)">
               {nftInfo.name}
             </TruncatedText>
 
@@ -204,13 +223,14 @@ function NFTDetails({
                   aria-label="NFTs tabs"
                 >
                   {tabs.map(({ label, id }) => (
-                    <Tab key={id} sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500, fontFamily: 'Rubik' }} label={intl.formatMessage(label)} value={id} />
+                    <Tab key={id} sx={{ minWidth: 'unset', paddingX: '0px', width: 'content', marginRight: id === tabs[0].id && '24px', textTransform: 'none', fontWeight: 500 }} label={intl.formatMessage(label)} value={id} />
                   ))}
                 </TabList>
               </Box>
               <TabPanel
                 sx={{
                   boxShadow: 'none',
+                  paddingBottom: '0px',
                   bgcolor: 'transparent',
                   maxHeight: '400px',
                   overflow: 'auto'
@@ -223,8 +243,8 @@ function NFTDetails({
                   <LabelWithValue
                     label={intl.formatMessage(globalMessages.fingerprint)}
                     value={
-                      <CopyAddress withButton text={nftInfo.id}>
-                        {nftInfo.id}
+                      <CopyAddress text={nftInfo.id}>
+                        {displayAddr(nftInfo.id)}
                       </CopyAddress>
                     }
                   />
@@ -232,8 +252,8 @@ function NFTDetails({
                   <LabelWithValue
                     label={intl.formatMessage(tokenMessages.policyId)}
                     value={
-                      <CopyAddress withButton text={nftInfo.policyId}>
-                        {nftInfo.policyId}
+                      <CopyAddress text={nftInfo.policyId}>
+                        {displayAddr(nftInfo.policyId)}
                       </CopyAddress>
                     }
                   />
@@ -290,7 +310,7 @@ function NFTDetails({
           </ThemeProvider>
         </Box>
       </Stack>
-      <Modal onClose={onClose} open={open} sx={{ background: 'rgba(18, 31, 77, 0.7)', backdropFilter: 'blur(10px)' }}>
+      <Modal onClose={onClose} open={open} sx={{ background: 'rgba(18, 31, 77, 0.7)', zIndex: '10000', backdropFilter: 'blur(10px)' }}>
         <Box
           sx={{
             position: 'absolute',
@@ -300,7 +320,7 @@ function NFTDetails({
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'auto',
-            cursor: 'pointer',
+            cursor: 'zoom-out',
           }}
           onClick={onClose}
         >
@@ -335,10 +355,10 @@ const ImageItem = styled(Box)({
 const TruncatedText = styled(Typography)({
   whiteSpace: 'nowrap',
   overflow: 'hidden',
-  textOverflow: 'ellipsis'
+  textOverflow: 'ellipsis',
 })
 
-function CopyAddress({ text }): Node {
+function CopyAddress({ text, children }): Node {
   const [isCopied, setCopy] = useState(false);
 
   const onCopy = async () => {
@@ -359,7 +379,7 @@ function CopyAddress({ text }): Node {
   return (
     <Stack direction='row' alignItems='center' justifyContent='space-between'>
       <TruncatedText sx={{ width: '90%' }}>
-        {text}
+        {children}
       </TruncatedText>
 
       <IconButton onClick={onCopy}>
