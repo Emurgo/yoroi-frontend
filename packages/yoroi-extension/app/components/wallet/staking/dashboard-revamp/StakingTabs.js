@@ -25,18 +25,12 @@ type Props = {|
     pool: PoolData,
     undelegate: void | (void => Promise<void>),
   |},
-  rewardHistory: {|
-    graphData: GraphRewardData,
-    onOpenRewardList: () => void,
-  |},
   epochProgress: {|
     currentEpoch: number,
     startEpochDate: string,
     endEpochDate: string,
     percentage: number,
   |},
-  +epochLength: ?number,
-  +graphData: GraphData,
 |};
 
 type Intl = {|
@@ -59,84 +53,21 @@ const messages = defineMessages({
   },
 });
 
-function StakingTabs({
-  delegatedPool,
-  epochLength,
-  epochProgress,
-  rewardHistory,
-  intl,
-  graphData,
-}: Props & Intl): Node {
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
-  const getEpochLengthLabel: void => string = () => {
-    if (epochLength == null) {
-      return intl.formatMessage(globalMessages.epochLabel);
-    }
-
-    return epochLength === 1
-      ? intl.formatMessage(messages.singleEpochAxisLabel)
-      : intl.formatMessage(messages.epochAxisLabel, { epochLength });
-  };
-
-  const { hideYAxis, items } = graphData.rewardsGraphData;
-  const tabs = [
-    {
-      id: 0,
-      label: intl.formatMessage(globalMessages.stakePoolDelegated),
-      component: (
-        <StakePoolDelegatedTab
-          alertMessage={intl.formatMessage(messages.alertInfo)}
-          delegatedPool={delegatedPool.pool}
-          undelegate={delegatedPool.undelegate}
-        />
-      ),
-    },
-    {
-      id: 1,
-      label: intl.formatMessage(globalMessages.rewardHistory),
-      component: (
-        <RewardHistoryTab
-          graphData={rewardHistory.graphData}
-          onOpenRewardList={rewardHistory.onOpenRewardList}
-        />
-      ),
-    },
-    {
-      id: 2,
-      label: intl.formatMessage(globalMessages.epochProgress),
-      component: (
-        <EpochProgressCard
-          percentage={epochProgress.percentage}
-          days={moment(epochProgress.endEpochDate).diff(moment(), 'days')}
-          currentEpoch={epochProgress.currentEpoch}
-          startEpochDate={epochProgress.startEpochDate}
-          endEpochDate={epochProgress.endEpochDate}
-        />
-      ),
-    },
-  ];
-
+function StakingTabs({ delegatedPool, epochProgress, intl }: Props & Intl): Node {
   return (
     <Card>
-      <TabContext value={value}>
-        <Box sx={{ borderBottom: 1, borderColor: 'var(--yoroi-palette-gray-200)' }}>
-          <TabList onChange={handleChange} aria-label="Staking tabs">
-            {tabs.map(({ label, id }) => (
-              <StyledTab key={id + label} label={label} value={String(id)} />
-            ))}
-          </TabList>
-        </Box>
-        {tabs.map(({ component, id }) => (
-          <TabPanel key={id} value={String(id)}>
-            {component}
-          </TabPanel>
-        ))}
-      </TabContext>
+      <StakePoolDelegatedTab
+        alertMessage={intl.formatMessage(messages.alertInfo)}
+        delegatedPool={delegatedPool.pool}
+        undelegate={delegatedPool.undelegate}
+      />
+      <EpochProgressCard
+        percentage={epochProgress.percentage}
+        days={moment(epochProgress.endEpochDate).diff(moment(), 'days')}
+        currentEpoch={epochProgress.currentEpoch}
+        startEpochDate={epochProgress.startEpochDate}
+        endEpochDate={epochProgress.endEpochDate}
+      />
     </Card>
   );
 }

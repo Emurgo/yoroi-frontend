@@ -139,6 +139,20 @@ class StakingPage extends Component<AllProps> {
               )
             : new MultiToken([], defaultToken);
         })()}
+        epochLength={this.getEpochLengthInDays(request.publicDeriver)}
+        graphData={generateGraphData({
+          delegationRequests: request.delegationRequests,
+          publicDeriver: request.publicDeriver,
+          currentEpoch: stores.time.getCurrentTimeRequests(request.publicDeriver).currentEpoch,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+          getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+        })}
+        onOpenRewardList={() =>
+          actions.dialogs.open.trigger({
+            dialog: RewardHistoryDialog,
+          })
+        }
       />
     );
   };
@@ -240,12 +254,6 @@ class StakingPage extends Component<AllProps> {
         : `${beforeDecimalRewards}${afterDecimalRewards} ${truncateToken(getTokenName(tokenInfo))}`;
     };
 
-    // TODO: get currency of delegated token
-    const getCurrency = tokenEntry => {
-      // return getTokenName(tokenEntry);
-      return 'ADA';
-    };
-
     for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
@@ -257,7 +265,6 @@ class StakingPage extends Component<AllProps> {
           primary: getNormalized(nextReward.getDefaultEntry()),
           poolName: getMiniPoolInfo(poolHash),
           poolId: poolHash,
-          currency: getCurrency(),
           date: getDateFromEpoch(i),
         });
         historyIterator++;
@@ -267,7 +274,6 @@ class StakingPage extends Component<AllProps> {
           primary: 0,
           poolName: '',
           poolId: '',
-          currency: '',
           date: '',
         });
       }
@@ -326,11 +332,8 @@ class StakingPage extends Component<AllProps> {
     return epochLengthInDays;
   };
 
-  getStakePools: (PublicDeriver<>, GraphRewardData) => Node | void = (
-    publicDeriver,
-    rewardsGraphData
-  ) => {
-    const { actions, stores } = this.generated;
+  getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
+    const { stores } = this.generated;
     const timeStore = stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
@@ -423,29 +426,12 @@ class StakingPage extends Component<AllProps> {
                 }
               : undefined,
         }}
-        rewardHistory={{
-          graphData: rewardsGraphData,
-          onOpenRewardList: () =>
-            actions.dialogs.open.trigger({
-              dialog: RewardHistoryDialog,
-            }),
-        }}
         epochProgress={{
           startEpochDate: previousEpochDate,
           currentEpoch,
           endEpochDate,
           percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
         }}
-        graphData={generateGraphData({
-          delegationRequests,
-          publicDeriver,
-          currentEpoch: this.generated.stores.time.getCurrentTimeRequests(publicDeriver)
-            .currentEpoch,
-          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
-          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
-          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
-        })}
-        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
   };
@@ -479,7 +465,7 @@ class StakingPage extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPage)} no public deriver. Should never happen`);
     }
-    const { stores } = this.generated;
+    const { actions, stores } = this.generated;
     const { uiDialogs, delegation: delegationStore } = stores;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
@@ -505,7 +491,7 @@ class StakingPage extends Component<AllProps> {
     });
 
     const showStakePoolTabs =
-      errorIfPresent == null ? this.getStakePools(publicDeriver, rewardsGraphData) : errorIfPresent;
+      errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
 
     return (
       <TopBarLayout
@@ -831,5 +817,5 @@ const WrapperCards = styled(Box)({
   display: 'flex',
   justifyContent: 'space-between',
   marginBottom: '40px',
-  height: '412px',
+  height: '546px',
 });
