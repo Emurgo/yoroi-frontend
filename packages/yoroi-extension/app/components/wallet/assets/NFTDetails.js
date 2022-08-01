@@ -184,7 +184,7 @@ function NFTDetails({
               px: '24px',
             }}
           >
-            <TruncatedText variant="h2" sx={{ width: below1400 ? '50%' : '75%' }} color="var(--yoroi-palette-gray-900)">
+            <TruncatedText variant="h2" sx={{ width: below1400 ? '200px' : '400px' }} color="var(--yoroi-palette-gray-900)">
               {nftInfo.name}
             </TruncatedText>
 
