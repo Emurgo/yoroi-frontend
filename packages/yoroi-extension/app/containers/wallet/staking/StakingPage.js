@@ -392,11 +392,8 @@ class StakingPage extends Component<AllProps> {
       // server hasn't returned information about the stake pool yet
       return undefined;
     }
-    const name = meta.info?.name ?? truncateAddressShort(currentPool.toString());
-    const delegatedPool = {
-      id: String(currentPool),
-      name,
-    };
+    const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+    const delegatedPool = { id: String(currentPool), name };
 
     // TODO: implement this eventually
     // const stakePoolMeta = {
@@ -432,6 +429,28 @@ class StakingPage extends Component<AllProps> {
           endEpochDate,
           percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
         }}
+        delegatedPool={delegatedPool}
+        undelegate={
+          // don't support undelegation for ratio stake since it's a less intuitive UX
+          currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
+            ? async () => {
+                this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
+                await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
+                  { publicDeriver, poolRequest: undefined }
+                );
+              }
+            : undefined
+        }
+        graphData={generateGraphData({
+          delegationRequests,
+          publicDeriver,
+          currentEpoch: this.generated.stores.time.getCurrentTimeRequests(publicDeriver)
+            .currentEpoch,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
+        })}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
   };
@@ -657,10 +676,6 @@ class StakingPage extends Component<AllProps> {
           |},
         |},
       |},
-      time: {|
-        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
-        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
-      |},
       delegation: {|
         selectedPage: number,
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
@@ -748,7 +763,6 @@ class StakingPage extends Component<AllProps> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
-        time,
         substores: {
           ada: {
             delegation: {
