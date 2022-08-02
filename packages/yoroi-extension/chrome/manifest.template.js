@@ -48,7 +48,7 @@ export default ({
     // the name shown in chrome://extensions
     // we also reuse this to choose the filename on disk
     name: titleOverride === true ? defaultTitle : 'Yoroi',
-    manifest_version: 2,
+    manifest_version: 3,
     description,
     browser_action: {
       default_title: defaultTitle,
@@ -65,8 +65,9 @@ export default ({
     },
     permissions: [
       'storage',
+    ],
+    host_permissions: [
       '*://connect.trezor.io/*',
-      'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*'
     ],
     content_scripts: [
       {
