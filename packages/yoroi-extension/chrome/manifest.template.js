@@ -50,7 +50,7 @@ export default ({
     name: titleOverride === true ? defaultTitle : 'Yoroi',
     manifest_version: 3,
     description,
-    browser_action: {
+    action: {
       default_title: defaultTitle,
       default_icon: icons,
     },
@@ -130,10 +130,10 @@ export function overrideForNightly(manifest: any): any {
   manifest.browser_specific_settings.gecko.id = '{6abdeba8-579b-11ea-8e2d-0242ac130003}';
 
   manifest.name = nightlyTitle;
-  manifest.browser_action.default_title = nightlyTitle;
+  manifest.action.default_title = nightlyTitle;
 
   manifest.icons = nightlyIcons;
-  manifest.browser_action.default_icon = nightlyIcons;
+  manifest.action.default_icon = nightlyIcons;
 
   return manifest;
 }

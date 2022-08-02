@@ -98,7 +98,7 @@ const onYoroiIconClicked = () => {
   chrome.tabs.create({ url: 'main_window.html' });
 };
 
-chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
+chrome.action.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
 /**
  * we store the ID instead of an index
