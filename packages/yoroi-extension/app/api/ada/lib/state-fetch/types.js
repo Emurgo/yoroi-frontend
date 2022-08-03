@@ -353,6 +353,7 @@ export type CatalystRoundInfoRequest = {|
 
 export type CatalystRound = {|
   +id: number,
+  +name: string,
   +registrationStart: string,
   +registrationEnd: string,
   +votingStart: string,

@@ -776,7 +776,7 @@
   "wallet.voting.line2": "Before you begin, make sure to complete steps below",
   "wallet.voting.line3": "Download the Catalyst Voting App.",
   "wallet.voting.line4": "Open the Catalyst Voting App and click on the Complete registration button.",
-  "wallet.voting.lineTitle": "Register to vote on Fund { round }",
+  "wallet.voting.lineTitle": "Register to vote on { fundName }",
   "wallet.withdrawal.transaction.unregister": "Essa transação irá revogar uma ou mais chave de participação, reembolsando suas {refundAmount}{ticker} pagas como depósito no registro de sua chave de participação",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copiar para área de transferência",
   "widgets.explorer.tooltip": "Ir para {websiteName}",
