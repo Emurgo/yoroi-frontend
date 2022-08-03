@@ -13,3 +13,8 @@ export const emailOptions = {
   url: `https://mailsac.com/api/addresses/${mailsacEmail}/messages`,
   headers: { 'Mailsac-Key': mailsacAPIKey },
 };
+
+export const adaToFiatPrices = {
+  method: 'get',
+  url: `https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current`,
+}

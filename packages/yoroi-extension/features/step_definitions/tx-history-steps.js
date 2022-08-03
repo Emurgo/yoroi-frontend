@@ -2,13 +2,25 @@
 
 import { Then, When, Given } from 'cucumber';
 import { By } from 'selenium-webdriver';
-import chai from 'chai';
+import chai, { expect } from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
+import { walletTransactionAmount } from '../pages/walletTransactionsPage';
+import { adaToFiatPrices } from '../support/helpers/common-constants';
+
+const axios = require('axios');
 
 function verifyAllTxsFields(
-  txType, txAmount, txTime, txStatus, txFee, txFromList, txToList,
-  txId, expectedTx, txConfirmations
+  txType,
+  txAmount,
+  txTime,
+  txStatus,
+  txFee,
+  txFromList,
+  txToList,
+  txId,
+  expectedTx,
+  txConfirmations
 ) {
   chai.expect(txType).to.equal(expectedTx.txType);
   chai.expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
@@ -47,8 +59,9 @@ When(/^I see the transactions summary$/, async function () {
 Then(
   /^I should see that the number of transactions is ([^"]*)$/,
   async function (expectedTxsNumber) {
-    const txsNumberMessage = await i18n.formatMessage(this.driver,
-      { id: 'wallet.summary.page.transactionsLabel' });
+    const txsNumberMessage = await i18n.formatMessage(this.driver, {
+      id: 'wallet.summary.page.transactionsLabel',
+    });
     await this.waitUntilText(
       { locator: '.WalletSummary_numberOfTransactions', method: 'css' },
       txsNumberMessage + ': ' + expectedTxsNumber
@@ -56,56 +69,63 @@ Then(
   }
 );
 
-
 Then(/^I should see no transactions$/, async function () {
   await this.waitForElement({ locator: '.WalletNoTransactions_component', method: 'css' });
-  const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+  const actualTxsList = await this.getElementsBy({
+    locator: '.Transaction_component',
+    method: 'css',
+  });
   chai.expect(actualTxsList.length).to.equal(0);
 });
 
-Then(
-  /^I should see ([^"]*) ([^"]*) transactions$/,
-  async function (txsNumber, txExpectedStatus) {
-    const txsAmount = parseInt(txsNumber, 10);
-    const showMoreLocator = '.WalletTransactionsList_component .MuiButton-primary';
+Then(/^I should see ([^"]*) ([^"]*) transactions$/, async function (txsNumber, txExpectedStatus) {
+  const txsAmount = parseInt(txsNumber, 10);
+  const showMoreLocator = '.WalletTransactionsList_component .MuiButton-primary';
 
+  await this.driver.sleep(500);
+  // press the show more transaction button until all transactions are visible
+  for (let i = 1; i < txsAmount; i++) {
+    const buttonShowMoreExists = await this.checkIfExists({
+      locator: showMoreLocator,
+      method: 'css',
+    });
+    if (!buttonShowMoreExists) {
+      break;
+    }
+    await this.click({ locator: showMoreLocator, method: 'css' });
     await this.driver.sleep(500);
-    // press the show more transaction button until all transactions are visible
-    for (let i = 1; i < txsAmount; i++) {
-      const buttonShowMoreExists = await this.checkIfExists({ locator: showMoreLocator, method: 'css' });
-      if (!buttonShowMoreExists) {
-        break;
-      }
-      await this.click({ locator: showMoreLocator, method: 'css' });
-      await this.driver.sleep(500);
-    }
-
-    const allTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
-    const pendingTxsList = await this.getElementsBy({ locator: '.Transaction_pendingLabel', method: 'css' });
-    const failedTxsList = await this.getElementsBy({ locator: '.Transaction_failedLabel', method: 'css' });
-    if (txExpectedStatus === 'pending') {
-      chai.expect(pendingTxsList.length).to.equal(txsAmount);
-      return;
-    }
-    if (txExpectedStatus === 'failed') {
-      chai.expect(failedTxsList.length).to.equal(txsAmount);
-      return;
-    }
-    chai.expect(allTxsList.length - pendingTxsList.length - failedTxsList.length)
-      .to.equal(txsAmount);
   }
-);
 
-When(
-  /^I expand the top transaction$/,
-  async function () {
-    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
-    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
-    const topTx = actualTxsList[0];
-
-    await topTx.click();
+  const allTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+  const pendingTxsList = await this.getElementsBy({
+    locator: '.Transaction_pendingLabel',
+    method: 'css',
+  });
+  const failedTxsList = await this.getElementsBy({
+    locator: '.Transaction_failedLabel',
+    method: 'css',
+  });
+  if (txExpectedStatus === 'pending') {
+    chai.expect(pendingTxsList.length).to.equal(txsAmount);
+    return;
   }
-);
+  if (txExpectedStatus === 'failed') {
+    chai.expect(failedTxsList.length).to.equal(txsAmount);
+    return;
+  }
+  chai.expect(allTxsList.length - pendingTxsList.length - failedTxsList.length).to.equal(txsAmount);
+});
+
+When(/^I expand the top transaction$/, async function () {
+  await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+  const actualTxsList = await this.getElementsBy({
+    locator: '.Transaction_component',
+    method: 'css',
+  });
+  const topTx = actualTxsList[0];
+
+  await topTx.click();
+});
 
 async function parseTxInfo(addressList) {
   const addressInfoRow = await addressList.findElements(By.css('.Transaction_addressItem'));
@@ -120,65 +140,75 @@ async function parseTxInfo(addressList) {
   return result;
 }
 
-Then(
-  /^I verify top transaction content ([^"]*)$/,
-  async function (walletName) {
-    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
-    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
-    const topTx = actualTxsList[0];
+Then(/^I verify top transaction content ([^"]*)$/, async function (walletName) {
+  await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+  const actualTxsList = await this.getElementsBy({
+    locator: '.Transaction_component',
+    method: 'css',
+  });
+  const topTx = actualTxsList[0];
 
-    let status = 'successful';
-    {
-      const pending = await topTx.findElements(By.css('.Transaction_pendingLabel'));
-      const failed = await topTx.findElements(By.css('.Transaction_failedLabel'));
-      if (pending.length > 0) {
-        status = 'pending';
-      } else if (failed.length > 0) {
-        status = 'failed';
-      }
+  let status = 'successful';
+  {
+    const pending = await topTx.findElements(By.css('.Transaction_pendingLabel'));
+    const failed = await topTx.findElements(By.css('.Transaction_failedLabel'));
+    if (pending.length > 0) {
+      status = 'pending';
+    } else if (failed.length > 0) {
+      status = 'failed';
     }
+  }
 
-    await topTx.click();
+  await topTx.click();
 
-    const txList = await topTx.findElements(By.css('.Transaction_addressList'));
-    const fromTxInfo = await parseTxInfo(txList[0]);
-    const toTxInfo = await parseTxInfo(txList[1]);
+  const txList = await topTx.findElements(By.css('.Transaction_addressList'));
+  const fromTxInfo = await parseTxInfo(txList[0]);
+  const toTxInfo = await parseTxInfo(txList[1]);
 
-    const txData = await topTx.getText();
-    const txDataFields = txData.split('\n');
-    const [txTime, txType, txStatus, txFee, txAmount] = txDataFields;
+  const txData = await topTx.getText();
+  const txDataFields = txData.split('\n');
+  const [txTime, txType, txStatus, txFee, txAmount] = txDataFields;
 
-    const expectedTx = displayInfo[walletName];
+  const expectedTx = displayInfo[walletName];
 
-    const txId = await (async () => {
-      const elem = await topTx.findElement(By.css('.txid'));
-      return await elem.getText();
-    })();
-    const txConfirmation =
-      status === 'successful'
-        ? await (async () => {
+  const txId = await (async () => {
+    const elem = await topTx.findElement(By.css('.txid'));
+    return await elem.getText();
+  })();
+  const txConfirmation =
+    status === 'successful'
+      ? await (async () => {
           const txConfirmationsCount = await topTx.findElement(By.css('.confirmationCount'));
           const txConfirmationParentElem = await txConfirmationsCount.findElement(By.xpath('./..'));
           return await txConfirmationParentElem.getText();
         })()
-        : undefined;
+      : undefined;
 
-    verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, fromTxInfo,
-      toTxInfo, txId, expectedTx, txConfirmation);
-  }
-);
+  verifyAllTxsFields(
+    txType,
+    txAmount,
+    txTime,
+    txStatus,
+    txFee,
+    fromTxInfo,
+    toTxInfo,
+    txId,
+    expectedTx,
+    txConfirmation
+  );
+});
 
-Then(
-  /^The number of confirmations of the top tx is ([^"]*)$/,
-  async function (count) {
-    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
-    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
-    const topTx = actualTxsList[0];
-    const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
-    const confirmationCount = await assuranceElem[0].getText();
-    chai.expect(confirmationCount).to.equal(count);
-  }
-);
+Then(/^The number of confirmations of the top tx is ([^"]*)$/, async function (count) {
+  await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
+  const actualTxsList = await this.getElementsBy({
+    locator: '.Transaction_component',
+    method: 'css',
+  });
+  const topTx = actualTxsList[0];
+  const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
+  const confirmationCount = await assuranceElem[0].getText();
+  chai.expect(confirmationCount).to.equal(count);
+});
 
 const displayInfo = {
   'many-tx-wallet': {
@@ -186,9 +216,7 @@ const displayInfo = {
     txAmount: '-0.169999',
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'HIGH',
-    txFrom: [
-      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.82 ADA'],
-    ],
+    txFrom: [['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.82 ADA']],
     txTo: [
       ['Ae2tdPwUPE...iLjTnt34Aj', 'BYRON - EXTERNAL', '+0.000001 ADA'],
       ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.65 ADA'],
@@ -202,12 +230,8 @@ const displayInfo = {
     txAmount: '-0.999999',
     txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
-    txFrom: [
-      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1 ADA'],
-    ],
-    txTo: [
-      ['Ae2tdPwUPE...sTrQfTxPVX', 'PROCESSING...', '+0.000001 ADA']
-    ],
+    txFrom: [['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1 ADA']],
+    txTo: [['Ae2tdPwUPE...sTrQfTxPVX', 'PROCESSING...', '+0.000001 ADA']],
     txId: 'fa6f2c82fb511d0cc9c12a540b5fac6e5a9b0f288f2d140f909f981279e16fbe',
     txFee: '0.999999',
   },
@@ -216,9 +240,7 @@ const displayInfo = {
     txAmount: '-0.18',
     txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
-    txFrom: [
-      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1 ADA'],
-    ],
+    txFrom: [['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1 ADA']],
     txTo: [
       ['Ae2tdPwUPE...xJPmFzi6G2', 'ADDRESS BOOK', '+0.000001 ADA'],
       ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.82 ADA'],
@@ -231,3 +253,22 @@ const displayInfo = {
 When(/^I go to the tx history screen$/, async function () {
   await this.click({ locator: '.summary ', method: 'css' });
 });
+
+Then(
+  /^I validate the transaction amount to (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) currency pairing$/,
+  async function (currency) {
+    const txAmount = await this.getText(walletTransactionAmount);
+    expect(txAmount).to.contain(currency);
+
+    const response = await axios(adaToFiatPrices);
+    const rate = await response.data.ticker.prices[currency];
+
+    const amountList = await txAmount.split('\n');
+
+    const fiatAmount = await amountList[0].replace(currency, '');
+    const adaAmount = await parseFloat(amountList[1].replace('ADA', ''));
+
+    const expectedValue = await parseFloat(((await adaAmount) * rate).toFixed(6));
+    expect(fiatAmount).to.contain(`${expectedValue}`);
+  }
+);

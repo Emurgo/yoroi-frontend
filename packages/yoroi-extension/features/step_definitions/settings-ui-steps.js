@@ -3,7 +3,7 @@
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
-import { truncateLongName, } from '../../app/utils/formatters';
+import { truncateLongName } from '../../app/utils/formatters';
 import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 
@@ -15,7 +15,10 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click({ locator: '.SettingsLayout_settingsPane .InlineEditingInput_component', method: 'css' });
+  await this.click({
+    locator: '.SettingsLayout_settingsPane .InlineEditingInput_component',
+    method: 'css',
+  });
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -25,7 +28,7 @@ When(/^I enter new wallet name:$/, async function (table) {
    * This makes our InlineEditingInput become disabled causing the clear and sendKeys to fail
    * https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/214
    * We instead repeatedly delete characters until we've deleted the whole name
-  */
+   */
 
   // can't programmatically get the wallet name due to the issue above
   // so assume max length
@@ -53,17 +56,32 @@ When(/^I click on the "([^"]*)" password label$/, async function (label) {
 
 When(/^I change wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: '.changePasswordDialog .currentPassword input', method: 'css' }, fields.currentPassword);
-  await this.input({ locator: '.changePasswordDialog .newPassword input', method: 'css' }, fields.password);
-  await this.input({ locator: '.changePasswordDialog .repeatedPassword input', method: 'css' }, fields.repeatedPassword);
+  await this.input(
+    { locator: '.changePasswordDialog .currentPassword input', method: 'css' },
+    fields.currentPassword
+  );
+  await this.input(
+    { locator: '.changePasswordDialog .newPassword input', method: 'css' },
+    fields.password
+  );
+  await this.input(
+    { locator: '.changePasswordDialog .repeatedPassword input', method: 'css' },
+    fields.repeatedPassword
+  );
 });
 
 When(/^I clear the current wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm({ locator: '.changePasswordDialog .currentPassword input', method: 'css' }, password.length);
+  await this.clearInputUpdatingForm(
+    { locator: '.changePasswordDialog .currentPassword input', method: 'css' },
+    password.length
+  );
 });
 
 When(/^I clear the current wallet repeat password ([^"]*)$/, async function (repeatPassword) {
-  await this.clearInputUpdatingForm({ locator: '.changePasswordDialog .repeatedPassword input', method: 'css' }, repeatPassword.length);
+  await this.clearInputUpdatingForm(
+    { locator: '.changePasswordDialog .repeatedPassword input', method: 'css' },
+    repeatPassword.length
+  );
 });
 
 When(/^I submit the wallet password dialog$/, async function () {
@@ -79,15 +97,22 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+  await this.waitUntilText(
+    { locator: '.NavPlate_name', method: 'css' },
+    truncateLongName(walletName)
+  );
 });
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
   await checkErrorByTranslationId(
     this,
-    { locator: '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]', method: 'xpath' },
-    error);
+    {
+      locator: '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]',
+      method: 'xpath',
+    },
+    error
+  );
 });
 
 Then(/^I should see "Doesn't match" error message:$/, async function (data) {
@@ -95,7 +120,8 @@ Then(/^I should see "Doesn't match" error message:$/, async function (data) {
   await checkErrorByTranslationId(
     this,
     { locator: '.MuiFormHelperText-root', method: 'css' },
-    error);
+    error
+  );
 });
 
 Then(/^I should see the following submit error messages:$/, async function (data) {
@@ -103,25 +129,43 @@ Then(/^I should see the following submit error messages:$/, async function (data
   await checkErrorByTranslationId(
     this,
     { locator: '.ChangeWalletPasswordDialog_error', method: 'css' },
-    error);
+    error
+  );
 });
 
 Then(/^I should stay in the change password dialog$/, async function () {
-  const changePasswordMessage = await i18n.formatMessage(this.driver,
-    { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText({ locator: '.dialog__title', method: 'css' }, changePasswordMessage.toUpperCase(), 2000);
+  const changePasswordMessage = await i18n.formatMessage(this.driver, {
+    id: 'wallet.settings.changePassword.dialog.title.changePassword',
+  });
+  await this.waitUntilText(
+    { locator: '.dialog__title', method: 'css' },
+    changePasswordMessage.toUpperCase(),
+    2000
+  );
 });
 
 Then(/^I should see support screen$/, async function () {
-  await this.waitForElement({ locator: "//h1[contains(text(), 'Frequently asked questions')]", method: 'xpath' });
-  await this.waitForElement({ locator: "//h1[contains(text(), 'Reporting a problem')]", method: 'xpath' });
+  await this.waitForElement({
+    locator: "//h1[contains(text(), 'Frequently asked questions')]",
+    method: 'xpath',
+  });
+  await this.waitForElement({
+    locator: "//h1[contains(text(), 'Reporting a problem')]",
+    method: 'xpath',
+  });
   await this.waitForElement({ locator: "//h1[contains(text(), 'Logs')]", method: 'xpath' });
 });
 
 Then(/^I should see blockchain screen$/, async function () {
   await this.waitForElement({ locator: '.ExplorerSettings_component', method: 'css' });
-  await this.waitForElement({ locator: "//h2[contains(text(), 'Cardano Payment URLs')]", method: 'xpath' });
-  await this.waitForElement({ locator: "//h2[contains(text(), 'Currency Conversion')]", method: 'xpath' });
+  await this.waitForElement({
+    locator: "//h2[contains(text(), 'Cardano Payment URLs')]",
+    method: 'xpath',
+  });
+  await this.waitForElement({
+    locator: "//h2[contains(text(), 'Currency Conversion')]",
+    method: 'xpath',
+  });
 });
 
 When(/^I click on remove wallet$/, async function () {
@@ -144,16 +188,15 @@ Then(/^I should see the wallet export for key "([^"]*)"$/, async function (expec
 });
 
 Then(/^I click on the checkbox$/, async function () {
-  const warningCheckboxElement = await this.driver.findElement(By.css('.DangerousActionDialog_checkbox'));
+  const warningCheckboxElement = await this.driver.findElement(
+    By.css('.DangerousActionDialog_checkbox')
+  );
   const checkbox = await warningCheckboxElement.findElement(By.xpath('//input[@type="checkbox"]'));
   await checkbox.click();
 });
 
 Then(/^I should see a no wallet message$/, async function () {
-  const noWalletMessage = await i18n.formatMessage(
-    this.driver,
-    { id: 'wallet.nowallet.title' }
-  );
+  const noWalletMessage = await i18n.formatMessage(this.driver, { id: 'wallet.nowallet.title' });
   await this.waitUntilText({ locator: '.FullscreenMessage_title', method: 'css' }, noWalletMessage);
 });
 
@@ -161,7 +204,7 @@ Then(/^I sleep for ([^"]*)$/, async function (ms) {
   await this.driver.sleep(Number.parseInt(ms, 10));
 });
 
-Then(/^I should see "Incorrect wallet password." error message$/, async function(){
+Then(/^I should see "Incorrect wallet password." error message$/, async function () {
   const errorSelector = '.ChangeWalletPasswordDialog_error';
   await this.waitUntilText(
     { locator: errorSelector, method: 'css' },

@@ -9,6 +9,7 @@ import {
   AfterAll,
   setDefinitionFunctionWrapper,
   setDefaultTimeout,
+  When,
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
@@ -17,10 +18,7 @@ import { enterRecoveryPhrase, getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
-import {
-  testRunsDataDir,
-  snapshotsDir,
-  } from '../support/helpers/common-constants';
+import { testRunsDataDir, snapshotsDir } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
@@ -50,7 +48,7 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  saveButton
+  saveButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import * as helpers from '../support/helpers/helpers';
@@ -661,7 +659,16 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   await walletButtonInRow.click();
 });
 
-Then(/^Debug. Take screenshot$/,  async function () {
+Then(/^I should see the dashboard screen$/, async function () {
+  await this.waitForElement({ locator: '.StakingDashboard_page', method: 'css' });
+});
+
+When(/^I go to General Settings$/, async function () {
+  await goToSettings(this);
+  await selectSubmenuSettings(this, 'general');
+});
+
+Then(/^Debug. Take screenshot$/, async function () {
   const currentTime = getLogDate();
   await takeScreenshot(this.driver, `debug_${currentTime}`);
   await takePageSnapshot(this.driver, `debug_${currentTime}`);
