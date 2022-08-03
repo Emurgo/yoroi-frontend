@@ -55,6 +55,7 @@ import {
   getAddressing,
   connectorSignData,
   connectorGetAssets,
+  getTokenMetadataFromIds,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -87,6 +88,7 @@ import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import { find721metadata } from '../../app/utils/nftMetadata';
 
 /*::
 declare var chrome;
@@ -1433,7 +1435,35 @@ function handleInjectorConnect(port) {
             } catch (e) {
               handleError(e);
             }
-          break;
+            break;
+          case 'get_network_id':
+            try {
+              checkParamCount(0);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - get_network_id could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const networkId = wallet.getParent()
+                        .getNetworkInfo().BaseConfig[0].ChainNetworkId;
+                      rpcResponse({
+                        ok: parseInt(networkId, 10),
+                      });
+                    },
+                    db,
+                    localStorageApi,
+                    false,
+                  );
+                });
+              }
+            } catch (e) {
+              handleError(e);
+            }
+            break;
           case 'list_nfts/cardano':
             try {
               await withDb(async (db, localStorageApi) => {
@@ -1442,29 +1472,25 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const assets = await connectorGetAssets(wallet);
                     const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
-                    const fetcher = await getCardanoStateFetcher(localStorageApi);
-                    const metadatasList = await fetcher.getMultiAssetMintMetadata({
-                      assets: potentialNFTAssets.map(asset => {
-                        const ident = asset.identifier.split('.');
-                        return {
-                          policy: ident[0],
-                          name: Buffer.from(ident[1], 'hex').toString(),
-                        };
-                      }),
-                      network: wallet.getParent().getNetworkInfo(),
-                    });
+                    const tokenIds = potentialNFTAssets.map(asset => asset.identifier);
+                    const tokenMetadata = await getTokenMetadataFromIds(tokenIds, wallet);
+
                     const nfts = {};
-                    for (let key in metadatasList) {
-                      if(!Object.prototype.hasOwnProperty.call(metadatasList, key)) {
+
+                    for (const metadata of tokenMetadata) {
+                      if (!metadata.IsNFT) {
                         continue;
                       }
-                      const metadatas = metadatasList[key];
-                      const ident = key.split('.');
-                      const policyId = ident[0];
-                      const assetName = ident[1];
-                      const metadata = find721metadata(policyId, assetName, metadatas);
-                      if (metadata !== null) {
-                        nfts[`${policyId}.${Buffer.from(assetName).toString('hex')}`] = { metadata };
+                      if (metadata.Metadata.type !== 'Cardano') {
+                        throw new Error('this API only supports Cardano');
+                      }
+                      const nftMetadata = find721metadata(
+                        metadata.Metadata.policyId,
+                        metadata.Metadata.assetName,
+                        metadata.Metadata.assetMintMetadata,
+                      );
+                      if (nftMetadata) {
+                        nfts[metadata.Identifier] = { metadata: nftMetadata };
                       }
                     }
                     rpcResponse({ ok: nfts });
@@ -1656,23 +1682,6 @@ function handleInjectorConnect(port) {
       }
     }
   });
-}
-
-function find721metadata(policyId: string, assetName: string, metadatas: any): any {
-  const metadataWrapper = metadatas.find(m => m.key === '721');
-  if (metadataWrapper === undefined) {
-    return null;
-  }
-  const metadata = metadataWrapper.metadata;
-  if (metadata.version && metadata.version !== '1.0') {
-    return null;
-  }
-  const asset = metadata[policyId]?.[assetName];
-  if (!asset) {
-    return null;
-  }
-
-  return asset;
 }
 
 function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {

@@ -470,17 +470,28 @@ export const AddressMappingSchema: {|
   }
 };
 
+export type NFTMetadata = {|
+  name: string,
+  image: string | Array<string>,
+  mediaType?: ?string,
+  description: ?(string | Array<string>),
+  files?: ?Array<{|
+    name?: ?string,
+    mediaType?: ?string,
+    src?: ?(string | Array<string>),
+  |}>
+|};
+
 export type CardanoAssetMintMetadata = {|
   // transaction_metadatum_label: 721 for NFTs
   // See CIP 721
   // https://github.com/cardano-foundation/CIPs/blob/8b1f2f0900d81d6233e9805442c2b42aa1779d2d/CIP-NFTMetadataStandard.md
-  ...{[key: string]: {|
-    // policy ID
-    ...{[key: string]: {|
-      // asset name
-      ...{[key: string]: any}
-    |}}
-  |}}
+  [key: string]: {|
+    version?: ?string,
+    [policyID: string]: {|
+      [assetNameHex: string]: NFTMetadata
+    |}
+  |}
 |}
 
 export type CommonMetadata = {|
@@ -513,7 +524,7 @@ export type TokenMetadata = {|
   // empty string for ADA
   +assetName: string,
   ...CommonMetadata,
-  +assetMintMetadata?: ?Array<CardanoAssetMintMetadata | any> | any
+  +assetMintMetadata?: Array<CardanoAssetMintMetadata>
 |};
 
 export type TokenInsert = {|
