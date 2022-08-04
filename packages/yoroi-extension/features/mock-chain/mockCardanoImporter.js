@@ -2315,7 +2315,27 @@ const getUtxoData  = (txHash: string, txIndex: number): UtxoData | null => {
     output: output.output,
     spendingTxHash: output.spendingTxHash
   };
-}
+};
+
+const currentADAPrice = {
+  error: null,
+  ticker: {
+    from: 'ADA',
+    timestamp: 1659640203000,
+    signature:
+      '5ead08f0e91be35413d5a9b25da1727779aa3a3298b87a343a449b65ef24285d4b128d58e9806bfb209b4bcb83f620de347b93534553d0410c8092cc66c83d0a',
+    prices: {
+      BRL: 2.5935456329171314,
+      BTC: 0.000022075,
+      CNY: 3.358264434856802,
+      ETH: 0.00031116608241096773,
+      EUR: 0.48543447946200424,
+      JPY: 66.128348113336,
+      KRW: 648.4642598773457,
+      USD: 0.4975722571017442,
+    },
+  },
+};
 
 export default {
   utxoForAddresses,
@@ -2329,4 +2349,5 @@ export default {
   getRewardHistory,
   getAccountState,
   getUtxoData,
+  currentADAPrice,
 };

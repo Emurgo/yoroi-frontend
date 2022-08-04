@@ -276,6 +276,14 @@ export function getMockServer(settings: {
       res.send(status);
     });
 
+    server.get('/api/price/ADA/current', (req, res) => {
+      logger.info(`mockCardanoServer: /api/price/ADA/current -> request`);
+      const price = mockImporter.currentADAPrice;
+      logger.info(`mockCardanoServer: GET: /api/price/ADA/current`);
+      logger.info(JSON.stringify(price));
+      res.send(price);
+    });
+
     // To test the dApp connector, we need a no-op mock dApp.
     server.get('/mock-dapp', (req, res: { send(arg: ServerStatusResponse): any, ... }): void => {
       // $FlowFixMe[prop-missing]

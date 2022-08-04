@@ -126,7 +126,8 @@ When(
       locator: `//*[starts-with(text(), "${currency}")]`,
       method: 'xpath',
     };
-    await this.waitForElement(currencySelector);
+
+    await this.scrollIntoView(currencySelector);
     await this.click(currencySelector);
   }
 );
@@ -134,18 +135,17 @@ When(
 Then(
   /^I see the correct conversion value for (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) on header$/,
   async function (currency) {
-    const amountFiat = await this.driver.findElement(By.css('.AmountDisplay_fiat'));
-    const amountDisplayFiatValue = await amountFiat.getText();
+    const amountDisplayFiatValue = await this.getText(amountDisplayFiat);
 
     const response = await axios(adaToFiatPrices);
-
     const value = await response.data.ticker.prices[currency];
 
-    const amountDisplayAmount = await this.driver.findElement(By.css('.AmountDisplay_amount'));
-    const adaAmount = await amountDisplayAmount.getText();
-    const adaValue = await parseFloat(parseFloat(adaAmount.replace('\n', '').replace(' ADA', '')).toFixed(2));
-    const expectedValue = await adaValue * value;
+    const adaAmount = await this.getText(amountDisplayADA);
+    const adaValue = await parseFloat(
+      parseFloat(adaAmount.replace('\n', '').replace(' ADA', '')).toFixed(2)
+    );
 
+    const expectedValue = (await adaValue) * value;
     expect(amountDisplayFiatValue).to.equal(`${expectedValue} ${currency}`);
   }
 );

@@ -9,19 +9,52 @@ Feature: Wallet UI Settings
     Then I should see the "General Settings" page
 
 @currency-1
-  Scenario: Change currency pair to JPY
-    When I select JPY as fiat pairing currency
-    Then I see the correct conversion value for JPY on header
+  Scenario Outline: Change currency pair
+    When I select <currency> as fiat pairing currency
+    Then I see the correct conversion value for <currency> on header
+
+    Examples:
+    | currency |
+    | USD |
+    | JPY |
+    | EUR |
+    | CNY |
+    | KRW |
+    | BTC |
+    | ETH |
+    | BRL |
 
 @currency-2
-  Scenario: Change currency pair back to ADA
-    When I select USD as fiat pairing currency
+  Scenario Outline: Change currency pair back to ADA
+    When I select <currency> as fiat pairing currency
     And I select ADA as fiat pairing currency
     Then I see only ADA value on header
 
+    Examples:
+    | currency |
+    | USD |
+    | JPY |
+    | EUR |
+    | CNY |
+    | KRW |
+    | BTC |
+    | ETH |
+    | BRL |
+
 @currency-3
-  Scenario: Check wallet transactions pairings after changing currency to EUR
-    When I select EUR as fiat pairing currency
+  Scenario Outline: Check wallet transactions pairings after changing currency
+    When I select <currency> as fiat pairing currency
     And Revamp. I go to the wallet shelley-simple-15
-    Then I validate the transaction amount to EUR currency pairing
+    Then I validate the transaction amount to <currency> currency pairing
+
+    Examples:
+    | currency |
+    | USD |
+    | JPY |
+    | EUR |
+    | CNY |
+    | KRW |
+    | BTC |
+    | ETH |
+    | BRL |
 

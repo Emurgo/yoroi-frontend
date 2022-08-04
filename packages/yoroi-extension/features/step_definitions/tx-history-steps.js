@@ -5,7 +5,6 @@ import { By } from 'selenium-webdriver';
 import chai, { expect } from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
-import { walletTransactionAmount } from '../pages/walletTransactionsPage';
 import { adaToFiatPrices } from '../support/helpers/common-constants';
 
 const axios = require('axios');
@@ -257,18 +256,25 @@ When(/^I go to the tx history screen$/, async function () {
 Then(
   /^I validate the transaction amount to (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) currency pairing$/,
   async function (currency) {
-    const txAmount = await this.getText(walletTransactionAmount);
-    expect(txAmount).to.contain(currency);
+    const allTxsAmountList = await this.getElementsBy({
+      locator: 'transactionAmount',
+      method: 'id',
+    });
 
-    const response = await axios(adaToFiatPrices);
-    const rate = await response.data.ticker.prices[currency];
+    for (const txAmountElem of allTxsAmountList) {
+      const txAmount = await txAmountElem.getText();
+      expect(txAmount).to.contain(currency);
 
-    const amountList = await txAmount.split('\n');
+      const response = await axios(adaToFiatPrices);
+      const rate = await response.data.ticker.prices[currency];
 
-    const fiatAmount = await amountList[0].replace(currency, '');
-    const adaAmount = await parseFloat(amountList[1].replace('ADA', ''));
+      const amountList = await txAmount.split('\n');
 
-    const expectedValue = await parseFloat(((await adaAmount) * rate).toFixed(6));
-    expect(fiatAmount).to.contain(`${expectedValue}`);
+      const fiatAmount = await amountList[0].replace(currency, '');
+      const adaAmount = await parseFloat(amountList[1].replace('ADA', ''));
+
+      const expectedValue = await parseFloat(((await adaAmount) * rate).toFixed(6));
+      expect(fiatAmount).to.contain(`${expectedValue}`);
+    }
   }
 );

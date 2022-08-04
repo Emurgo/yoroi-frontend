@@ -278,6 +278,14 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
+  this.scrollIntoView = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Scroll into view "${JSON.stringify(locator)}"`);
+    await this.waitForElement(locator);
+    const clickable = await this.getElementBy(locator);
+    await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
+  };
+
+
   this.click = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     await this.waitForElement(locator);
