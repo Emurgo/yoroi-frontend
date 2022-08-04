@@ -776,7 +776,7 @@
   "wallet.voting.line2": "Bevor du beginnst, schließe bitte die folgenden Schritte ab",
   "wallet.voting.line3": "Lade die Catalyst Abstimmungs-App herunter.",
   "wallet.voting.line4": "Öffne die Catalyst Voting App und klicke auf die Schaltfläche Registrierung abschließen.",
-  "wallet.voting.lineTitle": "Registrierung für die Fund { round } Abstimmung",
+  "wallet.voting.lineTitle": "Registrierung für die { fundName } Abstimmung",
   "wallet.withdrawal.transaction.unregister": "Diese Transaktion wird eine oder mehrere Staking Schlüssel zurückziehen, und Dir {refundAmount} {ticker} zurückgeben",
   "widgets.copyableaddress.addressCopyTooltipMessage": "In die Zwischenablage kopieren",
   "widgets.explorer.tooltip": "Gehe zu {websiteName}",
