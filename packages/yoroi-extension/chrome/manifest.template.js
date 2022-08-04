@@ -75,7 +75,9 @@ export default ({
         js: ['js/trezor-content-script.js'],
       },
     ],
-    content_security_policy: contentSecurityPolicy,
+    content_security_policy: {
+      extension_pages: contentSecurityPolicy
+    },
     protocol_handlers: !enableProtocolHandlers
       ? []
       : [
