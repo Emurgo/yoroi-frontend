@@ -776,7 +776,7 @@
   "wallet.voting.line2": "Zorg ervoor dat u de onderstaande stappen uitvoert voordat u begint",
   "wallet.voting.line3": "Download de Catalyst Stem-applicatie.",
   "wallet.voting.line4": "Open de Catalyst Stem-applicatie en klik op de knop \"Registratie voltooien\".",
-  "wallet.voting.lineTitle": "Registreer uzelf om op Fonds { round } te stemmen",
+  "wallet.voting.lineTitle": "Registreer uzelf om op { fundName } te stemmen",
   "wallet.withdrawal.transaction.unregister": "Met deze transactie wordt de registratie van een of meer stemsleutels ongedaan gemaakt, waardoor u uw {refundAmount} {ticker} van uw storting terugkrijgt",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Kopieer naar klembord",
   "widgets.explorer.tooltip": "Ga naar {websiteName}",

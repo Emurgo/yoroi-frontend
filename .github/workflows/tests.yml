@@ -153,16 +153,11 @@ jobs:
 
       - name: Download firmware
         working-directory: ../trezor-user-env/src/binaries/firmware/bin/
-        run: |
-          sed '/^.*R_LATEST_BUILD.*$/d' download.sh | sed '/^.*trezor_r_master.*$/d' > temp_file.sh
-          rm download.sh
-          mv temp_file.sh download.sh
-          chmod +x download.sh
-          sudo ./download.sh
+        run: sudo ./download.sh
 
       - name: Download trezord-go
-        working-directory: ../trezor-user-env
-        run: sudo ./src/binaries/trezord-go/bin/download.sh
+        working-directory: ../trezor-user-env/src/binaries/trezord-go/bin/
+        run: sudo ./download.sh
 
       - name: Copy the v2-master firmware to the root of the project
         working-directory: ../trezor-user-env
