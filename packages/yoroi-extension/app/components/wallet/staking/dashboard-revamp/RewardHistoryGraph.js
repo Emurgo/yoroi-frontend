@@ -133,11 +133,14 @@ function RewardHistoryGraph({
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = intl.formatMessage(globalMessages.rewardHistory);
   return (
-    <Box p="24px">
+    <Box
+      p="24px"
+      sx={{ height: '278px', display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}
+    >
       <Typography
         as="button"
         variant="body2"
-        color="var(--yoroi-palette-gray-600)"
+        color="var(--yoroi-palette-secondary-300)"
         display="block"
         marginLeft="auto"
         sx={{ textTransform: 'uppercase' }}

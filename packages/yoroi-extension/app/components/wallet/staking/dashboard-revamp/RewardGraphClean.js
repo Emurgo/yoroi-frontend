@@ -17,7 +17,7 @@ import { Typography } from '@mui/material';
 import type { GraphItems } from '../dashboard/GraphWrapper';
 
 const graphVars = {
-  barWidth: Number(readCssVar('--yoroi-dashboard-graph-bar-width')),
+  barWidth: 10,
   fontSize: '14px',
   lineHeight: 16,
 };
@@ -90,41 +90,48 @@ export default class RewardGraphClean extends Component<Props> {
     // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
     const graphTooltip = <GraphTooltip />;
     return (
-      <ResponsiveContainer width="100%" height={250}>
-        <BarChart data={data.slice(-10)} height={200}>
+      <ResponsiveContainer width="100%" height={210}>
+        <BarChart
+          data={data.slice(-10)}
+          height={200}
+          margin={{ top: 0, right: 0, left: 30, bottom: 0 }}
+        >
           <XAxis
             tick={{
-              fill: '#A7AFC0',
+              fill: '#6B7384',
               fontSize: graphVars.fontSize,
               lineHeight: graphVars.lineHeight,
             }}
             dataKey="name"
+            height={50}
             label={{
               value: xAxisLabel,
               position: 'insideBottom',
               fontSize: graphVars.fontSize,
-              fill: '#A7AFC0',
-              dy: 10
+              fill: '#6B7384',
             }}
             padding={{ left: 24, right: 24 }}
-            stroke="#A7AFC0"
+            stroke="#DCE0E9"
             tickLine={false}
           />
           <YAxis
             tickFormatter={formatYAxis}
             padding={{ top: 12 }}
             tick={{
-              fill: '#A7AFC0',
+              fill: '#6B7384',
               fontSize: graphVars.fontSize,
               lineHeight: graphVars.lineHeight,
             }}
-            stroke="#A7AFC0"
+            stroke="#DCE0E9"
             tickLine={false}
             label={{
               value: yAxisLabel,
-              position: 'inside',
+              position: 'insideLeft',
+              offset: -20,
+              dy: 50,
               angle: -90,
-              color: readCssVar('--yoroi-palette-gray-600'),
+              fill: '#6B7384',
+              textAnchor: 'middle',
             }}
           />
 

@@ -113,7 +113,7 @@ function SummaryCard({
     <Card>
       <Box
         sx={{
-          padding: '22px 24px',
+          padding: '15px 24px',
           borderBottom: '1px solid var(--yoroi-palette-gray-200)',
         }}
       >

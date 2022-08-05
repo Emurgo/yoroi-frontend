@@ -1,5 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { GraphData } from '../../../wallet/staking/dashboard/StakingDashboard';
 import { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../i18n/global-messages';
@@ -32,7 +33,7 @@ export type GraphRewardData = {|
 |};
 
 type Props = {|
-  graphData: GraphRewardData,
+  graphData: GraphData,
   onClose: () => void,
 |};
 type Intl = {|
@@ -40,7 +41,8 @@ type Intl = {|
 |};
 
 function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
-  const rewardList = graphData.items;
+  const rewardItems = graphData.rewardsGraphData.items;
+  const rewardList = rewardItems?.totalRewards.filter(p => Boolean(p.primary)) ?? [];
 
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
 
@@ -57,12 +59,12 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
         {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
       </Typography>
       <Box>
-        {graphData.error && (
+        {graphData.rewardsGraphData.error && (
           <div>
             <center>
               <InvalidURIImg />
             </center>
-            <ErrorBlock error={graphData.error} />
+            <ErrorBlock error={graphData.rewardsGraphData.error} />
           </div>
         )}
         {rewardList == null ? (
