@@ -17,7 +17,7 @@ import type { WalletType } from './types';
 const messages = defineMessages({
   lineTitle: {
     id: 'wallet.voting.lineTitle',
-    defaultMessage: '!!!Register to vote on Fund {round}',
+    defaultMessage: '!!!Register to vote on {fundName}',
   },
   line2: {
     id: 'wallet.voting.line2',
@@ -54,7 +54,7 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +hasAnyPending: boolean,
   +isDelegated: boolean,
-  +round: number,
+  +name: string,
   +walletType: WalletType,
 |};
 
@@ -100,7 +100,7 @@ export default class Voting extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const round = this.props.round;
+    const fundName = this.props.name;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
@@ -135,7 +135,7 @@ export default class Voting extends Component<Props> {
           </div>
 
           <div className={classnames([styles.lineTitle, styles.firstItem])}>
-            {intl.formatMessage(messages.lineTitle, { round })}
+            {intl.formatMessage(messages.lineTitle, { fundName })}
           </div>
 
           <div className={styles.lineText}>
