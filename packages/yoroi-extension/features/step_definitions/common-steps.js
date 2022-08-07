@@ -52,6 +52,7 @@ import {
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import * as helpers from '../support/helpers/helpers';
+import { walletSummaryBox } from '../pages/walletTransactionsPage';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -657,6 +658,7 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
+  await this.waitForElement(walletSummaryBox);
 });
 
 Then(/^I should see the dashboard screen$/, async function () {

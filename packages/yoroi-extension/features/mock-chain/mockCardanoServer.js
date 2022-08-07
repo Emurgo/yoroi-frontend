@@ -31,10 +31,11 @@ import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
 import { Ports } from '../../scripts/connections';
 
 import { getCircularReplacer, getLogDate } from '../support/helpers/helpers';
-import { testRunsDataDir } from '../support/helpers/common-constants';
+import { adaToFiatPrices, testRunsDataDir } from '../support/helpers/common-constants';
 
 const simpleNodeLogger = require('simple-node-logger');
 const fs = require('fs');
+const axios = require('axios');
 
 // MockData should always be consistent with the following values
 const addressesLimit = 50;
@@ -276,12 +277,20 @@ export function getMockServer(settings: {
       res.send(status);
     });
 
-    server.get('/api/price/ADA/current', (req, res) => {
-      logger.info(`mockCardanoServer: /api/price/ADA/current -> request`);
-      const price = mockImporter.currentADAPrice;
-      logger.info(`mockCardanoServer: GET: /api/price/ADA/current`);
-      logger.info(JSON.stringify(price));
-      res.send(price);
+    server.get('/api/price/:from/current', async (req, res) => {
+      logger.info(`mockCardanoServer: /api/price/${req.params.from}/current -> request`);
+      const cardanoResponsePrice = (await axios(adaToFiatPrices)).data;
+      logger.info(`mockCardanoServer: GET: /api/price/${req.params.from}/current <- response`);
+      logger.info(JSON.stringify(cardanoResponsePrice));
+      res.send(cardanoResponsePrice);
+    });
+
+    server.get('/api/price/:from/:timestamps', async (req, res) => {
+      logger.info(`mockCardanoServer: /api/price/${req.params.from}/${req.params.timestamps} -> request`);
+      const cardanoResponsePrice = (await axios(adaToFiatPrices)).data;
+      logger.info(`mockCardanoServer: GET: /api/price/${req.params.from}/${req.params.timestamps} <- response`);
+      logger.info(JSON.stringify(cardanoResponsePrice));
+      res.send(cardanoResponsePrice);
     });
 
     // To test the dApp connector, we need a no-op mock dApp.

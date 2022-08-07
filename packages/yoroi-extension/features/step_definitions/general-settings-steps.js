@@ -14,6 +14,7 @@ import {
 } from '../pages/generalSettingsPage';
 import type { LocatorObject } from '../support/webdriver';
 import { adaToFiatPrices } from '../support/helpers/common-constants';
+import { loadingSpinnerWindow } from '../pages/commonComponentsPage';
 
 const axios = require('axios');
 
@@ -126,9 +127,10 @@ When(
       locator: `//*[starts-with(text(), "${currency}")]`,
       method: 'xpath',
     };
-
+    await this.waitForElement(currencySelector);
     await this.scrollIntoView(currencySelector);
     await this.click(currencySelector);
+    await this.waitForElementNotPresent(loadingSpinnerWindow)
   }
 );
 
@@ -141,7 +143,7 @@ Then(
     const value = await response.data.ticker.prices[currency];
 
     const adaAmount = await this.getText(amountDisplayADA);
-    const adaValue = await parseFloat(
+    const adaValue = parseFloat(
       parseFloat(adaAmount.replace('\n', '').replace(' ADA', '')).toFixed(2)
     );
 
