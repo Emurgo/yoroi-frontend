@@ -9,7 +9,7 @@ import LocalStorageApi, {
 import { environment } from '../../environment';
 import { TRACKED_ROUTES } from '../../routes-config';
 import type { StoresMap } from '../../stores';
-import { isTestnet as isTestnetFunc} from '../ada/lib/storage/database/prepackaged/networks';
+import { isTestnet as isTestnetFunc } from '../ada/lib/storage/database/prepackaged/networks';
 
 const MATOMO_URL = 'https://analytics.emurgo-rnd.com/matomo.php';
 const SITE_ID = '4';
@@ -144,9 +144,6 @@ export function trackResyncWallet(): void {
 function generateAnalyticsInstanceId(): string {
   // Matomo requires 16 character hex string
   return cryptoRandomString({ length: 16 });
-}
-
-function getCurrentWalletInfo() {
 }
 
 function emitEvent(instanceId: string, event: string): void {
