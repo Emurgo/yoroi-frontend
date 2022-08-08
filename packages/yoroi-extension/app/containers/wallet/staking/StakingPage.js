@@ -507,10 +507,6 @@ class StakingPage extends Component<AllProps> {
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
-      time: {|
-        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
-        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
-      |},
       profile: {|
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
@@ -589,7 +585,6 @@ class StakingPage extends Component<AllProps> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
-        time,
         substores: {
           ada: {
             delegation: {
