@@ -1,4 +1,27 @@
 // @flow
+// routes to by tracked by analytics
+export const TRACKED_ROUTES: RegExp = new RegExp(
+  '^(' +
+  '(/my-wallets)|' +
+  '(/wallets/add)|' +
+  '(/wallets/transactions)|' +
+  '(/wallets/send)|' +
+  '(/wallets/assets)|' +
+  '(/wallets/receive/.+)|' +
+  '(/wallets/delegation-dashboard)|' +
+  '(/wallets/cardano-delegation)|' +
+  '(/wallets/voting)|' +
+  '(/settings/.+)|' +
+  '(/transfer(/.+)?)|' +
+  '(/send-from-uri)|' +
+  '(/notice-board)|' +
+  '(/staking)|' +
+  '(/assets/.*)|' +
+  '(/connector/connected-websites)|' +
+  '(/experimental/.*)' +
+  ')$'
+);
+
 export const ROUTES = {
   ROOT: '/',
 

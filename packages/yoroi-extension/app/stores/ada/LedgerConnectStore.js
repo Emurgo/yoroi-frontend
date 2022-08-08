@@ -61,6 +61,7 @@ import type { StoresMap } from '../index';
 import type {
   GetExtendedPublicKeyResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { trackWalletCreation } from '../../api/analytics';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
@@ -365,6 +366,7 @@ export default class LedgerConnectStore
     await this._saveHW(
       walletName,
     );
+    trackWalletCreation('hardware');
   };
 
   /** creates new wallet and loads it */
