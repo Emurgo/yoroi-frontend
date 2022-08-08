@@ -18,6 +18,7 @@ import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencie
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { trackSetUnitOfAccount, trackSetLocale } from '../../../api/analytics';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -84,6 +85,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
       ? unitOfAccountDisabledValue
       : { enabled: true, currency: value };
     await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+    trackSetUnitOfAccount(value);
+  };
+
+  onSelectLanguage: {| locale: string |} => PossiblyAsync<void> = ({ locale }) => {
+    this.generated.actions.profile.updateLocale.trigger({ locale });
+    trackSetLocale(locale);
   };
 
   render(): Node {
@@ -120,7 +127,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     return (
       <>
         <GeneralSettings
-          onSelectLanguage={this.generated.actions.profile.updateLocale.trigger}
+          onSelectLanguage={this.onSelectLanguage}
           isSubmitting={isSubmittingLocale}
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}

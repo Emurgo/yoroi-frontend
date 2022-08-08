@@ -45,6 +45,7 @@ import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
+import { trackCatalystRegistration } from '../../api/analytics';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -392,9 +393,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-      return;
-    }
-    if (isTrezorTWallet(request.publicDeriver.getParent())) {
+    } else if (isTrezorTWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
@@ -404,23 +403,23 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-      return;
-    }
-
-    // normal password-based wallet
-    if (request.password == null) {
-      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
-    }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          publicDeriver: request.publicDeriver,
-          password: request.password,
-          signRequest: result,
+    } else {
+      // normal password-based wallet
+      if (request.password == null) {
+        throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+      }
+      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+        broadcastRequest: {
+          normal: {
+            publicDeriver: request.publicDeriver,
+            password: request.password,
+            signRequest: result,
+          },
         },
-      },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
-    });
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      });
+    }
+    trackCatalystRegistration();
   };
 
   @action _generateCatalystKey: void => Promise<void> = async () => {

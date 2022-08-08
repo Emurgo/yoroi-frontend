@@ -77,7 +77,6 @@ import type { lf$Database, } from 'lovefield';
 import { schema } from 'lovefield';
 import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
-import { Mutex, } from 'async-mutex';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell
@@ -198,13 +197,6 @@ const ports: Map<TabId, any> = new Map();
 let pendingTxs: PendingTransaction[] = [];
 
 /**
-* need to make sure JS tasks run in an order where no two of them have different DB instances
-* Otherwise, caching logic may make things go wrong
-* TODO: this doesn't help if the Yoroi Extension or a Web Worker makes a query during this execution
-*/
-const dbAccessMutex = new Mutex();
-
-/**
  * Performs wallet version migration if needed
  * Then calls the continuation with storage objects
  * Note: the DB returns is an IN-MEMORY COPY of the real DB
@@ -214,39 +206,37 @@ const dbAccessMutex = new Mutex();
 async function withDb<T>(
   continuation: (lf$Database, LocalStorageApi) => Promise<T>
 ): Promise<T> {
-  return await dbAccessMutex.runExclusive(async () => {
-    // note: lovefield internally caches queries an optimization
-    // this doesn't work for us because the DB can change under our feet through the Yoroi Extension
-    // so instead, we create the DB, use it, then close the connection
-    const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-    let inMemoryDb: void | lf$Database = undefined;
-    try {
-      // process migration here before anything involving storage is cached
-      // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
-      const localStorageApi = new LocalStorageApi();
-      // note: it's safe that this call modifies the DB that is shared with the main extension
-      // since if a migration actually needs to be processed,
-      // it means the extension hasn't been launched since the Yoroi version updated
-      // which means it's not running at the same time as the connector
-      await migrateNoRefresh({
-        localStorageApi,
-        persistentDb: db,
-        currVersion: environment.getVersion(),
-      })
+  // note: lovefield internally caches queries an optimization
+  // this doesn't work for us because the DB can change under our feet through the Yoroi Extension
+  // so instead, we create the DB, use it, then close the connection
+  const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+  let inMemoryDb: void | lf$Database = undefined;
+  try {
+    // process migration here before anything involving storage is cached
+    // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
+    const localStorageApi = new LocalStorageApi();
+    // note: it's safe that this call modifies the DB that is shared with the main extension
+    // since if a migration actually needs to be processed,
+    // it means the extension hasn't been launched since the Yoroi version updated
+    // which means it's not running at the same time as the connector
+    await migrateNoRefresh({
+      localStorageApi,
+      persistentDb: db,
+      currVersion: environment.getVersion(),
+    })
 
-      // note: we can't close the persistent DB connection here after copying it
-      // since lovefield closes some shared workers causing the in-memory connection to fail as well
-      inMemoryDb = await copyDbToMemory(db);
+    // note: we can't close the persistent DB connection here after copying it
+    // since lovefield closes some shared workers causing the in-memory connection to fail as well
+    inMemoryDb = await copyDbToMemory(db);
 
-      return await continuation(inMemoryDb, localStorageApi);
-    } catch (e) {
-      Logger.error(`DB continuation call failed due to internal error: ${e}\n${e.stack}`);
-      throw e;
-    } finally {
-      inMemoryDb?.close();
-      db.close();
-    }
-  });
+    return await continuation(inMemoryDb, localStorageApi);
+  } catch (e) {
+    Logger.error(`DB continuation call failed due to internal error: ${e}\n${e.stack}`);
+    throw e;
+  } finally {
+    inMemoryDb?.close();
+    db.close();
+  }
 }
 
 async function createFetcher(

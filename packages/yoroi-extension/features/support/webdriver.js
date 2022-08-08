@@ -11,6 +11,8 @@ import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 import { testRunsDataDir } from './helpers/common-constants';
+import { WebDriverError } from 'selenium-webdriver/lib/error';
+import * as helpers from './helpers/helpers';
 
 const fs = require('fs');
 const simpleNodeLogger = require('simple-node-logger');
@@ -176,6 +178,21 @@ function CustomWorld(cmdInput: WorldInput) {
       return 'chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg/main_window.html';
     }
     return `moz-extension://${firefoxExtensionId}/main_window.html`;
+  };
+
+  this.get = async (url: string) => {
+    for (let i = 0; i < 6; i++) {
+      try {
+        await this.driver.get(url);
+      } catch (e) {
+        if (e instanceof WebDriverError) {
+          this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 1 second and retry`);
+          await helpers.sleep(500);
+          continue;
+        }
+      }
+      break;
+    }
   };
 
   this.getElementBy = (locator: LocatorObject) =>
