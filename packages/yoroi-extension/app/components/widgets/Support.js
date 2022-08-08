@@ -16,7 +16,6 @@ export default class Support extends Component <Props, State> {
   }
 
   messageHandler = (event: any) => {
-    console.log(event)
     if (event.origin === 'null') {
       return
     }
