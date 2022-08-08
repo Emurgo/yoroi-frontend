@@ -496,7 +496,7 @@ describe('takeUtxosForValues', () => {
     // The third utxo is taken then
     const take2 = CoinSelection.takeUtxosForValues(
       [utxos[2], utxos[0], utxos[1]],
-      [multiToken(1_990_000)],
+      [multiToken(2_990_000)],
       createCoinsPerUtxoWord(30_000),
       0,
     );
