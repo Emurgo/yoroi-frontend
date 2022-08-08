@@ -23,6 +23,7 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   GetAllExplorersResponse,
 } from '../../../api/ada/lib/storage/bridge/explorers';
+import { trackUriPrompt } from '../../../api/analytics';
 
 type GeneratedData = typeof BlockchainSettingsPage.prototype.generated;
 
@@ -50,7 +51,12 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     )
       ? (
         <UriSettingsBlock
-          registerUriScheme={() => registerProtocols()}
+          registerUriScheme={
+            () => {
+              registerProtocols();
+              trackUriPrompt('allow');
+            }
+          }
           isFirefox={environment.userAgentInfo.isFirefox()}
         />
       )

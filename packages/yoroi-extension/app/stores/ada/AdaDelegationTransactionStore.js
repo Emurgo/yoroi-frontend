@@ -27,6 +27,7 @@ import {
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { trackDelegation } from '../../api/analytics';
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
 
@@ -214,9 +215,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-      return;
-    }
-    if (isTrezorTWallet(request.publicDeriver.getParent())) {
+    } else if (isTrezorTWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
@@ -226,23 +225,23 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-      return;
-    }
-
-    // normal password-based wallet
-    if (request.password == null) {
-      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
-    }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          publicDeriver: request.publicDeriver,
-          password: request.password,
-          signRequest: result.signTxRequest,
+    } else {
+      // normal password-based wallet
+      if (request.password == null) {
+        throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+      }
+      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+        broadcastRequest: {
+          normal: {
+            publicDeriver: request.publicDeriver,
+            password: request.password,
+            signRequest: result.signTxRequest,
+          },
         },
-      },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
-    });
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      });
+    }
+    trackDelegation();
   }
 
   _complete: void => void = () => {
