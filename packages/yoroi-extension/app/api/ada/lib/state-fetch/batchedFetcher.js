@@ -20,7 +20,6 @@ import type {
   RemoteTransaction,
   MultiAssetMintMetadataRequest,
   MultiAssetMintMetadataResponse,
-  MultiAssetMintMetadataFunc,
   GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
 } from './types';
 import type {
@@ -41,7 +40,6 @@ import {
   GetAccountStateApiError,
   GetPoolInfoApiError,
   GetTokenInfoApiError,
-  GetMultiAssetMintMetadataApiError,
 } from '../../../common/errors';
 import {
   Logger,
