@@ -13,6 +13,7 @@ import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/util
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { trackSend } from '../../../api/analytics';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
@@ -85,6 +86,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             publicDeriver,
             onSuccess: openTransactionSuccessDialog,
           });
+          trackSend();
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
         onCancel={() => {
