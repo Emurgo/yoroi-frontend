@@ -6,7 +6,7 @@ import chai, { expect } from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
 import { adaToFiatPrices } from '../support/helpers/common-constants';
-import { getLastTxAmount } from '../pages/walletTransactionsPage';
+import { getTxAmount, txRowComponent } from '../pages/walletTransactionsPage';
 
 const axios = require('axios');
 
@@ -257,17 +257,20 @@ When(/^I go to the tx history screen$/, async function () {
 Then(
   /^I validate the transaction amount to (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) currency pairing$/,
   async function (currency) {
-    const lastTxAmount = await getLastTxAmount(this);
-    expect(lastTxAmount).to.contain(currency);
-
     const response = await axios(adaToFiatPrices);
     const rate = await response.data.ticker.prices[currency];
 
-    const amountList = lastTxAmount.split('\n');
-    const fiatAmount = amountList[0].replace(currency, '');
-    const adaAmount = parseFloat(amountList[1].replace('ADA', ''));
+    const allTxsList = await this.findElements(txRowComponent);
+    for (const txListElement of allTxsList) {
+      const txAmount = await getTxAmount(txListElement);
+      expect(txAmount).to.contain(currency);
 
-    const expectedValue = parseFloat((adaAmount * rate).toFixed(6));
-    expect(fiatAmount).to.contain(`${expectedValue}`);
+      const amountList = txAmount.split('\n');
+      const fiatAmount = amountList[0].replace(currency, '');
+      const adaAmount = parseFloat(amountList[1].replace('ADA', ''));
+
+      const expectedValue = parseFloat((adaAmount * rate).toFixed(6));
+      expect(fiatAmount).to.contain(`${expectedValue}`);
+    }
   }
 );

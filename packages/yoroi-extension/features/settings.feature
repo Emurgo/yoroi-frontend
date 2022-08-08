@@ -9,7 +9,7 @@ Feature: Wallet UI Settings
     Then I should see the "General Settings" page
 
 @currency-1
-  Scenario Outline: Change currency pair
+  Scenario Outline: Change currency pair. ADA -> <currency>. @currency-1
     When I select <currency> as fiat pairing currency
     Then I see the correct conversion value for <currency> on header
 
@@ -25,7 +25,7 @@ Feature: Wallet UI Settings
     | BRL |
 
 @currency-2
-  Scenario Outline: Change currency pair back to ADA
+  Scenario Outline: Change currency pair back to ADA. <currency> -> ADA. @currency-2
     When I select <currency> as fiat pairing currency
     And I select ADA as fiat pairing currency
     Then I see only ADA value on header
@@ -42,7 +42,7 @@ Feature: Wallet UI Settings
     | BRL |
 
 @currency-3
-  Scenario Outline: Check wallet transactions pairings after changing currency
+  Scenario Outline: Check wallet transactions pairings after changing currency to <currency>. @currency-3
     When I select <currency> as fiat pairing currency
     And Revamp. I go to the wallet shelley-simple-15
     Then I validate the transaction amount to <currency> currency pairing

@@ -31,3 +31,8 @@ export const getLastTxAmount = async (customWorld: any): Promise<string> => {
     const amountElement = await lastTx.findElement(getMethod(txAmount.method)(txAmount.locator));
     return await amountElement.getText();
 }
+
+export const getTxAmount = async (txElement: any): Promise<string> => {
+    const amountElement = await txElement.findElement(getMethod(txAmount.method)(txAmount.locator));
+    return await amountElement.getText();
+}
