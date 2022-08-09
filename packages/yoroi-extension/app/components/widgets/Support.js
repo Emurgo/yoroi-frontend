@@ -3,51 +3,76 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { ReactComponent as SupportIcon } from '../../assets/images/support.inline.svg';
 import { IconButton } from '@mui/material';
+import { Box } from '@mui/system';
+import environment from '../../environment';
 
 type Props = {||}
+type State = {|
+  open: boolean,
+|}
+export default class Support extends Component <Props, State> {
 
-export default class Support extends Component <Props> {
+  state: State = {
+    open: false,
+  }
 
-  loadScript(src: string, id: string): void {
-      const script = document.createElement('script')
-      script.src = src
-      script.id = id
-      document.body?.appendChild(script)
+  messageHandler: any => void = (event) => {
+    if (event.origin === 'null') {
+      return
+    }
+
+    const eventType = event.data;
+    if (eventType === 'close') {
+      this.setState({ open: false })
+    }
   }
 
   componentDidMount() {
-      this.loadScript('https://static.zdassets.com/ekr/snippet.js?key=68b95d72-6354-4343-8a64-427979a6f5d6', 'ze-snippet');
-
-      const interval = setInterval(()=>{
-        if (typeof window.zE !== 'undefined' && typeof window.zE.hide === 'function') {
-          window.zE.hide()
-          if (interval) {
-            clearInterval(interval)
-          }
-        }
-      }, 500);
+    window.addEventListener('message', this.messageHandler, false);
   }
 
-  openChatBoxSupport(){
-    if (typeof window.zE !== 'undefined') {
-        window.zE.activate()
-      }
+  componentWillUnmount() {
+    window.removeEventListener('message', this.messageHandler);
+  }
+
+  getUrl(): string | null {
+    if (!environment.userAgentInfo.isExtension()) return null;
+    const agent = environment.userAgentInfo.isFirefox() ? 'firefox' : 'chrome'
+    return `https://emurgo.github.io/yoroi-support/?source=${agent}&extensionId=${window.location.hostname}`;
   }
 
   render(): Node {
-      return (
+    const { open } = this.state;
+
+    const url = this.getUrl();
+    if (url === null) return null;
+
+    return (
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: '24px',
+          right: '30px',
+          zIndex: '9999',
+        }}
+      >
+        {open === false &&
         <IconButton
           sx={{
-            position: 'absolute',
-            bottom: '24px',
-            right: '30px',
-            zIndex: '9999', // Support button should be on top of every component including models!
             padding: '3px',
           }}
-          onClick={this.openChatBoxSupport.bind(this)}
+          onClick={() => this.setState({ open: true })}
         >
           <SupportIcon />
-        </IconButton>
-      )
+        </IconButton>}
+        <iframe
+          style={{ marginRight: '-20px', marginBottom: '-30px', display: open ? 'block' : 'none' }}
+          width='375px'
+          height='560px'
+          src={url}
+          title='Zendesk'
+        />
+      </Box>
+    )
   }
 }
