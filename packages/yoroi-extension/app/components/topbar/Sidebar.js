@@ -80,7 +80,11 @@ export default class Sidebar extends Component<Props> {
           }) : null}
         </div>
 
-        <div className={styles.footer}>
+        <div
+          className={classnames(
+            isSidebarExpanded ? styles.footer : null
+          )}
+        >
           <a
             className={styles.faq}
             href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
