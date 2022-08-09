@@ -16,7 +16,7 @@ export default class Support extends Component <Props, State> {
     open: false,
   }
 
-  messageHandler = (event: any) => {
+  messageHandler: any => void = (event) => {
     if (event.origin === 'null') {
       return
     }
