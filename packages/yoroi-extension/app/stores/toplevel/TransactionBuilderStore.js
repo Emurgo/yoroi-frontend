@@ -293,7 +293,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     if (filteredTokens.length === 0) return String(1_000_000);
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
-    const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
+    const fakeAmount = new BigNumber('1000000');
     const fakeMultitoken = new MultiToken(
       [{
         identifier: defaultToken.Identifier,
