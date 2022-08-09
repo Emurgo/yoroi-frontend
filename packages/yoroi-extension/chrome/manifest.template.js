@@ -61,7 +61,7 @@ export default ({
     },
     icons,
     background: {
-      page: 'background.html',
+      service_worker: 'js/background-service-worker.js',
     },
     permissions: [
       'storage',

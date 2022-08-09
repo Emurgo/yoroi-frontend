@@ -24,18 +24,6 @@ export function genCSP(request: {|
   const styleSrc = request.additional['style-src'] ?? [];
   const imgSrc = request.additional['img-src'] ?? [];
 
-  if (request.isDev) {
-    defaultSrc.push(portToPermission(Ports.WebpackDev));
-    defaultSrc.push(portToPermission(Ports.ReactDevTools));
-
-    connectSrc.push(portToPermission(Ports.WebpackDev));
-    connectSrc.push(portToPermission(Ports.DevBackendServe));
-    connectSrc.push(portToPermission(Ports.ReactDevTools));
-    connectSrc.push(portToSocketPermission(Ports.WebpackDev));
-
-    imgSrc.push(portToPermission(Ports.WebpackDev));
-  }
-
   imgSrc.push('https://static.adapools.org/');
   imgSrc.push('https://ipfs.io/ipfs/');
   // connectSrc.push('https://api.dropboxapi.com');
