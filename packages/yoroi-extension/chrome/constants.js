@@ -48,7 +48,7 @@ export function genCSP(request: {|
 
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
-  frameSrc.push('https://emurgo.github.io/yoroi-support');
+  frameSrc.push('https://emurgo.github.io/');
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
 

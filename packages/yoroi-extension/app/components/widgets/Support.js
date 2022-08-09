@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import { ReactComponent as SupportIcon } from '../../assets/images/support.inline.svg';
 import { IconButton } from '@mui/material';
 import { Box } from '@mui/system';
+import environment from '../../environment';
 
 type Props = {||}
 type State = {|
@@ -34,8 +35,18 @@ export default class Support extends Component <Props, State> {
     window.removeEventListener('message', this.messageHandler);
   }
 
+  getUrl(): string | null {
+    if (!environment.userAgentInfo.isExtension()) return null;
+    const agent = environment.userAgentInfo.isFirefox() ? 'firefox' : 'chrome'
+    return `https://emurgo.github.io/yoroi-support/?source=${agent}&extensionId=${window.location.hostname}`;
+  }
+
   render(): Node {
     const { open } = this.state;
+
+    const url = this.getUrl();
+    if (url === null) return null;
+
     return (
       <Box
         sx={{
@@ -55,10 +66,10 @@ export default class Support extends Component <Props, State> {
           <SupportIcon />
         </IconButton>}
         <iframe
-          style={{ marginRight: '-20px', marginBottom: '-30px' }}
-          width={open ? '375px' : '0px'}
-          height={open ? '560px': '0px'}
-          src="https://emurgo.github.io/yoroi-support/?extensionId=lenadjbonljinhejgofjblhkkopjmmfn&source=chrome"
+          style={{ marginRight: '-20px', marginBottom: '-30px', display: open ? 'block' : 'none' }}
+          width='375px'
+          height='560px'
+          src={url}
           title='Zendesk'
         />
       </Box>
