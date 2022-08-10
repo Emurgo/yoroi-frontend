@@ -270,10 +270,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     if (this.plannedTxInfoMap.length === 0) return false;
     for (const token of this.plannedTxInfoMap) {
       // we only care about the value in non-sendall case
-      if (
-        !token.shouldSendAll && !token.amount
-      ) {
-        return false;
+      if (!token.shouldSendAll) {
+        if (token.amount == null || new BigNumber(token.amount).isLessThanOrEqualTo(0)) {
+          return false;
+        }
       }
       if (this.receiver == null) {
         return false;
