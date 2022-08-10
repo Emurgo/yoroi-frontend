@@ -366,8 +366,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       }).slot);
 
       const tokens = this._genTokenList();
-      const hasZeroTokenAmount =
-        tokens.some(({ amount }) => new BigNumber(amount).isLessThanOrEqualTo(0));
+      const hasZeroTokenAmount = tokens.some(({ amount }) =>
+        amount != null && new BigNumber(amount).isLessThanOrEqualTo(0));
       if (hasZeroTokenAmount) {
         return;
       }
