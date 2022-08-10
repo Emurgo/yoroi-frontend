@@ -365,10 +365,17 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
+      const tokens = this._genTokenList();
+      const hasZeroTokenAmount =
+        tokens.some(({ amount }) => new BigNumber(amount).isLessThanOrEqualTo(0));
+      if (hasZeroTokenAmount) {
+        return;
+      }
+
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver: withHasUtxoChains,
         receiver,
-        tokens: this._genTokenList(),
+        tokens,
         filter: this.filter,
         absSlotNumber,
         metadata: this.metadata,
