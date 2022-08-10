@@ -79,7 +79,7 @@ function TopBarLayout({
                     minHeight: '200px',
                     padding: '40px',
                     backgroundColor: 'var(--yoroi-palette-gray-50)',
-                    overflow: 'overlay',
+                    overflow: 'scroll',
                   }}
                 >
                   {children}
