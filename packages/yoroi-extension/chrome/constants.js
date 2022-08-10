@@ -48,3 +48,9 @@ export function genCSP(request: {|
     `img-src 'self' ${imgSrc.join(' ')} data: ;`,
   ].join(' ');
 }
+
+export const injectedScripts = [
+  'cardanoApiInject.js',
+  'ergoApiInject.js',
+  'initialInject.js',
+];

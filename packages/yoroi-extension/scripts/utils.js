@@ -1,6 +1,7 @@
 const fs = require('fs');
 const shell = require('shelljs');
 const argv = require('minimist')(process.argv.slice(2));
+const { injectedScripts } = require('../chrome/constants');
 
 const shouldInjectConnector = argv.dontInjectConnector === undefined;
 const isNightly = argv.nightly != null;
@@ -32,6 +33,9 @@ const buildAndCopyInjector = (destDir: string, buildType: string) => {
   } catch (e) {
     console.error('Failed to write the fixed connector inject script!', e);
     throw e;
+  }
+  for (const script of injectedScripts) {
+    shell.cp(`${__dirname}/../../yoroi-ergo-connector/src/${script}`, destDir);
   }
 };
 

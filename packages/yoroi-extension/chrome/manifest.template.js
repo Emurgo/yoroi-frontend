@@ -1,4 +1,5 @@
 // @flow
+const { injectedScripts } = require('./constants');
 
 /*::
 type Icons = {|
@@ -104,6 +105,10 @@ export default ({
         all_frames: true,
       }
     );
+    base.web_accessible_resources = [{
+      resources: injectedScripts.map(script => `js/${script}`),
+      matches: ['<all_urls>'],
+    }];
   }
 
   const verName /*: {| version_name?: string |} */ = versionName != null
