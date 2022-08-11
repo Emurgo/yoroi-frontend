@@ -69,8 +69,8 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
       <Box
         borderRadius="8px"
         bgcolor="var(--yoroi-palette-common-white)"
-        height="100%"
-        overflow="overlay"
+        height="content"
+        overflow="auto"
       >
         <TokenDetails tokenInfo={tokenInfo} tokensCount={assetsList.length} network={network} />
       </Box>
