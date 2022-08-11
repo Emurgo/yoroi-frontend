@@ -36,7 +36,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
       </Box>
-      <Wrapper>
+      <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
           {avatar != null ? (
             <AvatarImg src={avatar} alt="stake pool logo" />
@@ -55,7 +55,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           />
         </Box>
       </Wrapper>
-      <Wrapper justifyContent="space-between">
+      <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
             <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">

@@ -686,7 +686,7 @@ const WrapperCards = styled(Box)({
   gap: '40px',
   justifyContent: 'space-between',
   marginBottom: '40px',
-  height: '526px',
+  height: '556px',
 });
 
 const RightCardsWrapper = styled(Box)({
