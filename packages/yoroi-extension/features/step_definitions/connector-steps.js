@@ -43,7 +43,7 @@ const connectorPopUpIsDisplayed = async (customWorld: Object) => {
 
 Given(/^I have opened the mock dApp$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the mock dApp`);
-  await this.driver.get(mockDAppUrl);
+  await this.get(mockDAppUrl);
 });
 
 Then(/^I open the mock dApp tab$/, async function () {
