@@ -183,18 +183,18 @@ export function NftImage({ imageUrl, name, width, height }: {|
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  imageUrl = imageUrl !== null ? imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/'): null;
+  let url = imageUrl !== null ? imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/'): null;
 
   useEffect(() => {
-    if (imageUrl !== null)
+    if (url !== null)
     imageExists(
-        String(imageUrl),
+        String(url),
         () => { setLoading(false); setError(false) }, // on-success
         () => { setLoading(false); setError(true) }, // on-error
       )
-  }, [imageUrl])
+  }, [url])
 
-  if (error || imageUrl === null) return (
+  if (error || url === null) return (
     <Box sx={{
       display: 'flex',
       alignItems: 'center',
@@ -216,7 +216,7 @@ export function NftImage({ imageUrl, name, width, height }: {|
         minWidth: width, minHeight: height,
         maxWidth: width, maxHeight: height,
         flex: '1', objectFit: 'cover', display: 'inline-block' }}
-      src={imageUrl}
+      src={url}
       alt={name}
       loading="lazy"
     />
