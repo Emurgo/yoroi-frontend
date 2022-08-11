@@ -168,7 +168,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
-function isImageExist(imageSrc: string, onload: void => void, onerror: void => void) {
+function imageExists(imageSrc: string, onload: void => void, onerror: void => void) {
   const img = new Image();
   img.onload = onload;
   img.onerror = onerror;
@@ -187,7 +187,7 @@ export function NftImage({ imageUrl, name, width, height }: {|
 
   useEffect(() => {
     if (imageUrl !== null)
-      isImageExist(
+    imageExists(
         String(imageUrl),
         () => { setLoading(false); setError(false) }, // on-success
         () => { setLoading(false); setError(true) }, // on-error

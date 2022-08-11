@@ -254,7 +254,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
             variant="body1"
             sx={{ textDecoration: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '70%' }}
             color="var(--yoroi-palette-primary-300)"
-            to={ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
+            to={id !== '-' &&  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
