@@ -205,12 +205,12 @@ function ListItemLayout({ firstColumn, secondColumn, thirdColumn }) {
     {
       id: 1,
       content: firstColumn,
-      width: '20%',
+      width: '25%',
     },
     {
       id: 2,
       content: secondColumn,
-      width: '45%',
+      width: '40%',
     },
     {
       id: 3,
@@ -252,7 +252,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
-            sx={{ textDecoration: 'none' }}
+            sx={{ textDecoration: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '70%' }}
             color="var(--yoroi-palette-primary-300)"
             to={ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
