@@ -147,7 +147,7 @@ type ConnectedSite = {|
 
 function getDefaultBounds(): {| width: number, positionX: number, positionY: number |} {
   return {
-    width: screen.availWidth,
+    width: chrome.system.display.width,
     positionX: 0,
     positionY: 0,
   };

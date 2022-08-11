@@ -66,6 +66,8 @@ export default ({
     },
     permissions: [
       'storage',
+      // so that the background service could access `chrome.system.display.width`
+      'system.display',
     ],
     host_permissions: [
       '*://connect.trezor.io/*',
