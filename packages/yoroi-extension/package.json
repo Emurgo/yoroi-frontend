@@ -186,6 +186,7 @@
     "@mui/lab": "^5.0.0-alpha.51",
     "@mui/material": "^5.0.4",
     "@svgr/webpack": "5.5.0",
+    "async-mutex": "^0.3.1",
     "axios": "0.21.1",
     "bech32": "2.0.0",
     "bignumber.js": "9.0.1",
