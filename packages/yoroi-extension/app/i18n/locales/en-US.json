@@ -930,7 +930,7 @@
   "wallet.voting.line2": "Before you begin, make sure to complete steps below",
   "wallet.voting.line3": "Download the Catalyst Voting App.",
   "wallet.voting.line4": "Open the Catalyst Voting App and click on the Complete registration button.",
-  "wallet.voting.lineTitle": "Register to vote on Fund { round }",
+  "wallet.voting.lineTitle": "Register to vote on { fundName }",
   "wallet.voting.notDelegated": "You haven't delegated anything. Your voting power is determined by the amount you delegate and voting rewards are distributed to your delegation reward address. Please remember to delegate prior to voting.",
   "wallet.voting.trezorTRequirement": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware\">Update</a> your Trezor Model T firmware version to 2.4.1 or above.",
   "wallet.withdrawal.transaction.unregister": "This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticker} from your deposit",

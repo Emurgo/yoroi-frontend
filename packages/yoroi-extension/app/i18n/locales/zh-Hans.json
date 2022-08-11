@@ -776,7 +776,7 @@
   "wallet.voting.line2": "在您开始之前，请确保完成了下列步骤",
   "wallet.voting.line3": "下载Catalyst投票应用。",
   "wallet.voting.line4": "打开Catalyst投票应用，点击完成注册按钮。",
-  "wallet.voting.lineTitle": "注册并给资金{ round }投票",
+  "wallet.voting.lineTitle": "注册并给资金{ fundName }投票",
   "wallet.withdrawal.transaction.unregister": "此交易将取消注册一个或多个委托密钥，从而从您的存款中退还您的{refundAmount}{ticker}。",
   "widgets.copyableaddress.addressCopyTooltipMessage": "复制到剪贴板",
   "widgets.explorer.tooltip": "前往{websiteName}",

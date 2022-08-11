@@ -280,6 +280,7 @@ export default class VotingPage extends Component<Props> {
     out of the registration dates.
     */
     const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
+    const fundName = catalystRoundInfo?.currentFund?.name || round.toString();
     return (
       //
       <div>
@@ -289,7 +290,7 @@ export default class VotingPage extends Component<Props> {
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
           isDelegated={this.isDelegated === true}
-          round={round}
+          name={fundName}
           walletType={walletType}
         />
       </div>
