@@ -100,6 +100,18 @@ const onYoroiIconClicked = () => {
 
 chrome.action.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
+const STORAGE_KEY_PREFIX = 'background-';
+
+async function setInStorage(key: string, value: any): void {
+  await chrome.storage.session.set({ [STORAGE_KEY_PREFIX + key]: value });
+}
+
+async function getFromStorage(key: string): Promise<any> {
+  const storageKey = STORAGE_KEY_PREFIX + key;
+  const result = await chrome.storage.session.get(storageKey);
+  return result[storageKey];
+}
+
 /**
  * we store the ID instead of an index
  * because the user could delete a wallet (causing indices to shift)
@@ -132,9 +144,6 @@ type PendingSign = {|
   // resolve function from signRequest's Promise
   resolve: ({| ok: any |} | {| err: any |}) => void,
 |}
-
-let imgBase64Url: string = '';
-let connectionProtocol: 'cardano' | 'ergo' = 'cardano';
 
 type ConnectedSite = {|
   url: string,
@@ -604,6 +613,7 @@ const yoroiMessageHandler = async (
       if (connection.status != null) {
         if (connection.status.resolve) {
           connection.status.openedWindow = true;
+          const imgBase64Url = await getFromStorage('imgBase64Url');
           sendResponse(({
             url: connection.url,
             protocol: connection.protocol,
@@ -855,10 +865,11 @@ function handleInjectorConnect(port) {
   ports.set(tabId, port);
   port.onMessage.addListener(async message => {
 
-      connectionProtocol = message.protocol;
-      const isCardano = connectionProtocol === 'cardano';
+      const isCardano = message.protocol === 'cardano';
 
-      imgBase64Url = message.imgBase64Url;
+      await setInStorage('connectionProtocol', message.protocol);
+      await setInStorage('imgBase64Url', message.imgBase64Url);
+
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
@@ -1156,6 +1167,8 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
+                    const connectionProtocol = await getFromStorage('connectionProtocol') ||
+                      'cardano';
                     const balance =
                       await connectorGetBalance(wallet, pendingTxs, tokenId, connectionProtocol);
                     if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
