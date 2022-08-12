@@ -16,7 +16,6 @@ import type {
   GetConnectionProtocolData,
   GetUtxosRequest,
   PendingSignData,
-  PendingTransaction,
   RemoveWalletFromWhitelistData,
   RpcUid,
   SigningMessage,
@@ -204,8 +203,6 @@ const connectedSites: Map<TabId, ConnectedSite> = new Map();
 const ports: Map<TabId, any> = new Map();
 
 
-let pendingTxs: PendingTransaction[] = [];
-
 /**
 * need to make sure JS tasks run in an order where no two of them have different DB instances
 * Otherwise, caching logic may make things go wrong
@@ -332,16 +329,6 @@ async function syncWallet(
             stateFetcher.getAssetInfo,
             stateFetcher.getBestBlock
           );
-        }
-        if (!isCardano) {
-          // to be safe we filter possibly accepted txs for up to 10 minutes
-          // this could be accepted in a variable amount of time due to Ergo's PoW
-          // but this is probably an okay amount. If it was not accepted then at worst
-          // the values are just temporarily withheld for a few minutes too long,
-          // and if it was accepted, then none of the UTXOs held would have been
-          // reuseable anyway.
-          pendingTxs = pendingTxs.filter(
-            pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10 * 60 * 1000);
         }
         Logger.debug('sync ended');
       }
@@ -1170,7 +1157,7 @@ function handleInjectorConnect(port) {
                     const connectionProtocol = await getFromStorage('connectionProtocol') ||
                       'cardano';
                     const balance =
-                      await connectorGetBalance(wallet, pendingTxs, tokenId, connectionProtocol);
+                      await connectorGetBalance(wallet, tokenId, connectionProtocol);
                     if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
                       await RustModule.load();
                       const W4 = RustModule.WalletV4;
@@ -1214,7 +1201,6 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const utxos = await connectorGetUtxosErgo(
                       wallet,
-                      pendingTxs,
                       valueExpected,
                       tokenId,
                       paginate
@@ -1248,7 +1234,6 @@ function handleInjectorConnect(port) {
                     const utxos = await transformCardanoUtxos(
                       await connectorGetUtxosCardano(
                         wallet,
-                        pendingTxs,
                         valueExpected,
                         paginate,
                         coinsPerUtxoWord,
@@ -1383,7 +1368,7 @@ function handleInjectorConnect(port) {
                       }
                     } else { // is Ergo
                       const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
-                      id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                      id = await connectorSendTx(wallet, tx, localStorageApi);
                       try {
                         await connectorRecordSubmittedErgoTransaction(
                           wallet,
@@ -1603,7 +1588,6 @@ function handleInjectorConnect(port) {
                       reorgTargetAmount
                     } = await connectorGetCollateralUtxos(
                       wallet,
-                      pendingTxs,
                       requiredAmount,
                       addressedUtxos.map(u => {
                         // eslint-disable-next-line no-unused-vars

@@ -5,7 +5,6 @@ import type {
   Address,
   CardanoTx,
   Paginate,
-  PendingTransaction,
   SignedTx,
   TokenId,
   Tx,
@@ -115,30 +114,19 @@ function valueToBigNumber(x: Value): BigNumber {
 
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
-  pendingTxs: PendingTransaction[],
   tokenId: TokenId,
   protocol: 'cardano' | 'ergo',
 ): Promise<AccountBalance | Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
-    if (pendingTxs.length === 0) {
-      // can directly query for balance
-      const canGetBalance = asGetBalance(wallet);
-      if (canGetBalance != null) {
-        const balance = await canGetBalance.getBalance();
-        return Promise.resolve(bigNumberToValue(balance.getDefault()));
-      }
-      throw Error('asGetBalance failed in connectorGetBalance');
-    } else {
-      // need to filter based on pending txs since they could have been included (or could not)
-      const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
-      let total = new BigNumber(0);
-      for (const box of allUtxos) {
-        total = total.plus(valueToBigNumber(box.value));
-      }
-      return Promise.resolve(bigNumberToValue(total));
+    // can directly query for balance
+    const canGetBalance = asGetBalance(wallet);
+    if (canGetBalance != null) {
+      const balance = await canGetBalance.getBalance();
+      return Promise.resolve(bigNumberToValue(balance.getDefault()));
     }
+      throw Error('asGetBalance failed in connectorGetBalance');
   } else if (protocol === 'ergo') {
-    const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
+    const allUtxos = await connectorGetUtxosErgo(wallet, null, tokenId);
     let total = new BigNumber(0);
     for (const box of allUtxos) {
       for (const asset of box.assets) {
@@ -196,7 +184,6 @@ function formatUtxoToBoxErgo(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson
 
 export async function connectorGetUtxosErgo(
   wallet: PublicDeriver<>,
-  pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
   tokenId: TokenId,
   paginate: ?Paginate
@@ -206,7 +193,6 @@ export async function connectorGetUtxosErgo(
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  const spentBoxIds = pendingTxs.flatMap(pending => pending.tx.inputs.map(input => input.boxId));
   // TODO: should we use a different coin selection algorithm besides greedy?
   const utxosToUse = [];
   if (valueExpected != null) {
@@ -214,17 +200,15 @@ export async function connectorGetUtxosErgo(
     const target = valueToBigNumber(valueExpected);
     for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
       const formatted = formatUtxoToBoxErgo(utxos[i])
-      if (!spentBoxIds.includes(formatted.boxId)) {
-        if (tokenId === 'ERG') {
-          valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
-          utxosToUse.push(formatted);
-        } else {
-          for (const asset of formatted.assets) {
-            if (asset.tokenId === tokenId) {
-              valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
-              utxosToUse.push(formatted);
-              break;
-            }
+      if (tokenId === 'ERG') {
+        valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
+        utxosToUse.push(formatted);
+      } else {
+        for (const asset of formatted.assets) {
+          if (asset.tokenId === tokenId) {
+            valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
+            utxosToUse.push(formatted);
+            break;
           }
         }
       }
@@ -252,7 +236,6 @@ function stringToWasmValue(s: string): RustModule.WalletV4.Value {
 
 export async function connectorGetUtxosCardano(
   wallet: PublicDeriver<>,
-  pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
   paginate: ?Paginate,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
@@ -311,7 +294,6 @@ type GetCollateralUtxosRespose = {|
 
 export async function connectorGetCollateralUtxos(
   wallet: PublicDeriver<>,
-  pendingTxs: PendingTransaction[],
   requiredAmount: Value,
   utxos: Array<RemoteUnspentOutput>,
   submittedTxs: Array<PersistedSubmittedTransaction>,
@@ -970,7 +952,6 @@ export async function connectorCreateCardanoTx(
 
 export async function connectorSendTx(
   wallet: IPublicDeriver</* ConceptualWallet */>,
-  pendingTxs: PendingTransaction[],
   tx: SignedTx,
   localStorage: LocalStorageApi,
 ): Promise<TxId> {
@@ -992,10 +973,6 @@ export async function connectorSendTx(
       }
     }
   ).then(response => {
-    pendingTxs.push({
-      tx,
-      submittedTime: new Date()
-    });
     return Promise.resolve(response.data.id);
   })
     .catch((_error) => {
