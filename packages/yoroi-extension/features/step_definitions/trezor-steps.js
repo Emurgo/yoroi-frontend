@@ -43,7 +43,7 @@ Then(/^I switch to Trezor-connect screen and allow using$/, async function () {
 });
 
 Then(/^I press Yes on the Trezor emulator$/, async function () {
-  for (let i = 1; i < 4; i++) {
+  for (let i = 1; i < 5; i++) {
     const pressYesResponse = await this.trezorController.emulatorPressYes();
     expect(pressYesResponse.success, `${i} emulator-press-yes request is failed`).to.be.true;
   }

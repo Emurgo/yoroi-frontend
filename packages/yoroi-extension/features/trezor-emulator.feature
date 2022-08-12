@@ -51,7 +51,8 @@ Feature: Trezor wallet emulator
     Then I switch to Trezor-connect screen and allow using
     And I press Yes on the Trezor emulator
     Given I click on see dashboard
-    Then I should see the dashboard screen 
+    Then I should see the dashboard screen
+
 
   @Trezor-004
   Scenario: Trezor (emulator). Withdraw rewards w/ deregistration.
