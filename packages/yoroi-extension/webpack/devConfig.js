@@ -97,7 +97,7 @@ const backgroundServiceWorkerConfig = (
   isLight /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
-  experiments: commonConfig.experiments,
+  experiments: { asyncWebAssembly: true },
   resolve: commonConfig.resolve(),
   // could not use the eval option because Chrome manifest v3 prohibits eval()
   devtool: 'source-map',
@@ -136,6 +136,12 @@ const backgroundServiceWorkerConfig = (
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
+    new webpack.NormalModuleReplacementPlugin(
+      /rustLoader/,
+      (resource) => {
+        resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground')
+      }
+    ),
   ],
   module: {
     rules: [
