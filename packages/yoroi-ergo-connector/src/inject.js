@@ -81,12 +81,13 @@ function getFavicons(url) {
     }
     return [defaultFavicon];
 }
-let yoroiPort = null;
+
+let connected = false;
 let ergoApiInjected = false;
 let cardanoApiInjected = false;
 
 function disconnectWallet(protocol) {
-    yoroiPort = null;
+    connected = false;
     if (protocol === 'ergo') {
         window.dispatchEvent(new Event("ergo_wallet_disconnected"));
     } else {
@@ -94,17 +95,9 @@ function disconnectWallet(protocol) {
     }
 }
 
-function createYoroiPort() {
+function listenToBackgroundServiceWorker() {
     const connectedProtocolHolder = [];
-    // events from Yoroi
-    if (extensionId === 'self') {
-      // this is part of Yoroi extension
-      yoroiPort = chrome.runtime.connect();    
-    } else {
-      // this is the seperate connector extension
-      yoroiPort = chrome.runtime.connect(extensionId);
-    }
-    yoroiPort.onMessage.addListener(async (message) => {
+    chrome.runtime.onMessage.addListener(async (message) => {
         // alert("content script message: " + JSON.stringify(message));
         if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
@@ -156,25 +149,24 @@ function createYoroiPort() {
                 auth: message.auth,
                 err: message.err,
             }, location.origin);
+        } else if (message.type === 'disconnect') {
+            disconnectWallet(connectedProtocolHolder[0]);
         }
     });
-
-    yoroiPort.onDisconnect.addListener(event => {
-        disconnectWallet(connectedProtocolHolder[0]);
-    });
+    connected = true;
 }
 
 async function handleConnectorConnectRequest(event, protocol) {
     const requestIdentification = event.data.requestIdentification;
-    if ((ergoApiInjected || (cardanoApiInjected && !requestIdentification)) && yoroiPort) {
+    if ((ergoApiInjected || (cardanoApiInjected && !requestIdentification)) && connected) {
         // we can skip communication - API injected + hasn't been disconnected
         window.postMessage({
             type: "connector_connected",
             success: true
         }, location.origin);
     } else {
-        if (yoroiPort == null) {
-            await createYoroiPort();
+        if (!connected) {
+            listenToBackgroundServiceWorker();
         }
         // note: content scripts are subject to the same CORS policy as the website they are embedded in
         // but since we are querying the website this script is injected into, it should be fine
@@ -190,32 +182,18 @@ async function handleConnectorConnectRequest(event, protocol) {
                   },
                   protocol,
               };
-              yoroiPort.postMessage(message);
+              chrome.runtime.sendMessage(message);
           });
     }
 }
 
 async function handleConnectorRpcRequest(event) {
     console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-    if (event.data.function === 'is_enabled/cardano' && yoroiPort == null) {
-      await createYoroiPort();
-    }
-    if (!yoroiPort) {
-        // No active wallet connection
-        window.postMessage({
-            type: "connector_rpc_response",
-            uid: event.data.uid,
-            return: {
-                err: {
-                    code: API_REFUSED,
-                    info: 'Wallet disconnected'
-                }
-            }
-        }, location.origin);
-        return;
+    if (event.data.function === 'is_enabled/cardano' && !connected) {
+        listenToBackgroundServiceWorker();
     }
     try {
-        yoroiPort.postMessage(event.data);
+        chrome.runtime.sendMessage(event.data);
     } catch (e) {
         console.error(`Could not send RPC to Yoroi: ${e}`);
         window.postMessage({
