@@ -712,7 +712,7 @@ async function confirmSign(
     });
       chrome.windows.create({
         ...popupProps,
-      url: chrome.extension.getURL(`/main_window_connector.html#/signin-transaction`),
+      url: chrome.runtime.getURL(`/main_window_connector.html#/signin-transaction`),
       left: (bounds.width + bounds.positionX) - popupProps.width,
       top: bounds.positionY + 80,
     });
@@ -800,7 +800,7 @@ async function confirmConnect(
       });
       chrome.windows.create({
         ...popupProps,
-        url: chrome.extension.getURL('main_window_connector.html'),
+        url: chrome.runtime.getURL('main_window_connector.html'),
         left: (bounds.width + bounds.positionX) - popupProps.width,
         top: bounds.positionY + 80,
       });
@@ -819,7 +819,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
         const bounds = getBoundsForWindow(currentWindow);
         chrome.windows.create({
           ...popupProps,
-          url: chrome.extension.getURL(`/main_window_connector.html#/settings`),
+          url: chrome.runtime.getURL(`/main_window_connector.html#/settings`),
           left: (bounds.width + bounds.positionX) - popupProps.width,
           top: bounds.positionY + 80,
         });
