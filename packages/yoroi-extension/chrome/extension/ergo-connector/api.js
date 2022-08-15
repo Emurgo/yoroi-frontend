@@ -254,7 +254,7 @@ export async function connectorGetUtxosCardano(
     utxo_id: utxo.utxo_id,
     assets: utxo.assets,
   });
-  const submittedTxs = loadSubmittedTransactions() || [];
+  const submittedTxs = await loadSubmittedTransactions() || [];
   const adaApi = new AdaApi();
   const formattedUtxos: Array<RemoteUnspentOutput> =
     adaApi.utxosWithSubmittedTxs(
@@ -413,8 +413,8 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     .then(arr => arr.map(a => a.base58));
 }
 
-function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
-  const submittedTxs = loadSubmittedTransactions() || [];
+async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
+  const submittedTxs = await loadSubmittedTransactions() || [];
   return submittedTxs
     .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
     .flatMap(({ transaction }) => {
@@ -429,7 +429,7 @@ export async function connectorGetUsedAddresses(
   const usedAddresses = await getAllAddresses(wallet, true);
 
   const outputAddressesInSubmittedTxs = new Set(
-    getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
+    await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
   );
   const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
         .filter(address => outputAddressesInSubmittedTxs.has(address));
@@ -443,7 +443,7 @@ export async function connectorGetUsedAddresses(
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
   const result = await getAllAddresses(wallet, false);
   const outputAddressesInSubmittedTxs = new Set(
-    getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
+    await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
   );
   return result.filter(address => !outputAddressesInSubmittedTxs.has(address));
 }
@@ -817,7 +817,7 @@ export async function connectorSignCardanoTx(
     console.log('otherRequiredSigners', JSON.stringify(otherRequiredSigners));
   }
 
-  const submittedTxs = loadSubmittedTransactions() || [];
+  const submittedTxs = await loadSubmittedTransactions() || [];
   const adaApi = new AdaApi();
   const addressedUtxos = await adaApi.addressedUtxosWithSubmittedTxs(
     asAddressedUtxoCardano(utxos),
@@ -897,7 +897,7 @@ export async function connectorCreateCardanoTx(
     time: new Date(),
   }).slot);
 
-  const submittedTxs = loadSubmittedTransactions() || [];
+  const submittedTxs = await loadSubmittedTransactions() || [];
 
   const utxos = asAddressedUtxoCardano(
     await withUtxos.getAllUtxos()
@@ -1123,7 +1123,7 @@ export async function connectorRecordSubmittedErgoTransaction(
     block: null,
   };
 
-  const submittedTxs = loadSubmittedTransactions() || [];
+  const submittedTxs = await loadSubmittedTransactions() || [];
   submittedTxs.push({
     publicDeriverId: publicDeriver.publicDeriverId,
     transaction: submittedTx,
@@ -1154,7 +1154,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
       await withUtxos.getAllUtxos()
     );
   }
-  const submittedTxs = loadSubmittedTransactions() || [];
+  const submittedTxs = await loadSubmittedTransactions() || [];
   const adaApi = new AdaApi();
   utxos = await adaApi.addressedUtxosWithSubmittedTxs(
     utxos,

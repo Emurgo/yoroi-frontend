@@ -344,19 +344,15 @@ export type PersistedSubmittedTransaction = {|
   |}>,
 |};
 
-export function persistSubmittedTransactions(
+export async function persistSubmittedTransactions(
   submittedTransactions: any,
-): void {
-  localStorage.setItem(
-    storageKeys.SUBMITTED_TRANSACTIONS,
-    JSON.stringify(submittedTransactions)
-  );
+): Promise<void> {
+  await chrome.storage.local.set({
+    [storageKeys.SUBMITTED_TRANSACTIONS]: submittedTransactions
+  });
 }
 
-export function loadSubmittedTransactions(): any {
-  const dataStr = localStorage.getItem(storageKeys.SUBMITTED_TRANSACTIONS);
-  if (dataStr == null) {
-    return null;
-  }
-  return JSON.parse(dataStr);
+export async function loadSubmittedTransactions(): any {
+  const result = await chrome.storage.local.get(storageKeys.SUBMITTED_TRANSACTIONS);
+  return result[storageKeys.SUBMITTED_TRANSACTIONS];
 }

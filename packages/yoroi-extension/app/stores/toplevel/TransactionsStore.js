@@ -846,7 +846,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _loadSubmittedTransactions: () => Promise<void> = async () => {
     try {
-      const data = loadSubmittedTransactions();
+      const data = await loadSubmittedTransactions();
       if (!data) {
         return;
       }

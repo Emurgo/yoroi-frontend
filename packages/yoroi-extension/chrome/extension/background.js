@@ -1588,7 +1588,7 @@ async function handleInjectorMessage(message, sender) {
               }
               const walletUtxos = await withUtxos.getAllUtxos();
               const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
-              const submittedTxs = loadSubmittedTransactions() || [];
+              const submittedTxs = await loadSubmittedTransactions() || [];
               const {
                 utxosToUse,
                 reorgTargetAmount

@@ -573,7 +573,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('Missgin utxos for signing tx')
     }
 
-    const submittedTxs = loadSubmittedTransactions() || [];
+    const submittedTxs = await loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(response.utxos),
       selectedWallet.publicDeriver,
@@ -848,7 +848,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected signing data type');
     }
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
-    const submittedTxs = loadSubmittedTransactions() || [];
+    const submittedTxs = await loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       selectedWallet.publicDeriver,
