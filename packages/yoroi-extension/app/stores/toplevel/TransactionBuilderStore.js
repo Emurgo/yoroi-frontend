@@ -270,10 +270,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     if (this.plannedTxInfoMap.length === 0) return false;
     for (const token of this.plannedTxInfoMap) {
       // we only care about the value in non-sendall case
-      if (
-        !token.shouldSendAll && !token.amount
-      ) {
-        return false;
+      if (!token.shouldSendAll) {
+        if (token.amount == null || new BigNumber(token.amount).isLessThanOrEqualTo(0)) {
+          return false;
+        }
       }
       if (this.receiver == null) {
         return false;
@@ -293,7 +293,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     if (filteredTokens.length === 0) return String(1_000_000);
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
-    const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
+    const fakeAmount = new BigNumber('1000000');
     const fakeMultitoken = new MultiToken(
       [{
         identifier: defaultToken.Identifier,
