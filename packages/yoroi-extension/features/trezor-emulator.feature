@@ -63,13 +63,30 @@ Feature: Trezor wallet emulator
     And I see the deregistration for the transaction
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | reward | fees     |
-      | stake1u9tdkhx53zwggygdfh5scr2s8dgms3xm8ehas7v3ywyetwcufngyf | 5      | 0.173157 |
+      | stake1u9jz8z7rnjtz4g5p26j953sjzdmsmzxcpzyk0p0e9sa2f5sjeqemq | 5      | 0.178877 |
     Given The expected transaction is "hKYAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8hsCGgACpGUDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAXpQuoGfhAzvgfp0H9ouqVNr4ZQPpQnFG9frwUkkyzA7dLIl1GmIuFbkJFMp3AakfKpXSZ9s+3dpaw9hYFkKgLglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQICDQmLn20i7qEzQSnFGhJv3Yp2qiAFF/6XxaqOeIvva6u/jxDYC/CFoA3UV4B6thf4QFJZ9owY9EsOhQuu14A319g=="
     When I confirm Yoroi transfer funds
     Then I switch to Trezor-connect screen and allow using
     When I press Yes on the Trezor emulator
     Then I do not see the deregistration for the transaction
     Then I should see the transactions screen
+
+  @Trezor-005
+  Scenario: Trezor (emulator). Send wSHIBA.
+    Given I go to the send transaction screen
+    And I fill the form:
+      | asset | address                                                     | amount   |
+      | wSHIBA | Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe | 4.5 |
+    Then I add a transaction memo that says "my awesome memo"
+    And I click on the next button in the wallet send form
+    Then I see the hardware send money confirmation dialog
+    Given The expected transaction is "hKQAgYJYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoARKogAhoAD0JAAxoR/pTNoQCBglggIL1t3O4RKx2YKpd4BSHseH/S7owdieZYrByrYgJ36IhYQFjVE/uopnIMYcnbrHgNxjqM6RamCo2bqEkHrtdG9boMd7btZ7I5M97lZQtyWHqmWRU02FrTl1/bhGHsOaduhAP19g=="
+    Then I submit the wallet send form
+    Then I switch to Trezor-connect screen and allow using
+    And I press Yes on the Trezor emulator
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
   @it-120 @ignore
   Scenario: Test Byron Trezor (IT-120)
