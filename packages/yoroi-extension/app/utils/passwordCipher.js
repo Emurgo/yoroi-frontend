@@ -19,10 +19,13 @@ export function decryptWithPassword(
   password: string,
   encryptedHex: string
 ): Uint8Array {
-  const encryptedBytes = Buffer.from(encryptedHex, 'hex');
+  const passwordHex = Buffer.from(password).toString('hex');
   let decryptedBytes;
   try {
-    decryptedBytes = RustModule.WalletV2.password_decrypt(password, encryptedBytes);
+    decryptedBytes = Buffer.from(
+      RustModule.WalletV4.decrypt_with_password(passwordHex, encryptedHex),
+      'hex'
+    );
   } catch (err) {
     throw new WrongPassphraseError();
   }
