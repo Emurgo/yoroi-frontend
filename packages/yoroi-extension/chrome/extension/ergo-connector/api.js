@@ -88,6 +88,9 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import fetchAdapter from '@vespaiach/axios-fetch-adapter';
+
+axios.defaults.adapter = fetchAdapter;
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
