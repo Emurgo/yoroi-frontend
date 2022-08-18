@@ -91,7 +91,7 @@ function TokenList({
       newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
-    setState({ sortingDirection: newSortDirection })
+    setState({ ...state, sortingDirection: newSortDirection })
 
     if (field === SORTING_COLUMNS.AMOUNT) {
       return compareNumbers(a[field], b[field], newSortDirection)
