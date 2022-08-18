@@ -723,7 +723,7 @@
   "wallet.restore.dialog.verify.wallet.button.label": "Verify wallet",
   "wallet.restore.dialog.wallet.name.input.hint": "e.g: Shopping Wallet",
   "wallet.restore.dialog.wallet.name.input.label": "Wallet name",
-  "wallet.restore.dialog.walletExist.explanation": "You are trying to restore existing wallet.",
+  "wallet.restore.dialog.walletExist.explanation": "The wallet you are trying to restore already exists.",
   "wallet.restore.dialog.walletExist.openWallet": "Open Wallet",
   "wallet.restore.dialog.walletExist.title": "Wallet Already Exist",
   "wallet.send.confirmationDialog.addressToLabel": "To",
