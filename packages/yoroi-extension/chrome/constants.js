@@ -30,11 +30,7 @@ export function genCSP(request: {|
   // connectSrc.push('https://content.dropboxapi.com');
 
   frameSrc.push('https://connect.trezor.io/');
-  frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
-
-  // Zendesk setup
-  connectSrc.push('https://*.zdassets.com/')
-  connectSrc.push('https://emurgohelpdesk.zendesk.com/')
+  frameSrc.push('https://emurgo.github.io/');
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
