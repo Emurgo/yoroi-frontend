@@ -559,6 +559,7 @@ export const WithdrawalTxPage = (): Node => {
                   ),
                   reset: action('createWithdrawalTx reset'),
                 },
+                shouldDeregister: false,
               },
             },
           },

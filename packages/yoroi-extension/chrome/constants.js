@@ -36,6 +36,9 @@ export function genCSP(request: {|
   connectSrc.push('https://*.zdassets.com/')
   connectSrc.push('https://emurgohelpdesk.zendesk.com/')
 
+  // Analytics
+  connectSrc.push('https://analytics.emurgo-rnd.com/');
+
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [

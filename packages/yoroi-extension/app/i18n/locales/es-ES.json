@@ -776,7 +776,7 @@
   "wallet.voting.line2": "Antes de empezar, asegúrate de completar los siguientes pasos",
   "wallet.voting.line3": "Descarga la aplicación Catalyst Voting App.",
   "wallet.voting.line4": "Abre la Catalyst Voting App y haz clic en el botón Completar registro.",
-  "wallet.voting.lineTitle": "Registrarse para votar en el Fondo { round }",
+  "wallet.voting.lineTitle": "Registrarse para votar en el { fundName }",
   "wallet.withdrawal.transaction.unregister": "Esta transacción desregistrará una o más claves de delegación, devolviendo las {refundAmount} {ticker} de tu depósito",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copiar al portapapeles",
   "widgets.explorer.tooltip": "Ir a {websiteName}",

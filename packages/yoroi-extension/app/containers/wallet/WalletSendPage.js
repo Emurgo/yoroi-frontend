@@ -49,6 +49,7 @@ import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
+import { trackSend } from '../../api/analytics';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -397,11 +398,14 @@ class WalletSendPage extends Component<AllProps> {
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
           onSubmit={
-            () => ledgerSendAction.sendUsingLedgerWallet.trigger({
-              params: { signRequest },
-              publicDeriver,
-              onSuccess: this.openTransactionSuccessDialog,
-            })
+            () => {
+              ledgerSendAction.sendUsingLedgerWallet.trigger({
+                params: { signRequest },
+                publicDeriver,
+                onSuccess: this.openTransactionSuccessDialog,
+              });
+              trackSend();
+            }
           }
           onCancel={ledgerSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
@@ -431,11 +435,14 @@ class WalletSendPage extends Component<AllProps> {
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}
           onSubmit={
-            () => trezorSendAction.sendUsingTrezor.trigger({
-              params: { signRequest },
-              publicDeriver,
-              onSuccess: this.openTransactionSuccessDialog,
-            })
+            () => {
+              trezorSendAction.sendUsingTrezor.trigger({
+                params: { signRequest },
+                publicDeriver,
+                onSuccess: this.openTransactionSuccessDialog,
+              })
+              trackSend();
+            }
           }
           onCancel={trezorSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
