@@ -171,6 +171,10 @@ After({ tags: '@trezorEmulatorTest' }, async function () {
   this.trezorController.closeWsConnection();
 });
 
+Before({ tags: '@smoke' }, () => {
+  setDefaultTimeout(3 * 60 * 1000);
+});
+
 After(async function (scenario) {
   this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has done ####`);
   if (scenario.result.status === 'failed') {
