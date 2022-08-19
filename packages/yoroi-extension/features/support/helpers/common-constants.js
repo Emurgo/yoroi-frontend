@@ -15,3 +15,4 @@ export const emailOptions = {
 };
 
 export const commonWalletPassword = 'asdfasdfasdf';
+export const txSuccessfulStatuses = ['high', 'medium', 'low'];
