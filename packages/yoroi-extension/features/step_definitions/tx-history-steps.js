@@ -5,6 +5,8 @@ import { By } from 'selenium-webdriver';
 import { expect, AssertionError } from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
+import { getTopTx, getTxStatus, transactionComponent } from '../pages/walletTransactionsHistoryPage';
+import { txSuccessfulStatuses } from '../support/helpers/common-constants';
 
 function verifyAllTxsFields(
   txType, txAmount, txTime, txStatus, txFee, txFromList, txToList,
@@ -232,4 +234,23 @@ const displayInfo = {
 
 When(/^I go to the tx history screen$/, async function () {
   await this.click({ locator: '.summary ', method: 'css' });
+});
+
+Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async function (minutes) {
+  const waitTimeMs = parseInt(minutes, 10) * 60 * 1000;
+  this.webDriverLogger.info(`Step: I wait for ${minutes} minute(s) the last transaction is confirmed`);
+  const startTime = Date.now();
+  while (startTime + waitTimeMs > Date.now()){
+    const topTx = await getTopTx(this);
+    const topTxState = await getTxStatus(topTx);
+    if(txSuccessfulStatuses.includes(topTxState.toLowerCase())){
+      const endTime = Date.now();
+      this.webDriverLogger.debug(`Step: The new transaction is confirmed`);
+      this.webDriverLogger.debug(`Step: Waiting time is ${(endTime - startTime) / 1000} seconds`);
+      return;
+    }
+    await this.driver.sleep(1000);
+  }
+  this.webDriverLogger.error(`The latest transaction is still in status "Submitted" after ${minutes} minutes`);
+  throw new AssertionError(`The latest transaction is still in status "Submitted" after ${minutes} minutes`);
 });
