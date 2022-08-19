@@ -7,6 +7,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import UnavailableDialog from '../widgets/UnavailableDialog';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { Link, Typography } from '@mui/material';
 
 const messages = defineMessages({
   title: {
@@ -50,38 +51,31 @@ export default class Crashed extends Component<Props> {
   _getErrorMessageComponent: (void => Node) = () => {
     const { intl } = this.context;
     const {
-      onExternalLinkClick,
       onDownloadLogs
     } = this.props;
 
     const downloadLogsLink = (
       // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      <a
-        className={styles.link}
-        href="#"
-        onClick={_event => onDownloadLogs()}
-      >
+      <Link href='#' onClick={_event => onDownloadLogs()}>
         {intl.formatMessage(globalMessages.downloadLogsLink)}
-      </a>
+      </Link>
     );
 
     const supportRequestLink = (
-      <a
-        className={styles.link}
-        href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'
-        onClick={event => onExternalLinkClick(event)}
-        target='_blank'
-        rel="noreferrer"
-      >
-        {intl.formatMessage(globalMessages.contactSupport)}
-      </a>
+      <Link href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335' target='_blank' rel="noreferrer">
+        {intl.formatMessage(globalMessages.here)}
+      </Link>
     );
 
     return (
       <p>
-        <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} />
-        <br /><br />
-        <FormattedMessage {...globalMessages.forMoreHelp} values={{ supportRequestLink }} />
+        <Typography sx={{ textAlign: 'justify', mb: '15px' }}>
+          <FormattedMessage {...globalMessages.forMoreHelp} values={{ supportRequestLink }} />
+        </Typography>
+
+        <Typography variant='subtitle2' sx={{ textAlign: 'justify' }}>
+          <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} />
+        </Typography>
       </p>
     );
   };
