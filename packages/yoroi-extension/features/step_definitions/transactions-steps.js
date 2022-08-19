@@ -11,16 +11,18 @@ import {
   networks,
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { walletSummaryBox } from '../pages/walletTransactionsPage';
+import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
 
 Given(/^I have a wallet with funds$/, async function () {
-  const amountWithCurrency = await this.driver.findElements(
-    By.xpath("//div[@class='WalletTopbarTitle_walletAmount']")
+  await this.waitUntilContainsText(
+    { locator: '.NavWalletDetails_amount', method: 'css' },
+    'ADA',
+    60 * 1000
   );
-  const matchedAmount = /^"([0-9]*\.[0-9]*)".*$/.exec(amountWithCurrency);
-  if (!matchedAmount) return false;
-  const amount = parseFloat(matchedAmount[1]);
-  expect(Number(amount), 'Available funds').to.be.above(0);
+  const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
+  const balanceText = await balanceTextElement.getText();
+  const [balance, ] = balanceText.split(' ');
+  expect(parseFloat(balance, 10), 'The wallet is empty').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -129,7 +131,7 @@ Then(/^I should see the successfully sent page$/, async function () {
 });
 
 Then(/^I click the transaction page button$/, async function () {
-  await this.click({ locator: '.summary', method: 'css' });
+  await this.click({ locator: '//button[contains(text(), "Transaction page")]', method: 'xpath' });
 });
 
 Then(/^I should see the summary screen$/, async function () {
