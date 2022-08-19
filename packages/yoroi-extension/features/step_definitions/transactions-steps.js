@@ -12,6 +12,12 @@ import {
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
+import {
+  getTokenLocator,
+  selectAssetDropDown,
+  selectSendingAmountDropDown,
+  sendAllItem
+} from '../pages/walletSendPage';
 
 Given(/^I have a wallet with funds$/, async function () {
   await this.waitUntilContainsText(
@@ -201,28 +207,15 @@ When(/^I click on the unmangle button$/, async function () {
 });
 
 When(/^I open the token selection dropdown$/, async function () {
-  await this.click({ locator: '.WalletSendForm_component .SimpleInput_input', method: 'css' });
+  await this.click(selectAssetDropDown);
 });
 
 When(/^I select token "([^"]*)"$/, async function (tokenName) {
-  const tokenRows = await this.getElementsBy({ locator: '.TokenOptionRow_item_name', method: 'css' });
-  for (const row of tokenRows) {
-    const name = await row.getText();
-    if (name === tokenName) {
-      await row.click();
-    }
-  }
+  await this.click(getTokenLocator(tokenName));
 });
 
 When(/^I open the amount dropdown and select send all$/, async function () {
-  await this.driver.executeScript(
-    `const dropdownInput = document.querySelector('input[value="Custom Amount"]').click;
-    const tokenList = document.querySelectorAll('.TokenOptionRow_item_name');
-    for(let token of tokenList){
-      if(token.innerHTML.startsWith('Send all')){
-        token.click()
-         }
-     }
-`
-  );
+  await this.click(selectSendingAmountDropDown);
+  await this.driver.sleep(500);
+  await this.click(sendAllItem);
 });

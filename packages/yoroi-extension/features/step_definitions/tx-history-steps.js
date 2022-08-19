@@ -245,8 +245,8 @@ Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async f
     const topTxState = await getTxStatus(topTx);
     if(txSuccessfulStatuses.includes(topTxState.toLowerCase())){
       const endTime = Date.now();
-      this.webDriverLogger.debug(`Step: The new transaction is confirmed`);
-      this.webDriverLogger.debug(`Step: Waiting time is ${(endTime - startTime) / 1000} seconds`);
+      this.webDriverLogger.info(`Step: The new transaction is confirmed`);
+      this.webDriverLogger.info(`Step: Waiting time is ${(endTime - startTime) / 1000} seconds`);
       return;
     }
     await this.driver.sleep(1000);
