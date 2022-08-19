@@ -5,7 +5,6 @@ import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdri
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
-// eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod, getLogDate } from './helpers/helpers';
 import { WindowManager } from './windowManager';
