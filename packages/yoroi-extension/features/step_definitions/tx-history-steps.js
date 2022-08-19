@@ -2,7 +2,7 @@
 
 import { Then, When, Given } from 'cucumber';
 import { By } from 'selenium-webdriver';
-import chai from 'chai';
+import { expect, AssertionError } from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
 
@@ -10,26 +10,26 @@ function verifyAllTxsFields(
   txType, txAmount, txTime, txStatus, txFee, txFromList, txToList,
   txId, expectedTx, txConfirmations
 ) {
-  chai.expect(txType).to.equal(expectedTx.txType);
-  chai.expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
-  chai.expect(txTime).to.equal(moment(expectedTx.txTime).format('hh:mm:ss A'));
-  chai.expect(txStatus).to.equal(expectedTx.txStatus);
+  expect(txType).to.equal(expectedTx.txType);
+  expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
+  expect(txTime).to.equal(moment(expectedTx.txTime).format('hh:mm:ss A'));
+  expect(txStatus).to.equal(expectedTx.txStatus);
   for (let i = 0; i < txFromList.length; i++) {
     for (let j = 0; j < txFromList[i].length; j++) {
-      chai.expect(txFromList[i][j]).to.equal(expectedTx.txFrom[i][j]);
+      expect(txFromList[i][j]).to.equal(expectedTx.txFrom[i][j]);
     }
   }
   for (let i = 0; i < txToList.length; i++) {
     for (let j = 0; j < txToList[i].length; j++) {
-      chai.expect(txToList[i][j]).to.equal(expectedTx.txTo[i][j]);
+      expect(txToList[i][j]).to.equal(expectedTx.txTo[i][j]);
     }
   }
-  chai.expect(txId).to.equal(expectedTx.txId);
+  expect(txId).to.equal(expectedTx.txId);
   if (txConfirmations) {
-    chai.expect(txConfirmations).to.equal(expectedTx.txConfirmations);
+    expect(txConfirmations).to.equal(expectedTx.txConfirmations);
   }
   if (txFee) {
-    chai.expect(txFee).to.equal(expectedTx.txFee);
+    expect(txFee).to.equal(expectedTx.txFee);
   }
 }
 
@@ -59,8 +59,8 @@ Then(
 
 Then(/^I should see no transactions$/, async function () {
   await this.waitForElement({ locator: '.WalletNoTransactions_component', method: 'css' });
-  const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
-  chai.expect(actualTxsList.length).to.equal(0);
+  const actualTxsList = await this.getElementsBy(transactionComponent);
+  expect(actualTxsList.length).to.equal(0);
 });
 
 Then(
@@ -80,18 +80,20 @@ Then(
       await this.driver.sleep(500);
     }
 
-    const allTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
-    const pendingTxsList = await this.getElementsBy({ locator: '.Transaction_pendingLabel', method: 'css' });
-    const failedTxsList = await this.getElementsBy({ locator: '.Transaction_failedLabel', method: 'css' });
     if (txExpectedStatus === 'pending') {
-      chai.expect(pendingTxsList.length).to.equal(txsAmount);
+      const pendingTxsList = await this.getElementsBy({ locator: '.Transaction_pendingLabel', method: 'css' });
+      expect(pendingTxsList.length).to.equal(txsAmount);
       return;
     }
     if (txExpectedStatus === 'failed') {
-      chai.expect(failedTxsList.length).to.equal(txsAmount);
+      const failedTxsList = await this.getElementsBy({ locator: '.Transaction_failedLabel', method: 'css' });
+      expect(failedTxsList.length).to.equal(txsAmount);
       return;
     }
-    chai.expect(allTxsList.length - pendingTxsList.length - failedTxsList.length)
+    const pendingTxsList = await this.getElementsBy({ locator: '.Transaction_pendingLabel', method: 'css' });
+    const failedTxsList = await this.getElementsBy({ locator: '.Transaction_failedLabel', method: 'css' });
+    const allTxsList = await this.getElementsBy(transactionComponent);
+    expect(allTxsList.length - pendingTxsList.length - failedTxsList.length)
       .to.equal(txsAmount);
   }
 );
@@ -99,8 +101,8 @@ Then(
 When(
   /^I expand the top transaction$/,
   async function () {
-    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
-    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+    await this.waitForElement(transactionComponent);
+    const actualTxsList = await this.getElementsBy(transactionComponent);
     const topTx = actualTxsList[0];
 
     await topTx.click();
@@ -123,8 +125,8 @@ async function parseTxInfo(addressList) {
 Then(
   /^I verify top transaction content ([^"]*)$/,
   async function (walletName) {
-    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
-    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+    await this.waitForElement(transactionComponent);
+    const actualTxsList = await this.getElementsBy(transactionComponent);
     const topTx = actualTxsList[0];
 
     let status = 'successful';
@@ -171,12 +173,12 @@ Then(
 Then(
   /^The number of confirmations of the top tx is ([^"]*)$/,
   async function (count) {
-    await this.waitForElement({ locator: '.Transaction_component', method: 'css' });
-    const actualTxsList = await this.getElementsBy({ locator: '.Transaction_component', method: 'css' });
+    await this.waitForElement(transactionComponent);
+    const actualTxsList = await this.getElementsBy(transactionComponent);
     const topTx = actualTxsList[0];
     const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
     const confirmationCount = await assuranceElem[0].getText();
-    chai.expect(confirmationCount).to.equal(count);
+    expect(confirmationCount).to.equal(count);
   }
 );
 
