@@ -7,7 +7,8 @@ export const DEFAULT_LOCALE = 'en-US';
 export const ENV = {
   isProduction: process.env.NODE_ENV === 'production',
   isDevelopment: process.env.NODE_ENV === 'development',
-  isFirefox: String(navigator.userAgent).includes('Firefox'),
+  isFirefox: (String(navigator.userAgent).includes('Firefox'): boolean),
+  // $FlowFixMe[prop-missing]
   isHidSupported: navigator.hid != null,
 };
 export const DEFAULT_TRANSPORT_PROTOCOL: TransportIdType = ENV.isHidSupported
