@@ -327,7 +327,8 @@ jobs:
         env:
           FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
-        run: npm run test:run:e2e:smoke:${{ matrix.browser }}
+        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:run:e2e:smoke:${{ matrix.browser }}
+
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
