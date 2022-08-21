@@ -1,9 +1,32 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
+import {
+  iframe,
+  iframeFirstPoolDelegateButton,
+  iframePoolIdInput,
+  iframePoolIdSearchButton
+} from '../pages/walletDelegationPage';
 
 When(/^I go to the delegation by id screen$/, async function () {
   await this.click({ locator: '.cardanoStake', method: 'css' });
+});
+
+When(/^I go to the delegation list screen$/, async function () {
+  await this.click({ locator: '.stakeSimulator', method: 'css' });
+  await this.waitForElement({ locator: 'classicCardanoStakingPage', method: 'id' });
+});
+
+Then(/^I select the pool with the id "([^"]*)"$/, async function(stakePoolId) {
+  const iframeElement = await this.findElement(iframe);
+  await this.driver.switchTo().frame(iframeElement);
+  await this.waitForElement(iframePoolIdInput);
+  await this.waitForElement(iframeFirstPoolDelegateButton);
+  await this.input(iframePoolIdInput, stakePoolId);
+  await this.click(iframePoolIdSearchButton);
+  await this.driver.sleep(1000);
+  await this.click(iframeFirstPoolDelegateButton);
+  await this.driver.switchTo().defaultContent();
 });
 
 When(/^I fill the delegation id form:$/, async function (table) {
