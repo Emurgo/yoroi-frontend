@@ -250,6 +250,7 @@ jobs:
         browser: [ 'chrome', 'firefox' ]
       fail-fast: false
     steps:
+      - uses: actions/checkout@v2
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
         run: |
