@@ -78,6 +78,7 @@ import {
   walletInfoDialog,
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
+import * as helpers from '../support/helpers/helpers';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -172,7 +173,7 @@ After({ tags: '@trezorEmulatorTest' }, async function () {
 });
 
 Before({ tags: '@smoke' }, () => {
-  setDefaultTimeout(3 * 60 * 1000);
+  setDefaultTimeout(5 * 60 * 1000);
 });
 
 After(async function (scenario) {
@@ -186,6 +187,7 @@ After(async function (scenario) {
     }
   }
   await this.driver.quit();
+  await helpers.sleep(500);
 });
 
 type WalletEra = {|
@@ -270,7 +272,7 @@ async function takePageSnapshot(driver, name) {
  *
  * @param driver The driver.
  * @param name The name of the test.
- * @param loggingType The logging type required. Select between logging.Type.DRIVER and logging.Type.BROWSER.
+ * @param loggingType The logging type required. Select logging.Type.DRIVER or logging.Type.BROWSER.
  */
 async function getLogs(driver, name, loggingType) {
   let log = '';
@@ -456,7 +458,7 @@ async function acceptUriPrompt(world: any) {
 
 Given(/^I have opened the extension$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the extension`);
-  await this.driver.get(this.getExtensionUrl());
+  await this.get(this.getExtensionUrl());
   const browserName = await this.getBrowser();
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();

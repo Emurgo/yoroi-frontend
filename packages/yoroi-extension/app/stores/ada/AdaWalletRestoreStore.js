@@ -14,6 +14,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { trackWalletCreation } from '../../api/analytics';
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
 
@@ -129,6 +130,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
       });
       return wallet;
     }).promise;
+    trackWalletCreation('restored');
   };
 
   teardown(): void {

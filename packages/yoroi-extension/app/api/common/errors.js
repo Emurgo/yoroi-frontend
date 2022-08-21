@@ -124,6 +124,10 @@ const messages = defineMessages({
     id: 'api.errors.checkAdressesInUseApiError',
     defaultMessage: '!!!Error received from server while checking used addresses.',
   },
+  getMultiAssetMintMetadataApiError: {
+    id: 'api.errors.getMultiAssetMintMetadataApiError',
+    defaultMessage: '!!!Error received from server while querying minting metadata.',
+  },
   assetInfoApiError: {
     id: 'api.errors.assetInfoApiError',
     defaultMessage: '!!!Error received from server while getting asset info.',
@@ -435,6 +439,15 @@ export class CheckAddressesInUseApiError extends LocalizableError {
     super({
       id: messages.checkAdressesInUseApiError.id,
       defaultMessage: messages.checkAdressesInUseApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetMultiAssetMintMetadataApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getMultiAssetMintMetadataApiError.id,
+      defaultMessage: messages.getMultiAssetMintMetadataApiError.defaultMessage || '',
     });
   }
 }

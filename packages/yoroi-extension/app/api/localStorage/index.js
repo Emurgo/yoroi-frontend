@@ -32,6 +32,7 @@ const storageKeys = {
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
+  ANALYTICS_INSTANCE_ID: networkForLocalStorage + '-ANALYTICS',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
@@ -360,3 +361,12 @@ export function loadSubmittedTransactions(): any {
   }
   return JSON.parse(dataStr);
 }
+
+export async function loadAnalyticsInstanceId(): Promise<?string> {
+  return getLocalItem(storageKeys.ANALYTICS_INSTANCE_ID);
+}
+
+export async function saveAnalyticsInstanceId(id: string): Promise<void> {
+  await setLocalItem(storageKeys.ANALYTICS_INSTANCE_ID, id);
+}
+

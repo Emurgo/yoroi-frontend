@@ -148,4 +148,4 @@ Feature: Smoke tests
     Then I do not see the deregistration for the transaction
     Then I should see the summary screen
     And I should see 1 pending transactions
-    Then I wait for 3 minute(s) the last transaction is confirmed
+    Then I wait for 4 minute(s) the last transaction is confirmed

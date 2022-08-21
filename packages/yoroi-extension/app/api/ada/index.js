@@ -1351,7 +1351,7 @@ export default class AdaApi {
         }
       }
 
-      let amount = makeMultiToken(target.value ?? '0');
+      let amount = makeMultiToken(target.value ?? '1000000');
       const dataHash = target.dataHash;
       const ensureMinValue = target.ensureRequiredMinimalValue;
       if (ensureMinValue == null || ensureMinValue === false) {

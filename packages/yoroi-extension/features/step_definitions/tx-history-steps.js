@@ -251,6 +251,7 @@ Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async f
     }
     await this.driver.sleep(1000);
   }
-  this.webDriverLogger.error(`The latest transaction is still in status "Submitted" after ${minutes} minutes`);
+  const endTime = Date.now();
+  this.webDriverLogger.error(`The latest transaction is still in status "Submitted" after ${minutes} minutes (${(endTime - startTime) / 1000})`);
   throw new AssertionError(`The latest transaction is still in status "Submitted" after ${minutes} minutes`);
 });

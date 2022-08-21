@@ -20,6 +20,7 @@ import {
 } from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { SendUsingLedgerParams } from '../../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../../actions/ada/trezor-send-actions';
+import { trackSend } from '../../../../api/analytics';
 
 export type GeneratedData = typeof WalletSendPreviewStepContainer.prototype.generated;
 
@@ -50,6 +51,8 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
 
   componentWillUnmount() {
     this.generated.stores.wallets.sendMoneyRequest.reset();
+    this.generated.actions.ada.ledgerSend.cancel.trigger();
+    this.generated.actions.ada.trezorSend.cancel.trigger();
   }
 
   onSubmit: {| password: string |} => Promise<void> = async ({ password }) => {
@@ -88,6 +91,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         onSuccess: openTransactionSuccessDialog,
       });
     }
+    trackSend()
   }
 
   render(): Node {
@@ -185,6 +189,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
               onSuccess?: void => void,
             |}) => Promise<void>
           |},
+          cancel: {| trigger: (params: void) => void |},
         |},
         trezorSend: {|
           sendUsingTrezor: {|
@@ -194,6 +199,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
               onSuccess?: void => void,
             |}) => Promise<void>
           |},
+          cancel: {| trigger: (params: void) => void |},
         |},
       |},
     |},
@@ -281,10 +287,16 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
             sendUsingTrezor: {
               trigger: actions.ada.trezorSend.sendUsingTrezor.trigger,
             },
+            cancel: {
+              trigger: actions.ada.trezorSend.cancel.trigger,
+            },
           },
           ledgerSend: {
             sendUsingLedger: {
               trigger: actions.ada.ledgerSend.sendUsingLedgerWallet.trigger,
+            },
+            cancel: {
+              trigger: actions.ada.ledgerSend.cancel.trigger,
             },
           },
         },

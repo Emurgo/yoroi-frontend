@@ -211,8 +211,7 @@ class CardanoAPI {
     }) 
     
     getNetworkId() {
-      // TODO
-      throw new Error('Not implemented yet');
+      return this._cardano_rpc_call("get_network_id", []);
     }
     
     getBalance(token_id = '*') {

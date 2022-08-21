@@ -56,3 +56,7 @@ export function getCircularReplacer(): Object {
     return value;
   };
 }
+
+export const sleep = (milliseconds: number): Promise<any> => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
