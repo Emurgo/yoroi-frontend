@@ -3,7 +3,6 @@
 import { Given, When, Then } from 'cucumber';
 import {
   iframe,
-  iframeFirstPoolDelegateButton,
   iframePoolIdInput,
   iframePoolIdSearchButton
 } from '../pages/walletDelegationPage';
@@ -18,15 +17,34 @@ When(/^I go to the delegation list screen$/, async function () {
 });
 
 Then(/^I select the pool with the id "([^"]*)"$/, async function(stakePoolId) {
+  await this.webDriverLogger.info(`Step: "I select the pool with the id ${stakePoolId}" has started`);
   const iframeElement = await this.findElement(iframe);
   await this.driver.switchTo().frame(iframeElement);
+  await this.webDriverLogger.info(`Step:  Switched to stake pool iframe`);
   await this.waitForElement(iframePoolIdInput);
-  await this.waitForElement(iframeFirstPoolDelegateButton);
+  await this.driver.wait(async () => {
+    const allButtons = await this.findElements({ locator: '//button', method: 'xpath' });
+    for (let i = 0; i < allButtons.length; i++) {
+      const buttonText = await allButtons[i].getText();
+      if (buttonText.toLowerCase() === 'delegate'){
+        return true;
+      }
+    }
+    return false;
+  });
   await this.input(iframePoolIdInput, stakePoolId);
   await this.click(iframePoolIdSearchButton);
   await this.driver.sleep(1000);
-  await this.click(iframeFirstPoolDelegateButton);
+  const allButtons = await this.findElements({ locator: '//button', method: 'xpath' });
+  for (let i = 0; i < allButtons.length; i++) {
+    const buttonText = await allButtons[i].getText();
+    if (buttonText.toLowerCase() === 'delegate'){
+      await allButtons[i].click();
+      break;
+    }
+  }
   await this.driver.switchTo().defaultContent();
+  await this.webDriverLogger.info(`Step:  Switched back to the default content`);
 });
 
 When(/^I fill the delegation id form:$/, async function (table) {
