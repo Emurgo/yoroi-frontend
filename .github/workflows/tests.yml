@@ -122,7 +122,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [ 'chrome', 'firefox' ]
+        browser: [ 'chrome' ]
       fail-fast: false
     steps:
       - name: Forcefully update the Chrome browser
@@ -247,7 +247,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [ 'chrome', 'firefox' ]
+        browser: [ 'chrome' ]
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
