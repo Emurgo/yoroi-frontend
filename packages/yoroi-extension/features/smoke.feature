@@ -115,3 +115,37 @@ Feature: Smoke tests
     Then I should see the summary screen
     And I should see 1 pending transactions
     Then I wait for 3 minute(s) the last transaction is confirmed
+
+  @smoke-007
+  Scenario: Delegating (smoke-007)
+    Given There is a Shelley wallet stored named Second-Smoke-Test-Wallet
+    And I have a wallet with funds
+    Given I go to the delegation list screen
+    Then I select the pool with the id "df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207"
+    Then I see the delegation confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Then I submit the wallet send form
+    Given I click on see dashboard
+    Then I should see the dashboard screen
+    Then I go to the transaction history screen
+    And I should see 1 pending transactions
+    Then I wait for 3 minute(s) the last transaction is confirmed
+
+  @smoke-008
+  Scenario: Deregister (smoke-008)
+    Given There is a Shelley wallet stored named Second-Smoke-Test-Wallet
+    And I have a wallet with funds
+    When I click on the withdraw button
+    Then I click on the checkbox
+    And I click the next button
+    And I see the deregistration for the transaction
+    And I enter the wallet password:
+      | password     |
+      | asdfasdfasdf |
+    When I confirm Yoroi transfer funds
+    Then I do not see the deregistration for the transaction
+    Then I should see the summary screen
+    And I should see 1 pending transactions
+    Then I wait for 3 minute(s) the last transaction is confirmed
