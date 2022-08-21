@@ -114,7 +114,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
       const classicCardanoStakingPage = (
-        <div>
+        <div id='classicCardanoStakingPage'>
           {this.getDialog()}
           <SeizaFetcher
             urlTemplate={urlTemplate}
