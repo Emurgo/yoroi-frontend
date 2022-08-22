@@ -172,7 +172,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         },
         ({ field }) => ([
-          field.value.length > 10,
+          field.value.length > 9,
           this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
         ]),
         ],
