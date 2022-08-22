@@ -100,7 +100,7 @@ chrome.action.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading:
 
 const STORAGE_KEY_PREFIX = 'background-';
 
-async function setInStorage(key: string, value: any): void {
+async function setInStorage(key: string, value: any): Promise<void> {
   await chrome.storage.session.set({ [STORAGE_KEY_PREFIX + key]: value });
 }
 
@@ -627,6 +627,8 @@ const yoroiMessageHandler = async (
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
   } else if (request.type === 'get_protocol') {
+    const connectionProtocol = await getFromStorage('connectionProtocol') ||
+      'cardano';
     sendResponse({ type: connectionProtocol })
   } else if (request.type === 'get_utxos/addresses') {
     try {
@@ -829,9 +831,9 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 });
 
 // message from injected code of the standalone connector
-chrome.runtime.onMessageExternal.addListener((message, sender) => {
+chrome.runtime.onMessageExternal.addListener(async (message, sender) => {
   if (sender.id === environment.ergoConnectorExtensionId) {
-    handleInjectorMessage(message, sender);
+    await handleInjectorMessage(message, sender);
   }
 });
 

@@ -5,14 +5,11 @@
 // worker with the help of webpack NormalModuleReplacementPlugin.
 // Note this won't even here:
 // import typeof * as WasmV2 from 'cardano-wallet-browser';
-import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
-import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
+import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
-import * as wasmv2 from 'cardano-wallet-browser';
-import * as wasmv4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import * as ergo from 'ergo-lib-wasm-browser';
-import * as messageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
+import * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import * as SigmaRust from 'ergo-lib-wasm-browser';
+import * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -20,18 +17,19 @@ const MAX_TX_BYTES = 16384;
 
 class Module {
   async load(_ignored: any): Promise<void> {
+    // noop because all the modules are synchronously loaded
   }
 
-  get WalletV4(): WasmV4 {
-    return wasmv4;
+  get WalletV4(): typeof WasmV4 {
+    return WasmV4;
   }
 
-  get SigmaRust(): SigmaRust {
-    return ergo;
+  get SigmaRust(): typeof SigmaRust {
+    return SigmaRust;
   }
 
-  get MessageSigning(): WasmMessageSigning {
-    return messageSigning;
+  get MessageSigning(): typeof WasmMessageSigning {
+    return WasmMessageSigning;
   }
 
   WalletV4TxBuilderFromConfig(config: {

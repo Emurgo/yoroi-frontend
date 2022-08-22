@@ -1,19 +1,21 @@
+// @flow
+
 const fs = require('fs');
 const shell = require('shelljs');
-const argv = require('minimist')(process.argv.slice(2));
+const argv: Object = require('minimist')(process.argv.slice(2));
 const { injectedScripts } = require('../chrome/constants');
 
-const shouldInjectConnector = argv.dontInjectConnector === undefined;
-const isNightly = argv.nightly != null;
+const shouldInjectConnector: boolean = argv.dontInjectConnector === undefined;
+const isNightly: boolean = argv.nightly != null;
 
-const exec = cmd => {
+const exec: string => void = cmd => {
   const r = shell.exec(cmd);
   if (r.code !== 0) {
     process.exit(r);
   }
 };
 
-const buildAndCopyInjector = (destDir: string, buildType: string) => {
+const buildAndCopyInjector: (string, string) => void = (destDir, buildType) => {
   console.log('[Build injector]');
   console.log('-'.repeat(80));
   shell.pushd('../yoroi-ergo-connector')

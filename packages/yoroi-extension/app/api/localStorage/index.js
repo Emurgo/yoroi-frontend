@@ -16,6 +16,8 @@ import {
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
 
+declare var chrome;
+
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',

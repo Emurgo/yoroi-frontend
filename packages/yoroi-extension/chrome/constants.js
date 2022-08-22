@@ -1,11 +1,5 @@
 // @flow
 
-import {
-  Ports,
-  portToPermission,
-  portToSocketPermission,
-} from '../scripts/connections';
-
 export function genCSP(request: {|
   isDev: boolean,
   additional: {|

@@ -217,8 +217,7 @@ export async function connectorGetUtxosErgo(
       }
     }
   } else {
-    const filtered = utxos.map(formatUtxoToBoxErgo).filter(box => !spentBoxIds.includes(box.boxId));
-    utxosToUse.push(...filtered);
+    utxosToUse.push(...utxos.map(formatUtxoToBoxErgo));
   }
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }

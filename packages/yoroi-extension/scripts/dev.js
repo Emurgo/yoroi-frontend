@@ -1,10 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+// @flow
+
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
 const tasks = require('./tasks');
+
 const { baseDevConfig, backgroundServiceWorkerConfig } = require(`../webpack/devConfig`);
 const { argv, shouldInjectConnector, isNightly, buildAndCopyInjector } = require('./utils');
 

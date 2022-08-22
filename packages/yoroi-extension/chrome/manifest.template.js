@@ -90,6 +90,7 @@ export default ({
           uriTemplate: 'main_window.html#/send-from-uri?q=%s',
         },
       ],
+    web_accessible_resources: [],
   };
 
   if (shouldInjectConnector) {
@@ -107,10 +108,12 @@ export default ({
         all_frames: true,
       }
     );
-    base.web_accessible_resources = [{
-      resources: injectedScripts.map(script => `js/${script}`),
-      matches: ['<all_urls>'],
-    }];
+    base.web_accessible_resources.push(
+      {
+        resources: injectedScripts.map(script => `js/${script}`),
+        matches: ['<all_urls>'],
+      }
+    );
   }
 
   const verName /*: {| version_name?: string |} */ = versionName != null
