@@ -6,12 +6,13 @@ Feature: Trezor wallet emulator
     And I have completed the basic setup
     Then I connect to trezor controller
     And I start trezor emulator environment
-    Given I connected Trezor emulator device
-    Then I should see the dashboard screen
-    Then I should see a plate PXCA-2349
 
   @Trezor-001
   Scenario: Trezor (emulator). Send ADA.
+    Given I setup trezor emulator for trezor-wallet
+    And I connected Trezor emulator device
+    Then I should see the dashboard screen
+    Then I should see a plate PXCA-2349
     Given I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -29,6 +30,10 @@ Feature: Trezor wallet emulator
 
   @Trezor-002
   Scenario: Trezor (emulator). Verify address.
+    Given I setup trezor emulator for trezor-wallet
+    And I connected Trezor emulator device
+    Then I should see the dashboard screen
+    Then I should see a plate PXCA-2349
     When I go to the receive screen
     Given I should see the Receive screen
     And I click on the verify address button
@@ -38,8 +43,13 @@ Feature: Trezor wallet emulator
 
   @Trezor-003
   Scenario: Test Shelley Trezor delegation
-    # test delegation
-    Given I go to the delegation by id screen
+    Given I setup trezor emulator for trezor-wallet
+    And I connected Trezor emulator device
+    Then I should see the dashboard screen
+    Then I should see a plate PXCA-2349
+    And Debug. Make driver sleep for 2 seconds
+    And Debug. Make driver sleep for 2 seconds
+    When I go to the delegation by id screen
     And I fill the delegation id form:
       | stakePoolId                                              |
       | df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207 |
@@ -56,14 +66,19 @@ Feature: Trezor wallet emulator
 
   @Trezor-004
   Scenario: Trezor (emulator). Withdraw rewards w/ deregistration.
-    Given I go to the dashboard screen
-    When I click on the withdraw button
-    Then I click on the checkbox
+  Given I setup trezor emulator for shelley-trezor-delegated
+    And I connected Trezor emulator device
+    Then I should see the dashboard screen
+    Then I should see a plate COAP-6423
+    When I go to the dashboard screen
+    And Debug. Make driver sleep for 2 seconds
+    And I click on the withdraw button
+    And I click on the checkbox
     And I click the next button
-    And I see the deregistration for the transaction
-    Then I should see on the Yoroi withdrawal transfer summary screen:
+    Then I see the deregistration for the transaction
+    And I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | reward | fees     |
-      | stake1u9jz8z7rnjtz4g5p26j953sjzdmsmzxcpzyk0p0e9sa2f5sjeqemq | 5      | 0.178877 |
+      | stake1u8fcyyagyh9je4rz5vdytakutyhtlgq62hdpl8xt5hwv88qy2k0xy | 0      | 0.171485 |
     Given The expected transaction is "hKYAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8hsCGgACpGUDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAXpQuoGfhAzvgfp0H9ouqVNr4ZQPpQnFG9frwUkkyzA7dLIl1GmIuFbkJFMp3AakfKpXSZ9s+3dpaw9hYFkKgLglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQICDQmLn20i7qEzQSnFGhJv3Yp2qiAFF/6XxaqOeIvva6u/jxDYC/CFoA3UV4B6thf4QFJZ9owY9EsOhQuu14A319g=="
     When I confirm Yoroi transfer funds
     Then I switch to Trezor-connect screen and allow using

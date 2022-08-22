@@ -670,5 +670,5 @@ Then(/^Debug. Take screenshot$/,  async function () {
 });
 
 Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
-  await this.driver.sleep(2000);
+  await this.driver.sleep(20000);
 });

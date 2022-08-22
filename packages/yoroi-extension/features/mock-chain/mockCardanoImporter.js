@@ -86,6 +86,8 @@ export const generateTransaction = (): {|
   shelleyDelegatedTx2: RemoteTransaction,
   shelleyLedgerDelegatedTx1: RemoteTransaction,
   shelleyLedgerDelegatedTx2: RemoteTransaction,
+  shelleyTrezorDelegatedTx1: RemoteTransaction,
+  shelleyTrezorDelegatedTx2: RemoteTransaction,
   shelleyOnlyRegisteredTx1: RemoteTransaction,
   shelleyOnlyRegisteredTx2: RemoteTransaction,
   delegateMangledWallet: RemoteTransaction,
@@ -1661,6 +1663,220 @@ export const generateTransaction = (): {|
   };
 
   // ============================
+  //   shelley-trezor-delegated
+  // ============================
+
+  /**const shelleyTrezorDelegatedTx1 = {
+    hash: 'e14986973572b02bed190436acc25b53a64ac51288478653bda3e5e7bbc65bee',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '26',
+        index: 26,
+        amount: '8500000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        amount: '1',
+        assets: [],
+      },
+      {
+        // shelley-ledger-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q8fjpk726dy24jhwv4yq2rvhuzrcpvfnmmg4zykj8t0jxk7nsgf6sfwt9n2x9gc6ghmdckfwh7sp54w6r7wvhfwucwwqfqyflj
+        address:
+          '0102fb4153955394045be263143a85c0e49f7ce0e95f767a40ffaa07bed38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    height: 100,
+    block_hash: '100',
+    tx_ordinal: 6,
+    time: '2019-04-20T15:15:33.000Z',
+    epoch: 0,
+    slot: 100,
+    last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful',
+  };
+
+  const shelleyTrezorDelegatedTx2 = {
+    hash: '167db2a681bd7688c92e90bad909d8f9d3ff7d7b4b557b4f8e8662aba9c8db02',
+    type: 'shelley',
+    inputs: [
+      {
+        // shelley-ledger-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q8fjpk726dy24jhwv4yq2rvhuzrcpvfnmmg4zykj8t0jxk7nsgf6sfwt9n2x9gc6ghmdckfwh7sp54w6r7wvhfwucwwqfqyflj
+        address:
+          '01d320dbcad348aacaee6548050d97e08780b133ded15112d23adf235bd38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        txHash: shelleyTrezorDelegatedTx1.hash,
+        id: shelleyTrezorDelegatedTx1.hash + '1',
+        index: 1,
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // shelley-ledger-delegated base address index 0'/1/0
+        // eslint-disable-next-line max-len
+        // addr1q9mhtwlxextzp4kqe04ycj7gus5j8gd5jaz42xsklslcdzx7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq62plmk
+        address:
+          '0102fb4153955394045be263143a85c0e49f7ce0e95f767a40ffaa07bed38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        amount: '3000000',
+        assets: [],
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        rewardAddress: 'e1d38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+      },
+      {
+        certIndex: 1,
+        kind: ShelleyCertificateTypes.StakeDelegation,
+        rewardAddress: 'e1d38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        poolKeyHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', // YOROI
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 9,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful',
+  };*/
+
+  const shelleyTrezorDelegatedTx1 = {
+    hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '15',
+        index: 15,
+        amount: '7000000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        amount: '1',
+        assets: [],
+      },
+      {
+        // trezor-wallet base address index 0'/0/2
+        address:
+          '0167500862f27364277d20db90b4482be409172b2141bd18da18f2d843d38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    height: 301,
+    block_hash: '301',
+    tx_ordinal: 6,
+    time: '2019-04-20T15:15:53.000Z',
+    epoch: 0,
+    slot: 301,
+    last_update: '2019-05-20T23:17:11.899Z',
+    tx_state: 'Successful',
+  };
+
+  const shelleyTrezorDelegatedTx2 = {
+    hash: '3677e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    type: 'shelley',
+    inputs: [
+      {
+        // shelley-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
+        address:
+          '01d320dbcad348aacaee6548050d97e08780b133ded15112d23adf235bd38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        txHash: shelleyTrezorDelegatedTx1.hash,
+        id: shelleyTrezorDelegatedTx1.hash + '1',
+        index: 1,
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // trezor-wallet base address index 0'/0/2
+        address:
+          '0167500862f27364277d20db90b4482be409172b2141bd18da18f2d843d38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        rewardAddress: 'e1d38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+      },
+      {
+        certIndex: 1,
+        kind: ShelleyCertificateTypes.StakeDelegation,
+        rewardAddress: 'e1d38213a825cb2cd462a31a45f6dc592ebfa01a55da1f9ccba5dcc39c',
+        poolKeyHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', // YOROI
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 9,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful',
+  };
+
+  // ============================
   //   shelley-just-registered
   // ============================
 
@@ -1886,6 +2102,8 @@ export const generateTransaction = (): {|
     shelleyDelegatedTx2,
     shelleyLedgerDelegatedTx1,
     shelleyLedgerDelegatedTx2,
+    shelleyTrezorDelegatedTx1,
+    shelleyTrezorDelegatedTx2,
     shelleyOnlyRegisteredTx1,
     shelleyOnlyRegisteredTx2,
     delegateMangledWallet,
@@ -1976,6 +2194,9 @@ export function resetChain(chainToUse: $Values<typeof MockChain>): void {
     // shelley-ledger-delegated
     addTransaction(txs.shelleyLedgerDelegatedTx1);
     addTransaction(txs.shelleyLedgerDelegatedTx2);
+    // shelley-trezor-delegated
+    addTransaction(txs.shelleyTrezorDelegatedTx1);
+    addTransaction(txs.shelleyTrezorDelegatedTx2);
     // shelley-only-registered
     addTransaction(txs.shelleyOnlyRegisteredTx1);
     addTransaction(txs.shelleyOnlyRegisteredTx2);

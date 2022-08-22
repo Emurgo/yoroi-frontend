@@ -10,6 +10,7 @@ import {
 import { TrezorEmulatorController } from '../support/trezorEmulatorController';
 import { expect } from 'chai';
 import { verifyButton } from '../pages/verifyAddressPage';
+import { testWallets } from '../mock-chain/TestWallets';
 
 export async function switchToTrezorAndAllow(customWorld: any) {
   // wait for a new tab
@@ -69,10 +70,13 @@ Then(/^I start trezor emulator environment$/, async function () {
 
   const emulatorWipeResponse = await this.trezorController.emulatorWipe();
   expect(emulatorWipeResponse.success, 'emulator-wipe request is failed').to.be.true;
+});
 
-  const emulatorSetupResponse = await this.trezorController.emulatorSetup(
-    'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel'
-  );
+Then(/^I setup trezor emulator for ([^"]*)$/, async function (walletName) {
+  const restoreInfo = testWallets[walletName];
+  expect(restoreInfo).to.not.equal(undefined);
+
+  const emulatorSetupResponse = await this.trezorController.emulatorSetup(restoreInfo.mnemonic);
   expect(emulatorSetupResponse.success, 'emulator-setup request is failed').to.be.true;
 });
 
