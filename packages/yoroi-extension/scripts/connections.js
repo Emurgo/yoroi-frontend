@@ -7,7 +7,7 @@ function portToSocketPermission(port /*: number */)/*: string */ {
   return `ws://localhost:${port} wss://localhost:${port}`;
 }
 function serverToPermission(server /*: string */)/*: string */ {
-  return `https://${server} wss://${server}:443`;
+  return `http://${server} wss://${server}:443`;
 }
 
 const Ports = {
@@ -19,7 +19,7 @@ const Ports = {
 
 const Servers = {
   // this allows connecting to multiple different backends for different currencies
-  Primary: '*.yoroiwallet.com',
+  Primary: '*.emurgo-rnd.com',
 };
 
 module.exports = {

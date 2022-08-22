@@ -29,10 +29,10 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
-        : 'https://iohk-mainnet.yoroiwallet.com',
+        : 'http://backend.waw4.emurgo-rnd.com',
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
-        : 'wss://iohk-mainnet.yoroiwallet.com:443',
+        : 'wss://backend.waw4.emurgo-rnd.com:443',
       TokenInfoService:
         'https://cdn.yoroiwallet.com',
     },
