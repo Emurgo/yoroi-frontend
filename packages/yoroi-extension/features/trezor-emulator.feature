@@ -87,34 +87,3 @@ Feature: Trezor wallet emulator
     Then I should see the successfully sent page
     And I click the transaction page button
     Then I should see the summary screen
-
-  @it-120 @ignore
-  Scenario: Test Byron Trezor (IT-120)
-    Given I connected Trezor device 6495958994A4025BB5EE1DB0
-    # test restoration
-    When I select a Byron-era Trezor device
-    And I restore the Trezor device
-    Then I should see the summary screen
-    Then I should see a plate CZSA-2051
-    # test sending
-    Given I go to the send transaction screen
-    And I fill the form:
-      | address                                                     | amount   |
-      | Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe | 5.144385 |
-    Then I add a transaction memo that says "my awesome memo"
-    And I click on the next button in the wallet send form
-    Then I see the hardware send money confirmation dialog
-    Given The expected transaction is "g6QAg4JYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ogAYJYIAWEBYkvZgddg6vRt/40HS1b/S9hIrL4dHAAOeUHjg3VAYJYIBAp7vW7DwaXmrC5UwpiusEeGAeX0IyrmA/jk4nUKzZXAAGBglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoATn9BAhoAAsX1AxoR/pTNoQKDhFgg/OzJFHxPlMKFDW9EFxmYPVVgPVzugQEeJKi8G6Z53SBYQL6AGt9yNRSaA62/trcYpxUTx3b3g0zn+sRN1dRj2B9WH6MRJE6fDab5MqSab9TpGNNG4xPcpSoE1aepTVBmfAVYIDV5JxLCyqvpBdt0le+EfezS1nIHZ/SVPbtaFugdNbENQaCEWCBuJwykTKqtfi5OyMYeJG+UyCLYack5wLGIlNEp24UZVlhAP7nKpcJyuREGWncNtFNy1ZOqifzgi0Cji4oBRuTv5hapZWSEL1fRVitJVWL7FSdHEXaPsa1OOfu+ZzXWhQKaAFggfWWCXtxX4sbaJDEuCcMwUmas37GGCd6TftqcwcstFCZBoIRYIO9odrsMMrrk705nbVG5FWZXouCzkB8U8VHjAMiKu+FbWECGGzqdT95Z8q+gE1e7Ax897Unj62yPC80ru7EPo5fJenRmoOwv+kWefItSZArK9YAv5Vs2qMsfIL9HjlcwGr0LWCDbr4V5V0+JN2EAd8rerGsUQVAxeKvkdq4sVrOvsCZ9akGg9g=="
-    Then I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
-    And I expand the top transaction
-    Then The memo content says "my awesome memo"
-    # test address verification
-    When I go to the receive screen
-    Given I should see the Receive screen
-    And I click on the verify address button
-    Then I see the verification address "Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe"
-    And I see the derivation path "m/44'/1815'/0'/0/8"
-    Then I verify the address on my trezor device
