@@ -21,7 +21,7 @@ Our end-to-end testing uses Selenium + Cucumber
 
 You **must** run `npm run test:build` **before** running the tests!
 
-`test:build` will _BUILD_ the extension and then the tests will _LOAD_ the extension.
+`test:build` will *BUILD* the extension and then the tests will *LOAD* the extension.
 
 Rerun `test:build` anytime you make changes to the application itself. If you only change test files, you do not need to rerun it.
 

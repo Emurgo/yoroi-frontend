@@ -33,7 +33,6 @@ type WalletNames =
   'shelley-simple-15' |
   'shelley-delegated' |
   'shelley-ledger-delegated' |
-  'shelley-trezor-delegated' |
   'shelley-only-registered' |
   'small-single-tx' |
   'failed-single-tx' |
@@ -131,13 +130,6 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     mnemonic: 'parrot offer switch thank film high drop salute task train squirrel coral consider coyote evolve',
     plate: 'PALP-0076',
     deviceId: '707fa118bf6b84',
-  }),
-  createWallet({
-    name: ('shelley-trezor-delegated': WalletNames),
-    mnemonic: 'fence copper giraffe lady soccer gospel display naive protect they buzz spawn',
-    plate: 'COAP-6423',
-    plateShelley: 'PXCA-2349',
-    deviceId: '6495958994A4025BB5EE1DB0',
   }),
   createWallet({
     name: ('shelley-only-registered': WalletNames),

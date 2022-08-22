@@ -6,13 +6,13 @@ Feature: Trezor wallet emulator
     And I have completed the basic setup
     Then I connect to trezor controller
     And I start trezor emulator environment
-
-  @Trezor-001
-  Scenario: Trezor (emulator). Send ADA.
-    Given I setup trezor emulator for trezor-wallet
+    When I setup trezor emulator for trezor-wallet
     And I connected Trezor emulator device
     Then I should see the dashboard screen
     Then I should see a plate PXCA-2349
+
+  @Trezor-001
+  Scenario: Trezor (emulator). Send ADA.
     Given I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -30,10 +30,6 @@ Feature: Trezor wallet emulator
 
   @Trezor-002
   Scenario: Trezor (emulator). Verify address.
-    Given I setup trezor emulator for trezor-wallet
-    And I connected Trezor emulator device
-    Then I should see the dashboard screen
-    Then I should see a plate PXCA-2349
     When I go to the receive screen
     Given I should see the Receive screen
     And I click on the verify address button
@@ -43,12 +39,6 @@ Feature: Trezor wallet emulator
 
   @Trezor-003
   Scenario: Test Shelley Trezor delegation
-    Given I setup trezor emulator for trezor-wallet
-    And I connected Trezor emulator device
-    Then I should see the dashboard screen
-    Then I should see a plate PXCA-2349
-    And Debug. Make driver sleep for 2 seconds
-    And Debug. Make driver sleep for 2 seconds
     When I go to the delegation by id screen
     And I fill the delegation id form:
       | stakePoolId                                              |
@@ -63,22 +53,16 @@ Feature: Trezor wallet emulator
     Given I click on see dashboard
     Then I should see the dashboard screen
 
-
   @Trezor-004
   Scenario: Trezor (emulator). Withdraw rewards w/ deregistration.
-  Given I setup trezor emulator for shelley-trezor-delegated
-    And I connected Trezor emulator device
-    Then I should see the dashboard screen
-    Then I should see a plate COAP-6423
     When I go to the dashboard screen
-    And Debug. Make driver sleep for 2 seconds
     And I click on the withdraw button
     And I click on the checkbox
     And I click the next button
     Then I see the deregistration for the transaction
     And I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | reward | fees     |
-      | stake1u8fcyyagyh9je4rz5vdytakutyhtlgq62hdpl8xt5hwv88qy2k0xy | 0      | 0.171485 |
+      | stake1u9jz8z7rnjtz4g5p26j953sjzdmsmzxcpzyk0p0e9sa2f5sjeqemq | 5      | 0.193793 |
     Given The expected transaction is "hKYAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8hsCGgACpGUDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAXpQuoGfhAzvgfp0H9ouqVNr4ZQPpQnFG9frwUkkyzA7dLIl1GmIuFbkJFMp3AakfKpXSZ9s+3dpaw9hYFkKgLglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQICDQmLn20i7qEzQSnFGhJv3Yp2qiAFF/6XxaqOeIvva6u/jxDYC/CFoA3UV4B6thf4QFJZ9owY9EsOhQuu14A319g=="
     When I confirm Yoroi transfer funds
     Then I switch to Trezor-connect screen and allow using
@@ -87,11 +71,12 @@ Feature: Trezor wallet emulator
     Then I should see the transactions screen
 
   @Trezor-005
-  Scenario: Trezor (emulator). Send wSHIBA.
+  Scenario: Trezor (emulator). Send Assets.
     Given I go to the send transaction screen
+    And I select the asset "nicoin" on the form
     And I fill the form:
-      | asset | address                                                     | amount   |
-      | wSHIBA | Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe | 4.5 |
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe | 123 |
     Then I add a transaction memo that says "my awesome memo"
     And I click on the next button in the wallet send form
     Then I see the hardware send money confirmation dialog
