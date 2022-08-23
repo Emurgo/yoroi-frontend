@@ -38,7 +38,7 @@ Feature: Trezor wallet emulator
     And I verify the address on the trezor emulator
 
   @Trezor-003
-  Scenario: Test Shelley Trezor delegation
+  Scenario: Trezor (emulator). Test Shelley Trezor delegation
     When I go to the delegation by id screen
     And I fill the delegation id form:
       | stakePoolId                                              |
@@ -87,3 +87,23 @@ Feature: Trezor wallet emulator
     Then I should see the successfully sent page
     And I click the transaction page button
     Then I should see the summary screen
+
+  @Trezor-006
+  Scenario: Trezor (emulator). User can transfer funds from a trezor wallet
+    Given I switch to the advanced level
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I click on the icarus tab
+    Then I select the trezor option
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                               |
+    | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
+    And I proceed with the recovery
+    Then I should see a plate EDAO-9229
+    Then I click the next button
+    Then I should see on the Yoroi transfer summary screen:
+    | fromAddress                                                 | recoveredBalance | fees     |
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567.898765   | 0.167217 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfibxAIaAAKKyQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEA97UHd+arHPWEd8xAv3ZQtmkL58YcVrg8ekQLoEMX3MO8CrtVCwWYUgfLSgaqja9/dLnvPy0zghsbnrVszs+QCWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9fY="
+    When I confirm Yoroi transfer funds
+    Then I should see the Yoroi transfer success screen
