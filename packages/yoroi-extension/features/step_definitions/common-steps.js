@@ -54,6 +54,7 @@ import {
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import * as helpers from '../support/helpers/helpers';
+import { extensionTabName } from '../support/windowManager';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -152,11 +153,12 @@ After(async function (scenario) {
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
-    if (this.getBrowser !== 'firefox') {
+    if (this.getBrowser() !== 'firefox') {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
     }
-  }
+  };
+  await this.windowManager.switchTo(extensionTabName);
   await this.driver.quit();
   await helpers.sleep(500);
 });
