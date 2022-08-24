@@ -121,17 +121,15 @@ function sendToInjector(tabId, message) {
  */
 type PublicDeriverId = number;
 
+type ConnectRequestType = 'cardano-connect-request' | 'ergo-connect-request';
+
 // PublicDeriverId = successfully connected - which public deriver the user selected
 // null = refused by user
 type ConnectedStatus = null | {|
   publicDeriverId: PublicDeriverId,
   auth: ?WalletAuthEntry,
 |} | {|
-  // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
-  resolve: ({|
-    connectedWallet: ?PublicDeriverId,
-    auth: ?WalletAuthEntry,
-  |}) => void,
+  requestType: ConnectRequestType,
   // if a window has fetched this to show to the user yet
   openedWindow: boolean,
   publicDeriverId: null,
@@ -382,6 +380,34 @@ async function withSelectedWallet<T>(
   });
 }
 
+function connectContinuation(
+  connectType: ConnectRequestType,
+  connectedWallet: ?PublicDeriverId,
+  auth: ?WalletAuthEntry,
+  tabId: number,
+) {
+  if (connectType === 'ergo-connect-request') {
+    sendToInjector(
+      tabId,
+      {
+        type: 'yoroi_connect_response/ergo',
+        success: connectedWallet != null,
+      }
+    );
+  } else if (connectType === 'cardano-connect-request') {
+    sendToInjector(
+      tabId,
+      {
+        type: 'yoroi_connect_response/cardano',
+        success: connectedWallet != null,
+        auth,
+      }
+    );
+
+  }
+}
+
+
 // messages from other parts of Yoroi (i.e. the UI for the connector)
 const yoroiMessageHandler = async (
   request: (
@@ -450,18 +476,25 @@ const yoroiMessageHandler = async (
     if (request.tabId == null) return;
     const { tabId } = request;
     const connection = connectedSites.get(tabId);
-    if (connection?.status?.resolve != null) {
+    if (connection?.status?.requestType != null) {
       if (request.accepted === true) {
-        connection.status.resolve({
-          connectedWallet: request.publicDeriverId,
-          auth: request.auth,
-        });
+        connectContinuation(
+          connection?.status?.requestType,
+          request.publicDeriverId,
+          request.auth,
+          tabId,
+        );
         connection.status = {
           publicDeriverId: request.publicDeriverId,
           auth: request.auth,
         };
       } else {
-        connection.status.resolve({ connectedWallet: null, auth: null });
+        connectContinuation(
+          connection?.status?.requestType,
+          null,
+          null,
+          tabId,
+        ),
         connectedSites.delete(tabId);
       }
     }
@@ -597,7 +630,7 @@ const yoroiMessageHandler = async (
   } else if (request.type === 'connect_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
       if (connection.status != null) {
-        if (connection.status.resolve) {
+        if (connection.status.requestType) {
           connection.status.openedWindow = true;
           const imgBase64Url = await getFromStorage('imgBase64Url');
           sendResponse(({
@@ -742,6 +775,7 @@ async function findWhitelistedConnection(
 }
 
 async function confirmConnect(
+  requestType: ConnectRequestType,
   tabId: number,
   connectParameters: {|
     url: string,
@@ -750,10 +784,7 @@ async function confirmConnect(
     protocol: 'cardano' | 'ergo',
   |},
   localStorageApi: LocalStorageApi,
-): Promise<{|
-  connectedWallet: ?PublicDeriverId,
-  auth: ?WalletAuthEntry,
-|}> {
+): Promise<void> {
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
@@ -761,54 +792,50 @@ async function confirmConnect(
     getBoundsForTabWindow(tabId),
     findWhitelistedConnection(url, requestIdentification, protocol, localStorageApi),
   ])
-  return new Promise((resolve, reject) => {
-    try {
-      if (whitelistEntry != null) {
-        // we already whitelisted this website, so no need to re-ask the user to confirm
-        if (connectedSites.get(tabId) == null) {
-          connectedSites.set(tabId, {
-            url,
-            protocol,
-            appAuthID,
-            status: {
-              publicDeriverId: whitelistEntry.publicDeriverId,
-              auth: isAuthRequested ? whitelistEntry.auth : undefined,
-            },
-            pendingSigns: new Map()
-          });
-        }
-        resolve({
-          connectedWallet: whitelistEntry.publicDeriverId,
-          auth: isAuthRequested ? whitelistEntry.auth : undefined,
-        });
-        return;
-      }
-      if (Boolean(onlySilent) === true) {
-        reject(new Error('[onlySilent:fail] No active connection'));
-        return;
-      }
-      // website not on whitelist, so need to ask user to confirm connection
+
+  if (whitelistEntry != null) {
+    // we already whitelisted this website, so no need to re-ask the user to confirm
+    if (connectedSites.get(tabId) == null) {
       connectedSites.set(tabId, {
         url,
         protocol,
         appAuthID,
         status: {
-          resolve,
-          openedWindow: false,
-          publicDeriverId: null,
-          auth: null,
+          publicDeriverId: whitelistEntry.publicDeriverId,
+          auth: isAuthRequested ? whitelistEntry.auth : undefined,
         },
         pendingSigns: new Map()
       });
-      chrome.windows.create({
-        ...popupProps,
-        url: chrome.runtime.getURL('main_window_connector.html'),
-        left: (bounds.width + bounds.positionX) - popupProps.width,
-        top: bounds.positionY + 80,
-      });
-    } catch (e) {
-      reject(e);
     }
+    connectContinuation(
+      requestType,
+      whitelistEntry.publicDeriverId,
+      isAuthRequested ? whitelistEntry.auth : undefined,
+      tabId,
+    );
+    return;
+  }
+  if (Boolean(onlySilent) === true) {
+    throw new Error('[onlySilent:fail] No active connection');
+  }
+  // website not on whitelist, so need to ask user to confirm connection
+  connectedSites.set(tabId, {
+    url,
+    protocol,
+    appAuthID,
+    status: {
+      requestType,
+      openedWindow: false,
+      publicDeriverId: null,
+      auth: null,
+    },
+    pendingSigns: new Map()
+  });
+  chrome.windows.create({
+    ...popupProps,
+    url: chrome.runtime.getURL('main_window_connector.html'),
+    left: (bounds.width + bounds.positionX) - popupProps.width,
+    top: bounds.positionY + 80,
   });
 }
 
@@ -894,15 +921,11 @@ async function handleInjectorMessage(message, sender) {
   if (message.type === 'yoroi_connect_request/ergo') {
     await withDb(
       async (_db, localStorageApi) => {
-        const { connectedWallet } =
-              (await confirmConnect(tabId, connectParameters(), localStorageApi)) ?? {};
-        const accepted = connectedWallet != null;
-        sendToInjector(
+        await confirmConnect(
+          'ergo-connect-request',
           tabId,
-          {
-            type: 'yoroi_connect_response/ergo',
-            success: accepted
-          }
+          connectParameters(),
+          localStorageApi
         );
       }
     );
@@ -910,16 +933,11 @@ async function handleInjectorMessage(message, sender) {
     try {
       await withDb(
         async (_db, localStorageApi) => {
-          const { connectedWallet, auth } =
-                (await confirmConnect(tabId, connectParameters(), localStorageApi)) ?? {};
-          const accepted = connectedWallet != null;
-          sendToInjector(
+          await confirmConnect(
+            'cardano-connect-request',
             tabId,
-            {
-              type: 'yoroi_connect_response/cardano',
-              success: accepted,
-              auth,
-            }
+            connectParameters(),
+            localStorageApi,
           );
         }
       );
