@@ -44,7 +44,7 @@ jobs:
     runs-on: macos-12
     strategy:
       matrix:
-        browser: ['chrome']
+        browser: ['chrome', 'firefox']
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -114,15 +114,15 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData
-          path: ./packages/yoroi-extension/testRunsData
+          name: testRunsData_${{ matrix.browser }}
+          path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
 
   Trezor_Model_T_emulator:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/trezor-check'))
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: ['chrome']
+        browser: ['chrome', 'firefox']
       fail-fast: false
     steps:
       - name: Forcefully update the Chrome browser
@@ -239,15 +239,15 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData
-          path: ./packages/yoroi-extension/testRunsData
+          name: testRunsData_${{ matrix.browser }}
+          path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
 
   E2E_smoke_tests:
     if: github.event.review && (contains(github.event.review.body, '/release-check'))
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: ['chrome']
+        browser: ['chrome', 'firefox']
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
@@ -333,5 +333,5 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData
-          path: ./packages/yoroi-extension/testRunsData
+          name: testRunsData_${{ matrix.browser }}
+          path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}

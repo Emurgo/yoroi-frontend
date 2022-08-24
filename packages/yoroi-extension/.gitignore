@@ -8,6 +8,7 @@ production-key.pem
 build/
 dev/
 testRunsData/
+testRunsData*
 storybook-static/
 __screenshots__/
 screenshots/

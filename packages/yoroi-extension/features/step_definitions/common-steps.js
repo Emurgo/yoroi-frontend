@@ -244,7 +244,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
 async function createDirInTestRunsData(driver, subdirectoryName) {
   const cap = await driver.getCapabilities();
   const browserName = cap.getBrowserName();
-  const dir = `${testRunsDataDir}/${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
+  const dir = `${testRunsDataDir}_${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }

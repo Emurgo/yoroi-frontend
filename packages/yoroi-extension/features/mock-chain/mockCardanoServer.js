@@ -92,7 +92,7 @@ export function getMockServer(settings: {
   outputLog?: boolean,
   ...
 }): typeof MockServer {
-  const dir = `${testRunsDataDir}cardanoMockServerLogs`;
+  const dir = `${testRunsDataDir}_cardanoMockServerLogs`;
   fs.mkdirSync(dir);
   const loggerPath = `${dir}/cardanoMockServerLog_${getLogDate()}.log`;
 

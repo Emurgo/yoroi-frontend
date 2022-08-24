@@ -136,7 +136,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this._allLoggers = [];
 
-  const logsDir = `${testRunsDataDir}${this.getBrowser()}/Logs/`
+  const logsDir = `${testRunsDataDir}_${this.getBrowser()}/`
 
   const mockAndWMLogDir = `${logsDir}mockAndWMLogs`;
   if (!fs.existsSync(mockAndWMLogDir)) {
@@ -157,8 +157,13 @@ function CustomWorld(cmdInput: WorldInput) {
   this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
   this._allLoggers.push(this.webDriverLogger);
 
-  const trezorEmuLogPath = `${logsDir}trezorEmulatorController_${getLogDate()}.log`;
+  const trezorEmulatorLogsDir = `${logsDir}trezorEmulatorLogs`;
+  if (!fs.existsSync(trezorEmulatorLogsDir)) {
+    fs.mkdirSync(trezorEmulatorLogsDir, { recursive: true });
+  }
+  const trezorEmuLogPath = `${trezorEmulatorLogsDir}/trezorEmulatorController_${getLogDate()}.log`;
   this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
+  this._allLoggers.push(this.trezorEmuLogger);
   this.trezorController = undefined;
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
