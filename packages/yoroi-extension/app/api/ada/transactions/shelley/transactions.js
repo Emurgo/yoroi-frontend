@@ -614,7 +614,8 @@ function _newAdaUnsignedTxFromUtxo(
     );
     txBuilder.set_withdrawals(withdrawalWasm);
   }
-  txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+  // txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+  txBuilder.set_ttl(100);
 
   function addOutput(output: TxOutput): void {
     const wasmReceiver = normalizeToAddress(output.address);
