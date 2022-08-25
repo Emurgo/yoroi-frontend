@@ -141,7 +141,7 @@ Before(function(scenario) {
   this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
   this.addToLoggers(this.trezorEmuLogger);
 
-  this.sendToAllLoggers(`### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`);
+  this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has started ####`);
 
 });
 
