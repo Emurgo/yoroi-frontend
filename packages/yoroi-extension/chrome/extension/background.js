@@ -136,13 +136,31 @@ type ConnectedStatus = null | {|
   auth: null,
 |};
 
+type SignContinuationDataType = {|
+  type: 'ergo-tx',
+|} | {|
+  type: 'cardano-tx',
+  returnTx: boolean,
+|} | {|
+  type: 'cardano-tx-input',
+|} | {|
+  type: 'cardano-data',
+  address: string,
+  payload: string,
+|} | {|
+  type: 'cardano-reorg-tx',
+  isCBOR: boolean,
+  utxosToUse: Array<RemoteUnspentOutput>,
+|};
+
 type PendingSign = {|
   // data needed to complete the request
   request: PendingSignData,
   // if an opened window has been created for this request to show the user
   openedWindow: boolean,
-  // resolve function from signRequest's Promise
-  resolve: ({| ok: any |} | {| err: any |}) => void,
+  continuationData: SignContinuationDataType,
+  protocol: string,
+  uid: string,
 |}
 
 type ConnectedSite = {|
@@ -514,6 +532,20 @@ const yoroiMessageHandler = async (
       });
     }
     const password = request.pw;
+
+    function rpcResponse(response: {| ok: any |} | {| err: any |}) {
+      sendToInjector(
+        request.tabId,
+        {
+          type: 'connector_rpc_response',
+          protocol: responseData.protocol,
+          uid: request.uid,
+          return: response
+        }
+      );
+    }
+
+
     switch (responseData.request.type) {
       case 'tx':
       {
@@ -525,9 +557,9 @@ const yoroiMessageHandler = async (
             allIndices.push(i);
           }
           const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
-          responseData.resolve({ ok: signedTx });
+          rpcResponse({ ok: signedTx });
         } catch (error) {
-          responseData.resolve({ err: 'transaction signing failed' })
+          rpcResponse({ err: 'transaction signing failed' });
         }
       }
         break;
@@ -542,35 +574,99 @@ const yoroiMessageHandler = async (
             password,
             request.tabId
           );
-          responseData.resolve({ ok: signedTx.inputs[data.index] });
+          rpcResponse({ ok: signedTx.inputs[data.index] });
         } catch (error) {
-          responseData.resolve({ err: 'transaction signing failed' })
+          rpcResponse({ err: 'transaction signing failed' });
         }
       }
         break;
       case 'tx/cardano':
       {
+        let resp;
         try {
           const signedTx = await signCardanoTx(
             (request.tx: any),
             password,
             request.tabId
           );
-          responseData.resolve({ ok: signedTx });
+          resp = { ok: signedTx };
         } catch (error) {
-          responseData.resolve({ err: 'transaction signing failed' })
+          resp = { err: 'transaction signing failed' };
+        }
+        if (responseData.continuationData.type !== 'cardano-tx') {
+          rpcResponse({ err: 'unexpected error' });
+          return;
+        }
+        const { returnTx } = responseData.continuationData;
+        if (!returnTx && resp?.ok != null) {
+          const witnessSetResp = Buffer.from(
+            RustModule.WalletV4.Transaction.from_bytes(
+              Buffer.from(resp.ok, 'hex'),
+            ).witness_set().to_bytes()
+          ).toString('hex');
+          rpcResponse({ ok: witnessSetResp });
+        } else {
+          rpcResponse(resp);
         }
       }
         break;
       case 'data':
       {
-        responseData.resolve({ ok: { password } });
+        if (responseData.continuationData.type !== 'cardano-data') {
+          rpcResponse({ err: 'unexpected error' });
+          return;
+        }
+        const { address, payload } = responseData.continuationData;
+        let dataSig;
+        try {
+          dataSig = await withDb(async (db, localStorageApi) => {
+            return await withSelectedWallet(
+              request.tabId,
+              async (wallet) => {
+                const addressing = await getAddressing(wallet, address);
+                if (!addressing) {
+                  throw new Error('key derivation path does not exist');
+                }
+                return await connectorSignData(
+                  wallet,
+                  password,
+                  addressing,
+                  address,
+                  payload,
+                );
+              },
+              db,
+              localStorageApi,
+              false,
+            );
+          });
+        } catch (error) {
+          Logger.error(`error when signing data ${error}`);
+          rpcResponse(
+            {
+              err: {
+                code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
+                info: error.message,
+              }
+            }
+          );
+          return;
+        }
+        rpcResponse({ ok: dataSig });
       }
         break;
       case 'tx-reorg/cardano':
       {
-        const utxos = (request.tx: any);
-        responseData.resolve({ ok: utxos });
+        if (responseData.continuationData.type !== 'cardano-reorg-tx') {
+          rpcResponse({ err: 'unexpected error' });
+          return;
+        }
+        const { utxosToUse, isCBOR } = responseData.continuationData;
+        const utxos = await transformCardanoUtxos(
+          [...utxosToUse, ...(request.tx: any)],
+          isCBOR
+        );
+        rpcResponse({ ok: utxos });
       }
         break;
       default:
@@ -582,12 +678,15 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
-      responseData.resolve({
-        err: {
-          code: 2,
-          info: 'User rejected'
+      sendToInjector(
+        request.tabId,
+        {
+          err: {
+            code: 2,
+            info: 'User rejected'
+          }
         }
-      });
+      );
       connection.pendingSigns.delete(request.uid);
     } else {
       // eslint-disable-next-line no-console
@@ -597,12 +696,15 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
-      responseData.resolve({
-        err: {
-          code: 3,
-          info: `utxo error: ${request.errorType} (${request.data})`
+      sendToInjector(
+        request.tabId,
+        {
+          err: {
+            code: 3,
+            info: `utxo error: ${request.errorType} (${request.data})`
+          }
         }
-      });
+      );
       connection.pendingSigns.delete(request.uid);
     } else {
       // eslint-disable-next-line no-console
@@ -737,20 +839,24 @@ async function confirmSign(
   tabId: number,
   request: PendingSignData,
   connectedSite: ConnectedSite,
-): Promise<({| ok: any |} | {| err: any |})> {
+  continuationData: SignContinuationDataType,
+  protocol: string,
+  uid: string,
+): Promise<void> {
   const bounds = await getBoundsForTabWindow(tabId);
-  return new Promise(resolve => {
-    connectedSite.pendingSigns.set(request.uid, {
-      request,
-      openedWindow: false,
-      resolve
-    });
-      chrome.windows.create({
-        ...popupProps,
-      url: chrome.runtime.getURL(`/main_window_connector.html#/signin-transaction`),
-      left: (bounds.width + bounds.positionX) - popupProps.width,
-      top: bounds.positionY + 80,
-    });
+
+  connectedSite.pendingSigns.set(request.uid, {
+    request,
+    openedWindow: false,
+    continuationData,
+    protocol,
+    uid,
+  });
+  chrome.windows.create({
+    ...popupProps,
+    url: chrome.runtime.getURL(`/main_window_connector.html#/signin-transaction`),
+    left: (bounds.width + bounds.positionX) - popupProps.width,
+    top: bounds.positionY + 80,
   });
 }
 
@@ -804,6 +910,7 @@ async function confirmConnect(
           publicDeriverId: whitelistEntry.publicDeriverId,
           auth: isAuthRequested ? whitelistEntry.auth : undefined,
         },
+        // !!!
         pendingSigns: new Map()
       });
     }
@@ -829,6 +936,7 @@ async function confirmConnect(
       publicDeriverId: null,
       auth: null,
     },
+    // !!!
     pendingSigns: new Map()
   });
   chrome.windows.create({
@@ -998,16 +1106,18 @@ async function handleInjectorMessage(message, sender) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
               } else {
-                const resp = await confirmSign(
+                await confirmSign(
                   tabId,
                   {
                     type: 'tx',
                     tx,
                     uid: message.uid
                   },
-                  connection
+                  connection,
+                  { type: 'ergo-tx' },
+                  message.protocol,
+                  message.uid,
                 );
-                rpcResponse(resp);
               }
             },
             db,
@@ -1030,26 +1140,21 @@ async function handleInjectorMessage(message, sender) {
         await RustModule.load();
         const { tx, partialSign, returnTx } = message.params[0];
 
-        const resp: ?({| ok: any |} | {| err: any |}) =
-          await confirmSign(
-            tabId,
-            {
-              type: 'tx/cardano',
-              tx: { tx, partialSign, tabId },
-              uid: message.uid
-            },
-            connection
-          );
-        if (!returnTx && resp?.ok != null) {
-          const witnessSetResp = Buffer.from(
-            RustModule.WalletV4.Transaction.from_bytes(
-              Buffer.from(resp.ok, 'hex'),
-            ).witness_set().to_bytes()
-          ).toString('hex');
-          rpcResponse({ ok: witnessSetResp });
-        } else {
-          rpcResponse(resp);
-        }
+        await confirmSign(
+          tabId,
+          {
+            type: 'tx/cardano',
+            tx: { tx, partialSign, tabId },
+            uid: message.uid
+          },
+          connection,
+          {
+            type: 'cardano-tx',
+            returnTx,
+          },
+          message.protocol,
+          message.uid,
+        );
       } catch (e) {
         handleError(e);
       }
@@ -1072,7 +1177,7 @@ async function handleInjectorMessage(message, sender) {
               if (typeof txIndex !== 'number') {
                 throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
               }
-              const resp = await confirmSign(
+              await confirmSign(
                 tabId,
                 {
                   type: 'tx_input',
@@ -1080,9 +1185,11 @@ async function handleInjectorMessage(message, sender) {
                   index: txIndex,
                   uid: message.uid
                 },
-                connection
+                connection,
+                { type: 'cardano-tx-input' },
+                message.protocol,
+                message.uid,
               );
-              rpcResponse(resp);
             },
             db,
             localStorageApi,
@@ -1126,7 +1233,7 @@ async function handleInjectorMessage(message, sender) {
                   });
                   return;
                 }
-                const resp = await confirmSign(
+                await confirmSign(
                   tabId,
                   {
                     type: 'data',
@@ -1135,31 +1242,14 @@ async function handleInjectorMessage(message, sender) {
                     uid: message.uid
                   },
                   connection,
-                );
-                if (!resp.ok) {
-                  rpcResponse(resp);
-                  return;
-                }
-                let dataSig;
-                try {
-                  dataSig = await connectorSignData(
-                    wallet,
-                    resp.ok.password,
-                    addressing,
+                  {
+                    type: 'cardano-data',
                     address,
                     payload,
-                  );
-                } catch (error) {
-                  Logger.error(`error when signing data ${error}`);
-                  rpcResponse({
-                    err: {
-                      code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
-                      info: error.message,
-                    }
-                  });
-                  return;
-                }
-                rpcResponse({ ok: dataSig });
+                  },
+                  message.protocol,
+                  message.uid,
+                );
               } else {
                 rpcResponse({ err: 'not implemented' });
               }
@@ -1663,7 +1753,7 @@ async function handleInjectorMessage(message, sender) {
                 return;
               }
 
-              const resp = await confirmSign(
+              await confirmSign(
                 tabId,
                 {
                   type: 'tx-reorg/cardano',
@@ -1675,16 +1765,14 @@ async function handleInjectorMessage(message, sender) {
                   uid: message.uid,
                 },
                 connection,
+                {
+                  type: 'cardano-reorg-tx',
+                  utxosToUse,
+                  isCBOR,
+                },
+                message.protocol,
+                message.uid,
               );
-              if (!resp.ok) {
-                rpcResponse({ error: 'sign failed' });
-                return;
-              }
-              const utxos = await transformCardanoUtxos(
-                [...utxosToUse, ...resp.ok],
-                isCBOR
-              );
-              rpcResponse({ ok: utxos });
             },
             db,
             localStorageApi,
