@@ -94,8 +94,7 @@ const testProgress = {
   step: 0,
 };
 
-// eslint-disable-next-line prefer-arrow-callback
-BeforeAll(function() {
+BeforeAll(() => {
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
