@@ -26,7 +26,7 @@ import { expect } from 'chai';
 import { satisfies } from 'semver';
 import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
-import type { RestorationInput } from '../mock-chain/TestWallets';
+import type { RestorationInput, WalletNames } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
 import {
@@ -190,12 +190,6 @@ After(async function (scenario) {
   await helpers.sleep(500);
 });
 
-type WalletEra = {|
-  era:
-    | 'shelley'
-    | 'byron',
-|}
-
 export async function getPlates(customWorld: any): Promise<any> {
   // check plate in confirmation dialog
   let plateElements = await customWorld.driver.findElements(
@@ -291,8 +285,8 @@ async function getLogs(driver, name, loggingType) {
 
 async function restoreWallet (
     customWorld: any,
-    walletEra: WalletEra,
-    walletName: string
+    walletEra: string,
+    walletName: WalletNames
 ): Promise<void> {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
@@ -366,12 +360,12 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   await checkWalletPlate(this, walletName, restoreInfo);
 });
 
-Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
+Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   await restoreWallet(this, 'shelley', walletName);
 });
 
-Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
+Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Byron wallet stored named ${walletName}`);
   await restoreWallet(this, 'byron', walletName);
 });
