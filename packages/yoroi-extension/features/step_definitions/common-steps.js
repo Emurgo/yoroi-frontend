@@ -130,16 +130,16 @@ Before(function(scenario) {
   const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
   this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
   this.windowManager.init().then().catch();
-  this._allLoggers.push(mockAndWMLogger);
+  this.addToLoggers(mockAndWMLogger);
   this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
 
   const webDriverLogPath = `${logsDir}webDriver.log`;
   this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
-  this._allLoggers.push(this.webDriverLogger);
+  this.addToLoggers(this.webDriverLogger);
 
   const trezorEmuLogPath = `${logsDir}trezorEmulatorController.log`;
   this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
-  this._allLoggers.push(this.trezorEmuLogger);
+  this.addToLoggers(this.trezorEmuLogger);
 
   this.sendToAllLoggers(`### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`);
 

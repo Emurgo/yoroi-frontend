@@ -134,6 +134,10 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.trezorController = undefined;
 
+  this.addToLoggers = (logger: any) => {
+    this._allLoggers.push(logger);
+  } ;
+
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
       someLogger[level](message);
