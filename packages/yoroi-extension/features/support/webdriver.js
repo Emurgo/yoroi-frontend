@@ -6,15 +6,11 @@ import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { getMethod, getLogDate } from './helpers/helpers';
-import { WindowManager } from './windowManager';
-import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { testRunsDataDir } from './helpers/common-constants';
+import { getMethod } from './helpers/helpers';
 import { WebDriverError } from 'selenium-webdriver/lib/error';
 import * as helpers from './helpers/helpers';
 
 const fs = require('fs');
-const simpleNodeLogger = require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -136,34 +132,6 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this._allLoggers = [];
 
-  const logsDir = `${testRunsDataDir}_${this.getBrowser()}/`
-
-  const mockAndWMLogDir = `${logsDir}mockAndWMLogs`;
-  if (!fs.existsSync(mockAndWMLogDir)) {
-    fs.mkdirSync(mockAndWMLogDir, { recursive: true });
-  }
-  const mockAndWMLogPath = `${mockAndWMLogDir}/mockAndWMLog_${getLogDate()}.log`;
-  const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
-  this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
-  this.windowManager.init().then().catch();
-  this._allLoggers.push(mockAndWMLogger);
-  this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
-
-  const webDriverLogDir = `${logsDir}webDriverLogs`;
-  if (!fs.existsSync(webDriverLogDir)) {
-    fs.mkdirSync(webDriverLogDir, { recursive: true });
-  }
-  const webDriverLogPath = `${webDriverLogDir}/webDriverLog_${getLogDate()}.log`;
-  this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
-  this._allLoggers.push(this.webDriverLogger);
-
-  const trezorEmulatorLogsDir = `${logsDir}trezorEmulatorLogs`;
-  if (!fs.existsSync(trezorEmulatorLogsDir)) {
-    fs.mkdirSync(trezorEmulatorLogsDir, { recursive: true });
-  }
-  const trezorEmuLogPath = `${trezorEmulatorLogsDir}/trezorEmulatorController_${getLogDate()}.log`;
-  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
-  this._allLoggers.push(this.trezorEmuLogger);
   this.trezorController = undefined;
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {

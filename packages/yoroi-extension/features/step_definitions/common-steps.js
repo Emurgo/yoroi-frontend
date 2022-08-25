@@ -79,10 +79,13 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
+import { MockDAppWebpage } from '../mock-dApp-webpage';
+import { WindowManager } from '../support/windowManager';
+
+const simpleNodeLogger = require('simple-node-logger');
 
 const { promisify } = require('util');
 const fs = require('fs');
-const rimraf = require('rimraf');
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -91,9 +94,8 @@ const testProgress = {
   step: 0,
 };
 
-BeforeAll(() => {
-  rimraf.sync(testRunsDataDir);
-  fs.mkdirSync(testRunsDataDir);
+// eslint-disable-next-line prefer-arrow-callback
+BeforeAll(function() {
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -105,7 +107,8 @@ AfterAll(() => {
   ErgoServer.closeMockServer();
 });
 
-Before(scenario => {
+// eslint-disable-next-line prefer-arrow-callback
+Before(function(scenario) {
   const pathItems = scenario.sourceLocation.uri.split('/');
   // eslint-disable-next-line no-console
   console.log(
@@ -117,6 +120,30 @@ Before(scenario => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+
+  const logsDir = `${testRunsDataDir}_${this.getBrowser()}/${testProgress.scenarioName}/`
+
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+
+  const mockAndWMLogPath = `${logsDir}/mockAndWM.log`;
+  const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
+  this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
+  this.windowManager.init().then().catch();
+  this._allLoggers.push(mockAndWMLogger);
+  this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
+
+  const webDriverLogPath = `${logsDir}/webDriver.log`;
+  this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
+  this._allLoggers.push(this.webDriverLogger);
+
+  const trezorEmuLogPath = `${logsDir}/trezorEmulatorController.log`;
+  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
+  this._allLoggers.push(this.trezorEmuLogger);
+
+  this.sendToAllLoggers(`### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`);
+
 });
 
 Before({ tags: 'not @TestAssuranceChain' }, () => {
@@ -244,6 +271,7 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
 async function createDirInTestRunsData(driver, subdirectoryName) {
   const cap = await driver.getCapabilities();
   const browserName = cap.getBrowserName();
+
   const dir = `${testRunsDataDir}_${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
