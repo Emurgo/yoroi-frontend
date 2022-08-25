@@ -10,6 +10,10 @@ export type RestorationInput = {|
   deviceId?: ?string,
 |};
 
+function getMnemonicFromEnv(walletName): string {
+  return process.env[walletName] ?? '';
+}
+
 function createWallet(payload: {|
   name: string,
   mnemonic: string,
@@ -30,7 +34,7 @@ function createWallet(payload: {|
 // You can use this website to generate more mnemonics if you need for testing
 // https://iancoleman.io/bip39/
 
-type WalletNames =
+export type WalletNames =
   'shelley-simple-24' |
   'shelley-simple-15' |
   'shelley-delegated' |
@@ -167,12 +171,12 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   }),
   createWallet({
     name: ('First-Smoke-Test-Wallet': WalletNames),
-    mnemonic: process.env.FIRST_SMOKE_TEST_WALLET,
+    mnemonic: getMnemonicFromEnv('FIRST_SMOKE_TEST_WALLET'),
     plate: 'XONT-4910'
   }),
   createWallet({
     name: ('Second-Smoke-Test-Wallet': WalletNames),
-    mnemonic: process.env.SECOND_SMOKE_TEST_WALLET,
+    mnemonic: getMnemonicFromEnv('SECOND_SMOKE_TEST_WALLET'),
     plate: 'XZHD-1651',
   }),
 );
