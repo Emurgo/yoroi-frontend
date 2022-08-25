@@ -179,7 +179,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.getText = (locator: LocatorObject) => this.getElementBy(locator).getText();
 
-  this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
+  this.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
   this.waitForElementLocated = async (locator: LocatorObject) => {
@@ -189,7 +189,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   // Returns a promise that resolves to the element
-  this.waitForElement = this.driver.waitForElement = async (locator: LocatorObject) => {
+  this.waitForElement = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be visible`);
     await this.waitForElementLocated(locator);
     const element = await this.getElementBy(locator);
@@ -206,9 +206,7 @@ function CustomWorld(cmdInput: WorldInput) {
     return element;
   };
 
-  this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (
-    locator: LocatorObject
-  ) => {
+  this.waitForElementNotPresent = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" not present`);
     await this.driver.wait(async () => {
       const elements = await this.getElementsBy(locator);
