@@ -168,9 +168,38 @@ type ConnectedSite = {|
   protocol: 'cardano' | 'ergo',
   appAuthID?: string,
   status: ConnectedStatus,
-  pendingSigns: Map<RpcUid, PendingSign>
+  pendingSigns: {| [uid: string]: PendingSign |},
 |};
 
+type TabId = number;
+
+const STORAGE_KEY_CONNECTION_PROTOCOL = 'connectionProtocol';
+const STORAGE_KEY_IMG_BASE64 = 'imgBase64Url';
+const STORAGE_KEY_CONNECTED_SITES = 'connectedSites';
+
+async function getAllConnectedSites(): Promise<{| [tabId: string]: ConnectedSite |}> {
+  return (await getFromStorage(STORAGE_KEY_CONNECTED_SITES)) || {};
+}
+
+async function getConnectedSite(tabId: number): Promise<?ConnectedSite> {
+  const connectedSites = await getFromStorage(STORAGE_KEY_CONNECTED_SITES);
+  if (!connectedSites) {
+    return null;
+  }
+  return connectedSites[String(tabId)];
+}
+
+async function deleteConnectedSite(tabId: number): Promise<void> {
+  const connectedSites = await getFromStorage(STORAGE_KEY_CONNECTED_SITES) || {};
+  delete connectedSites[String(tabId)];
+  await setInStorage(STORAGE_KEY_CONNECTED_SITES, connectedSites);
+}
+
+async function setConnectedSite(tabId: number, connectedSite: ConnectedSite): Promise<void> {
+  const connectedSites = await getFromStorage(STORAGE_KEY_CONNECTED_SITES) || {};
+  connectedSites[String(tabId)] = connectedSite;
+  await setInStorage(STORAGE_KEY_CONNECTED_SITES, connectedSites);
+}
 
 function getDefaultBounds(): {| width: number, positionX: number, positionY: number |} {
   return {
@@ -213,10 +242,6 @@ const popupProps: {|width: number, height: number, focused: boolean, type: strin
   focused: true,
   type: 'popup',
 };
-
-type TabId = number;
-
-const connectedSites: Map<TabId, ConnectedSite> = new Map();
 
 /**
 * need to make sure JS tasks run in an order where no two of them have different DB instances
@@ -359,7 +384,7 @@ async function withSelectedSiteConnection<T>(
   tabId: number,
   continuation: ?ConnectedSite => Promise<T>,
 ): Promise<T> {
-  const connected = connectedSites.get(tabId);
+  const connected = await getConnectedSite(tabId);
   if (connected) {
     if (typeof connected.status?.publicDeriverId === 'number') {
       return await continuation(Object.freeze(connected));
@@ -383,7 +408,7 @@ async function withSelectedWallet<T>(
       cache => cache.getPublicDeriverId() === publicDeriverId
     );
     if (selectedWallet == null) {
-      connectedSites.delete(tabId);
+      await deleteConnectedSite(tabId);
       // $FlowFixMe[incompatible-call]
       await removeWallet(tabId, publicDeriverId, localStorageApi);
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
@@ -493,7 +518,7 @@ const yoroiMessageHandler = async (
   if (request.type === 'connect_response') {
     if (request.tabId == null) return;
     const { tabId } = request;
-    const connection = connectedSites.get(tabId);
+    const connection = await getConnectedSite(tabId);
     if (connection?.status?.requestType != null) {
       if (request.accepted === true) {
         connectContinuation(
@@ -513,18 +538,18 @@ const yoroiMessageHandler = async (
           null,
           tabId,
         ),
-        connectedSites.delete(tabId);
+        await deleteConnectedSite(tabId);
       }
     }
   } else if (request.type === 'sign_confirmed') {
-    const connection = connectedSites.get(request.tabId);
+    const connection = await getConnectedSite(request.tabId);
     if (connection == null) {
       throw new ConnectorError({
         code: APIErrorCodes.API_INTERNAL_ERROR,
         info: 'Connection has failed. Please retry.',
       });
     }
-    const responseData = connection.pendingSigns.get(request.uid);
+    const responseData = connection.pendingSigns[String(request.uid)];
     if (!responseData) {
       throw new ConnectorError({
         code: APIErrorCodes.API_INTERNAL_ERROR,
@@ -673,10 +698,11 @@ const yoroiMessageHandler = async (
         // log?
         break;
     }
-    connection.pendingSigns.delete(request.uid);
+    delete connection.pendingSigns[String(request.uid)];
+    await setConnectedSite(request.tabId, connection);
   } else if (request.type === 'sign_rejected') {
-    const connection = connectedSites.get(request.tabId);
-    const responseData = connection?.pendingSigns.get(request.uid);
+    const connection = await getConnectedSite(request.tabId);
+    const responseData = connection?.pendingSigns[String(request.uid)];
     if (connection && responseData) {
       sendToInjector(
         request.tabId,
@@ -687,14 +713,15 @@ const yoroiMessageHandler = async (
           }
         }
       );
-      connection.pendingSigns.delete(request.uid);
+      delete connection.pendingSigns[String(request.uid)];
+      await setConnectedSite(request.tabId, connection);
     } else {
       // eslint-disable-next-line no-console
-      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+      console.error(`couldn't find tabId: ${request.tabId}`);
     }
   } else if (request.type === 'sign_error') {
-    const connection = connectedSites.get(request.tabId);
-    const responseData = connection?.pendingSigns.get(request.uid);
+    const connection = await getConnectedSite(request.tabId);
+    const responseData = connection?.pendingSigns[String(request.uid)];
     if (connection && responseData) {
       sendToInjector(
         request.tabId,
@@ -705,23 +732,28 @@ const yoroiMessageHandler = async (
           }
         }
       );
-      connection.pendingSigns.delete(request.uid);
+      delete connection.pendingSigns[String(request.uid)];
+      await setConnectedSite(request.tabId, connection);
     } else {
       // eslint-disable-next-line no-console
-      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+      console.error(`couldn't find tabId: ${request.tabId}`);
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
-    for (const [tabId, connection] of connectedSites) {
-      for (const [/* uid */, responseData] of connection.pendingSigns.entries()) {
+    const connectedSites = await getAllConnectedSites();
+    for (const tabId of Object.keys(connectedSites)) {
+      const connection = connectedSites[tabId];
+      for (const uid of Object.keys(connection.pendingSigns)) {
+        const responseData = connection.pendingSigns[uid];
         if (!responseData.openedWindow) {
           responseData.openedWindow = true;
+          setConnectedSite(Number(tabId), connection);
           if (connection.status?.publicDeriverId == null) {
             throw new Error(`${request.type} no public deriver set for request`);
           }
           sendResponse(({
             publicDeriverId: connection.status.publicDeriverId,
             sign: responseData.request,
-            tabId
+            tabId: Number(tabId),
           }: SigningMessage));
           return;
         }
@@ -730,39 +762,42 @@ const yoroiMessageHandler = async (
     // not sure if this should happen - close window if we can't find a tx to sign
     sendResponse(null);
   } else if (request.type === 'connect_retrieve_data') {
-    for (const [tabId, connection] of connectedSites) {
+    const connectedSites = await getAllConnectedSites();
+    for (const tabId of Object.keys(connectedSites)) {
+      const connection = connectedSites[tabId];
       if (connection.status != null) {
         if (connection.status.requestType) {
           connection.status.openedWindow = true;
-          const imgBase64Url = await getFromStorage('imgBase64Url');
+          const imgBase64Url = await getFromStorage(STORAGE_KEY_IMG_BASE64);
           sendResponse(({
             url: connection.url,
             protocol: connection.protocol,
             appAuthID: connection.appAuthID,
             imgBase64Url,
-            tabId,
+            tabId: Number(tabId),
           }: ConnectingMessage));
         }
       }
     }
     sendResponse(null);
   } else if (request.type === 'remove_wallet_from_whitelist') {
-    for (const [tabId, site] of connectedSites) {
+    const connectedSites = await getAllConnectedSites();
+    for (const tabId of Object.keys(connectedSites)) {
+      const site = connectedSites[tabId];
       if (site.url === request.url) {
         sendToInjector(tabId, { type: 'disconnect' });
         break;
       }
     }
   } else if (request.type === 'get_connected_sites') {
-    const activeSites = []
-    for (const value of connectedSites.values()){
-      activeSites.push(value);
-    }
+    const activeSites: Array<ConnectedSite> =
+      (Object.values(await getAllConnectedSites()): any);
+
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
   } else if (request.type === 'get_protocol') {
-    const connectionProtocol = await getFromStorage('connectionProtocol') ||
+    const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
       'cardano';
     sendResponse({ type: connectionProtocol })
   } else if (request.type === 'get_utxos/addresses') {
@@ -825,7 +860,7 @@ async function removeWallet(
   publicDeriverId: number,
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
-  connectedSites.delete(tabId);
+  await deleteConnectedSite(tabId);
 
   const whitelist = await localStorageApi.getWhitelist();
   await localStorageApi.setWhitelist(
@@ -845,13 +880,14 @@ async function confirmSign(
 ): Promise<void> {
   const bounds = await getBoundsForTabWindow(tabId);
 
-  connectedSite.pendingSigns.set(request.uid, {
+  connectedSite.pendingSigns[String(request.uid)] = {
     request,
     openedWindow: false,
     continuationData,
     protocol,
     uid,
-  });
+  };
+  await setConnectedSite(tabId, connectedSite);
   chrome.windows.create({
     ...popupProps,
     url: chrome.runtime.getURL(`/main_window_connector.html#/signin-transaction`),
@@ -901,8 +937,8 @@ async function confirmConnect(
 
   if (whitelistEntry != null) {
     // we already whitelisted this website, so no need to re-ask the user to confirm
-    if (connectedSites.get(tabId) == null) {
-      connectedSites.set(tabId, {
+    if (await getConnectedSite(tabId) == null) {
+      await setConnectedSite(tabId, {
         url,
         protocol,
         appAuthID,
@@ -910,8 +946,7 @@ async function confirmConnect(
           publicDeriverId: whitelistEntry.publicDeriverId,
           auth: isAuthRequested ? whitelistEntry.auth : undefined,
         },
-        // !!!
-        pendingSigns: new Map()
+        pendingSigns: {},
       });
     }
     connectContinuation(
@@ -926,7 +961,7 @@ async function confirmConnect(
     throw new Error('[onlySilent:fail] No active connection');
   }
   // website not on whitelist, so need to ask user to confirm connection
-  connectedSites.set(tabId, {
+  await setConnectedSite(tabId, {
     url,
     protocol,
     appAuthID,
@@ -936,8 +971,7 @@ async function confirmConnect(
       publicDeriverId: null,
       auth: null,
     },
-    // !!!
-    pendingSigns: new Map()
+    pendingSigns: {},
   });
   chrome.windows.create({
     ...popupProps,
@@ -979,8 +1013,8 @@ async function handleInjectorMessage(message, sender) {
   const tabId = sender.tab.id;
   const isCardano = message.protocol === 'cardano';
 
-  await setInStorage('connectionProtocol', message.protocol);
-  await setInStorage('imgBase64Url', message.imgBase64Url);
+  await setInStorage(STORAGE_KEY_CONNECTION_PROTOCOL, message.protocol);
+  await setInStorage(STORAGE_KEY_IMG_BASE64, message.imgBase64Url);
 
   function rpcResponse(response) {
     sendToInjector(
@@ -1131,7 +1165,7 @@ async function handleInjectorMessage(message, sender) {
     case 'sign_tx/cardano':
       try {
         checkParamCount(1);
-        const connection = connectedSites.get(tabId);
+        const connection = await getConnectedSite(tabId);
         if (connection == null) {
           Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
           rpcResponse(undefined); // shouldn't happen
@@ -1209,7 +1243,7 @@ async function handleInjectorMessage(message, sender) {
             async (wallet) => {
               if (isCardano) {
                 await RustModule.load();
-                const connection = connectedSites.get(tabId);
+                const connection = await getConnectedSite(tabId);
                 if (connection == null) {
                   Logger.error(`ERR - sign_data could not find connection with tabId = ${tabId}`);
                   rpcResponse(undefined); // shouldn't happen
@@ -1270,7 +1304,7 @@ async function handleInjectorMessage(message, sender) {
           await withSelectedWallet(
             tabId,
             async (wallet) => {
-              const connectionProtocol = await getFromStorage('connectionProtocol') ||
+              const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
                     'cardano';
               const balance =
                     await connectorGetBalance(wallet, tokenId, connectionProtocol);
@@ -1518,7 +1552,7 @@ async function handleInjectorMessage(message, sender) {
       try {
         checkParamCount(1);
         await RustModule.load();
-        const connection = connectedSites.get(tabId);
+        const connection = await getConnectedSite(tabId);
         if (connection == null) {
           Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
           rpcResponse(undefined); // shouldn't happen
@@ -1553,7 +1587,7 @@ async function handleInjectorMessage(message, sender) {
     case 'get_network_id':
       try {
         checkParamCount(0);
-        const connection = connectedSites.get(tabId);
+        const connection = await getConnectedSite(tabId);
         if (connection == null) {
           Logger.error(`ERR - get_network_id could not find connection with tabId = ${tabId}`);
           rpcResponse(undefined); // shouldn't happen
@@ -1746,7 +1780,7 @@ async function handleInjectorMessage(message, sender) {
               }
               // we can get enough collaterals after re-organization
               // pop-up the UI
-              const connection = connectedSites.get(tabId);
+              const connection = await getConnectedSite(tabId);
               if (connection == null) {
                 Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
                 rpcResponse(undefined); // shouldn't happen
