@@ -56,8 +56,9 @@ When(/^I click on the transfer funds from Daedalus master key button$/, async fu
 });
 
 When(/^I proceed with the recovery$/, async function () {
-  const button = await this.findElement(proceedRecoveryButton);
-  await button.click();
+  await this.waitForElement(proceedRecoveryButton);
+  await this.waitEnable(proceedRecoveryButton);
+  await this.click(proceedRecoveryButton);
 });
 
 When(/^I click next button on the Daedalus transfer page$/, async function () {

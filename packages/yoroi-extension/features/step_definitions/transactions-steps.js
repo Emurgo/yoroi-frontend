@@ -35,6 +35,12 @@ When(/^I go to the send transaction screen$/, async function () {
   await this.click({ locator: '.send', method: 'css' });
 });
 
+When(/^I select the asset "(.+)" on the form$/, async function (assetName) {
+  await this.click({ locator: `#tokenAssetsSelect`, method: 'css' });
+  const locator = { locator: `//p[contains(text(), '${assetName}')]`, method: 'xpath' };
+  await this.click(locator);
+});
+
 When(/^I fill the form:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
@@ -58,8 +64,14 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
     { locator: '.WalletSendConfirmationDialog_addressTo', method: 'css' },
     truncateAddress(fields.address)
   );
-  await this.waitUntilContainsText({ locator: '.WalletSendConfirmationDialog_fees', method: 'css' }, fields.fee);
-  await this.waitUntilContainsText({ locator: '.WalletSendConfirmationDialog_amount', method: 'css' }, fields.amount);
+  await this.waitUntilContainsText(
+    { locator: '.WalletSendConfirmationDialog_fees', method: 'css' },
+    fields.fee
+  );
+  await this.waitUntilContainsText(
+    { locator: '.WalletSendConfirmationDialog_amount', method: 'css' },
+    fields.amount
+  );
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
@@ -75,7 +87,10 @@ When(/^I clear the receiver$/, async function () {
 });
 
 When(/^I clear the wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm({ locator: "input[name='walletPassword']", method: 'css' }, password.length);
+  await this.clearInputUpdatingForm(
+    { locator: "input[name='walletPassword']", method: 'css' },
+    password.length
+  );
 });
 
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
@@ -89,7 +104,7 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
       .findElement(By.xpath('//p'));
     const messageText = await messageElement.getText();
     return messageText === `+ ${fee} of fees`;
-  })
+  });
   expect(result).to.be.true;
 });
 
@@ -146,7 +161,7 @@ Then(/^I should see the summary screen$/, async function () {
 
 Then(/^Revamp. I should see the summary screen$/, async function () {
   await this.waitForElement(walletSummaryBox);
-})
+});
 
 Then(/^I should see an invalid address error$/, async function () {
   await this.waitForElement({ locator: '.receiver .SimpleInput_errored', method: 'css' });
@@ -156,7 +171,10 @@ Then(/^I should see a not enough ada error$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.NotEnoughMoneyToSendError',
   });
-  await this.waitUntilText({ locator: '.FormFieldOverridesClassic_error', method: 'css' }, errorMessage);
+  await this.waitUntilText(
+    { locator: '.FormFieldOverridesClassic_error', method: 'css' },
+    errorMessage
+  );
 });
 
 Then(/^I should not be able to submit$/, async function () {
@@ -167,14 +185,20 @@ Then(/^I should see an invalid signature error message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.invalidWitnessError',
   });
-  await this.waitUntilText({ locator: '.WalletSendConfirmationDialog_error', method: 'css' }, errorMessage);
+  await this.waitUntilText(
+    { locator: '.WalletSendConfirmationDialog_error', method: 'css' },
+    errorMessage
+  );
 });
 
 Then(/^I should see an incorrect wallet password error message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.IncorrectPasswordError',
   });
-  await this.waitUntilText({ locator: '.WalletSendConfirmationDialog_error', method: 'css' }, errorMessage);
+  await this.waitUntilText(
+    { locator: '.WalletSendConfirmationDialog_error', method: 'css' },
+    errorMessage
+  );
 });
 
 Then(/^I should see an delegation incorrect wallet password error message$/, async function () {

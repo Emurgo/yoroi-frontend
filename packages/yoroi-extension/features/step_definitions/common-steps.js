@@ -79,6 +79,7 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
+import { extensionTabName } from '../support/windowManager';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -181,11 +182,12 @@ After(async function (scenario) {
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
-    if (this.getBrowser !== 'firefox') {
+    if (this.getBrowser() !== 'firefox') {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
     }
-  }
+  };
+  await this.windowManager.switchTo(extensionTabName);
   await this.driver.quit();
   await helpers.sleep(500);
 });
@@ -423,7 +425,7 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
-Given(/^I switched to the advanced level$/, async function () {
+Given(/^I switch to the advanced level$/, async function () {
   this.webDriverLogger.info(`Step: I switched to the advanced level`);
   // Navigate to the general settings screen
   await navigateTo.call(this, '/settings');
@@ -435,7 +437,10 @@ Given(/^I switched to the advanced level$/, async function () {
   // Select the most complex level
   const cardChoseButton = await getComplexityLevelButton(this, false);
   await cardChoseButton.click(); // choose most complex level for tests
+});
 
+Given(/^I navigate back to the main page$/, async function () {
+  this.webDriverLogger.info(`Step: I navigate back to the main page`);
   // Navigate back to the main page
   await navigateTo.call(this, '/wallets/add');
   await waitUntilUrlEquals.call(this, '/wallets/add');
