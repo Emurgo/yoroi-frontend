@@ -2,7 +2,7 @@
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
-import { Logger, stringifyData, stringifyError } from '../../utils/logging';
+import { fullErrStr, Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import {
@@ -862,13 +862,14 @@ export default class AdaApi {
         request.signRequest.metadata,
       );
 
-      const response = request.sendTx({
+      const response = await request.sendTx({
         network: request.publicDeriver.getParent().getNetworkInfo(),
         id: Buffer.from(
           RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
         ).toString('hex'),
         encodedTx: signedTx.to_bytes(),
       });
+
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
       );
@@ -877,7 +878,8 @@ export default class AdaApi {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} error: ${fullErrStr(error)}` );
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }
