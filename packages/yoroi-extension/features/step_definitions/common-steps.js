@@ -126,18 +126,18 @@ Before(function(scenario) {
     fs.mkdirSync(logsDir, { recursive: true });
   }
 
-  const mockAndWMLogPath = `${logsDir}/mockAndWM.log`;
+  const mockAndWMLogPath = `${logsDir}mockAndWM.log`;
   const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
   this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
   this.windowManager.init().then().catch();
   this._allLoggers.push(mockAndWMLogger);
   this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
 
-  const webDriverLogPath = `${logsDir}/webDriver.log`;
+  const webDriverLogPath = `${logsDir}webDriver.log`;
   this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
   this._allLoggers.push(this.webDriverLogger);
 
-  const trezorEmuLogPath = `${logsDir}/trezorEmulatorController.log`;
+  const trezorEmuLogPath = `${logsDir}trezorEmulatorController.log`;
   this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
   this._allLoggers.push(this.trezorEmuLogger);
 
