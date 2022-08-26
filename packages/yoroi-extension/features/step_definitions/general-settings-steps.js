@@ -5,6 +5,7 @@ import { camelCase } from 'lodash';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, WebElement } from 'selenium-webdriver';
+import { complexitySelected, secondThemeSelected, settingsLayoutComponent, complexityLevelForm, languageSelector } from '../pages/settingsPage';
 
 export async function selectSubmenuSettings(customWorld: Object, buttonName: string) {
   const formattedButtonName = camelCase(buttonName);
@@ -20,14 +21,14 @@ export async function goToSettings(customWorld: Object) {
   await navigateTo.call(customWorld, '/settings/general');
 
   await waitUntilUrlEquals.call(customWorld, '/settings/general');
-  await customWorld.waitForElement({ locator: '.SettingsLayout_component', method: 'css' });
+  await customWorld.waitForElement(settingsLayoutComponent);
 }
 
 export async function getComplexityLevelButton(
   customWorld: Object,
   isLow: boolean = true
 ): Promise<WebElement> {
-  await customWorld.waitForElement({ locator: '.ComplexityLevelForm_cardsWrapper', method: 'css' });
+  await customWorld.waitForElement(complexityLevelForm);
   const levels = await customWorld.driver.findElements(By.css('.ComplexityLevelForm_card'));
   let card;
   if (isLow) {
@@ -50,11 +51,11 @@ When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
 });
 
 When(/^I select second theme$/, async function () {
-  await this.click({ locator: '.ThemeSettingsBlock_themesWrapper > button:nth-child(2)', method: 'css' });
+  await this.click(secondThemeSelected);
 });
 
 When(/^I open General Settings language selection dropdown$/, async function () {
-  await this.click({ locator: '//div[starts-with(@id, "languageId")]', method: 'xpath' });
+  await this.click(languageSelector);
 });
 
 Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonName) {
@@ -74,14 +75,11 @@ Then(/^The Japanese language should be selected$/, async function () {
 });
 
 Then(/^I should see second theme as selected$/, async function () {
-  await this.waitForElement({
-    locator: '.ThemeSettingsBlock_themesWrapper button:nth-child(2).ThemeSettingsBlock_active',
-    method: 'css'
-  });
+  await this.waitForElement(secondThemeSelected);
 });
 
 Then(/^The selected level is "([^"]*)"$/, async function (level) {
-  await this.waitUntilText({ locator: '.currentLevel', method: 'css' }, level.toUpperCase());
+  await this.waitUntilText(complexitySelected, level.toUpperCase());
 });
 
 Then(/^I select the most complex level$/, async function () {

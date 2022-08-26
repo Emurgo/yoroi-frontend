@@ -7,6 +7,11 @@ export const createWalletButton: LocatorObject = { locator: '.WalletAdd_btnCreat
 export const restoreWalletButton: LocatorObject = { locator: '.WalletAdd_btnRestoreWallet', method: 'css' };
 // Currency options dialog
 export const pickUpCurrencyDialog: LocatorObject = { locator: '.PickCurrencyOptionDialog', method: 'css' };
+export const pickUpCurrencyDialogErgo: LocatorObject = { locator: '.PickCurrencyOptionDialog_ergo', method: 'css' };
+export const pickUpCurrencyDialogCardano: LocatorObject = { locator: '.PickCurrencyOptionDialog_cardano', method: 'css' };
+export const walletRestoreOptionDialog = { locator: '.WalletRestoreOptionDialog', method: 'css' };
+export const restoreNormalWallet = { locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' };
+export const walletRestoreDialog = { locator: '.WalletRestoreDialog', method: 'css' };
 export const getCurrencyButton = (currency: string): LocatorObject => {
     return { locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' };
 };

@@ -10,6 +10,7 @@ import {
   getCurrencyButton,
   pickUpCurrencyDialog
 } from '../pages/newWalletPages';
+import { continueButton } from '../pages/basicSetupPage';
 
 When(/^I click the create button$/, async function () {
   await this.click(createWalletButton);
@@ -64,7 +65,7 @@ When(/^I accept the creation terms$/, async function () {
   );
   const privacyChkbox = privacyDlg.findElement(By.xpath('//input[@type="checkbox"]'));
   privacyChkbox.click();
-  await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
+  await this.click(continueButton);
 });
 
 When(/^I copy and enter the displayed mnemonic phrase$/, async function () {

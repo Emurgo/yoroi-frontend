@@ -6,6 +6,7 @@ import { By, Key } from 'selenium-webdriver';
 import { truncateLongName, } from '../../app/utils/formatters';
 import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
+import { walletNameText } from '../pages/walletPage';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -79,7 +80,7 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+  await this.waitUntilText(walletNameText, truncateLongName(walletName));
 });
 
 Then(/^I should see the following error messages:$/, async function (data) {
