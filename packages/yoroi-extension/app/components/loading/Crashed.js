@@ -17,7 +17,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onExternalLinkClick: MouseEvent => void,
   +onDownloadLogs: void => void,
 |};
 
