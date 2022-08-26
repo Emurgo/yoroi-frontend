@@ -3,6 +3,7 @@
 import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
 import languageSelection, { clickContinue } from '../support/helpers/language-selection-helpers';
+import { languageSelectionForm } from '../pages/basicSetupPage';
 
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
@@ -11,7 +12,7 @@ Given(/^I have selected English language$/, async function () {
 });
 
 When(/^I am on the language selection screen$/, async function () {
-  await this.waitForElement({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
+  await this.waitForElement(languageSelectionForm);
 });
 
 When(/^I open language selection dropdown$/, async function () {

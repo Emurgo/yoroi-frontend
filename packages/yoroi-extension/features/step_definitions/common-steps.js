@@ -17,10 +17,7 @@ import { enterRecoveryPhrase, getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
-import {
-  testRunsDataDir,
-  snapshotsDir,
-  } from '../support/helpers/common-constants';
+import { testRunsDataDir, snapshotsDir } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
@@ -50,10 +47,26 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  saveButton
+  saveButton,
+  pickUpCurrencyDialogErgo,
+  walletRestoreOptionDialog,
+  restoreNormalWallet,
+  walletRestoreDialog,
+  pickUpCurrencyDialogCardano,
+  byronEraButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import * as helpers from '../support/helpers/helpers';
+import {
+  confirmButton,
+  repeatPasswordInput,
+  walletPasswordInput,
+} from '../pages/restoreWalletPage';
+import { walletNameText } from '../pages/walletPage';
+import { continueButton, languageSelectionForm, termsOfUseComponent, walletAddComponent } from '../pages/basicSetupPage';
+import { settingsLayoutComponent } from '../pages/settingsPage';
+import { allowButton, finishButton, uriAcceptComponent, uriPromptForm } from '../pages/uriPromptPage';
+import { yoroiClassic } from '../pages/mainWindowPage';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -259,27 +272,18 @@ async function inputMnemonicForWallet(
   walletName: string,
   restoreInfo: RestorationInput
 ): Promise<void> {
-  await customWorld.input({ locator: "input[name='walletName']", method: 'css' }, restoreInfo.name);
+  await customWorld.input(walletNameInput, restoreInfo.name);
   await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
-  await customWorld.input(
-    { locator: "input[name='walletPassword']", method: 'css' },
-    restoreInfo.password
-  );
-  await customWorld.input(
-    { locator: "input[name='repeatPassword']", method: 'css' },
-    restoreInfo.password
-  );
-  await customWorld.click({ locator: '.WalletRestoreDialog .primary', method: 'css' });
+  await customWorld.input(walletPasswordInput, restoreInfo.password);
+  await customWorld.input(repeatPasswordInput, restoreInfo.password);
+  await customWorld.click(restoreWalletButton);
 
   const plateElements = await getPlates(customWorld);
   const plateText = await plateElements[0].getText();
   expect(plateText).to.be.equal(restoreInfo.plate);
 
-  await customWorld.click({ locator: '.confirmButton', method: 'css' });
-  await customWorld.waitUntilText(
-    { locator: '.NavPlate_name', method: 'css' },
-    truncateLongName(walletName)
-  );
+  await customWorld.click(confirmButton);
+  await customWorld.waitUntilText(walletNameText, truncateLongName(walletName));
 }
 
 export async function checkErrorByTranslationId(
@@ -300,15 +304,15 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
+  await this.click(restoreWalletButton);
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_ergo', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogErgo);
 
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
+  await this.waitForElement(walletRestoreOptionDialog);
 
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.click(restoreNormalWallet);
+  await this.waitForElement(walletRestoreDialog);
 
   await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
@@ -318,16 +322,16 @@ Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (wallet
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
+  await this.click(restoreWalletButton);
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogCardano);
 
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
+  await this.waitForElement(walletRestoreOptionDialog);
 
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.click(restoreNormalWallet);
+  await this.click(shelleyEraButton);
+  await this.waitForElement(walletRestoreDialog);
 
   await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
@@ -342,11 +346,11 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
 
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
+  await this.waitForElement(walletRestoreOptionDialog);
 
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.click(restoreNormalWallet);
+  await this.click(byronEraButton);
+  await this.waitForElement(walletRestoreDialog);
 
   await inputMnemonicForWallet(this, walletName, restoreInfo);
 });
@@ -354,17 +358,17 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
 Given(/^I have completed the basic setup$/, async function () {
   this.webDriverLogger.info(`Step: I have completed the basic setup`);
   // language select page
-  await this.waitForElement({ locator: '.LanguageSelectionForm_component', method: 'css' });
-  await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
+  await this.waitForElement(languageSelectionForm);
+  await this.click();
   // ToS page
-  await this.waitForElement({ locator: '.TermsOfUseForm_component', method: 'css' });
+  await this.waitForElement(termsOfUseComponent);
   const tosClassElement = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
   const checkbox = await tosClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
   await checkbox.click();
-  await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
+  await this.click(continueButton);
   // uri prompt page
   await acceptUriPrompt(this);
-  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
+  await this.waitForElement(walletAddComponent);
 });
 
 Given(/^I switched to the advanced level$/, async function () {
@@ -373,7 +377,7 @@ Given(/^I switched to the advanced level$/, async function () {
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
   await waitUntilUrlEquals.call(this, '/settings/general');
-  await this.waitForElement({ locator: '.SettingsLayout_component', method: 'css' });
+  await this.waitForElement(settingsLayoutComponent);
   // Click on secondary menu "levelOfComplexity" item
   await selectSubmenuSettings(this, 'levelOfComplexity');
   // Select the most complex level
@@ -383,7 +387,7 @@ Given(/^I switched to the advanced level$/, async function () {
   // Navigate back to the main page
   await navigateTo.call(this, '/wallets/add');
   await waitUntilUrlEquals.call(this, '/wallets/add');
-  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
+  await this.waitForElement(walletAddComponent);
 });
 
 Then(/^I accept uri registration$/, async function () {
@@ -393,10 +397,10 @@ Then(/^I accept uri registration$/, async function () {
 
 async function acceptUriPrompt(world: any) {
   if (world.getBrowser() !== 'firefox') {
-    await world.waitForElement({ locator: '.UriPromptForm_component', method: 'css' });
-    await world.click({ locator: '.allowButton', method: 'css' });
-    await world.waitForElement({ locator: '.UriAccept_component', method: 'css' });
-    await world.click({ locator: '.finishButton', method: 'css' });
+    await world.waitForElement(uriPromptForm);
+    await world.click(allowButton);
+    await world.waitForElement(uriAcceptComponent);
+    await world.click(finishButton);
   }
 }
 
@@ -414,7 +418,7 @@ Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(500);
-  await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
+  await this.waitForElement(yoroiClassic);
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -423,13 +427,13 @@ Given(/^I restart the browser$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(500);
-  await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
+  await this.waitForElement(yoroiClassic);
 });
 
 Given(/^There is no wallet stored$/, async function () {
   this.webDriverLogger.info(`Step: There is no wallet stored`);
   await restoreWalletsFromStorage(this);
-  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
+  await this.waitForElement(walletAddComponent);
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {
@@ -450,7 +454,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(1500);
-  await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
+  await this.waitForElement(yoroiClassic);
 });
 
 async function setLedgerWallet(client, serial) {
@@ -661,7 +665,7 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   await walletButtonInRow.click();
 });
 
-Then(/^Debug. Take screenshot$/,  async function () {
+Then(/^Debug. Take screenshot$/, async function () {
   const currentTime = getLogDate();
   await takeScreenshot(this.driver, `debug_${currentTime}`);
   await takePageSnapshot(this.driver, `debug_${currentTime}`);

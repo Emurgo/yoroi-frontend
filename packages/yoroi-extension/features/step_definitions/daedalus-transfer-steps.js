@@ -20,6 +20,9 @@ import { daedalusMasterKeyButton, twelveWordOption } from '../pages/walletClaimT
 import { proceedRecoveryButton } from '../pages/restoreWalletPage';
 import { errorMessage, errorPageTitle } from '../pages/errorPage';
 import { amountField, feeField, totalAmountField } from '../pages/confirmTransactionPage';
+import { walletAddComponent } from '../pages/basicSetupPage';
+import { backButton, formFieldOverridesClassicError, nextButton, transferButton } from '../pages/daedalusTransferPage';
+import { activeNavTab } from '../pages/walletPage';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
@@ -61,33 +64,33 @@ When(/^I proceed with the recovery$/, async function () {
 });
 
 When(/^I click next button on the Daedalus transfer page$/, async function () {
-  await this.click({ locator: "//button[contains(@label, 'Next')]", method: 'xpath' });
+  await this.click(nextButton);
 });
 
 When(/^I click the back button$/, async function () {
-  await this.click({ locator: "//button[contains(@label, 'Back')]", method: 'xpath' });
+  await this.click(backButton);
 });
 
 Then(/^I should see "This field is required." error message:$/, async function (data) {
   const error = data.hashes()[0];
   await checkErrorByTranslationId(
     this,
-    { locator: '.FormFieldOverridesClassic_error', method: 'css' },
+    formFieldOverridesClassicError,
     error);
 });
 
 When(/^I confirm Daedalus transfer funds$/, async function () {
-  await this.click({ locator: '.transferButton', method: 'css' });
+  await this.click(transferButton);
 });
 
 Then(/^I should see the Create wallet screen$/, async function () {
-  await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
+  await this.waitForElement(walletAddComponent);
 });
 
 Then(/^I should see the Receive screen$/, async function () {
   const receiveTitle = await i18n.formatMessage(this.driver,
     { id: 'wallet.navigation.receive' });
-  await this.waitUntilText({ locator: '.WalletNavButton_active', method: 'css' }, receiveTitle);
+  await this.waitUntilText(activeNavTab, receiveTitle);
   await this.driver.sleep(2000);
 });
 

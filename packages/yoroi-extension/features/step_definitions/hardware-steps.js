@@ -5,28 +5,29 @@ import { testWallets } from '../mock-chain/TestWallets';
 import { truncateAddress, } from '../../app/utils/formatters';
 import { addressField, derivationField, verifyButton } from '../pages/verifyAddressPage';
 import { expect } from 'chai';
+import { byronEraButton, pickUpCurrencyDialog, pickUpCurrencyDialogCardano, shelleyEraButton } from '../pages/newWalletPages';
 
 When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogCardano);
 
   await this.waitForElement({ locator: '.WalletConnectHWOptionDialog', method: 'css' });
 
   await this.click({ locator: '.WalletConnectHWOptionDialog_connectLedger', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
+  await this.click(byronEraButton);
 });
 When(/^I select a Shelley-era Ledger device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogCardano);
 
   await this.waitForElement({ locator: '.WalletConnectHWOptionDialog', method: 'css' });
 
   await this.click({ locator: '.WalletConnectHWOptionDialog_connectLedger', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' });
+  await this.click(shelleyEraButton);
 });
 When(/^I restore the Ledger device$/, async function () {
   await this.waitForElement({ locator: '.CheckDialog_component', method: 'css' });
@@ -43,19 +44,19 @@ When(/^I restore the Ledger device$/, async function () {
 When(/^I select a Byron-era Trezor device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogCardano);
 
   await this.waitForElement({ locator: '.WalletConnectHWOptionDialog', method: 'css' });
 
   await this.click({ locator: '.WalletConnectHWOptionDialog_connectTrezor', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
+  await this.click(byronEraButton);
 });
 When(/^I select a Shelley-era Trezor device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogCardano);
 
   await this.waitForElement({ locator: '.WalletConnectHWOptionDialog', method: 'css' });
 

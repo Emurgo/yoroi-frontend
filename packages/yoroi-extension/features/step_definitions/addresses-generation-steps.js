@@ -8,9 +8,13 @@ import { checkIfElementsInArrayAreUnique } from '../support/helpers/helpers';
 import { truncateAddress, truncateAddressShort } from '../../app/utils/formatters';
 import { receiveTab } from '../pages/walletPage';
 import {
-  addressErrorPhrase, generateAddressButton,
+  addressErrorPhrase,
+  generateAddressButton,
   getAddressLocator,
   getGeneratedAddressLocator,
+  addressBookTab,
+  rewardAddressTab,
+  yourWalletAddrHeader
 } from '../pages/walletReceivePage';
 
 Given(/^Revamp. I go to the receive screen$/, async function () {
@@ -18,7 +22,7 @@ Given(/^Revamp. I go to the receive screen$/, async function () {
 });
 
 Given(/^I go to the receive screen$/, async function () {
-  await this.click({ locator: '.receive', method: 'css' });
+  await this.click(receiveTab);
 });
 
 When(/^I click on the Generate new address button$/, async function () {
@@ -30,17 +34,11 @@ When(/^I click on the ([^ ]*) ([^ ]*) tab$/, async function (kind, chain) {
 });
 
 When(/^I click on the top-level address book tab$/, async function () {
-  await this.click({
-    locator: `//div[contains(text(), "Address book") and contains(@class, "ReceiveNavButton_label")]`,
-    method: 'xpath',
-  });
+  await this.click(addressBookTab);
 });
 
 When(/^I click on the top-level reward address tab$/, async function () {
-  await this.click({
-    locator: `//div[contains(text(), "Reward") and contains(@class, "ReceiveNavButton_label")]`,
-    method: 'xpath',
-  });
+  await this.click(rewardAddressTab);
 });
 
 When(/^I click on the All addresses button$/, async function () {
@@ -70,7 +68,7 @@ When(/^I click on the HasBalance addresses button$/, async function () {
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {
   for (let curr = 1; curr <= times; curr++) {
-    await this.click({ locator: '.generateAddressButton', method: 'css' });
+    await this.click(generateAddressButton);
     await this.waitForElement({
       locator: `.generatedAddress-${curr + 1} .RawHash_hash`,
       method: 'css',
@@ -80,14 +78,16 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
   await this.waitUntilText(
-    { locator: '.StandardHeader_copyableHash', method: 'css' },
+    yourWalletAddrHeader,
     truncateAddress(address)
   );
 });
+
 Then(/^I should see at least ([^"]*) addresses$/, async function (numAddresses) {
   const rows = await this.driver.findElements(By.css('.WalletReceive_walletAddress'));
   expect(rows.length).be.at.least(Number.parseInt(numAddresses, 10));
 });
+
 Then(
   /^I should see ([^"]*) addresses with address "([^"]*)" at the top$/,
   async function (numAddresses, address) {

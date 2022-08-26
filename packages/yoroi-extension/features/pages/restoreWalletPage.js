@@ -26,6 +26,9 @@ export const getWords = (word: string): LocatorObject => {
   return { locator: `//span[contains(text(), '${word}')]`, method: 'xpath' }
 };
 
+export const walletNameInput = { locator: "input[name='walletName']", method: 'css' };
+export const restoreWalletButton = { locator: '.WalletRestoreDialog .primary', method: 'css' }
 export const walletPasswordInput = { locator: "input[name='walletPassword']", method: 'css' };
 export const repeatPasswordInput = { locator: "input[name='repeatPassword']", method: 'css' };
 export const paperPasswordInput = { locator: "input[name='paperPassword']", method: 'css' };
+export const confirmButton = { locator: '.confirmButton', method: 'css' };

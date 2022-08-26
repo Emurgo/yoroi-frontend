@@ -2,6 +2,7 @@
 
 import { When, Then } from 'cucumber';
 import { truncateLongName } from '../../app/utils/formatters';
+import { walletNameText } from '../pages/walletPage';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
   await this.input({ locator: "input[name='walletName']", method: 'css' }, walletName);
@@ -13,11 +14,11 @@ When(/^I clear the name "([^"]*)"$/, async function (walletName) {
 
 When(/^I navigate to wallet sidebar category$/, async function () {
   await this.click({ locator: `//div[@class='Sidebar_categories']//button[1]`, method: 'xpath' });
-  await this.waitForElement({ locator: '.NavPlate_name', method: 'css' });
+  await this.waitForElement(walletNameText);
 });
 
 Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+  await this.waitUntilText(walletNameText, truncateLongName(walletName));
 });
 
 Then(/^I unselect the wallet$/, async function () {

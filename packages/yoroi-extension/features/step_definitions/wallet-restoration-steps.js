@@ -16,46 +16,47 @@ import {
   walletPasswordInput,
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
+import { pickUpCurrencyDialog, pickUpCurrencyDialogCardano, restoreNormalWallet, shelleyEraButton, walletRestoreDialog, walletRestoreOptionDialog } from '../pages/newWalletPages';
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
   await this.click({ locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' });
 
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
+  await this.waitForElement(walletRestoreOptionDialog);
 });
 
 Then(/^I select Byron-era 15-word wallet$/, async function () {
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.click(restoreNormalWallet);
+  await this.click(byronEraButton);
+  await this.waitForElement(walletRestoreDialog);
 });
 Then(/^I select Shelley-era 15-word wallet$/, async function () {
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.click({ locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.click(restoreNormalWallet);
+  await this.click(shelleyEraButton);
+  await this.waitForElement(walletRestoreDialog);
 });
 Then(/^I select Shelley-era 24-word wallet$/, async function () {
   await this.click({ locator: '.WalletRestoreOptionDialog_normal24WordWallet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.waitForElement(walletRestoreDialog);
 });
 
 Then(/^I select bip44 15-word wallet$/, async function () {
-  await this.click({ locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.click(restoreNormalWallet);
+  await this.waitForElement(walletRestoreDialog);
 });
 
 When(/^I click the restore paper wallet button$/, async function () {
   await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(pickUpCurrencyDialogCardano);
 
-  await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
+  await this.waitForElement(walletRestoreOptionDialog);
 
   await this.click({ locator: '.WalletRestoreOptionDialog_restorePaperWallet', method: 'css' });
-  await this.waitForElement({ locator: '.WalletRestoreDialog', method: 'css' });
+  await this.waitForElement(walletRestoreDialog);
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
