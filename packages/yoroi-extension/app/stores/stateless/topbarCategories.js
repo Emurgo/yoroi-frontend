@@ -165,5 +165,5 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     route: ROUTES.TRANSFER.ROOT,
     label: messages.claimTransfer,
     isVisible: _request => true,
-  },
+  }
 ];
