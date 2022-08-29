@@ -8,6 +8,7 @@ import { checkErrorByTranslationId, getPlates } from './common-steps';
 import { enterRecoveryPhrase } from '../support/helpers/helpers';
 import {
   cleanRecoverInput,
+  confirmButton,
   errorInvalidRecoveryPhrase,
   getWords,
   paperPasswordInput,
@@ -17,6 +18,7 @@ import {
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
 import { pickUpCurrencyDialog, pickUpCurrencyDialogCardano, restoreNormalWallet, shelleyEraButton, walletRestoreDialog, walletRestoreOptionDialog } from '../pages/newWalletPages';
+import { dialogTitle } from '../pages/commonDialogPage';
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
@@ -149,7 +151,7 @@ Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, {
     id: 'wallet.restore.dialog.title.label',
   });
-  await this.waitUntilText({ locator: '.dialog__title', method: 'css' }, restoreMessage.toUpperCase(), 2000);
+  await this.waitUntilText(dialogTitle, restoreMessage.toUpperCase(), 2000);
 });
 
 Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
@@ -201,5 +203,5 @@ Then(/^I should see the wallet already exist window$/, async function () {
 });
 
 When(/^I click the Open wallet button$/, async function () {
-  await this.click({ locator: '.confirmButton', method: 'css' });
+  await this.click(confirmButton);
 });

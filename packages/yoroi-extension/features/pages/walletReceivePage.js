@@ -21,3 +21,6 @@ export const generateAddressButton = { locator: '.generateAddressButton', method
 export const addressBookTab = { locator: `.addressBook`, method: 'css' };
 export const rewardAddressTab = { locator: `.reward`, method: 'css' };
 export const yourWalletAddrHeader = { locator: '.StandardHeader_copyableHash', method: 'css' };
+export const verifyAddressButton = { locator: '.WalletReceive_verifyIcon', method: 'css' };
+
+export const verifyAddressHWButton = { locator: '.VerifyAddressDialog_component .primary', method: 'css' };

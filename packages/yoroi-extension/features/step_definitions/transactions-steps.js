@@ -12,6 +12,7 @@ import {
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { walletSummaryBox } from '../pages/walletTransactionsPage';
+import { amountInput, receiverInput } from '../pages/walletSendPage';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(
@@ -35,13 +36,13 @@ When(/^I select the asset "(.+)" on the form$/, async function (assetName) {
 
 When(/^I fill the form:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
-  await this.input({ locator: "input[name='amount']", method: 'css' }, fields.amount);
+  await this.input(receiverInput, fields.address);
+  await this.input(amountInput, fields.amount);
 });
 
 When(/^I fill the address of the form:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
+  await this.input(receiverInput, fields.address);
 });
 
 Given(/^The expected transaction is "([^"]*)"$/, base64Tx => {
@@ -75,7 +76,7 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
 });
 
 When(/^I clear the receiver$/, async function () {
-  await this.clearInput({ locator: "input[name='receiver']", method: 'css' });
+  await this.clearInput(receiverInput);
 });
 
 When(/^I clear the wallet password ([^"]*)$/, async function (password) {
@@ -86,7 +87,7 @@ When(/^I clear the wallet password ([^"]*)$/, async function (password) {
 });
 
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, receiver);
+  await this.input(receiverInput, receiver);
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {

@@ -4,6 +4,7 @@ import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
+import { amountInput } from '../pages/walletSendPage';
 
 When(/^I click on "generate payment URL" button$/, async function () {
   await this.click({ locator: '.WalletReceive_generateURIIcon', method: 'css' });
@@ -11,7 +12,7 @@ When(/^I click on "generate payment URL" button$/, async function () {
 });
 
 Then(/^I generate a URI for ([0-9]+) ADA$/, async function (amount) {
-  await this.input({ locator: "input[name='amount']", method: 'css' }, amount);
+  await this.input(amountInput, amount);
   await this.click({ locator: '.URIGenerateDialog_component .MuiButton-primary', method: 'css' });
 });
 

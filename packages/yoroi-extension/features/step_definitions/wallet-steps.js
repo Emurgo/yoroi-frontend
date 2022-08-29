@@ -2,14 +2,15 @@
 
 import { When, Then } from 'cucumber';
 import { truncateLongName } from '../../app/utils/formatters';
+import { walletNameInput } from '../pages/restoreWalletPage';
 import { walletNameText } from '../pages/walletPage';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
-  await this.input({ locator: "input[name='walletName']", method: 'css' }, walletName);
+  await this.input(walletNameInput, walletName);
 });
 
 When(/^I clear the name "([^"]*)"$/, async function (walletName) {
-  await this.clearInputUpdatingForm({ locator: "input[name='walletName']", method: 'css' }, walletName.length);
+  await this.clearInputUpdatingForm(walletNameInput, walletName.length);
 });
 
 When(/^I navigate to wallet sidebar category$/, async function () {

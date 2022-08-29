@@ -7,3 +7,7 @@ export const assetsButton = { locator: 'sidebar.assets', method: 'id' };
 export const votingButton = { locator: 'sidebar.voting', method: 'id' };
 export const settingsButton = { locator: 'sidebar.settings', method: 'id' };
 export const faqButton = { locator: '.SidebarRevamp_faq', method: 'css' };
+
+// Classic version elements
+
+export const walletButtonClassic = { locator: `//div[@class='Sidebar_categories']//button[1]`, method: 'xpath' };

@@ -14,6 +14,7 @@ import {
 } from '../support/helpers/transfer-helpers';
 import { claimTransferTab } from '../pages/walletPage';
 import { byronButton } from '../pages/walletClaimTransferPage';
+import { primaryButton } from '../pages/commonDialogPage';
 
 async function confirmAttentionScreen(customWorld: Object){
   // Attention screen
@@ -71,7 +72,7 @@ Then(/^I see the transfer transaction$/, async function () {
   await this.waitForElement({ locator: '.TransferSummaryPage_body', method: 'css' });
 });
 Then(/^I accept the prompt$/, async function () {
-  await this.click({ locator: '.primary', method: 'css' });
+  await this.click(primaryButton);
 });
 Then(/^I select the trezor option$/, async function () {
   await this.click({ locator: '.fromTrezor_connectTrezor', method: 'css' });
