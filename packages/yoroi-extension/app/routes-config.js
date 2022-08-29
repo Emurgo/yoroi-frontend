@@ -24,7 +24,6 @@ export const TRACKED_ROUTES: RegExp = new RegExp(
 
 export const ROUTES = {
   ROOT: '/',
-
   NIGHTLY_INFO: '/nightly',
   MY_WALLETS: '/my-wallets',
   PROFILE: {
@@ -88,7 +87,6 @@ export const ROUTES = {
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites'
   },
-  // Experimental
   EXPERIMENTAL: {
     YOROI_PALETTE: '/experimental/yoroi-palette',
     YOROI_COMPONENTS: '/experimental/components',

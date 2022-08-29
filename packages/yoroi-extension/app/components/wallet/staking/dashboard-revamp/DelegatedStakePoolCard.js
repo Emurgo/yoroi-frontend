@@ -52,9 +52,11 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
         </Typography>
         <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
       </Box>
-      <UndelegateButton color="secondary" onClick={undelegate}>
-        {intl.formatMessage(globalMessages.undelegateLabel)}
-      </UndelegateButton>
+      {undelegate && (
+        <UndelegateButton color="secondary" onClick={undelegate}>
+          {intl.formatMessage(globalMessages.undelegateLabel)}
+        </UndelegateButton>
+      )}
     </Wrapper>
   );
 }

@@ -19,6 +19,13 @@
   flex: 1;
 }
 
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
 .faq {
   max-width: 47px;
   text-transform: uppercase;
