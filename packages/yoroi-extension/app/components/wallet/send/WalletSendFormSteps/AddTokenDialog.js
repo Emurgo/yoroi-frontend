@@ -280,7 +280,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
       this.setState({ sortingDirection: newSortDirection })
 
-      if (field === 'amount') {
+      if (field === SORTING_COLUMNS.AMOUNT) {
         return compareNumbers(a[field], b[field], newSortDirection)
       }
       // Other fields

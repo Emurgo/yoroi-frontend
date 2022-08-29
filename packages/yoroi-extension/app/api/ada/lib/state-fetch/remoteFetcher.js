@@ -300,7 +300,12 @@ export class RemoteFetcher implements IFetcher {
       txId: body.id
     }))
       .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
+        const err = {
+          msg: error.message,
+          res: error.response?.data || null,
+        }
+
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ${stringifyError(err)}`);
         if (error.request.response.includes('Invalid witness')) {
           throw new InvalidWitnessError();
         }
