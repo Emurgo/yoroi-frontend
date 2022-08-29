@@ -90,8 +90,9 @@ function TokenList({
       newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
+    setState({ ...state, sortingDirection: newSortDirection })
 
-    if (field === 'amount') {
+    if (field === SORTING_COLUMNS.AMOUNT) {
       return compareNumbers(a[field], b[field], newSortDirection)
     }
     // Other fields

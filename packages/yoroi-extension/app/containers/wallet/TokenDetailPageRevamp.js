@@ -64,6 +64,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
 
     const { tokenId } = this.props.match.params;
     const tokenInfo = assetsList.find(token => token.id === tokenId);
+    const tokensCount = assetsList.length + 1 // +1 for the default assets
 
     return (
       <Box
@@ -72,7 +73,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
         height="content"
         overflow="auto"
       >
-        <TokenDetails tokenInfo={tokenInfo} tokensCount={assetsList.length} network={network} />
+        <TokenDetails tokenInfo={tokenInfo} tokensCount={tokensCount} network={network} />
       </Box>
     );
   }
