@@ -1558,26 +1558,27 @@ async function handleInjectorMessage(message, sender) {
           rpcResponse(undefined); // shouldn't happen
         } else {
           await withDb(async (db, localStorageApi) => {
-            return await withSelectedWallet(tabId,
-                                            async (wallet) => {
-                                              const stateFetcher: CardanoIFetcher =
-                                                    await getCardanoStateFetcher(localStorageApi);
-                                              const networkInfo = wallet.getParent().getNetworkInfo();
-                                              const foreignUtxoFetcher: ForeignUtxoFetcher =
-                                                    ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
-                                              const resp = await connectorCreateCardanoTx(
-                                                wallet,
-                                                null,
-                                                message.params[0],
-                                                foreignUtxoFetcher,
-                                              );
-                                              rpcResponse({
-                                                ok: resp,
-                                              });
-                                            },
-                                            db,
-                                            localStorageApi
-                                           );
+            return await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                const stateFetcher: CardanoIFetcher =
+                      await getCardanoStateFetcher(localStorageApi);
+                const networkInfo = wallet.getParent().getNetworkInfo();
+                const foreignUtxoFetcher: ForeignUtxoFetcher =
+                      ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
+                const resp = await connectorCreateCardanoTx(
+                  wallet,
+                  null,
+                  message.params[0],
+                  foreignUtxoFetcher,
+                );
+                rpcResponse({
+                  ok: resp,
+                });
+              },
+              db,
+              localStorageApi
+            );
           });
         }
       } catch (e) {
