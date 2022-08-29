@@ -110,12 +110,6 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    new webpack.NormalModuleReplacementPlugin(
-      /rustLoader/,
-      (resource) => {
-        resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground')
-      }
-    ),
   ],
   module: {
     rules: [
