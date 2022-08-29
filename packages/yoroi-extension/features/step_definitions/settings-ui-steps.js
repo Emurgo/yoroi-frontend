@@ -3,12 +3,35 @@
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
-import { truncateLongName, } from '../../app/utils/formatters';
+import { truncateLongName } from '../../app/utils/formatters';
 import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 import { walletNameText } from '../pages/walletPage';
-
-const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
+import {
+  changePasswordDialog,
+  changePasswordDialogError,
+  confirmButton,
+  currentPasswordInput,
+  explorerSettingsDropdown,
+  helperText,
+  newPasswordInput,
+  repeatPasswordInput,
+  walletNameInput,
+  walletNameInputSelector,
+  walletPasswordHelperText,
+  walletSettingsPane,
+  faqTitle,
+  logsTitle,
+  reportingAProblemTitle,
+  cardanoPaymentsURLTitle,
+  currencyConversionText,
+  removeWalletButton,
+  resyncWalletButton,
+  exportButton,
+  exportPublicKeyDialog,
+  fullScreenMessage,
+} from '../pages/settingsPage';
+import { dialogTitle } from '../pages/commonDialogPage';
 
 Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
@@ -16,7 +39,7 @@ Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dia
 });
 
 When(/^I click on "name" input field$/, async function () {
-  await this.click({ locator: '.SettingsLayout_settingsPane .InlineEditingInput_component', method: 'css' });
+  await this.click(walletNameInput);
 });
 
 When(/^I enter new wallet name:$/, async function (table) {
@@ -26,17 +49,17 @@ When(/^I enter new wallet name:$/, async function (table) {
    * This makes our InlineEditingInput become disabled causing the clear and sendKeys to fail
    * https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/214
    * We instead repeatedly delete characters until we've deleted the whole name
-  */
+   */
 
   // can't programmatically get the wallet name due to the issue above
   // so assume max length
   const maxNameLength = 40;
   for (let i = 0; i < maxNameLength; i++) {
     // Chrome and Firefox select the text field starting at the left / right respectively
-    await this.input({ locator: walletNameInputSelector, method: 'css' }, Key.BACK_SPACE); // Firefox
-    await this.input({ locator: walletNameInputSelector, method: 'css' }, Key.DELETE); // Chrome
+    await this.input(walletNameInputSelector, Key.BACK_SPACE); // Firefox
+    await this.input(walletNameInputSelector, Key.DELETE); // Chrome
   }
-  await this.input({ locator: walletNameInputSelector, method: 'css' }, fields.name);
+  await this.input(walletNameInputSelector, fields.name);
 });
 
 Then(/^I should see the "Terms of use" screen$/, async function () {
@@ -44,7 +67,7 @@ Then(/^I should see the "Terms of use" screen$/, async function () {
 });
 
 When(/^I click outside "name" input field$/, async function () {
-  await this.click({ locator: '.SettingsLayout_settingsPane', method: 'css' });
+  await this.click(walletSettingsPane);
 });
 
 When(/^I click on the "([^"]*)" password label$/, async function (label) {
@@ -54,29 +77,29 @@ When(/^I click on the "([^"]*)" password label$/, async function (label) {
 
 When(/^I change wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: '.changePasswordDialog .currentPassword input', method: 'css' }, fields.currentPassword);
-  await this.input({ locator: '.changePasswordDialog .newPassword input', method: 'css' }, fields.password);
-  await this.input({ locator: '.changePasswordDialog .repeatedPassword input', method: 'css' }, fields.repeatedPassword);
+  await this.input(currentPasswordInput, fields.currentPassword);
+  await this.input(newPasswordInput, fields.password);
+  await this.input(repeatPasswordInput, fields.repeatedPassword);
 });
 
 When(/^I clear the current wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm({ locator: '.changePasswordDialog .currentPassword input', method: 'css' }, password.length);
+  await this.clearInputUpdatingForm(currentPasswordInput, password.length);
 });
 
 When(/^I clear the current wallet repeat password ([^"]*)$/, async function (repeatPassword) {
-  await this.clearInputUpdatingForm({ locator: '.changePasswordDialog .repeatedPassword input', method: 'css' }, repeatPassword.length);
+  await this.clearInputUpdatingForm(repeatPasswordInput, repeatPassword.length);
 });
 
 When(/^I submit the wallet password dialog$/, async function () {
-  await this.click({ locator: '.confirmButton', method: 'css' });
+  await this.click(confirmButton);
 });
 
 When(/^I click the next button$/, async function () {
-  await this.click({ locator: '.confirmButton', method: 'css' });
+  await this.click(confirmButton);
 });
 
 Then(/^I should not see the change password dialog anymore$/, async function () {
-  await this.waitForElementNotPresent({ locator: '.changePasswordDialog', method: 'css' });
+  await this.waitForElementNotPresent(changePasswordDialog);
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
@@ -85,88 +108,74 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  await checkErrorByTranslationId(
-    this,
-    { locator: '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]', method: 'xpath' },
-    error);
+  await checkErrorByTranslationId(this, walletPasswordHelperText, error);
 });
 
 Then(/^I should see "Doesn't match" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  await checkErrorByTranslationId(
-    this,
-    { locator: '.MuiFormHelperText-root', method: 'css' },
-    error);
+  await checkErrorByTranslationId(this, helperText, error);
 });
 
 Then(/^I should see the following submit error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  await checkErrorByTranslationId(
-    this,
-    { locator: '.ChangeWalletPasswordDialog_error', method: 'css' },
-    error);
+  await checkErrorByTranslationId(this, changePasswordDialogError, error);
 });
 
 Then(/^I should stay in the change password dialog$/, async function () {
-  const changePasswordMessage = await i18n.formatMessage(this.driver,
-    { id: 'wallet.settings.changePassword.dialog.title.changePassword' });
-  await this.waitUntilText({ locator: '.dialog__title', method: 'css' }, changePasswordMessage.toUpperCase(), 2000);
+  const changePasswordMessage = await i18n.formatMessage(this.driver, {
+    id: 'wallet.settings.changePassword.dialog.title.changePassword',
+  });
+  await this.waitUntilText(dialogTitle, changePasswordMessage.toUpperCase(), 2000);
 });
 
 Then(/^I should see support screen$/, async function () {
-  await this.waitForElement({ locator: "//h1[contains(text(), 'Frequently asked questions')]", method: 'xpath' });
-  await this.waitForElement({ locator: "//h1[contains(text(), 'Reporting a problem')]", method: 'xpath' });
-  await this.waitForElement({ locator: "//h1[contains(text(), 'Logs')]", method: 'xpath' });
+  await this.waitForElement(faqTitle);
+  await this.waitForElement(reportingAProblemTitle);
+  await this.waitForElement(logsTitle);
 });
 
 Then(/^I should see blockchain screen$/, async function () {
-  await this.waitForElement({ locator: '.ExplorerSettings_component', method: 'css' });
-  await this.waitForElement({ locator: "//h2[contains(text(), 'Cardano Payment URLs')]", method: 'xpath' });
-  await this.waitForElement({ locator: "//h2[contains(text(), 'Currency Conversion')]", method: 'xpath' });
+  await this.waitForElement(explorerSettingsDropdown);
+  await this.waitForElement(cardanoPaymentsURLTitle);
+  await this.waitForElement(currencyConversionText);
 });
 
 When(/^I click on remove wallet$/, async function () {
-  await this.click({ locator: '.removeWallet', method: 'css' });
+  await this.click(removeWalletButton);
 });
 
 When(/^I click on resync wallet$/, async function () {
-  await this.click({ locator: '.resyncButton', method: 'css' });
+  await this.click(resyncWalletButton);
 });
 
 When(/^I click on export wallet$/, async function () {
-  await this.click({ locator: '.exportWallet', method: 'css' });
+  await this.click(exportButton);
 });
 
 Then(/^I should see the wallet export for key "([^"]*)"$/, async function (expectedKey) {
-  await this.waitForElement({ locator: '.ExportPublicKeyDialog_component', method: 'css' });
+  await this.waitForElement(exportPublicKeyDialog);
   const publicKeyForm = await this.driver.findElement(By.css('.CodeBlock_component'));
   const publicKey = await publicKeyForm.getText();
   expect(publicKey).to.equal(expectedKey);
 });
 
 Then(/^I click on the checkbox$/, async function () {
-  const warningCheckboxElement = await this.driver.findElement(By.css('.DangerousActionDialog_checkbox'));
+  const warningCheckboxElement = await this.driver.findElement(
+    By.css('.DangerousActionDialog_checkbox')
+  );
   const checkbox = await warningCheckboxElement.findElement(By.xpath('//input[@type="checkbox"]'));
   await checkbox.click();
 });
 
 Then(/^I should see a no wallet message$/, async function () {
-  const noWalletMessage = await i18n.formatMessage(
-    this.driver,
-    { id: 'wallet.nowallet.title' }
-  );
-  await this.waitUntilText({ locator: '.FullscreenMessage_title', method: 'css' }, noWalletMessage);
+  const noWalletMessage = await i18n.formatMessage(this.driver, { id: 'wallet.nowallet.title' });
+  await this.waitUntilText(fullScreenMessage, noWalletMessage);
 });
 
 Then(/^I sleep for ([^"]*)$/, async function (ms) {
   await this.driver.sleep(Number.parseInt(ms, 10));
 });
 
-Then(/^I should see "Incorrect wallet password." error message$/, async function(){
-  const errorSelector = '.ChangeWalletPasswordDialog_error';
-  await this.waitUntilText(
-    { locator: errorSelector, method: 'css' },
-    'Incorrect wallet password.',
-    15000
-  );
+Then(/^I should see "Incorrect wallet password." error message$/, async function () {
+  await this.waitUntilText(changePasswordDialogError, 'Incorrect wallet password.', 15000);
 });

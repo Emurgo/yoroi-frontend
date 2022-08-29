@@ -5,6 +5,7 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
 import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import { primaryButton } from '../pages/commonDialogPage';
 
 // ========== Paper wallet ==========
 
@@ -17,7 +18,7 @@ Then(/^I select 2 addresses$/, async function () {
 });
 
 Then(/^I click the create paper wallet button$/, async function () {
-  await this.click({ locator: '.primary', method: 'css' });
+  await this.click(primaryButton);
 });
 
 const fakeAddresses = [

@@ -32,3 +32,5 @@ export const trezorConfirmButton: LocatorObject = { locator: '.MuiButton-primary
 export const walletNameInput: LocatorObject = { locator: '//input[@name="walletName"]', method: 'xpath' };
 export const saveDialog: LocatorObject = { locator: '.SaveDialog', method: 'css' };
 export const saveButton: LocatorObject = { locator: '//button[@id="primaryButton"]', method: 'xpath' };
+export const checkDialog: LocatorObject = { locator: '.CheckDialog_component', method: 'css' };
+export const sendConfirmationDialog: LocatorObject = { locator: '.HWSendConfirmationDialog_dialog', method: 'css' };

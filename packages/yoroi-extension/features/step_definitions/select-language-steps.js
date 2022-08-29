@@ -3,7 +3,7 @@
 import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
 import languageSelection, { clickContinue } from '../support/helpers/language-selection-helpers';
-import { languageSelectionForm } from '../pages/basicSetupPage';
+import { japaneseLaguageSelection, languageSelectionForm } from '../pages/basicSetupPage';
 
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
@@ -20,7 +20,7 @@ When(/^I open language selection dropdown$/, async function () {
 });
 
 When(/^I select Japanese language$/, async function () {
-  return this.click({ locator: '//span[contains(text(), "日本語")]', method: 'xpath' });
+  return this.click(japaneseLaguageSelection);
 });
 
 When(/^I submit the language selection form$/, async function () {
@@ -28,10 +28,7 @@ When(/^I submit the language selection form$/, async function () {
 });
 
 Then(/^I should not see the language selection screen anymore$/, async function () {
-  await this.waitForElementNotPresent({
-    locator: LANGUAGE_SELECTION_FORM,
-    method: 'css'
-  });
+  await this.waitForElementNotPresent(languageSelectionForm);
 });
 
 Then(/^I should have Japanese language set$/, async function () {

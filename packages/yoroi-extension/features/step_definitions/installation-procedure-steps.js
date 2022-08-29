@@ -3,11 +3,12 @@
 import { Given, When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
+import { termsOfUseComponent } from '../pages/basicSetupPage';
 
 const TERMS_OF_USE_FORM = '.TermsOfUseForm_component';
 
 Given(/^I am on the "Terms of use" screen$/, async function () {
-  await this.waitForElement({ locator: TERMS_OF_USE_FORM, method: 'css' });
+  await this.waitForElement(termsOfUseComponent);
 });
 
 When(/^I click on "I agree with the terms of use" checkbox$/, async function () {
@@ -23,10 +24,7 @@ When(/^I submit the "Terms of use" form$/, async function () {
 });
 
 Then(/^I should not see the "Terms of use" screen anymore$/, async function () {
-  await this.waitForElementNotPresent({
-    locator: TERMS_OF_USE_FORM,
-    method: 'css'
-  });
+  await this.waitForElementNotPresent(termsOfUseComponent);
 });
 
 Then(/^I should have "Terms of use" accepted$/, async function () {

@@ -11,6 +11,7 @@ import {
   pickUpCurrencyDialog
 } from '../pages/newWalletPages';
 import { continueButton } from '../pages/basicSetupPage';
+import { dialogTitle } from '../pages/commonDialogPage';
 
 When(/^I click the create button$/, async function () {
   await this.click(createWalletButton);
@@ -117,7 +118,7 @@ Then(/^I see All selected words are cleared$/, async function () {
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
   const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.create.dialog.title' });
-  await this.waitUntilText({ locator: '.dialog__title', method: 'css' }, createMessage.toUpperCase(), 2000);
+  await this.waitUntilText(dialogTitle, createMessage.toUpperCase(), 2000);
 });
 
 Then(

@@ -10,6 +10,7 @@ import {
 import { TrezorEmulatorController } from '../support/trezorEmulatorController';
 import { expect } from 'chai';
 import { verifyButton } from '../pages/verifyAddressPage';
+import { errorBlockComponent } from '../pages/commonDialogPage';
 
 export async function switchToTrezorAndAllow(customWorld: any) {
     // wait for a new tab
@@ -85,5 +86,5 @@ Then(/^I verify the address on the trezor emulator$/, async function () {
     }
     await this.windowManager.waitForClosingAndSwitchTo(trezorConnectTabName, extensionTabName);
     // we should have this disable while the action is processing, but we don't show a spinner on this
-    await this.waitForElementNotPresent({ locator: '.ErrorBlock_component', method: 'css' });
+    await this.waitForElementNotPresent(errorBlockComponent);
 });
