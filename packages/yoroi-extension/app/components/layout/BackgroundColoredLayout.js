@@ -11,7 +11,7 @@ function BackgroundColoredLayout({ children }: Props): Node {
   return (
     <Box
       sx={{
-        overflow: 'overlay',
+        overflow: 'auto',
         height: '100%',
         padding: '30px',
         background: 'var(--yoroi-palette-gray-50)',

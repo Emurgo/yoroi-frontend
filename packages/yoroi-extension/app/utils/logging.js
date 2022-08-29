@@ -77,3 +77,9 @@ export const stringifyData = (data : any): string => inspect(data);
 export const stringifyError = (error : any): string => (
   JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
 );
+
+// It should convert the whole error object into json
+// Unlike `stringifyError` which use a `replacer` to select some fields
+export const fullErrStr = (err: any): string  => (
+  JSON.stringify(err, null, 2)
+)

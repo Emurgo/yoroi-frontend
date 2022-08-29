@@ -21,7 +21,7 @@ const messages = defineMessages({
   },
   explanation: {
     id: 'wallet.restore.dialog.walletExist.explanation',
-    defaultMessage: '!!!You are trying to restore existing wallet.',
+    defaultMessage: '!!!The wallet you are trying to restore already exists.',
   }
 });
 

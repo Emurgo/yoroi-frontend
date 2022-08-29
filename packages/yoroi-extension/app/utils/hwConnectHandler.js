@@ -89,12 +89,12 @@ export class LedgerConnect {
       chrome.tabs.sendMessage(
         tabId,
         {
-          data: {
+          data: JSON.parse(JSON.stringify({
             action,
             params,
             target: YOROI_LEDGER_CONNECT_TARGET_NAME,
             serial,
-        }
+          })),
         },
         (response: ?MessageType) => {
           if (response != null) {
