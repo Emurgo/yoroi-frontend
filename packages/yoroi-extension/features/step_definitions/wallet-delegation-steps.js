@@ -1,7 +1,6 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-<<<<<<< HEAD
 import {
   delegationDashboardPage,
   delegationDashboardPageButton,
@@ -11,9 +10,6 @@ import {
   poolIdInput,
   stakePoolTicker,
 } from '../pages/walletDelegationPage';
-=======
-import { delegationDashboardPage, delegationDashboardPageButton, delegationFormNextButton, delegationSuccessPage, delegationTxDialog, poolIdInput, stakePoolTicker } from '../pages/walletDelegationPage';
->>>>>>> 81dc2848d8d1b4eb27a469700ceb1622cbc6745c
 import { delegationByIdTab } from '../pages/walletPage';
 
 When(/^I go to the delegation by id screen$/, async function () {
