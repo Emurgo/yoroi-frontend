@@ -160,16 +160,19 @@ const StyledTab = styled(Tab)({
 });
 
 function StakePoolAlert({ message }: {| message: string |}): Node {
+  const [show, setShow] = useState(true);
   return (
-    <StyledBox>
-      <InfoIconSVG />
-      <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
-        {message}
-      </Typography>
-      <IconButton>
-        <CloseIcon />
-      </IconButton>
-    </StyledBox>
+    show && (
+      <StyledBox>
+        <InfoIconSVG />
+        <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
+          {message}
+        </Typography>
+        <IconButton onClick={() => setShow(false)}>
+          <CloseIcon />
+        </IconButton>
+      </StyledBox>
+    )
   );
 }
 const StyledBox = styled(Box)({
