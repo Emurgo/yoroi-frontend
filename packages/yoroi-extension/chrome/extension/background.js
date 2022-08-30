@@ -531,6 +531,7 @@ const yoroiMessageHandler = async (
           publicDeriverId: request.publicDeriverId,
           auth: request.auth,
         };
+        await setConnectedSite(request.tabId, connection);
       } else {
         connectContinuation(
           connection?.status?.requestType,
