@@ -5,23 +5,24 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
 import { amountInput } from '../pages/walletSendPage';
+import { copyToClipboardIcon, generateUriButton, generateUriIcon, invalidUriDialog, uriDetailsConfirmButton, uriDisplayDialog, uriGenerateDialog, uriLandingDialog, uriLandingDialogAcceptButton, uriVerifyDialog, uriVerifyDialogAddress, uriVerifyDialogAmount } from '../pages/walletReceivePage';
 
 When(/^I click on "generate payment URL" button$/, async function () {
-  await this.click({ locator: '.WalletReceive_generateURIIcon', method: 'css' });
-  await this.waitForElement({ locator: '.URIGenerateDialog', method: 'css' });
+  await this.click(generateUriIcon);
+  await this.waitForElement(uriGenerateDialog);
 });
 
 Then(/^I generate a URI for ([0-9]+) ADA$/, async function (amount) {
   await this.input(amountInput, amount);
-  await this.click({ locator: '.URIGenerateDialog_component .MuiButton-primary', method: 'css' });
+  await this.click(generateUriButton);
 });
 
 Then(/^I should see the URI displayed in a new dialog$/, async function () {
-  await this.waitForElement({ locator: '.URIDisplayDialog', method: 'css' });
+  await this.waitForElement(uriDisplayDialog);
 });
 
 Then(/^I click on the copy to clipboard icon$/, async function () {
-  await this.click({ locator: '.URIDisplayDialog_uriDisplay .CopyableAddress_copyIconBig', method: 'css' });
+  await this.click(copyToClipboardIcon);
 });
 
 When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async function (address, amount) {
@@ -33,27 +34,27 @@ When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async func
 });
 
 Then(/^I should see and accept a warning dialog$/, async function () {
-  await this.waitForElement({ locator: '.URILandingDialog', method: 'css' });
-  await this.click({ locator: '.URILandingDialog .MuiButton-primary', method: 'css' });
+  await this.waitForElement(uriLandingDialog);
+  await this.click(uriLandingDialogAcceptButton);
 });
 
 Then(/^I should see a dialog with the transaction details$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.waitForElement({ locator: '.URIVerifyDialog', method: 'css' });
-  await this.waitUntilContainsText({ locator: '.URIVerifyDialog_address', method: 'css' }, truncateAddress(fields.address));
-  await this.waitUntilContainsText({ locator: '.URIVerifyDialog_amount', method: 'css' }, fields.amount);
+  await this.waitForElement(uriVerifyDialog);
+  await this.waitUntilContainsText(uriVerifyDialogAddress, truncateAddress(fields.address));
+  await this.waitUntilContainsText(uriVerifyDialogAmount, fields.amount);
 });
 
 When(/^I confirm the URI transaction details$/, async function () {
-  await this.click({ locator: '.URIVerifyDialog .primary', method: 'css' });
+  await this.click(uriDetailsConfirmButton);
 });
 
 Then(/^I should land on send wallet screen with prefilled parameters$/, async function (table) {
   const fields = table.hashes()[0];
   const rxInput = await this.driver.findElement(By.xpath("//input[@name='receiver']")).getAttribute('value');
   expect(rxInput).to.be.equal(fields.address);
-  const amountInput = await this.driver.findElement(By.xpath("//input[@name='amount']")).getAttribute('value');
-  expect(amountInput).to.be.equal(fields.amount);
+  const sendAmountInput = await this.driver.findElement(By.xpath("//input[@name='amount']")).getAttribute('value');
+  expect(sendAmountInput).to.be.equal(fields.amount);
 });
 
 When(/^I open an invalid cardano URI$/, async function () {
@@ -65,5 +66,5 @@ When(/^I open an invalid cardano URI$/, async function () {
 });
 
 Then(/^I should see an "invalid URI" dialog$/, async function () {
-  await this.waitForElement({ locator: '.URIInvalidDialog', method: 'css' });
+  await this.waitForElement(invalidUriDialog);
 });

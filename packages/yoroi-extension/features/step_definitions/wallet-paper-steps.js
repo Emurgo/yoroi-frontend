@@ -3,14 +3,15 @@
 import { Given, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import { truncateAddress, } from '../../app/utils/formatters';
+import { truncateAddress } from '../../app/utils/formatters';
 import { enterRecoveryPhrase } from '../support/helpers/helpers';
 import { primaryButton } from '../pages/commonDialogPage';
+import { paperWalletDialogSelect } from '../pages/newWalletPages';
 
 // ========== Paper wallet ==========
 
 Then(/^I open Number of Adddresses selection dropdown$/, async function () {
-  await this.click({ locator: '.WalletPaperDialog_component .MuiSelect-select', method: 'css' });
+  await this.click(paperWalletDialogSelect);
 });
 
 Then(/^I select 2 addresses$/, async function () {
@@ -27,31 +28,33 @@ const fakeAddresses = [
 ];
 Then(/^I enter the paper recovery phrase$/, async function () {
   /**
- * Mnemomic is printed on the paper wallet and not present in the UI
- * So we instead fetch the paper wallet from app memory
- */
-  const recoveryPhrase = await this.driver.executeScript(() => (
-    window.yoroi.stores.substores.ada.paperWallets.paper.scrambledWords
-  ));
+   * Mnemomic is printed on the paper wallet and not present in the UI
+   * So we instead fetch the paper wallet from app memory
+   */
+  const recoveryPhrase = await this.driver.executeScript(
+    () => window.yoroi.stores.substores.ada.paperWallets.paper.scrambledWords
+  );
 
   await enterRecoveryPhrase(this, recoveryPhrase.join(' '));
 });
 
 Given(/^I swap the paper wallet addresses$/, async function () {
   // make sure 2 addresses we generated as expected
-  const addresses = await this.driver.executeScript(() => (
-    window.yoroi.stores.substores.ada.paperWallets.paper.addresses
-  ));
+  const addresses = await this.driver.executeScript(
+    () => window.yoroi.stores.substores.ada.paperWallets.paper.addresses
+  );
   expect(addresses.length).to.be.equal(2);
 
   // we swap out the generated addresses with fake ones to get a consistent UI for screenshots
-  await this.driver.executeScript((fakes) => {
+  await this.driver.executeScript(fakes => {
     window.yoroi.stores.substores.ada.paperWallets.paper.addresses = fakes;
   }, fakeAddresses);
 });
 
 Then(/^I should see two addresses displayed$/, async function () {
-  const addressesElem = await this.driver.findElements(By.xpath("//span[contains(@class, 'RawHash_hash')]"));
+  const addressesElem = await this.driver.findElements(
+    By.xpath("//span[contains(@class, 'RawHash_hash')]")
+  );
   expect(addressesElem.length).to.be.equal(fakeAddresses.length);
   for (let i = 0; i < fakeAddresses.length; i++) {
     const address = await addressesElem[i].getText();
