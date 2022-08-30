@@ -30,6 +30,8 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
 import { ReactComponent as NoWalletImage }  from '../../assets/images/no-websites-connected.inline.svg'
 import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as IconEyeOpen }  from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed }  from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg'
 
 const messages = defineMessages({
   subtitle: {
@@ -96,6 +98,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
+  +onUpdateHideBalance: void => Promise<void>,
 |};
 
 @observer
@@ -186,6 +189,7 @@ class ConnectPage extends Component<Props> {
       network,
       shouldHideBalance,
       isAppAuth,
+      onUpdateHideBalance,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -291,7 +295,7 @@ class ConnectPage extends Component<Props> {
             passwordForm
           ) : (
             <>
-              <Box borderBottom="1px solid #dce0e9">
+              <Box>
                 {isError ? <div className={styles.errorMessage}>{error}</div> : null}
                 {isLoading ? (
                   <div className={styles.loading}>
@@ -299,14 +303,23 @@ class ConnectPage extends Component<Props> {
                   </div>
                 ) : hasWallets ? (
                   <Box>
-                    <Typography
-                      variant="h5"
-                      fontWeight="300"
-                      color="var(--yoroi-palette-gray-600)"
-                      mb="14px"
-                    >
-                      {intl.formatMessage(messages.yourWallets)}
-                    </Typography>
+                    <div className={styles.titleWallet}>
+                      <Typography
+                        variant="h5"
+                        fontWeight="300"
+                        color="var(--yoroi-palette-gray-600)"
+                      >
+                        {intl.formatMessage(messages.yourWallets)}
+                      </Typography>
+                      <button
+                        type="button"
+                        className={styles.toggleButton}
+                        onClick={onUpdateHideBalance}
+                      >
+                        {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+                      </button>
+                    </div>
+
                     <ul className={styles.list}>
                       {publicDerivers.map(item => (
                         <li
@@ -328,25 +341,26 @@ class ConnectPage extends Component<Props> {
                   </Box>
                 ) : null}
               </Box>
-              <Typography
-                align='left'
-                color="var(--yoroi-palette-gray-600)"
-                marginTop="20px"
-              >
-                {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
-              </Typography>
             </>
           )}
         </Box>
+        {
+       		hasWallets && !isAppAuth ?
+         <div className={styles.bottom}>
+           <p
+             className={styles.infoText}
+           >
+             {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
+           </p>
 
-        {hasWallets && isAppAuth ? (
-          <div className={styles.bottom}>
-            <div className={styles.infoText}>
-              <p>{intl.formatMessage(messages.connectInfo)}</p>
-              <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
-            </div>
-          </div>
-        ) : null}
+           <p className={styles.infoText}>
+             {intl.formatMessage(messages.connectInfo)}
+           </p>
+           <p className={styles.infoText}>
+             {intl.formatMessage(connectorMessages.messageReadOnly)}
+           </p>
+
+         </div> : null }
       </div>
     );
   }

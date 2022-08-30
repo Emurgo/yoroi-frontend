@@ -1,6 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
+import { Chip } from '@mui/material';
 import styles from './WalletCard.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -27,8 +28,8 @@ function constructPlate(
       <WalletAccountIcon
         iconSeed={plate.ImagePart}
         saturationFactor={saturationFactor}
-        scalePx={6}
-        size={5}
+        scalePx={9}
+        size={8}
       />
     </div>,
   ];
@@ -50,11 +51,17 @@ export default class WalletCard extends Component<Props> {
       : assetNameFromIdentifier(defaultEntry.identifier);
 
     const { shouldHideBalance } = this.props;
+    const checksum = this.props.publicDeriver.checksum?.TextPart;
 
     return (
       <div className={styles.card}>
-        <div className={styles.avatar}>{iconComponent}</div>
-        <div className={styles.name}>{this.props.publicDeriver.name}</div>
+        <div className={styles.wrapper}>
+          <div className={styles.avatar}>{iconComponent}</div>
+          <div className={styles.nameWrapper}>
+            <div className={styles.name}>{this.props.publicDeriver.name}</div>
+            <Chip label={checksum} size="small" />
+          </div>
+        </div>
         <p className={styles.balance}>
           {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
           <span>{ticker}</span>

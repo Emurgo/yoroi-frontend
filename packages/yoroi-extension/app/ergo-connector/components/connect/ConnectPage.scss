@@ -1,9 +1,11 @@
 .component {
-  height: calc(100vh - 92px);
-  overflow: auto;
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 52px);
+	overflow: auto;
   &.isNightly {
     height: calc(100vh - 138px);
-  }
+	} 
 }
 .connectWrapper {
   padding-top: 47px;
@@ -30,8 +32,16 @@
     font-size: 18px;
     font-weight: 500;
   }
-
 }
+
+
+.titleWallet {
+	display: flex;
+	& * + * {
+		padding-left: 10px;
+	}
+}
+
 .noWallets {
   display: flex;
   align-items: center;
@@ -81,20 +91,13 @@
 }
 
 .bottom {
-  padding-left: 32px;
-  padding-right: 32px;
+	border-top: 1px solid #dce0e9;
+  padding: 15px 32px;
 
   .infoText {
     color: var(--yoroi-palette-gray-600);
     font-size: 12px;
-    margin-bottom: 32px;
     line-height: 20px;
-  }
-  & .wrapperBtn {
-    display: flex;
-    button + button {
-      margin-left: 22px;
-    }
   }
 }
 .errorMessage {

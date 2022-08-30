@@ -157,6 +157,10 @@ export default class ConnectContainer extends Component<
     this.setState({ isAppAuth: false })
   }
 
+  updateHideBalance: void => Promise<void> = async () => {
+    await this.generated.actions.connector.updateHideBalance.trigger();
+  };
+
   render(): Node {
     const responseMessage = this.generated.stores.connector.connectingMessage;
     const wallets = this.generated.stores.connector.filteredWallets;
@@ -180,6 +184,7 @@ export default class ConnectContainer extends Component<
         network={network}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        onUpdateHideBalance={this.updateHideBalance}
       />
     );
   }
@@ -197,6 +202,9 @@ export default class ConnectContainer extends Component<
           trigger: (params: void) => void,
         |},
         getConnectorWhitelist: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+        updateHideBalance: {|
           trigger: (params: void) => Promise<void>,
         |},
         updateConnectorWhitelist: {|
@@ -254,6 +262,7 @@ export default class ConnectContainer extends Component<
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger }
         },
       },
     });
