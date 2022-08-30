@@ -34,7 +34,7 @@ const theme = createTheme({
 });
 
 type Props = {|
-  nftInfo: void | {|
+  nftInfo: void | {
     policyId: string,
     ticker: string,
     assetName: string,
@@ -44,7 +44,8 @@ type Props = {|
     description: ?string,
     author: ?string,
     metadata: CardanoAssetMintMetadata | null,
-  |},
+    ...
+  },
   network: $ReadOnly<NetworkRow>,
   nextNftId: string,
   prevNftId: string,
@@ -114,7 +115,7 @@ function NFTDetails({
   const below1250 = useMediaQuery('(max-width:1250px)');
 
   const onCopyMetadata = async () => {
-    if (nftInfo.metadata === null) return;
+    if (nftInfo?.metadata == null) return;
 
     setCopy(false)
     try {
@@ -270,7 +271,7 @@ function NFTDetails({
                         href={
                           networkUrl != null && `${networkUrl}/${nftInfo.policyId}${nftInfo.assetName}`
                         }
-                        disabled={networkUrl === null}
+                        disabled={networkUrl == null}
                         rel="noopener noreferrer"
                         sx={{ textDecoration: 'none' }}
                       >
