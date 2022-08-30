@@ -45,7 +45,11 @@ Then(/^I switch to Trezor-connect screen and allow using$/, async function () {
 });
 
 Then(/^I press Yes on the Trezor emulator$/, async function () {
+<<<<<<< HEAD
   for (let i = 1; i < 6; i++) {
+=======
+  for (let i = 1; i < 4; i++) {
+>>>>>>> 81dc2848d8d1b4eb27a469700ceb1622cbc6745c
     const pressYesResponse = await this.trezorController.emulatorPressYes();
     expect(pressYesResponse.success, `${i} emulator-press-yes request is failed`).to.be.true;
   }
@@ -71,6 +75,7 @@ Then(/^I start trezor emulator environment$/, async function () {
 
   const emulatorWipeResponse = await this.trezorController.emulatorWipe();
   expect(emulatorWipeResponse.success, 'emulator-wipe request is failed').to.be.true;
+<<<<<<< HEAD
 });
 
 Then(/^I setup trezor emulator for ([^"]*)$/, async function (walletName) {
@@ -78,6 +83,12 @@ Then(/^I setup trezor emulator for ([^"]*)$/, async function (walletName) {
   expect(restoreInfo).to.not.equal(undefined);
 
   const emulatorSetupResponse = await this.trezorController.emulatorSetup(restoreInfo.mnemonic);
+=======
+
+  const emulatorSetupResponse = await this.trezorController.emulatorSetup(
+    'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel'
+  );
+>>>>>>> 81dc2848d8d1b4eb27a469700ceb1622cbc6745c
   expect(emulatorSetupResponse.success, 'emulator-setup request is failed').to.be.true;
 });
 

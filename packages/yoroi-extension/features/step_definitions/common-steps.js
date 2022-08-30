@@ -58,7 +58,6 @@ import {
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import * as helpers from '../support/helpers/helpers';
 import { extensionTabName } from '../support/windowManager';
-
 import {
   confirmButton,
   repeatPasswordInput,
