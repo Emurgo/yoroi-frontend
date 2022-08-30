@@ -33,10 +33,14 @@ Then(/^I delete the memo$/, async function () {
   await this.click({ locator: '.editMemoButton', method: 'css' });
   await this.click(primaryButton);
   let memoComponent = await this.driver.findElement(By.css('.MemoDialogCommon_component'));
-  const deleteButton = await memoComponent.findElement(By.xpath('//button[@aria-label="delete memo"]'));
+  const deleteButton = await memoComponent.findElement(
+    By.xpath('//button[@aria-label="delete memo"]')
+  );
   await deleteButton.click();
   memoComponent = await this.driver.findElement(By.css('.MemoDialogCommon_component'));
-  const confirmDelete = await memoComponent.findElement(By.xpath('//button[contains(text(), "Delete")]'));
+  const confirmDelete = await memoComponent.findElement(
+    By.xpath('//button[contains(text(), "Delete")]')
+  );
   await confirmDelete.click();
 });
 

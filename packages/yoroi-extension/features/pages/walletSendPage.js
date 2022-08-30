@@ -14,7 +14,7 @@ export const receiverInput: LocatorObject = { locator: "input[name='receiver']",
 export const amountInput: LocatorObject = { locator: "input[name='amount']", method: 'css' };
 export const addMemoButton: LocatorObject = { locator: '.addMemoButton', method: 'css' };
 export const memoContentInput: LocatorObject = {
-  locator: "input[name='memoContent']",
+  locator: "input[name='memo']",
   method: 'css',
 };
 export const nextButton: LocatorObject = {

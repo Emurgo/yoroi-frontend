@@ -276,7 +276,9 @@ Then(/^I close the dApp-connector pop-up window$/, async function () {
 });
 
 Then(/^The wallet (.+) is connected to the website (.+)$/, async function (walletName, websiteUrl) {
-  this.webDriverLogger.info(`Step: The wallet ${walletName} is connected to the website ${websiteUrl}`);
+  this.webDriverLogger.info(
+    `Step: The wallet ${walletName} is connected to the website ${websiteUrl}`
+  );
   await this.windowManager.switchTo(extensionTabName);
   const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
   // it should be reworked by using ui components when it is done
@@ -382,7 +384,9 @@ When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
 Then(
   /^The dApp should see collateral: (.+) for (.+)$/,
   async function (expectedCollateral, utxosAmount) {
-    this.webDriverLogger.info(`Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`);
+    this.webDriverLogger.info(
+      `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
+    );
     const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
     const collateralJson = JSON.parse(collateral)[0];
     const expectedUtxos = JSON.parse(expectedCollateral);
@@ -422,7 +426,9 @@ Then(/^I should see the collateral from address info:$/, async function (table) 
     addr =>
       addr.address === expectedFromAddress && addr.amount === parseFloat(expectedFromAddressAmount)
   );
-  this.webDriverLogger.info(`Step: I should see the collateral from address info: address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}`);
+  this.webDriverLogger.info(
+    `Step: I should see the collateral from address info: address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}`
+  );
   expect(
     foundFromAddresses.length,
     `Expected fromAddress:

@@ -5,15 +5,22 @@ import { camelCase } from 'lodash';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, WebElement } from 'selenium-webdriver';
-import { complexitySelected, secondThemeSelected, settingsLayoutComponent, complexityLevelForm, languageSelector } from '../pages/settingsPage';
+import {
+  complexitySelected,
+  secondThemeSelected,
+  settingsLayoutComponent,
+  complexityLevelForm,
+  languageSelector,
+} from '../pages/settingsPage';
 
 export async function selectSubmenuSettings(customWorld: Object, buttonName: string) {
   const formattedButtonName = camelCase(buttonName);
   const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
   await customWorld.click({ locator: buttonSelector, method: 'css' });
-  await customWorld.waitForElement(
-    { locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`, method: 'css' }
-  );
+  await customWorld.waitForElement({
+    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
+    method: 'css',
+  });
 }
 
 export async function goToSettings(customWorld: Object) {
@@ -47,7 +54,10 @@ When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
   const formattedButtonName = camelCase(buttonName);
   const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
   await this.click({ locator: buttonSelector, method: 'css' });
-  await this.waitForElement({ locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`, method: 'css' });
+  await this.waitForElement({
+    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
+    method: 'css',
+  });
 });
 
 When(/^I select second theme$/, async function () {

@@ -28,3 +28,5 @@ export const delegationDashboardPage: LocatorObject = {
   locator: '.StakingDashboard_page',
   method: 'css',
 };
+export const hardwareDisclaimerComponent = { locator: '.HardwareDisclaimer_component', method: 'css' };
+export const understandButton = { locator: '//button[text()="I understand"]', method: 'xpath' };

@@ -28,10 +28,11 @@ Then(/^I should not see the "Terms of use" screen anymore$/, async function () {
 });
 
 Then(/^I should have "Terms of use" accepted$/, async function () {
-  const result = await this.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.profile.getTermsOfUseAcceptanceRequest.execute()
+  const result = await this.driver.executeAsyncScript(done => {
+    window.yoroi.stores.profile.getTermsOfUseAcceptanceRequest
+      .execute()
       .then(done)
-      .catch((error) => done(error));
+      .catch(error => done(error));
   });
   expect(result).to.equal(true);
 });

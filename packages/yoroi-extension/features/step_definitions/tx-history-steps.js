@@ -5,7 +5,14 @@ import { By } from 'selenium-webdriver';
 import chai from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
-import { failedTransactionElement, noTransactionsComponent, numberOfTransactions, pendingTransactionElement, showMoreButton, transactionListElement } from '../pages/walletTransactionsPage';
+import {
+  failedTransactionElement,
+  noTransactionsComponent,
+  numberOfTransactions,
+  pendingTransactionElement,
+  showMoreButton,
+  transactionListElement,
+} from '../pages/walletTransactionsPage';
 import { summaryTab } from '../pages/walletPage';
 
 function verifyAllTxsFields(

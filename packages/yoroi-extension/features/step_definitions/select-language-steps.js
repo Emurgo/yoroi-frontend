@@ -32,10 +32,11 @@ Then(/^I should not see the language selection screen anymore$/, async function 
 });
 
 Then(/^I should have Japanese language set$/, async function () {
-  const result = await this.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.profile.getProfileLocaleRequest.execute()
+  const result = await this.driver.executeAsyncScript(done => {
+    window.yoroi.stores.profile.getProfileLocaleRequest
+      .execute()
       .then(done)
-      .catch((error) => done(error));
+      .catch(error => done(error));
   });
   expect(result).to.equal('ja-JP');
 });

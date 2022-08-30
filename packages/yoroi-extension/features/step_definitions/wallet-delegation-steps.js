@@ -1,7 +1,15 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-import { delegationDashboardPage, delegationDashboardPageButton, delegationFormNextButton, delegationSuccessPage, delegationTxDialog, poolIdInput, stakePoolTicker } from '../pages/walletDelegationPage';
+import {
+  delegationDashboardPage,
+  delegationDashboardPageButton,
+  delegationFormNextButton,
+  delegationSuccessPage,
+  delegationTxDialog,
+  poolIdInput,
+  stakePoolTicker,
+} from '../pages/walletDelegationPage';
 import { delegationByIdTab } from '../pages/walletPage';
 
 When(/^I go to the delegation by id screen$/, async function () {
@@ -33,4 +41,3 @@ Given(/^I click on see dashboard$/, async function () {
 When(/^I should see the dashboard screen$/, async function () {
   await this.waitForElement(delegationDashboardPage);
 });
-

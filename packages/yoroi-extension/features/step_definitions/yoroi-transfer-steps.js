@@ -36,16 +36,17 @@ import {
 } from '../pages/walletClaimTransferPage';
 import { primaryButton } from '../pages/commonDialogPage';
 import { fullScreenMessage } from '../pages/settingsPage';
+import { hardwareDisclaimerComponent, understandButton } from '../pages/walletDelegationPage';
 
 async function confirmAttentionScreen(customWorld: Object) {
   // Attention screen
-  await customWorld.waitForElement({ locator: '.HardwareDisclaimer_component', method: 'css' });
+  await customWorld.waitForElement(hardwareDisclaimerComponent);
   const disclaimerClassElement = await customWorld.driver.findElement(
     By.css('.HardwareDisclaimer_component')
   );
   const checkbox = await disclaimerClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
   await checkbox.click();
-  await customWorld.click({ locator: '//button[text()="I understand"]', method: 'xpath' });
+  await customWorld.click(understandButton);
 }
 
 Given(/^I am on the transfer start screen$/, async function () {

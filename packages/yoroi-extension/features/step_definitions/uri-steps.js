@@ -3,9 +3,22 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import { truncateAddress, } from '../../app/utils/formatters';
+import { truncateAddress } from '../../app/utils/formatters';
 import { amountInput } from '../pages/walletSendPage';
-import { copyToClipboardIcon, generateUriButton, generateUriIcon, invalidUriDialog, uriDetailsConfirmButton, uriDisplayDialog, uriGenerateDialog, uriLandingDialog, uriLandingDialogAcceptButton, uriVerifyDialog, uriVerifyDialogAddress, uriVerifyDialogAmount } from '../pages/walletReceivePage';
+import {
+  copyToClipboardIcon,
+  generateUriButton,
+  generateUriIcon,
+  invalidUriDialog,
+  uriDetailsConfirmButton,
+  uriDisplayDialog,
+  uriGenerateDialog,
+  uriLandingDialog,
+  uriLandingDialogAcceptButton,
+  uriVerifyDialog,
+  uriVerifyDialogAddress,
+  uriVerifyDialogAmount,
+} from '../pages/walletReceivePage';
 
 When(/^I click on "generate payment URL" button$/, async function () {
   await this.click(generateUriIcon);
@@ -25,13 +38,17 @@ Then(/^I click on the copy to clipboard icon$/, async function () {
   await this.click(copyToClipboardIcon);
 });
 
-When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async function (address, amount) {
-  // In practice, clicking a cardano URI will cause the browser to open a URL of this form
-  const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;
-  await this.driver.get('about:blank'); // dummy step, but needed
-  await this.driver.get(uri);
-  await this.driver.sleep(500);
-});
+When(
+  /^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/,
+  async function (address, amount) {
+    // In practice, clicking a cardano URI will cause the browser to open a URL of this form
+    const uri =
+      this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;
+    await this.driver.get('about:blank'); // dummy step, but needed
+    await this.driver.get(uri);
+    await this.driver.sleep(500);
+  }
+);
 
 Then(/^I should see and accept a warning dialog$/, async function () {
   await this.waitForElement(uriLandingDialog);
@@ -51,16 +68,25 @@ When(/^I confirm the URI transaction details$/, async function () {
 
 Then(/^I should land on send wallet screen with prefilled parameters$/, async function (table) {
   const fields = table.hashes()[0];
-  const rxInput = await this.driver.findElement(By.xpath("//input[@name='receiver']")).getAttribute('value');
+  const rxInput = await this.driver
+    .findElement(By.xpath("//input[@name='receiver']"))
+    .getAttribute('value');
   expect(rxInput).to.be.equal(fields.address);
-  const sendAmountInput = await this.driver.findElement(By.xpath("//input[@name='amount']")).getAttribute('value');
+  const sendAmountInput = await this.driver
+    .findElement(By.xpath("//input[@name='amount']"))
+    .getAttribute('value');
   expect(sendAmountInput).to.be.equal(fields.amount);
 });
 
 When(/^I open an invalid cardano URI$/, async function () {
   const invalidAddress = 'Ae2tdPwUPEZKmw0y3AU3cXb5Chnasj6mvVNxV1H11997q3VW5IhbSfQwGpm';
   const amount = '1';
-  const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + invalidAddress + '?amount=' + amount;
+  const uri =
+    this.getExtensionUrl() +
+    '#/send-from-uri?q=web+cardano:' +
+    invalidAddress +
+    '?amount=' +
+    amount;
   await this.driver.get('about:blank'); // dummy step, but needed
   await this.driver.get(uri);
 });
