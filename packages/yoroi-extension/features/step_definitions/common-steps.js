@@ -36,7 +36,6 @@ import { walletButton } from '../pages/sidebarPage';
 import { getWalletButtonByPlate } from '../pages/walletsListPage';
 import {
   connectHwButton,
-  restoreWalletButton,
   getCurrencyButton,
   pickUpCurrencyDialog,
   hwOptionsDialog,
@@ -54,12 +53,14 @@ import {
   walletRestoreDialog,
   pickUpCurrencyDialogCardano,
   byronEraButton,
+  walletAddRestoreWalletButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import * as helpers from '../support/helpers/helpers';
 import {
   confirmButton,
   repeatPasswordInput,
+  restoreWalletButton,
   walletPasswordInput,
 } from '../pages/restoreWalletPage';
 import { walletNameText } from '../pages/walletPage';
@@ -304,7 +305,7 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click(restoreWalletButton);
+  await this.click(walletAddRestoreWalletButton);
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogErgo);
@@ -322,7 +323,7 @@ Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (wallet
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click(restoreWalletButton);
+  await this.click(walletAddRestoreWalletButton);
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogCardano);
@@ -341,7 +342,7 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click(restoreWalletButton);
+  await this.click(walletAddRestoreWalletButton);
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
@@ -359,7 +360,7 @@ Given(/^I have completed the basic setup$/, async function () {
   this.webDriverLogger.info(`Step: I have completed the basic setup`);
   // language select page
   await this.waitForElement(languageSelectionForm);
-  await this.click();
+  await this.click(continueButton);
   // ToS page
   await this.waitForElement(termsOfUseComponent);
   const tosClassElement = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
