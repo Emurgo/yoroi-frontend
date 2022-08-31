@@ -316,6 +316,7 @@ class WalletAddPage extends Component<AllProps> {
       return (
         <TopBarLayout
           banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+          asModern
         >
           <WalletAdd
             onHardwareConnect={
