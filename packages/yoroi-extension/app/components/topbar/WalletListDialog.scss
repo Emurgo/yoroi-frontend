@@ -6,6 +6,10 @@
   padding-right: 0 !important;
   padding-bottom: 0px !important;
 
+  & > div {
+    padding: 0px;
+  }
+
   .header {
     position: sticky;
     top: 0px;
@@ -15,9 +19,11 @@
     padding-top: 14px;
     padding-left: 40px;
   }
+
   .totalInfo {
     display: flex;
   }
+
   .amount {
     margin-right: 8px;
     color: var(--yoroi-palette-gray-600);
