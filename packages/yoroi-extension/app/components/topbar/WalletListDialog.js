@@ -239,7 +239,7 @@ export default class WalletListDialog extends Component<Props, State> {
               )}
             </Droppable>
           </DragDropContext>
-          {cardanoWalletsIdx.length > 0 &&
+          {ergoWalletsIdx.length > 0 &&
           <div className={styles.sectionHeader}>
             <h1>{intl.formatMessage(messages.ergo)}</h1>
           </div>}
