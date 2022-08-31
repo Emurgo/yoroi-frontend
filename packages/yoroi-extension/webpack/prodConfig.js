@@ -85,7 +85,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
 
 const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
   mode: 'production',
-  experiments: commonConfig.experiments,
+  experiments: { asyncWebAssembly: true },
   resolve: commonConfig.resolve(),
   entry: {
     background: [
