@@ -53,19 +53,5 @@
     padding-left: 24px;
     overflow-y: scroll;
   }
-  .footer {
-    position: sticky;
-    bottom: 0px;
-    background: var(--yoroi-comp-dialog-background);
-    border-top: 1px solid #dce0e9;
-    padding: 20px 0;
-    display: flex;
-    justify-content: center;
-    button {
-      font-weight: 500;
-      text-transform: uppercase;
-      color: var(--yoroi-palette-secondary-300);
-    }
-  }
 }
 
