@@ -5,7 +5,7 @@
 	overflow: auto;
   &.isNightly {
     height: calc(100vh - 138px);
-	} 
+  }
 }
 .connectWrapper {
   padding-top: 47px;
@@ -91,7 +91,7 @@
 }
 
 .bottom {
-	border-top: 1px solid #dce0e9;
+  border-top: 1px solid #dce0e9;
   padding: 15px 32px;
 
   .infoText {
