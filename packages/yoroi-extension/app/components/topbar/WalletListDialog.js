@@ -19,6 +19,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import type { WalletsNavigation } from '../../api/localStorage';
+import { Button } from '@mui/material';
 
 const messages = defineMessages({
   addWallet: {
@@ -267,11 +268,9 @@ export default class WalletListDialog extends Component<Props, State> {
             )}
           </Droppable>
         </DragDropContext>
-        <div className={styles.footer}>
-          <button type="button" className={styles.toggleButton} onClick={onAddWallet}>
-            {intl.formatMessage(messages.addWallet)}
-          </button>
-        </div>
+        <Button onClick={onAddWallet} fullWidth variant='text' color='secondary' sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', borderRadius: '0px' }}>
+          {intl.formatMessage(messages.addWallet)}
+        </Button>
       </Dialog>
     );
   }
