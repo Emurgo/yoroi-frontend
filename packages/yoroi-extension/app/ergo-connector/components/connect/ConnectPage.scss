@@ -1,8 +1,8 @@
 .component {
-	display: flex;
-	flex-direction: column;
-	height: calc(100vh - 52px);
-	overflow: auto;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px);
+  overflow: auto;
   &.isNightly {
     height: calc(100vh - 138px);
   }
@@ -36,10 +36,10 @@
 
 
 .titleWallet {
-	display: flex;
-	& * + * {
-		padding-left: 10px;
-	}
+  display: flex;
+  & * + * {
+    padding-left: 10px;
+  }
 }
 
 .noWallets {
