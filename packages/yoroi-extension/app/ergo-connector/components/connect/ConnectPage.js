@@ -344,23 +344,22 @@ class ConnectPage extends Component<Props> {
             </>
           )}
         </Box>
-        {
-       		hasWallets && !isAppAuth ?
-         <div className={styles.bottom}>
-           <p
-             className={styles.infoText}
-           >
-             {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
-           </p>
+        { hasWallets && !isAppAuth ?
+          <div className={styles.bottom}>
+            <p
+              className={styles.infoText}
+            >
+              {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
+            </p>
 
-           <p className={styles.infoText}>
-             {intl.formatMessage(messages.connectInfo)}
-           </p>
-           <p className={styles.infoText}>
-             {intl.formatMessage(connectorMessages.messageReadOnly)}
-           </p>
+            <p className={styles.infoText}>
+              {intl.formatMessage(messages.connectInfo)}
+            </p>
+            <p className={styles.infoText}>
+              {intl.formatMessage(connectorMessages.messageReadOnly)}
+            </p>
 
-         </div> : null }
+          </div> : null }
       </div>
     );
   }
