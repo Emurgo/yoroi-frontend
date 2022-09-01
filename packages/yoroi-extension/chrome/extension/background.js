@@ -109,7 +109,7 @@ async function getFromStorage(key: string): Promise<any> {
   return result[storageKey];
 }
 
-function sendToInjector(tabId, message) {
+function sendToInjector(tabId: number, message: any) {
   chrome.tabs.sendMessage(tabId, message);
 }
 
@@ -783,7 +783,7 @@ const yoroiMessageHandler = async (
     for (const tabId of Object.keys(connectedSites)) {
       const site = connectedSites[tabId];
       if (site.url === request.url) {
-        sendToInjector(tabId, { type: 'disconnect' });
+        sendToInjector(Number(tabId), { type: 'disconnect' });
         break;
       }
     }
