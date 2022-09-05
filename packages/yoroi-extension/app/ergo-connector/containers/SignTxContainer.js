@@ -45,7 +45,7 @@ export default class SignTxContainer extends Component<
 
   componentDidMount() {
     this.generated.actions.connector.refreshWallets.trigger();
-    window.addEventListener('unload', this.onUnload);
+    window.addEventListener('beforeunload', this.onUnload);
   }
 
   onConfirm: (PublicDeriver<>) => string => Promise<void> = deriver => async password => {

@@ -705,10 +705,15 @@ const yoroiMessageHandler = async (
       sendToInjector(
         request.tabId,
         {
-          err: {
-            code: 2,
-            info: 'User rejected'
-          }
+          type: 'connector_rpc_response',
+          protocol: responseData.protocol,
+          uid: request.uid,
+          return: {
+            err: {
+              code: 2,
+              info: 'User rejected'
+            },
+          },
         }
       );
       delete connection.pendingSigns[String(request.uid)];
@@ -724,10 +729,15 @@ const yoroiMessageHandler = async (
       sendToInjector(
         request.tabId,
         {
-          err: {
-            code: 3,
-            info: `utxo error: ${request.errorType} (${request.data})`
-          }
+          type: 'connector_rpc_response',
+          protocol: responseData.protocol,
+          uid: request.uid,
+          return: {
+            err: {
+              code: 3,
+              info: `utxo error: ${request.errorType} (${request.data})`
+            },
+          },
         }
       );
       delete connection.pendingSigns[String(request.uid)];
