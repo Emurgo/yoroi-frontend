@@ -62,6 +62,10 @@ export const tokenMessages: Object = defineMessages({
     id: 'wallet.assets.identifier',
     defaultMessage: '!!!Identifier',
   },
+  description: {
+    id: 'wallet.nftGallary.details.description',
+    defaultMessage: '!!!Description'
+  },
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
@@ -208,9 +212,9 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           />
         </Box>
         {/* TODO: add description */}
-        {/* <Box marginTop="22px"> */}
-        {/*  <LabelWithValue label="Description" value={'lorem ips'} /> */}
-        {/* </Box> */}
+        <Box marginTop="22px">
+          <LabelWithValue label={intl.formatMessage(tokenMessages.description)} value="lorem ips" />
+        </Box>
       </Box>
     </Box>
   );
