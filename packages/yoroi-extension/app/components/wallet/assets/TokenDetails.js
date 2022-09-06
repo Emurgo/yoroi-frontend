@@ -18,6 +18,7 @@ import {
   isTestnet,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { CopyAddress } from './NFTDetails';
 
 type Props = {|
   tokenInfo: void | {|
@@ -190,7 +191,9 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           <LabelWithValue
             label={intl.formatMessage(globalMessages.fingerprint)}
             value={
-              <CopyToClipboardText text={tokenInfo.policyId}>{tokenInfo.id}</CopyToClipboardText>
+              <CopyAddress text={tokenInfo.policyId}>
+                {tokenInfo.policyId}
+              </CopyAddress>
             }
           />
         </Box>
@@ -198,9 +201,9 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           <LabelWithValue
             label={intl.formatMessage(tokenMessages.policyId)}
             value={
-              <CopyToClipboardText text={tokenInfo.policyId}>
+              <CopyAddress text={tokenInfo.policyId}>
                 {tokenInfo.policyId}
-              </CopyToClipboardText>
+              </CopyAddress>
             }
           />
         </Box>

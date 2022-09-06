@@ -358,7 +358,7 @@ const TruncatedText = styled(Typography)({
   textOverflow: 'ellipsis',
 })
 
-function CopyAddress({ text, children }): Node {
+export function CopyAddress({ text, children }): Node {
   const [isCopied, setCopy] = useState(false);
 
   const onCopy = async () => {
