@@ -101,10 +101,10 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
               textDecoration: 'none',
             }}
           >
-            {intl.formatMessage(globalMessages.tokens)}({tokensCount}) -&gt;{' '}
+            {intl.formatMessage(globalMessages.tokens)}({tokensCount})
           </Typography>
           <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
-            {tokenInfo.name}
+            / {tokenInfo.name}
           </Typography>
         </Typography>
       </Box>
@@ -211,10 +211,14 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
             }
           />
         </Box>
-        {/* TODO: add description */}
+
+        {tokenInfo.description &&
         <Box marginTop="22px">
-          <LabelWithValue label={intl.formatMessage(tokenMessages.description)} value="lorem ips" />
-        </Box>
+          <LabelWithValue
+            label={intl.formatMessage(tokenMessages.description)}
+            value={tokenInfo.description}
+          />
+        </Box>}
       </Box>
     </Box>
   );
