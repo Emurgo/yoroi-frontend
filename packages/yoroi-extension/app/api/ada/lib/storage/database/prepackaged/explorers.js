@@ -134,6 +134,19 @@ const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
+const CardanoPreprodTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+  {
+    ExplorerId: 4_00,
+    NetworkId: networks.CardanoPreprodTestnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://explorer.cardano-testnet.iohkdev.io/en/address?address=',
+      transaction: 'https://explorer.cardano-testnet.iohkdev.io/en/transaction?id=',
+    },
+    Name: 'CardanoExplorer',
+  },
+];
+
 const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 5_00,
@@ -150,7 +163,7 @@ const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
-  [networks.CardanoPreprodTestnet.NetworkId, CardanoTestnetExplorers],
+  [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
   [networks.JormungandrMainnet.NetworkId, JormungandrExplorers],
   [networks.ErgoMainnet.NetworkId, ErgoExplorers],
   [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],

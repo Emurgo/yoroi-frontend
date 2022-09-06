@@ -82,8 +82,8 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 <OptionBlock
                   parentName="PickCurrencyOptionDialog"
                   type="cardanoTestnet"
-                  title="Cardano Testnet"
-                  onSubmit={this.props.onCardanoTestnet}
+                  title="Cardano Preprod Testnet"
+                  onSubmit={this.props.onCardanoPreprodTestnet}
                   learnMoreText={
                     <>
                       {intl.formatMessage(messages.testnetDescription)}<br />
@@ -98,8 +98,8 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 <OptionBlock
                   parentName="PickCurrencyOptionDialog"
                   type="cardanoTestnet"
-                  title="Cardano Preprod Testnet"
-                  onSubmit={this.props.onCardanoPreprodTestnet}
+                  title="Cardano Legacy Testnet"
+                  onSubmit={this.props.onCardanoTestnet}
                   learnMoreText={
                     <>
                       {intl.formatMessage(messages.testnetDescription)}<br />
