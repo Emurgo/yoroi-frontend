@@ -11,7 +11,6 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import {
   isCardanoHaskell,
   isErgo,
@@ -157,6 +156,7 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
               value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
             />
           </Grid>
+          {isCardanoHaskell(network) &&
           <Grid item xs={4}>
             <LabelWithValue
               label={
@@ -181,11 +181,11 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
                   rel="noopener noreferrer"
                   sx={{ textDecoration: 'none' }}
                 >
-                  Cardanoscan
+                  {intl.formatMessage(globalMessages.cardanoscan)}
                 </LinkMui>
               }
             />
-          </Grid>
+          </Grid>}
         </Grid>
         <Box marginTop="22px">
           <LabelWithValue
