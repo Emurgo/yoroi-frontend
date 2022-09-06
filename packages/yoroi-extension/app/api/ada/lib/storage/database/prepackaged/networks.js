@@ -166,10 +166,10 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
-        : 'https://testnet-backend.lon.emurgo-rnd.com',
+        : 'https://preprod-backend.yoroiwallet.com',
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
-        : 'wss://testnet-backend.lon.emurgo-rnd.com:443',
+        : 'wss://preprod-backend.yoroiwallet.com:443',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
     },
