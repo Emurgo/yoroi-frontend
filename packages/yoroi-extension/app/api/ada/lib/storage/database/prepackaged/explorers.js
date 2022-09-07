@@ -136,14 +136,17 @@ const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
 
 const CardanoPreprodTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
-    ExplorerId: 4_00,
+    ExplorerId: 4_50,
     NetworkId: networks.CardanoPreprodTestnet.NetworkId,
     IsBackup: true,
     Endpoints: {
-      address: 'https://explorer.cardano-testnet.iohkdev.io/en/address?address=',
-      transaction: 'https://explorer.cardano-testnet.iohkdev.io/en/transaction?id=',
+      address: 'https://testnet.cardanoscan.io/address/',
+      transaction: 'https://testnet.cardanoscan.io/transaction/',
+      pool: 'https://testnet.cardanoscan.io/pool/',
+      stakeAddress: 'https://testnet.cardanoscan.io/stakeKey/',
+      token: 'https://testnet.cardanoscan.io/token/',
     },
-    Name: 'CardanoExplorer',
+    Name: 'CardanoScan',
   },
 ];
 
