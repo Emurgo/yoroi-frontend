@@ -218,7 +218,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
         wallet,
         settingsCache,
         shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
-        isCurrentWallet: wallet === this.generated.stores.wallets.selected,
       };
 
       if(isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap)
@@ -231,6 +230,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           cardanoWallets={cardanoWallets}
           ergoWallets={ergoWallets}
           onSelect={this.onSelectWallet}
+          selectedWallet={this.generated.stores.wallets.selected}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}

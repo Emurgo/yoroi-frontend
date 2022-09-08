@@ -117,6 +117,7 @@ export default class WalletListDialog extends Component<Props, State> {
       {
         ergoWalletsIdx: ergoWalletsId,
         cardanoWalletsIdx: cardanoWalletsId,
+        selectedWallet: this.props.selectedWallet,
       },
       async () => {
         await this.props.updateSortedWalletList({
@@ -178,6 +179,12 @@ export default class WalletListDialog extends Component<Props, State> {
     const { selectedWallet } = this.state;
     if (selectedWallet === null) return;
     this.props.onSelect(selectedWallet);
+    this.props.close();
+  }
+
+  isCurrentWallet(wallet: PublicDeriver<>, compareWith: 'local' | 'global') {
+    const selectedWallet = compareWith === 'local' ? this.state.selectedWallet : this.props.selectedWallet;
+    return wallet.getPublicDeriverId() === selectedWallet?.getPublicDeriverId()
   }
 
   render(): Node {
@@ -231,24 +238,26 @@ export default class WalletListDialog extends Component<Props, State> {
                 {provided => (
                   <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
                     {cardanoWalletsIdx.length > 0 &&
-                  cardanoWalletsIdx.map((walletId, idx) => {
-                    const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
-                    if (!wallet) {
-                      return null;
-                    }
-                    return (
-                      <WalletCard
-                        key={walletId}
-                        idx={idx}
-                        toggleQuickAccess={this.toggleQuickAccess}
-                        isInQuickAccess={quickAccessList.has(walletId)}
-                        onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
-                        {...wallet}
-                        unitOfAccountSetting={unitOfAccountSetting}
-                        getCurrentPrice={getCurrentPrice}
-                      />
-                    );
-                  }).filter(Boolean)}
+                    cardanoWalletsIdx.map((walletId, idx) => {
+                      const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
+                      if (!wallet) {
+                        return null;
+                      }
+
+                      return (
+                        <WalletCard
+                          key={walletId}
+                          idx={idx}
+                          toggleQuickAccess={this.toggleQuickAccess}
+                          isInQuickAccess={quickAccessList.has(walletId)}
+                          onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
+                          isCurrentWallet={this.isCurrentWallet(wallet.wallet, 'local')}
+                          {...wallet}
+                          unitOfAccountSetting={unitOfAccountSetting}
+                          getCurrentPrice={getCurrentPrice}
+                        />
+                      );
+                    }).filter(Boolean)}
                     {provided.placeholder}
                   </div>
               )}
@@ -291,7 +300,7 @@ export default class WalletListDialog extends Component<Props, State> {
           <Button onClick={onAddWallet} size='large' fullWidth variant='outlined' color='secondary'>
             {intl.formatMessage(messages.addWallet)}
           </Button>
-          <Button onClick={this.onSelect} size='large' disabled={this.state.selectedWallet === null} fullWidth variant="primary">
+          <Button onClick={this.onSelect} size='large' disabled={this.state.selectedWallet === null || this.isCurrentWallet(this.state.selectedWallet, 'global')} fullWidth variant="primary">
             {intl.formatMessage(messages.applyWallet)}
           </Button>
         </Stack>
