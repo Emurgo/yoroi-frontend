@@ -283,6 +283,8 @@ export default class WalletListDialog extends Component<Props, State> {
                         idx={idx}
                         toggleQuickAccess={this.toggleQuickAccess}
                         isInQuickAccess={quickAccessList.has(walletId)}
+                        onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
+                        isCurrentWallet={this.isCurrentWallet(wallet.wallet, 'local')}
                         {...wallet}
                         unitOfAccountSetting={unitOfAccountSetting}
                         getCurrentPrice={getCurrentPrice}
