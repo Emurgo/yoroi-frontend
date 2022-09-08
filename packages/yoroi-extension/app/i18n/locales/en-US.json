@@ -625,6 +625,8 @@
   "wallet.loading": "Loading...",
   "wallet.nav.addButton": "Add new wallet",
   "wallet.nav.addWallet": "Add Wallet",
+  "wallet.nav.addNewWallet": "Add new wallet",
+  "wallet.nav.applyNewWallet": "Apply new wallet",
   "wallet.nav.allWalletsLabel": "All wallets",
   "wallet.nav.backButton": "Back to my wallets",
   "wallet.nav.noWalletsAccessList.goToWallets": "Go to all my wallets and star those you use most often",

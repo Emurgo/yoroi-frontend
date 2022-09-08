@@ -19,13 +19,17 @@ import globalMessages from '../../i18n/global-messages';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import type { WalletsNavigation } from '../../api/localStorage';
-import { Button } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 
 const messages = defineMessages({
   addWallet: {
-    id: 'wallet.nav.addWallet',
-    defaultMessage: '!!!Add Wallet',
+    id: 'wallet.nav.addNewWallet',
+    defaultMessage: '!!!Add new wallet',
+  },
+  applyWallet: {
+    id: 'wallet.nav.applyNewWallet',
+    defaultMessage: '!!!Apply new wallet',
   },
   totalBalance: {
     id: 'wallet.topbar.dialog.totalBalance',
@@ -192,7 +196,7 @@ export default class WalletListDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
       >
-        <Box sx={{ paddingX: '40px' }}>
+        <Box>
           <div className={styles.header}>
             <div className={styles.totalInfo}>
               {(walletsTotal !== undefined) && (
@@ -208,15 +212,16 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          {cardanoWalletsIdx.length > 0 &&
-          <div className={styles.sectionHeader}>
-            <h1>{intl.formatMessage(messages.cardano)}</h1>
-          </div>}
-          <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
-            <Droppable droppableId="cardano-list-droppable">
-              {provided => (
-                <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                  {cardanoWalletsIdx.length > 0 &&
+          <Box sx={{ overflow: 'auto', maxHeight: '50vh', overflowY: 'auto', paddingX: '40px' }}>
+            {cardanoWalletsIdx.length > 0 &&
+            <div className={styles.sectionHeader}>
+              <h1>{intl.formatMessage(messages.cardano)}</h1>
+            </div>}
+            <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
+              <Droppable droppableId="cardano-list-droppable">
+                {provided => (
+                  <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
+                    {cardanoWalletsIdx.length > 0 &&
                   cardanoWalletsIdx.map((walletId, idx) => {
                     const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
                     if (!wallet) {
@@ -234,20 +239,47 @@ export default class WalletListDialog extends Component<Props, State> {
                       />
                     );
                   }).filter(Boolean)}
-                  {provided.placeholder}
-                </div>
+                    {provided.placeholder}
+                  </div>
               )}
-            </Droppable>
-          </DragDropContext>
-          {ergoWalletsIdx.length > 0 &&
-          <div className={styles.sectionHeader}>
-            <h1>{intl.formatMessage(messages.ergo)}</h1>
-          </div>}
-          <DragDropContext onDragEnd={(result) => this.onDragEnd('ergo', result)}>
-            <Droppable droppableId="ergo-list-droppable">
-              {provided => (
-                <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                  {ergoWalletsIdx.length > 0 &&
+              </Droppable>
+            </DragDropContext>
+            <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
+              <Droppable droppableId="cardano-list-droppable">
+                {provided => (
+                  <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
+                    {cardanoWalletsIdx.length > 0 &&
+                  cardanoWalletsIdx.map((walletId, idx) => {
+                    const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
+                    if (!wallet) {
+                      return null;
+                    }
+                    return (
+                      <WalletCard
+                        key={walletId}
+                        idx={idx}
+                        toggleQuickAccess={this.toggleQuickAccess}
+                        isInQuickAccess={quickAccessList.has(walletId)}
+                        {...wallet}
+                        unitOfAccountSetting={unitOfAccountSetting}
+                        getCurrentPrice={getCurrentPrice}
+                      />
+                    );
+                  }).filter(Boolean)}
+                    {provided.placeholder}
+                  </div>
+              )}
+              </Droppable>
+            </DragDropContext>
+            {ergoWalletsIdx.length > 0 &&
+            <div className={styles.sectionHeader}>
+              <h1>{intl.formatMessage(messages.ergo)}</h1>
+            </div>}
+            <DragDropContext onDragEnd={(result) => this.onDragEnd('ergo', result)}>
+              <Droppable droppableId="ergo-list-droppable">
+                {provided => (
+                  <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
+                    {ergoWalletsIdx.length > 0 &&
                   ergoWalletsIdx.map((walletId, idx) => {
                     const wallet = this.props.ergoWallets.find(w => w.walletId === walletId);
                     if (!wallet) {
@@ -265,15 +297,21 @@ export default class WalletListDialog extends Component<Props, State> {
                       />
                     );
                   }).filter(Boolean)}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </Box>
         </Box>
-        <Button onClick={onAddWallet} fullWidth variant='text' color='secondary' sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', borderRadius: '0px' }}>
-          {intl.formatMessage(messages.addWallet)}
-        </Button>
+        <Stack spacing={1} direction='row' sx={{ alignItems: 'center', justifyContent: 'center', padding: '40px', borderTop: '1px solid var(--yoroi-palette-gray-100)' }}>
+          <Button onClick={onAddWallet} size='large' fullWidth variant='outlined' color='secondary'>
+            {intl.formatMessage(messages.addWallet)}
+          </Button>
+          <Button onClick={onAddWallet} size='large' fullWidth variant='contained' color='primary'>
+            {intl.formatMessage(messages.applyWallet)}
+          </Button>
+        </Stack>
       </Dialog>
     );
   }
