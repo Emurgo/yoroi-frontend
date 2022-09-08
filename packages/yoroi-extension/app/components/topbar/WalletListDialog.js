@@ -21,6 +21,7 @@ import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import type { WalletsNavigation } from '../../api/localStorage';
 import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   addWallet: {
@@ -59,10 +60,12 @@ type Props = {|
   +cardanoWallets: Array<Object>,
   +walletsNavigation: WalletsNavigation,
   +updateSortedWalletList: WalletsNavigation => Promise<void>,
+  +onSelect: (PublicDeriver<>) => void,
 |};
 type State = {|
   ergoWalletsIdx: number[],
   cardanoWalletsIdx: number[],
+  selectedWallet: PublicDeriver<> | null,
 |};
 
 const reorder = (list, startIndex, endIndex) => {
@@ -97,6 +100,7 @@ export default class WalletListDialog extends Component<Props, State> {
   state: State = {
     ergoWalletsIdx: [],
     cardanoWalletsIdx: [],
+    selectedWallet: null,
   };
 
   async componentDidMount(): Promise<void> {
@@ -170,6 +174,12 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   };
 
+  onSelect = () => {
+    const { selectedWallet } = this.state;
+    if (selectedWallet === null) return;
+    this.props.onSelect(selectedWallet);
+  }
+
   render(): Node {
     const { intl } = this.context;
     const { ergoWalletsIdx, cardanoWalletsIdx } = this.state;
@@ -185,7 +195,6 @@ export default class WalletListDialog extends Component<Props, State> {
     } = this.props;
 
     const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
-
     const walletsTotal = this.renderWalletsTotal();
 
     return (
@@ -233,6 +242,7 @@ export default class WalletListDialog extends Component<Props, State> {
                         idx={idx}
                         toggleQuickAccess={this.toggleQuickAccess}
                         isInQuickAccess={quickAccessList.has(walletId)}
+                        onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
                         {...wallet}
                         unitOfAccountSetting={unitOfAccountSetting}
                         getCurrentPrice={getCurrentPrice}
@@ -281,7 +291,7 @@ export default class WalletListDialog extends Component<Props, State> {
           <Button onClick={onAddWallet} size='large' fullWidth variant='outlined' color='secondary'>
             {intl.formatMessage(messages.addWallet)}
           </Button>
-          <Button onClick={onAddWallet} size='large' fullWidth variant="primary">
+          <Button onClick={this.onSelect} size='large' disabled={this.state.selectedWallet === null} fullWidth variant="primary">
             {intl.formatMessage(messages.applyWallet)}
           </Button>
         </Stack>

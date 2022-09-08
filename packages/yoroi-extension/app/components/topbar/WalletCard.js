@@ -5,16 +5,11 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import styles from './WalletCard.scss';
 import WalletAccountIcon from './WalletAccountIcon';
-import { ReactComponent as ConceptualIcon }  from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
-import { ReactComponent as TrezorIcon }  from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
-import { ReactComponent as LedgerIcon }  from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import globalMessages from '../../i18n/global-messages';
 import {
   isLedgerNanoWallet,
@@ -30,6 +25,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { Tooltip, Typography } from '@mui/material';
 import AmountDisplay from '../common/AmountDisplay';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -44,10 +40,11 @@ const messages = defineMessages({
 
 type Props = {|
   +plate: null | WalletChecksum,
-  +wallet: {|
+  +settingsCache: {|
     conceptualWallet: ConceptualWallet,
     conceptualWalletName: string,
   |},
+  +wallet: PublicDeriver<>,
   +rewards: null | void | MultiToken,
   +shouldHideBalance: boolean,
   +walletAmount: null | MultiToken,
@@ -99,16 +96,6 @@ export default class WalletCard extends Component<Props, State> {
     isActionsShow: false,
   };
 
-  getEra: ConceptualWallet => void | $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
-    if (!isCardanoHaskell(wallet.getNetworkInfo())) {
-      return undefined;
-    }
-    if (wallet instanceof Bip44Wallet) {
-      return globalMessages.byronLabel;
-    }
-    return globalMessages.shelleyLabel;
-  };
-
   getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
     if (isLedgerNanoWallet(wallet)) {
       return globalMessages.ledgerWallet;
@@ -119,19 +106,10 @@ export default class WalletCard extends Component<Props, State> {
     return globalMessages.standardWallet;
   };
 
-  getIcon: ConceptualWallet => string = wallet => {
-    if (isLedgerNanoWallet(wallet)) {
-      return LedgerIcon;
-    }
-    if (isTrezorTWallet(wallet)) {
-      return TrezorIcon;
-    }
-    return ConceptualIcon;
-  };
-
   showActions: void => void = () => {
     this.setState({ isActionsShow: true });
   };
+
   hideActions: void => void = () => {
     this.setState({ isActionsShow: false });
   };
@@ -151,7 +129,7 @@ export default class WalletCard extends Component<Props, State> {
       ? constructPlate(this.props.plate, 0, styles.icon)
       : [];
 
-    const typeText = [this.getType(this.props.wallet.conceptualWallet)]
+    const typeText = [this.getType(this.props.settingsCache.conceptualWallet)]
       .filter(text => text != null)
       .map(text => intl.formatMessage(text))
       .join(' - ');
@@ -178,11 +156,11 @@ export default class WalletCard extends Component<Props, State> {
               className={styles.main}
               role="button"
               tabIndex="0"
-              onClick={this.props.onSelect}
-              onKeyDown={this.props.onSelect}
+              onClick={() => this.props.onSelect(this.props.wallet)}
+              onKeyDown={() => this.props.onSelect(this.props.wallet)}
             >
               <div className={styles.header}>
-                <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
+                <h5 className={styles.name}>{this.props.settingsCache.conceptualWalletName}</h5>
                 {' ·  '}
                 <div className={styles.type}>{typeText}</div>
               </div>
