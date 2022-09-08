@@ -61,6 +61,7 @@ type Props = {|
   +walletsNavigation: WalletsNavigation,
   +updateSortedWalletList: WalletsNavigation => Promise<void>,
   +onSelect: (PublicDeriver<>) => void,
+  +selectedWallet: null | PublicDeriver<>
 |};
 type State = {|
   ergoWalletsIdx: number[],
@@ -175,14 +176,14 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   };
 
-  onSelect = () => {
+  onSelect: void => void = () => {
     const { selectedWallet } = this.state;
     if (selectedWallet === null) return;
     this.props.onSelect(selectedWallet);
     this.props.close();
   }
 
-  isCurrentWallet(wallet: PublicDeriver<>, compareWith: 'local' | 'global') {
+  isCurrentWallet(wallet: PublicDeriver<>, compareWith: 'local' | 'global'): boolean {
     const selectedWallet = compareWith === 'local' ? this.state.selectedWallet : this.props.selectedWallet;
     return wallet.getPublicDeriverId() === selectedWallet?.getPublicDeriverId()
   }

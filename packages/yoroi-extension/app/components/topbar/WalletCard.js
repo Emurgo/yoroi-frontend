@@ -50,7 +50,7 @@ type Props = {|
   +walletAmount: null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isCurrentWallet?: boolean,
-  +onSelect?: void => void,
+  +onSelect: void => void,
   +walletId: string,
   +idx: number,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -86,9 +86,7 @@ export default class WalletCard extends Component<Props, State> {
 
   static defaultProps: {|
     isCurrentWallet: boolean,
-    onSelect: void,
   |} = {
-    onSelect: undefined,
     isCurrentWallet: false,
   };
 
@@ -156,8 +154,8 @@ export default class WalletCard extends Component<Props, State> {
               className={styles.main}
               role="button"
               tabIndex="0"
-              onClick={() => this.props.onSelect(this.props.wallet)}
-              onKeyDown={() => this.props.onSelect(this.props.wallet)}
+              onClick={this.props.onSelect}
+              onKeyDown={this.props.onSelect}
             >
               <div className={styles.header}>
                 <h5 className={styles.name}>{this.props.settingsCache.conceptualWalletName}</h5>
