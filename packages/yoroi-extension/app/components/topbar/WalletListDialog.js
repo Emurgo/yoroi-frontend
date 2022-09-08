@@ -244,33 +244,6 @@ export default class WalletListDialog extends Component<Props, State> {
               )}
               </Droppable>
             </DragDropContext>
-            <DragDropContext onDragEnd={(result) => this.onDragEnd('cardano', result)}>
-              <Droppable droppableId="cardano-list-droppable">
-                {provided => (
-                  <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                    {cardanoWalletsIdx.length > 0 &&
-                  cardanoWalletsIdx.map((walletId, idx) => {
-                    const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
-                    if (!wallet) {
-                      return null;
-                    }
-                    return (
-                      <WalletCard
-                        key={walletId}
-                        idx={idx}
-                        toggleQuickAccess={this.toggleQuickAccess}
-                        isInQuickAccess={quickAccessList.has(walletId)}
-                        {...wallet}
-                        unitOfAccountSetting={unitOfAccountSetting}
-                        getCurrentPrice={getCurrentPrice}
-                      />
-                    );
-                  }).filter(Boolean)}
-                    {provided.placeholder}
-                  </div>
-              )}
-              </Droppable>
-            </DragDropContext>
             {ergoWalletsIdx.length > 0 &&
             <div className={styles.sectionHeader}>
               <h1>{intl.formatMessage(messages.ergo)}</h1>
@@ -308,7 +281,7 @@ export default class WalletListDialog extends Component<Props, State> {
           <Button onClick={onAddWallet} size='large' fullWidth variant='outlined' color='secondary'>
             {intl.formatMessage(messages.addWallet)}
           </Button>
-          <Button onClick={onAddWallet} size='large' fullWidth variant='contained' color='primary'>
+          <Button onClick={onAddWallet} size='large' fullWidth variant="primary">
             {intl.formatMessage(messages.applyWallet)}
           </Button>
         </Stack>
