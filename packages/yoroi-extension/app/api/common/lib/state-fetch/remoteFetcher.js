@@ -29,7 +29,7 @@ declare var CONFIG: ConfigType;
 const priceBackendUrl = (() => {
   let endpoint;
   if (environment.isNightly()) {
-    endpoint = networks.CardanoTestnet.Backend.BackendService;
+    endpoint = networks.CardanoPreprodTestnet.Backend.BackendService;
   } else {
     endpoint = networks.CardanoMainnet.Backend.BackendService;
   }
