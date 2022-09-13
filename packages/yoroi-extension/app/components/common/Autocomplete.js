@@ -131,6 +131,7 @@ function Autocomplete({
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
         htmlFor={id ?? 'autocomplete-combobox'}
         {...getLabelProps()}
+        sx={{ backgroundColor: 'var(--yoroi-palette-common-white)', padding: '0px 6px' }}
       >
         {label}
       </InputLabel>

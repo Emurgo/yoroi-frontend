@@ -252,6 +252,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.nav.allWalletsLabel',
     defaultMessage: '!!!All wallets',
   },
+  changeWallet: {
+    id: 'wallet.nav.changeWallet',
+    defaultMessage: '!!!Change wallet',
+  },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
     defaultMessage: '!!!ATTENTION:',
