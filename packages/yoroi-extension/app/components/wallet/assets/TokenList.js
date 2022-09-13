@@ -9,6 +9,7 @@ import { ReactComponent as ArrowsListFromBottom }  from '../../../assets/images/
 import { ReactComponent as ArrowsListFromTop }  from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList }  from '../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as Info }  from '../../../assets/images/assets-page/info.inline.svg';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
@@ -24,6 +25,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Stack,
   Typography,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
@@ -161,9 +163,12 @@ function TokenList({
                 </ButtonBase>
               }
               secondColumn={
-                <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
-                  {intl.formatMessage(globalMessages.fingerprint)}
-                </Typography>
+                <Stack direction='row' alignItems='center' spacing='4px'>
+                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
+                    {intl.formatMessage(globalMessages.fingerprint)}
+                  </Typography>
+                  <Info />
+                </Stack>
               }
               thirdColumn={
                 <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
