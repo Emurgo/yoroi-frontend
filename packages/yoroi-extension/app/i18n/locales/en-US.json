@@ -626,6 +626,7 @@
   "wallet.nav.addButton": "Add new wallet",
   "wallet.nav.addWallet": "Add Wallet",
   "wallet.nav.allWalletsLabel": "All wallets",
+  "wallet.nav.changeWallet": "Change wallet",
   "wallet.nav.backButton": "Back to my wallets",
   "wallet.nav.noWalletsAccessList.goToWallets": "Go to all my wallets and star those you use most often",
   "wallet.nav.noWalletsAccessList.noWallets": "No wallets added to this list yet",
