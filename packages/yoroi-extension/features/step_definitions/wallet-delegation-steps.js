@@ -72,4 +72,3 @@ Given(/^I click on see dashboard$/, async function () {
 When(/^I should see the dashboard screen$/, async function () {
   await this.waitForElement({ locator: '.StakingDashboard_page', method: 'css' });
 });
-
