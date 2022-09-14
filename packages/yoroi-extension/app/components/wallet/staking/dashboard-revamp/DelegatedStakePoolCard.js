@@ -46,7 +46,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
           <Typography color="black" variant="body1" fontWeight="medium" mb="3px">
-            {`[${ticker}]`} {name}
+            {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
           <SocialMediaStakePool
             color="var(--yoroi-palette-gray-500)"
