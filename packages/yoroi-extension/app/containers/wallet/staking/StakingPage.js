@@ -18,10 +18,6 @@ import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationSto
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
-import type {
-  CurrentTimeRequests,
-  TimeCalcRequests,
-} from '../../../stores/base/BaseCardanoTimeStore';
 
 import { Component } from 'react';
 import { computed } from 'mobx';
@@ -80,6 +76,7 @@ class StakingPage extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
   onClose: void => void = () => {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
   };
@@ -88,12 +85,25 @@ class StakingPage extends Component<AllProps> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
-      publicDeriver
-    );
+    const adaDelegationRequests =
+          this.generated.stores.substores.ada.delegation.getDelegationRequests(publicDeriver);
     if (adaDelegationRequests == null) return undefined;
     return adaDelegationRequests.getRegistrationHistory.result?.current;
   };
+
+  async componentDidMount() {
+    const timeStore = this.generated.stores.time;
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(StakingPage)} no public deriver. Should never happen`);
+    }
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
+    await timeCalcRequests.requests.toRealTime.execute().promise;
+    await timeCalcRequests.requests.currentEpochLength.execute().promise;
+    await timeCalcRequests.requests.currentSlotLength.execute().promise;
+    await timeCalcRequests.requests.timeSinceGenesis.execute().promise;
+  }
 
   getErrorInFetch: (PublicDeriver<>) => void | {| error: LocalizableError |} = publicDeriver => {
     const delegationStore = this.generated.stores.delegation;
@@ -263,8 +273,9 @@ class StakingPage extends Component<AllProps> {
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
-    const timeCalcRequests = this.generated.stores.time.getTimeCalcRequests(publicDeriver);
-    const currTimeRequests = this.generated.stores.time.getCurrentTimeRequests(publicDeriver);
+    const timeStore = this.generated.stores.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
     if (toAbsoluteSlot == null) return undefined;
     const toRealTime = timeCalcRequests.requests.toRealTime.result;
