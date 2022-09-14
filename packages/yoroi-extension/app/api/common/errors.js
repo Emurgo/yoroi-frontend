@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   cannotSendBelowMinimumValueError: {
     id: 'api.errors.CannotSendBelowMinimumValueError',
-    defaultMessage: '!!!Minimum required is 1 ADA',
+    defaultMessage: '!!!A minimum of 1 ADA is required',
   },
   assetOverflowError: {
     id: 'api.errors.assetOverflowError',

@@ -280,11 +280,13 @@ const genBaseProps: {|
                   sendUsingTrezor: {
                     trigger: async (req) => action('sendUsingTrezor')(req),
                   },
+                  cancel: { trigger: () => {} },
                 },
                 ledgerSend: {
                   sendUsingLedgerWallet: {
                     trigger: async (req) => action('sendUsingLedgerWallet')(req),
                   },
+                  cancel: { trigger: () => {} },
                 },
               },
             },
@@ -980,11 +982,13 @@ export const AdaWithdrawDialog = (): Node => {
                       sendUsingTrezor: {
                         trigger: async (req) => action('sendUsingTrezor')(req),
                       },
+                      cancel: { trigger: () => {} },
                     },
                     ledgerSend: {
                       sendUsingLedgerWallet: {
                         trigger: async (req) => action('sendUsingLedgerWallet')(req),
                       },
+                      cancel: { trigger: () => {} },
                     },
                   },
                 },

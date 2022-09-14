@@ -171,7 +171,6 @@ class StakingPage extends Component<AllProps> {
     return epochLengthInDays;
   };
 
-
   getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
     const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
@@ -234,8 +233,10 @@ class StakingPage extends Component<AllProps> {
     }
     const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
     const delegatedPool = {
-      id: String(currentPool),
       name,
+      id: String(currentPool),
+      ticker: meta.info?.ticker,
+      websiteUrl: meta.info?.homepage,
     };
 
     // TODO: implement this eventually
@@ -274,8 +275,8 @@ class StakingPage extends Component<AllProps> {
         graphData={generateGraphData({
           delegationRequests,
           publicDeriver,
-          currentEpoch:
-            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+          currentEpoch: this.generated.stores.time.getCurrentTimeRequests(publicDeriver)
+            .currentEpoch,
           shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
           getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
