@@ -28,6 +28,7 @@ type Props = {|
     name: string,
     id: string,
     amount: string,
+    description: string | null,
   |},
   tokensCount: number,
   network: $ReadOnly<NetworkRow>,
