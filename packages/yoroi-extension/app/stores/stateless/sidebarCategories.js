@@ -15,6 +15,7 @@ import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/
 import { ReactComponent as walletIcon }  from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import { ReactComponent as stakingIcon }  from '../../assets/images/sidebar/revamp/staking.inline.svg';
 import { ReactComponent as assetsIcon }  from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
 import { ReactComponent as votingIcon }  from '../../assets/images/sidebar/revamp/voting.inline.svg';
 // import { ReactComponent as swapIcon }  from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon }  from '../../assets/images/sidebar/revamp/setting.inline.svg';
@@ -141,6 +142,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.ASSETS.ROOT,
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
+    isVisible: _request => _request.selected !== null,
+  },
+  {
+    className: 'nfts',
+    route: ROUTES.NFTS.ROOT,
+    icon: nftsIcon,
+    label: globalMessages.sidebarNfts,
     isVisible: _request => _request.selected !== null,
   },
   {

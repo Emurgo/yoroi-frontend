@@ -78,10 +78,11 @@ export const ROUTES = {
   STAKING: '/staking',
   ASSETS: {
     ROOT: '/assets',
-    TOKENS: '/assets/tokens',
-    TOKEN_DETAILS: '/assets/tokens/:tokenId',
-    NFTS: '/assets/nfts',
-    NFT_DETAILS: '/assets/nfts/:nftId'
+    DETAILS: '/assets/tokens/:tokenId',
+  },
+  NFTS: {
+    ROOT: '/nfts',
+    DETAILS: '/nfts/:nftId'
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites'

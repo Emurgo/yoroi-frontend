@@ -20,6 +20,7 @@ import type { Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import TokenDetails from '../../components/wallet/assets/TokenDetails';
+import { getDescriptionFromTokenMetadata } from '../../utils/nftMetadata';
 
 export type GeneratedData = typeof TokenDetailsPageRevamp.prototype.generated;
 type Props = {|
@@ -52,26 +53,34 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
               info: getTokenInfo(entry),
             }))
             .filter(item => item.info.IsNFT === false)
-            .map(token => ({
-              policyId: token.entry.identifier.split('.')[0],
-              lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
-              ticker: token.info.Metadata.ticker ?? '-',
-              assetName: token.entry.identifier.split('.')[1] ?? '',
-              name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-              id: getTokenIdentifierIfExists(token.info) ?? '-',
-              amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-            }));
+            .map(token => {
+              const policyId = token.entry.identifier.split('.')[0];
+              const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+              return {
+                policyId,
+                lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
+                ticker: token.info.Metadata.ticker ?? '-',
+                assetName: token.entry.identifier.split('.')[1] ?? '',
+                name,
+                id: getTokenIdentifierIfExists(token.info) ?? '-',
+                amount: genFormatTokenAmount(getTokenInfo)(token.entry),
+                description: getDescriptionFromTokenMetadata(
+                  policyId,
+                  name,
+                  token.info.Metadata
+                )
+              }
+            });
 
     const { tokenId } = this.props.match.params;
     const tokenInfo = assetsList.find(token => token.id === tokenId);
     const tokensCount = assetsList.length + 1 // +1 for the default assets
-
     return (
       <Box
         borderRadius="8px"
         bgcolor="var(--yoroi-palette-common-white)"
-        height="100%"
-        overflow="overlay"
+        height="content"
+        overflow="auto"
       >
         <TokenDetails tokenInfo={tokenInfo} tokensCount={tokensCount} network={network} />
       </Box>

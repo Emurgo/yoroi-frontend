@@ -73,6 +73,10 @@ export function find721metadata(
   ) {
     ret.files = asset.files;
   }
+
+  if (typeof asset.author === 'string') ret.author = asset.author
+  if (typeof asset.authors === 'string') ret.author = asset.authors
+
   return ret;
 }
 
@@ -102,6 +106,32 @@ export function getImageFromTokenMetadata(
   return null;
 }
 
+export function getAuthorFromTokenMetadata(
+  policyId: string,
+  name: string,
+  tokenMetadata: TokenMetadata,
+): string | null {
+  if (tokenMetadata.type !== 'Cardano') {
+    return null;
+  }
+  const nftMetadata = find721metadata(
+    policyId,
+    name,
+    tokenMetadata.assetMintMetadata,
+  );
+
+  if (!nftMetadata) {
+    return null;
+  }
+
+  if (typeof nftMetadata.author === 'string') {
+    return nftMetadata.author;
+  }
+  if (typeof nftMetadata.authors === 'string') {
+    return nftMetadata.authors;
+  }
+  return null;
+}
 
 export function getDescriptionFromTokenMetadata(
   policyId: string,

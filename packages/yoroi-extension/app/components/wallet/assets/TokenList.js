@@ -1,5 +1,5 @@
 // @flow
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { injectIntl } from 'react-intl';
@@ -74,16 +74,14 @@ function TokenList({
     sortingDirection: null,
     sortingColumn: '',
   });
+  const [keyword, setKeyword] = useState('');
 
-  const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
-    event: SyntheticEvent<HTMLInputElement>
-  ) => {
-    const keyword = event.currentTarget.value;
+  useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
     const assetsListCopy = [...list];
     const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp));
     setState(prev => ({ ...prev, assetsList: filteredAssetsList }));
-  };
+  }, [keyword, list])
 
   const compare: (a: any, b: any, field: string) => number = (a, b, field) => {
     let newSortDirection = SORTING_DIRECTIONS.UP;
@@ -125,7 +123,7 @@ function TokenList({
   const { assetsList } = state;
 
   return (
-    <Box>
+    <Stack sx={{ minHeight: '500px' }}>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -138,7 +136,7 @@ function TokenList({
         </Typography>
         <SearchInput
           disableUnderline
-          onChange={search}
+          onChange={(e) => setKeyword(e.target.value)}
           placeholder={intl.formatMessage(assetsMessage.search)}
           startAdornment={
             <InputAdornment position="start">
@@ -149,7 +147,9 @@ function TokenList({
       </Box>
 
       {!assetsList.length ? (
-        <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
+        <Stack alignItems='center' justifyContent='center' sx={{ height: '100%', flex: 1 }}>
+          <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
+        </Stack>
       ) : (
         <>
           <List>
@@ -192,7 +192,7 @@ function TokenList({
           </List>
         </>
       )}
-    </Box>
+    </Stack>
   );
 }
 export default (injectIntl(observer(TokenList)): ComponentType<Props>);
@@ -210,12 +210,12 @@ function ListItemLayout({ firstColumn, secondColumn, thirdColumn }) {
     {
       id: 1,
       content: firstColumn,
-      width: '20%',
+      width: '25%',
     },
     {
       id: 2,
       content: secondColumn,
-      width: '45%',
+      width: '40%',
     },
     {
       id: 3,
@@ -257,9 +257,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
-            sx={{ textDecoration: 'none' }}
+            sx={{ textDecoration: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '70%' }}
             color="var(--yoroi-palette-primary-300)"
-            to={ROUTES.ASSETS.TOKEN_DETAILS.replace(':tokenId', id)}
+            to={id !== '-' &&  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
