@@ -87,15 +87,17 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           </Box>
         )}
       </Wrapper>
-      <Wrapper>
-        <UndelegateButton
-          sx={{ border: '2px solid #17D1AA', width: '50%' }}
-          color="secondary"
-          onClick={undelegate}
-        >
-          {intl.formatMessage(globalMessages.undelegateLabel)}
-        </UndelegateButton>
-      </Wrapper>
+      {undelegate && (
+        <Wrapper>
+          <UndelegateButton
+            sx={{ border: '2px solid #17D1AA', width: '50%' }}
+            color="secondary"
+            onClick={undelegate}
+          >
+            {intl.formatMessage(globalMessages.undelegateLabel)}
+          </UndelegateButton>
+        </Wrapper>
+      )}
     </Card>
   );
 }

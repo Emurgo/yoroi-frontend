@@ -81,6 +81,8 @@ When(/^I see the hardware send money confirmation dialog$/, async function () {
 });
 
 When(/^I click on the verify address button$/, async function () {
+  // wait until all addresses are loaded
+  await this.driver.sleep(1000);
   const allVerifyAddressButtons = await this.findElements({ locator: '.WalletReceive_verifyIcon', method: 'css' });
   await allVerifyAddressButtons[0].click();
 });

@@ -40,7 +40,7 @@ function ReceiveWithNavigation({
           activeFilter={activeFilter}
         />
       </Box>
-      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'overlay', flex: 1 }}>
+      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>
         {children}
       </Box>
     </Box>
@@ -69,7 +69,7 @@ function ReceiveWithNavigation({
           activeFilter={activeFilter}
         />
       </Box>
-      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'overlay', flex: 1 }}>
+      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>
         {children}
       </Box>
     </Box>

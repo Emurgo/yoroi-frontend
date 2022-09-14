@@ -132,12 +132,15 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.CARDANO_DELEGATION,
   icon: undefined,
   label: messages.delegationById,
-  isVisible: request =>
-    asGetStakingKey(request.selected) != null &&
-    isCardanoHaskell(request.selected.getParent().getNetworkInfo()) &&
-    (environment.isTest() ||
-      request.selected.getParent().getNetworkInfo().NetworkId ===
-        networks.CardanoTestnet.NetworkId),
+  isVisible: request => {
+    const networkId = request.selected.getParent().getNetworkInfo().NetworkId;
+    return asGetStakingKey(request.selected) != null &&
+      isCardanoHaskell(request.selected.getParent().getNetworkInfo()) &&
+      (environment.isTest()
+        || networkId === networks.CardanoTestnet.NetworkId
+        || networkId === networks.CardanoPreprodTestnet.NetworkId
+      );
+  },
 });
 
 /** Revamp Wallet categoriess */
@@ -165,5 +168,5 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     route: ROUTES.TRANSFER.ROOT,
     label: messages.claimTransfer,
     isVisible: _request => true,
-  },
+  }
 ];
