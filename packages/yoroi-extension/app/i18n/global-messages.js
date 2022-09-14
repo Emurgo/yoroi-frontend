@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  here: {
+    id: 'global.util.here',
+    defaultMessage: '!!!here',
+  },
   token: {
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
@@ -244,6 +248,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.nav.allWalletsLabel',
     defaultMessage: '!!!All wallets',
   },
+  changeWallet: {
+    id: 'wallet.nav.changeWallet',
+    defaultMessage: '!!!Change wallet',
+  },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
     defaultMessage: '!!!ATTENTION:',
@@ -427,7 +435,7 @@ const globalMessages: * = defineMessages({
   },
   forMoreHelp: {
     id: 'loading.screen.error',
-    defaultMessage: '!!!For more help, you can {supportRequestLink}',
+    defaultMessage: '!!!Unexpected error occurred. We apologize for the inconvenience. If this error persists, please reach out to our support team {supportRequestLink}',
   },
   logsContent: {
     id: 'settings.support.logs.content',

@@ -769,6 +769,19 @@ Object {
     },
     Object {
       "Endpoints": Object {
+        "address": "https://testnet.cardanoscan.io/address/",
+        "pool": "https://testnet.cardanoscan.io/pool/",
+        "stakeAddress": "https://testnet.cardanoscan.io/stakeKey/",
+        "token": "https://testnet.cardanoscan.io/token/",
+        "transaction": "https://testnet.cardanoscan.io/transaction/",
+      },
+      "ExplorerId": 450,
+      "IsBackup": true,
+      "Name": "CardanoScan",
+      "NetworkId": 250,
+    },
+    Object {
+      "Endpoints": Object {
         "address": "https://adastat.net/address/",
         "pool": "https://adastat.net/pool/",
         "transaction": "https://adastat.net/transaction/",
@@ -1311,7 +1324,7 @@ Object {
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkId": 300,
-      "NetworkName": "Cardano Testnet",
+      "NetworkName": "Cardano Legacy Testnet",
     },
     Object {
       "Backend": Object {
@@ -1347,6 +1360,41 @@ Object {
       "Fork": 0,
       "NetworkId": 400,
       "NetworkName": "Alonzo Testnet",
+    },
+    Object {
+      "Backend": Object {
+        "BackendService": "https://preprod-backend.yoroiwallet.com",
+        "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
+        "WebSocket": "wss://preprod-backend.yoroiwallet.com:443",
+      },
+      "BaseConfig": Array [
+        Object {
+          "ByronNetworkId": 1,
+          "ChainNetworkId": "0",
+          "GenesisDate": "1654041600000",
+          "SlotDuration": 20,
+          "SlotsPerEpoch": 21600,
+          "StartAt": 0,
+        },
+        Object {
+          "CoinsPerUtxoWord": "34482",
+          "KeyDeposit": "400000",
+          "LinearFee": Object {
+            "coefficient": "44",
+            "constant": "155381",
+          },
+          "MinimumUtxoVal": "1000000",
+          "PerEpochPercentageReward": 69344,
+          "PoolDeposit": "500000000",
+          "SlotDuration": 1,
+          "SlotsPerEpoch": 432000,
+          "StartAt": 0,
+        },
+      ],
+      "CoinType": 2147485463,
+      "Fork": 0,
+      "NetworkId": 250,
+      "NetworkName": "Cardano Preprod Testnet",
     },
   ],
   "PreferredExplorer": Array [],
@@ -1462,6 +1510,22 @@ Object {
       },
       "NetworkId": 400,
       "TokenId": 5,
+    },
+    Object {
+      "Digest": 6.262633522161549e-167,
+      "Identifier": "",
+      "IsDefault": true,
+      "IsNFT": false,
+      "Metadata": Object {
+        "assetName": "",
+        "longName": null,
+        "numberOfDecimals": 6,
+        "policyId": "",
+        "ticker": "TADA",
+        "type": "Cardano",
+      },
+      "NetworkId": 250,
+      "TokenId": 6,
     },
   ],
   "TokenList": Array [],
