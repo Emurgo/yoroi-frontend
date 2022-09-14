@@ -127,12 +127,17 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   }
   this.driver = builder.build();
-
   this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this._allLoggers = [];
 
   this.trezorController = undefined;
+
+  this.windowManager = undefined;
+
+  this.webDriverLogger = undefined;
+
+  this.trezorEmuLogger = undefined;
 
   this.addToLoggers = (logger: any) => {
     this._allLoggers.push(logger);

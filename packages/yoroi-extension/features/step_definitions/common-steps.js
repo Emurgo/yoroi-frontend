@@ -79,9 +79,8 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
-import { extensionTabName } from '../support/windowManager';
+import { extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { WindowManager } from '../support/windowManager';
 
 const simpleNodeLogger = require('simple-node-logger');
 
