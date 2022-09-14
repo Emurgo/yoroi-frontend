@@ -18,12 +18,13 @@ import {
   selectSendingAmountDropDown,
   sendAllItem
 } from '../pages/walletSendPage';
+import { halfSecond, oneMinute } from '../support/helpers/common-constants';
 
 Given(/^I have a wallet with funds$/, async function () {
   await this.waitUntilContainsText(
     { locator: '.NavWalletDetails_amount', method: 'css' },
     'ADA',
-    60 * 1000
+    oneMinute
   );
   const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
   const balanceText = await balanceTextElement.getText();
@@ -121,7 +122,7 @@ When(/^I click on the next button in the wallet send form$/, async function () {
    *
    * I attempt to fix it by just clicking twice after a delay
    */
-  await this.driver.sleep(500);
+  await this.driver.sleep(halfSecond);
   try {
     await this.click({ locator: button, method: 'css' });
   } catch (e) {
@@ -240,6 +241,6 @@ When(/^I select token "([^"]*)"$/, async function (tokenName) {
 
 When(/^I open the amount dropdown and select send all$/, async function () {
   await this.click(selectSendingAmountDropDown);
-  await this.driver.sleep(500);
+  await this.driver.sleep(halfSecond);
   await this.click(sendAllItem);
 });

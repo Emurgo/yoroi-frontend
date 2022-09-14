@@ -21,6 +21,10 @@ import {
   testRunsDataDir,
   snapshotsDir,
   commonWalletPassword,
+  fiveMinute,
+  oneSecond,
+  halfSecond,
+  quarterMinute, halfMinute,
 } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
@@ -95,7 +99,7 @@ const testProgress = {
 };
 
 BeforeAll(() => {
-  setDefaultTimeout(20 * 1000);
+  setDefaultTimeout(halfMinute);
 
   CardanoServer.getMockServer({});
   ErgoServer.getMockServer({});
@@ -199,7 +203,7 @@ After({ tags: '@trezorEmulatorTest' }, async function () {
 });
 
 Before({ tags: '@smoke' }, () => {
-  setDefaultTimeout(5 * 60 * 1000);
+  setDefaultTimeout(fiveMinute);
 });
 
 After(async function (scenario) {
@@ -214,7 +218,7 @@ After(async function (scenario) {
   }
   await this.windowManager.switchTo(extensionTabName);
   await this.driver.quit();
-  await helpers.sleep(500);
+  await helpers.sleep(halfSecond);
 });
 
 export async function getPlates(customWorld: any): Promise<any> {
@@ -361,7 +365,7 @@ export async function checkErrorByTranslationId(
   errorSelector: LocatorObject,
   errorObject: Object
 ) {
-  await client.waitUntilText(errorSelector, await client.intl(errorObject.message), 15000);
+  await client.waitUntilText(errorSelector, await client.intl(errorObject.message), quarterMinute);
 }
 
 Then(/^I pause the test to debug$/, async function () {
@@ -494,7 +498,7 @@ Given(/^I refresh the page$/, async function () {
   this.webDriverLogger.info(`Step: I refresh the page`);
   await this.driver.navigate().refresh();
   // wait for page to refresh
-  await this.driver.sleep(500);
+  await this.driver.sleep(halfSecond);
   await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
 });
 
@@ -503,7 +507,7 @@ Given(/^I restart the browser$/, async function () {
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
   // wait for page to refresh
-  await this.driver.sleep(500);
+  await this.driver.sleep(halfSecond);
   await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
 });
 
@@ -530,7 +534,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   // refresh page to trigger migration
   await this.driver.navigate().refresh();
   // wait for page to refresh
-  await this.driver.sleep(1500);
+  await this.driver.sleep(oneSecond + halfSecond);
   await this.waitForElement({ locator: '.YoroiClassic', method: 'css' });
 });
 
@@ -751,5 +755,5 @@ Then(/^Debug. Take screenshot$/,  async function () {
 });
 
 Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
-  await this.driver.sleep(2000);
+  await this.driver.sleep(2 * oneSecond);
 });

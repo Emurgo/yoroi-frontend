@@ -1,6 +1,6 @@
 // @flow
 
-import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
+import { setWorldConstructor } from 'cucumber';
 import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
@@ -9,6 +9,13 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getMethod } from './helpers/helpers';
 import { WebDriverError } from 'selenium-webdriver/lib/error';
 import * as helpers from './helpers/helpers';
+import {
+  defaultWaitTimeout,
+  defaultRepeatPeriod,
+  halfSecond,
+  quarterMinute,
+  oneMinute,
+} from './helpers/common-constants';
 
 const fs = require('fs');
 
@@ -29,12 +36,10 @@ function encode(file) {
  * We then note the mapping of the extension ID to the random UUID is stored in about:config
  * Under the key "extensions.webextensions.uuids".
  * Therefore, we specify a fixed extension ID for Yoroi in the manifest
- * Then we use Selenium to override the config to manually specify a a fixed UUID
+ * Then we use Selenium to override the config to manually specify a fixed UUID
  */
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
-const defaultWaitTimeout = 10 * 1000;
-const defaultRepeatPeriod = 1000;
 
 function getBraveBuilder() {
   return new Builder().forBrowser('chrome').setChromeOptions(
@@ -167,8 +172,8 @@ function CustomWorld(cmdInput: WorldInput) {
         await this.driver.get(url);
       } catch (e) {
         if (e instanceof WebDriverError) {
-          this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 1 second and retry`);
-          await helpers.sleep(500);
+          this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 0.5 second and retry`);
+          await helpers.sleep(halfSecond);
           continue;
         }
       }
@@ -233,7 +238,11 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator: LocatorObject, text, timeout = 75000) => {
+  this.waitUntilText = async (
+    locator: LocatorObject,
+    text,
+    timeout = oneMinute + quarterMinute
+  ) => {
     this.webDriverLogger.info(`Webdriver: Waiting Until "${JSON.stringify(locator)}" contains "${text}"`);
     await this.driver.wait(async () => {
       try {
@@ -245,7 +254,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = 15000) => {
+  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = quarterMinute) => {
     this.webDriverLogger.info(`Webdriver: Waiting for "${JSON.stringify(locator)}" to contain text "${text}"`);
     await this.driver.wait(async () => {
       try {
@@ -401,7 +410,6 @@ function CustomWorld(cmdInput: WorldInput) {
 RustModule.load()
   .then(() => {
     setWorldConstructor(CustomWorld);
-    setDefaultTimeout(30 * 1000);
     return undefined;
   })
   .catch();
