@@ -3,8 +3,8 @@
 import Store from '../../base/Store';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import {
+  fullErrStr,
   Logger,
-  stringifyError,
 } from '../../../utils/logging';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -124,7 +124,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
       );
       return { txId };
     } catch (error) {
-      Logger.error(`${nameof(AdaMnemonicSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      Logger.error(`${nameof(AdaMnemonicSendStore)}::${nameof(this.signAndBroadcast)} error: ${fullErrStr(error)}` );
       throw error;
     }
   }

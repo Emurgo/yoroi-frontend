@@ -475,6 +475,8 @@ export type NFTMetadata = {|
   image: string | Array<string>,
   mediaType?: ?string,
   description: ?(string | Array<string>),
+  authors: ?string,
+  author: ?string,
   files?: ?Array<{|
     name?: ?string,
     mediaType?: ?string,

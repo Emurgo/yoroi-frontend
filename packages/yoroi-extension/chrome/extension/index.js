@@ -15,6 +15,7 @@ import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 import { Logger } from '../../app/utils/logging';
 import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
+import { trackStartup } from '../../app/api/analytics';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -30,6 +31,7 @@ const initializeYoroi: void => Promise<void> = async () => {
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions, router);
+  await trackStartup(stores);
 
   Logger.debug(`[yoroi] stores created`);
 

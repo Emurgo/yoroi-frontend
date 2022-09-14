@@ -15,6 +15,7 @@ import {
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -32,6 +33,8 @@ const storageKeys = {
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
+  ANALYTICS_INSTANCE_ID: networkForLocalStorage + '-ANALYTICS',
+  CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
@@ -359,4 +362,24 @@ export function loadSubmittedTransactions(): any {
     return null;
   }
   return JSON.parse(dataStr);
+}
+
+export async function loadAnalyticsInstanceId(): Promise<?string> {
+  return getLocalItem(storageKeys.ANALYTICS_INSTANCE_ID);
+}
+
+export async function saveAnalyticsInstanceId(id: string): Promise<void> {
+  await setLocalItem(storageKeys.ANALYTICS_INSTANCE_ID, id);
+}
+
+export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {
+  const json = await getLocalItem(storageKeys.CATALYST_ROUND_INFO);
+  if (!json) {
+    return undefined;
+  }
+  return JSON.parse(json);
+}
+
+export async function saveCatalystRoundInfo(data: CatalystRoundInfoResponse): Promise<void> {
+  await setLocalItem(storageKeys.CATALYST_ROUND_INFO, JSON.stringify(data));
 }

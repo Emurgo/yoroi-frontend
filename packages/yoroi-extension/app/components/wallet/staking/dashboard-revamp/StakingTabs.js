@@ -5,8 +5,8 @@ import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { IconButton, Tab, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import { ReactComponent as InfoIconSVG }  from '../../../../assets/images/info-icon.inline.svg';
-import { ReactComponent as CloseIcon }  from '../../../../assets/images/forms/close.inline.svg';
+import { ReactComponent as InfoIconSVG } from '../../../../assets/images/info-icon.inline.svg';
+import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close.inline.svg';
 import DelegatedStakePoolCard from './DelegatedStakePoolCard';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -14,12 +14,20 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import RewardGraph from './RewardsGraph';
 import type { GraphData } from '../dashboard/StakingDashboard';
+import { EpochProgressCard } from './EpochProgressCard';
+import moment from 'moment';
 
 type Props = {|
   delegatedPool: PoolData,
+  epochProgress: {|
+    currentEpoch: number,
+    startEpochDate: string,
+    endEpochDate: string,
+    percentage: number,
+  |},
   +undelegate: void | (void => Promise<void>),
   +epochLength: ?number,
-  +graphData: GraphData
+  +graphData: GraphData,
 |};
 
 type Intl = {|
@@ -46,9 +54,10 @@ function StakingTabs({
   delegatedPool,
   epochLength,
   undelegate,
+  epochProgress,
   intl,
-  graphData
- }: Props & Intl): Node {
+  graphData,
+}: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -63,9 +72,9 @@ function StakingTabs({
     return epochLength === 1
       ? intl.formatMessage(messages.singleEpochAxisLabel)
       : intl.formatMessage(messages.epochAxisLabel, { epochLength });
-  }
+  };
 
-  const { hideYAxis, items } = graphData.rewardsGraphData
+  const { hideYAxis, items } = graphData.rewardsGraphData;
   const tabs = [
     {
       id: 0,
@@ -74,10 +83,9 @@ function StakingTabs({
       component: (
         <Box>
           <StakePoolAlert message={intl.formatMessage(messages.alertInfo)} />
-          <Box py="10px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
+          <Box py="20px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
             <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />
           </Box>
-
           <RewardGraph
             epochTitle={intl.formatMessage(globalMessages.epochLabel)}
             stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
@@ -99,8 +107,16 @@ function StakingTabs({
     {
       id: 2,
       label: 'Epoch progress',
-      disabled: true,
-      component: <Box>TODO: Epoch progress!</Box>,
+      disabled: false,
+      component: (
+        <EpochProgressCard
+          percentage={epochProgress.percentage}
+          days={moment(epochProgress.endEpochDate).diff(moment(), 'days')}
+          currentEpoch={epochProgress.currentEpoch}
+          startEpochDate={epochProgress.startEpochDate}
+          endEpochDate={epochProgress.endEpochDate}
+        />
+      ),
     },
   ];
 
@@ -143,16 +159,19 @@ const StyledTab = styled(Tab)({
 });
 
 function StakePoolAlert({ message }: {| message: string |}): Node {
+  const [show, setShow] = useState(true);
   return (
-    <StyledBox>
-      <InfoIconSVG />
-      <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
-        {message}
-      </Typography>
-      <IconButton>
-        <CloseIcon />
-      </IconButton>
-    </StyledBox>
+    show && (
+      <StyledBox>
+        <InfoIconSVG />
+        <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
+          {message}
+        </Typography>
+        <IconButton onClick={() => setShow(false)}>
+          <CloseIcon />
+        </IconButton>
+      </StyledBox>
+    )
   );
 }
 const StyledBox = styled(Box)({

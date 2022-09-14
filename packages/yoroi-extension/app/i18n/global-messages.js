@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  here: {
+    id: 'global.util.here',
+    defaultMessage: '!!!here',
+  },
   token: {
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
@@ -132,6 +136,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.remove',
     defaultMessage: '!!!Remove',
   },
+  cardanoscan: {
+    id: 'global.explorers.cardanoscan',
+    defaultMessage: '!!!Cardanoscan',
+  },
   exportButtonLabel: {
     id: 'wallet.transaction.export.dialog.exportButton.label',
     defaultMessage: '!!!Export',
@@ -243,6 +251,10 @@ const globalMessages: * = defineMessages({
   allWalletsLabel: {
     id: 'wallet.nav.allWalletsLabel',
     defaultMessage: '!!!All wallets',
+  },
+  changeWallet: {
+    id: 'wallet.nav.changeWallet',
+    defaultMessage: '!!!Change wallet',
   },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
@@ -427,7 +439,7 @@ const globalMessages: * = defineMessages({
   },
   forMoreHelp: {
     id: 'loading.screen.error',
-    defaultMessage: '!!!For more help, you can {supportRequestLink}',
+    defaultMessage: '!!!Unexpected error occurred. We apologize for the inconvenience. If this error persists, please reach out to our support team {supportRequestLink}',
   },
   logsContent: {
     id: 'settings.support.logs.content',
@@ -641,6 +653,10 @@ const globalMessages: * = defineMessages({
   sidebarAssets: {
     id: 'sidebar.assets',
     defaultMessage: '!!!Assets',
+  },
+  sidebarNfts: {
+    id: 'sidebar.nfts',
+    defaultMessage: '!!!NFTs',
   },
   sidebarVoting: {
     id: 'sidebar.voting',

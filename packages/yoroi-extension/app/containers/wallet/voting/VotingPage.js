@@ -160,11 +160,21 @@ export default class VotingPage extends Component<Props> {
         registrationStart: nextFund?.registrationStart
       })
 
+      const fund = {
+        'id': 8,
+        'name': 'Fund9',
+        'registrationStart': '2021-01-27T11:00:00Z',
+        'registrationEnd': '2023-08-04T11:00:00Z',
+        'votingStart': '2021-08-11T11:00:00Z',
+        'votingEnd': '2023-08-25T11:00:00Z',
+        'votingPowerThreshold': '450'
+      };
       if (currentFund) {
-        const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd))
-        const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart))
-        const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart))
-        const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd))
+        console.log(JSON.parse(JSON.stringify(currentFund)))
+        const isLate = new Date() >= new Date(Date.parse(fund.registrationEnd))
+        const isEarly = new Date() <= new Date(Date.parse(fund.registrationStart))
+        const isBeforeVoting = new Date() <= new Date(Date.parse(fund.votingStart))
+        const isAfterVoting = new Date() >= new Date(Date.parse(fund.votingEnd))
         const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
         if (isEarly) {
@@ -280,6 +290,7 @@ export default class VotingPage extends Component<Props> {
     out of the registration dates.
     */
     const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
+    const fundName = catalystRoundInfo?.currentFund?.name || round.toString();
     return (
       //
       <div>
@@ -289,7 +300,7 @@ export default class VotingPage extends Component<Props> {
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
           isDelegated={this.isDelegated === true}
-          round={round}
+          name={fundName}
           walletType={walletType}
         />
       </div>
