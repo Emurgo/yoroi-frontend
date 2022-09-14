@@ -13,35 +13,52 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-import globalMessages from '../../i18n/global-messages';
 import SidebarContainer from '../SidebarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+import { buildRoute } from '../../utils/routing';
+import { matchPath } from 'react-router';
 
-export type GeneratedData = typeof AssetsWrapper.prototype.generated;
+export type GeneratedData = typeof NFTsWrapper.prototype.generated;
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children?: Node,
 |};
+
+const messages = defineMessages({
+  NFTGallery: {
+    id: 'wallet.nftGallary.title',
+    defaultMessage: '!!!NFT Gallery',
+  },
+})
 @observer
-export default class AssetsWrapper extends Component<Props> {
+export default class NFTsWrapper extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
+  isActivePage: string => boolean = route => {
+    const { location } = this.generated.stores.router;
+    if (location) {
+      return !!matchPath(location.pathname, {
+        path: buildRoute(route),
+        exact: false,
+      });
+    }
+    return false;
+  };
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AssetsWrapper)}.`);
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(NFTsWrapper)}.`);
 
     const { intl } = this.context;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
-
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -49,11 +66,9 @@ export default class AssetsWrapper extends Component<Props> {
         navbar={
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarAssets)} />}
+            title={<NavBarTitle title={intl.formatMessage(messages.NFTGallery)} />}
           />
         }
-        showInContainer
-        showAsCard
       >
         {this.props.children}
       </TopBarLayout>
@@ -98,7 +113,7 @@ export default class AssetsWrapper extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(AssetsWrapper)} no way to generated props`);
+      throw new Error(`${nameof(NFTsWrapper)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({
