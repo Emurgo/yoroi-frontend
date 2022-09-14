@@ -92,8 +92,10 @@ export function getMockServer(settings: {
   outputLog?: boolean,
   ...
 }): typeof MockServer {
-  const dir = `${testRunsDataDir}cardanoMockServerLogs`;
-  fs.mkdirSync(dir);
+  const dir = `${testRunsDataDir}_cardanoMockServerLogs`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
   const loggerPath = `${dir}/cardanoMockServerLog_${getLogDate()}.log`;
 
   logger = simpleNodeLogger.createSimpleFileLogger(loggerPath);

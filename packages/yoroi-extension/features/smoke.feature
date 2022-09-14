@@ -72,15 +72,15 @@ Feature: Smoke tests
     Then I wait for 3 minute(s) the last transaction is confirmed
 
   @smoke-005
-  Scenario: Sending intrawallet transaction. Registered token (smoke-005)
+  Scenario Outline: Sending intrawallet transaction. Registered token - <token> (smoke-005)
     Given There is a Shelley wallet stored named Second-Smoke-Test-Wallet
     And I have a wallet with funds
     Then I go to the send transaction screen
     And I open the token selection dropdown
-    And I select token "SPACE"
+    And I select token "<token>"
     And I fill the form:
       | address                                                     | amount   |
-      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 55 |
+      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 15 |
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -92,6 +92,12 @@ Feature: Smoke tests
     Then I should see the summary screen
     And I should see 1 pending transactions
     Then I wait for 3 minute(s) the last transaction is confirmed
+
+    Examples:
+      | token |
+      | SPACE |
+      | DRIP  |
+      | XRAY  |
 
   @smoke-006
   Scenario: Sending intrawallet transaction. Send all (smoke-006)

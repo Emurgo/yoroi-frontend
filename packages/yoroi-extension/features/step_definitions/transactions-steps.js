@@ -28,7 +28,7 @@ Given(/^I have a wallet with funds$/, async function () {
   const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
   const balanceText = await balanceTextElement.getText();
   const [balance, ] = balanceText.split(' ');
-  expect(parseFloat(balance, 10), 'The wallet is empty').to.be.above(0);
+  expect(parseFloat(balance), 'The wallet is empty').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {

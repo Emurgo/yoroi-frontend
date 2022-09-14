@@ -26,7 +26,7 @@ import { expect } from 'chai';
 import { satisfies } from 'semver';
 import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
-import type { RestorationInput } from '../mock-chain/TestWallets';
+import type { RestorationInput, WalletNames } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
 import {
@@ -79,11 +79,13 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
-import { extensionTabName } from '../support/windowManager';
+import { extensionTabName, WindowManager } from '../support/windowManager';
+import { MockDAppWebpage } from '../mock-dApp-webpage';
+
+const simpleNodeLogger = require('simple-node-logger');
 
 const { promisify } = require('util');
 const fs = require('fs');
-const rimraf = require('rimraf');
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -93,8 +95,6 @@ const testProgress = {
 };
 
 BeforeAll(() => {
-  rimraf.sync(testRunsDataDir);
-  fs.mkdirSync(testRunsDataDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -106,7 +106,8 @@ AfterAll(() => {
   ErgoServer.closeMockServer();
 });
 
-Before(scenario => {
+// eslint-disable-next-line prefer-arrow-callback
+Before(function(scenario) {
   const pathItems = scenario.sourceLocation.uri.split('/');
   // eslint-disable-next-line no-console
   console.log(
@@ -118,6 +119,30 @@ Before(scenario => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+
+  const logsDir = `${testRunsDataDir}_${this.getBrowser()}/${testProgress.scenarioName}/`
+
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+
+  const mockAndWMLogPath = `${logsDir}mockAndWM.log`;
+  const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
+  this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
+  this.windowManager.init().then().catch();
+  this.addToLoggers(mockAndWMLogger);
+  this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
+
+  const webDriverLogPath = `${logsDir}webDriver.log`;
+  this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
+  this.addToLoggers(this.webDriverLogger);
+
+  const trezorEmuLogPath = `${logsDir}trezorEmulatorController.log`;
+  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
+  this.addToLoggers(this.trezorEmuLogger);
+
+  this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has started ####`);
+
 });
 
 Before({ tags: 'not @TestAssuranceChain' }, () => {
@@ -186,17 +211,11 @@ After(async function (scenario) {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
     }
-  };
+  }
   await this.windowManager.switchTo(extensionTabName);
   await this.driver.quit();
   await helpers.sleep(500);
 });
-
-type WalletEra = {|
-  era:
-    | 'shelley'
-    | 'byron',
-|}
 
 export async function getPlates(customWorld: any): Promise<any> {
   // check plate in confirmation dialog
@@ -246,7 +265,8 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
 async function createDirInTestRunsData(driver, subdirectoryName) {
   const cap = await driver.getCapabilities();
   const browserName = cap.getBrowserName();
-  const dir = `${testRunsDataDir}/${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
+
+  const dir = `${testRunsDataDir}_${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -293,8 +313,8 @@ async function getLogs(driver, name, loggingType) {
 
 async function restoreWallet (
     customWorld: any,
-    walletEra: WalletEra,
-    walletName: string
+    walletEra: string,
+    walletName: WalletNames
 ): Promise<void> {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
@@ -368,12 +388,12 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   await checkWalletPlate(this, walletName, restoreInfo);
 });
 
-Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
+Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   await restoreWallet(this, 'shelley', walletName);
 });
 
-Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
+Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Byron wallet stored named ${walletName}`);
   await restoreWallet(this, 'byron', walletName);
 });
@@ -425,7 +445,7 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
-Given(/^I switch to the advanced level$/, async function () {
+Given(/^I switched to the advanced level$/, async function () {
   this.webDriverLogger.info(`Step: I switched to the advanced level`);
   // Navigate to the general settings screen
   await navigateTo.call(this, '/settings');

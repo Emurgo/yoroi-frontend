@@ -41,6 +41,8 @@
     "test:run:e2e:dApp:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags '@dApp'",
     "test:run:e2e:trezor:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags '@Trezor'",
     "test:run:e2e:trezor:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags '@Trezor'",
+    "test:run:e2e:smoke:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags '@smoke'",
+    "test:run:e2e:smoke:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags '@smoke'",
     "test:run:tag:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags",
     "test:run:tag:brave": "npm run test:run:base -- --world-parameters '{\"browser\":\"brave\"}' features/*.feature --tags",
     "test:run:tag:firefox": "npm run test:run:base -- --world-parameters '{\"browser\":\"firefox\"}' features/*.feature --tags",
