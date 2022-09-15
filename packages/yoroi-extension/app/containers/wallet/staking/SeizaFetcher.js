@@ -32,7 +32,6 @@ export type PoolData = {|
   +poolSize?: number,
   +share?: string,
   +websiteUrl?: string,
-  +ticker?: string,
   +socialLinks?: SocialLinks,
 |};
 

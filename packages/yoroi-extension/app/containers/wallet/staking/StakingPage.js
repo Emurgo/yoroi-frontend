@@ -18,6 +18,10 @@ import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationSto
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
+import type {
+  CurrentTimeRequests,
+  TimeCalcRequests,
+} from '../../../stores/base/BaseCardanoTimeStore';
 
 import { Component } from 'react';
 import { computed } from 'mobx';
@@ -85,8 +89,9 @@ class StakingPage extends Component<AllProps> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests =
-          this.generated.stores.substores.ada.delegation.getDelegationRequests(publicDeriver);
+    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
+      publicDeriver
+    );
     if (adaDelegationRequests == null) return undefined;
     return adaDelegationRequests.getRegistrationHistory.result?.current;
   };
@@ -224,10 +229,11 @@ class StakingPage extends Component<AllProps> {
     );
     if (meta == null) {
       // server hasn't returned information about the stake pool yet
-      return undefined;
+      return null;
     }
     const { intl } = this.context;
     const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+    // TODO: remove placeholders
     const delegatedPool = {
       id: String(currentPool),
       name,
@@ -235,7 +241,7 @@ class StakingPage extends Component<AllProps> {
       poolSize: 2560000,
       share: '0.3',
       websiteUrl: meta.info?.homepage,
-      ...(meta.info || {}),
+      ticker: meta.info?.ticker,
     };
 
     // TODO: implement this eventually
@@ -559,6 +565,10 @@ class StakingPage extends Component<AllProps> {
         showDelegationBanner: boolean,
         getTxRequests: (PublicDeriver<>) => TxRequests,
       |},
+      time: {|
+        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -608,7 +618,6 @@ class StakingPage extends Component<AllProps> {
           getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
-        time,
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
@@ -631,6 +640,7 @@ class StakingPage extends Component<AllProps> {
             },
           },
         },
+        time,
       },
       actions: {
         ada: {

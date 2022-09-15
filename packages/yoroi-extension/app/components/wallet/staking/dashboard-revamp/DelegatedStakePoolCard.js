@@ -6,7 +6,7 @@ import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { HelperTooltip, SocialMediaStakePool } from './StakePool/StakePool';
+import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
 
@@ -66,7 +66,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
             </Typography>
           </Box>
         ) : null}
-        {poolSize && (
+        {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
             <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
               Pool Size
@@ -76,7 +76,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
             </Typography>
           </Box>
         )}
-        {share && (
+        {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
             <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
               Share

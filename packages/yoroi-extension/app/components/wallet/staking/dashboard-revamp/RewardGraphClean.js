@@ -1,16 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { readCssVar } from '../../../../styles/utils';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
