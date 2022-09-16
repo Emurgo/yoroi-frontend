@@ -276,7 +276,6 @@ export default class StakingDashboardPage extends Component<Props> {
     if (timeSinceGenesis == null) return undefined;
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return undefined;
-
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {

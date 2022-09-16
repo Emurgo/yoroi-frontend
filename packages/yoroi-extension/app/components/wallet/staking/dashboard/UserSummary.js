@@ -164,7 +164,7 @@ export default class UserSummary extends Component<Props> {
     width: string,
     height: string,
     marginBottom: string,
-  |}): Node {
+  |}, _index: number): Node {
     return (
       <Skeleton
         variant="rectangular"
@@ -188,7 +188,7 @@ export default class UserSummary extends Component<Props> {
     ]
     return (
       <Box>
-        {skeletons.map(skeleton => this.getSkeleton(skeleton))}
+        {skeletons.map(this.getSkeleton)}
       </Box>
     )
   }
