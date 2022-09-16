@@ -142,12 +142,19 @@ export const restoreDialogButton: LocatorObject = {
   locator: '.WalletRestoreDialog .primary',
   method: 'css',
 };
+export const getAddressesAmountButton = (addressesAmount: string): LocatorObject => {
+  return { locator: `//li[contains(text(), "${addressesAmount}")]`, method: 'xpath' };
+};
 export const recoveryPhraseDeleteIcon = {
   locator: `(//span[contains(text(), '×')])[1]`,
   method: 'xpath',
 };
 export const recoveryPhraseError: LocatorObject = {
   locator: '//p[starts-with(@id, "recoveryPhrase--")]',
+  method: 'xpath',
+};
+export const addressElement : LocatorObject = {
+  locator: '//span[contains(@class, "RawHash_hash")]',
   method: 'xpath',
 };
 

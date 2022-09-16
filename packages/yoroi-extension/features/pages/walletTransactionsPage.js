@@ -12,6 +12,19 @@ export const getNotificationMessage = async (customWorld: any, translatedMessage
   );
 }
 
+export const parseTxInfo = async (addressList: Array<any>): Promise<Array<any>> => {
+  const addressInfoRow = await addressList.findElements(By.css('.Transaction_addressItem'));
+
+  const result = [];
+  for (const row of addressInfoRow) {
+    const rowInfo = await row.findElements(By.xpath('*'));
+    const rowInfoText = await Promise.all(rowInfo.map(async column => await column.getText()));
+    result.push(rowInfoText);
+  }
+
+  return result;
+}
+
 export const walletSummaryBox: LocatorObject = { locator: 'walletSummary_box', method: 'id' };
 export const walletSummaryComponent: LocatorObject = {
   locator: '.WalletSummary_component',
@@ -43,5 +56,9 @@ export const pendingTransactionElement: LocatorObject = {
 };
 export const failedTransactionElement: LocatorObject = {
   locator: '.Transaction_failedLabel',
+  method: 'css',
+};
+export const transactionAddressListElement: LocatorObject = {
+  locator: '.Transaction_addressList',
   method: 'css',
 };

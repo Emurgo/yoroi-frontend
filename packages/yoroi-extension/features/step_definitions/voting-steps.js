@@ -9,6 +9,7 @@ import {
   confirmPinDialogError,
   errorBlock,
   generatedPinButton,
+  generatedPinStepElement,
   generatePinDialog,
   pinInput,
   qrCodeDialog,
@@ -29,7 +30,7 @@ When(/^I click on the register button in the voting page$/, async function () {
 });
 
 Then(/^I see the Auto generated Pin Steps$/, async function () {
-  const elements = await this.driver.findElements(By.css('.GeneratePinDialog_pin > span '));
+  const elements = await this.findElements(generatedPinStepElement);
 
   const pin = [];
   for (const item of elements) {

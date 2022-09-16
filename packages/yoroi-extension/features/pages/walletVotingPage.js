@@ -14,6 +14,10 @@ export const generatedPinButton: LocatorObject = {
   locator: '.GeneratePinDialog_dialog > .Dialog_actions > .primary',
   method: 'css',
 };
+export const generatedPinStepElement: LocatorObject = {
+  locator: '.GeneratePinDialog_pin > span',
+  method: 'css',
+};
 export const confirmPinDialog: LocatorObject = {
   locator: '.ConfirmPinDialog_dialog',
   method: 'css',

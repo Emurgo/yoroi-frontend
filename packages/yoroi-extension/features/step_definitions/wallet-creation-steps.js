@@ -80,7 +80,7 @@ When(/^I accept the creation terms$/, async function () {
     By.xpath('//div[contains(@class,"WalletBackupPrivacyWarningDialog_component")]')
   );
   const privacyChkbox = privacyDlg.findElement(By.xpath('//input[@type="checkbox"]'));
-  privacyChkbox.click();
+  await privacyChkbox.click();
   await this.click(continueButton);
 });
 
