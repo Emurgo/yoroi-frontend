@@ -1,6 +1,42 @@
 // @flow
 
 import type { LocatorObject } from '../support/webdriver';
+import { camelCase } from 'lodash';
+import { navigateTo, waitUntilUrlEquals } from '../support/helpers/route-helpers';
+import { By, WebElement } from 'selenium-webdriver';
+
+export async function selectSubmenuSettings(customWorld: Object, buttonName: string) {
+  const formattedButtonName = camelCase(buttonName);
+  const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
+  await customWorld.click({ locator: buttonSelector, method: 'css' });
+  await customWorld.waitForElement({
+    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
+    method: 'css',
+  });
+}
+
+export async function goToSettings(customWorld: Object) {
+  await navigateTo.call(customWorld, '/settings');
+  await navigateTo.call(customWorld, '/settings/general');
+
+  await waitUntilUrlEquals.call(customWorld, '/settings/general');
+  await customWorld.waitForElement(settingsLayoutComponent);
+}
+
+export async function getComplexityLevelButton(
+  customWorld: Object,
+  isLow: boolean = true
+): Promise<WebElement> {
+  await customWorld.waitForElement(complexityLevelForm);
+  const levels = await customWorld.driver.findElements(By.css('.ComplexityLevelForm_card'));
+  let card;
+  if (isLow) {
+    card = levels[0];
+  } else {
+    card = levels[levels.length - 1];
+  }
+  return await card.findElement(By.xpath('.//button'));
+}
 
 export const fullScreenMessage: LocatorObject = {
   locator: '.FullscreenMessage_title',
@@ -51,6 +87,8 @@ export const secondThemeSelected: LocatorObject = {
   locator: '.ThemeSettingsBlock_themesWrapper button:nth-child(2).ThemeSettingsBlock_active',
   method: 'css',
 };
+
+export const revampThemeButton: LocatorObject = { locator: 'switchToRevampButton', method: 'id' };
 
 // Change password dialog
 

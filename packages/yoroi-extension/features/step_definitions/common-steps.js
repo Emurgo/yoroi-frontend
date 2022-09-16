@@ -26,11 +26,6 @@ import stableStringify from 'json-stable-stringify';
 import type { RestorationInput } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
-import {
-  selectSubmenuSettings,
-  getComplexityLevelButton,
-  goToSettings,
-} from './general-settings-steps';
 import type { LocatorObject } from '../support/webdriver';
 import { walletButton } from '../pages/sidebarPage';
 import { getWalletButtonByPlate } from '../pages/walletsListPage';
@@ -67,11 +62,18 @@ import {
 import { walletNameText } from '../pages/walletPage';
 import {
   continueButton,
+  getTosCheckbox,
   languageSelectionForm,
   termsOfUseComponent,
   walletAddComponent,
 } from '../pages/basicSetupPage';
-import { settingsLayoutComponent } from '../pages/settingsPage';
+import {
+  getComplexityLevelButton,
+  goToSettings,
+  revampThemeButton,
+  selectSubmenuSettings,
+  settingsLayoutComponent,
+} from '../pages/settingsPage';
 import {
   allowButton,
   finishButton,
@@ -375,8 +377,7 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click(continueButton);
   // ToS page
   await this.waitForElement(termsOfUseComponent);
-  const tosClassElement = await this.driver.findElement(By.css('.TermsOfUseForm_component'));
-  const checkbox = await tosClassElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  const checkbox = await getTosCheckbox();
   await checkbox.click();
   await this.click(continueButton);
   // uri prompt page
@@ -668,8 +669,7 @@ Then(/^Revamp. I switch to revamp version$/, async function () {
   this.webDriverLogger.info(`Step: Revamp. I switch to revamp version`);
   await goToSettings(this);
   await selectSubmenuSettings(this, 'general');
-  const revampButton = await this.driver.findElement(By.id('switchToRevampButton'));
-  await revampButton.click();
+  await this.click(revampThemeButton);
 });
 
 Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {

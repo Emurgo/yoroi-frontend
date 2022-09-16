@@ -2,49 +2,14 @@
 
 import { When, Then } from 'cucumber';
 import { camelCase } from 'lodash';
-import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
-import { By, WebElement } from 'selenium-webdriver';
 import {
   complexitySelected,
-  secondThemeSelected,
-  settingsLayoutComponent,
-  complexityLevelForm,
+  getComplexityLevelButton,
+  goToSettings,
   languageSelector,
+  secondThemeSelected,
 } from '../pages/settingsPage';
-
-export async function selectSubmenuSettings(customWorld: Object, buttonName: string) {
-  const formattedButtonName = camelCase(buttonName);
-  const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
-  await customWorld.click({ locator: buttonSelector, method: 'css' });
-  await customWorld.waitForElement({
-    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
-    method: 'css',
-  });
-}
-
-export async function goToSettings(customWorld: Object) {
-  await navigateTo.call(customWorld, '/settings');
-  await navigateTo.call(customWorld, '/settings/general');
-
-  await waitUntilUrlEquals.call(customWorld, '/settings/general');
-  await customWorld.waitForElement(settingsLayoutComponent);
-}
-
-export async function getComplexityLevelButton(
-  customWorld: Object,
-  isLow: boolean = true
-): Promise<WebElement> {
-  await customWorld.waitForElement(complexityLevelForm);
-  const levels = await customWorld.driver.findElements(By.css('.ComplexityLevelForm_card'));
-  let card;
-  if (isLow) {
-    card = levels[0];
-  } else {
-    card = levels[levels.length - 1];
-  }
-  return await card.findElement(By.xpath('.//button'));
-}
 
 When(/^I navigate to the general settings screen$/, async function () {
   await goToSettings(this);
