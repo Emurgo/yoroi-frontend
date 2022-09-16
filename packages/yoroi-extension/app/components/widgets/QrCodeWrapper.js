@@ -23,6 +23,7 @@ export default class QrCodeWrapper extends Component<Props> {
         bgColor={qrCodeBackgroundColor}
         fgColor={qrCodeForegroundColor}
         size={this.props.size}
+        id="qr-code"
       />
     );
   }

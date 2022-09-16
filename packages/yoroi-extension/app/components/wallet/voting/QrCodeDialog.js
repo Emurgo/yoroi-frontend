@@ -14,6 +14,7 @@ import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import type { StepsList } from './types';
 
 import styles from './QrCodeDialog.scss';
+import { Button } from '@mui/material';
 
 const messages = defineMessages({
   lineTitle: {
@@ -93,6 +94,9 @@ export default class QrCodeDialog extends Component<Props> {
           {votingKey !== null ? (
             <div className={styles.qrCode}>
               <QrCodeWrapper value={votingKey} size={152} />
+              <Button>
+                Download QR Code
+              </Button>
             </div>
           ) : (
             ''
