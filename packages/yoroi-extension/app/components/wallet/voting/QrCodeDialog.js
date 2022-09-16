@@ -102,7 +102,7 @@ export default class QrCodeDialog extends Component<Props> {
                 includeMargin
                 id={QR_ID}
               />
-              <Button onClick={() => downloadQrCode(QR_ID, 'Voting key')}>
+              <Button size='small' variant='ternary' onClick={() => downloadQrCode(QR_ID, 'Voting key')}>
                 Download QR Code
               </Button>
             </div>
