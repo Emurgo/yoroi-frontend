@@ -3,9 +3,11 @@
 import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
 import languageSelection, { clickContinue } from '../support/helpers/language-selection-helpers';
-import { japaneseLaguageSelection, languageSelectionForm } from '../pages/basicSetupPage';
-
-const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
+import {
+  japaneseLaguageSelection,
+  languageSelectionForm,
+  languageSelectionFromDropdown,
+} from '../pages/basicSetupPage';
 
 Given(/^I have selected English language$/, async function () {
   await languageSelection.ensureLanguageIsSelected(this, { language: 'en-US' });
@@ -16,7 +18,7 @@ When(/^I am on the language selection screen$/, async function () {
 });
 
 When(/^I open language selection dropdown$/, async function () {
-  await this.click({ locator: `${LANGUAGE_SELECTION_FORM} .MuiInputBase-input`, method: 'css' });
+  await this.click(languageSelectionFromDropdown);
 });
 
 When(/^I select Japanese language$/, async function () {

@@ -3,11 +3,19 @@
 import type { LocatorObject } from '../support/webdriver';
 import { By } from 'selenium-webdriver';
 
+const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
+
 // language select page
 export const languageSelectionForm: LocatorObject = {
-  locator: '.LanguageSelectionForm_component',
+  locator: LANGUAGE_SELECTION_FORM,
   method: 'css',
 };
+
+export const languageSelectionFromDropdown: LocatorObject = {
+  locator: `${LANGUAGE_SELECTION_FORM} .MuiInputBase-input`,
+  method: 'css',
+};
+
 export const japaneseLaguageSelection: LocatorObject = {
   locator: '//span[contains(text(), "日本語")]',
   method: 'xpath',
