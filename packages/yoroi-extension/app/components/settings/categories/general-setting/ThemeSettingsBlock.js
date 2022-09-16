@@ -138,7 +138,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
             />
             <FormControlLabel
               value={NEW_THEME}
-              control={<Radio size='small' />}
+              control={<Radio id="switchToRevampButton" size='small' />}
               label={intl.formatMessage(messages.newVersion)}
             />
           </RadioGroup>
