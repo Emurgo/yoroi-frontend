@@ -1,19 +1,62 @@
 // @flow
 
 import type { LocatorObject } from '../support/webdriver';
+import i18n from '../support/helpers/i18n-helpers';
+import { By } from 'selenium-webdriver';
 
-export const getGeneratedAddressLocator = (rowIndex: number): LocatorObject => {
+const getReceiveSubTabButton = (translatedText: string) => {
+  return { locator: `//span[contains(text(), "${translatedText}")]`, method: 'xpath' };
+}
+
+export const getGeneratedAddress = (rowIndex: number): LocatorObject => {
   return {
     locator: `.generatedAddress-${rowIndex + 1} .RawHash_hash`,
     method: 'css',
   };
 };
 
-export const getAddressLocator = (address: string): LocatorObject => {
+export const getAddress = (address: string): LocatorObject => {
   return {
     locator: `//div[contains(text(), "${address}")]`,
     method: 'xpath',
   };
+};
+
+export const getSubTabButton = (chain: string, kind: string): LocatorObject => {
+  return { locator: `div.${chain}.${kind}.ReceiveNavButton_wrapper`, method: 'css' };
+};
+
+export const getAllAddressesButton = async (): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(this.driver, {
+    id: 'wallet.receive.navigation.allLabel',
+  });
+  return getReceiveSubTabButton(translatedText);
+};
+
+export const getUnusedAddressesButton = async (): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(this.driver, {
+    id: 'wallet.receive.navigation.unusedLabel',
+  });
+  return getReceiveSubTabButton(translatedText);
+};
+
+export const getUsedAddressesButton = async (): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(this.driver, {
+    id: 'wallet.receive.navigation.usedLabel',
+  });
+  return getReceiveSubTabButton(translatedText);
+};
+
+export const getHasBalanceButton = async (): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(this.driver, {
+    id: 'wallet.receive.navigation.hasBalanceLabel',
+  });
+  return getReceiveSubTabButton(translatedText);
+};
+
+export const getAddressFromAddressRow = async (row: any): Promise<string> => {
+  const topAddrElem = await row.findElement(By.css(walletAddressLocator));
+  return await topAddrElem.getText();
 };
 
 export const addressErrorPhrase: LocatorObject = {
@@ -35,6 +78,8 @@ export const verifyAddressButton: LocatorObject = {
   method: 'css',
 };
 
+export const walletAddressRow: LocatorObject = { locator: 'WalletReceive_walletAddress', method: 'css' };
+export const walletAddressLocator = '.WalletReceive_addressHash';
 export const verifyAddressHWButton: LocatorObject = {
   locator: '.VerifyAddressDialog_component .primary',
   method: 'css',
