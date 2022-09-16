@@ -1,6 +1,16 @@
 // @flow
 
 import type { LocatorObject } from '../support/webdriver';
+import { By } from 'selenium-webdriver';
+
+export const getNotificationMessage = async (customWorld: any, translatedMessage: string) => {
+  const messageParentElement = await customWorld.driver.findElement(
+    By.xpath('//div[contains(@role, "tooltip")]')
+  );
+  return await messageParentElement.findElement(
+    By.xpath(`//span[contains(text(), "${translatedMessage}")]`)
+  );
+}
 
 export const walletSummaryBox: LocatorObject = { locator: 'walletSummary_box', method: 'id' };
 export const walletSummaryComponent: LocatorObject = {

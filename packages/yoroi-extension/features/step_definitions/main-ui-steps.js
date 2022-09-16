@@ -11,11 +11,16 @@ import {
   navDetailsBuyButton,
   navDetailsHideButton,
   navDetailsWalletDropdown,
+  switchToWallet,
   transactionsTab,
 } from '../pages/walletPage';
 import { amountInput, receiverInput } from '../pages/walletSendPage';
 import { walletButtonClassic } from '../pages/sidebarPage';
-import { copyToClipboardButton, walletSummaryComponent } from '../pages/walletTransactionsPage';
+import {
+  copyToClipboardButton,
+  getNotificationMessage,
+  walletSummaryComponent,
+} from '../pages/walletTransactionsPage';
 import { maintenanceBody, serverErrorBanner } from '../pages/mainWindowPage';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
@@ -46,12 +51,7 @@ Then(/^I click on "copy to clipboard" button$/, async function () {
 Then(/^I should see "copied" tooltip message:$/, async function (data) {
   const notification = data.hashes()[0];
   const notificationMessage = await this.intl(notification.message);
-  const messageParentElement = await this.driver.findElement(
-    By.xpath('//div[contains(@role, "tooltip")]')
-  );
-  const message = await messageParentElement.findElement(
-    By.xpath(`//span[contains(text(), "${notificationMessage}")]`)
-  );
+  const message = await getNotificationMessage(this, notificationMessage);
   expect(await message.isDisplayed()).to.be.true;
 });
 
@@ -86,19 +86,7 @@ Then(/^I should see my balance hidden$/, async function () {
 });
 
 Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
-  await this.click(navDetailsWalletDropdown);
-  const wallets = await this.driver.findElements(
-    By.xpath("//button[contains(@class, 'NavDropdownRow_head')]")
-  );
-  for (const wallet of wallets) {
-    const nameElem = await wallet.findElement(By.css('.NavPlate_name'));
-    const foundName = await nameElem.getText();
-    if (walletName === foundName) {
-      await wallet.click();
-      return;
-    }
-  }
-  throw new Error(`No wallet found with name ${walletName}`);
+  await switchToWallet(this, walletName);
 });
 
 Then(/^I select buy-sell from the dropdown$/, async function () {
