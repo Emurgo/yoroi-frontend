@@ -46,6 +46,7 @@ type Props = {|
   +votingKey: string | null,
 |};
 
+const QR_ID = 'qr-vote';
 @observer
 export default class QrCodeDialog extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -94,8 +95,14 @@ export default class QrCodeDialog extends Component<Props> {
         <div className={classnames([styles.qrCodeContainer, styles.lastItem])}>
           {votingKey !== null ? (
             <div className={styles.qrCode}>
-              <QrCodeWrapper value={votingKey} size={152} />
-              <Button onClick={() => downloadQrCode('qr-code', 'Voting key')}>
+              <QrCodeWrapper
+                value={votingKey}
+                size={152}
+                addBg={false}
+                includeMargin
+                id={QR_ID}
+              />
+              <Button onClick={() => downloadQrCode(QR_ID, 'Voting key')}>
                 Download QR Code
               </Button>
             </div>

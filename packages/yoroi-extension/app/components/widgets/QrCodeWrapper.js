@@ -17,26 +17,23 @@ type Props = {|
 export default class QrCodeWrapper extends Component<Props> {
 
   static defaultProps: {|
-    id: string,
-    includeMargin: boolean,
-    addBg: boolean,
   |} = {
     id: 'qr-code',
     includeMargin: false,
-    addBg: false,
+    addBg: true,
   }
 
   render(): Node {
     // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = readCssVar('--yoroi-qr-code-background');
-    const qrCodeForegroundColor = readCssVar('--yoroi-qr-code-foreground');
     const { id, includeMargin, addBg } = this.props;
+    const qrCodeBackgroundColor = addBg ? readCssVar('--yoroi-qr-code-background') : '#ffffff';
+    const qrCodeForegroundColor = readCssVar('--yoroi-qr-code-foreground');
 
     return (
       <QRCode
         value={this.props.value}
-        bgColor={addBg && qrCodeBackgroundColor}
-        fgColor={addBg && qrCodeForegroundColor}
+        bgColor={qrCodeBackgroundColor}
+        fgColor={qrCodeForegroundColor}
         size={this.props.size}
         includeMargin={includeMargin === true}
         id={id}
