@@ -12,8 +12,8 @@ import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg'
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
-import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
+import MuiAccordion  from '@mui/material/Accordion';
+import MuiAccordionSummary  from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import type { GraphData } from '../../../../components/wallet/staking/dashboard/StakingDashboard';
 
@@ -80,7 +80,7 @@ export const RewardHistoryItem = ({
   );
 };
 
-const Accordion = styled((props: AccordionProps) => (
+const Accordion = styled((props /* AccordionProps */) => (
   <MuiAccordion
     TransitionProps={{ timeout: { exit: 500 } }}
     disableGutters
@@ -131,7 +131,7 @@ const ExpandMoreIcon = () => (
   </svg>
 );
 
-const AccordionSummary = styled((props: AccordionSummaryProps) => (
+const AccordionSummary = styled((props /* AccordionSummaryProps */) => (
   <MuiAccordionSummary expandIcon={<ExpandMoreIcon />} {...props} />
 ))(() => ({
   padding: 0,

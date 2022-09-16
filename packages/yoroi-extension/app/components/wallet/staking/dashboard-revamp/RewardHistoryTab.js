@@ -7,14 +7,13 @@ import { injectIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { getAvatarFromPoolId, groupByPoolName } from '../utils';
-import RewardGraph from './RewardsGraph';
 import type { GraphRewardData } from './RewardHistoryDialog';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
-import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
+import MuiAccordion from '@mui/material/Accordion';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 
 const ExpandMoreIcon = () => (
@@ -28,7 +27,7 @@ const ExpandMoreIcon = () => (
   </svg>
 );
 
-const Accordion = styled((props: AccordionProps) => (
+const Accordion = styled((props /* AccordionProps */) => (
   <MuiAccordion
     TransitionProps={{ timeout: { exit: 500 } }}
     disableGutters
@@ -48,7 +47,7 @@ const Accordion = styled((props: AccordionProps) => (
   marginBottom: '16px',
 }));
 
-const AccordionSummary = styled((props: AccordionSummaryProps) => (
+const AccordionSummary = styled((props /* AccordionSummaryProps */) => (
   <MuiAccordionSummary expandIcon={<ExpandMoreIcon />} {...props} />
 ))(() => ({
   padding: 0,
