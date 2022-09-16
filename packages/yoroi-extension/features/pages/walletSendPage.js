@@ -1,6 +1,7 @@
 // @flow
 
 import type { LocatorObject } from '../support/webdriver';
+import { By } from 'selenium-webdriver';
 
 export const assetSelector: LocatorObject = {
   locator: '.WalletSendForm_component .SimpleInput_input',
@@ -13,10 +14,40 @@ export const assetListElement: LocatorObject = {
 export const receiverInput: LocatorObject = { locator: "input[name='receiver']", method: 'css' };
 export const amountInput: LocatorObject = { locator: "input[name='amount']", method: 'css' };
 export const addMemoButton: LocatorObject = { locator: '.addMemoButton', method: 'css' };
+export const memoDialogComponent: LocatorObject = {
+  locator: '.MemoDialogCommon_component',
+  method: 'css',
+};
+export const memoContentText: LocatorObject = { locator: '.memoContent', method: 'css' };
+export const getMemoText = async (customWorld: Object) => {
+  const memoElem = await customWorld.getElementsBy(memoContentText);
+  return await memoElem[0].getText();
+};
 export const memoContentInput: LocatorObject = {
   locator: "input[name='memo']",
   method: 'css',
 };
+export const editMemoButton: LocatorObject = { locator: '.editMemoButton', method: 'css' };
+export const deleteMemo = async (customWorld: Object, confirmDeleting: boolean = true) => {
+  let memoComponent = await customWorld.findElement(memoDialogComponent);
+  const deleteButton = await memoComponent.findElement(
+    By.xpath('//button[@aria-label="delete memo"]')
+  );
+  await deleteButton.click();
+  memoComponent = await customWorld.findElement(memoDialogComponent);
+  if (confirmDeleting){
+    const confirmDelete = await memoComponent.findElement(
+      By.xpath('//button[contains(text(), "Delete")]')
+    );
+    await confirmDelete.click();
+  } else {
+    const confirmDelete = await memoComponent.findElement(
+      By.xpath('//button[contains(text(), "Cancel")]')
+    );
+    await confirmDelete.click();
+  }
+}
+
 export const nextButton: LocatorObject = {
   locator: '.WalletSendForm_component .MuiButton-primary',
   method: 'css',

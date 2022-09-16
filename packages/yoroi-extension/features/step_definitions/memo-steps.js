@@ -1,11 +1,16 @@
 // @flow
 
 import { Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import chai from 'chai';
 import { MAX_MEMO_SIZE } from '../../app/config/externalStorageConfig';
 import { primaryButton } from '../pages/commonDialogPage';
-import { addMemoButton, memoContentInput } from '../pages/walletSendPage';
+import {
+  addMemoButton,
+  deleteMemo,
+  editMemoButton,
+  getMemoText,
+  memoContentInput,
+} from '../pages/walletSendPage';
 
 Then(/^I add a memo that says "([^"]*)"$/, async function (memo) {
   await this.click(addMemoButton);
@@ -16,8 +21,7 @@ Then(/^I add a memo that says "([^"]*)"$/, async function (memo) {
 
 Then(/^The memo content says "([^"]*)"$/, async function (memo) {
   await this.waitForElement({ locator: '.memoContent', method: 'css' });
-  const memoElem = await this.getElementsBy({ locator: '.memoContent', method: 'css' });
-  const memoContent = await memoElem[0].getText();
+  const memoContent = await getMemoText(this);
   chai.expect(memoContent).to.equal(memo);
 });
 
@@ -30,18 +34,9 @@ Then(/^I edit the memo to say "([^"]*)"$/, async function (memo) {
 });
 
 Then(/^I delete the memo$/, async function () {
-  await this.click({ locator: '.editMemoButton', method: 'css' });
+  await this.click(editMemoButton);
   await this.click(primaryButton);
-  let memoComponent = await this.driver.findElement(By.css('.MemoDialogCommon_component'));
-  const deleteButton = await memoComponent.findElement(
-    By.xpath('//button[@aria-label="delete memo"]')
-  );
-  await deleteButton.click();
-  memoComponent = await this.driver.findElement(By.css('.MemoDialogCommon_component'));
-  const confirmDelete = await memoComponent.findElement(
-    By.xpath('//button[contains(text(), "Delete")]')
-  );
-  await confirmDelete.click();
+  await deleteMemo(this);
 });
 
 Then(/^There is no memo for the transaction$/, async function () {
