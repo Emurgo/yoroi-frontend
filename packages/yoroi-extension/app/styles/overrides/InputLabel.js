@@ -29,6 +29,9 @@ const ModernInputLabel = {
   styleOverrides: {
     root: {
       color: 'var(--yoroi-comp-input-placeholder)',
+      '&::first-letter': {
+        textTransform: 'uppercase'
+      },
       '&.Mui-focused': {
         color: 'var(--yoroi-comp-input-text-focus)',
       },
@@ -37,10 +40,6 @@ const ModernInputLabel = {
       },
       '&.Mui-error': {
         color: 'var(--yoroi-comp-input-error)',
-      },
-      '&.MuiInputLabel-shrink': {
-        padding: '0 6px',
-        background: 'var(--yoroi-palette-common-white)',
       },
     },
   },

@@ -83,10 +83,9 @@ function StakingTabs({
       component: (
         <Box>
           <StakePoolAlert message={intl.formatMessage(messages.alertInfo)} />
-          <Box py="10px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
+          <Box py="20px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
             <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />
           </Box>
-
           <RewardGraph
             epochTitle={intl.formatMessage(globalMessages.epochLabel)}
             stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}

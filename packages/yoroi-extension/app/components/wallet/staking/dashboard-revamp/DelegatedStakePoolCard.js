@@ -20,7 +20,7 @@ type Intl = {|
 |};
 
 function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Intl): Node {
-  const { id, name, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
+  const { id, name, ticker, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
@@ -35,7 +35,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       </AvatarWrapper>
       <Box width="180px" overflow="hidden" paddingLeft="4px">
         <Typography color="var(--yoroi-palette-gray-900)" variant="body1" mb="3px">
-          {name}
+          [{ticker}] {name}
         </Typography>
         <SocialMediaStakePool
           color="var(--yoroi-palette-gray-600)"
@@ -44,13 +44,17 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
         />
       </Box>
       <Box display="flex" alignItems="center" flex="1">
-        <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
-          {intl.formatMessage(globalMessages.roa30d)}
-          <Typography ml="8px" as="span" color="var(--yoroi-palette-gray-900)">
-            {roa}
-          </Typography>
-        </Typography>
-        <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
+        {roa !== undefined && (
+          <>
+            <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
+              {intl.formatMessage(globalMessages.roa30d)}
+              <Typography ml="8px" as="span" color="var(--yoroi-palette-gray-900)">
+                {roa}
+              </Typography>
+            </Typography>
+            <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
+          </>
+        )}
       </Box>
       {undelegate && (
         <UndelegateButton color="secondary" onClick={undelegate}>
@@ -65,6 +69,7 @@ export default (injectIntl(observer(DelegatedStakePoolCard)): ComponentType<Prop
 const Wrapper: any = styled(Box)({
   display: 'flex',
   justifyContent: 'space-between',
+  alignItems: 'flex-start',
 });
 const AvatarWrapper: any = styled(Box)({
   width: '40px',
