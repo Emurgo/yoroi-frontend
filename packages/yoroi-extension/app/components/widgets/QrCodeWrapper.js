@@ -17,6 +17,9 @@ type Props = {|
 export default class QrCodeWrapper extends Component<Props> {
 
   static defaultProps: {|
+    id: string,
+    includeMargin: boolean,
+    addBg: boolean,
   |} = {
     id: 'qr-code',
     includeMargin: false,
