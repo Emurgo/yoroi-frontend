@@ -11,7 +11,6 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
 import { withLayout } from '../../../styles/context/layout';
 import type { Layouts } from '../../../styles/context/layout';
-import string from 'lodash/string';
 
 export type SocialLinks = {|
   tw?: string,

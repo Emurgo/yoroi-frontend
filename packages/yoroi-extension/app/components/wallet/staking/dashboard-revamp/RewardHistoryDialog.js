@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { GraphData } from '../../../wallet/staking/dashboard/StakingDashboard';
+import type { GraphData } from '../dashboard/StakingDashboard';
 import { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../i18n/global-messages';
@@ -18,7 +18,6 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { groupByPoolName } from '../utils';
 import styles from './RewardHistoryDialog.scss';
-import string from 'lodash/string';
 
 export type GraphRewardData = {|
   error: ?LocalizableError,

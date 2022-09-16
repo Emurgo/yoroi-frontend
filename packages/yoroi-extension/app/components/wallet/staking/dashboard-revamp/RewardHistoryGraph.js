@@ -4,9 +4,8 @@ import { Box, styled } from '@mui/system';
 import { Stack, Typography } from '@mui/material';
 import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import LocalizableError from '../../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { getAvatarFromPoolId, groupByPoolName } from '../utils';
+import { getAvatarFromPoolId } from '../utils';
 import RewardGraphClean from './RewardGraphClean';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
@@ -15,7 +14,7 @@ import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import MuiAccordion  from '@mui/material/Accordion';
 import MuiAccordionSummary  from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import type { GraphData } from '../../../../components/wallet/staking/dashboard/StakingDashboard';
+import type { GraphData } from '../dashboard/StakingDashboard';
 
 type RewardHistoryItemProps = {|
   poolId: string,

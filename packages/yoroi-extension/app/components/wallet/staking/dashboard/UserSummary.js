@@ -164,7 +164,7 @@ export default class UserSummary extends Component<Props> {
     width: string,
     height: string,
     marginBottom: string,
-  |}, index: number): Node {
+  |}, _index: number): Node {
     return (
       <Skeleton
         variant="rectangular"

@@ -17,8 +17,7 @@ import { hiddenAmount } from '../../../../utils/strings';
 import { truncateToken } from '../../../../utils/formatters';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { GraphData } from '../../../../components/wallet/staking/dashboard/StakingDashboard';
-import RewardHistoryTab from './RewardHistoryTab';
+import type { GraphData } from '../dashboard/StakingDashboard';
 import RewardHistoryGraph from './RewardHistoryGraph';
 
 type Props = {|
@@ -52,7 +51,7 @@ function SummaryCard({
   totalRewards,
   totalDelegated,
   getTokenInfo,
-  onOverviewClick,
+  onOverviewClick: _onOverviewClick,  // todo: remove?
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
@@ -210,6 +209,9 @@ const WrapperIcon = styled(Box)({
   marginRight: '24px',
 });
 const InfoDetails = styled(Box)({});
+
+// todo: remove?
+// eslint-disable-next-line no-unused-vars
 const OverviewButton = styled(Button)({
   marginLeft: 'auto',
   minWidth: 'auto',
