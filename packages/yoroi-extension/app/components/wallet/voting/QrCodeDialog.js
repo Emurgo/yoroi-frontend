@@ -59,10 +59,15 @@ export default class QrCodeDialog extends Component<Props> {
 
     const dialogActions = [
       {
-        label: intl.formatMessage(messages.actionButton),
-        primary: true,
+        label: 'Close',
+        primary: false,
         onClick: submit,
       },
+      {
+        label: 'Download QR Code',
+        primary: true,
+        onClick: () => downloadQrCode(QR_ID, 'Voting key.png'),
+      }
     ];
 
     return (
@@ -104,9 +109,9 @@ export default class QrCodeDialog extends Component<Props> {
                   id={QR_ID}
                 />
               </div>
-              <Button size='small' variant='ternary' onClick={() => downloadQrCode(QR_ID, 'Voting key')}>
+              {/* <Button size='small' variant='ternary' onClick={() => downloadQrCode(QR_ID, 'Voting key')}>
                 Download QR Code
-              </Button>
+              </Button> */}
             </Box>
           ) : (
             ''
