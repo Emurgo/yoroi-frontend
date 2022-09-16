@@ -63,7 +63,7 @@ const messages = defineMessages({
   },
   newVersion: {
     id: 'settings.theme.newVersion',
-    defaultMessage: '!!!Yoroi new version'
+    defaultMessage: '!!!Yoroi new version (beta)'
   },
   selectColorTheme: {
     id: 'settings.theme.selectColorTheme',
