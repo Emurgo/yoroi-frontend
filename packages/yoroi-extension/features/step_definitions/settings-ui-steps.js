@@ -2,7 +2,7 @@
 
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
-import { By, Key } from 'selenium-webdriver';
+import { Key } from 'selenium-webdriver';
 import { truncateLongName } from '../../app/utils/formatters';
 import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
@@ -30,8 +30,9 @@ import {
   exportButton,
   exportPublicKeyDialog,
   fullScreenMessage,
+  exportPublicKeyText,
 } from '../pages/settingsPage';
-import { dialogTitle } from '../pages/commonDialogPage';
+import { dialogTitle, getWarningCheckbox } from '../pages/commonDialogPage';
 
 Given(/^I should see the "([^"]*)" wallet password dialog$/, async function (dialogType) {
   const selector = '.' + dialogType + 'PasswordDialog';
@@ -154,16 +155,12 @@ When(/^I click on export wallet$/, async function () {
 
 Then(/^I should see the wallet export for key "([^"]*)"$/, async function (expectedKey) {
   await this.waitForElement(exportPublicKeyDialog);
-  const publicKeyForm = await this.driver.findElement(By.css('.CodeBlock_component'));
-  const publicKey = await publicKeyForm.getText();
+  const publicKey = await this.getText(exportPublicKeyText);
   expect(publicKey).to.equal(expectedKey);
 });
 
 Then(/^I click on the checkbox$/, async function () {
-  const warningCheckboxElement = await this.driver.findElement(
-    By.css('.DangerousActionDialog_checkbox')
-  );
-  const checkbox = await warningCheckboxElement.findElement(By.xpath('//input[@type="checkbox"]'));
+  const checkbox = await getWarningCheckbox(this);
   await checkbox.click();
 });
 

@@ -64,6 +64,10 @@ export const exportPublicKeyDialog: LocatorObject = {
   locator: '.ExportPublicKeyDialog_component',
   method: 'css',
 };
+export const exportPublicKeyText: LocatorObject = {
+  locator: '.CodeBlock_component',
+  method: 'css',
+};
 
 // Level of complexity tab
 
