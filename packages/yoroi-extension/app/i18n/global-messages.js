@@ -120,6 +120,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.cancel',
     defaultMessage: '!!!Cancel',
   },
+  close: {
+    id: 'global.labels.close',
+    defaultMessage: '!!!Close',
+  },
   change: {
     id: 'global.labels.change',
     defaultMessage: '!!!Change',
