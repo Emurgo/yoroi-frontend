@@ -52,7 +52,8 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
         <Box
           sx={match && {
             backgroundColor: 'var(--yoroi-palette-common-white)',
-            boxShadow: '0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74)'
+            boxShadow: '0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74)',
+            heigh: '100%',
           }}
         >
           <TabList
@@ -73,7 +74,7 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
         {tabs.map(({ component, id }) => (
           <TabPanel
             sx={{
-              height: environment.isNightly() || environment.isTest() ? 'calc(84vh - 55px)': '84vh',
+              height: environment.isNightly() || environment.isTest() ? 'calc(84vh - 55px)': 'calc(100vh - 103px)', // 103 = 52px (topbar) + 51px (tabs bar)
               overflowY: 'scroll',
               width: match ? '600px' : 'auto',
               margin: 'auto',

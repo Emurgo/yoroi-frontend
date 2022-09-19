@@ -33,6 +33,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
+import { Box } from '@mui/system';
 
 type Props = {|
   +staleTx: boolean,
@@ -213,20 +214,22 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             <div className={styles.addressToLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
-            {receivers.map((receiver, i) => (
-              <ExplorableHashContainer
-                key={receiver + i} // eslint-disable-line react/no-array-index-key
-                selectedExplorer={this.props.selectedExplorer}
-                hash={this.props.addressToDisplayString(receiver)}
-                light
-                linkType="address"
-              >
-                <RawHash light>
-                  <span className={styles.addressTo}>
-                    {truncateAddress(this.props.addressToDisplayString(receiver))}
-                  </span>
-                </RawHash>
-              </ExplorableHashContainer>
+            {[...new Set(receivers)].map((receiver, i) => (
+              <Box>
+                <ExplorableHashContainer
+                  key={receiver + i} // eslint-disable-line react/no-array-index-key
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={this.props.addressToDisplayString(receiver)}
+                  light
+                  linkType="address"
+                >
+                  <RawHash light>
+                    <span className={styles.addressTo}>
+                      {truncateAddress(this.props.addressToDisplayString(receiver))}
+                    </span>
+                  </RawHash>
+                </ExplorableHashContainer>
+              </Box>
             ))}
           </div>
 
