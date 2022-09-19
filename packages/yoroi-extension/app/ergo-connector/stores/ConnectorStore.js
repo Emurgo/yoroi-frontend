@@ -63,10 +63,11 @@ import {
 } from '../../../chrome/extension/ergo-connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { loadSubmittedTransactions } from '../../api/localStorage';
 import {
   signTransaction as shelleySignTransaction
 } from '../../api/ada/transactions/shelley/transactions';
-import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
+import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import type {
   HaskellShelleyTxSignRequest
@@ -75,6 +76,8 @@ import type {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -200,6 +203,8 @@ type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
+
+export type ForeignUtxoFetcher = Array<string> => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
@@ -327,9 +332,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
     }
     const { signingMessage } = this;
-    if (signingMessage.sign.tx == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
-    }
     const wallet = this.wallets.find(w =>
       w.publicDeriver.getPublicDeriverId() === this.signingMessage?.publicDeriverId
     );
@@ -397,6 +399,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       sendData = {
         type: 'sign_confirmed',
         tx: toJS(signingMessage.sign.tx),
+        uid: signingMessage.sign.uid,
+        tabId: signingMessage.tabId,
+        pw: password,
+      };
+    } else if (signingMessage.sign.type === 'data') {
+      sendData = {
+        type: 'sign_confirmed',
+        tx: null,
         uid: signingMessage.sign.uid,
         tabId: signingMessage.tabId,
         pw: password,
@@ -562,7 +572,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!response.utxos) {
       throw new Error('Missgin utxos for signing tx')
     }
-    const addressedUtxos = asAddressedUtxo(response.utxos);
+
+    const submittedTxs = loadSubmittedTransactions() || [];
+    const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
+      asAddressedUtxo(response.utxos),
+      selectedWallet.publicDeriver,
+      submittedTxs,
+    );
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       network.NetworkId
@@ -586,10 +602,28 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const inputs = [];
     const foreignInputs = [];
 
+    const allUsedUtxoIdsSet = new Set(
+      submittedTxs.flatMap(({ usedUtxos }) =>
+        (usedUtxos||[]).map(({ txHash, index }) => `${txHash}${index}`))
+    );
+
     for (let i = 0; i < txBody.inputs().len(); i++) {
       const input = txBody.inputs().get(i);
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
       const txIndex = input.index();
+      if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
+        window.chrome.runtime.sendMessage(
+          {
+            type: 'sign_error',
+            errorType: 'spent_utxo',
+            data: `${txHash}${txIndex}`,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+          }
+        );
+        this._closeWindow();
+        return;
+      }
       // eslint-disable-next-line camelcase
       const utxo = addressedUtxos.find(({ tx_hash, tx_index }) =>
         // eslint-disable-next-line camelcase
@@ -641,12 +675,97 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ownAddresses,
     );
 
+    if (foreignInputs.length) {
+      const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData(
+        {
+          network: selectedWallet.publicDeriver.getParent().networkInfo,
+          utxos: foreignInputs,
+        }
+      )
+      for (let i = 0; i < foreignUtxos.length; i++) {
+        const foreignUtxo = foreignUtxos[i];
+        if (foreignUtxo == null) {
+          window.chrome.runtime.sendMessage(
+            {
+              type: 'sign_error',
+              errorType: 'missing_utxo',
+              data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
+              uid: signingMessage.sign.uid,
+              tabId: signingMessage.tabId,
+            }
+          );
+          this._closeWindow();
+          return;
+        }
+        if (foreignUtxo.spendingTxHash != null) {
+          window.chrome.runtime.sendMessage(
+            {
+              type: 'sign_error',
+              errorType: 'spent_utxo',
+              data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
+              uid: signingMessage.sign.uid,
+              tabId: signingMessage.tabId,
+            }
+          );
+          this._closeWindow();
+          return;
+        }
+        const value = multiTokenFromRemote(
+          foreignUtxo.output,
+          defaultToken.NetworkId
+        );
+        inputs.push({
+          address: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+            foreignUtxo.output.address
+          ).to_bytes()).toString('hex'),
+          value,
+        });
+      }
+    }
+
     runInAction(() => {
-      // <TODO:FOREIGN_INPUTS>
       // $FlowFixMe[prop-missing]
       this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
     });
   }
+
+  static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher =
+    (fetcher, networkInfo) => {
+      return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
+        const foreignInputs = utxoIds.map((id: string) => {
+          // tx hash length is 64
+          if ((id?.length ?? 0) < 65) {
+            throw new Error(`Invalid utxo ID "${id}", expected \`{hash}{index}\` with no separator`);
+          }
+          try {
+            return {
+              txHash: id.substring(0, 64),
+              txIndex: parseInt(id.substring(64), 10),
+            }
+          } catch (e) {
+            throw new Error(`Failed to parse utxo ID "${id}": ${String(e)}`);
+          }
+        })
+        const fetchedData: GetUtxoDataResponse = await fetcher.getUtxoData({
+          network: networkInfo,
+          utxos: foreignInputs,
+        });
+        return fetchedData.map((data: (UtxoData | null), i): ?RemoteUnspentOutput => {
+          if (data == null) {
+            return null;
+          }
+          const { txHash, txIndex } = foreignInputs[i];
+          return {
+            utxo_id: utxoIds[i],
+            tx_hash: txHash,
+            tx_index: txIndex,
+            receiver: data.output.address,
+            amount: data.output.amount,
+            assets: data.output.assets,
+          };
+        })
+      };
+    }
 
   generateAdaTransaction: void => Promise<void> = async () => {
     if (this.signingMessage == null) return;
@@ -677,12 +796,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         time: new Date(),
       }).slot);
 
-      const result = await this.api.ada.createUnsignedTxForConnector({
-        publicDeriver: withHasUtxoChains,
-        absSlotNumber,
-        cardanoTxRequest: (signingMessage.sign: any).tx,
-        utxos: [],
-      });
+      const foreignUtxoFetcher: ForeignUtxoFetcher = ConnectorStore.createForeignUtxoFetcher(
+        this.stores.substores.ada.stateFetchStore.fetcher,
+        selectedWallet.publicDeriver.getParent().getNetworkInfo(),
+      )
+      const result = await this.api.ada.createUnsignedTxForConnector(
+        {
+          publicDeriver: withHasUtxoChains,
+          absSlotNumber,
+          cardanoTxRequest: (signingMessage.sign: any).tx,
+          submittedTxs: [],
+          utxos: [],
+        },
+        foreignUtxoFetcher,
+      );
       const fee = {
         tokenId: result.fee().getDefaultEntry().identifier,
         networkId: result.fee().getDefaultEntry().networkId,
@@ -721,12 +848,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected signing data type');
     }
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
+    const submittedTxs = loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       selectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
       asAddressedUtxo(utxos),
+      submittedTxs,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating

@@ -19,7 +19,8 @@ import type {
   UtxoSumFunc,
   RemoteTransaction,
   MultiAssetMintMetadataRequest,
-  MultiAssetMintMetadataResponse
+  MultiAssetMintMetadataResponse,
+  GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -51,6 +52,8 @@ import config from '../../../../config';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
+
+const MINT_METADATA_REQUEST_PAGE_SIZE = 100;
 
 /**
  * Makes calls to Yoroi backend service
@@ -99,10 +102,22 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.sendTx(body)
   )
 
-  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
-    => Promise<MultiAssetMintMetadataResponse> = (body) => (
-    this.baseFetcher.getMultiAssetMintMetadata(body)
-  )
+  getMultiAssetMintMetadata
+  : MultiAssetMintMetadataRequest => Promise<MultiAssetMintMetadataResponse>
+    = async (body) => {
+      const { network, assets } = body;
+      const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
+      const responses = await Promise.all(assetChunks.map(
+        batch => this.baseFetcher.getMultiAssetMintMetadata({ network, assets: batch })
+      ));
+      const result = {};
+      for (const response of responses) {
+        for (const [key, value] of Object.entries(response)) {
+          result[key] = value;
+        }
+      }
+      return result;
+    }
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
     batchGetAccountState(this.baseFetcher.getAccountState)(body)
@@ -122,6 +137,10 @@ export class BatchedFetcher implements IFetcher {
 
   getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = (body) => (
     batchGetCatalystRoundInfo(this.baseFetcher.getCatalystRoundInfo)(body)
+  )
+
+  getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = (body) => (
+    batchGetUtxoData(this.baseFetcher.getUtxoData)(body)
   )
 }
 
@@ -489,5 +508,22 @@ export function batchGetTokenInfo(
       if (error instanceof LocalizableError) throw error;
       throw new GetTokenInfoApiError();
     }
+  };
+}
+
+function batchGetUtxoData(
+  getUtxoData: GetUtxoDataFunc,
+): GetUtxoDataFunc {
+  return async function (body: GetUtxoDataRequest): Promise<GetUtxoDataResponse> {
+    return (await Promise.all(
+      body.utxos.map(
+        ({ txHash, txIndex }) => getUtxoData(
+          {
+            network: body.network,
+            utxos: [ { txHash, txIndex } ],
+          }
+        )
+      )
+    )).flat();
   };
 }

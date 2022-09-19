@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
-import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
+import { ReactComponent as NoItemsFoundImg } from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import { connectorMessages } from '../../../i18n/global-messages';
 import { BRANDED_DAPPS } from './dapps'
 import { Box, styled } from '@mui/system';

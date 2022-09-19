@@ -9,13 +9,13 @@ import {
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
-import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
-import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
-import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
-import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
-import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
-import assetsIcon from '../../assets/images/assets-page/assets.inline.svg';
+import { ReactComponent as transactionsIcon }  from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
+import { ReactComponent as sendIcon }  from '../../assets/images/wallet-nav/tab-send.inline.svg';
+import { ReactComponent as receiveIcon }  from '../../assets/images/wallet-nav/tab-receive.inline.svg';
+import { ReactComponent as dashboardIcon }  from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
+import { ReactComponent as delegationListIcon }  from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
+import { ReactComponent as votingIcon }  from '../../assets/images/wallet-nav/voting.inline.svg';
+import { ReactComponent as assetsIcon }  from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
 
 const messages = defineMessages({
@@ -132,12 +132,15 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.CARDANO_DELEGATION,
   icon: undefined,
   label: messages.delegationById,
-  isVisible: request =>
-    asGetStakingKey(request.selected) != null &&
-    isCardanoHaskell(request.selected.getParent().getNetworkInfo()) &&
-    (environment.isTest() ||
-      request.selected.getParent().getNetworkInfo().NetworkId ===
-        networks.CardanoTestnet.NetworkId),
+  isVisible: request => {
+    const networkId = request.selected.getParent().getNetworkInfo().NetworkId;
+    return asGetStakingKey(request.selected) != null &&
+      isCardanoHaskell(request.selected.getParent().getNetworkInfo()) &&
+      (environment.isTest()
+        || networkId === networks.CardanoTestnet.NetworkId
+        || networkId === networks.CardanoPreprodTestnet.NetworkId
+      );
+  },
 });
 
 /** Revamp Wallet categoriess */
@@ -165,5 +168,5 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     route: ROUTES.TRANSFER.ROOT,
     label: messages.claimTransfer,
     isVisible: _request => true,
-  },
+  }
 ];

@@ -334,11 +334,13 @@ export type Value = string;
 export type AccountBalance = {|
   default: string,
   networkId: number,
-  assets: Array<{|
-    identifier: string,
-    networkId: number,
-    amount: string,
-  |}>
+  assets: Array<Asset>,
+|};
+
+export type Asset = {|
+  identifier: string,
+  networkId: number,
+  amount: string,
 |};
 
 export function asValue(input: any): Value {
@@ -455,7 +457,7 @@ export type PendingSignData = {|
   type: 'data',
   uid: RpcUid,
   address: Address,
-  bytes: string
+  payload: string
 |} | {|
   type: 'tx/cardano',
   uid: RpcUid,
@@ -476,7 +478,7 @@ export type PendingSignData = {|
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput>,
+  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput> | null,
   uid: RpcUid,
   tabId: number,
   pw: string,
@@ -486,8 +488,13 @@ export type FailedSignData = {|
   type: 'sign_rejected',
   uid: RpcUid,
   tabId: number,
+|} | {|
+  type: 'sign_error',
+  errorType: 'string',
+  data: string,
+  uid: RpcUid,
+  tabId: number,
 |}
-
 export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: true,

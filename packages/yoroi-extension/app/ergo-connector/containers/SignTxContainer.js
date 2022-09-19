@@ -30,6 +30,7 @@ import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
 } from '../types';
+import { Box } from '@mui/material';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -153,10 +154,14 @@ export default class SignTxContainer extends Component<
         );
         break;
       }
-      case 'tx/cardano':
-      case 'tx-reorg/cardano': {
+      case 'tx-reorg/cardano':
+      case 'data':
+      case 'tx/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
-        if (txData == null) return this.renderLoading();
+        const signData = signingMessage.sign.type === 'data'
+          ? { address: signingMessage.sign.address, payload: signingMessage.sign.payload }
+          : null;
+        if (txData == null && signData == null) return this.renderLoading();
         component = (
           <CardanoSignTxPage
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
@@ -203,6 +208,7 @@ export default class SignTxContainer extends Component<
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             isReorg={signingMessage.sign.type === 'tx-reorg/cardano'}
             submissionError={this.generated.stores.connector.submissionError}
+            signData={signData}
           />
         );
         break;
@@ -211,7 +217,16 @@ export default class SignTxContainer extends Component<
         component = null;
     }
 
-    return <>{component}</>;
+    return  (
+      <Box
+        sx={{
+          height: 'calc(100vh - 52px)',
+          backgroundColor: 'var(--yoroi-palette-common-white)'
+        }}
+      >
+        {component}
+      </Box>
+    )
   }
 
   @computed get generated(): {|
@@ -234,7 +249,7 @@ export default class SignTxContainer extends Component<
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       connector: {|
         signingMessage: ?SigningMessage,

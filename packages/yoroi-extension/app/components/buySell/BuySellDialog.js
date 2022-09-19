@@ -11,10 +11,11 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import ChangellyFetcher from './ChangellyFetcher'
 
 import styles from './BuySellDialog.scss';
-import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
+import { ReactComponent as VerifyIcon }  from '../../assets/images/verify-icon.inline.svg'
 import VerticalFlexContainer from '../layout/VerticalFlexContainer'
 import LoadingSpinner from '../widgets/LoadingSpinner'
 import globalMessages from '../../i18n/global-messages';
+import { trackBuySellDialog } from '../../api/analytics';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -77,6 +78,7 @@ export default class BuySellDialog extends Component<Props, State> {
       }
     ]
     this.setState({ walletList: wallets })
+    trackBuySellDialog();
   }
 
   createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) => (

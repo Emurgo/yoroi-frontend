@@ -9,11 +9,11 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 export const messages: * = defineMessages({
   title: {
     id: 'wallet.nowallet.title',
-    defaultMessage: '!!!No wallet selected',
+    defaultMessage: '!!!No wallet selected.',
   },
   subtitle: {
     id: 'wallet.nowallet.subtitle',
-    defaultMessage: '!!!Please choose a wallet from the top-right dropdown',
+    defaultMessage: '!!!Please select a wallet from the dropdown menu on the top right.',
   },
 });
 

@@ -13,6 +13,7 @@ export type ServerStatusResponse = {|
   isServerOk: boolean,
   isMaintenance: boolean,
   serverTime: number, // in milliseconds
+  parallelSync?: ?boolean,
 |};
 export type ServerStatusFunc = (body: ServerStatusRequest) => Promise<ServerStatusResponse>;
 

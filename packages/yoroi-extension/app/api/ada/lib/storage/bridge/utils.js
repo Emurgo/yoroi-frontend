@@ -107,23 +107,23 @@ export function isValidReceiveAddress(
   const messages = defineMessages({
     invalidAddress: {
       id: 'wallet.send.form.errors.invalidAddress',
-      defaultMessage: '!!!Please enter a valid address.',
+      defaultMessage: '!!!Invalid address. Please retype.',
     },
     cannotSendToLegacy: {
       id: 'wallet.send.form.cannotSendToLegacy',
-      defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
+      defaultMessage: '!!!Unable to send funds to legacy addresses (any address created before July 29th, 2020).',
     },
     cannotSendToReward: {
       id: 'wallet.send.form.cannotSendToReward',
-      defaultMessage: '!!!You cannot send to a reward account',
+      defaultMessage: '!!!Unable to send funds to a reward account.',
     },
     cannotSendToP2SH: {
       id: 'wallet.send.form.cannotSendToP2SH',
-      defaultMessage: '!!!You cannot send to pay-to-script-hash addresses',
+      defaultMessage: '!!!Unable to send funds to pay-to-script-hash addresses.',
     },
     wrongNetwork: {
       id: 'global.wrongNetwork.address',
-      defaultMessage: '!!!Wrong network for address.',
+      defaultMessage: '!!!This address is on a different network. Please retype.',
     },
   });
 
@@ -210,28 +210,11 @@ export function normalizeToBase58(
 }
 
 // this implementation was copied from the convert function of the bech32 package.
-const convertBase32ToBase16 = (data: any[]) => {
-  const inBits = 5;
-  const outBits = 8;
-  let value = 0;
-  let bits = 0;
-  const maxV = (1 << outBits) - 1;
-  const result = [];
-  for (let i = 0; i < data.length; ++i) {
-      value = (value << inBits) | data[i];
-      bits += inBits;
-      while (bits >= outBits) {
-          bits -= outBits;
-          result.push((value >> bits) & maxV);
-      }
-  }
+const convertBase32ToHex = (data: any[]) => {
+  const encoded = bech32Module.fromWords(data);
+  const hex = Buffer.from(encoded).toString('hex');
 
-  if (bits >= inBits)
-      return 'Excess padding';
-  if ((value << (outBits - bits)) & maxV)
-      return 'Non-zero padding';
-
-  return result;
+  return hex;
 };
 
 /* eslint-disable */
@@ -335,8 +318,8 @@ export function normalizeToAddress(
   const bech32Decoded = bech32Module.decodeUnsafe(addr, addr.length);
   if (bech32Decoded) {
     // 3.1) if successfull, convert the decoded bech32 to base16 and try parsing the hex
-    const base16Decoded = convertBase32ToBase16(bech32Decoded.words);
-    return parseHexAddress(Buffer.from(base16Decoded).toString('hex'));
+    const hex = convertBase32ToHex(bech32Decoded.words);
+    return parseHexAddress(hex);
   }
 
   return undefined;

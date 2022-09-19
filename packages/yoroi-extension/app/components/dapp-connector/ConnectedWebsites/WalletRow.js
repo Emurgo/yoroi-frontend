@@ -7,8 +7,8 @@ import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiTo
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
-import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
-import NoDappImage from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as DeleteIcon }  from '../../../assets/images/dapp-connector/delete.inline.svg';
+import { ReactComponent as NoDappImage }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import WalletType from '../../widgets/WalletType';
 import NavPlate from '../../topbar/NavPlate'
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';

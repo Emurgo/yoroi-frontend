@@ -1,6 +1,7 @@
 // @flow
 
-import { By } from 'selenium-webdriver';
+import { By, Key } from 'selenium-webdriver';
+import { recoveryPhraseField } from '../../pages/restoreWalletPage';
 
 export const checkIfElementsInArrayAreUnique = function (arr: Array<string>): boolean {
   return new Set(arr).size === arr.length;
@@ -38,4 +39,35 @@ export function getMethod(
       return By.css;
     }
   }
+}
+
+export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
+
+  const recoveryPhrase = phrase.split(' ');
+  for (let i = 0; i < recoveryPhrase.length; i++) {
+    const recoveryPhraseElement = await customWorld.findElement(recoveryPhraseField);
+    await recoveryPhraseElement.sendKeys(recoveryPhrase[i], Key.RETURN);
+    if (i === 0) await customWorld.driver.sleep(500);
+  }
+}
+
+export function getLogDate(): string {
+  return new Date().toISOString().replace(/:/g, '_');
+}
+
+export function getCircularReplacer(): Object {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+}
+
+export const sleep = (milliseconds: number): Promise<any> => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

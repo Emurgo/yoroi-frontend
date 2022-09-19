@@ -7,8 +7,8 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from '@mui/material';
-import AppStoreBadge from '../../../assets/images/app-store-badge.inline.svg';
-import PlayStoreBadge from '../../../assets/images/google-play-badge.inline.svg';
+import { ReactComponent as AppStoreBadge }  from '../../../assets/images/app-store-badge.inline.svg';
+import { ReactComponent as PlayStoreBadge }  from '../../../assets/images/google-play-badge.inline.svg';
 import WarningBox from '../../widgets/WarningBox';
 
 import styles from './Voting.scss';
@@ -17,7 +17,7 @@ import type { WalletType } from './types';
 const messages = defineMessages({
   lineTitle: {
     id: 'wallet.voting.lineTitle',
-    defaultMessage: '!!!Register to vote on Fund {round}',
+    defaultMessage: '!!!Register to vote on {fundName}',
   },
   line2: {
     id: 'wallet.voting.line2',
@@ -33,7 +33,7 @@ const messages = defineMessages({
   },
   notDelegated: {
     id: 'wallet.voting.notDelegated',
-    defaultMessage: '!!!You have not delegated. Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please make sure to delegate before voting.',
+    defaultMessage: '!!!You haven\'t delegated anything. Your voting power is determined by the amount you delegate and voting rewards are distributed to your delegation reward address. Please remember to delegate prior to voting.',
   },
   keepDelegated: {
     id: 'wallet.voting.keepDelegated',
@@ -54,7 +54,7 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +hasAnyPending: boolean,
   +isDelegated: boolean,
-  +round: number,
+  +name: string,
   +walletType: WalletType,
 |};
 
@@ -100,7 +100,7 @@ export default class Voting extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const round = this.props.round;
+    const fundName = this.props.name;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
@@ -135,7 +135,7 @@ export default class Voting extends Component<Props> {
           </div>
 
           <div className={classnames([styles.lineTitle, styles.firstItem])}>
-            {intl.formatMessage(messages.lineTitle, { round })}
+            {intl.formatMessage(messages.lineTitle, { fundName })}
           </div>
 
           <div className={styles.lineText}>

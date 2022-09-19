@@ -1,0 +1,116 @@
+.component {
+    margin-bottom: 20px;
+    margin-right: 10px;
+    
+    .token {
+        cursor: pointer;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+        padding: 4px 0px;
+        margin-bottom: 23px;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+
+        .name {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            .logo {
+                overflow: hidden;
+                width: 32px;
+                height: 32px;
+                margin-right: 16px;
+            }
+
+            .label {
+                color: #3154CB;
+            }
+        }
+
+        .id {
+            color: #242838;
+            text-align: center;
+        }
+
+        .amount {
+            text-align: right;
+            color: #242838;
+        }
+
+    }
+    .amountWrapper {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 2px solid var(--yoroi-palette-gray-900);
+        border-radius: 8px;
+        padding: 12px 16px;
+        position: relative;
+
+        .error {
+            position: absolute;
+            bottom: -16px;
+            right: 27px;
+            color: var(--yoroi-comp-input-error);
+            font-family: "Roboto","Helvetica","Arial",sans-serif;
+            font-size: 0.75rem;
+        }
+
+        .amountTokenName {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            .logo {
+                margin-right: 16px;
+            }
+
+            .label {
+                color: #242838;
+            }
+        }
+
+        .amountInput {
+            width: 100%;
+            margin: 0px 8px;
+            input {
+                text-align: right; 
+                font-size: 16px;
+                line-height: 24px;
+                width: 100%;
+            }
+
+            input::placeholder {
+                font-size: 16px;
+                line-height: 24px;
+            }
+        }
+
+        .close {
+            position: absolute;
+            height: 32px;
+            width: 32px;
+            background-color: #F0F3F5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: -12px;
+            right: -12px;
+        }
+
+        .close:hover {
+            background-color: lighten($color: #F0F3F5, $amount: 0.90);
+        }
+    }
+
+    .amountError {
+        border: 2px solid var(--yoroi-palette-error-100);
+    }
+}

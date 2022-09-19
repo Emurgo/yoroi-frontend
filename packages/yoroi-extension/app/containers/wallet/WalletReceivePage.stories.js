@@ -259,11 +259,13 @@ const genBaseProps: {|
                   sendUsingLedgerWallet: {
                     trigger: async (req) => action('sendUsingLedgerWallet')(req),
                   },
+                  cancel: { trigger: () => {} },
                 },
                 trezorSend: {
                   sendUsingTrezor: {
                     trigger: async (req) => action('sendUsingTrezor')(req),
                   },
+                  cancel: { trigger: () => {} },
                 },
               },
             },
@@ -272,7 +274,7 @@ const genBaseProps: {|
                 addressSubgroupMap: request.addressSubgroupMap,
               },
               coinPriceStore: {
-                getCurrentPrice: (_from, _to) => 5,
+                getCurrentPrice: (_from, _to) => '5',
               },
               tokenInfoStore: {
                 tokenInfo: mockFromDefaults(defaultAssets),

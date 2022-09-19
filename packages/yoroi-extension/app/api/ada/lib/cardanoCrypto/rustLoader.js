@@ -11,6 +11,8 @@ import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-brow
 const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
+type RustModuleLoadFlags = 'dontLoadMessagesSigning';
+
 class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
@@ -18,7 +20,7 @@ class Module {
   _ergo: SigmaRust;
   _messageSigning: WasmMessageSigning;
 
-  async load(): Promise<void> {
+  async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
     if (
       this._wasmv2 != null
         || this._wasmv3 != null
@@ -26,10 +28,15 @@ class Module {
         || this._messageSigning != null
     ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
-    this._wasmv3 = await import('@emurgo/js-chain-libs/js_chain_libs');
+    // this is used only by the now defunct jormungandr wallet
+    this._wasmv3 = ((null: any): WasmV3);
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
     this._ergo = await import('ergo-lib-wasm-browser');
-    this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
+    if (flags.includes('dontLoadMessagesSigning')) {
+      this._messageSigning = ((null: any): WasmMessageSigning);
+    } else {
+      this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
+    }
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
@@ -90,14 +97,25 @@ class Module {
       // $FlowFixMe[prop-missing]
       maxTxBytes,
     } = params;
-    return this.WalletV4.TransactionBuilder.new(
-      this.WalletV4.TransactionBuilderConfigBuilder.new()
+    const w4 = this.WalletV4;
+    return w4.TransactionBuilder.new(
+      w4.TransactionBuilderConfigBuilder.new()
         .fee_algo(linearFee)
         .pool_deposit(poolDeposit)
         .key_deposit(keyDeposit)
         .coins_per_utxo_word(coinsPerUtxoWord)
         .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
         .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
+        .ex_unit_prices(w4.ExUnitPrices.new(
+          w4.UnitInterval.new(
+            w4.BigNum.from_str('577'),
+            w4.BigNum.from_str('10000'),
+          ),
+          w4.UnitInterval.new(
+            w4.BigNum.from_str('721'),
+            w4.BigNum.from_str('10000000'),
+          ),
+        ))
         .prefer_pure_change(true)
         .build()
     );

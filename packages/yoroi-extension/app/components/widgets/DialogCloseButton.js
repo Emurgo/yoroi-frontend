@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
-import CloseCross from '../../assets/images/cross-dark.inline.svg';
+import { ReactComponent as CloseCross }  from '../../assets/images/cross-dark.inline.svg';
 import { IconButton } from '@mui/material';
 
 type Props = {|

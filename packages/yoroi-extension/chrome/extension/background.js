@@ -14,6 +14,7 @@ import type {
   FailedSignData,
   GetConnectedSitesData,
   GetConnectionProtocolData,
+  GetUtxosRequest,
   PendingSignData,
   PendingTransaction,
   RemoveWalletFromWhitelistData,
@@ -23,7 +24,6 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-  GetUtxosRequest,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -33,27 +33,34 @@ import {
   asTx,
   asValue,
   ConnectorError,
+  DataSignErrorCodes,
 } from './ergo-connector/types';
 import {
   connectorCreateCardanoTx,
+  connectorGenerateReorgTx,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
+  connectorGetCollateralUtxos,
   connectorGetUnusedAddresses,
   connectorGetUsedAddresses,
   connectorGetUtxosCardano,
   connectorGetUtxosErgo,
+  connectorRecordSubmittedCardanoTransaction,
+  connectorRecordSubmittedErgoTransaction,
   connectorSendTx,
   connectorSendTxCardano,
   connectorSignCardanoTx,
   connectorSignTx,
-  connectorRecordSubmittedCardanoTransaction,
-  connectorRecordSubmittedErgoTransaction,
-  connectorGetCollateralUtxos,
-  connectorGenerateReorgTx,
+  getAddressing,
+  connectorSignData,
+  connectorGetAssets,
+  getTokenMetadataFromIds,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
-import { updateTransactions as cardanoUpdateTransactions } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
+import {
+  updateTransactions as cardanoUpdateTransactions
+} from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
 import type { IFetcher as ErgoIFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
 import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
@@ -61,7 +68,9 @@ import { RemoteFetcher as ErgoRemoteFetcher } from '../../app/api/ergo/lib/state
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as ErgoBatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
-import LocalStorageApi from '../../app/api/localStorage/index';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+} from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
@@ -69,13 +78,17 @@ import { schema } from 'lovefield';
 import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
-import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  isCardanoHaskell
+} from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../app/ergo-connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
-import {
-  asAddressedUtxo as asAddressedUtxoCardano,
-} from '../../app/api/ada/transactions/utils';
+import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
+import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import { find721metadata } from '../../app/utils/nftMetadata';
 
 /*::
 declare var chrome;
@@ -459,13 +472,13 @@ const yoroiMessageHandler = async (
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
-    if (!connection) {
+    if (connection == null) {
       throw new ConnectorError({
         code: APIErrorCodes.API_INTERNAL_ERROR,
         info: 'Connection has failed. Please retry.',
       });
     }
-    const responseData = connection?.pendingSigns.get(request.uid);
+    const responseData = connection.pendingSigns.get(request.uid);
     if (!responseData) {
       throw new ConnectorError({
         code: APIErrorCodes.API_INTERNAL_ERROR,
@@ -522,8 +535,9 @@ const yoroiMessageHandler = async (
       }
         break;
       case 'data':
-        // mocked data sign
-        responseData.resolve({ err: 'Generic data signing is not implemented yet' });
+      {
+        responseData.resolve({ ok: { password } });
+      }
         break;
       case 'tx-reorg/cardano':
       {
@@ -544,6 +558,21 @@ const yoroiMessageHandler = async (
         err: {
           code: 2,
           info: 'User rejected'
+        }
+      });
+      connection.pendingSigns.delete(request.uid);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+    }
+  } else if (request.type === 'sign_error') {
+    const connection = connectedSites.get(request.tabId);
+    const responseData = connection?.pendingSigns.get(request.uid);
+    if (connection && responseData) {
+      responseData.resolve({
+        err: {
+          code: 3,
+          info: `utxo error: ${request.errorType} (${request.data})`
         }
       });
       connection.pendingSigns.delete(request.uid);
@@ -853,17 +882,10 @@ function handleInjectorConnect(port) {
           const prot = message.protocol;
           const func = message.function;
           const args = message.params.map(JSON.stringify).join(', ');
-          if (e?.stack != null) {
-            Logger.error(`RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
-          } else {
-            Logger.error(`RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}`);
-          }
-          rpcResponse({
-            err: {
-              code: APIErrorCodes.API_INTERNAL_ERROR,
-              info: 'Yoroi has encountered an internal error - please see logs'
-            }
-          });
+          const msg = `Yoroi internal error: RPC call ${prot}.${func}(${args}) failed due to internal error: ${e}`;
+          const info = e?.stack == null ? msg : `${msg}\n${e.stack}`;
+          Logger.error(info);
+          rpcResponse({ err: { code: APIErrorCodes.API_INTERNAL_ERROR, info } });
         }
       }
       async function addressesToBech(addressesHex: string[]): Promise<string[]> {
@@ -986,14 +1008,15 @@ function handleInjectorConnect(port) {
               await RustModule.load();
               const { tx, partialSign, returnTx } = message.params[0];
 
-              const resp = await confirmSign(tabId,
-                {
-                  type: 'tx/cardano',
-                  tx: { tx, partialSign, tabId },
-                  uid: message.uid
-                },
-                connection
-              );
+              const resp: ?({| ok: any |} | {| err: any |}) =
+                await confirmSign(tabId,
+                  {
+                    type: 'tx/cardano',
+                    tx: { tx, partialSign, tabId },
+                    uid: message.uid
+                  },
+                  connection
+                );
               if (!returnTx && resp?.ok != null) {
                 const witnessSetResp = Buffer.from(
                   RustModule.WalletV4.Transaction.from_bytes(
@@ -1045,18 +1068,86 @@ function handleInjectorConnect(port) {
               handleError(e);
             }
             break;
-          // unsupported until EIP-0012's definition is finalized
-          // case 'sign_data':
-          //   {
-          //     const resp = await confirmSign(tabId, {
-          //       type: 'data',
-          //       address: message.params[0],
-          //       bytes: message.params[1],
-          //       uid: message.uid
-          //     });
-          //     rpcResponse(resp);
-          //   }
-          //   break;
+          case 'sign_data':
+            try {
+              const rawAddress = message.params[0];
+              const payload = message.params[1];
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    if (isCardano) {
+                      await RustModule.load();
+                      const connection = connectedSites.get(tabId);
+                      if (connection == null) {
+                        Logger.error(`ERR - sign_data could not find connection with tabId = ${tabId}`);
+                        rpcResponse(undefined); // shouldn't happen
+                        return;
+                      }
+                      let address;
+                      try {
+                        address = Buffer.from(
+                          RustModule.WalletV4.Address.from_bech32(rawAddress).to_bytes()
+                        ).toString('hex');
+                      } catch {
+                        address = rawAddress;
+                      }
+                      const addressing = await getAddressing(wallet, address);
+                      if (!addressing) {
+                        rpcResponse({
+                          err: {
+                            code: DataSignErrorCodes.DATA_SIGN_ADDRESS_NOT_PK,
+                            info: 'address not found',
+                          }
+                        });
+                        return;
+                      }
+                      const resp = await confirmSign(
+                        tabId,
+                        {
+                          type: 'data',
+                          address,
+                          payload,
+                          uid: message.uid
+                        },
+                        connection,
+                      );
+                      if (!resp.ok) {
+                        rpcResponse(resp);
+                        return;
+                      }
+                      let dataSig;
+                      try {
+                        dataSig = await connectorSignData(
+                          wallet,
+                          resp.ok.password,
+                          addressing,
+                          address,
+                          payload,
+                        );
+                      } catch (error) {
+                        Logger.error(`error when signing data ${error}`);
+                        rpcResponse({
+                          err: {
+                            code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
+                            info: error.message,
+                          }
+                        });
+                        return;
+                      }
+                      rpcResponse({ ok: dataSig });
+                    } else {
+                      rpcResponse({ err: 'not implemented' });
+                    }
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           case 'get_balance':
             try {
               checkParamCount(1);
@@ -1108,25 +1199,50 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    let utxos;
-                    if (isCardano) {
-                      utxos = await connectorGetUtxosCardano(
+                    const utxos = await connectorGetUtxosErgo(
+                      wallet,
+                      pendingTxs,
+                      valueExpected,
+                      tokenId,
+                      paginate
+                    );
+                    rpcResponse({ ok: utxos });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+            break;
+          case 'get_utxos/cardano':
+            try {
+              checkParamCount(2);
+              const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
+              const paginate = message.params[1] == null ? null : asPaginate(message.params[1]);
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    await RustModule.load();
+                    const network = wallet.getParent().getNetworkInfo();
+                    const config = getCardanoHaskellBaseConfig(
+                      network
+                    ).reduce((acc, next) => Object.assign(acc, next), {});
+                    const coinsPerUtxoWord =
+                      RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+                    const utxos = await transformCardanoUtxos(
+                      await connectorGetUtxosCardano(
                         wallet,
                         pendingTxs,
                         valueExpected,
-                        tokenId,
-                        paginate
-                      );
-                      utxos = await transformCardanoUtxos(utxos, isCBOR);
-                    } else {
-                      utxos = await connectorGetUtxosErgo(
-                        wallet,
-                        pendingTxs,
-                        valueExpected,
-                        tokenId,
-                        paginate
-                      );
-                    }
+                        paginate,
+                        coinsPerUtxoWord,
+                        network.NetworkId,
+                      ),
+                      isCBOR,
+                    );
                     rpcResponse({ ok: utxos });
                   },
                   db,
@@ -1273,7 +1389,6 @@ function handleInjectorConnect(port) {
                   },
                   db,
                   localStorageApi,
-                  false,
                 )
               });
             } catch (e) {
@@ -1297,10 +1412,16 @@ function handleInjectorConnect(port) {
                 await withDb(async (db, localStorageApi) => {
                   return await withSelectedWallet(tabId,
                     async (wallet) => {
+                      const stateFetcher: CardanoIFetcher =
+                        await getCardanoStateFetcher(localStorageApi);
+                      const networkInfo = wallet.getParent().getNetworkInfo();
+                      const foreignUtxoFetcher: ForeignUtxoFetcher =
+                        ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
                       const resp = await connectorCreateCardanoTx(
                         wallet,
                         null,
                         message.params[0],
+                        foreignUtxoFetcher,
                       );
                       rpcResponse({
                         ok: resp,
@@ -1314,7 +1435,74 @@ function handleInjectorConnect(port) {
             } catch (e) {
               handleError(e);
             }
-          break;
+            break;
+          case 'get_network_id':
+            try {
+              checkParamCount(0);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - get_network_id could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const networkId = wallet.getParent()
+                        .getNetworkInfo().BaseConfig[0].ChainNetworkId;
+                      rpcResponse({
+                        ok: parseInt(networkId, 10),
+                      });
+                    },
+                    db,
+                    localStorageApi,
+                    false,
+                  );
+                });
+              }
+            } catch (e) {
+              handleError(e);
+            }
+            break;
+          case 'list_nfts/cardano':
+            try {
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const assets = await connectorGetAssets(wallet);
+                    const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
+                    const tokenIds = potentialNFTAssets.map(asset => asset.identifier);
+                    const tokenMetadata = await getTokenMetadataFromIds(tokenIds, wallet);
+
+                    const nfts = {};
+
+                    for (const metadata of tokenMetadata) {
+                      if (!metadata.IsNFT) {
+                        continue;
+                      }
+                      if (metadata.Metadata.type !== 'Cardano') {
+                        throw new Error('this API only supports Cardano');
+                      }
+                      const nftMetadata = find721metadata(
+                        metadata.Metadata.policyId,
+                        metadata.Metadata.assetName,
+                        metadata.Metadata.assetMintMetadata,
+                      );
+                      if (nftMetadata) {
+                        nfts[metadata.Identifier] = { metadata: nftMetadata };
+                      }
+                    }
+                    rpcResponse({ ok: nfts });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch(e) {
+              handleError(e);
+            }
+            break;
           case 'auth_sign_hex_payload/cardano':
             try {
               checkParamCount(1);
@@ -1375,9 +1563,16 @@ function handleInjectorConnect(port) {
             try {
               checkParamCount(1);
               await RustModule.load();
-              const requiredAmount = RustModule.WalletV4.Value.from_bytes(
-                Buffer.from(message.params[0], 'hex')
-              ).coin().to_str();
+              let requiredAmount: string = message.params[0];
+              if (!/^\d+$/.test(requiredAmount)) {
+                try {
+                  requiredAmount = RustModule.WalletV4.Value.from_bytes(
+                    Buffer.from(requiredAmount, 'hex')
+                  ).coin().to_str();
+                } catch (e) {
+                  throw new Error(`Failed to parse the required collateral amount: "${requiredAmount}"`);
+                }
+              }
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
@@ -1389,7 +1584,7 @@ function handleInjectorConnect(port) {
                     }
                     const walletUtxos = await withUtxos.getAllUtxos();
                     const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
-
+                    const submittedTxs = loadSubmittedTransactions() || [];
                     const {
                       utxosToUse,
                       reorgTargetAmount
@@ -1402,9 +1597,10 @@ function handleInjectorConnect(port) {
                         const { addressing, ...rest } = u;
                         return rest;
                       }),
+                      submittedTxs,
                     );
                     // do have enough
-                    if (!reorgTargetAmount) {
+                    if (reorgTargetAmount == null) {
                       const utxos = await transformCardanoUtxos(
                         utxosToUse,
                         isCBOR
@@ -1426,6 +1622,7 @@ function handleInjectorConnect(port) {
                         usedUtxoIds,
                         reorgTargetAmount,
                         addressedUtxos,
+                        submittedTxs,
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {
@@ -1513,7 +1710,6 @@ async function transformCardanoUtxos(
   utxos: Array<RemoteUnspentOutput>,
   isCBOR: boolean,
 ) {
-  // $FlowFixMe[prop-missing]
   const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
   await RustModule.load();
   const W4 = RustModule.WalletV4;

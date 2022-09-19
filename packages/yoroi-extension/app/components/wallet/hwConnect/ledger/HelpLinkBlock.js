@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import ExternalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import { ReactComponent as ExternalLinkSVG }  from '../../../../assets/images/link-external.inline.svg';
 import styles from '../common/HelpLinkBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 

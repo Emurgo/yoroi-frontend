@@ -6,18 +6,20 @@ import type { Node } from 'react';
 import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import TextField from '../../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../../i18n/global-messages';
-import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './WalletSendPreviewStep.scss';
 import config from '../../../../config';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import WarningBox from '../../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  $npm$ReactIntl$IntlFormat,
+  $npm$ReactIntl$MessageDescriptor,
+} from 'react-intl';
 import {
   truncateToken,
 } from '../../../../utils/formatters';
@@ -27,12 +29,18 @@ import {
 import type {
   TokenLookupKey, TokenEntry,
 } from '../../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists } from '../../../../stores/stateless/tokenHelpers';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
-import { Button } from '@mui/material';
+import { Button, Link, Tooltip, Typography } from '@mui/material';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import type { Asset } from '../../assets/AssetsList'
+import { getNFTs, getTokens } from '../../../../utils/wallet';
+import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
+import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Box } from '@mui/system';
+import { ReactComponent as InfoIcon }  from '../../../../assets/images/attention-big-light.inline.svg';
+import ErrorBlock from '../../../widgets/ErrorBlock';
+import type LocalizableError from '../../../../i18n/LocalizableError';
 
 type Props = {|
   +staleTx: boolean,
@@ -44,28 +52,71 @@ type Props = {|
   +transactionSize: ?string,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +addressToDisplayString: string => string,
-  +onCancel: void => void,
   +isSubmitting: boolean,
-  +error: ?LocalizableError,
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
+  +isDefaultIncluded: boolean,
+  +minAda: ?MultiToken,
+  +plannedTxInfoMap: Array<{|
+    token: $ReadOnly<TokenRow>,
+    amount?: string,
+    shouldSendAll?: boolean,
+  |}>,
+  +selectedNetwork: $ReadOnly<NetworkRow>,
+  +walletType: 'trezor' | 'ledger' | 'mnemonic',
+  +ledgerSendError: ?LocalizableError,
+  +trezorSendError: ?LocalizableError,
 |};
+
+type State = {|
+  passwordError: string | null,
+  txError: string | null,
+|}
 
 const messages = defineMessages({
   nAssets: {
     id: 'wallet.send.form.preview.nAssets',
     defaultMessage: '!!!{number} Assets',
-  }
+  },
+  minAdaHelp: {
+    id: 'wallet.send.form.preview.minAdaHelp',
+    defaultMessage: '!!!Minimum ADA required to send these assets. {moreDetails}'
+  },
+  moreDetails: {
+    id: 'wallet.send.form.preview.moreDetails',
+    defaultMessage: '!!!More details here',
+  },
+  txConfirmationLedgerNanoLine1: {
+    id: 'wallet.send.ledger.confirmationDialog.info.line.1',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
+  },
+  sendUsingLedgerNano: {
+    id: 'wallet.send.ledger.confirmationDialog.submit',
+    defaultMessage: '!!!Send using Ledger',
+  },
+  txConfirmationTrezorTLine1: {
+    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
+  },
+  sendUsingTrezorT: {
+    id: 'wallet.send.trezor.confirmationDialog.submit',
+    defaultMessage: '!!!Send using Trezor',
+  },
 });
 
 @observer
-export default class WalletSendPreviewStep extends Component<Props> {
+export default class WalletSendPreviewStep extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  state: State = {
+    passwordError: null,
+    txError: null
+  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -94,16 +145,29 @@ export default class WalletSendPreviewStep extends Component<Props> {
   });
 
   submit(): void {
-    this.form.submit({
-      onSuccess: async (form) => {
-        const { walletPassword } = form.values();
-        const transactionData = {
-          password: walletPassword,
-        };
-        await this.props.onSubmit(transactionData);
-      },
-      onError: () => {}
-    });
+    if (this.props.walletType === 'mnemonic') {
+      this.form.submit({
+        onSuccess: async (form) => {
+          const { walletPassword } = form.values();
+          const transactionData = {
+            password: walletPassword,
+          };
+          try {
+            await this.props.onSubmit(transactionData);
+          } catch (error) {
+            const errorMessage = this.context.intl.formatMessage(error, error.values);
+            if (error instanceof IncorrectWalletPasswordError) {
+              this.setState({ passwordError: errorMessage });
+            } else {
+              this.setState({ txError: errorMessage });
+            }
+          }
+        },
+        onError: () => {}
+      });
+    } else { // hw wallets are not using passwords
+      this.props.onSubmit({ password: '' });
+    }
   }
 
   convertedToUnitOfAccount: (TokenEntry, string) => string = (token, toCurrency) => {
@@ -112,10 +176,11 @@ export default class WalletSendPreviewStep extends Component<Props> {
     const shiftedAmount = token.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    const coinPrice = this.props.getCurrentPrice(
-      tokenInfo.Identifier,
-      toCurrency
-    );
+    const ticker = tokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected main token type');
+    }
+    const coinPrice = this.props.getCurrentPrice(ticker, toCurrency);
 
     if (coinPrice == null) return '-';
 
@@ -127,33 +192,16 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
   renderSingleAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.amount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.amountSmall}>{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.amount}>{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
+    return (
+      <div className={styles.amount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
             truncateToken(getTokenName(this.props.getTokenInfo(entry)))
           }
-          </span>
-        </div>
-      );
+        </span>
+      </div>
+    );
   }
+
   renderTotalAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
@@ -161,16 +209,16 @@ export default class WalletSendPreviewStep extends Component<Props> {
     return unitOfAccountSetting.enabled
       ? (
         <>
-          <div className={styles.totalAmount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.totalAmountSmall}>{formatValue(entry)}
+          <div className={styles.totalAmount}>{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
               truncateToken(getTokenName(this.props.getTokenInfo(entry)))
             }
+            </span>
+          </div>
+          <div className={styles.totalFiatAmount}>
+            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
+            <span className={styles.currencySymbol}>
+              &nbsp;{unitOfAccountSetting.currency}
             </span>
           </div>
         </>
@@ -185,38 +233,17 @@ export default class WalletSendPreviewStep extends Component<Props> {
   }
   renderSingleFee: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.fees}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.feesSmall}>
-            {formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(
-                entry
-              )))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.fees}>
-          {formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
+    return(
+      <div className={styles.fees}>
+        {formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
             truncateToken(getTokenName(this.props.getTokenInfo(
               entry
             )))
           }
-          </span>
-        </div>
-      );
+        </span>
+      </div>
+    );
   }
 
   renderBundle: {|
@@ -235,16 +262,140 @@ export default class WalletSendPreviewStep extends Component<Props> {
     );
   }
 
-  getAssetsList: (() => Asset[]) = () => {
-    const { getTokenInfo } = this.props
-    return this.props.amount.nonDefaultEntries().map(entry => ({
-      entry,
-      info: getTokenInfo(entry)
-    })).map(token => ({
-      name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-      id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-      amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-    }))
+  _amountLabel: void => Node = () => {
+    const {
+      selectedNetwork,
+      plannedTxInfoMap,
+      minAda
+    } = this.props;
+    const { intl } = this.context;
+    const isCardano = isCardanoHaskell(selectedNetwork);
+
+
+    if (isCardano) {
+      const tokenInfo = plannedTxInfoMap.find(({ token }) => token.IsDefault);
+      if (
+        (
+          !tokenInfo || // Show Min-Ada label if the ADA is not included
+          // Or if included ADA less than Min-ADA
+          minAda?.getDefaultEntry().amount.gt(tokenInfo.amount ?? 0)
+        ) &&
+        !tokenInfo?.shouldSendAll
+      ) {
+        const moreDetailsLink = (
+          <Link
+            href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/5008187102351-What-is-the-locked-assets-deposit-"
+            target='_blank'
+            rel="noreferrer noopener"
+            sx={{
+              color: 'inherit',
+              textDecoration: 'underline'
+            }}
+          >
+            {intl.formatMessage(messages.moreDetails)}
+          </Link>
+        )
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {intl.formatMessage(globalMessages.minAda)}
+
+            <Tooltip
+              placement='top'
+              title={
+                <Typography>
+                  <FormattedMessage
+                    {...messages.minAdaHelp}
+                    values={{ moreDetails: moreDetailsLink }}
+                  />
+                </Typography>
+              }
+            >
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: '10px',
+                '& > svg': {
+                    width: 20,
+                    height: 20,
+                  }
+                }}
+              >
+                <InfoIcon />
+              </Box>
+            </Tooltip>
+          </Box>
+        )
+      }
+    }
+
+    return (
+      <Box>
+        {intl.formatMessage(globalMessages.amountLabel)}
+      </Box>
+    );
+  }
+
+  renderHWWalletInfo(): Node {
+    const { intl } = this.context;
+    const { walletType } = this.props;
+    if (walletType === 'mnemonic') {
+      return null;
+    }
+
+    let infoLine1;
+    let infoLine2;
+    if (walletType === 'trezor') {
+      infoLine1 = messages.txConfirmationTrezorTLine1;
+      infoLine2 = globalMessages.txConfirmationTrezorTLine2;
+    }
+    if (walletType === 'ledger') {
+      infoLine1 = messages.txConfirmationLedgerNanoLine1;
+      infoLine2 = globalMessages.txConfirmationLedgerNanoLine2;
+    }
+    return (
+      <div className={styles.infoBlock}>
+        <ul>
+          <li key="1"><span>{intl.formatMessage(infoLine1)}</span><br /></li>
+          <li key="2"><span>{intl.formatMessage(infoLine2)}</span><br /></li>
+        </ul>
+      </div>
+    );
+  }
+
+  getSendButtonText(): $npm$ReactIntl$MessageDescriptor {
+    const { walletType } = this.props;
+    if (walletType === 'ledger') {
+      return messages.sendUsingLedgerNano;
+    }
+    if (walletType === 'trezor') {
+      return messages.sendUsingTrezorT;
+    }
+    return globalMessages.sendButtonLabel;
+  }
+
+  renderError(): Node {
+    const { walletType } = this.props;
+    if (walletType === 'mnemonic') {
+      const { txError }  = this.state;
+      if (txError) {
+        return (
+          <div className={styles.txError}>
+            {txError}
+          </div>
+        );
+      }
+      return null;
+    }
+    if (walletType === 'trezor') {
+      const { trezorSendError } = this.props;
+      return (<ErrorBlock error={trezorSendError} />);
+    }
+    if (walletType === 'ledger') {
+      const { ledgerSendError } = this.props;
+      return (<ErrorBlock error={ledgerSendError} />);
+    }
+    throw new Error('unexpected wallet type');
   }
 
   render(): Node {
@@ -255,7 +406,10 @@ export default class WalletSendPreviewStep extends Component<Props> {
       amount,
       receivers,
       isSubmitting,
+      walletType,
     } = this.props;
+    const { passwordError } = this.state;
+
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -267,6 +421,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        {this.renderError()}
         <div className={styles.staleTxWarning}>
           {this.props.staleTx && staleTxWarning}
         </div>
@@ -292,12 +447,13 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
           <div className={styles.amountFeesWrapper}>
             {(amount.nonDefaultEntries().length > 0) &&
-            (
-              <AssetsDropdown assets={this.getAssetsList()} />
-            )}
+            (<AssetsDropdown
+              tokens={getTokens(amount, this.props.getTokenInfo)}
+              nfts={getNFTs(amount, this.props.getTokenInfo)}
+            />)}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(globalMessages.amountWithMinADA)}
+                {this._amountLabel()}
               </div>
               <div className={styles.amountValue}>
                 {this.renderSingleAmount(amount.getDefaultEntry())}
@@ -336,24 +492,37 @@ export default class WalletSendPreviewStep extends Component<Props> {
             </div>
           </div>
 
-          <TextField
-            type="password"
-            className={styles.walletPassword}
-            {...walletPasswordField.bind()}
-            disabled={isSubmitting}
-            error={walletPasswordField.error}
-          />
+          {(walletType === 'mnemonic' && (
+            <TextField
+              type="password"
+              className={styles.walletPassword}
+              {...walletPasswordField.bind()}
+              disabled={isSubmitting}
+              onChange={(e) => {
+                this.setState({ passwordError: null })
+                walletPasswordField.set('value', e.target.value)
+              }}
+              error={walletPasswordField.error || passwordError}
+            />
+          ))}
+        </div>
+
+        <div>
+          {this.renderHWWalletInfo()}
         </div>
 
         <Button
           variant="primary"
           onClick={this.submit.bind(this)}
-          disabled={!walletPasswordField.isValid || isSubmitting}
+          disabled={
+            (walletType === 'mnemonic' && !walletPasswordField.isValid) ||
+            isSubmitting
+          }
           sx={{ display: 'block', padding: '0px', marginTop: '9px' }}
         >
           {isSubmitting ?
             <LoadingSpinner light /> :
-            intl.formatMessage(globalMessages.sendButtonLabel)}
+            intl.formatMessage(this.getSendButtonText())}
         </Button>
 
       </div>

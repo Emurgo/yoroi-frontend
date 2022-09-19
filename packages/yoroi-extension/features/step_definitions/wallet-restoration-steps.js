@@ -4,7 +4,18 @@ import { When, Then } from 'cucumber';
 import { By, error, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
-import { checkErrorByTranslationId } from './common-steps';
+import { checkErrorByTranslationId, getPlates } from './common-steps';
+import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import {
+  cleanRecoverInput,
+  errorInvalidRecoveryPhrase,
+  getWords,
+  paperPasswordInput,
+  recoveryPhraseField,
+  repeatPasswordInput,
+  walletPasswordInput,
+} from '../pages/restoreWalletPage';
+import { masterKeyInput } from '../pages/walletClaimTransferPage';
 
 When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
@@ -68,59 +79,44 @@ When(/^I can't enter more then 15 words from the recovery phrase:$/, async funct
   expect(result).to.be.true;
 });
 
-export async function enterRecoveryPhrase(customWorld: any, phrase: string): Promise<void> {
-  const recoveryPhrase = phrase.split(' ');
-  for (let i = 0; i < recoveryPhrase.length; i++) {
-    const word = recoveryPhrase[i];
-    await customWorld.driver
-      .findElement(By.xpath('//input[starts-with(@id, "downshift-") and contains(@id, "-input")]'))
-      .sendKeys(word, Key.RETURN);
-    if (i === 0) await customWorld.driver.sleep(500);
-  }
-}
-
 When(/^I enter the master key:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: 'input[name="masterKey"]', method: 'css' }, fields.masterKey);
+  await this.input(masterKeyInput, fields.masterKey);
 });
 
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
-  const inputElement = await this.driver.findElement(
-    By.xpath('//input[starts-with(@id, "downshift-") and contains(@id, "-input")]')
-  );
+  const inputElement = await this.findElement(recoveryPhraseField);
   try {
     await inputElement.sendKeys(words.word, Key.RETURN);
     expect(false, 'Recovery phrase is intractable').to.true;
   } catch (e) {
     expect(e instanceof error.ElementNotInteractableError).to.be.true;
   }
-  const lastWord = await this.driver.findElements(
-    By.xpath(`//span[contains(text(), '${words.word}')]`)
-  );
+  const lastWord = await this.findElements(getWords(words.word));
   expect(lastWord.length).to.be.equal(0);
 });
 
 When(/^I clear the recovery phrase$/, async function () {
-  await this.clearInputUpdatingForm({ locator: '.AutocompleteOverridesClassic_autocompleteWrapper input', method: 'css' }, 15);
+  await this.clearInputUpdatingForm(cleanRecoverInput, 15);
 });
 
 When(/^I enter the restored wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='walletPassword']", method: 'css' }, fields.password);
-  await this.input({ locator: "input[name='repeatPassword']", method: 'css' }, fields.repeatedPassword);
+  await this.input(walletPasswordInput, fields.password);
+  await this.input(repeatPasswordInput, fields.repeatedPassword);
 });
 
 Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
-  await this.input({ locator: "input[name='repeatPassword']", method: 'css' }, password);
+  await this.input(repeatPasswordInput, password);
 });
 
 When(/^I enter the paper wallet password "([^"]*)"$/, async function (password) {
-  await this.input({ locator: "input[name='paperPassword']", method: 'css' }, password);
+  await this.input(paperPasswordInput, password);
 });
 
 When(/^I clear the restored wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm({ locator: "input[name='walletPassword']", method: 'css' }, password.length);
+  await this.clearInputUpdatingForm(walletPasswordInput, password.length);
 });
 
 When(/^I click the "Restore Wallet" button$/, async function () {
@@ -129,10 +125,7 @@ When(/^I click the "Restore Wallet" button$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
   await this.driver.sleep(500);
-  const errorElement = this.driver.findElement(
-    By.xpath('//p[contains(@class, "-error") and contains(@id, "recoveryPhrase")]')
-  );
-  expect(await errorElement.isDisplayed()).to.be.true;
+  expect(await this.isDisplayed(errorInvalidRecoveryPhrase)).to.be.true;
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
@@ -150,19 +143,6 @@ Then(/^I should see a plates$/, async function (table) {
     expect(plateText).to.be.equal(rows[i].plate);
   }
 });
-
-export async function getPlates(customWorld: any): Promise<any> {
-  // check plate in confirmation dialog
-  let plateElements = await customWorld.driver.findElements(
-    By.css('.WalletRestoreVerifyDialog_plateIdSpan')
-  );
-
-  // this makes this function also work for wallets that already exist
-  if (plateElements.length === 0) {
-    plateElements = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
-  }
-  return plateElements;
-}
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, {

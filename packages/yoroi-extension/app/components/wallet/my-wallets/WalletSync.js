@@ -10,6 +10,8 @@ import styles from './WalletSync.scss';
 
 type Props = {|
   +time: ?string,
+  +isRefreshing: boolean,
+  +isLoading: boolean,
 |};
 
 @observer
@@ -20,8 +22,28 @@ export default class WalletSync extends Component<Props> {
   };
 
   render(): Node {
-    const { time } = this.props;
+    const { time, isRefreshing, isLoading } = this.props;
     const { intl } = this.context;
+
+    if (isLoading) {
+      return (
+        <div className={styles.wrapper}>
+          <span className={styles.text}>
+            {intl.formatMessage(globalMessages.loading)}
+          </span>
+        </div>
+      );
+    }
+
+    if (isRefreshing) {
+      return (
+        <div className={styles.wrapper}>
+          <span className={styles.text}>
+            {intl.formatMessage(globalMessages.syncing)}
+          </span>
+        </div>
+      );
+    }
 
     return this.props.time != null
       ? (

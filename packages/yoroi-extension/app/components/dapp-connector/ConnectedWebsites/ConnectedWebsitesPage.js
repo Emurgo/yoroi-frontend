@@ -4,6 +4,8 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
 import styles from './ConnectedWebsitesPage.scss'
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WalletRow from './WalletRow';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -15,8 +17,6 @@ import NoDApp from './NoDApp';
 import { Box } from '@mui/system';
 import { BRANDED_DAPPS } from './dapps';
 import DApp from './DApp';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
 
 type WalletInfo = {| balance: null | MultiToken, plate: WalletChecksum |}
 type Props = {|

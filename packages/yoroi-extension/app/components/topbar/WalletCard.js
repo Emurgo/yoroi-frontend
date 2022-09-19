@@ -5,12 +5,11 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import styles from './WalletCard.scss';
 import WalletAccountIcon from './WalletAccountIcon';
-import ConceptualIcon from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
-import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
-import LedgerIcon from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
+import { ReactComponent as ConceptualIcon }  from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
+import { ReactComponent as TrezorIcon }  from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
+import { ReactComponent as LedgerIcon }  from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
-import { truncateToken, splitAmount } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -21,19 +20,26 @@ import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
-import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import DragIcon from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
-import StarIcon from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
+import { ReactComponent as DragIcon }  from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
+import { ReactComponent as StarIcon }  from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
+import { ReactComponent as StaredIcon }  from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
+
 import { Draggable } from 'react-beautiful-dnd';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { Tooltip, Typography } from '@mui/material';
+import AmountDisplay from '../common/AmountDisplay';
 
 const messages = defineMessages({
   tokenTypes: {
     id: 'wallet.topbar.dialog.tokenTypes',
     defaultMessage: '!!!Token types',
   },
+  quickAccessTooltip: {
+    id: 'wallet.topbar.dialog.quickAccess',
+    defaultMessage: '!!!Add to quick acceess wallets list',
+  }
 });
 
 type Props = {|
@@ -50,11 +56,15 @@ type Props = {|
   +onSelect?: void => void,
   +walletId: string,
   +idx: number,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
+  +toggleQuickAccess: string => void,
+  +isInQuickAccess: boolean,
 |};
 
 type State = {| +isActionsShow: boolean |};
 
-function constructPlate(
+export function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
   divClass: string
@@ -128,7 +138,13 @@ export default class WalletCard extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { shouldHideBalance, walletId, idx } = this.props;
+    const {
+      shouldHideBalance,
+      walletId,
+      idx,
+      unitOfAccountSetting,
+      getCurrentPrice,
+    } = this.props;
     const { isActionsShow } = this.state;
 
     const [, iconComponent] = this.props.plate
@@ -153,14 +169,18 @@ export default class WalletCard extends Component<Props, State> {
               this.props.isCurrentWallet === true && styles.currentCardWrapper,
               snapshot.isDragging === true && styles.isDragging
             )}
-            onClick={this.props.onSelect}
-            onKeyDown={this.props.onSelect}
             onMouseEnter={this.showActions}
             onMouseLeave={this.hideActions}
             {...provided.draggableProps}
             ref={provided.innerRef}
           >
-            <div className={styles.main}>
+            <div
+              className={styles.main}
+              role="button"
+              tabIndex="0"
+              onClick={this.props.onSelect}
+              onKeyDown={this.props.onSelect}
+            >
               <div className={styles.header}>
                 <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
                 {' ·  '}
@@ -169,20 +189,15 @@ export default class WalletCard extends Component<Props, State> {
               <div className={styles.body}>
                 <div>{iconComponent}</div>
                 <div className={styles.content}>
-                  <div className={styles.amount}>
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}
-                  </div>
-                  <div className={styles.fixedAmount}>
-                    {/* TODO: fix value to USD */}
-                    {this.renderAmountDisplay({
-                      shouldHideBalance,
-                      amount: totalAmount,
-                    })}{' '}
-                    USD
-                  </div>
+                  <AmountDisplay
+                    shouldHideBalance={shouldHideBalance}
+                    amount={totalAmount}
+                    getTokenInfo={this.props.getTokenInfo}
+                    showFiat
+                    showAmount
+                    unitOfAccountSetting={unitOfAccountSetting}
+                    getCurrentPrice={getCurrentPrice}
+                  />
                 </div>
                 <div className={styles.extraInfo}>
                   <p className={styles.label}>
@@ -204,51 +219,33 @@ export default class WalletCard extends Component<Props, State> {
               <div {...provided.dragHandleProps}>
                 <DragIcon />
               </div>
-              <button type="button" onClick={() => {}}>
-                <StarIcon />
-              </button>
+              {!this.props.isInQuickAccess &&
+                <Tooltip
+                  title={
+                    <Typography variant="body3">
+                      {intl.formatMessage(messages.quickAccessTooltip)}
+                    </Typography>
+                  }
+                  placement="bottom-end"
+                >
+                  <button type="button" onClick={() => this.props.toggleQuickAccess(this.props.walletId)}>
+                    <StarIcon />
+                  </button>
+                </Tooltip>}
             </div>
+            {this.props.isInQuickAccess &&
+            <button
+              className={styles.quickAccessToggle}
+              onClick={() => this.props.toggleQuickAccess(this.props.walletId)}
+              type='button'
+            >
+              <StaredIcon />
+            </button>}
           </div>
         )}
       </Draggable>
     );
   }
-
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
-    if (request.amount == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (request.shouldHideBalance) {
-      balanceDisplay = <span>{hiddenAmount}</span>;
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
 
   getTotalAmount: void => null | MultiToken = () => {
     if (this.props.rewards === undefined) {

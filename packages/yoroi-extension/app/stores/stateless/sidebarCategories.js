@@ -2,27 +2,25 @@
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
-import walletsIcon from '../../assets/images/sidebar/my_wallets.inline.svg';
-import transferIcon from '../../assets/images/sidebar/transfer_wallets.inline.svg';
-import settingsIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
-import goBackIcon from '../../assets/images/top-bar/back-arrow-white.inline.svg';
-import dappConnectorIcon from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import noticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
+import { ReactComponent as walletsIcon }  from '../../assets/images/sidebar/my_wallets.inline.svg';
+import { ReactComponent as transferIcon }  from '../../assets/images/sidebar/transfer_wallets.inline.svg';
+import { ReactComponent as settingsIcon }  from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
+import { ReactComponent as goBackIcon }  from '../../assets/images/top-bar/back-arrow-white.inline.svg';
+import { ReactComponent as dappConnectorIcon }  from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import { ReactComponent as noticeBoardIcon }  from '../../assets/images/notice-board/notice-board.inline.svg';
 import { matchRoute } from '../../utils/routing';
 import environment from '../../environment';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
-import walletIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import stakingIcon from '../../assets/images/sidebar/revamp/staking.inline.svg';
-import assetsIcon from '../../assets/images/sidebar/revamp/assets.inline.svg';
-import votingIcon from '../../assets/images/sidebar/revamp/voting.inline.svg';
-// import swapIcon from '../../assets/images/sidebar/revamp/swap.inline.svg';
-import settingIcon from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import faqIcon from '../../assets/images/sidebar/revamp/faq.inline.svg';
+import { ReactComponent as walletIcon }  from '../../assets/images/sidebar/revamp/wallet.inline.svg';
+import { ReactComponent as stakingIcon }  from '../../assets/images/sidebar/revamp/staking.inline.svg';
+import { ReactComponent as assetsIcon }  from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
+import { ReactComponent as votingIcon }  from '../../assets/images/sidebar/revamp/voting.inline.svg';
+// import { ReactComponent as swapIcon }  from '../../assets/images/sidebar/revamp/swap.inline.svg';
+import { ReactComponent as settingIcon }  from '../../assets/images/sidebar/revamp/setting.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-
-// import newUpdatesIcon from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
-// import feedbackIcon from '../../assets/images/sidebar/revamp/feedback.inline.svg';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type SidebarCategory = {|
   +className: string,
@@ -135,13 +133,22 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: _request => _request.selected !== null,
+    isVisible: ({ selected }) => (
+      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
+    ),
   },
   {
     className: 'assets',
     route: ROUTES.ASSETS.ROOT,
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
+    isVisible: _request => _request.selected !== null,
+  },
+  {
+    className: 'nfts',
+    route: ROUTES.NFTS.ROOT,
+    icon: nftsIcon,
+    label: globalMessages.sidebarNfts,
     isVisible: _request => _request.selected !== null,
   },
   {
@@ -164,13 +171,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/settings',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
-    isVisible: _request => true,
-  },
-  {
-    className: 'faq',
-    route: 'https://yoroi-wallet.com/faq',
-    icon: faqIcon,
-    label: globalMessages.sidebarFaq,
     isVisible: _request => true,
   },
   // {

@@ -1,0 +1,28 @@
+.component {
+  width: 100%;
+  min-height: var(--webauthn-layout-top-gap);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  opacity: 0.8;
+  background-color: var(--webauthn-top-background-color);
+  .warningBlock {
+    display: flex;
+    margin-bottom: 6px;
+    .warningIcon {
+      height: 16px;
+      width: 22px;
+      vertical-align: sub;
+    }
+    .text {
+      height: 18px;
+      color: var(--color-white);
+      line-height: 18px;
+      font-size: 13px;
+    }
+  }
+}
+
+.componentFirefox {
+  min-height: var(--webauthn-layout-top-gap-firefox);
+}

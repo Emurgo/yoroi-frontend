@@ -4,7 +4,7 @@ import { Given, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
-import { enterRecoveryPhrase } from './wallet-restoration-steps';
+import { enterRecoveryPhrase } from '../support/helpers/helpers';
 
 // ========== Paper wallet ==========
 

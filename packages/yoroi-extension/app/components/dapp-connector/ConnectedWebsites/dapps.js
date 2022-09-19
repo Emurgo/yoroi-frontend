@@ -1,8 +1,8 @@
 // @flow
 import { defineMessages } from 'react-intl'
-import FiboLogo from '../../../assets/images/dapp-connector/fibo-logo-black.inline.svg'
+import { ReactComponent as FiboLogo } from '../../../assets/images/dapp-connector/fibo-logo-black.inline.svg'
 // import AstarterLogo from '../../../assets/images/dapp-connector/a-starter-logo.inline.svg'
-import SundaeSwapLogo from '../../../assets/images/dapp-connector/sundae-swap-black.inline.svg'
+import { ReactComponent as SundaeSwapLogo } from '../../../assets/images/dapp-connector/sundae-swap-black.inline.svg'
 import type { Node } from 'react'
 import type { MessageDescriptor } from 'react-intl';
 

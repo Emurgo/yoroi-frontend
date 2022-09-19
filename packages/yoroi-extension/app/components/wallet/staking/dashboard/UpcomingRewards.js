@@ -8,13 +8,14 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/types';
 import CustomTooltip from '../../../widgets/CustomTooltip';
-import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import AttentionIcon from '../../../../assets/images/attention-modern.inline.svg';
+import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
 import { truncateStakePool } from '../../../../utils/formatters';
 
 import Card from './Card';
 import styles from './UpcomingRewards.scss';
+import { Skeleton } from '@mui/material';
+import { Box } from '@mui/system';
 
 const messages = defineMessages({
   title: {
@@ -75,10 +76,10 @@ export default class UpcomingRewards extends Component<Props> {
 
     const firstRewardWarning = this.props.showWarning
       ? [
-        <CustomTooltip
-          key="firstRewardWarning"
-          toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
-        />,
+          <CustomTooltip
+            key="firstRewardWarning"
+            toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
+          />,
         ]
       : [];
 
@@ -105,26 +106,51 @@ export default class UpcomingRewards extends Component<Props> {
           ])}
           {this.infoToNode(this.props.content[1], genUnregisteredWarning(this.props.content[1]))}
           {this.infoToNode(this.props.content[2], genUnregisteredWarning(this.props.content[2]))}
-          {this.infoToNode(
-            this.props.content[3],
-            genUnregisteredWarning(this.props.content[3])
-          )}
+          {this.infoToNode(this.props.content[3], genUnregisteredWarning(this.props.content[3]))}
         </div>
       </Card>
     );
+  }
+
+  getSkeleton(
+    layout: {|
+      width: string,
+      height: string,
+      marginBottom: string,
+    |},
+    index: number
+  ): Node {
+    return (
+      <Skeleton
+        key={index}
+        variant="rectangular"
+        width={layout.width}
+        height={layout.height}
+        animation="wave"
+        sx={{
+          backgroundColor: 'var(--yoroi-palette-common-white)',
+          borderRadius: '4px',
+          marginBottom: layout.marginBottom,
+        }}
+      />
+    );
+  }
+
+  rewardsSkeleton(): Node {
+    const skeletons = [
+      { width: '95%', height: '22', marginBottom: '6px' }, // End of Epoch Label
+      { width: '75%', height: '32', marginBottom: '24px' }, // Date
+      { width: '95%', height: '22', marginBottom: '6px' }, // Stake pool label
+      { width: '75%', height: '32', marginBottom: '0px' }, // Pool Id
+    ];
+    return <Box>{skeletons.map((skeleton, i) => this.getSkeleton(skeleton, i))}</Box>;
   }
 
   infoToNode: (?BoxInfo, Array<Node>) => Node = (info, additional) => {
     const { intl } = this.context;
 
     if (info == null) {
-      return (
-        <div className={styles.card}>
-          <div className={styles.loading}>
-            <LoadingSpinner />
-          </div>
-        </div>
-      );
+      return <div className={styles.card}>{this.rewardsSkeleton()}</div>;
     }
 
     return (
@@ -133,8 +159,8 @@ export default class UpcomingRewards extends Component<Props> {
           <h3 className={styles.label}>
             {this.props.useEndOfEpoch
               ? intl.formatMessage(messages.endOfEpoch)
-              : intl.formatMessage(globalMessages.epochLabel)}:
-            &nbsp;
+              : intl.formatMessage(globalMessages.epochLabel)}
+            : &nbsp;
             {info.isCurrentEpoch === true
               ? `${info.epoch} (${intl.formatMessage(globalMessages.current)})`
               : info.epoch}
@@ -154,11 +180,11 @@ export default class UpcomingRewards extends Component<Props> {
         <h3 className={classnames([styles.label, styles.mt20])}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}:
         </h3>
-        { (info.pools.length === 0) ?
+        {info.pools.length === 0 ? (
           <div>—</div>
-          :
+        ) : (
           <div className={styles.pools}>{info.pools.map(pool => this.getAvatars(pool))}</div>
-        }
+        )}
       </div>
     );
   };
@@ -169,15 +195,20 @@ export default class UpcomingRewards extends Component<Props> {
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const tooltip = pool.ticker == null
-      ? truncateStakePool(pool.id[0])
-      : (<>[{pool.ticker}] {pool.name}<br /><span>{truncateStakePool(pool.id[0])}</span></>);
+    const tooltip =
+      pool.ticker == null ? (
+        truncateStakePool(pool.id[0])
+      ) : (
+        <>
+          [{pool.ticker}] {pool.name}
+          <br />
+          <span>{truncateStakePool(pool.id[0])}</span>
+        </>
+      );
 
     const poolInfo =
       pool.ticker == null ? (
-        <div className={styles.poolInfo}>
-          {truncateStakePool(pool.id[0])}
-        </div>
+        <div className={styles.poolInfo}>{truncateStakePool(pool.id[0])}</div>
       ) : (
         <div className={styles.poolInfo}>
           [{pool.ticker}] {pool.name}
@@ -186,7 +217,6 @@ export default class UpcomingRewards extends Component<Props> {
 
     const img = <img alt="Pool avatar" src={avatar} className={styles.avatar} />;
     return (
-
       <CustomTooltip
         key={pool.id[0] + pool.id[1]}
         toolTip={<div className={styles.poolInfoToolTip}>{tooltip}</div>}
