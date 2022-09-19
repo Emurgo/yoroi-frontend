@@ -55,7 +55,6 @@ type Props = {|
   +onAddWallet: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
   +ergoWallets: Array<Object>,
   +cardanoWallets: Array<Object>,
   +walletsNavigation: WalletsNavigation,
