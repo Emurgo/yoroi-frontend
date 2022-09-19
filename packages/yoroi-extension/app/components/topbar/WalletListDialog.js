@@ -240,7 +240,7 @@ export default class WalletListDialog extends Component<Props, State> {
                   <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
                     {cardanoWalletsIdx.length > 0 &&
                     cardanoWalletsIdx.map((walletId, idx) => {
-                      const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
+                      const wallet = cardanoWallets.find(w => w.walletId === walletId);
                       if (!wallet) {
                         return null;
                       }
