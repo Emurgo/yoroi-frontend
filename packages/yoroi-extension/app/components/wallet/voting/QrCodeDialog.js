@@ -105,7 +105,7 @@ export default class QrCodeDialog extends Component<Props> {
             <div className={styles.qrCode}>
               <QrCodeWrapper
                 value={votingKey}
-                size={152}
+                size={720}
                 addBg={false}
                 includeMargin
                 id={QR_ID}
