@@ -65,8 +65,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
 
     let component = null;
 
-    // switch (votingStore.progressInfo.currentStep) {
-    switch (ProgressStep.QR_CODE) {
+    switch (votingStore.progressInfo.currentStep) {
       case ProgressStep.GENERATE:
         component = (
           <GeneratePinDialog
