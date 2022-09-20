@@ -185,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
     return (
       <Dialog
         className={styles.component}
-        title={`${intl.formatMessage(globalMessages.allWalletsLabel)} (${ergoWallets.length + cardanoWallets.length})`}
+        title={intl.formatMessage(globalMessages.changeWallet)}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
@@ -215,7 +215,7 @@ export default class WalletListDialog extends Component<Props, State> {
               <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
                 {cardanoWalletsIdx.length > 0 &&
                   cardanoWalletsIdx.map((walletId, idx) => {
-                    const wallet = this.props.cardanoWallets.find(w => w.walletId === walletId);
+                    const wallet = cardanoWallets.find(w => w.walletId === walletId);
                     if (!wallet) {
                       return null;
                     }
@@ -236,7 +236,7 @@ export default class WalletListDialog extends Component<Props, State> {
             )}
           </Droppable>
         </DragDropContext>
-        {cardanoWalletsIdx.length > 0 &&
+        {ergoWalletsIdx.length > 0 &&
         <div className={styles.sectionHeader}>
           <h1>{intl.formatMessage(messages.ergo)}</h1>
         </div>}
@@ -246,7 +246,7 @@ export default class WalletListDialog extends Component<Props, State> {
               <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
                 {ergoWalletsIdx.length > 0 &&
                   ergoWalletsIdx.map((walletId, idx) => {
-                    const wallet = this.props.ergoWallets.find(w => w.walletId === walletId);
+                    const wallet = ergoWallets.find(w => w.walletId === walletId);
                     if (!wallet) {
                       return null;
                     }

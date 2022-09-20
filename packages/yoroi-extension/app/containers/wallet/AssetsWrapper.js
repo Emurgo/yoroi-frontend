@@ -20,9 +20,6 @@ import { intlShape } from 'react-intl';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
-import { buildRoute } from '../../utils/routing';
-import AssetsMenu from '../../components/wallet/assets/AssetsMenu';
-import { matchPath } from 'react-router';
 
 export type GeneratedData = typeof AssetsWrapper.prototype.generated;
 type Props = {|
@@ -37,31 +34,13 @@ export default class AssetsWrapper extends Component<Props> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
-  isActivePage: string => boolean = route => {
-    const { location } = this.generated.stores.router;
-    if (location) {
-      return !!matchPath(location.pathname, {
-        path: buildRoute(route),
-        exact: false,
-      });
-    }
-    return false;
-  };
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AssetsWrapper)}.`);
 
     const { intl } = this.context;
-    const { actions } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
-
-    const menu = (
-      <AssetsMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={this.isActivePage}
-      />
-    );
 
     return (
       <TopBarLayout
@@ -71,7 +50,6 @@ export default class AssetsWrapper extends Component<Props> {
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}
             title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarAssets)} />}
-            menu={menu}
           />
         }
         showInContainer
