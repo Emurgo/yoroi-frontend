@@ -5,6 +5,13 @@
   width: 100%;
   letter-spacing: 0;
   line-height: 22px;
+  padding: 18px;
+  border: 2px solid #fff;
+  border-radius: 10px;
+
+  &:hover {
+    border-color: var(--yoroi-palette-gray-50);
+  }
 
   & .avatar {
     margin-right: 13px;
@@ -32,6 +39,6 @@
   }
 
   & .balance {
-    font-weight: 500;
+    font-weight: 400;
   }
 }

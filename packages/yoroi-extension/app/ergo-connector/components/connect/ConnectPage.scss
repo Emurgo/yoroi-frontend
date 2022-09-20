@@ -34,13 +34,18 @@
   }
 }
 
-
 .titleWallet {
   display: flex;
+  margin-left: 20px;
+
   & * + * {
     padding-left: 10px;
   }
 }
+
+.toggleButton {
+  cursor: pointer;
+} 
 
 .noWallets {
   display: flex;
@@ -64,7 +69,7 @@
   }
 
   .createWallet {
-    color: #17D1AA;
+    color: #17d1aa;
     font-size: 16px;
     line-height: 24px;
     cursor: pointer;
@@ -77,8 +82,6 @@
 
 .list {
   & .listItem {
-    padding-top: 15px;
-    padding-bottom: 15px;
     & > div {
       width: 100%;
     }
@@ -109,7 +112,6 @@
   }
 }
 
-
 @media (min-width: 678px) {
   .component {
     max-width: 600px;
@@ -122,4 +124,3 @@
     }
   }
 }
-
