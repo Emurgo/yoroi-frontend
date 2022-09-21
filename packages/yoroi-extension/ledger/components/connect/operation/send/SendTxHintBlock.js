@@ -179,11 +179,11 @@ const message = defineMessages({
   },
   confirmAssetFingerprint: {
     id: 'hint.sendTx.confirmAssetFingerprint',
-    defaultMessage: '!!!Confirm the asset fingerprint by pressintg <strong>both</strong> buttons',
+    defaultMessage: '!!!Confirm the asset fingerprint by pressing <strong>both</strong> buttons',
   },
   confirmAssetAmount: {
     id: 'hint.sendTx.confirmAssetAmount',
-    defaultMessage: '!!!Confirm the token amount by pressintg <strong>both</strong> buttons',
+    defaultMessage: '!!!Confirm the token amount by pressing <strong>both</strong> buttons',
   },
 });
 
