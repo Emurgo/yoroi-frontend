@@ -234,7 +234,7 @@ export const networks = Object.freeze({
         CoinsPerUtxoWord: '34482',
         MinimumUtxoVal: '1000000',
         PoolDeposit: '500000000',
-        KeyDeposit: '400000',
+        KeyDeposit: '2000000',
       })
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
