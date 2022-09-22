@@ -20,6 +20,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { THEMES } from '../../styles/utils';
 
 const messages = defineMessages({
   title: {
@@ -48,6 +49,11 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     }
 
     await this.generated.actions.profile.resetLocale.trigger();
+    // Make`revamp` the default theme when it's the first time to install Yoroi.
+    // Do it here as this is the first screen users see.
+    this.generated.actions.profile.updateTheme.trigger({
+      theme: THEMES.YOROI_REVAMP
+    });
   }
 
   onSelectLanguage: {| locale: string |} => void = (values) => {
@@ -163,6 +169,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       actions: {
         profile: {
           resetLocale: { trigger: actions.profile.resetLocale.trigger },
+          updateTheme: { trigger: actions.profile.updateTheme.trigger },
           updateTentativeLocale: { trigger: actions.profile.updateTentativeLocale.trigger },
           commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
         },
