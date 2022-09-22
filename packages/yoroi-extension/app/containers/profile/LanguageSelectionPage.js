@@ -51,7 +51,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     await this.generated.actions.profile.resetLocale.trigger();
     // Make`revamp` the default theme when it's the first time to install Yoroi.
     // Do it here as this is the first screen users see.
-    this.generated.actions.profile.updateTheme.trigger({
+    await this.generated.actions.profile.updateTheme.trigger({
       theme: THEMES.YOROI_REVAMP
     });
   }
@@ -116,6 +116,11 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
         |},
         resetLocale: {|
           trigger: (params: void) => Promise<void>
+        |},
+        updateTheme: {|
+          trigger: (params: {|
+            theme: string,
+          |}) => Promise<void>,
         |},
         updateTentativeLocale: {|
           trigger: (params: {| locale: string |}) => void
