@@ -633,6 +633,8 @@
   "wallet.loading": "Loading...",
   "wallet.nav.addButton": "Add new wallet",
   "wallet.nav.addWallet": "Add Wallet",
+  "wallet.nav.addNewWallet": "Add new wallet",
+  "wallet.nav.applyNewWallet": "Apply new wallet",
   "wallet.nav.allWalletsLabel": "All wallets",
   "wallet.nav.changeWallet": "Change wallet",
   "wallet.nav.backButton": "Back to my wallets",
