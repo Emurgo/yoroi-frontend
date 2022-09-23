@@ -49,11 +49,15 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     }
 
     await this.generated.actions.profile.resetLocale.trigger();
-    // Make`revamp` the default theme when it's the first time to install Yoroi.
-    // Do it here as this is the first screen users see.
-    await this.generated.actions.profile.updateTheme.trigger({
-      theme: THEMES.YOROI_REVAMP
-    });
+
+    // Todo: Should be removed with the first release
+    if (environment.isNightly() || environment.isDev()) {
+      // Make`revamp` the default theme when it's the first time to install Yoroi.
+      // Do it here as this is the first screen users see.
+      await this.generated.actions.profile.updateTheme.trigger({
+        theme: THEMES.YOROI_REVAMP
+      });
+    }
   }
 
   onSelectLanguage: {| locale: string |} => void = (values) => {
