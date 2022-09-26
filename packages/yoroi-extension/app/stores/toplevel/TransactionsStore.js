@@ -299,6 +299,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
   }
 
+  isWalletLoading:  PublicDeriver<> => boolean = (publicDeriver) => {
+    return !this.getTxRequests(publicDeriver).requests.recentRequest.wasExecuted;
+  }
+
   /** Refresh transaction data for all wallets and update wallet balance */
   @action _refreshTransactionData: {|
     publicDeriver: PublicDeriver<>,

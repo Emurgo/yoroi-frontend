@@ -42,6 +42,7 @@ export function getMethod(
 }
 
 export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
+
   const recoveryPhrase = phrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const recoveryPhraseElement = await customWorld.findElement(recoveryPhraseField);
@@ -52,4 +53,21 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string) {
 
 export function getLogDate(): string {
   return new Date().toISOString().replace(/:/g, '_');
+}
+
+export function getCircularReplacer(): Object {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+}
+
+export const sleep = (milliseconds: number): Promise<any> => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

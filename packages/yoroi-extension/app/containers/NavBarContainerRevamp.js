@@ -50,7 +50,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     await this.generated.actions.profile.updateHideBalance.trigger();
   };
 
-  switchToNewWallet: (PublicDeriver<>) => void = newWallet => {
+  onSelectWallet: (PublicDeriver<>) => void = newWallet => {
     this.generated.actions.router.goToRoute.trigger({
       route: this.generated.stores.app.currentRoute,
       publicDeriver: newWallet,
@@ -215,10 +215,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         walletAmount: walletBalance,
         getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
         plate,
-        wallet: settingsCache,
+        wallet,
+        settingsCache,
         shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
-        onSelect: () => this.switchToNewWallet(wallet),
-        isCurrentWallet: wallet === this.generated.stores.wallets.selected,
       };
 
       if(isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap)
@@ -230,6 +229,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <WalletListDialog
           cardanoWallets={cardanoWallets}
           ergoWallets={ergoWallets}
+          onSelect={this.onSelectWallet}
+          selectedWallet={this.generated.stores.wallets.selected}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}

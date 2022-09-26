@@ -1,18 +1,17 @@
 // @flow
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { injectIntl } from 'react-intl';
-import styles from './AssetsList.scss';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { ReactComponent as NoAssetLogo }  from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { ReactComponent as ArrowsListFromBottom }  from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop }  from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList }  from '../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
-import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
+import { ReactComponent as Info }  from '../../../assets/images/assets-page/info.inline.svg';
+import { truncateAddressShort } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
-import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import globalMessages from '../../../i18n/global-messages';
@@ -26,6 +25,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Stack,
   Typography,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
@@ -65,8 +65,6 @@ type State = {|
 |};
 
 function TokenList({
-  assetDeposit,
-  getTokenInfo,
   assetsList: list,
   shouldHideBalance,
   intl,
@@ -76,16 +74,14 @@ function TokenList({
     sortingDirection: null,
     sortingColumn: '',
   });
+  const [keyword, setKeyword] = useState('');
 
-  const search: (e: SyntheticEvent<HTMLInputElement>) => void = (
-    event: SyntheticEvent<HTMLInputElement>
-  ) => {
-    const keyword = event.currentTarget.value;
+  useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
     const assetsListCopy = [...list];
     const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp));
     setState(prev => ({ ...prev, assetsList: filteredAssetsList }));
-  };
+  }, [keyword, list])
 
   const compare: (a: any, b: any, field: string) => number = (a, b, field) => {
     let newSortDirection = SORTING_DIRECTIONS.UP;
@@ -95,8 +91,9 @@ function TokenList({
       newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
+    setState({ ...state, sortingDirection: newSortDirection })
 
-    if (field === 'amount') {
+    if (field === SORTING_COLUMNS.AMOUNT) {
       return compareNumbers(a[field], b[field], newSortDirection)
     }
     // Other fields
@@ -123,63 +120,10 @@ function TokenList({
     return <ArrowsList />;
   };
 
-  const renderTokenName: () => Node = () => {
-    if (assetDeposit == null) {
-      return <div className={styles.isLoading} />;
-    }
-    const defaultEntry = assetDeposit.getDefaultEntry();
-    const tokenInfo = getTokenInfo(defaultEntry);
-    return truncateToken(getTokenName(tokenInfo));
-  };
-
-  const renderAmountDisplay: () => Node = () => {
-    if (assetDeposit == null) {
-      return <div className={styles.isLoading} />;
-    }
-
-    const defaultEntry = assetDeposit.getDefaultEntry();
-    const tokenInfo = getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balanceDisplay;
-    if (shouldHideBalance) {
-      balanceDisplay = (
-        <Typography as="span" fontWeight="inherit">
-          {hiddenAmount}
-        </Typography>
-      );
-    } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
-
-      balanceDisplay = (
-        <>
-          <Typography as="span" fontWeight="inherit">
-            {beforeDecimalRewards}
-          </Typography>
-          <Typography as="span" fontWeight="inherit">
-            {afterDecimalRewards}
-          </Typography>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {balanceDisplay}
-        <Typography as="span" ml="4px" fontWeight="inherit">
-          {truncateToken(getTokenName(tokenInfo))}
-        </Typography>
-      </>
-    );
-  };
-
   const { assetsList } = state;
 
   return (
-    <Box>
+    <Stack sx={{ minHeight: '500px' }}>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -192,7 +136,7 @@ function TokenList({
         </Typography>
         <SearchInput
           disableUnderline
-          onChange={search}
+          onChange={(e) => setKeyword(e.target.value)}
           placeholder={intl.formatMessage(assetsMessage.search)}
           startAdornment={
             <InputAdornment position="start">
@@ -203,7 +147,9 @@ function TokenList({
       </Box>
 
       {!assetsList.length ? (
-        <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
+        <Stack alignItems='center' justifyContent='center' sx={{ height: '100%', flex: 1 }}>
+          <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
+        </Stack>
       ) : (
         <>
           <List>
@@ -217,9 +163,12 @@ function TokenList({
                 </ButtonBase>
               }
               secondColumn={
-                <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
-                  {intl.formatMessage(globalMessages.fingerprint)}
-                </Typography>
+                <Stack direction='row' alignItems='center' spacing='4px'>
+                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
+                    {intl.formatMessage(globalMessages.fingerprint)}
+                  </Typography>
+                  <Info />
+                </Stack>
               }
               thirdColumn={
                 <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
@@ -230,28 +179,20 @@ function TokenList({
                 </ButtonBase>
               }
             />
-            {assetDeposit ? (
-              <TokenItemRow
-                avatar={<NoAssetLogo />}
-                name={renderTokenName()}
-                id="-"
-                amount={renderAmountDisplay()}
-                isTotalAmount
-              />
-            ) : null}
+
             {assetsList.map(token => (
               <TokenItemRow
                 key={token.id}
                 avatar={<NoAssetLogo />}
                 name={token.name}
                 id={token.id}
-                amount={token.amount}
+                amount={shouldHideBalance ? hiddenAmount :  token.amount}
               />
             ))}
           </List>
         </>
       )}
-    </Box>
+    </Stack>
   );
 }
 export default (injectIntl(observer(TokenList)): ComponentType<Props>);
@@ -269,12 +210,12 @@ function ListItemLayout({ firstColumn, secondColumn, thirdColumn }) {
     {
       id: 1,
       content: firstColumn,
-      width: '20%',
+      width: '25%',
     },
     {
       id: 2,
       content: secondColumn,
-      width: '45%',
+      width: '40%',
     },
     {
       id: 3,
@@ -316,9 +257,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
-            sx={{ textDecoration: 'none' }}
+            sx={{ textDecoration: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '70%' }}
             color="var(--yoroi-palette-primary-300)"
-            to={ROUTES.ASSETS.TOKEN_DETAILS.replace(':tokenId', id)}
+            to={id !== '-' &&  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>

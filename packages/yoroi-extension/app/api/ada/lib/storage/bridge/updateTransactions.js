@@ -1972,11 +1972,10 @@ export async function getTokenMintMetadata(
       const assetName = parts[1];
       const policyId = parts[0];
       return {
-        name: Buffer.from(assetName, 'hex').toString(),
+        nameHex: assetName,
         policy: policyId
       };
-    })
-    .filter(a => a.name !== '');
+    });
 
   if (!nativeAssets || nativeAssets.length === 0) return {};
 
@@ -2862,8 +2861,6 @@ async function updateUtxos(
   },
   derivationTables: Map<number, string>,
 ): Promise<void> {
-  // Note: we are still using the pre-Yoroi-lib-UtxoService data to get the set of
-  // wallet addresses. May change in the future.
   const addresses = await rawGetAddressRowsForWallet(
     dbTx,
     {

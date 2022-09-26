@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   cannotSendBelowMinimumValueError: {
     id: 'api.errors.CannotSendBelowMinimumValueError',
-    defaultMessage: '!!!Minimum required is 1 ADA',
+    defaultMessage: '!!!A minimum of 1 ADA is required',
   },
   assetOverflowError: {
     id: 'api.errors.assetOverflowError',
@@ -123,6 +123,10 @@ const messages = defineMessages({
   checkAdressesInUseApiError: {
     id: 'api.errors.checkAdressesInUseApiError',
     defaultMessage: '!!!Error received from server while checking used addresses.',
+  },
+  getMultiAssetMintMetadataApiError: {
+    id: 'api.errors.getMultiAssetMintMetadataApiError',
+    defaultMessage: '!!!Error received from server while querying minting metadata.',
   },
   assetInfoApiError: {
     id: 'api.errors.assetInfoApiError',
@@ -259,6 +263,7 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
     });
   }
 }
+
 export class CannotSendBelowMinimumValueError extends LocalizableError {
   constructor() {
     super({
@@ -434,6 +439,15 @@ export class CheckAddressesInUseApiError extends LocalizableError {
     super({
       id: messages.checkAdressesInUseApiError.id,
       defaultMessage: messages.checkAdressesInUseApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetMultiAssetMintMetadataApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getMultiAssetMintMetadataApiError.id,
+      defaultMessage: messages.getMultiAssetMintMetadataApiError.defaultMessage || '',
     });
   }
 }

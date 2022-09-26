@@ -197,11 +197,13 @@ const genBaseProps: {|
                 sendUsingTrezor: {
                   trigger: async (req) => action('sendUsingTrezor')(req),
                 },
+                cancel: { trigger: () => {} },
               },
               ledgerSend: {
                 sendUsingLedgerWallet: {
                   trigger: async (req) => action('sendUsingLedgerWallet')(req),
                 },
+                cancel: { trigger: () => {} },
               },
             },
           },
@@ -559,6 +561,7 @@ export const WithdrawalTxPage = (): Node => {
                   ),
                   reset: action('createWithdrawalTx reset'),
                 },
+                shouldDeregister: false,
               },
             },
           },

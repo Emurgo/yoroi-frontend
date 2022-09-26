@@ -18,6 +18,7 @@ import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencie
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { trackSetUnitOfAccount, trackSetLocale } from '../../../api/analytics';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -84,6 +85,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
       ? unitOfAccountDisabledValue
       : { enabled: true, currency: value };
     await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+    trackSetUnitOfAccount(value);
+  };
+
+  onSelectLanguage: {| locale: string |} => PossiblyAsync<void> = ({ locale }) => {
+    this.generated.actions.profile.updateLocale.trigger({ locale });
+    trackSetLocale(locale);
   };
 
   render(): Node {
@@ -120,19 +127,11 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     return (
       <>
         <GeneralSettings
-          onSelectLanguage={this.generated.actions.profile.updateLocale.trigger}
+          onSelectLanguage={this.onSelectLanguage}
           isSubmitting={isSubmittingLocale}
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
-        />
-        <ThemeSettingsBlock
-          currentTheme={currentTheme}
-          switchToFirstWallet={this.handleSwitchToFirstWallet}
-          selectTheme={this.generated.actions.profile.updateTheme.trigger}
-          exportTheme={this.generated.actions.profile.exportTheme.trigger}
-          hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
-          onExternalLinkClick={handleExternalLinkClick}
         />
         <UnitOfAccountSettings
           onSelect={this.onSelectUnitOfAccount}
@@ -141,6 +140,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentValue={unitOfAccountValue}
           error={profileStore.setUnitOfAccountRequest.error}
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+        />
+        <ThemeSettingsBlock
+          currentTheme={currentTheme}
+          switchToFirstWallet={this.handleSwitchToFirstWallet}
+          selectTheme={this.generated.actions.profile.updateTheme.trigger}
+          onExternalLinkClick={handleExternalLinkClick}
         />
         <AboutYoroiSettingsBlock
           wallet={this.generated.stores.wallets.selected}
@@ -152,9 +157,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
   @computed get generated(): {|
     actions: {|
       profile: {|
-        exportTheme: {|
-          trigger: (params: void) => Promise<void>,
-        |},
         updateLocale: {|
           trigger: (params: {|
             locale: string,
@@ -187,7 +189,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         LANGUAGE_OPTIONS: Array<LanguageType>,
         currentLocale: string,
         currentTheme: Theme,
-        hasCustomTheme: void => boolean,
         setProfileLocaleRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
@@ -237,7 +238,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           currentLocale: profileStore.currentLocale,
           currentTheme: profileStore.currentTheme,
-          hasCustomTheme: profileStore.hasCustomTheme,
           UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
           unitOfAccount: profileStore.unitOfAccount,
           setUnitOfAccountRequest: {
@@ -261,7 +261,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         profile: {
           updateLocale: { trigger: actions.profile.updateLocale.trigger },
           updateTheme: { trigger: actions.profile.updateTheme.trigger },
-          exportTheme: { trigger: actions.profile.exportTheme.trigger },
           updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
         },
         router: {

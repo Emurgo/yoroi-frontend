@@ -54,6 +54,8 @@ import {
   connectorSignTx,
   getAddressing,
   connectorSignData,
+  connectorGetAssets,
+  getTokenMetadataFromIds,
 } from './ergo-connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -86,6 +88,7 @@ import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import { find721metadata } from '../../app/utils/nftMetadata';
 
 /*::
 declare var chrome;
@@ -1432,7 +1435,74 @@ function handleInjectorConnect(port) {
             } catch (e) {
               handleError(e);
             }
-          break;
+            break;
+          case 'get_network_id':
+            try {
+              checkParamCount(0);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - get_network_id could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                await withDb(async (db, localStorageApi) => {
+                  return await withSelectedWallet(tabId,
+                    async (wallet) => {
+                      const networkId = wallet.getParent()
+                        .getNetworkInfo().BaseConfig[0].ChainNetworkId;
+                      rpcResponse({
+                        ok: parseInt(networkId, 10),
+                      });
+                    },
+                    db,
+                    localStorageApi,
+                    false,
+                  );
+                });
+              }
+            } catch (e) {
+              handleError(e);
+            }
+            break;
+          case 'list_nfts/cardano':
+            try {
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const assets = await connectorGetAssets(wallet);
+                    const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
+                    const tokenIds = potentialNFTAssets.map(asset => asset.identifier);
+                    const tokenMetadata = await getTokenMetadataFromIds(tokenIds, wallet);
+
+                    const nfts = {};
+
+                    for (const metadata of tokenMetadata) {
+                      if (!metadata.IsNFT) {
+                        continue;
+                      }
+                      if (metadata.Metadata.type !== 'Cardano') {
+                        throw new Error('this API only supports Cardano');
+                      }
+                      const nftMetadata = find721metadata(
+                        metadata.Metadata.policyId,
+                        metadata.Metadata.assetName,
+                        metadata.Metadata.assetMintMetadata,
+                      );
+                      if (nftMetadata) {
+                        nfts[metadata.Identifier] = { metadata: nftMetadata };
+                      }
+                    }
+                    rpcResponse({ ok: nfts });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch(e) {
+              handleError(e);
+            }
+            break;
           case 'auth_sign_hex_payload/cardano':
             try {
               checkParamCount(1);

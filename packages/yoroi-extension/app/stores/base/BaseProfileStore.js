@@ -15,6 +15,10 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
+import {
+  trackSetLocale,
+  trackUpdateTheme
+} from '../../api/analytics';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<void => Promise<void>>
@@ -221,13 +225,15 @@ export default class BaseProfileStore
 
   _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
-    await this.setProfileLocaleRequest.execute(
-      this.inMemoryLanguage != null ? this.inMemoryLanguage : BaseProfileStore.getDefaultLocale()
-    );
+    const locale = this.inMemoryLanguage != null ?
+          this.inMemoryLanguage :
+          BaseProfileStore.getDefaultLocale();
+    await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
     runInAction(() => {
       this.inMemoryLanguage = null;
     });
+    trackSetLocale(locale);
   };
 
   _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
@@ -312,6 +318,7 @@ export default class BaseProfileStore
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
     await this.getThemeRequest.execute(); // eagerly cache
+    trackUpdateTheme(theme);
   };
 
 

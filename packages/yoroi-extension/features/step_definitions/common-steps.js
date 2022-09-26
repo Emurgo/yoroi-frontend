@@ -13,16 +13,14 @@ import {
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By, logging } from 'selenium-webdriver';
-import { enterRecoveryPhrase } from '../support/helpers/helpers';
-import { getPlates } from './wallet-restoration-steps';
+import { enterRecoveryPhrase, getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import {
   testRunsDataDir,
   snapshotsDir,
-  testRunsLogsDir,
-} from '../support/helpers/common-constants';
+  } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
@@ -39,6 +37,24 @@ import {
 import type { LocatorObject } from '../support/webdriver';
 import { walletButton } from '../pages/sidebarPage';
 import { getWalletButtonByPlate } from '../pages/walletsListPage';
+import {
+  connectHwButton,
+  restoreWalletButton,
+  getCurrencyButton,
+  pickUpCurrencyDialog,
+  hwOptionsDialog,
+  trezorWalletButton,
+  eraOptionsDialog,
+  shelleyEraButton,
+  trezorConnectDialog,
+  trezorConfirmButton,
+  walletNameInput,
+  saveDialog,
+  saveButton
+} from '../pages/newWalletPages';
+import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
+import * as helpers from '../support/helpers/helpers';
+import { extensionTabName } from '../support/windowManager';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -54,7 +70,6 @@ const testProgress = {
 BeforeAll(() => {
   rimraf.sync(testRunsDataDir);
   fs.mkdirSync(testRunsDataDir);
-  fs.mkdirSync(testRunsLogsDir);
   setDefaultTimeout(20 * 1000);
 
   CardanoServer.getMockServer({});
@@ -127,15 +142,39 @@ After({ tags: '@invalidWitnessTest' }, () => {
   CardanoServer.getMockServer({});
 });
 
+After({ tags: '@trezorEmulatorTest' }, async function () {
+  await this.trezorController.bridgeStop();
+  await this.trezorController.emulatorStop();
+  this.trezorController.closeWsConnection();
+});
+
 After(async function (scenario) {
   this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has done ####`);
   if (scenario.result.status === 'failed') {
     await takeScreenshot(this.driver, 'failedStep');
     await takePageSnapshot(this.driver, 'failedStep');
-    await getConsoleLogs(this.driver, 'failedStep');
-  }
+    if (this.getBrowser() !== 'firefox') {
+      await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
+      await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
+    }
+  };
+  await this.windowManager.switchTo(extensionTabName);
   await this.driver.quit();
+  await helpers.sleep(500);
 });
+
+export async function getPlates(customWorld: any): Promise<any> {
+  // check plate in confirmation dialog
+  let plateElements = await customWorld.driver.findElements(
+    By.css('.WalletRestoreVerifyDialog_plateIdSpan')
+  );
+
+  // this makes this function also work for wallets that already exist
+  if (plateElements.length === 0) {
+    plateElements = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
+  }
+  return plateElements;
+}
 
 const writeFile = promisify(fs.writeFile);
 
@@ -156,7 +195,12 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
       await takeScreenshot(this.driver, cleanString);
       await takePageSnapshot(this.driver, cleanString);
-      await getConsoleLogs(this.driver, cleanString);
+
+      const browserName = await this.getBrowser();
+      if (browserName !== 'firefox') {
+        await getLogs(this.driver, cleanString, logging.Type.BROWSER);
+        await getLogs(this.driver, cleanString, logging.Type.DRIVER);
+      }
     }
 
     testProgress.step += 1;
@@ -164,8 +208,10 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
   };
 });
 
-function createDirInTestRunsData(subdirectoryName) {
-  const dir = `${testRunsDataDir}/${testProgress.scenarioName}/${subdirectoryName}`;
+async function createDirInTestRunsData(driver, subdirectoryName) {
+  const cap = await driver.getCapabilities();
+  const browserName = cap.getBrowserName();
+  const dir = `${testRunsDataDir}/${browserName}/${testProgress.scenarioName}/${subdirectoryName}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -174,7 +220,7 @@ function createDirInTestRunsData(subdirectoryName) {
 
 async function takeScreenshot(driver, name) {
   // path logic
-  const dir = createDirInTestRunsData('screenshots');
+  const dir = await createDirInTestRunsData(driver, 'screenshots');
   const path = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}.png`;
 
   const screenshot = await driver.takeScreenshot();
@@ -182,24 +228,32 @@ async function takeScreenshot(driver, name) {
 }
 
 async function takePageSnapshot(driver, name) {
-  const dir = createDirInTestRunsData('pagesSnapshots');
+  const dir = await createDirInTestRunsData(driver, 'pagesSnapshots');
   const htmlLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-dom.html`;
   const html = await driver.executeScript('return document.body.innerHTML;');
   await fsAsync.writeFile(htmlLogPath, html);
 }
 
-async function getConsoleLogs(driver, name) {
-  const cap = await driver.getCapabilities();
-  const browserName = cap.getBrowserName();
-  if (browserName === 'firefox'){
-    return;
+/**
+ * Creates a new log file when a new test starts.
+ *
+ * @param driver The driver.
+ * @param name The name of the test.
+ * @param loggingType The logging type required. Select between logging.Type.DRIVER and logging.Type.BROWSER.
+ */
+async function getLogs(driver, name, loggingType) {
+  let log = '';
+  if (loggingType === logging.Type.DRIVER) {
+    log = 'driver';
+  } else if (loggingType === logging.Type.BROWSER) {
+    log = 'console';
   }
-  const dir = createDirInTestRunsData('consoleLogs');
-  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-console-log.json`;
-  const logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
+
+  const dir = await createDirInTestRunsData(driver, `${log}Logs`);
+  const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-${log}-log.json`;
+  const logEntries = await driver.manage().logs().get(loggingType);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
-
 }
 
 async function inputMnemonicForWallet(
@@ -239,10 +293,12 @@ export async function checkErrorByTranslationId(
 }
 
 Then(/^I pause the test to debug$/, async function () {
+  this.webDriverLogger.info(`Step: I pause the test to debug`);
   await this.waitForElement({ locator: '.element_that_does_not_exist', method: 'css' });
 });
 
 Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: There is an Ergo wallet stored named ${walletName}`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
@@ -260,6 +316,7 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
 });
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
@@ -278,13 +335,14 @@ Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (wallet
 });
 
 Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: There is a Byron wallet stored named ${walletName}`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click({ locator: '.WalletAdd_btnRestoreWallet', method: 'css' });
+  await this.click(restoreWalletButton);
 
-  await this.waitForElement({ locator: '.PickCurrencyOptionDialog', method: 'css' });
-  await this.click({ locator: '.PickCurrencyOptionDialog_cardano', method: 'css' });
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton('cardano'));
 
   await this.waitForElement({ locator: '.WalletRestoreOptionDialog', method: 'css' });
 
@@ -296,6 +354,7 @@ Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletNa
 });
 
 Given(/^I have completed the basic setup$/, async function () {
+  this.webDriverLogger.info(`Step: I have completed the basic setup`);
   // language select page
   await this.waitForElement({ locator: '.LanguageSelectionForm_component', method: 'css' });
   await this.click({ locator: '//button[text()="Continue"]', method: 'xpath' });
@@ -310,7 +369,8 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
-Given(/^I switched to the advanced level$/, async function () {
+Given(/^I switch to the advanced level$/, async function () {
+  this.webDriverLogger.info(`Step: I switched to the advanced level`);
   // Navigate to the general settings screen
   await navigateTo.call(this, '/settings');
   await navigateTo.call(this, '/settings/general');
@@ -321,7 +381,10 @@ Given(/^I switched to the advanced level$/, async function () {
   // Select the most complex level
   const cardChoseButton = await getComplexityLevelButton(this, false);
   await cardChoseButton.click(); // choose most complex level for tests
+});
 
+Given(/^I navigate back to the main page$/, async function () {
+  this.webDriverLogger.info(`Step: I navigate back to the main page`);
   // Navigate back to the main page
   await navigateTo.call(this, '/wallets/add');
   await waitUntilUrlEquals.call(this, '/wallets/add');
@@ -329,6 +392,7 @@ Given(/^I switched to the advanced level$/, async function () {
 });
 
 Then(/^I accept uri registration$/, async function () {
+  this.webDriverLogger.info(`Step: I accept uri registration`);
   await acceptUriPrompt(this);
 });
 
@@ -342,10 +406,16 @@ async function acceptUriPrompt(world: any) {
 }
 
 Given(/^I have opened the extension$/, async function () {
-  await this.driver.get(this.getExtensionUrl());
+  this.webDriverLogger.info(`Step: I have opened the extension`);
+  await this.get(this.getExtensionUrl());
+  const browserName = await this.getBrowser();
+  if (browserName === 'firefox') {
+    await this.driver.manage().window().maximize();
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
+  this.webDriverLogger.info(`Step: I refresh the page`);
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(500);
@@ -353,6 +423,7 @@ Given(/^I refresh the page$/, async function () {
 });
 
 Given(/^I restart the browser$/, async function () {
+  this.webDriverLogger.info(`Step: I restart the browser`);
   await this.driver.manage().deleteAllCookies();
   await this.driver.navigate().refresh();
   // wait for page to refresh
@@ -361,19 +432,23 @@ Given(/^I restart the browser$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
+  this.webDriverLogger.info(`Step: There is no wallet stored`);
   await restoreWalletsFromStorage(this);
   await this.waitForElement({ locator: '.WalletAdd_component', method: 'css' });
 });
 
 Then(/^I click then button labeled (.*)$/, async function (buttonName) {
+  this.webDriverLogger.info(`Step: I click then button labeled ${buttonName}`);
   await this.click({ locator: `//button[contains(text(), ${buttonName})]`, method: 'xpath' });
 });
 
 Given(/^I export a snapshot named ([^"]*)$/, async function (snapshotName) {
+  this.webDriverLogger.info(`Step: I export a snapshot named ${snapshotName}`);
   await exportYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
 });
 
 Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
+  this.webDriverLogger.info(`Step: I import a snapshot named ${snapshotName}`);
   await importYoroiSnapshot(this, snapshotsDir.concat(snapshotName));
 
   // refresh page to trigger migration
@@ -392,6 +467,7 @@ async function setLedgerWallet(client, serial) {
   }, serial);
 }
 Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
+  this.webDriverLogger.info(`Step: I connected Ledger device ${serial}`);
   await setLedgerWallet(this, serial);
 });
 
@@ -404,7 +480,33 @@ async function setTrezorWallet(client, deviceId) {
   }, deviceId);
 }
 Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
+  this.webDriverLogger.info(`Step: I connected Trezor device ${deviceId}`);
   await setTrezorWallet(this, deviceId);
+});
+
+Given(/^I connected Trezor emulator device$/, async function () {
+  // select connecting a HW wallet
+  await this.click(connectHwButton);
+  // pick up currency
+  await this.waitForElement(pickUpCurrencyDialog);
+  await this.click(getCurrencyButton('cardano'));
+  // select the trezor wallet
+  await this.waitForElement(hwOptionsDialog);
+  await this.click(trezorWalletButton);
+  // select the Shelley era
+  await this.waitForElement(eraOptionsDialog);
+  await this.click(shelleyEraButton);
+  // Confirm action twice
+  await this.waitForElement(trezorConnectDialog);
+  await this.click(trezorConfirmButton);
+  await this.click(trezorConfirmButton);
+  await switchToTrezorAndAllow(this);
+  await allowPubKeysAndSwitchToYoroi(this);
+  // save the emulator as is
+  await this.waitForElement(saveDialog);
+  const name = await this.getValue(walletNameInput);
+  expect(name).to.be.equal('Emulator');
+  await this.click(saveButton);
 });
 
 async function restoreWalletsFromStorage(client) {
@@ -533,18 +635,22 @@ async function compareToCapturedDbState(client, excludeSyncTime) {
 }
 
 Given(/^I capture DB state snapshot$/, async function () {
+  this.webDriverLogger.info(`Step: I capture DB state snapshot`);
   await captureDbStae(this);
 });
 
 Then(/^I compare to DB state snapshot$/, async function () {
+  this.webDriverLogger.info(`Step: I compare to DB state snapshot`);
   await compareToCapturedDbState(this, false);
 });
 
 Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
+  this.webDriverLogger.info(`Step: I compare to DB state snapshot excluding sync time`);
   await compareToCapturedDbState(this, true);
 });
 
 Then(/^Revamp. I switch to revamp version$/, async function () {
+  this.webDriverLogger.info(`Step: Revamp. I switch to revamp version`);
   await goToSettings(this);
   await selectSubmenuSettings(this, 'general');
   const revampButton = await this.driver.findElement(By.id('switchToRevampButton'));
@@ -552,9 +658,22 @@ Then(/^Revamp. I switch to revamp version$/, async function () {
 });
 
 Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
+  this.webDriverLogger.info(`Step: Revamp. I go to the wallet ${walletName}`);
   await this.click(walletButton);
 
   const restoreInfo = testWallets[walletName];
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
+});
+
+Then(/^Debug. Take screenshot$/,  async function () {
+  const currentTime = getLogDate();
+  await takeScreenshot(this.driver, `debug_${currentTime}`);
+  await takePageSnapshot(this.driver, `debug_${currentTime}`);
+  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
+  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+});
+
+Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
+  await this.driver.sleep(2000);
 });

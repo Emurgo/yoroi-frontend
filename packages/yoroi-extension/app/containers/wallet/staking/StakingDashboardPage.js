@@ -7,8 +7,6 @@ import { observer } from 'mobx-react';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
-import type { GraphData } from '../../../components/wallet/staking/dashboard/StakingDashboard';
-import type { GraphItems } from '../../../components/wallet/staking/dashboard/GraphWrapper';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
@@ -58,7 +56,6 @@ import type { NetworkRow, TokenRow, } from '../../../api/ada/lib/storage/databas
 import {
   isJormungandr,
   isCardanoHaskell,
-  getCardanoHaskellBaseConfig,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
@@ -70,6 +67,7 @@ import {
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
+import { generateGraphData } from '../../../utils/graph';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -144,9 +142,14 @@ export default class StakingDashboardPage extends Component<Props> {
           errorIfPresent,
         })}
         upcomingRewards={rewardInfo?.rewardPopup}
-        graphData={this._generateGraphData({
+        graphData={generateGraphData({
           delegationRequests,
           publicDeriver,
+          currentEpoch:
+            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
@@ -273,7 +276,6 @@ export default class StakingDashboardPage extends Component<Props> {
     if (timeSinceGenesis == null) return undefined;
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return undefined;
-
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
@@ -805,131 +807,6 @@ export default class StakingDashboardPage extends Component<Props> {
     );
     if (adaDelegationRequests == null) return undefined;
     return adaDelegationRequests.getRegistrationHistory.result?.current;
-  };
-
-  _generateRewardGraphData: ({|
-    delegationRequests: DelegationRequests,
-    currentEpoch: number,
-    publicDeriver: PublicDeriver<>,
-  |}) => ?{|
-    totalRewards: Array<GraphItems>,
-    perEpochRewards: Array<GraphItems>,
-  |} = request => {
-    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
-
-    const history = request.delegationRequests.rewardHistory.result;
-    if (history == null) {
-      return null;
-    }
-    if (!request.delegationRequests.getCurrentDelegation.wasExecuted) {
-      return null;
-    }
-    let historyIterator = 0;
-
-    // the reward history endpoint doesn't contain entries when the reward was 0
-    // so we need to insert these manually
-    const totalRewards: Array<GraphItems> = [];
-    const perEpochRewards: Array<GraphItems> = [];
-    let amountSum = new MultiToken([], defaultToken);
-
-    const startEpoch = (() => {
-      if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
-        const shelleyConfig = getCardanoHaskellBaseConfig(
-          request.publicDeriver.getParent().getNetworkInfo()
-        )[1];
-        return shelleyConfig.StartAt;
-      }
-      return 0;
-    })();
-    const endEpoch = (() => {
-      if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
-        // TODO: -1 since cardano-db-sync doesn't expose this information for some reason
-        return request.currentEpoch - 1;
-      }
-      if (isJormungandr(request.publicDeriver.getParent().getNetworkInfo())) {
-        // note: reward history includes the current epoch
-        // since it tells you the reward you got at slot 0 of the new epoch
-        return request.currentEpoch + 1;
-      }
-      throw new Error(
-        `${nameof(this._generateRewardGraphData)} can't compute endEpoch for rewards`
-      );
-    })();
-
-    const getMiniPoolInfo = (poolHash: string) => {
-      const meta = this.generated.stores.delegation.getLocalPoolInfo(
-        request.publicDeriver.getParent().getNetworkInfo(),
-        poolHash
-      );
-      if (meta == null || meta.info == null || meta.info.ticker == null || meta.info.name == null) {
-        return poolHash;
-      }
-      return `[${meta.info.ticker}] ${meta.info.name}`;
-    }
-
-    const getNormalized = (tokenEntry) => {
-      const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
-        .get(tokenEntry.networkId.toString())
-        ?.get(tokenEntry.identifier);
-      if (tokenRow == null) throw new Error(`${nameof(StakingDashboardPage)} no token info for ${JSON.stringify(tokenEntry)}`);
-
-      return tokenEntry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
-    }
-    for (let i = startEpoch; i < endEpoch; i++) {
-      if (historyIterator < history.length && i === history[historyIterator][0]) {
-        // exists a reward for this epoch
-        const poolHash = history[historyIterator][2];
-        const nextReward = history[historyIterator][1];
-        amountSum = amountSum.joinAddMutable(nextReward);
-        totalRewards.push({
-          name: i,
-          primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
-          poolName: getMiniPoolInfo(poolHash),
-        });
-        perEpochRewards.push({
-          name: i,
-          primary: getNormalized(nextReward.getDefaultEntry()).toNumber(),
-          poolName: getMiniPoolInfo(poolHash),
-        });
-        historyIterator++;
-      } else {
-        // no reward for this epoch
-        totalRewards.push({
-          name: i,
-          primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
-          poolName: '',
-        });
-        perEpochRewards.push({
-          name: i,
-          primary: 0,
-          poolName: '',
-        });
-      }
-    }
-    return {
-      totalRewards,
-      perEpochRewards,
-    };
-  };
-
-  _generateGraphData: ({|
-    delegationRequests: DelegationRequests,
-    publicDeriver: PublicDeriver<>,
-  |}) => GraphData = request => {
-    const timeStore = this.generated.stores.time;
-    const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
-
-    return {
-      rewardsGraphData: {
-        error: request.delegationRequests.rewardHistory.error,
-        items: this._generateRewardGraphData({
-          delegationRequests: request.delegationRequests,
-          currentEpoch: currTimeRequests.currentEpoch,
-          publicDeriver: request.publicDeriver,
-        }),
-        hideYAxis: this.generated.stores.profile.shouldHideBalance,
-      },
-    };
   };
 
   @computed get generated(): {|

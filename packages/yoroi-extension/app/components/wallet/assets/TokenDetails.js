@@ -11,13 +11,13 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import {
   isCardanoHaskell,
   isErgo,
   isTestnet,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { CopyAddress } from './NFTDetails';
 
 type Props = {|
   tokenInfo: void | {|
@@ -28,6 +28,7 @@ type Props = {|
     name: string,
     id: string,
     amount: string,
+    description: string | null,
   |},
   tokensCount: number,
   network: $ReadOnly<NetworkRow>,
@@ -62,6 +63,10 @@ export const tokenMessages: Object = defineMessages({
     id: 'wallet.assets.identifier',
     defaultMessage: '!!!Identifier',
   },
+  description: {
+    id: 'wallet.nftGallary.details.description',
+    defaultMessage: '!!!Description'
+  },
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
@@ -90,17 +95,17 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           <Typography
             as={Link}
             replace
-            to={ROUTES.ASSETS.TOKENS}
+            to={ROUTES.ASSETS.ROOT}
             variant="h5"
             sx={{
               color: 'var(--yoroi-palette-gray-600)',
               textDecoration: 'none',
             }}
           >
-            {intl.formatMessage(globalMessages.tokens)}({tokensCount}) -&gt;{' '}
+            {intl.formatMessage(globalMessages.tokens)}({tokensCount})
           </Typography>
           <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
-            {tokenInfo.name}
+            / {tokenInfo.name}
           </Typography>
         </Typography>
       </Box>
@@ -156,6 +161,7 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
               value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
             />
           </Grid>
+          {isCardanoHaskell(network) &&
           <Grid item xs={4}>
             <LabelWithValue
               label={
@@ -180,17 +186,19 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
                   rel="noopener noreferrer"
                   sx={{ textDecoration: 'none' }}
                 >
-                  Cardanoscan
+                  {intl.formatMessage(globalMessages.cardanoscan)}
                 </LinkMui>
               }
             />
-          </Grid>
+          </Grid>}
         </Grid>
         <Box marginTop="22px">
           <LabelWithValue
             label={intl.formatMessage(globalMessages.fingerprint)}
             value={
-              <CopyToClipboardText text={tokenInfo.policyId}>{tokenInfo.id}</CopyToClipboardText>
+              <CopyAddress text={tokenInfo.policyId}>
+                {tokenInfo.policyId}
+              </CopyAddress>
             }
           />
         </Box>
@@ -198,16 +206,20 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           <LabelWithValue
             label={intl.formatMessage(tokenMessages.policyId)}
             value={
-              <CopyToClipboardText text={tokenInfo.policyId}>
+              <CopyAddress text={tokenInfo.policyId}>
                 {tokenInfo.policyId}
-              </CopyToClipboardText>
+              </CopyAddress>
             }
           />
         </Box>
-        {/* TODO: add description */}
-        {/* <Box marginTop="22px"> */}
-        {/*  <LabelWithValue label="Description" value={'lorem ips'} /> */}
-        {/* </Box> */}
+
+        {tokenInfo.description &&
+        <Box marginTop="22px">
+          <LabelWithValue
+            label={intl.formatMessage(tokenMessages.description)}
+            value={tokenInfo.description}
+          />
+        </Box>}
       </Box>
     </Box>
   );

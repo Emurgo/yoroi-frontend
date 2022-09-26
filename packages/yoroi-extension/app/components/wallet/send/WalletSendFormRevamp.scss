@@ -1,10 +1,12 @@
+@import '../../../themes/mixins/loading-spinner';
+
 .component {
     display: flex;
     justify-content: center;
 
     .wrapper {
         width: 756px;
-        height: 600px;
+        min-height: 600px;
     }
 
     .formBody {
@@ -78,41 +80,45 @@
         }
 
         .amountStep {
-            padding-top: 30px;
-            font-family: Rubik;
-            padding-top: 40px;
+            padding-top: 65px;
             padding-right: 40px;
             padding-bottom: 20px;
             padding-left: 40px;
+            position: relative;
+
+            .calculatingFee {
+                position: absolute;
+                top: 25px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: var(--yoroi-palette-gray-600);
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 22px;
+            }
+
+            .sendError {
+                position: absolute;
+                top: 25px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: var(--yoroi-palette-error-100);
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 22px;
+            }
 
             .amountInput {
                 position: relative;
                 border: 1px solid #A7AFC0;
                 border-radius: 8px;
-
-                .label {
-                    position: relative;
-                    top: -10px;
-                    left: 6px;
-                    background-color: #ffffff;
-                    padding: 0px 4px;
-                    color: rgba(0,0,0,0.87);
-                    font-size: 12px;
-                    letter-spacing: 0.4px;
-                }
-
-
-                .labelDisabled {
-                    color: var(--yoroi-comp-input-text-disabled);
-                }
+                padding: 16px 0px;
 
                 .amountInputGrid {
-                    margin-top: 5px;
-                    padding: 0px 16px 16px 16px;
+                    margin: 0px 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-bottom: 1px solid var(--yoroi-comp-input-text-disabled);
 
                     input {
                         padding: 0px;
@@ -132,55 +138,79 @@
                     margin-right: 12px;
                 }
 
-                .max {
-                    height: 30px;
-                    width: 56px;
-                    border-radius: 8px;
-                    background-color: #F0F3F5;
-                    color: #6B7384;
-                    font-size: 14px;
-                    font-weight: 500;
-                    letter-spacing: 0.5px;
-                    line-height: 22px;              
-                }
-
-                .usd {
-                    margin: 16px;
-                    color: #A7AFC0;
+                .fiat {
+                    margin: 16px 16px 0px 16px;
+                    padding-top: 16px;
+                    color: var(--yoroi-palette-gray-400);
                     font-size: 16px;
                     letter-spacing: 0;
+                    border-top: 1px solid var(--yoroi-comp-input-text-disabled)
+                }
+
+                .amountError {
+                    position: absolute;
+                    bottom: -19px;
+                    left: 17px;
+                    color: var(--yoroi-palette-error-100);
+                    font-size: 12px;
+                    letter-spacing: 0.4px;
+                    line-height: 16px;
+                }
+
+                .maxButtonSpinning {
+                    @include loading-spinner('../../../assets/images/spinner-dark.svg', 25);
+                }
+
+                .maxBtn {
+                    min-width: 51px;
+                    min-height: 32px;
+                    padding: 8px 12px;
+                    border: none;
+                    color: var(--yoroi-palette-gray-600);
+                    background-color: var(--yoroi-palette-gray-50);
+                    font-weight: 500;
+                    font-size: 16px;
+                    line-height: 24px;
+                    border-radius: 8px;
+
+                    &:hover {
+                        background: var(--yoroi-palette-gray-200);
+                        color: #000000;
+                    }
+                    &:active {
+                        background: var(--yoroi-palette-gray-300);
+                    }
+
+                    &:disabled {
+                        cursor: not-allowed;
+                    }
                 }
             }
 
             .amountInputError {
-                border: 1px solid #FF1351;
+                border: 2px solid var(--yoroi-palette-error-100);
             }
 
             .disabled {
                 border: 1px solid var(--yoroi-comp-input-text-disabled);
             }
 
-            .amountError {
-                color: #FF1351;
-                font-family: Rubik;
-                font-size: 12px;
-                letter-spacing: 0.4px;
-                line-height: 16px;
-                margin-left: 16px;
-                margin-top: 4px;
-            }
+            .addButtonsWrapper {
+                margin-top: 20px;
+                margin-bottom: -60px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
 
-            .emptyError {
-                margin-top: 4px;
-                width: 100%;
-                height: 16px;
+                .btnText {
+                    margin-left: 8px;
+                }
             }
         }
 
         // Preview Step styles 
         .receiver {
             padding-top: 10px;
-            font-family: Rubik;
             font-size: 16px;
             letter-spacing: 0;
             line-height: 24px;

@@ -8,6 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /* eslint-disable no-console */
 
@@ -44,6 +45,14 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       chunks: ['background'],
       alwaysWriteToDisk: true
     }),
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, `../${folder}/ledger.html`),
+      template: path.join(__dirname, '../ledger/index.html'),
+      favicon: path.join(__dirname, '../ledger/assets/img/favicon.ico'),
+      chunks: ['ledger'],
+      alwaysWriteToDisk: true
+    }),
+
     /**
      * This plugin adds `alwaysWriteToDisk` to `HtmlWebpackPlugin`.
      * We need this otherwise the HTML files are managed by in-memory only by our hot reloader
@@ -57,7 +66,16 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    })
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, '../ledger/static/update-ledger-app/'),
+          to: '../update-ledger-app',
+          globOptions: { gitignore: true },
+        },
+      ],
+    }),
   ];
 };
 
@@ -130,13 +148,21 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
     ]
   },
   {
-    test: /\.svg$/,
-    issuer: /\.scss$/,
-    loader: 'file-loader'
+    test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+    include: [ path.resolve(__dirname, '../ledger') ],
+    loader: 'file-loader',
+    options: {
+      esModule: false,
+    },
   },
   {
-    test: /\.inline\.svg$/,
-    issuer: /\.js$/,
+    test: /\.svg$/,
+    issuer: /\.scss$/,
+    type: 'asset/inline',
+  },
+  {
+    test: /\.svg$/,
+    issuer: { not: [/\.scss$/] },
     use: [{
       loader: '@svgr/webpack',
       options: {
@@ -170,7 +196,7 @@ const optimization = {
   }
 };
 
-const resolve = (networkName /*: string */) /*: * */ => ({
+const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
     fs: false,
@@ -180,15 +206,7 @@ const resolve = (networkName /*: string */) /*: * */ => ({
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
   },
-  alias: (networkName === 'test')
-    ? {
-      'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
-      '@emurgo/ledger-connect-handler': path.resolve(__dirname, '../features/mock-ledger-connect/'),
-       process: 'process/browser',
-    }
-    : {
-      process: 'process/browser',
-    },
+  alias: { process: 'process/browser', }
 });
 
 const definePlugin = (
