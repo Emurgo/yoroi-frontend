@@ -62,15 +62,10 @@ export default class WalletAdd extends Component<Props> {
       onSettings,
       onDaedalusTransfer,
     } = this.props;
-
-    const componentStyle = classnames([
-      styles.component,
-    ]);
-
     const LogoIcon = this.getLogo();
 
     return (
-      <div className={componentStyle}>
+      <div className={styles.component}>
         {/* Setting button */}
         <div className={styles.hero}>
           <div className={styles.settingsBar}>

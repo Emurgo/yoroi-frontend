@@ -46,6 +46,10 @@ import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 import { trackCatalystRegistration } from '../../api/analytics';
+import {
+  loadCatalystRoundInfo,
+  saveCatalystRoundInfo,
+} from '../../api/localStorage';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -114,14 +118,23 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     votingActions.submitTransaction.listen(this._submitTransaction);
     votingActions.submitTransactionError.listen(this._submitTransactionError);
     votingActions.cancel.listen(this._cancel);
-    this.actions.wallets.setActiveWallet.listen(() => {this._getCatalystRoundInfo()});
+    this.actions.wallets.setActiveWallet.listen(() => {this._updateCatalystRoundInfo()});
+    this._loadCatalystRoundInfo();
+    this._updateCatalystRoundInfo();
   }
 
   get isActionProcessing(): boolean {
     return this.progressInfo.stepState === StepState.PROCESS;
   }
 
-  @action _getCatalystRoundInfo: void => Promise<void> = async () => {
+  _loadCatalystRoundInfo: void => Promise<void> = async () => {
+    const data = await loadCatalystRoundInfo();
+    runInAction(() => {
+      this.catalystRoundInfo = data;
+    });
+  }
+
+  @action _updateCatalystRoundInfo: void => Promise<void> = async () => {
     runInAction(() => {
       this.loadingCatalystRoundInfo = true
     })
@@ -139,7 +152,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       this.catalystRoundInfo = res
       this.loadingCatalystRoundInfo = false
     })
-
+    if (res) {
+      await saveCatalystRoundInfo(res);
+    }
   }
 
   @action _goBackToRegister: void => void = () => {

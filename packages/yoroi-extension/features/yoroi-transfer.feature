@@ -3,7 +3,8 @@ Feature: Transfer Yoroi Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And I switched to the advanced level
+    And I switch to the advanced level
+    And I navigate back to the main page
     Then I should see the Create wallet screen
 
   @it-114
@@ -81,26 +82,6 @@ Feature: Transfer Yoroi Wallet funds
       | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
       | Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd |                  |          |
     Given The expected transaction is "hKQAiIJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAH928AhoAAxOZAxoR/pTNoQKFhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQA7VNvJA2sJitEnFDKr5Bh1qdpn9hSavj8dCwIvGGWk4CdyLjopgdbTy1XqakezWGWLrIGKrr9pqIB2y66F40wlYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hA/IqZJK3qx7W7Uw1aeQh1KJlHCnqQ/lQnXwQDhFHrMuqNsZpxXZELid52k974JYZyXJH1Y0CnQEF6mDR1sbZDDFggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDM6M+ZB43mgqKGBksQMjWlaIvVl9dlhLYoirHrrzPESfZ6lq1w+IeL7JBezWDrWT1kab1zU+ZBfvBVkRwvWVIHWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQKRP2cf7y2v/NhPFdd/RCJw2v7M4c2zAxeBIPtVzpyDRXUVL1FYDhMcl4hr76lTK3AvTX4j6S5F2nMITQ2Z0IwVYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCC5TTZuZiJW+mD46uJ/IIwwoYvtsvdGnWfNR4HzHKY/BlhA8qvNTlrNvhYdDc447O1YY7ZfZUZoVdcfFWEmCsKoxb1KsT26b9x1DEN1TUkT+et2D2WDhgtnwdmpkYtBovB9AVggrsddVEovzNzpsw4Y3PHrjzmP9bkBd+LCRWEJPOQv66VBoPX2"
-    When I confirm Yoroi transfer funds
-    Then I should see the Yoroi transfer success screen
-
-  @it-115
-  Scenario: User can transfer funds from a trezor wallet (IT-115)
-    Given There is a Byron wallet stored named empty-wallet
-    And I am on the transfer start screen
-    When I click on the byron button on the transfer screen
-    When I click on the icarus tab
-    Then I select the trezor option
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                               |
-    | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
-    And I proceed with the recovery
-    Then I should see a plate EDAO-9229
-    Then I click the next button
-    Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | recoveredBalance | fees     |
-    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567.898765   | 0.166601 |
-    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfibxAIaAAKKyQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEA97UHd+arHPWEd8xAv3ZQtmkL58YcVrg8ekQLoEMX3MO8CrtVCwWYUgfLSgaqja9/dLnvPy0zghsbnrVszs+QCWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9fY="
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 

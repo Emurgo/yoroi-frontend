@@ -122,7 +122,7 @@ class App extends Component<Props, State> {
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
-      return <CrashPage stores={stores} actions={actions} />;
+      return <CrashPage />;
     }
     return <Router history={history}>{Routes(stores, actions)}</Router>;
   };

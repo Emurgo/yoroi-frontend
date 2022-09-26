@@ -151,7 +151,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
           background: 'var(--yoroi-palette-common-white)',
           padding: '20px 30px',
           marginTop: '2px',
-          overflow: 'overlay',
+          overflow: 'auto',
         }}
       >
         {transactionsGroups.map(group => (

@@ -68,7 +68,7 @@ class Wallet extends Component<AllProps> {
   checkRoute(): void | string {
     let categories;
     if (this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP) {
-      categories = allSubcategoriesRevamp;
+      categories = allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD);
     } else {
       categories = allCategories;
     }

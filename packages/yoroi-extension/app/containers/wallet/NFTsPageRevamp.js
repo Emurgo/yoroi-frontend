@@ -5,6 +5,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { Node } from 'react';
 import {
   genLookupOrFail,
+  getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
@@ -41,6 +42,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           const name = truncateToken(getTokenStrictName(token.info) ?? '-');
           return {
             name,
+            id: getTokenIdentifierIfExists(token.info) ?? '-',
             image: getImageFromTokenMetadata(
               policyId,
               name,
