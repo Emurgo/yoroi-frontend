@@ -39,6 +39,7 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
+  updateUtxos,
   updateTransactions,
 } from '../updateTransactions';
 import {
@@ -294,6 +295,11 @@ async function syncingSimpleTransaction(
   }
 
   {
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -406,6 +412,11 @@ async function syncingSimpleTransaction(
   {
     txHistory.push(nextRegularSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,

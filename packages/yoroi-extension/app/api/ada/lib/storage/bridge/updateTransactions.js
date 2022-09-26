@@ -904,6 +904,89 @@ export async function removeAllTransactions(
   );
 }
 
+export async function updateUtxos(
+  db: lf$Database,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  checkAddressesInUse: FilterFunc,
+): Promise<void> {
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+  const derivationTables = withLevels == null
+    ? new Map<number, string>()
+    : withLevels.getParent().getDerivationTables();
+
+  const scanAddrTables = Object.freeze({
+    GetKeyForPublicDeriver,
+    GetAddress,
+    GetPathWithSpecific,
+    GetUtxoTxOutputsWithTx,
+    ModifyAddress,
+    GetPublicDeriver,
+    AddDerivationTree,
+    ModifyDisplayCutoff,
+    GetDerivationsByPath,
+    GetDerivationSpecific,
+    GetKeyDerivation,
+  });
+
+  // sync our address set with remote to make sure txs are identified as ours
+  await raii(
+    db,
+    [
+      ...Object.keys(scanAddrTables).map(key => scanAddrTables[key])
+        .flatMap(table => getAllSchemaTables(db, table)),
+      ...mapToTables(db, derivationTables),
+    ],
+    async dbTx => {
+      const canScan = asScanAddresses(publicDeriver);
+      if (canScan != null) {
+        await canScan.rawScanAddresses(
+          dbTx,
+          {
+            GetKeyForPublicDeriver: scanAddrTables.GetKeyForPublicDeriver,
+            GetAddress: scanAddrTables.GetAddress,
+            GetPathWithSpecific: scanAddrTables.GetPathWithSpecific,
+            GetUtxoTxOutputsWithTx: scanAddrTables.GetUtxoTxOutputsWithTx,
+            ModifyAddress: scanAddrTables.ModifyAddress,
+            GetPublicDeriver: scanAddrTables.GetPublicDeriver,
+            AddDerivationTree: scanAddrTables.AddDerivationTree,
+            ModifyDisplayCutoff: scanAddrTables.ModifyDisplayCutoff,
+            GetDerivationsByPath: scanAddrTables.GetDerivationsByPath,
+            GetDerivationSpecific: scanAddrTables.GetDerivationSpecific,
+            GetKeyDerivation: scanAddrTables.GetKeyDerivation,
+          },
+          // TODO: race condition because we don't pass in best block here
+          { checkAddressesInUse },
+          derivationTables,
+        );
+      }
+    }
+  );
+
+  const getAddrTables = Object.freeze({
+    GetPathWithSpecific,
+    GetAddress,
+    GetDerivationSpecific,
+  });
+
+  await raii(
+    db,
+    [
+      ...Object.keys(UtxoStorageApi.depsTables).map(key => UtxoStorageApi.depsTables[key])
+        .flatMap(table => getAllSchemaTables(db, table)),
+      ...Object.keys(getAddrTables).map(key => getAddrTables[key])
+        .flatMap(table => getAllSchemaTables(db, table)),
+    ],
+    async dbTx => {
+      await rawUpdateUtxos(
+        db, dbTx,
+        publicDeriver,
+        getAddrTables,
+        derivationTables,
+      );
+    }
+  );
+}
+
 export async function updateTransactions(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,
@@ -918,10 +1001,6 @@ export async function updateTransactions(
     ? new Map<number, string>()
     : withLevels.getParent().getDerivationTables();
   let lastSyncInfo = undefined;
-  const updateUtxoTables = Object
-    .keys(UtxoStorageApi.depsTables)
-    .map(key => UtxoStorageApi.depsTables[key])
-    .flatMap(table => getAllSchemaTables(db, table));
 
   try {
     const updateDepTables = Object.freeze({
@@ -965,7 +1044,6 @@ export async function updateTransactions(
       [
         ...updateTables,
         ...mapToTables(db, derivationTables),
-        ...updateUtxoTables,
       ],
       async dbTx => {
         lastSyncInfo = await updateDepTables.GetLastSyncForPublicDeriver.forId(
@@ -977,26 +1055,16 @@ export async function updateTransactions(
           GetLastSyncForPublicDeriver, // eslint-disable-line no-unused-vars, no-shadow
           ...remainingDeps
         } = updateDepTables;
-
-
         await rawUpdateTransactions(
           db, dbTx,
           remainingDeps,
           publicDeriver,
           lastSyncInfo,
-          checkAddressesInUse,
           getTransactionsHistoryForAddresses,
           getBestBlock,
           derivationTables,
           getTokenInfo,
           getMultiAssetMetadata
-        );
-
-        await updateUtxos(
-          db, dbTx,
-          publicDeriver,
-          remainingDeps,
-          derivationTables,
         );
       }
     );
@@ -1034,7 +1102,6 @@ export async function updateTransactions(
       [
         ...rollbackTables,
         ...mapToTables(db, derivationTables),
-        ...updateUtxoTables,
       ],
       async dbTx => {
         const newLastSyncInfo = await rollbackDepTables.GetLastSyncForPublicDeriver.forId(
@@ -1056,13 +1123,6 @@ export async function updateTransactions(
             lastSyncInfo: newLastSyncInfo,
           },
           derivationTables
-        );
-
-        await updateUtxos(
-          db, dbTx,
-          publicDeriver,
-          rollbackDepTables,
-          derivationTables,
         );
       }
     );
@@ -1259,7 +1319,6 @@ async function rawUpdateTransactions(
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
-  checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
@@ -1288,29 +1347,7 @@ async function rawUpdateTransactions(
   if (bestBlock.hash != null) {
     const untilBlock = bestBlock.hash;
 
-    // 2) sync our address set with remote to make sure txs are identified as ours
-    const canScan = asScanAddresses(publicDeriver);
-    if (canScan != null) {
-      await canScan.rawScanAddresses(
-        dbTx,
-        {
-          GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver,
-          GetAddress: deps.GetAddress,
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
-          ModifyAddress: deps.ModifyAddress,
-          GetPublicDeriver: deps.GetPublicDeriver,
-          AddDerivationTree: deps.AddDerivationTree,
-          ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
-          GetDerivationsByPath: deps.GetDerivationsByPath,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetKeyDerivation: deps.GetKeyDerivation,
-        },
-        // TODO: race condition because we don't pass in best block here
-        { checkAddressesInUse },
-        derivationTables,
-      );
-    }
+    // 2) address syncing has been done by scanUtxos so no need to do it here again
 
     // 3) get new txs from fetcher
 
@@ -2849,16 +2886,15 @@ async function certificateToDb(
   return result;
 }
 
-async function updateUtxos(
+async function rawUpdateUtxos(
   db: lf$Database,
   dbTx: lf$Transaction,
   publicDeriver: IPublicDeriver<>,
-  deps: {
+  deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
-    ...
-  },
+  |},
   derivationTables: Map<number, string>,
 ): Promise<void> {
   const addresses = await rawGetAddressRowsForWallet(

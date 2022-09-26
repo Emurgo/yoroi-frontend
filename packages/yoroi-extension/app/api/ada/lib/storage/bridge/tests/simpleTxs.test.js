@@ -41,6 +41,7 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
+  updateUtxos,
   updateTransactions,
 } from '../updateTransactions';
 import {
@@ -335,6 +336,11 @@ async function syncingSimpleTransaction(
 
   // test Public Deriver functionality
   {
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -431,6 +437,11 @@ async function syncingSimpleTransaction(
   {
     const dbDump1 = (await db.export()).tables;
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -560,6 +571,11 @@ async function syncingSimpleTransaction(
   {
     txHistory.push(nextRegularSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -601,6 +617,11 @@ async function syncingSimpleTransaction(
   {
     txHistory.push(...twoTxsRegularSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -637,6 +658,11 @@ async function syncingSimpleTransaction(
     txHistory.pop();
     txHistory.pop();
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -678,6 +704,11 @@ async function syncingSimpleTransaction(
   {
     txHistory.push(...twoTxsRegularSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -774,6 +805,11 @@ async function utxoCreatedAndUsed(
     // add tx so that we  both created and used a utxo in the same sync
     txHistory.push(nextRegularSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,

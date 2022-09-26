@@ -43,7 +43,7 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
-  updateTransactions, getAllTransactions
+  updateUtxos, updateTransactions, getAllTransactions
 } from '../updateTransactions';
 import { TransactionType } from '../../database/primitives/tables';
 import UtxoApi from '../../../state-fetch/utxoApi';
@@ -338,6 +338,11 @@ async function baseTest(
 
   // single pending tx
   {
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -385,6 +390,11 @@ async function baseTest(
   {
     networkTransactions.push(otherSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -512,6 +522,11 @@ async function baseTest(
     };
     networkTransactions.push(newTx);
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -694,6 +709,11 @@ async function baseTest(
     // need to add a pointless tx to advance the bestblock on the server
     networkTransactions.push(pointlessTx(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -865,6 +885,11 @@ async function baseTest(
     networkTransactions.pop();
     networkTransactions.pop();
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -1030,6 +1055,11 @@ async function pendingDropped(
   }
 
   // add the pending tx to our wallet
+  await updateUtxos(
+    db,
+    basePubDeriver,
+    checkAddressesInUse,
+  );
   await updateTransactions(
     db,
     basePubDeriver,
@@ -1044,6 +1074,11 @@ async function pendingDropped(
   networkTransactions.pop();
 
   // resync so pending becomes failed
+  await updateUtxos(
+    db,
+    basePubDeriver,
+    checkAddressesInUse,
+  );
   await updateTransactions(
     db,
     basePubDeriver,

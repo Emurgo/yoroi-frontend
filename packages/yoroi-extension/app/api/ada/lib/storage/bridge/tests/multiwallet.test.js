@@ -43,6 +43,7 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
+  updateUtxos,
   updateTransactions,
   removeAllTransactions,
 } from '../updateTransactions';
@@ -416,6 +417,11 @@ async function syncingSimpleTransaction(
 
   // update balance for publicDeriver1
   {
+    await updateUtxos(
+      db,
+      withUtxos1,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       withUtxos1,
@@ -456,6 +462,11 @@ async function syncingSimpleTransaction(
     }
 
     // now sync and make sure it updated
+    await updateUtxos(
+      db,
+      withUtxos2,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       withUtxos2,
@@ -483,6 +494,11 @@ async function syncingSimpleTransaction(
 
   // check rollback on wallet 2
   {
+    await updateUtxos(
+      db,
+      withUtxos2,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       withUtxos2,
@@ -528,6 +544,11 @@ async function syncingSimpleTransaction(
   txHistory.push(removedTx);
   {
     // now sync and make sure it updated
+    await updateUtxos(
+      db,
+      withUtxos2,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       withUtxos2,
