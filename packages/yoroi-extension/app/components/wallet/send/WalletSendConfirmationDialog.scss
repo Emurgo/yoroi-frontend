@@ -137,7 +137,7 @@
   }
 }
 
-:global(.YoroiModern) .dialog {
+:global(.YoroiModern) .dialog, :global(.YoroiRevamp) {
   min-width: var(--yoroi-comp-dialog-min-width-lg);
   max-width: var(--yoroi-comp-dialog-min-width-lg);
   font-weight: 400;

@@ -128,7 +128,7 @@
   }
 }
 
-:global(.YoroiModern) .body {
+:global(.YoroiModern) .body, :global(.YoroiRevamp) .body {
   .addressLabel {
     font-size: 16px;
     text-transform: capitalize;
