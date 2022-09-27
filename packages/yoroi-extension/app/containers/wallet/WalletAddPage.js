@@ -141,6 +141,7 @@ class WalletAddPage extends Component<AllProps> {
         onClose={this.onClose}
         onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoMainnet)}
         onCardanoTestnet={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoTestnet)}
+        onCardanoPreprodTestnet={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoPreprodTestnet)}
         onErgo={uiDialogs.isOpen(WalletConnectHWOptionDialog)
           ? undefined
           : () => actions.profile.setSelectedNetwork.trigger(networks.ErgoMainnet)}
@@ -316,6 +317,7 @@ class WalletAddPage extends Component<AllProps> {
       return (
         <TopBarLayout
           banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+          asModern
         >
           <WalletAdd
             onHardwareConnect={

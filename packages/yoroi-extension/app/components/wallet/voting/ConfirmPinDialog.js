@@ -89,7 +89,7 @@ export default class ConfirmPinDialog extends Component<Props> {
         <div className={classnames([styles.lineText, styles.firstItem])}>
           <FormattedHTMLMessage {...messages.line1} />
         </div>
-        <div className={classnames([styles.pinInputContainer])}>
+        <div className={styles.pinInputContainer}>
           <PinInput
             setForm={form => this.setPinForm(form)}
             disabled={false}

@@ -122,7 +122,7 @@ export const networks = Object.freeze({
   }: NetworkRow),
   CardanoTestnet: ({
     NetworkId: 3_00,
-    NetworkName: 'Cardano Testnet',
+    NetworkName: 'Cardano Legacy Testnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -200,14 +200,55 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  CardanoPreprodTestnet: ({
+    NetworkId: 2_50,
+    NetworkName: 'Cardano Preprod Testnet',
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://preprod-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000'
+        : 'wss://preprod-backend.yoroiwallet.com:443',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
+    },
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 1,
+        GenesisDate: '1654041600000',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 0,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        CoinsPerUtxoWord: '34482',
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
+  }: NetworkRow),
 });
 
 export function isTestnet(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
-  if (network.NetworkId === networks.JormungandrMainnet.NetworkId) return true;
-  if (network.NetworkId === networks.CardanoTestnet.NetworkId) return true;
-  return false;
+  return network.NetworkId === networks.JormungandrMainnet.NetworkId
+    || network.NetworkId === networks.CardanoTestnet.NetworkId
+    || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId;
+
 }
 
 export function isJormungandr(
@@ -289,7 +330,7 @@ export const defaultAssets: Array<
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
           assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
           ticker:
-            (network === networks.CardanoTestnet || network === networks.AlonzoTestnet)
+            (network === networks.CardanoTestnet || network === networks.CardanoPreprodTestnet || network === networks.AlonzoTestnet)
               ? 'TADA'
               : 'ADA',
           longName: null,

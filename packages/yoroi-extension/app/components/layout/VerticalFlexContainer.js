@@ -14,7 +14,7 @@ function VerticalFlexContainer({ children }: Props): Node {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflowY: 'overlay',
+        overflowY: 'auto',
         position: 'relative',
         '&::-webkit-scrollbar-button': {
           height: '7px',

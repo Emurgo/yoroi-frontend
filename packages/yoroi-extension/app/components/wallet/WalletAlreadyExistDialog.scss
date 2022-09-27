@@ -1,8 +1,13 @@
 .component {
+    
+    & > div {
+        overflow: hidden;
+    }
     .wrapper {
         display: grid;
         grid-template-columns: 1fr 4fr;
         grid-gap: 8px;
+        overflow: hidden;
     }
 
     .explanation {
