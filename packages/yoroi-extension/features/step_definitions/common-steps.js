@@ -396,7 +396,7 @@ Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (wallet
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   const browserName = await this.getBrowser();
   if (walletName === 'Second-Smoke-Test-Wallet' && browserName === 'firefox') {
-    await restoreWallet(this, 'shelley', walletName + '-FF');
+    await restoreWallet(this, 'shelley', 'Second-Smoke-Test-Wallet-FF');
   } else {
     await restoreWallet(this, 'shelley', walletName);
   }
