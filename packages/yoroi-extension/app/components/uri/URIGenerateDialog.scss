@@ -18,18 +18,20 @@
   }
 }
 
-:global(.YoroiModern) .component, :global(.YoroiRevamp) .component {
-  :global {
-    .Dialog_title {
-      margin-bottom: 38px;
-    }
-  }
-
-  .receiverInput {
-    letter-spacing: 0;
-  }
-
-  .amountField {
-    margin-bottom: 10px;
-  }
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .component {
+      :global {
+       .Dialog_title {
+         margin-bottom: 38px;
+        }
+      }
+      
+      .receiverInput {
+        letter-spacing: 0;
+      }
+      
+      .amountField {
+        margin-bottom: 10px;
+      }
+  } 
 }
