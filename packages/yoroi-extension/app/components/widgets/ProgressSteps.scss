@@ -69,17 +69,16 @@ $common-color: var(--yoroi-palette-secondary-300);
   }
 }
 
-:global(.YoroiClassic) .component {
-}
-
-:global(.YoroiModern) .component {
-  .stepTopBar {
-    height: 4px;
-    border-radius: 2px;
-  }
-
-  .stepText {
-    font-size: 12px;
-    font-weight: 400;
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .component {
+    .stepTopBar {
+      height: 4px;
+      border-radius: 2px;
+    }
+    
+    .stepText {
+      font-size: 12px;
+      font-weight: 400;
+    }
   }
 }
