@@ -14,6 +14,7 @@ import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import type { StepsList } from './types';
 
 import styles from './QrCodeDialog.scss';
+import { downloadQrCode } from '../../../utils/qrcode';
 
 const messages = defineMessages({
   lineTitle: {
@@ -31,6 +32,10 @@ const messages = defineMessages({
   actionButton: {
     id: 'wallet.voting.dialog.step.qr.actionButton',
     defaultMessage: '!!!Confirm that I saved the QR code'
+  },
+  downloadQrCode: {
+    id: 'wallet.voting.dialog.step.qr.downloadQrCode',
+    defaultMessage: '!!!Download QR code',
   }
 });
 
@@ -44,6 +49,7 @@ type Props = {|
   +votingKey: string | null,
 |};
 
+const QR_ID = 'qr-vote';
 @observer
 export default class QrCodeDialog extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -56,10 +62,15 @@ export default class QrCodeDialog extends Component<Props> {
 
     const dialogActions = [
       {
-        label: intl.formatMessage(messages.actionButton),
-        primary: true,
+        label: intl.formatMessage(globalMessages.close),
+        primary: false,
         onClick: submit,
       },
+      {
+        label: intl.formatMessage(messages.downloadQrCode),
+        primary: true,
+        onClick: () => downloadQrCode(QR_ID, 'Voting key.png'),
+      }
     ];
 
     return (
@@ -92,7 +103,13 @@ export default class QrCodeDialog extends Component<Props> {
         <div className={classnames([styles.qrCodeContainer, styles.lastItem])}>
           {votingKey !== null ? (
             <div className={styles.qrCode}>
-              <QrCodeWrapper value={votingKey} size={152} />
+              <QrCodeWrapper
+                value={votingKey}
+                size={152}
+                addBg={false}
+                includeMargin
+                id={QR_ID}
+              />
             </div>
           ) : (
             ''

@@ -30,6 +30,7 @@ import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
 } from '../types';
+import { Box } from '@mui/material';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -216,7 +217,16 @@ export default class SignTxContainer extends Component<
         component = null;
     }
 
-    return <>{component}</>;
+    return  (
+      <Box
+        sx={{
+          height: 'calc(100vh - 52px)',
+          backgroundColor: 'var(--yoroi-palette-common-white)'
+        }}
+      >
+        {component}
+      </Box>
+    )
   }
 
   @computed get generated(): {|

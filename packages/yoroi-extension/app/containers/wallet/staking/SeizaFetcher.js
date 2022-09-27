@@ -28,6 +28,8 @@ export type PoolData = {|
   +ticker?: string,
   +avatar?: string,
   +roa?: string,
+  +poolSize?: number,
+  +share?: string,
   +websiteUrl?: string,
   +socialLinks?: SocialLinks,
 |};
