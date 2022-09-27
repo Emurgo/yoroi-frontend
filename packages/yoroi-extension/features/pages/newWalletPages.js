@@ -10,14 +10,25 @@ export const pickUpCurrencyDialog: LocatorObject = { locator: '.PickCurrencyOpti
 export const getCurrencyButton = (currency: string): LocatorObject => {
     return { locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' };
 };
+// Create options dialog
+export const createOptionDialog: LocatorObject = { locator: '.WalletCreateOptionDialog', method: 'css' };
+export const createNormalWalletButton: LocatorObject = { locator: '.WalletCreateOptionDialog_createWallet', method: 'css' };
+export const createPaperWalletButton: LocatorObject = { locator: '.WalletCreateOptionDialog_restorePaperWallet', method: 'css' };
+
+// Restore options dialog
+export const restoreOptionDialog: LocatorObject = { locator: '.WalletRestoreOptionDialog', method: 'css' };
+export const normalWordWalletButton: LocatorObject = { locator: '.WalletRestoreOptionDialog_restoreNormalWallet', method: 'css' };
+
 // HW options dialog
 export const hwOptionsDialog: LocatorObject = { locator: '.WalletConnectHWOptionDialog', method: 'css' };
 export const ledgerWalletButton: LocatorObject = { locator: '.WalletConnectHWOptionDialog_connectLedger', method: 'css' };
 export const trezorWalletButton: LocatorObject = { locator: '.WalletConnectHWOptionDialog_connectTrezor', method: 'css' };
+
 // Era options dialog
 export const eraOptionsDialog: LocatorObject = { locator: '.WalletEraOptionDialog', method: 'css' };
 export const shelleyEraButton: LocatorObject = { locator: '.WalletEraOptionDialog_bgShelleyMainnet', method: 'css' };
 export const byronEraButton: LocatorObject = { locator: '.WalletEraOptionDialog_bgByronMainnet', method: 'css' };
+
 // Trezor connect dialog
 export const trezorConnectDialog: LocatorObject = { locator: '.CheckDialog', method: 'css' };
 export const trezorWalletName: LocatorObject = { locator: '//input[@name="walletName"]', method: 'xpath' };
