@@ -35,8 +35,9 @@ Feature: Smoke tests
     And I have a wallet with funds
     Then I go to the send transaction screen
     And I fill the form:
-      | address                                                     | amount   |
-      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 1 |
+      | address                                                     | amount   | browser |
+      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 1 | chrome |
+      | addr1qxtrynld5ry55hrdznrdu7yzzjk5hjcna9grs3gegwznxv3ll380dw9nf8u3fry0xlxl4endeur3esvcnxewycdn3epqt4sv08 | 1 | firefox |
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -57,8 +58,9 @@ Feature: Smoke tests
     And I open the token selection dropdown
     And I select token "yoroi"
     And I fill the form:
-      | address                                                     | amount   |
-      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 5 |
+      | address                                                     | amount   | browser |
+      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 4 | chrome |
+      | addr1qxtrynld5ry55hrdznrdu7yzzjk5hjcna9grs3gegwznxv3ll380dw9nf8u3fry0xlxl4endeur3esvcnxewycdn3epqt4sv08 | 4 | firefox |
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -79,8 +81,9 @@ Feature: Smoke tests
     And I open the token selection dropdown
     And I select token "<token>"
     And I fill the form:
-      | address                                                     | amount   |
-      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 15 |
+      | address                                                     | amount   | browser |
+      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | 7 | chrome |
+      | addr1qxtrynld5ry55hrdznrdu7yzzjk5hjcna9grs3gegwznxv3ll380dw9nf8u3fry0xlxl4endeur3esvcnxewycdn3epqt4sv08 | 7 | firefox |
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -107,8 +110,9 @@ Feature: Smoke tests
     And I open the token selection dropdown
     And I select token "ADA"
     And I fill the address of the form:
-      | address                                                                                                 |
-      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 |
+      | address                                                                                                 | browser |
+      | addr1qx2dzfu535t6n9nlmh4y8l5mmjvvw7qk3vuser0rdsq04vc0hkzu65nj2s7rcluetdmcxm030cxcuwcn2fq7l0l6pexqsd4d95 | chrome  |
+      | addr1qxtrynld5ry55hrdznrdu7yzzjk5hjcna9grs3gegwznxv3ll380dw9nf8u3fry0xlxl4endeur3esvcnxewycdn3epqt4sv08 | firefox |
     And I open the amount dropdown and select send all
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog

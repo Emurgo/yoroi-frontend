@@ -56,7 +56,8 @@ export type WalletNames =
   'ergo-token-wallet' |
   'cardano-token-wallet' |
   'First-Smoke-Test-Wallet' |
-  'Second-Smoke-Test-Wallet';
+  'Second-Smoke-Test-Wallet' |
+  'Second-Smoke-Test-Wallet-FF';
 
 // eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object.assign(
@@ -178,5 +179,10 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('Second-Smoke-Test-Wallet': WalletNames),
     mnemonic: getMnemonicFromEnv('SECOND_SMOKE_TEST_WALLET'),
     plate: 'XZHD-1651',
+  }),
+  createWallet({
+    name: ('Second-Smoke-Test-Wallet-FF': WalletNames),
+    mnemonic: getMnemonicFromEnv('SECOND_SMOKE_TEST_WALLET_FF'),
+    plate: 'CJBE-8896'
   }),
 );

@@ -20,6 +20,18 @@ import {
 } from '../pages/walletSendPage';
 import { halfSecond, oneMinute } from '../support/helpers/common-constants';
 
+const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
+  const browserName = await customWorld.getBrowser();
+  const rows = inputData.hashes();
+  let fields = rows.filter(row => row.browser === browserName)[0];
+
+  if (!fields){
+    fields = rows[0];
+  }
+
+  return fields;
+};
+
 Given(/^I have a wallet with funds$/, async function () {
   await this.waitUntilContainsText(
     { locator: '.NavWalletDetails_amount', method: 'css' },
@@ -43,14 +55,22 @@ When(/^I select the asset "(.+)" on the form$/, async function (assetName) {
 });
 
 When(/^I fill the form:$/, async function (table) {
-  const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
-  await this.input({ locator: "input[name='amount']", method: 'css' }, fields.amount);
+  const fields = await filterInputByBrowser(this, table);
+  const receiverInput = { locator: "input[name='receiver']", method: 'css' };
+  const amountInput = { locator: "input[name='amount']", method: 'css' };
+
+  await this.waitForElement(receiverInput);
+  await this.waitForElement(amountInput);
+  await this.input(receiverInput, fields.address);
+  await this.input(amountInput, fields.amount);
 });
 
 When(/^I fill the address of the form:$/, async function (table) {
-  const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
+  const fields = await filterInputByBrowser(this, table);
+  const receiverInput = { locator: "input[name='receiver']", method: 'css' };
+
+  await this.waitForElement(receiverInput);
+  await this.input(receiverInput, fields.address);
 });
 
 Given(/^The expected transaction is "([^"]*)"$/, base64Tx => {

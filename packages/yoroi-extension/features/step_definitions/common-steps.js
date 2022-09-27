@@ -394,7 +394,12 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
-  await restoreWallet(this, 'shelley', walletName);
+  const browserName = await this.getBrowser();
+  if (walletName === 'Second-Smoke-Test-Wallet' && browserName === 'firefox') {
+    await restoreWallet(this, 'shelley', walletName + '-FF');
+  } else {
+    await restoreWallet(this, 'shelley', walletName);
+  }
 });
 
 Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
