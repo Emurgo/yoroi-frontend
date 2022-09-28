@@ -3,7 +3,7 @@ Feature: Transfer Yoroi Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And I switch to the advanced level
+    And I switched to the advanced level
     And I navigate back to the main page
     Then I should see the Create wallet screen
 
