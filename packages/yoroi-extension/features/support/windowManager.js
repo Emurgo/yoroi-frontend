@@ -12,6 +12,8 @@ class WindowManagerError extends Error {}
 export const mockDAppName = 'MockDApp';
 export const popupConnectorName = 'popupConnectorWindow';
 export const extensionTabName = 'Yoroi';
+export const faqTabName = 'Yoroi - EMURGO';
+export const trezorConnectTabName = 'Trezor';
 
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
@@ -50,7 +52,9 @@ export class WindowManager {
   _getHandleByTitle(title: string): Array<CustomWindowHandle> {
     this.logger.info(`WindowManager: Getting a handle by the title "${title}"`);
     const handles = this.windowHandles.filter(customHandle => customHandle.title === title);
-    this.logger.info(`WindowManager: -> The handles for title "${title}" are ${JSON.stringify(handles)}`);
+    this.logger.info(
+      `WindowManager: -> The handles for title "${title}" are ${JSON.stringify(handles)}`
+    );
     return handles;
   }
 
@@ -153,7 +157,9 @@ export class WindowManager {
       this.logger.info(`WindowManager: -> oldHandles: ${JSON.stringify(this.windowHandles)}`);
       if (newWindowHandles.length > this.windowHandles.length) {
         const newHandle = this._filterHandles(newWindowHandles);
-        this.logger.info(`WindowManager: -> The new window handle is "${JSON.stringify(newHandle)}"`);
+        this.logger.info(
+          `WindowManager: -> The new window handle is "${JSON.stringify(newHandle)}"`
+        );
         return newHandle;
       }
     }
@@ -175,7 +181,9 @@ export class WindowManager {
     this.windowHandles.push(popUpCustomHandle);
 
     await this.driver.switchTo().window(popupWindowHandle);
-    this.logger.info(`WindowManager: -> Switched to the new window ${JSON.stringify(popUpCustomHandle)}`);
+    this.logger.info(
+      `WindowManager: -> Switched to the new window ${JSON.stringify(popUpCustomHandle)}`
+    );
 
     return popUpCustomHandle;
   }
@@ -189,7 +197,7 @@ export class WindowManager {
       this.logger.error(`WindowManager: -> There is no handle for the title ${title}`);
       throw new WindowManagerError(`There is no handle for the title ${title}`);
     }
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
       const windowHandles = await this.getAllWindowHandles();
       if (windowHandles.includes(expectToBeClosedHandle[0].handle)) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -202,5 +210,18 @@ export class WindowManager {
     }
     this.logger.info(`WindowManager: -> The window with the title "${title}" is still opened`);
     return false;
+  }
+
+  async waitForClosingAndSwitchTo(
+      titleToClose: string,
+      titleSwitchTo: string
+  ): Promise<CustomWindowHandle> {
+    const result = await this.isClosed(titleToClose);
+    if (!result) {
+      throw new WindowManagerError(`The window with the title "${titleToClose}" is still opened`);
+    }
+    await this.switchTo(titleSwitchTo);
+
+    return this._getHandleByTitle(titleSwitchTo)[0];
   }
 }

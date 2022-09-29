@@ -3,6 +3,8 @@
 import { When, Then, } from 'cucumber';
 import { testWallets } from '../mock-chain/TestWallets';
 import { truncateAddress, } from '../../app/utils/formatters';
+import { addressField, derivationField, verifyButton } from '../pages/verifyAddressPage';
+import { expect } from 'chai';
 
 When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click({ locator: '.WalletAdd_btnConnectHW', method: 'css' });
@@ -79,15 +81,20 @@ When(/^I see the hardware send money confirmation dialog$/, async function () {
 });
 
 When(/^I click on the verify address button$/, async function () {
-  await this.click({ locator: '.WalletReceive_verifyIcon', method: 'css' });
+  // wait until all addresses are loaded
+  await this.driver.sleep(1000);
+  const allVerifyAddressButtons = await this.findElements({ locator: '.WalletReceive_verifyIcon', method: 'css' });
+  await allVerifyAddressButtons[0].click();
 });
 
-When(/^I see the verification address "([^"]*)"$/, async function (address) {
-  await this.waitUntilText({ locator: '.verificationAddress', method: 'css' }, truncateAddress(address));
+When(/^I see the verification address "([^"]*)"$/, async function (expectAddress) {
+  await this.waitForElement(addressField);
+  const actualAddressStr = await this.getText(addressField);
+  expect(actualAddressStr).to.equal(truncateAddress(expectAddress), `The actual verification address is different from expected.`);
 });
 
 When(/^I see the derivation path "([^"]*)"$/, async function (path) {
-  await this.waitUntilText({ locator: '.VerifyAddressDialog_derivation', method: 'css' }, path);
+  await this.waitUntilText(derivationField, path);
 });
 
 Then(/^I verify the address on my ledger device$/, async function () {
@@ -99,7 +106,7 @@ Then(/^I verify the address on my ledger device$/, async function () {
 });
 
 Then(/^I verify the address on my trezor device$/, async function () {
-  await this.click({ locator: '.Dialog_actions .primary', method: 'css' });
+  await this.click(verifyButton);
   // we should have this disable while the action is processing, but we don't show a spinner on this
   await this.waitForElementNotPresent({ locator: '.ErrorBlock_component', method: 'css' });
 });

@@ -1,29 +1,130 @@
 // @flow
-import LedgerConnect from '@emurgo/ledger-connect-handler';
+import { YOROI_LEDGER_CONNECT_TARGET_NAME } from '../../ledger/const';
+import { OPERATION_NAME } from '../../ledger/types/enum';
+import type {
+  GetExtendedPublicKeyRequest,
+  GetExtendedPublicKeysRequest,
+  GetExtendedPublicKeyResponse,
+  GetExtendedPublicKeysResponse,
+  SignTransactionRequest,
+  SignTransactionResponse,
+  ShowAddressRequest,
+  GetVersionResponse,
+  GetSerialResponse,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { MessageType } from '../../ledger/types/cmn';
 
-import { Logger } from './logging';
+declare var chrome;
 
-const LEDGER_BRIDGE_CHECK_INTERVAL = 800; // in ms (1000ms = 1sec)
-const LEDGER_BRIDGE_CHECK_COUNT = 10;
+export type ExtendedPublicKeyResp<Response> = {|
+  response: Response,
+  deviceVersion: GetVersionResponse,
+  deriveSerial: GetSerialResponse,
+|};
 
-export async function prepareLedgerConnect(ledgerConnect: LedgerConnect): Promise<void> {
-  if (ledgerConnect == null) {
-    throw new Error(`LedgerConnect Error: LedgerConnect is undefined`);
+type ShowAddressRequestWrapper = {|
+  ...ShowAddressRequest,
+  expectedAddr: string,
+|};
+
+export class LedgerConnect {
+  locale: string;
+
+  constructor(params: {| locale: string |}) {
+    this.locale = params.locale;
   }
 
-  return new Promise((resolve, reject) => {
-    let checkCounter = 0;
-    const checkInterval = setInterval(async () => {
-      if (ledgerConnect.isConnectorReady()) {
-        clearInterval(checkInterval);
-        resolve();
-      } else if (checkCounter > LEDGER_BRIDGE_CHECK_COUNT) {
-        clearInterval(checkInterval);
-        const timeSpentInSec = LEDGER_BRIDGE_CHECK_INTERVAL * LEDGER_BRIDGE_CHECK_COUNT / 1000;
-        Logger.error(`LedgerConnect Error: Timeout happened, Couldn't connect to connect handler in less than ${timeSpentInSec}seconds`);
-        reject(new Error("LedgerConnect Error: Timeout happened, Couldn't connect to connect handler"));
-      }
-      checkCounter++;
-    }, LEDGER_BRIDGE_CHECK_INTERVAL);
-  });
+  getExtendedPublicKey: {|
+    serial: ?string,
+    params: GetExtendedPublicKeyRequest,
+  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY,
+      request.params,
+      request.serial,
+    );
+  }
+
+  getExtendedPublicKeys: {|
+    serial: ?string,
+    params: GetExtendedPublicKeysRequest,
+  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeysResponse>> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS,
+      request.params,
+      request.serial,
+    );
+  }
+
+  signTransaction: {|
+    serial: ?string,
+    params: SignTransactionRequest,
+  |} => Promise<SignTransactionResponse> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.SIGN_TX,
+      request.params,
+      request.serial,
+    );
+  }
+
+  showAddress: {|
+    serial: ?string,
+    params: ShowAddressRequestWrapper,
+  |} => Promise<void> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.SHOW_ADDRESS,
+      request.params,
+      request.serial,
+    );
+  }
+
+  async _requestLedger(
+    action: string,
+    params: any,
+    serial: ?string,
+  ): any {
+    const tabId = await this._createLedgerTab();
+
+    return new Promise((resolve, reject) => {
+      chrome.tabs.sendMessage(
+        tabId,
+        {
+          data: JSON.parse(JSON.stringify({
+            action,
+            params,
+            target: YOROI_LEDGER_CONNECT_TARGET_NAME,
+            serial,
+          })),
+        },
+        (response: ?MessageType) => {
+          if (response != null) {
+            if (response.payload?.error) {
+              reject(new Error(response.payload.error));
+            } else {
+              resolve(response.payload);
+            }
+          } else {
+            reject(new Error('Forcefully cancelled by user'));
+          }
+        },
+      );
+    });
+  }
+
+  _createLedgerTab(): Promise<number> {
+    return new Promise(resolve => {
+      const readyListener = (message, sender) => {
+        if (message === 'ledger-ready') {
+          chrome.runtime.onMessage.removeListener(readyListener);
+          resolve(sender.tab.id);
+        }
+      };
+      chrome.runtime.onMessage.addListener(readyListener);
+      chrome.tabs.create({ url: `ledger.html?locale=${this.locale}` });
+    });
+  }
+
+  dispose() {
+  }
 }
+

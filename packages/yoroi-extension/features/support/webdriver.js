@@ -1,19 +1,23 @@
 // @flow
 
-import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
+import { setWorldConstructor } from 'cucumber';
 import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
-// eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { getMethod, getLogDate } from './helpers/helpers';
-import { WindowManager } from './windowManager';
-import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { testRunsLogsDir } from './helpers/common-constants';
+import { getMethod } from './helpers/helpers';
+import { WebDriverError } from 'selenium-webdriver/lib/error';
+import * as helpers from './helpers/helpers';
+import {
+  defaultWaitTimeout,
+  defaultRepeatPeriod,
+  halfSecond,
+  quarterMinute,
+  oneMinute,
+} from './helpers/common-constants';
 
 const fs = require('fs');
-const simpleNodeLogger= require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -32,12 +36,10 @@ function encode(file) {
  * We then note the mapping of the extension ID to the random UUID is stored in about:config
  * Under the key "extensions.webextensions.uuids".
  * Therefore, we specify a fixed extension ID for Yoroi in the manifest
- * Then we use Selenium to override the config to manually specify a a fixed UUID
+ * Then we use Selenium to override the config to manually specify a fixed UUID
  */
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
-const defaultWaitTimeout = 10 * 1000;
-const defaultRepeatPeriod = 1000;
 
 function getBraveBuilder() {
   return new Builder().forBrowser('chrome').setChromeOptions(
@@ -50,7 +52,7 @@ function getBraveBuilder() {
         '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
         '--start-maximized' // Starts the browser maximized, regardless of any previous settings
       )
-      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+      .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
   );
 }
 
@@ -59,7 +61,7 @@ function getChromeBuilder() {
     .forBrowser('chrome')
     .setChromeOptions(
       new chrome.Options()
-        .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+        .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
         .addArguments(
           '--no-sandbox',
           '--disable-gpu',
@@ -72,8 +74,12 @@ function getChromeBuilder() {
 
 function getFirefoxBuilder() {
   const options = new firefox.Options()
-    // .setBinary(firefox.Channel.NIGHTLY)
-    .addExtensions(path.resolve(__dirname, '../../yoroi-test.xpi'))
+    /**
+     * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
+     * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
+     */
+    .setBinary(process.env.FIREFOX_DEV)
+    .addExtensions(path.resolve(__dirname, '../../Yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
@@ -110,44 +116,43 @@ export type LocatorObject = {|
 |};
 
 function CustomWorld(cmdInput: WorldInput) {
+  let builder;
   switch (cmdInput.parameters.browser) {
     case 'brave': {
-      const braveBuilder = getBraveBuilder();
-      this.driver = braveBuilder.build();
-      this.windowManager = new WindowManager(this.driver);
-      this.windowManager.init().then().catch();
-      this.mockDAppPage = new MockDAppWebpage(this.driver);
+      builder = getBraveBuilder();
       break;
     }
     case 'firefox': {
-      const firefoxBuilder = getFirefoxBuilder();
-      this.driver = firefoxBuilder.build();
-      this.windowManager = new WindowManager(this.driver);
-      this.windowManager.init().then().catch();
-      this.mockDAppPage = new MockDAppWebpage(this.driver);
+      builder = getFirefoxBuilder();
       break;
     }
     default: {
-      this._allLoggers = [];
-      const chromeBuilder = getChromeBuilder();
-      this.driver = chromeBuilder.build();
-      const mockAndWMLogPath = `${testRunsLogsDir}mockAndWMLog_${getLogDate()}.log`;
-      const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
-      this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
-      this.windowManager.init().then().catch();
-      this._allLoggers.push(mockAndWMLogger);
-      this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
+      builder = getChromeBuilder();
       break;
     }
   }
+  this.driver = builder.build();
+  this.getBrowser = (): string => cmdInput.parameters.browser;
+
+  this._allLoggers = [];
+
+  this.trezorController = undefined;
+
+  this.windowManager = undefined;
+
+  this.webDriverLogger = undefined;
+
+  this.trezorEmuLogger = undefined;
+
+  this.addToLoggers = (logger: any) => {
+    this._allLoggers.push(logger);
+  } ;
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
       someLogger[level](message);
     }
   };
-
-  this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
@@ -161,6 +166,21 @@ function CustomWorld(cmdInput: WorldInput) {
     return `moz-extension://${firefoxExtensionId}/main_window.html`;
   };
 
+  this.get = async (url: string) => {
+    for (let i = 0; i < 6; i++) {
+      try {
+        await this.driver.get(url);
+      } catch (e) {
+        if (e instanceof WebDriverError) {
+          this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 0.5 second and retry`);
+          await helpers.sleep(halfSecond);
+          continue;
+        }
+      }
+      break;
+    }
+  };
+
   this.getElementBy = (locator: LocatorObject) =>
     this.driver.findElement(getMethod(locator.method)(locator.locator));
 
@@ -169,18 +189,18 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.getText = (locator: LocatorObject) => this.getElementBy(locator).getText();
 
-  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
-  this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
+  this.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
   this.waitForElementLocated = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be located`);
     const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
     return await this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
-  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
-  this.waitForElement = this.driver.waitForElement = async (locator: LocatorObject) => {
+  this.waitForElement = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be visible`);
     await this.waitForElementLocated(locator);
     const element = await this.getElementBy(locator);
     const condition = until.elementIsVisible(element);
@@ -188,6 +208,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.waitElementTextMatches = async (regex, locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for text on element "${locator.locator}" matches "${regex}"`);
     await this.waitForElement(locator);
     const element = await this.getElementBy(locator);
     const condition = until.elementTextMatches(element, regex);
@@ -195,10 +216,8 @@ function CustomWorld(cmdInput: WorldInput) {
     return element;
   };
 
-  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
-  this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (
-    locator: LocatorObject
-  ) => {
+  this.waitForElementNotPresent = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" not present`);
     await this.driver.wait(async () => {
       const elements = await this.getElementsBy(locator);
       return elements.length === 0;
@@ -206,18 +225,25 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.waitEnable = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting until "${JSON.stringify(locator)}" is enabled`);
     const element = await this.getElementBy(locator);
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
   this.waitDisable = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Waiting Until "${JSON.stringify(locator)}" is disabled`);
     const element = await this.getElementBy(locator);
     const condition = until.elementIsDisabled(element);
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator: LocatorObject, text, timeout = 75000) => {
+  this.waitUntilText = async (
+    locator: LocatorObject,
+    text,
+    timeout = oneMinute + quarterMinute
+  ) => {
+    this.webDriverLogger.info(`Webdriver: Waiting Until "${JSON.stringify(locator)}" contains "${text}"`);
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -228,7 +254,8 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = 15000) => {
+  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = quarterMinute) => {
+    this.webDriverLogger.info(`Webdriver: Waiting for "${JSON.stringify(locator)}" to contain text "${text}"`);
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -240,6 +267,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.click = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     await this.waitForElement(locator);
     await this.waitEnable(locator);
     const clickable = await this.getElementBy(locator);
@@ -247,16 +275,19 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.input = async (locator: LocatorObject, value) => {
+    this.webDriverLogger.info(`Webdriver: Input "${value}" into "${JSON.stringify(locator)}"`);
     const input = await this.getElementBy(locator);
     await input.sendKeys(value);
   };
 
   this.clearInput = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clearing Input for "${JSON.stringify(locator)}"`);
     const input = await this.getElementBy(locator);
     await input.clear();
   };
 
   this.clearInputUpdatingForm = async (locator: LocatorObject, textLength) => {
+    this.webDriverLogger.info(`Webdriver: Clearing Input Updating Form for "${JSON.stringify(locator)}"`);
     const input = await this.getElementBy(locator);
     for (let i = 0; i < textLength; i++) {
       // eslint-disable-next-line no-await-in-loop
@@ -264,31 +295,41 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = script =>
-    this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+  this.executeLocalStorageScript = script => {
+    this.webDriverLogger.info(`Webdriver: Executing Local Storage Script`);
+    return this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+  };
 
   this.getFromLocalStorage = async key => {
+    this.webDriverLogger.info(`Webdriver: Getting item "${key}" from Local Storage`);
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
+    this.webDriverLogger.info(`Webdriver: Result ${JSON.stringify(result)}`);
     return JSON.parse(result);
   };
 
-  this.saveToLocalStorage = (key, value) =>
+  this.saveToLocalStorage = (key, value) => {
+    this.webDriverLogger.info(`Webdriver: Saving to Local Storage key: "${key}", value: "${value}"`);
     this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
+  };
 
-  this.intl = (key, lang = 'en-US') => this.driver.executeAsyncScript(
-    (k, l, callback) => {
-      window.yoroi.translations[l]
-        .then(translation => callback(translation[k]))
-        // eslint-disable-next-line no-console
-        .catch(e => { console.error('Intl fail: ', e); });
-    },
-    key,
-    lang
-  );
+  this.intl = (key, lang = 'en-US') =>
+    this.driver.executeAsyncScript(
+      (k, l, callback) => {
+        window.yoroi.translations[l]
+          .then(translation => callback(translation[k]))
+          // eslint-disable-next-line no-console
+          .catch(e => {
+            console.error('Intl fail: ', e);
+          });
+      },
+      key,
+      lang
+    );
 
   this.dropDB = () => this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
 
   this.saveLastReceiveAddressIndex = index => {
+    this.webDriverLogger.info(`Webdriver: Saving last Receive Address Index`);
     this.driver.executeScript(i => {
       const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
@@ -304,6 +345,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.checkIfExists = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Checking if element exists "${JSON.stringify(locator)}"`);
     return await this.driver.findElement(getMethod(locator.method)(locator.locator)).then(
       () => true,
       err => {
@@ -331,6 +373,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   // The method is for debugging
   this.highlightElement = async (element: WebElement) => {
+    this.webDriverLogger.info(`Webdriver: Highlighting element "${JSON.stringify(element)}"`);
     await this.driver.executeScript(
       "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');",
       element
@@ -338,18 +381,26 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.isDisplayed = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Checking if element "${JSON.stringify(locator)}" is displayed`);
     const element = await this.driver.findElement(getMethod(locator.method)(locator.locator));
 
     return await element.isDisplayed();
   };
 
-  this.findElement = async (locator: LocatorObject) =>
-    await this.driver.findElement(getMethod(locator.method)(locator.locator));
+  this.findElement = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver:findElement: Finding element "${JSON.stringify(locator)}"`);
 
-  this.findElements = async (locator: LocatorObject) =>
-    await this.driver.findElements(getMethod(locator.method)(locator.locator));
+    return await this.driver.findElement(getMethod(locator.method)(locator.locator));
+  }
+
+  this.findElements = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver:findElements: Finding elements "${JSON.stringify(locator)}"`);
+
+    return await this.driver.findElements(getMethod(locator.method)(locator.locator));
+  }
 
   this.hoverOnElement = async (locator: WebElement) => {
+    this.webDriverLogger.info(`Webdriver:hoverOnElement: Hovering on element "${JSON.stringify(locator)}"`);
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
   };
@@ -359,7 +410,6 @@ function CustomWorld(cmdInput: WorldInput) {
 RustModule.load()
   .then(() => {
     setWorldConstructor(CustomWorld);
-    setDefaultTimeout(30 * 1000);
     return undefined;
   })
   .catch();

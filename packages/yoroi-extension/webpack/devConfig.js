@@ -21,7 +21,7 @@ const baseDevConfig = (
   mode: 'development',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
-  resolve: commonConfig.resolve(networkName),
+  resolve: commonConfig.resolve(),
   devtool: 'eval-source-map',
   entry: {
     yoroi: [
@@ -38,6 +38,11 @@ const baseDevConfig = (
       customPath,
       hotScript,
       path.join(__dirname, '../chrome/extension/ergo-connector/index')
+    ],
+    ledger: [
+      customPath,
+      hotScript,
+      path.join(__dirname, '../ledger/index')
     ],
   },
   devMiddleware: {
@@ -97,6 +102,7 @@ const baseDevConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+        include: [ path.resolve(__dirname, '../app') ],
         loader: 'file-loader',
       },
     ]

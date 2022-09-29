@@ -2,9 +2,7 @@
 
 import type {
   ExtendedPublicKeyResp,
-  GetVersionRequest,
-  GetSerialRequest,
-} from '@emurgo/ledger-connect-handler';
+} from '../../app/utils/hwConnectHandler';
 import type {
   BIP32Path,
   DeriveAddressRequest,
@@ -71,6 +69,8 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsPoolRetirement: true,
             supportsMultisigTransaction: true,
             supportsAlonzo: false,
+            supportsBabbage: false,
+            supportsReqSignersInOrdinaryTx: false,
           },
         },
       };
@@ -505,7 +505,7 @@ class MockLedgerConnect {
 
   getVersion: {|
     serial: ?string,
-    params: GetVersionRequest,
+    params: void,
   |} => Promise<GetVersionResponse> = async (request) => {
     this.checkSerial(request.serial);
     if (MockLedgerConnect.selectedWallet == null) {
@@ -518,7 +518,7 @@ class MockLedgerConnect {
 
   getSerial: {|
     serial: ?string,
-    params: GetSerialRequest,
+    params: void,
   |} => Promise<GetSerialResponse> = async (request) => {
     this.checkSerial(request.serial);
     if (MockLedgerConnect.selectedWallet == null) {

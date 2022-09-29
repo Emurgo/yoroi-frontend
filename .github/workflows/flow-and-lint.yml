@@ -6,7 +6,7 @@ on:
 
 jobs:
   flow-and-lint:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

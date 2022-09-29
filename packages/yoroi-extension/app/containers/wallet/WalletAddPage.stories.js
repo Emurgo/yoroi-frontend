@@ -512,7 +512,7 @@ const restoreWalletProps: {|
       tokenInfo: mockFromDefaults(defaultAssets),
     },
     coinPriceStore: {
-      getCurrentPrice: (_from, _to) => 5,
+      getCurrentPrice: (_from, _to) => '5',
     },
     walletRestore: {
       step: request.step,
@@ -1335,7 +1335,7 @@ export const LedgerUpgrade = (): Node => {
                     },
                   },
                   coinPriceStore: {
-                    getCurrentPrice: (_from, _to) => 5,
+                    getCurrentPrice: (_from, _to) => '5',
                   },
                   substores: {
                     ada: {

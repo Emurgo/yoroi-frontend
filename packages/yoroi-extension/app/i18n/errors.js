@@ -5,7 +5,7 @@ import { defineMessages } from 'react-intl';
 const messages = defineMessages({
   unableToLoad: {
     id: 'app.errors.unableToLoad',
-    defaultMessage: '!!!Unable to load!',
+    defaultMessage: '!!!Unable to load the wallet. Please retry.',
   },
   storageLoadError: {
     id: 'app.errors.storageLoadError',

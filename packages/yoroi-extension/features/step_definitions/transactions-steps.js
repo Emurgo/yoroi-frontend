@@ -11,31 +11,66 @@ import {
   networks,
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { walletSummaryBox } from '../pages/walletTransactionsPage';
+import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
+import {
+  getTokenLocator,
+  selectAssetDropDown,
+  selectSendingAmountDropDown,
+  sendAllItem
+} from '../pages/walletSendPage';
+import { halfSecond, oneMinute } from '../support/helpers/common-constants';
+
+const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
+  const browserName = await customWorld.getBrowser();
+  const rows = inputData.hashes();
+  let fields = rows.filter(row => row.browser === browserName)[0];
+
+  if (!fields){
+    fields = rows[0];
+  }
+
+  return fields;
+};
 
 Given(/^I have a wallet with funds$/, async function () {
-  const amountWithCurrency = await this.driver.findElements(
-    By.xpath("//div[@class='WalletTopbarTitle_walletAmount']")
+  await this.waitUntilContainsText(
+    { locator: '.NavWalletDetails_amount', method: 'css' },
+    'ADA',
+    oneMinute
   );
-  const matchedAmount = /^"([0-9]*\.[0-9]*)".*$/.exec(amountWithCurrency);
-  if (!matchedAmount) return false;
-  const amount = parseFloat(matchedAmount[1]);
-  expect(Number(amount), 'Available funds').to.be.above(0);
+  const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
+  const balanceText = await balanceTextElement.getText();
+  const [balance, ] = balanceText.split(' ');
+  expect(parseFloat(balance), 'The wallet is empty').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
   await this.click({ locator: '.send', method: 'css' });
 });
 
+When(/^I select the asset "(.+)" on the form$/, async function (assetName) {
+  await this.click({ locator: `#tokenAssetsSelect`, method: 'css' });
+  const locator = { locator: `//p[contains(text(), '${assetName}')]`, method: 'xpath' };
+  await this.click(locator);
+});
+
 When(/^I fill the form:$/, async function (table) {
-  const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
-  await this.input({ locator: "input[name='amount']", method: 'css' }, fields.amount);
+  const fields = await filterInputByBrowser(this, table);
+  const receiverInput = { locator: "input[name='receiver']", method: 'css' };
+  const amountInput = { locator: "input[name='amount']", method: 'css' };
+
+  await this.waitForElement(receiverInput);
+  await this.waitForElement(amountInput);
+  await this.input(receiverInput, fields.address);
+  await this.input(amountInput, fields.amount);
 });
 
 When(/^I fill the address of the form:$/, async function (table) {
-  const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='receiver']", method: 'css' }, fields.address);
+  const fields = await filterInputByBrowser(this, table);
+  const receiverInput = { locator: "input[name='receiver']", method: 'css' };
+
+  await this.waitForElement(receiverInput);
+  await this.input(receiverInput, fields.address);
 });
 
 Given(/^The expected transaction is "([^"]*)"$/, base64Tx => {
@@ -50,8 +85,14 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
     { locator: '.WalletSendConfirmationDialog_addressTo', method: 'css' },
     truncateAddress(fields.address)
   );
-  await this.waitUntilContainsText({ locator: '.WalletSendConfirmationDialog_fees', method: 'css' }, fields.fee);
-  await this.waitUntilContainsText({ locator: '.WalletSendConfirmationDialog_amount', method: 'css' }, fields.amount);
+  await this.waitUntilContainsText(
+    { locator: '.WalletSendConfirmationDialog_fees', method: 'css' },
+    fields.fee
+  );
+  await this.waitUntilContainsText(
+    { locator: '.WalletSendConfirmationDialog_amount', method: 'css' },
+    fields.amount
+  );
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
@@ -67,7 +108,10 @@ When(/^I clear the receiver$/, async function () {
 });
 
 When(/^I clear the wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm({ locator: "input[name='walletPassword']", method: 'css' }, password.length);
+  await this.clearInputUpdatingForm(
+    { locator: "input[name='walletPassword']", method: 'css' },
+    password.length
+  );
 });
 
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
@@ -81,7 +125,7 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
       .findElement(By.xpath('//p'));
     const messageText = await messageElement.getText();
     return messageText === `+ ${fee} of fees`;
-  })
+  });
   expect(result).to.be.true;
 });
 
@@ -98,7 +142,7 @@ When(/^I click on the next button in the wallet send form$/, async function () {
    *
    * I attempt to fix it by just clicking twice after a delay
    */
-  await this.driver.sleep(500);
+  await this.driver.sleep(halfSecond);
   try {
     await this.click({ locator: button, method: 'css' });
   } catch (e) {
@@ -129,7 +173,7 @@ Then(/^I should see the successfully sent page$/, async function () {
 });
 
 Then(/^I click the transaction page button$/, async function () {
-  await this.click({ locator: "//button[contains(text(), 'Transaction page')]", method: 'xpath' });
+  await this.click({ locator: '//button[contains(text(), "Transaction page")]', method: 'xpath' });
 });
 
 Then(/^I should see the summary screen$/, async function () {
@@ -138,7 +182,7 @@ Then(/^I should see the summary screen$/, async function () {
 
 Then(/^Revamp. I should see the summary screen$/, async function () {
   await this.waitForElement(walletSummaryBox);
-})
+});
 
 Then(/^I should see an invalid address error$/, async function () {
   await this.waitForElement({ locator: '.receiver .SimpleInput_errored', method: 'css' });
@@ -148,7 +192,10 @@ Then(/^I should see a not enough ada error$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.NotEnoughMoneyToSendError',
   });
-  await this.waitUntilText({ locator: '.FormFieldOverridesClassic_error', method: 'css' }, errorMessage);
+  await this.waitUntilText(
+    { locator: '.FormFieldOverridesClassic_error', method: 'css' },
+    errorMessage
+  );
 });
 
 Then(/^I should not be able to submit$/, async function () {
@@ -159,14 +206,20 @@ Then(/^I should see an invalid signature error message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.invalidWitnessError',
   });
-  await this.waitUntilText({ locator: '.WalletSendConfirmationDialog_error', method: 'css' }, errorMessage);
+  await this.waitUntilText(
+    { locator: '.WalletSendConfirmationDialog_error', method: 'css' },
+    errorMessage
+  );
 });
 
 Then(/^I should see an incorrect wallet password error message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.IncorrectPasswordError',
   });
-  await this.waitUntilText({ locator: '.WalletSendConfirmationDialog_error', method: 'css' }, errorMessage);
+  await this.waitUntilText(
+    { locator: '.WalletSendConfirmationDialog_error', method: 'css' },
+    errorMessage
+  );
 });
 
 Then(/^I should see an delegation incorrect wallet password error message$/, async function () {
@@ -199,28 +252,15 @@ When(/^I click on the unmangle button$/, async function () {
 });
 
 When(/^I open the token selection dropdown$/, async function () {
-  await this.click({ locator: '.WalletSendForm_component .SimpleInput_input', method: 'css' });
+  await this.click(selectAssetDropDown);
 });
 
 When(/^I select token "([^"]*)"$/, async function (tokenName) {
-  const tokenRows = await this.getElementsBy({ locator: '.TokenOptionRow_item_name', method: 'css' });
-  for (const row of tokenRows) {
-    const name = await row.getText();
-    if (name === tokenName) {
-      await row.click();
-    }
-  }
+  await this.click(getTokenLocator(tokenName));
 });
 
 When(/^I open the amount dropdown and select send all$/, async function () {
-  await this.driver.executeScript(
-    `const dropdownInput = document.querySelector('input[value="Custom Amount"]').click;
-    const tokenList = document.querySelectorAll('.TokenOptionRow_item_name');
-    for(let token of tokenList){
-      if(token.innerHTML.startsWith('Send all')){
-        token.click()
-         }
-     }
-`
-  );
+  await this.click(selectSendingAmountDropDown);
+  await this.driver.sleep(halfSecond);
+  await this.click(sendAllItem);
 });

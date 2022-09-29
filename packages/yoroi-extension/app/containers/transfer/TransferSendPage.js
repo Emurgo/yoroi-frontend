@@ -81,6 +81,8 @@ export default class TransferSendPage extends Component<Props> {
   componentWillUnmount() {
     this.generated.stores.wallets.sendMoneyRequest.reset();
     this.props.transactionRequest.reset();
+    this.generated.actions.ada.ledgerSend.cancel.trigger();
+    this.generated.actions.ada.trezorSend.cancel.trigger();
   }
 
   submit: void => Promise<void> = async () => {
@@ -228,7 +230,8 @@ export default class TransferSendPage extends Component<Props> {
               publicDeriver: PublicDeriver<>,
               onSuccess?: void => void,
             |}) => Promise<void>
-          |}
+          |},
+          cancel: {| trigger: (params: void) => void |},
         |},
         trezorSend: {|
           sendUsingTrezor: {|
@@ -237,7 +240,8 @@ export default class TransferSendPage extends Component<Props> {
               publicDeriver: PublicDeriver<>,
               onSuccess?: void => void,
             |}) => Promise<void>
-          |}
+          |},
+          cancel: {| trigger: (params: void) => void |},
         |},
       |},
       wallets: {|
@@ -256,7 +260,7 @@ export default class TransferSendPage extends Component<Props> {
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?string
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -323,10 +327,16 @@ export default class TransferSendPage extends Component<Props> {
             sendUsingLedgerWallet: {
               trigger: actions.ada.ledgerSend.sendUsingLedgerWallet.trigger,
             },
+            cancel: {
+              trigger: actions.ada.ledgerSend.cancel.trigger,
+            },
           },
           trezorSend: {
             sendUsingTrezor: {
               trigger: actions.ada.trezorSend.sendUsingTrezor.trigger,
+            },
+            cancel: {
+              trigger: actions.ada.trezorSend.cancel.trigger,
             },
           },
         },

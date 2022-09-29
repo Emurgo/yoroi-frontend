@@ -334,11 +334,13 @@ export type Value = string;
 export type AccountBalance = {|
   default: string,
   networkId: number,
-  assets: Array<{|
-    identifier: string,
-    networkId: number,
-    amount: string,
-  |}>
+  assets: Array<Asset>,
+|};
+
+export type Asset = {|
+  identifier: string,
+  networkId: number,
+  amount: string,
 |};
 
 export function asValue(input: any): Value {

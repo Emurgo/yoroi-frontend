@@ -22,7 +22,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
-  resolve: commonConfig.resolve(env.networkName),
+  resolve: commonConfig.resolve(),
   entry: {
     yoroi: [
       customPath,
@@ -35,6 +35,10 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     ergo: [
       customPath,
       path.join(__dirname, '../chrome/extension/ergo-connector/index')
+    ],
+    ledger: [
+      customPath,
+      path.join(__dirname, '../ledger/index')
     ],
   },
   output: {
@@ -72,6 +76,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+        include: [ path.resolve(__dirname, '../app') ],
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS

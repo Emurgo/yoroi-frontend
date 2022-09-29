@@ -353,6 +353,7 @@ export type CatalystRoundInfoRequest = {|
 
 export type CatalystRound = {|
   +id: number,
+  +name: string,
   +registrationStart: string,
   +registrationEnd: string,
   +votingStart: string,
@@ -379,7 +380,7 @@ export type MultiAssetMintMetadataRequest = {|
 |};
 
 export type MultiAssetMintMetadataRequestAsset = {|
-  name: string,
+  nameHex: string,
   policy: string
 |}
 

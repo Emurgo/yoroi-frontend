@@ -19,7 +19,6 @@ export default ({
   iconOverride,
   version,
   enableProtocolHandlers,
-  ledgerScript,
   shouldInjectConnector,
 } /*: {|
   description: string,
@@ -32,7 +31,6 @@ export default ({
   iconOverride?: Icons,
   version: string,
   enableProtocolHandlers: boolean,
-  ledgerScript?: string,
   shouldInjectConnector: boolean,
 |} */
 )/* : * */ => { // eslint-disable-line function-paren-newline
@@ -49,7 +47,7 @@ export default ({
     version,
     // the name shown in chrome://extensions
     // we also reuse this to choose the filename on disk
-    name: titleOverride === true ? defaultTitle : 'yoroi',
+    name: titleOverride === true ? defaultTitle : 'Yoroi',
     manifest_version: 2,
     description,
     browser_action: {
@@ -74,10 +72,6 @@ export default ({
       {
         matches: ['*://connect.trezor.io/*/popup.html'],
         js: ['js/trezor-content-script.js'],
-      },
-      {
-        matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*'],
-        js: [ledgerScript != null ? ledgerScript : 'js/ledger-content-script.js']
       },
     ],
     content_security_policy: contentSecurityPolicy,

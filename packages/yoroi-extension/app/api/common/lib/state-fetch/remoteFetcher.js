@@ -22,9 +22,22 @@ import { networks } from '../../../ada/lib/storage/database/prepackaged/networks
 
 import type { ConfigType } from '../../../../../config/config-types';
 
+import { environment } from '../../../../environment';
+
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const priceBackendUrl = CONFIG.network.priceBackendUrl;
+const priceBackendUrl = (() => {
+  let endpoint;
+  if (environment.isNightly()) {
+    endpoint = networks.CardanoPreprodTestnet.Backend.BackendService;
+  } else {
+    endpoint = networks.CardanoMainnet.Backend.BackendService;
+  }
+  if (endpoint == null) {
+    throw new Error();
+  }
+  return endpoint;
+})();
 
 function getEndpoint(): string {
   // TODO: some currency-independent endpoint
@@ -74,7 +87,7 @@ export class RemoteFetcher implements IFetcher {
   )
 
   getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = (body) => (
-    axios(`${priceBackendUrl}/price/${body.from}/current`,
+    axios(`${priceBackendUrl}/api/price/${body.from}/current`,
       {
         method: 'get',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
@@ -92,7 +105,7 @@ export class RemoteFetcher implements IFetcher {
   getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = (
     body
   ) => (
-    axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`,
+    axios(`${priceBackendUrl}/api/price/${body.from}/${body.timestamps.join(',')}`,
       {
         method: 'get',
         timeout: 2 * CONFIG.app.walletRefreshInterval,

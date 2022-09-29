@@ -72,7 +72,7 @@ const messages = defineMessages({
   },
   calculatingFee: {
     id: 'wallet.send.form.calculatingFee',
-    defaultMessage: '!!!Calculating fee...',
+    defaultMessage: '!!!Calculating the fee, please wait.',
   },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
@@ -80,7 +80,7 @@ const messages = defineMessages({
   },
   willSendAll: {
     id: 'wallet.send.form.willSendAll',
-    defaultMessage: '!!!Will Send All Tokens!'
+    defaultMessage: '!!!ATTENTION! You will send all of your tokens below:'
   }
 });
 
@@ -109,7 +109,10 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
-  +onAddToken: (void | $ReadOnly<TokenRow>) => void,
+  +onAddToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldReset?: boolean,
+  |}) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
 |};
@@ -401,7 +404,7 @@ export default class WalletSendForm extends Component<Props> {
           return {
             label,
             value: token.value,
-            id: token.id
+            id: 'send-all'
           }
         })
       ]
@@ -424,9 +427,12 @@ export default class WalletSendForm extends Component<Props> {
               labelId="token-assets-select"
               {...form.$('selectedToken').bind()}
               onChange={value => {
-                this.props.onAddToken(tokenOptions.find(
-                  token => token.info.TokenId === value
-                )?.info);
+                this.props.onAddToken({
+                  token: tokenOptions.find(
+                    token => token.info.TokenId === value
+                  )?.info,
+                  shouldReset: true,
+                });
 
                 // clear send all when changing currencies
                 if (this.props.shouldSendAll) {
@@ -446,7 +452,9 @@ export default class WalletSendForm extends Component<Props> {
                 }).TokenId
               }
               renderValue={value => (
-                <Box>{tokenOptions.filter(option => option.value === value)[0]?.label}</Box>
+                <Box id='tokenAssetsSelect'>
+                  {tokenOptions.filter(option => option.value === value)[0]?.label}
+                </Box>
               )}
             >
               <MenuItem
@@ -538,7 +546,7 @@ export default class WalletSendForm extends Component<Props> {
             }}
           >
             {sendAmountOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value} id={option.id}>
                 <TokenOptionRow displayName={option.label} nameOnly />
               </MenuItem>
             ))}
@@ -588,7 +596,7 @@ export default class WalletSendForm extends Component<Props> {
 
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
-    const { memo } = this.form.values();
+    const { memo, amount } = this.form.values();
 
     const {
       hasAnyPending,
@@ -598,6 +606,7 @@ export default class WalletSendForm extends Component<Props> {
       !this.props.fee
       || hasAnyPending
       || !isValidMemoOptional(memo)
+      || !amount
     );
 
     return (

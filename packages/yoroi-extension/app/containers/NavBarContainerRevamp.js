@@ -28,6 +28,7 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
+import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
 import QuickAccessWalletsList from '../components/topbar/QuickAccessWalletsList'
 import type { WalletsNavigation } from '../api/localStorage';
 
@@ -49,7 +50,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     await this.generated.actions.profile.updateHideBalance.trigger();
   };
 
-  switchToNewWallet: (PublicDeriver<>) => void = newWallet => {
+  onSelectWallet: (PublicDeriver<>) => void = newWallet => {
     this.generated.actions.router.goToRoute.trigger({
       route: this.generated.stores.app.currentRoute,
       publicDeriver: newWallet,
@@ -105,6 +106,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
           defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
             publicDeriver.getParent().getNetworkInfo().NetworkId
           )}
+          unitOfAccountSetting={profile.unitOfAccount}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         />
       );
     };
@@ -140,7 +143,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
       })
 
       return (
-        <QuickAccessWalletsList wallets={walletsMap} />
+        <QuickAccessWalletsList
+          wallets={walletsMap}
+          unitOfAccountSetting={profile.unitOfAccount}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+        />
       )
     }
 
@@ -208,10 +215,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         walletAmount: walletBalance,
         getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
         plate,
-        wallet: settingsCache,
+        wallet,
+        settingsCache,
         shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
-        onSelect: () => this.switchToNewWallet(wallet),
-        isCurrentWallet: wallet === this.generated.stores.wallets.selected,
       };
 
       if(isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap)
@@ -223,6 +229,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <WalletListDialog
           cardanoWallets={cardanoWallets}
           ergoWallets={ergoWallets}
+          onSelect={this.onSelectWallet}
+          selectedWallet={this.generated.stores.wallets.selected}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
@@ -234,6 +242,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
           }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
           walletsNavigation={this.generated.stores.profile.walletsNavigation}
+          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         />
       );
     }
@@ -352,6 +362,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       |},
       profile: {|
         shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType,
         walletsNavigation: WalletsNavigation,
       |},
       tokenInfoStore: {|
@@ -368,6 +379,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         getPublicKeyCache: IGetPublic => PublicKeyCache,
         publicDerivers: Array<PublicDeriver<>>,
         selected: null | PublicDeriver<>,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
@@ -402,6 +416,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          unitOfAccount: stores.profile.unitOfAccount,
           walletsNavigation: stores.profile.walletsNavigation,
         },
         delegation: {
@@ -409,6 +424,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
       },
       actions: {

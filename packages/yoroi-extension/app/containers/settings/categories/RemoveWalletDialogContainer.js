@@ -17,6 +17,7 @@ import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { getWalletType } from '../../../stores/toplevel/WalletSettingsStore';
 import type { WalletsNavigation } from '../../../api/localStorage'
+import { trackRemoveWallet } from '../../../api/analytics';
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
@@ -68,13 +69,14 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
       const walletType = getWalletType(this.props.publicDeriver)
       const newWalletsNavigation = {
         ...walletsNavigation,
-        // $FlowFixMe
+        // $FlowFixMe[invalid-computed-prop]
         [walletType]: walletsNavigation[walletType].filter(
           walletId => walletId !== selectedWalletId
         ),
         quickAccess: walletsNavigation.quickAccess.filter(walletId => walletId !== selectedWalletId)
       }
       await this.generated.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+      trackRemoveWallet();
     }
 
     this.props.publicDeriver &&
@@ -99,11 +101,14 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
-          onClick: () =>
-            this.props.publicDeriver &&
-            settingsActions.removeWallet.trigger({
-              publicDeriver: this.props.publicDeriver,
-            }),
+          onClick: () => {
+            if (this.props.publicDeriver != null) {
+              settingsActions.removeWallet.trigger({
+                publicDeriver: this.props.publicDeriver,
+              });
+              trackRemoveWallet();
+            }
+          }
         }}
         secondaryButton={{
           onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,

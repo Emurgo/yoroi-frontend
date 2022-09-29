@@ -15,6 +15,7 @@ type Props = {|
   +languageSelectionBackground?: boolean,
   +showInContainer?: boolean,
   +showAsCard?: boolean,
+  +asModern?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -30,11 +31,11 @@ function TopBarLayout({
   showInContainer,
   showAsCard,
   isRevampLayout,
+  asModern,
 }: Props & InjectedProps) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
     const navbarComponent = <Box sx={{ zIndex: 2 }}>{navbar}</Box>;
-
     const content = (
       <>
         {topbar != null ? topbarComponent : null}
@@ -63,7 +64,7 @@ function TopBarLayout({
             }),
           }}
         >
-          {isRevampLayout ? (
+          {isRevampLayout && asModern !== true ? (
             <Box sx={{ background: 'var(--yoroi-palette-gray-50)', height: '100%' }}>
               <Box
                 sx={{
@@ -79,7 +80,7 @@ function TopBarLayout({
                     minHeight: '200px',
                     padding: '40px',
                     backgroundColor: 'var(--yoroi-palette-gray-50)',
-                    overflow: 'overlay',
+                    overflow: 'auto',
                   }}
                 >
                   {children}
@@ -93,7 +94,7 @@ function TopBarLayout({
       </>
     );
     if (showInContainer === true) {
-      return isRevampLayout ? (
+      return isRevampLayout && asModern !== true ? (
         <Box
           sx={{
             maxWidth: '100%',
@@ -188,4 +189,5 @@ TopBarLayout.defaultProps = {
   languageSelectionBackground: false,
   showInContainer: false,
   showAsCard: false,
+  asModern: false,
 };

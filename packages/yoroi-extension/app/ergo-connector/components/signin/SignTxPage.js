@@ -50,7 +50,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +shouldHideBalance: boolean,
   +selectedWallet: PublicDeriverCache,
   +connectedWebsite: ?WhitelistEntry,
@@ -219,7 +219,7 @@ class SignTxPage extends Component<Props, State> {
     if (tokenInfo == null) return this.displayUnAvailableToken(request.entry);
     const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
+    if (false && this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(request.entry.identifier, currency);
       if (price != null) {
@@ -257,16 +257,13 @@ class SignTxPage extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
-
     const { isSubmitting } = this.state;
-
     const { intl } = this.context;
     const { txData, onCancel, connectedWebsite } = this.props;
 
     const totalInput = txData.totalInput();
     const fee = txData.fee();
     const amount = totalInput.joinSubtractCopy(fee);
-
     const url = connectedWebsite?.url ?? '';
     const faviconUrl = connectedWebsite?.image ?? '';
 

@@ -15,7 +15,6 @@ exports.copyAssets = (type: string, env: string) => {
   cp('-R', 'chrome/assets/*', type);
   cp('chrome/content-scripts/3rd-party-trezor/*.js', `${type}/js/`);
   cp('chrome/content-scripts/3rd-party-trezor/trezor-usb-permissions.html', `${type}/`);
-  cp('chrome/content-scripts/ledger/*.js', `${type}/js/`);
 };
 
 const buildManifest = (

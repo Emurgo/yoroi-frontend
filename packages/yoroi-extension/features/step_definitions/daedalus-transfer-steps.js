@@ -56,8 +56,9 @@ When(/^I click on the transfer funds from Daedalus master key button$/, async fu
 });
 
 When(/^I proceed with the recovery$/, async function () {
-  const button = await this.findElement(proceedRecoveryButton);
-  await button.click();
+  await this.waitForElement(proceedRecoveryButton);
+  await this.waitEnable(proceedRecoveryButton);
+  await this.click(proceedRecoveryButton);
 });
 
 When(/^I click next button on the Daedalus transfer page$/, async function () {
@@ -88,6 +89,7 @@ Then(/^I should see the Receive screen$/, async function () {
   const receiveTitle = await i18n.formatMessage(this.driver,
     { id: 'wallet.navigation.receive' });
   await this.waitUntilText({ locator: '.WalletNavButton_active', method: 'css' }, receiveTitle);
+  await this.driver.sleep(2000);
 });
 
 Then(/^I should see an Error screen$/, async function () {

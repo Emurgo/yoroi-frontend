@@ -32,6 +32,7 @@ import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContai
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import RevampSwitchDialog from '../../components/wallet/staking/dashboard/RevampSwitchDialog';
 import { THEMES } from '../../styles/utils';
+import type { Theme } from '../../styles/utils';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -66,6 +67,12 @@ class Wallet extends Component<AllProps> {
   }
 
   checkRoute(): void | string {
+    let categories;
+    if (this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP) {
+      categories = allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD);
+    } else {
+      categories = allCategories;
+    }
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -74,7 +81,7 @@ class Wallet extends Component<AllProps> {
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
-    const activeCategory = allCategories.find(
+    const activeCategory = categories.find(
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
     );
 
@@ -83,7 +90,7 @@ class Wallet extends Component<AllProps> {
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
     if (!activeCategory?.isVisible(visibilityContext)) {
-      const firstValidCategory = allCategories
+      const firstValidCategory = categories
         .find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
@@ -104,7 +111,7 @@ class Wallet extends Component<AllProps> {
     if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
         <WalletSyncingOverlay
-          classicTheme={this.generated.stores.profile.isClassicTheme}
+          classicTheme={this.generated.stores.profile.currentTheme === THEMES.YOROI_CLASSIC}
           onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
       )
@@ -311,6 +318,7 @@ class Wallet extends Component<AllProps> {
       |},
       uiDialogs: {|
         isOpen: any => boolean,
+        currentTheme: Theme,
       |},
     |}
     |} {
@@ -356,6 +364,7 @@ class Wallet extends Component<AllProps> {
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           shouldShowRevampDialog: stores.profile.shouldShowRevampDialog,
+          currentTheme: stores.profile.currentTheme,
         }
       },
       actions: {

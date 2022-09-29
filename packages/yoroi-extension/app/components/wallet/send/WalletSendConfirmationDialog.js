@@ -20,7 +20,6 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
@@ -34,6 +33,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
+import { Box } from '@mui/system';
 
 type Props = {|
   +staleTx: boolean,
@@ -51,7 +51,7 @@ type Props = {|
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 @observer
@@ -100,117 +100,44 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     });
   }
 
-  convertedToUnitOfAccount: (TokenEntry, string) => string = (token, toCurrency) => {
-    const tokenInfo = this.props.getTokenInfo(token);
-
-    const shiftedAmount = token.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    const coinPrice = this.props.getCurrentPrice(
-      tokenInfo.Identifier,
-      toCurrency
-    );
-
-    if (coinPrice == null) return '-';
-
-    return calculateAndFormatValue(
-      shiftedAmount,
-      coinPrice
-    );
-  }
-
   renderSingleAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.amount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.amountSmall}>{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.amount}>{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
-            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-          }
-          </span>
-        </div>
-      );
+    return  (
+      <div className={styles.amount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(entry)))
+        }
+        </span>
+      </div>
+    );
   }
   renderTotalAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.totalAmount}>
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.totalAmountSmall}>{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.totalAmount}>{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
-            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
-          }
-          </span>
-        </div>
-      );
+    return  (
+      <div className={styles.totalAmount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(entry)))
+        }
+        </span>
+      </div>
+    );
   }
   renderSingleFee: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const { unitOfAccountSetting } = this.props;
-    return unitOfAccountSetting.enabled
-      ? (
-        <>
-          <div className={styles.fees}>+
-            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-            <span className={styles.currencySymbol}>
-              &nbsp;{unitOfAccountSetting.currency}
-            </span>
-          </div>
-          <div className={styles.feesSmall}>
-            +{formatValue(entry)}
-            <span className={styles.currencySymbol}>&nbsp;{
-              truncateToken(getTokenName(this.props.getTokenInfo(
-                entry
-              )))
-            }
-            </span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.fees}>
-          +{formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{
-            truncateToken(getTokenName(this.props.getTokenInfo(
-              entry
-            )))
-          }
-          </span>
-        </div>
-      );
+    return  (
+      <div className={styles.fees}>
+        +{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(
+            entry
+          )))
+        }
+        </span>
+      </div>
+    );
   }
 
   renderBundle: {|
@@ -287,20 +214,22 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             <div className={styles.addressToLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
-            {receivers.map((receiver, i) => (
-              <ExplorableHashContainer
-                key={receiver + i} // eslint-disable-line react/no-array-index-key
-                selectedExplorer={this.props.selectedExplorer}
-                hash={this.props.addressToDisplayString(receiver)}
-                light
-                linkType="address"
-              >
-                <RawHash light>
-                  <span className={styles.addressTo}>
-                    {truncateAddress(this.props.addressToDisplayString(receiver))}
-                  </span>
-                </RawHash>
-              </ExplorableHashContainer>
+            {[...new Set(receivers)].map((receiver, i) => (
+              <Box>
+                <ExplorableHashContainer
+                  key={receiver + i} // eslint-disable-line react/no-array-index-key
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={this.props.addressToDisplayString(receiver)}
+                  light
+                  linkType="address"
+                >
+                  <RawHash light>
+                    <span className={styles.addressTo}>
+                      {truncateAddress(this.props.addressToDisplayString(receiver))}
+                    </span>
+                  </RawHash>
+                </ExplorableHashContainer>
+              </Box>
             ))}
           </div>
 

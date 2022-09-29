@@ -147,7 +147,7 @@ const genBaseProps: {|
         selected: request.wallet.publicDeriver,
       },
       coinPriceStore: {
-        getCurrentPrice: (_from, _to) => 5,
+        getCurrentPrice: (_from, _to) => '5',
       },
       uiDialogs: {
         isOpen: (dialog) => dialog === request.openDialog,
@@ -281,11 +281,13 @@ const genBaseProps: {|
                   sendUsingTrezor: {
                     trigger: async (req) => action('sendUsingTrezor')(req),
                   },
+                  cancel: { trigger: () => {} },
                 },
                 ledgerSend: {
                   sendUsingLedgerWallet: {
                     trigger: async (req) => action('sendUsingLedgerWallet')(req),
                   },
+                  cancel: { trigger: () => {} },
                 },
               },
             },
@@ -294,7 +296,7 @@ const genBaseProps: {|
                 addressSubgroupMap: genDefaultGroupMap(),
               },
               coinPriceStore: {
-                getCurrentPrice: (_from, _to) => 5,
+                getCurrentPrice: (_from, _to) => '5',
               },
               tokenInfoStore: {
                 tokenInfo: mockFromDefaults(defaultAssets),
@@ -964,7 +966,7 @@ export const AdaWithdrawDialog = (): Node => {
                     },
                   },
                   coinPriceStore: {
-                    getCurrentPrice: (_from, _to) => 5,
+                    getCurrentPrice: (_from, _to) => '5',
                   },
                   tokenInfoStore: {
                     tokenInfo: mockFromDefaults(defaultAssets),
@@ -981,11 +983,13 @@ export const AdaWithdrawDialog = (): Node => {
                       sendUsingTrezor: {
                         trigger: async (req) => action('sendUsingTrezor')(req),
                       },
+                      cancel: { trigger: () => {} },
                     },
                     ledgerSend: {
                       sendUsingLedgerWallet: {
                         trigger: async (req) => action('sendUsingLedgerWallet')(req),
                       },
+                      cancel: { trigger: () => {} },
                     },
                   },
                 },
@@ -1015,6 +1019,7 @@ export const AdaWithdrawDialog = (): Node => {
                       ),
                       reset: action('createWithdrawalTx reset'),
                     },
+                    shouldDeregister: false,
                   },
                 },
               },

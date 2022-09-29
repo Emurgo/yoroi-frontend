@@ -71,6 +71,18 @@
   }
 }
 
+.fiat {
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: -2px;
+    color: var(--yoroi-palette-gray-600);
+
+  .afterDecimal {
+    font-size: 12px;
+    font-weight: 300;
+  }
+}
+
 .label {
   display: inline-block;
   color: var(--yoroi-palette-gray-600);
