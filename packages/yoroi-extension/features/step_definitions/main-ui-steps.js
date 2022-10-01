@@ -5,10 +5,21 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { hiddenAmount } from '../../app/utils/strings';
 import { truncateAddress, } from '../../app/utils/formatters';
+import { getRewardValue, getTotalAdaValue } from '../pages/dashboardPage';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
   await this.waitUntilText({ locator: '.NavWalletDetails_amount', method: 'css' }, number);
 });
+
+Then(/^I should see the Total ADA is equal to "([^"]*)"$/, async function (expectedTotalAda) {
+  const realTotalAda = await getTotalAdaValue(this);
+  expect(parseFloat(expectedTotalAda), `The Total ADA is different from the expected`).to.be.equal(realTotalAda);
+})
+
+Then(/^I should see the Reward is equal to "([^"]*)"$/, async function (expectedRewardAmount) {
+  const realRewardAmount = await getRewardValue(this);
+  expect(parseFloat(expectedRewardAmount), `The Total ADA is different from the expected`).to.be.equal(realRewardAmount);
+})
 
 Then(/^I should see send transaction screen$/, async function () {
   await this.waitForElement({ locator: "input[name='receiver']", method: 'css' });
