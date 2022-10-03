@@ -92,7 +92,8 @@ export const secondThemeSelected: LocatorObject = {
   method: 'css',
 };
 
-export const revampThemeButton: LocatorObject = { locator: 'switchToRevampButton', method: 'id' };
+export const oldThemeRadiobutton: LocatorObject = { locator: 'switchToOldVersionButton', method: 'id' };
+export const revampThemeRadiobutton: LocatorObject = { locator: 'switchToNewVersionButton', method: 'id' };
 
 // Change password dialog
 

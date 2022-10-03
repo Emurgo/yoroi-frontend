@@ -95,7 +95,7 @@ import {
 import {
   getComplexityLevelButton,
   goToSettings,
-  revampThemeButton,
+  revampThemeRadiobutton,
   selectSubmenuSettings,
   settingsLayoutComponent,
 } from '../pages/settingsPage';
@@ -761,8 +761,10 @@ Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
 Then(/^Revamp. I switch to revamp version$/, async function () {
   this.webDriverLogger.info(`Step: Revamp. I switch to revamp version`);
   await goToSettings(this);
+  this.webDriverLogger.info(`Step: -----> We are in the Settings`);
   await selectSubmenuSettings(this, 'general');
-  await this.click(revampThemeButton);
+  this.webDriverLogger.info(`Step: -----> We are in the Settings - General`);
+  await this.click(revampThemeRadiobutton);
 });
 
 Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
