@@ -37,15 +37,37 @@ import { sendTab } from '../pages/walletPage';
 import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
 import { unmangleButton } from '../pages/walletReceivePage';
+import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
+import {
+  getTokenLocator,
+  selectAssetDropDown,
+  selectSendingAmountDropDown,
+  sendAllItem
+} from '../pages/walletSendPage';
+import { halfSecond, oneMinute } from '../support/helpers/common-constants';
+
+const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
+  const browserName = await customWorld.getBrowser();
+  const rows = inputData.hashes();
+  let fields = rows.filter(row => row.browser === browserName)[0];
+
+  if (!fields){
+    fields = rows[0];
+  }
+
+  return fields;
+};
 
 Given(/^I have a wallet with funds$/, async function () {
-  const amountWithCurrency = await this.driver.findElements(
-    By.xpath("//div[@class='WalletTopbarTitle_walletAmount']")
+  await this.waitUntilContainsText(
+    { locator: '.NavWalletDetails_amount', method: 'css' },
+    'ADA',
+    oneMinute
   );
-  const matchedAmount = /^"([0-9]*\.[0-9]*)".*$/.exec(amountWithCurrency);
-  if (!matchedAmount) return false;
-  const amount = parseFloat(matchedAmount[1]);
-  expect(Number(amount), 'Available funds').to.be.above(0);
+  const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
+  const balanceText = await balanceTextElement.getText();
+  const [balance, ] = balanceText.split(' ');
+  expect(parseFloat(balance), 'The wallet is empty').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -59,13 +81,16 @@ When(/^I select the asset "(.+)" on the form$/, async function (assetName) {
 });
 
 When(/^I fill the form:$/, async function (table) {
-  const fields = table.hashes()[0];
+  const fields = await filterInputByBrowser(this, table);
+  await this.waitForElement(receiverInput);
+  await this.waitForElement(amountInput);
   await this.input(receiverInput, fields.address);
   await this.input(amountInput, fields.amount);
 });
 
 When(/^I fill the address of the form:$/, async function (table) {
-  const fields = table.hashes()[0];
+  const fields = await filterInputByBrowser(this, table);
+  await this.waitForElement(receiverInput);
   await this.input(receiverInput, fields.address);
 });
 
@@ -125,7 +150,7 @@ When(/^I click on the next button in the wallet send form$/, async function () {
    *
    * I attempt to fix it by just clicking twice after a delay
    */
-  await this.driver.sleep(500);
+  await this.driver.sleep(halfSecond);
   try {
     await this.click(nextButton);
   } catch (e) {
@@ -226,28 +251,15 @@ When(/^I click on the unmangle button$/, async function () {
 });
 
 When(/^I open the token selection dropdown$/, async function () {
-  await this.click(assetSelector);
+  await this.click(selectAssetDropDown);
 });
 
 When(/^I select token "([^"]*)"$/, async function (tokenName) {
-  const tokenRows = await this.getElementsBy(assetListElement);
-  for (const row of tokenRows) {
-    const name = await row.getText();
-    if (name === tokenName) {
-      await row.click();
-    }
-  }
+  await this.click(getTokenLocator(tokenName));
 });
 
 When(/^I open the amount dropdown and select send all$/, async function () {
-  await this.driver.executeScript(
-    `const dropdownInput = document.querySelector('input[value="Custom Amount"]').click;
-    const tokenList = document.querySelectorAll('.TokenOptionRow_item_name');
-    for(let token of tokenList){
-      if(token.innerHTML.startsWith('Send all')){
-        token.click()
-         }
-     }
-`
-  );
+  await this.click(selectSendingAmountDropDown);
+  await this.driver.sleep(halfSecond);
+  await this.click(sendAllItem);
 });

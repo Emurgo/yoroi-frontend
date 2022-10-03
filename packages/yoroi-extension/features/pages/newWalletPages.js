@@ -78,6 +78,10 @@ export const createOptionDialog: LocatorObject = {
   locator: '.WalletCreateOptionDialog',
   method: 'css',
 };
+export const createNormalWalletButton: LocatorObject = {
+  locator: '.WalletCreateOptionDialog_createWallet',
+  method: 'css'
+};
 export const createPaperWalletButton: LocatorObject = {
   locator: '.WalletCreateOptionDialog_restorePaperWallet',
   method: 'css',

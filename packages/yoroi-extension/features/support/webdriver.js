@@ -1,21 +1,23 @@
 // @flow
 
-import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
+import { setWorldConstructor } from 'cucumber';
 import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
-// eslint-disable-next-line import/named
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { getMethod, getLogDate } from './helpers/helpers';
-import { WindowManager } from './windowManager';
-import { MockDAppWebpage } from '../mock-dApp-webpage';
-import { testRunsDataDir } from './helpers/common-constants';
+import { getMethod } from './helpers/helpers';
 import { WebDriverError } from 'selenium-webdriver/lib/error';
 import * as helpers from './helpers/helpers';
+import {
+  defaultWaitTimeout,
+  defaultRepeatPeriod,
+  halfSecond,
+  quarterMinute,
+  oneMinute,
+} from './helpers/common-constants';
 
 const fs = require('fs');
-const simpleNodeLogger = require('simple-node-logger');
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -34,12 +36,10 @@ function encode(file) {
  * We then note the mapping of the extension ID to the random UUID is stored in about:config
  * Under the key "extensions.webextensions.uuids".
  * Therefore, we specify a fixed extension ID for Yoroi in the manifest
- * Then we use Selenium to override the config to manually specify a a fixed UUID
+ * Then we use Selenium to override the config to manually specify a fixed UUID
  */
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
-const defaultWaitTimeout = 10 * 1000;
-const defaultRepeatPeriod = 1000;
 
 function getBraveBuilder() {
   return new Builder().forBrowser('chrome').setChromeOptions(
@@ -132,35 +132,21 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   }
   this.driver = builder.build();
-
   this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this._allLoggers = [];
 
-  const logsDir = `${testRunsDataDir}${this.getBrowser()}/Logs/`
-
-  const mockAndWMLogDir = `${logsDir}mockAndWMLogs`;
-  if (!fs.existsSync(mockAndWMLogDir)) {
-    fs.mkdirSync(mockAndWMLogDir, { recursive: true });
-  }
-  const mockAndWMLogPath = `${mockAndWMLogDir}/mockAndWMLog_${getLogDate()}.log`;
-  const mockAndWMLogger = simpleNodeLogger.createSimpleFileLogger(mockAndWMLogPath);
-  this.windowManager = new WindowManager(this.driver, mockAndWMLogger);
-  this.windowManager.init().then().catch();
-  this._allLoggers.push(mockAndWMLogger);
-  this.mockDAppPage = new MockDAppWebpage(this.driver, mockAndWMLogger);
-
-  const webDriverLogDir = `${logsDir}webDriverLogs`;
-  if (!fs.existsSync(webDriverLogDir)) {
-    fs.mkdirSync(webDriverLogDir, { recursive: true });
-  }
-  const webDriverLogPath = `${webDriverLogDir}/webDriverLog_${getLogDate()}.log`;
-  this.webDriverLogger = simpleNodeLogger.createSimpleFileLogger(webDriverLogPath);
-  this._allLoggers.push(this.webDriverLogger);
-
-  const trezorEmuLogPath = `${logsDir}trezorEmulatorController_${getLogDate()}.log`;
-  this.trezorEmuLogger = simpleNodeLogger.createSimpleFileLogger(trezorEmuLogPath);
   this.trezorController = undefined;
+
+  this.windowManager = undefined;
+
+  this.webDriverLogger = undefined;
+
+  this.trezorEmuLogger = undefined;
+
+  this.addToLoggers = (logger: any) => {
+    this._allLoggers.push(logger);
+  } ;
 
   this.sendToAllLoggers = (message: string, level: string = 'info') => {
     for (const someLogger of this._allLoggers) {
@@ -186,8 +172,8 @@ function CustomWorld(cmdInput: WorldInput) {
         await this.driver.get(url);
       } catch (e) {
         if (e instanceof WebDriverError) {
-          this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 1 second and retry`);
-          await helpers.sleep(500);
+          this.webDriverLogger.info(`Webdriver: Caught the WebDriverError. Sleep for 0.5 second and retry`);
+          await helpers.sleep(halfSecond);
           continue;
         }
       }
@@ -203,7 +189,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.getText = (locator: LocatorObject) => this.getElementBy(locator).getText();
 
-  this.getValue = this.driver.getValue = async (locator: LocatorObject) =>
+  this.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
   this.waitForElementLocated = async (locator: LocatorObject) => {
@@ -213,7 +199,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   // Returns a promise that resolves to the element
-  this.waitForElement = this.driver.waitForElement = async (locator: LocatorObject) => {
+  this.waitForElement = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be visible`);
     await this.waitForElementLocated(locator);
     const element = await this.getElementBy(locator);
@@ -230,9 +216,7 @@ function CustomWorld(cmdInput: WorldInput) {
     return element;
   };
 
-  this.waitForElementNotPresent = this.driver.waitForElementNotPresent = async (
-    locator: LocatorObject
-  ) => {
+  this.waitForElementNotPresent = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" not present`);
     await this.driver.wait(async () => {
       const elements = await this.getElementsBy(locator);
@@ -254,7 +238,11 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator: LocatorObject, text, timeout = 75000) => {
+  this.waitUntilText = async (
+    locator: LocatorObject,
+    text,
+    timeout = oneMinute + quarterMinute
+  ) => {
     this.webDriverLogger.info(`Webdriver: Waiting Until "${JSON.stringify(locator)}" contains "${text}"`);
     await this.driver.wait(async () => {
       try {
@@ -266,7 +254,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = 15000) => {
+  this.waitUntilContainsText = async (locator: LocatorObject, text, timeout = quarterMinute) => {
     this.webDriverLogger.info(`Webdriver: Waiting for "${JSON.stringify(locator)}" to contain text "${text}"`);
     await this.driver.wait(async () => {
       try {
@@ -422,7 +410,6 @@ function CustomWorld(cmdInput: WorldInput) {
 RustModule.load()
   .then(() => {
     setWorldConstructor(CustomWorld);
-    setDefaultTimeout(30 * 1000);
     return undefined;
   })
   .catch();

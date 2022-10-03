@@ -28,25 +28,25 @@ Then(/^I click the create paper wallet button$/, async function () {
 
 Then(/^I enter the paper recovery phrase$/, async function () {
   /**
-   * Mnemomic is printed on the paper wallet and not present in the UI
-   * So we instead fetch the paper wallet from app memory
-   */
-  const recoveryPhrase = await this.driver.executeScript(
-    () => window.yoroi.stores.substores.ada.paperWallets.paper.scrambledWords
-  );
+ * Mnemomic is printed on the paper wallet and not present in the UI
+ * So we instead fetch the paper wallet from app memory
+ */
+  const recoveryPhrase = await this.driver.executeScript(() => (
+    window.yoroi.stores.substores.ada.paperWallets.paper.scrambledWords
+  ));
 
   await enterRecoveryPhrase(this, recoveryPhrase.join(' '));
 });
 
 Given(/^I swap the paper wallet addresses$/, async function () {
   // make sure 2 addresses we generated as expected
-  const addresses = await this.driver.executeScript(
-    () => window.yoroi.stores.substores.ada.paperWallets.paper.addresses
-  );
+  const addresses = await this.driver.executeScript(() => (
+    window.yoroi.stores.substores.ada.paperWallets.paper.addresses
+  ));
   expect(addresses.length).to.be.equal(2);
 
   // we swap out the generated addresses with fake ones to get a consistent UI for screenshots
-  await this.driver.executeScript(fakes => {
+  await this.driver.executeScript((fakes) => {
     window.yoroi.stores.substores.ada.paperWallets.paper.addresses = fakes;
   }, fakeAddresses);
 });

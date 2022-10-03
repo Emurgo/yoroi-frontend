@@ -1,7 +1,8 @@
 // @flow
 
-import type { LocatorObject } from '../support/webdriver';
+import { truncateToken } from '../../app/utils/formatters';
 import { By } from 'selenium-webdriver';
+import type { LocatorObject } from '../support/webdriver';
 
 export const assetSelector: LocatorObject = {
   locator: '.WalletSendForm_component .SimpleInput_input',
@@ -104,3 +105,16 @@ export const sendConfirmationDialogError: LocatorObject = {
   method: 'css',
 };
 export const warningBox: LocatorObject = { locator: '.WarningBox_warning', method: 'css' };
+export const selectAssetDropDown: LocatorObject = {
+  locator: '//div[starts-with(@id, "selectedToken--")]',
+  method: 'xpath',
+};
+export const getTokenLocator = (tokenName: string): LocatorObject => {
+  return { locator: truncateToken(tokenName), method: 'id' };
+};
+export const selectSendingAmountDropDown: LocatorObject = {
+  locator: '//div[starts-with(@id, "selectedAmount--")]',
+  method: 'xpath',
+};
+export const customAmountItem: LocatorObject = { locator: 'custom-amount', method: 'id' };
+export const sendAllItem: LocatorObject = { locator: 'send-all', method: 'id' };

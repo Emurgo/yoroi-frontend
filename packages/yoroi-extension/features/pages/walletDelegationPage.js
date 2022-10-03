@@ -28,5 +28,18 @@ export const delegationDashboardPage: LocatorObject = {
   locator: '.StakingDashboard_page',
   method: 'css',
 };
-export const hardwareDisclaimerComponent = { locator: '.HardwareDisclaimer_component', method: 'css' };
-export const understandButton = { locator: '//button[text()="I understand"]', method: 'xpath' };
+export const hardwareDisclaimerComponent: LocatorObject = { locator: '.HardwareDisclaimer_component', method: 'css' };
+export const understandButton: LocatorObject = { locator: '//button[text()="I understand"]', method: 'xpath' };
+export const iframe: LocatorObject = {
+  locator: '#classicCardanoStakingPage > iframe',
+  method: 'css',
+};
+export const iframePoolIdInput: LocatorObject = { locator: '//div/form/input', method: 'xpath' };
+export const iframePoolIdSearchButton: LocatorObject = {
+  locator: '//div/form/button',
+  method: 'xpath',
+};
+export const iframeFirstPoolDelegateButton: LocatorObject = {
+  locator: '//table/tbody/tr/td/button',
+  method: 'xpath',
+};

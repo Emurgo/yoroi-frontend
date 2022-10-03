@@ -22,10 +22,21 @@ import {
   walletSummaryComponent,
 } from '../pages/walletTransactionsPage';
 import { maintenanceBody, serverErrorBanner } from '../pages/mainWindowPage';
+import { getRewardValue, getTotalAdaValue } from '../pages/dashboardPage';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
   await this.waitUntilText(navDetailsAmount, number);
 });
+
+Then(/^I should see the Total ADA is equal to "([^"]*)"$/, async function (expectedTotalAda) {
+  const realTotalAda = await getTotalAdaValue(this);
+  expect(parseFloat(expectedTotalAda), `The Total ADA is different from the expected`).to.be.equal(realTotalAda);
+})
+
+Then(/^I should see the Reward is equal to "([^"]*)"$/, async function (expectedRewardAmount) {
+  const realRewardAmount = await getRewardValue(this);
+  expect(parseFloat(expectedRewardAmount), `The Total ADA is different from the expected`).to.be.equal(realRewardAmount);
+})
 
 Then(/^I should see send transaction screen$/, async function () {
   await this.waitForElement(receiverInput);
