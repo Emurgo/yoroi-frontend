@@ -24,23 +24,17 @@ import { verifyAddressButton, verifyAddressHWButton } from '../pages/walletRecei
 
 When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click(connectHwButton);
-
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogCardano);
-
   await this.waitForElement(hwOptionsDialog);
-
   await this.click(ledgerWalletButton);
   await this.click(byronEraButton);
 });
 When(/^I select a Shelley-era Ledger device$/, async function () {
   await this.click(connectHwButton);
-
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogCardano);
-
   await this.waitForElement(hwOptionsDialog);
-
   await this.click(ledgerWalletButton);
   await this.click(shelleyEraButton);
 });
@@ -48,32 +42,23 @@ When(/^I restore the Ledger device$/, async function () {
   await this.waitForElement(checkDialog);
   await this.click(primaryButton);
   await this.click(primaryButton);
-
-  // between these is where the tab & iframe gets opened
-
   await this.waitForElement(saveDialog);
   await this.click(primaryButton);
 });
 
 When(/^I select a Byron-era Trezor device$/, async function () {
   await this.click(connectHwButton);
-
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogCardano);
-
   await this.waitForElement(hwOptionsDialog);
-
   await this.click(trezorWalletButton);
   await this.click(byronEraButton);
 });
 When(/^I select a Shelley-era Trezor device$/, async function () {
   await this.click(connectHwButton);
-
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogCardano);
-
   await this.waitForElement(hwOptionsDialog);
-
   await this.click(trezorWalletButton);
   await this.click(shelleyEraButton);
 });
@@ -82,9 +67,6 @@ When(/^I restore the Trezor device$/, async function () {
   await this.waitForElement(checkDialog);
   await this.click(primaryButton);
   await this.click(primaryButton);
-
-  // between these is where the tab & iframe gets opened
-
   await this.waitForElement(saveDialog);
   await this.input(walletNameInput, testWallets['trezor-wallet'].name);
   await this.click(primaryButton);

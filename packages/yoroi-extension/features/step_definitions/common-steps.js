@@ -12,7 +12,7 @@ import {
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
-import { By, logging } from 'selenium-webdriver';
+import { logging } from 'selenium-webdriver';
 import { getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
 import * as ErgoImporter from '../mock-chain/mockErgoImporter';
@@ -28,6 +28,7 @@ import {
 } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
+// eslint-disable-next-line import/named
 import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
 import type { RestorationInput, WalletNames } from '../mock-chain/TestWallets';
@@ -52,11 +53,8 @@ import {
   walletRestoreOptionDialog,
   restoreNormalWallet,
   walletRestoreDialog,
-  pickUpCurrencyDialogCardano,
   walletAddRestoreWalletButton,
   saveButton,
-  restoreOptionDialog,
-  normalWordWalletButton,
   byronEraButton,
   createWalletButton,
   createOptionDialog,
@@ -68,6 +66,9 @@ import {
   inputMnemonicForWallet,
   walletPasswordInput,
   repeatPasswordInput,
+  confirmButton,
+  restoreWalletButton,
+  restoringDialogPlate,
 } from '../pages/restoreWalletPage';
 import {
   backupPrivacyWarningDialog,
@@ -83,14 +84,7 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
-import { extensionTabName } from '../support/windowManager';
-import {
-  confirmButton,
-  repeatPasswordInput,
-  restoreWalletButton,
-  walletPasswordInput,
-} from '../pages/restoreWalletPage';
-import { walletNameText } from '../pages/walletPage';
+import { walletNameText, walletPlate } from '../pages/walletPage';
 import {
   continueButton,
   getTosCheckbox,
@@ -252,13 +246,11 @@ After(async function (scenario) {
 
 export async function getPlates(customWorld: any): Promise<any> {
   // check plate in confirmation dialog
-  let plateElements = await customWorld.driver.findElements(
-    By.css('.WalletRestoreVerifyDialog_plateIdSpan')
-  );
+  let plateElements = await customWorld.findElements(restoringDialogPlate);
 
   // this makes this function also work for wallets that already exist
   if (plateElements.length === 0) {
-    plateElements = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
+    plateElements = await customWorld.findElements(walletPlate);
   }
   return plateElements;
 }
@@ -357,9 +349,9 @@ async function restoreWallet (
   await customWorld.waitForElement(pickUpCurrencyDialog);
   await customWorld.click(getCurrencyButton('cardano'));
 
-  await customWorld.waitForElement(restoreOptionDialog);
+  await customWorld.waitForElement(walletRestoreDialog);
 
-  await customWorld.click(normalWordWalletButton);
+  await customWorld.click(restoreNormalWallet);
   if (walletEra === 'shelley') {
     await customWorld.click(shelleyEraButton);
   } else if (walletEra === 'byron') {
@@ -378,12 +370,6 @@ async function checkWalletPlate(
   walletName: string,
   restoreInfo: RestorationInput
 ): Promise<void> {
-  await customWorld.input(walletNameInput, restoreInfo.name);
-  await enterRecoveryPhrase(customWorld, restoreInfo.mnemonic);
-  await customWorld.input(walletPasswordInput, restoreInfo.password);
-  await customWorld.input(repeatPasswordInput, restoreInfo.password);
-  await customWorld.click(restoreWalletButton);
-
   const plateElements = await getPlates(customWorld);
   const plateText = await plateElements[0].getText();
   expect(plateText).to.be.equal(restoreInfo.plate);

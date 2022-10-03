@@ -3,7 +3,7 @@
 import { Given, Then } from 'cucumber';
 import { expect } from 'chai';
 import { truncateAddress } from '../../app/utils/formatters';
-import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import { enterRecoveryPhrase } from '../pages/restoreWalletPage';
 import { primaryButton } from '../pages/commonDialogPage';
 import {
   addressElement,

@@ -259,7 +259,7 @@ Then(/^I should see no password errors$/, async function () {
 });
 
 When(/^I click the back button \(Connector pop-up window\)$/, async function () {
-  this.webDriverLogger.info(`Step: I click the back button \(Connector pop-up window\)`);
+  this.webDriverLogger.info(`Step: I click the back button (Connector pop-up window)`);
   await this.waitForElement(backButton);
   await this.click(backButton);
 });
@@ -325,7 +325,7 @@ Then(/^I should see "No Cardano wallets is found" message$/, async function () {
 });
 
 Then(/^I press the "Create wallet" button \(Connector pop-up window\)$/, async function () {
-  this.webDriverLogger.info(`Step: I press the "Create wallet" button \(Connector pop-up window\)`);
+  this.webDriverLogger.info(`Step: I press the "Create wallet" button (Connector pop-up window)`);
   await this.waitForElement(createWalletBtn);
   await this.click(createWalletBtn);
 });

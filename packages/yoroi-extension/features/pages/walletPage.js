@@ -11,6 +11,7 @@ export const claimTransferTab: LocatorObject = { locator: '.claimTransfer', meth
 export const votingTab: LocatorObject = { locator: '.voting', method: 'css' };
 export const delegationByIdTab: LocatorObject = { locator: '.cardanoStake', method: 'css' };
 
+export const walletPlate: LocatorObject = { locator: '.NavPlate_plate', method: 'css' };
 export const walletNameText: LocatorObject = { locator: '.NavPlate_name', method: 'css' };
 export const activeNavTab: LocatorObject = { locator: '.WalletNavButton_active', method: 'css' };
 export const dashboardTab: LocatorObject = { locator: '.stakeDashboard ', method: 'css' };

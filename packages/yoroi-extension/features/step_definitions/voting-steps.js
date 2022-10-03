@@ -88,8 +88,8 @@ Then(/^I see should see pin mismatch error$/, async function () {
   await this.waitUntilText(confirmPinDialogError, errorMessage);
 
   // clear the wrong pin at the end
-  // we doing backspace 4 times for pin length of 4
-  // as .clear() does not update the react component value
+  // we are doing backspace 4 times for pin length of 4
+  // as .clear() does not update the React component value
   const input = this.driver.findElement(By.name('pin'));
   for (let i = 1; i <= 4; i++) {
     input.sendKeys(Key.BACK_SPACE);

@@ -7,17 +7,18 @@ import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
 import {
   failedTransactionElement,
+  getTopTx,
+  getTxStatus,
   noTransactionsComponent,
   numberOfTransactions,
   parseTxInfo,
   pendingTransactionElement,
-  showMoreButton, transactionAddressListElement,
-  transactionListElement,
-} from '../pages/walletTransactionsPage';
+  showMoreButton,
+  transactionAddressListElement,
+  transactionComponent,
+} from '../pages/walletTransactionsHistoryPage';
 import { summaryTab } from '../pages/walletPage';
-import { displayInfo } from '../support/helpers/common-constants';
-import { getTopTx, getTxStatus, transactionComponent } from '../pages/walletTransactionsHistoryPage';
-import { txSuccessfulStatuses } from '../support/helpers/common-constants';
+import { displayInfo , txSuccessfulStatuses } from '../support/helpers/common-constants';
 
 function verifyAllTxsFields(
   txType,
@@ -78,7 +79,7 @@ Then(
 Then(/^I should see no transactions$/, async function () {
   await this.waitForElement(noTransactionsComponent);
   const actualTxsList = await this.getElementsBy(transactionComponent);
-  chai.expect(actualTxsList.length).to.equal(0);
+  expect(actualTxsList.length).to.equal(0);
 });
 
 Then(/^I should see ([^"]*) ([^"]*) transactions$/, async function (txsNumber, txExpectedStatus) {
@@ -120,19 +121,6 @@ When(/^I expand the top transaction$/, async function () {
 
     await topTx.click();
 });
-
-async function parseTxInfo(addressList) {
-  const addressInfoRow = await addressList.findElements(By.css('.Transaction_addressItem'));
-
-  const result = [];
-  for (const row of addressInfoRow) {
-    const rowInfo = await row.findElements(By.xpath('*'));
-    const rowInfoText = await Promise.all(rowInfo.map(async column => await column.getText()));
-    result.push(rowInfoText);
-  }
-
-  return result;
-}
 
 Then(/^I verify top transaction content ([^"]*)$/, async function (walletName) {
   await this.waitForElement(transactionComponent);
@@ -196,54 +184,6 @@ Then(
     const confirmationCount = await assuranceElem[0].getText();
     expect(confirmationCount).to.equal(count);
 });
-
-const displayInfo = {
-  'many-tx-wallet': {
-    txType: 'ADA intrawallet transaction',
-    txAmount: '-0.169999',
-    txTime: '2019-04-21T15:13:33.000Z',
-    txStatus: 'HIGH',
-    txFrom: [
-      ['Ae2tdPwUPE...VWfitHfUM9', 'BYRON - INTERNAL', '-0.82 ADA'],
-    ],
-    txTo: [
-      ['Ae2tdPwUPE...iLjTnt34Aj', 'BYRON - EXTERNAL', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.65 ADA'],
-    ],
-    txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
-    txConfirmations: 'High. 104 confirmations.',
-    txFee: '0.169999',
-  },
-  'simple-pending-wallet': {
-    txType: 'ADA intrawallet transaction',
-    txAmount: '-0.999999',
-    txTime: '2019-04-20T23:14:52.000Z',
-    txStatus: 'PENDING',
-    txFrom: [
-      ['Ae2tdPwUPE...e1cT2aGdSJ', 'BYRON - EXTERNAL', '-1 ADA'],
-    ],
-    txTo: [
-      ['Ae2tdPwUPE...sTrQfTxPVX', 'PROCESSING...', '+0.000001 ADA']
-    ],
-    txId: 'fa6f2c82fb511d0cc9c12a540b5fac6e5a9b0f288f2d140f909f981279e16fbe',
-    txFee: '0.999999',
-  },
-  'failed-single-tx': {
-    txType: 'ADA sent',
-    txAmount: '-0.18',
-    txTime: '2019-04-20T23:14:51.000Z',
-    txStatus: 'FAILED',
-    txFrom: [
-      ['Ae2tdPwUPE...gBfkkDNBNv', 'BYRON - EXTERNAL', '-1 ADA'],
-    ],
-    txTo: [
-      ['Ae2tdPwUPE...xJPmFzi6G2', 'ADDRESS BOOK', '+0.000001 ADA'],
-      ['Ae2tdPwUPE...bL4UYPN3eU', 'BYRON - INTERNAL', '+0.82 ADA'],
-    ],
-    txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',
-    txFee: '0.179999',
-  },
-};
 
 When(/^I go to the tx history screen$/, async function () {
   await this.click(summaryTab);

@@ -20,7 +20,7 @@ import {
   copyToClipboardButton,
   getNotificationMessage,
   walletSummaryComponent,
-} from '../pages/walletTransactionsPage';
+} from '../pages/walletTransactionsHistoryPage';
 import { maintenanceBody, serverErrorBanner } from '../pages/mainWindowPage';
 import { getRewardValue, getTotalAdaValue } from '../pages/dashboardPage';
 

@@ -11,17 +11,19 @@ import {
   networks,
   defaultAssets,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { walletSummaryBox, walletSummaryComponent } from '../pages/walletTransactionsPage';
+import { walletSummaryBox, walletSummaryComponent } from '../pages/walletTransactionsHistoryPage';
 import {
   amountInput,
-  assetListElement,
-  assetSelector,
   disabledSubmitButton,
+  getTokenLocator,
   invalidAddressError,
   nextButton,
   notEnoughAdaError,
   receiverInput,
+  selectAssetDropDown,
+  selectSendingAmountDropDown,
   sendAllCheckbox,
+  sendAllItem,
   sendConfirmationDialogAddressToText,
   sendConfirmationDialogAmountText,
   sendConfirmationDialogError,
@@ -37,13 +39,6 @@ import { sendTab } from '../pages/walletPage';
 import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
 import { unmangleButton } from '../pages/walletReceivePage';
-import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
-import {
-  getTokenLocator,
-  selectAssetDropDown,
-  selectSendingAmountDropDown,
-  sendAllItem
-} from '../pages/walletSendPage';
 import { halfSecond, oneMinute } from '../support/helpers/common-constants';
 
 const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
