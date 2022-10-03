@@ -26,29 +26,29 @@ export const getSubTabButton = (chain: string, kind: string): LocatorObject => {
   return { locator: `div.${chain}.${kind}.ReceiveNavButton_wrapper`, method: 'css' };
 };
 
-export const getAllAddressesButton = async (): Promise<LocatorObject> => {
-  const translatedText = await i18n.formatMessage(this.driver, {
+export const getAllAddressesButton = async (customWorld: any): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(customWorld.driver, {
     id: 'wallet.receive.navigation.allLabel',
   });
   return getReceiveSubTabButton(translatedText);
 };
 
-export const getUnusedAddressesButton = async (): Promise<LocatorObject> => {
-  const translatedText = await i18n.formatMessage(this.driver, {
+export const getUnusedAddressesButton = async (customWorld: any): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(customWorld.driver, {
     id: 'wallet.receive.navigation.unusedLabel',
   });
   return getReceiveSubTabButton(translatedText);
 };
 
-export const getUsedAddressesButton = async (): Promise<LocatorObject> => {
-  const translatedText = await i18n.formatMessage(this.driver, {
+export const getUsedAddressesButton = async (customWorld: any): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(customWorld.driver, {
     id: 'wallet.receive.navigation.usedLabel',
   });
   return getReceiveSubTabButton(translatedText);
 };
 
-export const getHasBalanceButton = async (): Promise<LocatorObject> => {
-  const translatedText = await i18n.formatMessage(this.driver, {
+export const getHasBalanceButton = async (customWorld: any): Promise<LocatorObject> => {
+  const translatedText = await i18n.formatMessage(customWorld.driver, {
     id: 'wallet.receive.navigation.hasBalanceLabel',
   });
   return getReceiveSubTabButton(translatedText);

@@ -15,7 +15,10 @@ export const getTxStatus = async (tx: webdriver$WebElement): Promise<string> => 
   );
   return await statusElement.getText();
 };
-export const getNotificationMessage = async (customWorld: any, translatedMessage: string) => {
+export const getNotificationMessage = async (
+  customWorld: any,
+  translatedMessage: string
+): Promise<webdriver$WebElement> => {
   const messageParentElement = await customWorld.driver.findElement(
     By.xpath('//div[contains(@role, "tooltip")]')
   );
@@ -23,7 +26,7 @@ export const getNotificationMessage = async (customWorld: any, translatedMessage
     By.xpath(`//span[contains(text(), "${translatedMessage}")]`)
   );
 }
-export const parseTxInfo = async (addressList: Array<any>): Promise<Array<any>> => {
+export const parseTxInfo = async (addressList: webdriver$WebElement): Promise<Array<any>> => {
   const addressInfoRow = await addressList.findElements(By.css('.Transaction_addressItem'));
 
   const result = [];

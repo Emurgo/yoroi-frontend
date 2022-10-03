@@ -15,7 +15,7 @@ export const warningCheckboxElement: LocatorObject = {
   method: 'css',
 };
 
-export const getWarningCheckbox = async (customWorld: Object) => {
+export const getWarningCheckbox = async (customWorld: Object): Promise<webdriver$WebElement> => {
   const warningCheckboxComponent = await customWorld.findElement(warningCheckboxElement);
   return await warningCheckboxComponent.findElement(By.xpath('//input[@type="checkbox"]'));
 }

@@ -49,16 +49,16 @@ When(/^I click on the top-level reward address tab$/, async function () {
 });
 
 When(/^I click on the All addresses button$/, async function () {
-  await this.click(await getAllAddressesButton());
+  await this.click(await getAllAddressesButton(this));
 });
 When(/^I click on the Unused addresses button$/, async function () {
-  await this.click(await getUnusedAddressesButton());
+  await this.click(await getUnusedAddressesButton(this));
 });
 When(/^I click on the Used addresses button$/, async function () {
-  await this.click(await getUsedAddressesButton());
+  await this.click(await getUsedAddressesButton(this));
 });
 When(/^I click on the HasBalance addresses button$/, async function () {
-  await this.click(await getHasBalanceButton());
+  await this.click(await getHasBalanceButton(this));
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {

@@ -20,7 +20,7 @@ export const memoDialogComponent: LocatorObject = {
   method: 'css',
 };
 export const memoContentText: LocatorObject = { locator: '.memoContent', method: 'css' };
-export const getMemoText = async (customWorld: Object) => {
+export const getMemoText = async (customWorld: Object): Promise<string> => {
   const memoElem = await customWorld.getElementsBy(memoContentText);
   return await memoElem[0].getText();
 };
