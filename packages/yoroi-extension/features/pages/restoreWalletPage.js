@@ -46,10 +46,11 @@ export const cleanRecoverInput: LocatorObject = {
   method: 'css',
 };
 export const walletNameInput: LocatorObject = { locator: "input[name='walletName']", method: 'css' };
-export const restoreWalletButton: LocatorObject = { locator: '.WalletRestoreDialog .primary', method: 'css' };
+export const confirmRestoreWalletButton: LocatorObject = { locator: '.WalletRestoreDialog .primary', method: 'css' };
 export const walletPasswordInput: LocatorObject = { locator: "input[name='walletPassword']", method: 'css' };
 export const repeatPasswordInput: LocatorObject = { locator: "input[name='repeatPassword']", method: 'css' };
 export const paperPasswordInput: LocatorObject = { locator: "input[name='paperPassword']", method: 'css' };
 export const confirmButton: LocatorObject = { locator: '.confirmButton', method: 'css' };
 export const confirmConfirmationButton: LocatorObject = { locator: '.WalletRestoreDialog .primary', method: 'css' };
-export const restoringDialogPlate: LocatorObject = { locator: 'WalletRestoreVerifyDialog_plateIdSpan', method: 'css' };
+export const verifyRestoredInfoDialog: LocatorObject = { locator: '.WalletRestoreVerifyDialog_dialog', method: 'css' };
+export const restoringDialogPlate: LocatorObject = { locator: '.WalletRestoreVerifyDialog_plateIdSpan', method: 'css' };

@@ -53,7 +53,7 @@ import {
   walletRestoreOptionDialog,
   restoreNormalWallet,
   walletRestoreDialog,
-  walletAddRestoreWalletButton,
+  restoreWalletButton,
   saveButton,
   byronEraButton,
   createWalletButton,
@@ -67,8 +67,8 @@ import {
   walletPasswordInput,
   repeatPasswordInput,
   confirmButton,
-  restoreWalletButton,
   restoringDialogPlate,
+  verifyRestoredInfoDialog,
 } from '../pages/restoreWalletPage';
 import {
   backupPrivacyWarningDialog,
@@ -341,28 +341,35 @@ async function restoreWallet (
     walletEra: string,
     walletName: WalletNames
 ): Promise<void> {
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Restoring the wallet "${walletName}"`);
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
   await customWorld.click(restoreWalletButton);
-
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Clicked restoreWalletButton`);
   await customWorld.waitForElement(pickUpCurrencyDialog);
   await customWorld.click(getCurrencyButton('cardano'));
-
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Selected currency "cardano"`);
   await customWorld.waitForElement(walletRestoreDialog);
 
   await customWorld.click(restoreNormalWallet);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Selected 15-word wallet`);
   if (walletEra === 'shelley') {
     await customWorld.click(shelleyEraButton);
+    customWorld.webDriverLogger.info(`Step:restoreWallet: Selected era "shelley"`);
   } else if (walletEra === 'byron') {
     await customWorld.click(byronEraButton);
+    customWorld.webDriverLogger.info(`Step:restoreWallet: Selected era "byron"`);
   } else {
     throw new Error(`Unknown wallet era: ${walletEra}.`);
   }
   await customWorld.waitForElement(restoreWalletInputPhraseDialog);
 
   await inputMnemonicForWallet(customWorld, restoreInfo);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Mnemonic phrase is entered`);
+  await customWorld.waitForElement(verifyRestoredInfoDialog);
   await checkWalletPlate(customWorld, walletName, restoreInfo);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet plate is checked`);
 }
 
 async function checkWalletPlate(
@@ -396,7 +403,7 @@ Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletNa
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
-  await this.click(walletAddRestoreWalletButton);
+  await this.click(restoreWalletButton);
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(pickUpCurrencyDialogErgo);
@@ -463,7 +470,7 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click(continueButton);
   // ToS page
   await this.waitForElement(termsOfUseComponent);
-  const checkbox = await getTosCheckbox();
+  const checkbox = await getTosCheckbox(this);
   await checkbox.click();
   await this.click(continueButton);
   // uri prompt page

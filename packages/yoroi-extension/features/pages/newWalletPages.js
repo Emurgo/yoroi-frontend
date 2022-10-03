@@ -7,7 +7,7 @@ export const createWalletButton: LocatorObject = {
   locator: '.WalletAdd_btnCreateWallet',
   method: 'css',
 };
-export const walletAddRestoreWalletButton: LocatorObject = {
+export const restoreWalletButton: LocatorObject = {
   locator: '.WalletAdd_btnRestoreWallet',
   method: 'css',
 };
@@ -37,7 +37,7 @@ export const restore24WordWallet: LocatorObject = {
   method: 'css',
 };
 export const walletRestoreDialog: LocatorObject = {
-  locator: '.WalletRestoreDialog',
+  locator: '.WalletRestoreOptionDialog',
   method: 'css',
 };
 export const getCurrencyButton = (currency: string): LocatorObject => {
