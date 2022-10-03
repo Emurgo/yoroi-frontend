@@ -78,7 +78,7 @@ export const verifyAddressButton: LocatorObject = {
   method: 'css',
 };
 
-export const walletAddressRow: LocatorObject = { locator: 'WalletReceive_walletAddress', method: 'css' };
+export const walletAddressRow: LocatorObject = { locator: '.WalletReceive_walletAddress', method: 'css' };
 export const walletAddressLocator = '.WalletReceive_addressHash';
 export const verifyAddressHWButton: LocatorObject = {
   locator: '.VerifyAddressDialog_component .primary',
