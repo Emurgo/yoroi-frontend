@@ -9,6 +9,7 @@ Given(/^I am on the "Terms of use" screen$/, async function () {
 });
 
 When(/^I click on "I agree with the terms of use" checkbox$/, async function () {
+  this.webDriverLogger.info(`Step: I click on "I agree with the terms of use" checkbox`);
   const checkbox = await getTosCheckbox();
   await checkbox.click();
 });
