@@ -14,7 +14,6 @@ import {
   paperPasswordInput,
   recoveryPhraseField,
   repeatPasswordInput,
-  restoreWalletButton,
   walletPasswordInput,
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
@@ -24,6 +23,7 @@ import {
   pickUpCurrencyDialogCardano,
   recoveryPhraseDeleteIcon,
   recoveryPhraseError,
+  restoreWalletButton,
   restore24WordWallet,
   restoreDialogButton,
   restoreNormalWallet,
