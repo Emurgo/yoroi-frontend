@@ -22,6 +22,7 @@ import RevampAnnouncement from './RevampAnnouncement';
 import { THEMES } from '../../../../styles/utils';
 import type { Theme } from '../../../../styles/utils';
 import { Skeleton, Typography } from '@mui/material';
+import environment from '../../../../environment';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -130,7 +131,8 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
-          {currentTheme !== THEMES.YOROI_REVAMP && (
+          {(environment.isNightly() || environment.isDev())
+          && currentTheme !== THEMES.YOROI_REVAMP && (
           <RevampAnnouncement
             onClick={this.props.openRevampAnnouncementDialog}
           />)}
