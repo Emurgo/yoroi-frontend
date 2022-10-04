@@ -243,8 +243,9 @@ class Wallet extends Component<AllProps> {
         showAsCard
       >
         {warning}
-        {this.renderOverlay()}
         {this.props.children}
+        {this.renderOverlay()}
+        {this.getDialog()}
       </TopBarLayout>
     );
 

@@ -50,7 +50,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
 
     await this.generated.actions.profile.resetLocale.trigger();
 
-    // Todo: Should be removed with the first release
+    // Todo: Should be removed with the revamp release
     if (environment.isNightly() || environment.isDev()) {
       // Make`revamp` the default theme when it's the first time to install Yoroi.
       // Do it here as this is the first screen users see.

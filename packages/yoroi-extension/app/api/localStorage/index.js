@@ -66,16 +66,20 @@ export default class LocalStorageApi {
   ) => setLocalItem(storageKeys.USER_LOCALE, locale);
 
   unsetUserLocale: void => Promise<void> = () => removeLocalItem(storageKeys.USER_LOCALE);
+
   // ========== Revamp Announcement Dialog ========== //
+
   getShowRevampDialog: void => Promise<boolean> = () => (
+    // Default state -> true
     getLocalItem(storageKeys.SHOW_REVAMP_DIALOG).then(status => (
-      status !== 'false'
+      status === null || status !== 'false'
     ))
   )
 
   setShowRevampDialog: boolean => Promise<void> = (status) => (
     setLocalItem(storageKeys.SHOW_REVAMP_DIALOG, JSON.stringify(status))
   )
+
   // ========== Terms of Use ========== //
 
   getTermsOfUseAcceptance: void => Promise<boolean> = () => getLocalItem(
