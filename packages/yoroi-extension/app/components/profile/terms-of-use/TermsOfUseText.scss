@@ -41,22 +41,30 @@
   color: var(--yoroi-terms-of-use-text-color);
 }
 
-:global(.YoroiModern) .terms {
-  h1, h2 {
-    font-size: 16px;
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .terms  {
+    h1, h2 {
+      font-size: 16px;
+    }
+    
+    h1 {
+      margin-top: 26px;
+    }
+    
+    h2 {
+      margin-top: 46px;
+    }
+    
+    p, li {
+      color: var(--yoroi-terms-of-use-text-color);
+      font-size: 13px;
+      line-height: 1.54;
+    }
   }
+}
 
-  h1 {
-    margin-top: 26px;
-  }
-
-  h2 {
-    margin-top: 46px;
-  }
-
-  p, li {
-    color: var(--yoroi-terms-of-use-text-color);
-    font-size: 13px;
-    line-height: 1.54;
+:global(.YoroiRevamp) .terms {
+  &.fixedHeight {
+    max-height: calc(100vh - 500px);
   }
 }
