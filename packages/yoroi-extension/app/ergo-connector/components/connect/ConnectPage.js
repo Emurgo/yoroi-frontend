@@ -2,8 +2,16 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  PublicDeriverCache,
+  ConnectingMessage,
+} from '../../../../chrome/extension/ergo-connector/types';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { intlShape, defineMessages } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
@@ -11,16 +19,9 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type {
-  PublicDeriverCache,
-  ConnectingMessage,
-} from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
-import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { environment } from '../../../environment';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
 import TextField from '../../../components/common/TextField';
@@ -99,6 +100,8 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
+  +unitOfAccount: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
   +onUpdateHideBalance: void => Promise<void>,
 |};
 
@@ -226,25 +229,15 @@ class ConnectPage extends Component<Props> {
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
 
     const passwordForm = (
-      <>
+      <Box p="26px">
         <div>
-          <Typography
-            variant="h4"
-            align="center"
-            color="var(--yoroi-palette-gray-900)"
-            marginBottom="40px"
-            paddingLeft="32px"
-            fontWeight="400"
-          >
-            {intl.formatMessage(messages.connectWalletAuthRequest)}
-          </Typography>
           <TextField
             type="password"
             {...walletPasswordField.bind()}
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt="15px">
+        <Stack direction="row" spacing={4} mt="15px">
           <Button
             fullWidth
             variant="secondary"
@@ -263,7 +256,7 @@ class ConnectPage extends Component<Props> {
             {intl.formatMessage(globalMessages.confirm)}
           </Button>
         </Stack>
-      </>
+      </Box>
     );
 
     return (
@@ -335,6 +328,8 @@ class ConnectPage extends Component<Props> {
                             shouldHideBalance={shouldHideBalance}
                             publicDeriver={item}
                             getTokenInfo={this.props.getTokenInfo}
+                            unitOfAccountSetting={this.props.unitOfAccount}
+                            getCurrentPrice={this.props.getCurrentPrice}
                           />
                         </WalletButton>
                       </li>

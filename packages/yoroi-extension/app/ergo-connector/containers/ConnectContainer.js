@@ -11,10 +11,11 @@ import type {
   WhitelistEntry,
   ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
-import { LoadingWalletStates } from '../types';
-import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { LoadingWalletStates } from '../types';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { createAuthEntry } from '../api';
 
@@ -154,8 +155,8 @@ export default class ConnectContainer extends Component<
   };
 
   hidePasswordForm: void => void = () => {
-    this.setState({ isAppAuth: false })
-  }
+    this.setState({ isAppAuth: false });
+  };
 
   updateHideBalance: void => Promise<void> = async () => {
     await this.generated.actions.connector.updateHideBalance.trigger();
@@ -184,6 +185,8 @@ export default class ConnectContainer extends Component<
         network={network}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        unitOfAccount={this.generated.stores.profile.unitOfAccount}
+        getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         onUpdateHideBalance={this.updateHideBalance}
       />
     );
@@ -217,6 +220,10 @@ export default class ConnectContainer extends Component<
     stores: {|
       profile: {|
         shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       connector: {|
         connectingMessage: ?ConnectingMessage,
@@ -242,6 +249,10 @@ export default class ConnectContainer extends Component<
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          unitOfAccount: stores.profile.unitOfAccount,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         connector: {
           connectingMessage: stores.connector.connectingMessage,
@@ -262,7 +273,7 @@ export default class ConnectContainer extends Component<
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
-          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger }
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },
       },
     });

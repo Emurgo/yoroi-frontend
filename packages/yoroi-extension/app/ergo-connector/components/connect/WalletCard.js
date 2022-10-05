@@ -8,19 +8,23 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { assetNameFromIdentifier, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
+import { FiatDisplay } from '../../../components/common/AmountDisplay';
 
 type Props = {|
   +shouldHideBalance: boolean,
   +publicDeriver: PublicDeriverCache,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => ?$ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
-  divClass: string,
+  divClass: string
 ): [string, React$Element<'div'>] {
   return [
     plate.TextPart,
@@ -36,7 +40,24 @@ function constructPlate(
 }
 
 export default class WalletCard extends Component<Props> {
+  renderWalletTotal({ ticker, shiftedAmount }: {| ticker: string, shiftedAmount: any |}): ?Node {
+    const { unitOfAccountSetting, shouldHideBalance, getCurrentPrice } = this.props;
+    if (unitOfAccountSetting.enabled) {
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const { currency } = unitOfAccountSetting;
+      if (!currency) {
+        throw new Error(`unexpected unit of account ${String(currency)}`);
+      }
+      const price = getCurrentPrice(ticker, currency);
+      if (price == null) return null;
 
+      const val = shiftedAmount.multipliedBy(price);
+
+      return <FiatDisplay shouldHideBalance={shouldHideBalance} amount={val} currency={currency} />;
+    }
+  }
   render(): Node {
     // eslint-disable-next-line no-unused-vars
     const [_, iconComponent] = this.props.publicDeriver.checksum
@@ -47,7 +68,8 @@ export default class WalletCard extends Component<Props> {
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
     const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
-    const ticker = tokenInfo ? getTokenName(tokenInfo)
+    const ticker = tokenInfo
+      ? getTokenName(tokenInfo)
       : assetNameFromIdentifier(defaultEntry.identifier);
 
     const { shouldHideBalance } = this.props;
@@ -62,10 +84,12 @@ export default class WalletCard extends Component<Props> {
             <Chip label={checksum} size="small" />
           </div>
         </div>
-        <p className={styles.balance}>
-          {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
-          <span>{ticker}</span>
-        </p>
+        <div style={{ textAlign: 'right' }}>
+          <p className={styles.balance}>
+            {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()} <span>{ticker}</span>
+          </p>
+          <p>{this.renderWalletTotal({ shiftedAmount, ticker })}</p>
+        </div>
       </div>
     );
   }
