@@ -61,7 +61,7 @@ export default class RevampAnnouncement extends Component<Props> {
                 {intl.formatMessage(globalMessages.learnMore)}
               </LearnMoreButton>
             </Box>
-            <Typography fontWeight='400' fontSize='14px' lineHeight='22px' color='var(--yoroi-palette-common-white)'>
+            <Typography sx={{ maxWidth: '80%' }} fontWeight='400' fontSize='14px' lineHeight='22px' color='var(--yoroi-palette-common-white)'>
               {intl.formatMessage(messages.text)}
             </Typography>
           </Box>
