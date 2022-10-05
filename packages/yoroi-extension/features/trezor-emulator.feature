@@ -90,7 +90,7 @@ Feature: Trezor wallet emulator
 
   @Trezor-006
   Scenario: Trezor (emulator). User can transfer funds from a trezor wallet
-    Given I switch to the advanced level
+    Given I switched to the advanced level
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab

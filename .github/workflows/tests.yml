@@ -6,7 +6,7 @@ on:
 
 jobs:
   Unit_tests:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -114,15 +114,15 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData
-          path: ./packages/yoroi-extension/testRunsData
+          name: testRunsData_${{ matrix.browser }}
+          path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
 
   Trezor_Model_T_emulator:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/trezor-check'))
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [ 'chrome', 'firefox' ]
+        browser: ['chrome', 'firefox']
       fail-fast: false
     steps:
       - name: Forcefully update the Chrome browser
@@ -239,5 +239,100 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData
-          path: ./packages/yoroi-extension/testRunsData
+          name: testRunsData_${{ matrix.browser }}
+          path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
+
+  E2E_smoke_tests:
+    if: github.event.review && (contains(github.event.review.body, '/release-check'))
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Forcefully update the Chrome browser
+        if: matrix.browser=='chrome'
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+
+      - name: Install Firefox Developer Edition
+        if: matrix.browser=='firefox'
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
+      - name: Cache extension node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yoroi-extension-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-extension/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache connector node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yoroi-connector-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-ergo-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: npm install
+        run: |
+          . install-all.sh
+
+      - name: Build the test mainnet version
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:build:mainnet
+
+      - name: Create the report's folder
+        working-directory: ./packages/yoroi-extension
+        run: |
+          mkdir reports
+          touch ./reports/cucumberReports.json
+
+      - name: Run smoke tests
+        working-directory: ./packages/yoroi-extension
+        env:
+          FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
+        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:run:e2e:smoke:${{ matrix.browser }}
+
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: testRunsData_${{ matrix.browser }}
+          path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}

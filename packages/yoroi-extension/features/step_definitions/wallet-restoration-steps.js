@@ -5,9 +5,9 @@ import { By, error, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
 import { checkErrorByTranslationId, getPlates } from './common-steps';
-import { enterRecoveryPhrase } from '../support/helpers/helpers';
 import {
   cleanRecoverInput,
+  enterRecoveryPhrase,
   errorInvalidRecoveryPhrase,
   getWords,
   paperPasswordInput,
