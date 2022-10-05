@@ -69,6 +69,8 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsPoolRetirement: true,
             supportsMultisigTransaction: true,
             supportsAlonzo: false,
+            supportsBabbage: false,
+            supportsReqSignersInOrdinaryTx: false,
           },
         },
       };
