@@ -2,6 +2,7 @@
 
 import i18n from './i18n-helpers';
 import { By } from 'selenium-webdriver';
+import { languageSelectionForm } from '../../pages/basicSetupPage';
 
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
@@ -11,9 +12,9 @@ const languageSelection = {
     { isHidden }: {| isHidden: boolean, |} = {}
   ): Promise<void> => {
     if (isHidden) {
-      return client.waitForElementNotPresent({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
+      return client.waitForElementNotPresent(languageSelectionForm);
     }
-    return client.waitForElement({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
+    return client.waitForElement(languageSelectionForm);
   },
   ensureLanguageIsSelected: async (
     client: any,
