@@ -50,7 +50,7 @@ const messages = defineMessages({
   reorgMessage: {
     id: 'connector.signin.reorg.message',
     defaultMessage:
-      '!!!<span>To interact with <a>smart contract</a> in Cardano you should add collateral, which means to make a 0 ADA transaction.<br/><br/>It is a guarantee that prevent from failing smart contracts and scams. <a>Learn more</a> about collateral.</span>',
+      '!!!<span>To interact with <a href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4415793858959-What-are-smart-contracts" target="_blank">smart contract</a> in Cardano you should add collateral, which means to make a 0 ADA transaction.<br/><br/>It is a guarantee that prevent from failing smart contracts and scams. <a href="https://docs.cardano.org/plutus/collateral-mechanism" target="_blank">Learn more</a> about collateral.</span>',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
@@ -229,7 +229,7 @@ class AddCollateralPage extends Component<Props, State> {
               gap="16px"
             >
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
+                <Typography>{intl.formatMessage(globalMessages.labels.amount)}</Typography>
                 <Typography>
                   {this.renderAmountDisplay({
                     entry: {
