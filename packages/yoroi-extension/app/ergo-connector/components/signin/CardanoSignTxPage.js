@@ -2,9 +2,9 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button, Typography, Alert } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -328,7 +328,7 @@ class SignTxPage extends Component<Props, State> {
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const { txData, onCancel, connectedWebsite, submissionError, signData } = this.props;
+    const { txData, onCancel, connectedWebsite, signData } = this.props;
 
     const { isSubmitting } = this.state;
 
