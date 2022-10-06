@@ -2,9 +2,9 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button, Typography, Alert } from '@mui/material';
+import { Button, Typography, Alert, Link } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -50,7 +50,7 @@ const messages = defineMessages({
   reorgMessage: {
     id: 'connector.signin.reorg.message',
     defaultMessage:
-      '!!!<span>To interact with <a href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4415793858959-What-are-smart-contracts" target="_blank">smart contract</a> in Cardano you should add collateral, which means to make a 0 ADA transaction.<br/><br/>It is a guarantee that prevent from failing smart contracts and scams. <a href="https://docs.cardano.org/plutus/collateral-mechanism" target="_blank">Learn more</a> about collateral.</span>',
+      '!!!To interact with {smartContracts} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMore} about collateral.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
@@ -201,6 +201,28 @@ class AddCollateralPage extends Component<Props, State> {
     const txAmount = txData.amount.get(txAmountDefaultToken) ?? new BigNumber('0');
     const txFeeAmount = new BigNumber(txData.fee.amount).negated();
 
+    const learnMoreLink = (
+      <Link
+        href="https://docs.cardano.org/plutus/collateral-mechanism"
+        target="_blank"
+        rel="noreferrer"
+        sx={{ textDecoration: 'none' }}
+      >
+        {intl.formatMessage(globalMessages.learnMore)}
+      </Link>
+    );
+
+    const smartContractsLink = (
+      <Link
+        href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4415793858959-What-are-smart-contracts"
+        target="_blank"
+        rel="noreferrer"
+        sx={{ textDecoration: 'none' }}
+      >
+        {intl.formatMessage(globalMessages.smartContracts).toLowerCase()}
+      </Link>
+    );
+
     return (
       <Box overflowWrap="break-word" display="flex" height="100%" flexDirection="column">
         <Box padding="32px" flex="1" flexGrow="1" overflow="auto">
@@ -215,9 +237,17 @@ class AddCollateralPage extends Component<Props, State> {
           <Box textAlign="center" my="32px">
             <AddCollateralIcon />
           </Box>
-          <Typography>
-            <FormattedHTMLMessage {...messages.reorgMessage} />
-          </Typography>
+          <div>
+            <FormattedMessage
+              {...messages.reorgMessage}
+              values={{
+                learnMore: learnMoreLink,
+                smartContracts: smartContractsLink,
+                lineBreak: <br />,
+              }}
+            />
+          </div>
+
           <Box pt="32px">
             <Box
               width="100%"
@@ -229,7 +259,7 @@ class AddCollateralPage extends Component<Props, State> {
               gap="16px"
             >
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography>{intl.formatMessage(globalMessages.labels.amount)}</Typography>
+                <Typography>{intl.formatMessage(globalMessages.amount)}</Typography>
                 <Typography>
                   {this.renderAmountDisplay({
                     entry: {
