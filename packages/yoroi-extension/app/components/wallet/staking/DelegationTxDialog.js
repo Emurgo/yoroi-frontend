@@ -151,6 +151,12 @@ export default class DelegationTxDialog extends Component<Props> {
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
+    const decimalPlaces = this.props.getTokenInfo(
+      this.props.amountToDelegate.getDefaultEntry()
+    ).Metadata.numberOfDecimals;
+    const delegatingValue = new BigNumber(
+      this.props.amountToDelegate.getDefaultEntry().amount
+    ).shiftedBy(-decimalPlaces);
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
@@ -200,11 +206,7 @@ export default class DelegationTxDialog extends Component<Props> {
           <AmountInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            decimalPlaces={
-              this.props.getTokenInfo(
-                this.props.amountToDelegate.getDefaultEntry()
-              ).Metadata.numberOfDecimals
-            }
+            decimalPlaces={decimalPlaces}
             disabled
             currency={getTokenName(
               this.props.getTokenInfo(
@@ -215,7 +217,7 @@ export default class DelegationTxDialog extends Component<Props> {
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
-            value={this.props.amountToDelegate.getDefaultEntry().amount}
+            value={delegatingValue}
           />
         </div>
         <div className={styles.walletPasswordFields}>

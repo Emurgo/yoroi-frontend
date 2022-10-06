@@ -26,7 +26,7 @@ export default class TokenOptionRow extends Component<Props> {
   render(): Node {
     const notOnlyName = !this.props.nameOnly;
     return (
-      <Box width="100%">
+      <Box width="100%" id={this.props.displayName}>
         <Box
           sx={{
             display: 'flex',

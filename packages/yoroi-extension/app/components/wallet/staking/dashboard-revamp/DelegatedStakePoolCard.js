@@ -2,13 +2,13 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, Typography } from '@mui/material';
-import { toSvg } from 'jdenticon';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { HelperTooltip, SocialMediaStakePool } from './StakePool/StakePool';
+import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
+import { getAvatarFromPoolId } from '../utils';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -20,52 +20,102 @@ type Intl = {|
 |};
 
 function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Intl): Node {
-  const { id, name, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
-  const avatarSource = toSvg(id, 36, { padding: 0 });
-  const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+  const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } =
+    delegatedPool || {};
+  const avatarGenerated = getAvatarFromPoolId(id);
 
   return (
-    <Wrapper>
-      <AvatarWrapper>
-        {avatar != null ? (
-          <AvatarImg src={avatar} alt="stake pool logo" />
-        ) : (
-          <AvatarImg src={avatarGenerated} alt="stake pool logo" />
-        )}
-      </AvatarWrapper>
-      <Box width="180px" overflow="hidden" paddingLeft="4px">
-        <Typography color="var(--yoroi-palette-gray-900)" variant="body1" mb="3px">
-          {name}
+    <Card>
+      <Box
+        sx={{
+          padding: '15px 24px',
+          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+        }}
+      >
+        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+          {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
-        <SocialMediaStakePool
-          color="var(--yoroi-palette-gray-600)"
-          websiteUrl={websiteUrl}
-          socialLinks={socialLinks}
-        />
       </Box>
-      <Box display="flex" alignItems="center" flex="1">
-        <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
-          {intl.formatMessage(globalMessages.roa30d)}
-          <Typography ml="8px" as="span" color="var(--yoroi-palette-gray-900)">
-            {roa}
+      <Wrapper sx={{ paddingBottom: 0 }}>
+        <AvatarWrapper>
+          {avatar != null ? (
+            <AvatarImg src={avatar} alt="stake pool logo" />
+          ) : (
+            <AvatarImg src={avatarGenerated} alt="stake pool logo" />
+          )}
+        </AvatarWrapper>
+        <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+          <Typography color="black" variant="body1" fontWeight="medium" mb="3px">
+            {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
-        </Typography>
-        <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
-      </Box>
+          <SocialMediaStakePool
+            color="var(--yoroi-palette-gray-500)"
+            websiteUrl={websiteUrl}
+            socialLinks={socialLinks}
+          />
+        </Box>
+      </Wrapper>
+      <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
+        {roa != null ? (
+          <Box sx={{ display: 'flex', flexFlow: 'column' }}>
+            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+              {intl.formatMessage(globalMessages.roa30d)}
+            </Typography>
+            <Typography as="span" color="black" variant="h2">
+              {roa} %
+            </Typography>
+          </Box>
+        ) : null}
+        {poolSize != null && (
+          <Box sx={{ display: 'flex', flexFlow: 'column' }}>
+            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+              Pool Size
+            </Typography>
+            <Typography as="span" color="black" variant="h2">
+              {poolSize}
+            </Typography>
+          </Box>
+        )}
+        {share != null && (
+          <Box sx={{ display: 'flex', flexFlow: 'column' }}>
+            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+              Share
+            </Typography>
+            <Typography as="span" color="black" variant="h2">
+              {share} %
+            </Typography>
+          </Box>
+        )}
+      </Wrapper>
       {undelegate && (
-        <UndelegateButton color="secondary" onClick={undelegate}>
-          {intl.formatMessage(globalMessages.undelegateLabel)}
-        </UndelegateButton>
+        <Wrapper>
+          <UndelegateButton
+            sx={{ border: '2px solid #17D1AA', width: '50%' }}
+            color="secondary"
+            onClick={undelegate}
+          >
+            {intl.formatMessage(globalMessages.undelegateLabel)}
+          </UndelegateButton>
+        </Wrapper>
       )}
-    </Wrapper>
+    </Card>
   );
 }
 export default (injectIntl(observer(DelegatedStakePoolCard)): ComponentType<Props>);
 
+const Card = styled(Box)({
+  backgroundColor: 'var(--yoroi-palette-common-white)',
+  borderRadius: '8px',
+  flex: '1 1 100%',
+  display: 'flex',
+  flexDirection: 'column',
+});
+
 const Wrapper: any = styled(Box)({
   display: 'flex',
-  justifyContent: 'space-between',
+  padding: 24,
 });
+
 const AvatarWrapper: any = styled(Box)({
   width: '40px',
   height: '40px',
