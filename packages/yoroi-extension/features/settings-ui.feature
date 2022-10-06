@@ -93,9 +93,9 @@ Feature: Wallet UI Settings
     Examples:
     | walletName                               |                      |
     | first Edited                             | 2 words name         |
-    |ウォレットの追加                             | Japanese             |
-    |지갑 추가                                   | Korean               |
-    |НАСТРОЙКИ                                 | Russian              |
+    | ウォレットの追加                            | Japanese             |
+    | 지갑 추가                                  | Korean               |
+    | НАСТРОЙКИ                                | Russian              |
     | a                                        | 1-characters length  |
     | asdfghjklpoiuytrewqazxcvbnmlkjhgfdsaqwer | 40 characters length |
 
