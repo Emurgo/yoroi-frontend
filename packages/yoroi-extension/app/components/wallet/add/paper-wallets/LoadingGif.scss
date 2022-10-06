@@ -22,7 +22,7 @@
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-modern.gif");
   }

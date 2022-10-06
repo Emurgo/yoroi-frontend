@@ -1378,7 +1378,7 @@ Object {
         },
         Object {
           "CoinsPerUtxoWord": "34482",
-          "KeyDeposit": "400000",
+          "KeyDeposit": "2000000",
           "LinearFee": Object {
             "coefficient": "44",
             "constant": "155381",

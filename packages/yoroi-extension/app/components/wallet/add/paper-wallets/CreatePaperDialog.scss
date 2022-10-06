@@ -55,7 +55,7 @@
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     .downloadIcon {
       background-image: url('../../../../assets/images/paper-wallet/download-certificate-modern.inline.svg');

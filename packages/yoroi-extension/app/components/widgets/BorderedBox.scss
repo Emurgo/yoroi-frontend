@@ -3,11 +3,13 @@
   padding: 20px;
 }
 
-:global(.YoroiModern) .component {
-  padding: 30px;
-  border-radius: 8px;
-
-  label {
-    background: var(--yoroi-palette-common-white);
-  }
+:global(.YoroiModern), :global(.YoroiRevamp)  {
+  .component {
+    border-radius: 8px;
+    padding: 30px;
+    
+    label {
+      background: var(--yoroi-palette-common-white);
+    }
+  } 
 }
