@@ -50,7 +50,7 @@ const messages = defineMessages({
   reorgMessage: {
     id: 'connector.signin.reorg.message',
     defaultMessage:
-      '!!!To interact with {smartContracts} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMore} about collateral.',
+      '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
@@ -237,17 +237,16 @@ class AddCollateralPage extends Component<Props, State> {
           <Box textAlign="center" my="32px">
             <AddCollateralIcon />
           </Box>
-          <div>
+          <Typography>
             <FormattedMessage
               {...messages.reorgMessage}
               values={{
-                learnMore: learnMoreLink,
-                smartContracts: smartContractsLink,
+                learnMoreLink,
+                smartContractsLink,
                 lineBreak: <br />,
               }}
             />
-          </div>
-
+          </Typography>
           <Box pt="32px">
             <Box
               width="100%"
