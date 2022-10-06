@@ -204,7 +204,7 @@ export default class WalletSummary extends Component<Props> {
     const { intl } = this.context;
 
     const content = (
-      <div className={styles.content}>
+      <div className={styles.content} id='walletSummary_box'>
         <div className={styles.leftBlock} />
         <div className={styles.middleBlock}>
           <BorderedBox>

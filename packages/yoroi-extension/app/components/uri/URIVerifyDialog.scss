@@ -43,7 +43,7 @@
   }
 }
 
-:global(.YoroiModern) .component {
+:global(.YoroiModern) .component, :global(.YoroiRevamp) .component {
   min-width: var(--yoroi-comp-dialog-min-width-lg);
   max-width: var(--yoroi-comp-dialog-min-width-lg);
 }

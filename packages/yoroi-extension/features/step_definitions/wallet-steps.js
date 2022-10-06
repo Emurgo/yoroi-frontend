@@ -2,28 +2,32 @@
 
 import { When, Then } from 'cucumber';
 import { truncateLongName } from '../../app/utils/formatters';
+import { myWalletsPage } from '../pages/mainWindowPage';
+import { walletNameInput } from '../pages/restoreWalletPage';
+import { walletNameText, walletNavBackButton } from '../pages/walletPage';
+import { walletButtonClassic } from '../pages/sidebarPage';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
-  await this.input({ locator: "input[name='walletName']", method: 'css' }, walletName);
+  await this.input(walletNameInput, walletName);
 });
 
 When(/^I clear the name "([^"]*)"$/, async function (walletName) {
-  await this.clearInputUpdatingForm({ locator: "input[name='walletName']", method: 'css' }, walletName.length);
+  await this.clearInputUpdatingForm(walletNameInput, walletName.length);
 });
 
 When(/^I navigate to wallet sidebar category$/, async function () {
-  await this.click({ locator: `//div[@class='Sidebar_categories']//button[1]`, method: 'xpath' });
-  await this.waitForElement({ locator: '.NavPlate_name', method: 'css' });
+  await this.click(walletButtonClassic);
+  await this.waitForElement(walletNameText);
 });
 
 Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText({ locator: '.NavPlate_name', method: 'css' }, truncateLongName(walletName));
+  await this.waitUntilText(walletNameText, truncateLongName(walletName));
 });
 
 Then(/^I unselect the wallet$/, async function () {
-  await this.click({ locator: '.NavBar_navbar .NavBar_title .NavBarBack_backButton', method: 'css' });
+  await this.click(walletNavBackButton);
 });
 
 When(/^I am on the my wallets screen$/, async function () {
-  await this.waitForElement({ locator: '.MyWallets_page', method: 'css' });
+  await this.waitForElement(myWalletsPage);
 });

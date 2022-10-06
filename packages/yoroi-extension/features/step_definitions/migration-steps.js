@@ -25,7 +25,7 @@ async function getLastLaunchVersion(client: any) {
 
 async function setLastLaunchVersion(client: any, newVersion: string) {
   return await client.executeScript(
-    (ver) => yoroi.stores.profile.setLastLaunchVersion(ver),
+    ver => yoroi.stores.profile.setLastLaunchVersion(ver),
     newVersion
   );
 }

@@ -30,7 +30,6 @@ export default class AddAnotherWallet extends Component<Props> {
 
   render(): Node {
     const LogoIcon = this.getLogo();
-
     const iconClass = classnames(
       styles.heroLogo,
     );
