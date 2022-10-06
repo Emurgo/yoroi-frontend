@@ -64,7 +64,7 @@
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     .headerIcon {
       background-image: url(../../assets/images/attention-modern.inline.svg);
