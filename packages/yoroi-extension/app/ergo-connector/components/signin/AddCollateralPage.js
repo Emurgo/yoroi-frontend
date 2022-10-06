@@ -309,6 +309,7 @@ class AddCollateralPage extends Component<Props, State> {
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </Button>
             <LoadingButton
+              sx={{ minWidth: 'auto' }}
               variant="primary"
               fullWidth
               disabled={!walletPasswordField.isValid}
