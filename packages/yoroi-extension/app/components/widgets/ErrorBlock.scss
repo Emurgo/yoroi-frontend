@@ -10,8 +10,10 @@
   }
 }
 
-:global(.YoroiModern) .component {
-  span {
-    font-size: 12px;
-  }  
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .component {
+    span {
+      font-size: 12px;
+    }  
+  } 
 }
