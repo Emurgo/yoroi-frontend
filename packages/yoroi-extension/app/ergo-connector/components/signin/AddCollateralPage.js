@@ -225,7 +225,7 @@ class AddCollateralPage extends Component<Props, State> {
 
     return (
       <Box overflowWrap="break-word" display="flex" height="100%" flexDirection="column">
-        <Box padding="32px" flex="1" flexGrow="1" overflow="auto">
+        <Box maxWidth={480} margin="0 auto" padding="32px" flex="1" flexGrow="1" overflow="auto">
           <Typography
             textAlign="center"
             color="var(--yoroi-palette-gray-900)"
@@ -294,12 +294,15 @@ class AddCollateralPage extends Component<Props, State> {
             )}
           </Box>
         </Box>
-        <Box padding="32px" borderTop="1px solid var(--yoroi-palette-gray-300)">
+        <Box borderTop="1px solid var(--yoroi-palette-gray-300)">
           <Box
             sx={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gridGap: '15px',
+              maxWidth: 480,
+              margin: '0 auto',
+              padding: '32px',
             }}
           >
             <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
