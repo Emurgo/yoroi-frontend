@@ -154,6 +154,9 @@ export default class TestBlock extends React.Component<Props, State> {
           <button type="button" onClick={this.onCatalystRegistrationSignTransaction}>
             Sign CIP-15 transaction
           </button>
+          <button type="button" onClick={this.onSignMultiAssetTransaction}>
+            Sign a multi-asset transaction
+          </button>
         </div>
         <div>
           <button type="button" onClick={this.onShowByronAddress}>Verify Byron address</button>
@@ -405,6 +408,93 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onSignTransaction`);
+  }
+
+  onSignMultiAssetTransaction: () => void = () => {
+    if (this.state.visible === `${styles.visible}`) {
+      const inputs = [
+        {
+          txHashHex: 'e3a768c5b3109fa3268d875316063809a298602a272d7933c2b4443b69058d7a',
+          outputIndex: 0,
+          path: utils.str_to_path("1852'/1815'/0'/0/0")
+        }
+      ];
+
+      const outputs = [
+        {
+          amount: '700000',
+          destination: {
+            type: TxOutputDestinationType.THIRD_PARTY,
+            params: {
+              // Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf
+              addressHex: '82d818582183581c9f01f38ec3af8341f45a301b075bfd6fd0cfbaddb01c5ebe780918b9a0001adb482c56',
+            },
+          },
+          tokenBundle: [
+            {
+              policyIdHex: '16af70780a170994e8e5e575f4401b1d89bddf7d1a11d6264e0b0c85',
+              tokens: [
+                {
+                  amount: '1',
+                  assetNameHex: '74426967546f6b656e4e616d653132'
+                }
+              ]
+            },
+            {
+              policyIdHex: '2c9d0ecfc2ee1288056df15be4196d8ded73db345ea5b4cd5c7fac3f',
+              tokens: [
+                {
+                  amount: '1',
+                  assetNameHex: '76737562737465737435'
+                }
+              ]
+            },
+            {
+              policyIdHex: '6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7',
+              tokens: [
+                {
+                  amount: '2',
+                  assetNameHex: ''
+                }
+              ]
+            }
+          ],
+        },
+        {
+          destination: {
+            type: TxOutputDestinationType.DEVICE_OWNED,
+            params: {
+              type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+              params: {
+                spendingPath: utils.str_to_path("1852'/1815'/0'/0/0"),
+                stakingPath: utils.str_to_path("1852'/1815'/0'/2/0"),
+              },
+            },
+          },
+          amount: '100000',
+        },
+      ];
+
+      const req = this.makeRequest(
+        OPERATION_NAME.SIGN_TX,
+        ({
+          signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
+          tx: {
+            network: {
+              networkId: MainnetIds.chainNetworkId,
+              protocolMagic: MainnetIds.protocolMagic,
+            },
+            inputs,
+            outputs,
+            fee: '500',
+            ttl: '20',
+          },
+          additionalWitnessPaths: [],
+        }: SignTransactionRequest)
+      );
+      window.postMessage(req);
+    }
+    console.debug(`[YLC] TEST:onSignMultiAssetTransaction`);
   }
 
   onCatalystRegistrationSignTransaction: () => void = () => {
