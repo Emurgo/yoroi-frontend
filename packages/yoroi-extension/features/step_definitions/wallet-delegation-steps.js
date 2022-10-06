@@ -2,13 +2,21 @@
 
 import { Given, When, Then } from 'cucumber';
 import {
+  delegationDashboardPage,
+  delegationDashboardPageButton,
+  delegationFormNextButton,
+  delegationSuccessPage,
+  delegationTxDialog,
   iframe,
   iframePoolIdInput,
-  iframePoolIdSearchButton
+  iframePoolIdSearchButton,
+  poolIdInput,
+  stakePoolTicker,
 } from '../pages/walletDelegationPage';
+import { delegationByIdTab } from '../pages/walletPage';
 
 When(/^I go to the delegation by id screen$/, async function () {
-  await this.click({ locator: '.cardanoStake', method: 'css' });
+  await this.click(delegationByIdTab);
 });
 
 When(/^I go to the delegation list screen$/, async function () {
@@ -49,26 +57,26 @@ Then(/^I select the pool with the id "([^"]*)"$/, async function(stakePoolId) {
 
 When(/^I fill the delegation id form:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input({ locator: "input[name='poolId']", method: 'css' }, fields.stakePoolId);
+  await this.input(poolIdInput, fields.stakePoolId);
 });
 
 Then(/^I see the stakepool ticker "([^"]*)"$/, async function (ticker) {
-  await this.waitUntilText({ locator: '.StakePool_userTitle', method: 'css' }, ticker);
+  await this.waitUntilText(stakePoolTicker, ticker);
 });
 
 When(/^I click on the next button in the delegation by id$/, async function () {
-  await this.click({ locator: '.DelegationSendForm_component .MuiButton-primary', method: 'css' });
+  await this.click(delegationFormNextButton);
 });
 
 When(/^I see the delegation confirmation dialog$/, async function () {
-  await this.waitForElement({ locator: '.DelegationTxDialog_dialog', method: 'css' });
+  await this.waitForElement(delegationTxDialog);
 });
 
 Given(/^I click on see dashboard$/, async function () {
-  await this.waitForElement({ locator: '.SuccessPage_component', method: 'css' });
-  await this.click({ locator: "//button[contains(text(), 'Dashboard page')]", method: 'xpath' });
+  await this.waitForElement(delegationSuccessPage);
+  await this.click(delegationDashboardPageButton);
 });
 
 When(/^I should see the dashboard screen$/, async function () {
-  await this.waitForElement({ locator: '.StakingDashboard_page', method: 'css' });
+  await this.waitForElement(delegationDashboardPage);
 });
