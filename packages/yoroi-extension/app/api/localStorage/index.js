@@ -353,13 +353,18 @@ export async function persistSubmittedTransactions(
   submittedTransactions: any,
 ): Promise<void> {
   await chrome.storage.local.set({
-    [storageKeys.SUBMITTED_TRANSACTIONS]: submittedTransactions
+    [storageKeys.SUBMITTED_TRANSACTIONS]: JSON.stringify(submittedTransactions)
   });
 }
 
 export async function loadSubmittedTransactions(): any {
-  const result = await chrome.storage.local.get(storageKeys.SUBMITTED_TRANSACTIONS);
-  return result[storageKeys.SUBMITTED_TRANSACTIONS];
+  const json = (
+    await chrome.storage.local.get(storageKeys.SUBMITTED_TRANSACTIONS)
+  )[storageKeys.SUBMITTED_TRANSACTIONS];
+  if (!json) {
+    return [];
+  }
+  return JSON.parse(json);
 }
 
 export async function loadAnalyticsInstanceId(): Promise<?string> {
