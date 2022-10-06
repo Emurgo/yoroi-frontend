@@ -359,13 +359,13 @@ class SignTxPage extends Component<Props, State> {
             <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="center"
+              alignItems="flex-start"
               color="var(--yoroi-palette-gray-600)"
               py="6px"
               px="10px"
             >
               <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-              <Typography>
+              <Typography textAlign='right'>
                 {this.renderAmountDisplay({
                   entry: {
                     identifier: txData.fee.tokenId,
@@ -381,13 +381,13 @@ class SignTxPage extends Component<Props, State> {
               mt="10px"
               display="flex"
               justifyContent="space-between"
-              alignItems="center"
+              alignItems="flex-start"
               borderRadius="6px"
               backgroundColor="var(--yoroi-palette-primary-300)"
               color="var(--yoroi-palette-common-white)"
             >
               <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
-              <Typography variant="h3">
+              <Typography variant="h3" textAlign='right'>
                 {this.renderAmountDisplay({
                   entry: {
                     identifier: txAmountDefaultToken,
