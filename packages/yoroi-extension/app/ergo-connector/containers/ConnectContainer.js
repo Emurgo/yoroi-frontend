@@ -234,6 +234,7 @@ export default class ConnectContainer extends Component<
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          // todo: import profile store for stablecoin display
         },
         connector: {
           connectingMessage: stores.connector.connectingMessage,
