@@ -8,7 +8,7 @@ Feature: dApp connector get collateral
     
     
   @dApp-1023
-  Scenario: dApp, anonymous wallet, get collateral
+  Scenario: dApp, anonymous wallet, get collateral (DAPP-1023)
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
@@ -21,7 +21,7 @@ Feature: dApp connector get collateral
     Then The dApp should see collateral: {"utxo_id":"3677e75c7ba699bfdc6cd57d42f246f86f63aefd76025006ac78313fad2bba211","tx_hash":"3677e75c7ba699bfdc6cd57d42f246f86f63aefd76025006ac78313fad2bba21","tx_index":1,"receiver":"addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn","amount":"5500000","assets":[]} for 490000
 
   @dApp-1024
-  Scenario: dApp, authorized wallet, get collateral
+  Scenario: dApp, authorized wallet, get collateral (DAPP-1024)
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
@@ -35,7 +35,7 @@ Feature: dApp connector get collateral
     Then The dApp should see collateral: {"utxo_id":"3677e75c7ba699bfdc6cd57d42f246f86f63aefd76025006ac78313fad2bba211","tx_hash":"3677e75c7ba699bfdc6cd57d42f246f86f63aefd76025006ac78313fad2bba21","tx_index":1,"receiver":"addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn","amount":"5500000","assets":[]} for 490000
 
   @dApp-1025
-  Scenario: dApp, authorized wallet, get collateral, connector popup
+  Scenario: dApp, authorized wallet, get collateral, connector popup (DAPP-1025)
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
@@ -57,7 +57,7 @@ Feature: dApp connector get collateral
       | 2000000   | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
 
   @dApp-1026
-  Scenario: dApp, anonymous wallet, get collateral, connector popup
+  Scenario: dApp, anonymous wallet, get collateral, connector popup (DAPP-1026)
     Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
