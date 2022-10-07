@@ -381,9 +381,7 @@ When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
   await this.mockDAppPage.addCollateral(utxos);
 });
 
-Then(
-  /^The dApp should see collateral: (.+) for (.+)$/,
-  async function (expectedCollateral, utxosAmount) {
+Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expectedCollateral, utxosAmount) {
     this.webDriverLogger.info(
       `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
     );
@@ -394,10 +392,22 @@ Then(
   }
 );
 
-Then(/^I should see the connector popup to Add Collateral$/, async function () {
-  this.webDriverLogger.info(`Step: I should see the connector popup to Add Collateral`);
+Then(/^The dApp should receive collateral$/, async function (table) {
+  const fields = table.hashes()[0];
+  const utxosAmount = fields.forAmount;
+  const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+  const collateralJson = JSON.parse(collateral)[0];
+  expect(collateralJson.amount, 'Amount is different').to.equal(fields.amount);
+  expect(collateralJson.receiver, 'Receiver is different').to.equal(fields.receiver);
+});
+
+Then(/^I should see the connector popup to Add Collateral with fee info$/, async function (table) {
+  this.webDriverLogger.info(`Step: I should see the connector popup to Add Collateral with fee info`);
   await connectorPopUpIsDisplayed(this);
   await this.waitForElement(addCollateralTitle);
+  const fields = table.hashes()[0];
+  const realFee = await getTransactionFee(this);
+  expect(realFee, 'Fee is different').to.equal(fields.fee);
 });
 
 Then(/^I should see the collateral fee data:$/, async function (table) {
