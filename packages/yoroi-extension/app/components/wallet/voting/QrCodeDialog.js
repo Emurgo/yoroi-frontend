@@ -69,7 +69,7 @@ export default class QrCodeDialog extends Component<Props> {
       {
         label: intl.formatMessage(messages.downloadQrCode),
         primary: true,
-        onClick: () => downloadQrCode(QR_ID, 'Voting key.png'),
+        onClick: () => downloadQrCode(QR_ID, 'Voting key'),
       }
     ];
 
@@ -105,7 +105,7 @@ export default class QrCodeDialog extends Component<Props> {
             <div className={styles.qrCode}>
               <QrCodeWrapper
                 value={votingKey}
-                size={152}
+                size={720}
                 addBg={false}
                 includeMargin
                 id={QR_ID}
