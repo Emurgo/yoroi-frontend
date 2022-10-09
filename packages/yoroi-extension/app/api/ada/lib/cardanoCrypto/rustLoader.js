@@ -19,6 +19,7 @@ class Module {
   _wasmv4: WasmV4;
   _ergo: SigmaRust;
   _messageSigning: WasmMessageSigning;
+  _crossCsl: any;
 
   async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
     if (
@@ -26,6 +27,7 @@ class Module {
         || this._wasmv3 != null
         || this._wasmv4 != null
         || this._messageSigning != null
+        || this._crossCsl != null
     ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     // this is used only by the now defunct jormungandr wallet
@@ -37,6 +39,7 @@ class Module {
     } else {
       this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
     }
+    this._crossCsl = await import('@emurgo/cross-csl-browser');
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
@@ -50,6 +53,9 @@ class Module {
   // Need to expose through a getter to get Flow to detect the type correctly
   get WalletV4(): WasmV4 {
     return this._wasmv4;
+  }
+  get CrossCsl(): any {
+    return this._crossCsl;
   }
   WalletV4TxBuilderFromConfig(config: {
     +LinearFee: {|

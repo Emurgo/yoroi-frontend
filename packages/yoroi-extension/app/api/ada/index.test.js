@@ -23,6 +23,7 @@ import { asGetPublicKey } from './lib/storage/models/PublicDeriver/traits';
 import {
   networks,
 } from './lib/storage/database/prepackaged/networks';
+import BigNumber from 'bignumber.js';
 
 let db: lf$Database;
 
@@ -323,3 +324,309 @@ const RESTORED_ADDRESSES = {
     }
   }]
 };
+
+test('create tx', async () => {
+  const createTxRequest = {
+    absSlotNumber: new BigNumber('70858976'),
+    receivers: [
+      {
+        address: '00ca292fa69ed94a6fbaa4747797dc08a0c0b0831a83d960a320179ab2c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e'
+      },
+      {
+        address: '005ef516805e1fed9d3aa2c78c7599e931cd9c5d914c372eb2728006cfc3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e',
+        addressing: {
+          path: [
+            2147485500,
+            2147485463,
+            2147483648,
+            1,
+            585
+          ],
+          startLevel: 1
+        }
+      }
+    ],
+    network: {
+      NetworkId: 300,
+      NetworkName: 'Cardano Legacy Testnet',
+      Backend: {
+        BackendService: 'https://testnet-backend.yoroiwallet.com',
+        WebSocket: 'wss://testnet-backend.yoroiwallet.com:443',
+        TokenInfoService: 'https://stage-cdn.yoroiwallet.com'
+      },
+      BaseConfig: [
+        {
+          StartAt: 0,
+          ChainNetworkId: '0',
+          ByronNetworkId: 1097911063,
+          GenesisDate: '1563999616000',
+          SlotsPerEpoch: 21600,
+          SlotDuration: 20
+        },
+        {
+          StartAt: 74,
+          SlotsPerEpoch: 432000,
+          SlotDuration: 1,
+          PerEpochPercentageReward: 69344,
+          LinearFee: {
+            coefficient: '44',
+            constant: '155381'
+          },
+          CoinsPerUtxoWord: '34482',
+          MinimumUtxoVal: '1000000',
+          PoolDeposit: '500000000',
+          KeyDeposit: '2000000'
+        }
+      ],
+      CoinType: 2147485463,
+      Fork: 0
+    },
+    defaultToken: {
+      defaultNetworkId: 300,
+      defaultIdentifier: ''
+    },
+    utxos: [
+      {
+        amount: '10000000',
+        receiver: '6085abf3eca55024aa1c22b944599b5e890ec12dfb19941229da4ba293',
+        tx_hash: 'fa489b6c954ff298ab307a7433f33fa508a3504de04190533a5541905728292c',
+        tx_index: 1,
+        utxo_id: 'fa489b6c954ff298ab307a7433f33fa508a3504de04190533a5541905728292c1',
+        addressing: {
+          path: [
+            2147485500,
+            2147485463,
+            2147483648,
+            0,
+            0
+          ],
+          startLevel: 1
+        },
+        assets: [
+          {
+            amount: '45000000',
+            assetId: 'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c.474f4c44',
+            policyId: 'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c',
+            name: '474f4c44'
+          },
+        ]
+      },
+    ],
+    tokens: [
+      {
+        token: {
+          TokenId: 4,
+          NetworkId: 300,
+          IsDefault: true,
+          IsNFT: false,
+          Identifier: '',
+          Digest: -6.1389758346808205e-55,
+          Metadata: {
+            type: 'Cardano',
+            policyId: '',
+            assetName: '',
+            ticker: 'TADA',
+            longName: null,
+            numberOfDecimals: 6
+          }
+        },
+        amount: '1000000',
+        shouldSendAll: false
+      }
+    ],
+    metadata: undefined,
+  }
+  const response = await AdaApi.prototype.createUnsignedTxForUtxos(createTxRequest);
+
+  expect(response.senderUtxos).toEqual(
+    [
+      {
+        amount: '10000000',
+        receiver: '6085abf3eca55024aa1c22b944599b5e890ec12dfb19941229da4ba293',
+        tx_hash: 'fa489b6c954ff298ab307a7433f33fa508a3504de04190533a5541905728292c',
+        tx_index: 1,
+        utxo_id: 'fa489b6c954ff298ab307a7433f33fa508a3504de04190533a5541905728292c1',
+        addressing: {
+          path: [
+            2147485500,
+            2147485463,
+            2147483648,
+            0,
+            0
+          ],
+          startLevel: 1
+        },
+        assets: [
+          {
+            amount: '45000000',
+            assetId: 'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c.474f4c44',
+            policyId: 'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c',
+            name: '474f4c44'
+          },
+        ]
+      },
+    ]
+  );
+  expect(response.changeAddr.length).toBe(1);
+
+  expect(response.changeAddr[0].address).toBe(
+    '005ef516805e1fed9d3aa2c78c7599e931cd9c5d914c372eb2728006cfc3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e'
+  );
+  expect(response.changeAddr[0].addressing).toEqual(
+    {
+      path: [
+        2147485500,
+        2147485463,
+        2147483648,
+        1,
+        585
+      ],
+      startLevel: 1
+    }
+  );
+  expect(response.changeAddr[0].values.values).toEqual(
+    [
+      {
+        identifier: '',
+        networkId: 300,
+        amount: new BigNumber('8812631')
+      },
+      {
+        amount: new BigNumber('45000000'),
+        identifier: 'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c.474f4c44',
+        networkId: 300,
+      },
+    ]
+  );
+
+  expect(response.unsignedTx.get_fee_if_set()?.to_str()).toEqual('187369');
+
+  function cmpOutputs(o1, o2) {
+    if (o1.address > o2.address) {
+      return 1;
+    } else if (o1.address < o2.address) {
+      return -1;
+    } else {
+      return Number(o1.amount.coin) - Number(o2.amount.coin);
+    }
+  }
+
+  const txJson = JSON.parse(response.unsignedTx.build_tx().to_json());
+  const ref = {
+    auxiliary_data: null,
+    body: {
+      auxiliary_data_hash: null,
+      certs: null,
+      collateral: null,
+      collateral_return: null,
+      fee: '187369',
+      inputs: [
+        {
+          index: 1,
+          transaction_id: 'fa489b6c954ff298ab307a7433f33fa508a3504de04190533a5541905728292c'
+        }
+      ],
+      mint: null,
+      network_id: null,
+      outputs: [
+        {
+          address: 'addr_test1qr9zjtaxnmv55ma65368097upzsvpvyrr2pajc9ryqte4vkr3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qfwzsgx',
+          amount: {
+            coin: '1000000',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '1000000',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '1000000',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '1000000',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '1000000',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '1000000',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '1155080',
+            multiasset: {
+              'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c':  {
+                '474f4c44': '45000000',
+              },
+            },
+          },
+          plutus_data: null,
+          script_ref: null,
+        },
+        {
+          address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+          amount: {
+            coin: '2657551',
+            multiasset: null
+          },
+          plutus_data: null,
+          script_ref: null
+        }
+      ],
+      reference_inputs: null,
+      required_signers: null,
+      script_data_hash: null,
+      total_collateral: null,
+      ttl: "70866176",
+      update: null,
+      validity_start_interval: null,
+      withdrawals: null
+    },
+    is_valid: true,
+    witness_set: {
+      bootstraps: null,
+      native_scripts: null,
+      plutus_data: null,
+      plutus_scripts: null,
+      redeemers: null,
+      vkeys: null
+    }
+  };
+  txJson.body.outputs.sort(cmpOutputs);
+  ref.body.outputs.sort(cmpOutputs);
+  expect(txJson).toEqual(ref);
+
+});
