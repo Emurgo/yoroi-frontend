@@ -1,7 +1,8 @@
 // @flow
-import styles from './ProgressBar.scss';
-
 import type { Node } from 'react';
+import styles from './ProgressBar.scss';
+import LinearProgress from '@mui/material/LinearProgress';
+
 
 type Props = {|
   +step?: number,
@@ -11,7 +12,7 @@ type Props = {|
 const ProgressBar = ({ step, max }: Props): Node => {
   return (
     <div className={styles.component}>
-      <progress value={step} max={max} />
+      <LinearProgress color='secondary' sx={{ height: '8px' }} value={step * 100 / max} variant="determinate" />
     </div>
   );
 };
