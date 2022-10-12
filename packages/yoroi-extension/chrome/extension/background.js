@@ -16,7 +16,6 @@ import type {
   GetUtxosRequest,
   PendingSignData,
   RemoveWalletFromWhitelistData,
-  RpcUid,
   SigningMessage,
   Tx,
   TxSignWindowRetrieveData,
@@ -170,8 +169,6 @@ type ConnectedSite = {|
   status: ConnectedStatus,
   pendingSigns: {| [uid: string]: PendingSign |},
 |};
-
-type TabId = number;
 
 const STORAGE_KEY_CONNECTION_PROTOCOL = 'connectionProtocol';
 const STORAGE_KEY_IMG_BASE64 = 'imgBase64Url';
@@ -538,7 +535,7 @@ const yoroiMessageHandler = async (
           null,
           null,
           tabId,
-        ),
+        );
         await deleteConnectedSite(tabId);
       }
     }
@@ -559,7 +556,7 @@ const yoroiMessageHandler = async (
     }
     const password = request.pw;
 
-    function rpcResponse(response: {| ok: any |} | {| err: any |}) {
+    const rpcResponse = (response: {| ok: any |} | {| err: any |}) => {
       sendToInjector(
         request.tabId,
         {
@@ -569,7 +566,7 @@ const yoroiMessageHandler = async (
           return: response
         }
       );
-    }
+    };
 
 
     switch (responseData.request.type) {
@@ -747,7 +744,7 @@ const yoroiMessageHandler = async (
         const responseData = connection.pendingSigns[uid];
         if (!responseData.openedWindow) {
           responseData.openedWindow = true;
-          setConnectedSite(Number(tabId), connection);
+          await setConnectedSite(Number(tabId), connection);
           if (connection.status?.publicDeriverId == null) {
             throw new Error(`${request.type} no public deriver set for request`);
           }
