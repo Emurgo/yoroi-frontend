@@ -47,7 +47,7 @@
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .heroCardsItemBg {
     &.bgConnectHW {
       background-image: url(../../../assets/images/add-wallet/connect-hw-modern.inline.svg);

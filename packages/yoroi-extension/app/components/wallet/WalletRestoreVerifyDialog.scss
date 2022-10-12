@@ -53,8 +53,10 @@
   text-align: center;
 }
 
-:global(.YoroiModern) .dialog {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1052
-  min-width: 740px;
-  max-width: 740px;
+  .dialog {
+    min-width: 740px;
+    max-width: 740px;
+  }
 }
