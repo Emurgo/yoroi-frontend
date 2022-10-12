@@ -10,7 +10,7 @@ Feature: dApp connector data signing
     Then I open the mock dApp tab
 
   @dApp-1019
-  Scenario: dApp, anonymous wallet, unused address, sign Cardano data
+  Scenario: dApp, anonymous wallet, unused address, sign Cardano data (DAPP-1019)
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -29,7 +29,7 @@ Feature: dApp connector data signing
     Then The popup window should be closed
 
   @dApp-1020
-  Scenario: dApp, anonymous wallet, used address, sign Cardano data
+  Scenario: dApp, anonymous wallet, used address, sign Cardano data (DAPP-1020)
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -48,7 +48,7 @@ Feature: dApp connector data signing
     Then The popup window should be closed
 
   @dApp-1021
-  Scenario: dApp, authorised wallet, unused address, sign Cardano data
+  Scenario: dApp, authorised wallet, unused address, sign Cardano data (DAPP-1021)
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -68,7 +68,7 @@ Feature: dApp connector data signing
     Then The popup window should be closed
 
   @dApp-1022
-  Scenario: dApp, authorised wallet, unused address, sign Cardano data
+  Scenario: dApp, authorised wallet, used address, sign Cardano data (DAPP-1022)
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance

@@ -168,6 +168,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
   },
+  smartContracts: {
+    id: 'global.labels.smartContracts',
+    defaultMessage: '!!!Smart contracts',
+  },
   walletLabel: {
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
