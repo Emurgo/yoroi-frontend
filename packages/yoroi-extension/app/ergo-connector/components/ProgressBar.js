@@ -9,10 +9,13 @@ type Props = {|
   +max?: number,
 |};
 
-const ProgressBar = ({ step, max }: Props): Node => {
+const ProgressBar = (props: Props): Node => {
+  const step = props.step || 1;
+  const max = props.max || 3
+
   return (
     <div className={styles.component}>
-      <LinearProgress color='secondary' sx={{ height: '8px' }} value={step * 100 / max} variant="determinate" />
+      <LinearProgress color='secondary' sx={{ height: '8px' }} value={(step || 1) * 100 / (max || 3)} variant="determinate" />
     </div>
   );
 };
