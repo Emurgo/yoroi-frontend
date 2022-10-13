@@ -908,11 +908,7 @@ function toggleConnectionUI(status) {
   }
 }
 
-const onload = window.onload;
-window.onload = function () {
-  if (onload) {
-    onload();
-  }
+window.onload = (() => {
   if (typeof window.cardano === 'undefined') {
     alertError('Cardano API not found');
   } else {
@@ -933,4 +929,4 @@ window.onload = function () {
       }
     );
   }
-};
+})();
