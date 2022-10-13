@@ -1560,7 +1560,6 @@ function handleInjectorConnect(port) {
             }
           break;
           case 'get_collateral_utxos':
-            console.log('get_col')
             try {
               checkParamCount(1);
               await RustModule.load();
@@ -1644,7 +1643,7 @@ function handleInjectorConnect(port) {
                     const connection = connectedSites.get(tabId);
                     if (connection == null) {
                       Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
-                      rpcResponse(undefined);
+                      rpcResponse(undefined); // shouldn't happen
                       return;
                     }
 
