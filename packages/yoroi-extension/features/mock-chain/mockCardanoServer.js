@@ -79,6 +79,47 @@ export function setExpectedTx(signedTx: void | string): void {
 // TODO: no type from json-server
 let MockServer: null | any = null;
 
+class MethodLogger {
+  constructor(localLogger: LocalLogger, method: string, url: string) {
+    this.localLogger = localLogger;
+    this.method = method;
+    this.url = url;
+  }
+
+  logRequest = (message?: string) => {
+    this.localLogger
+      .logInfo(`${this.method}: ${this.url} <- request${message? `\n    ${message}`: ''}`, false);
+  };
+
+  logResponseSuccess = (message?: string) => {
+    this.localLogger
+      .logInfo(`${this.method}: ${this.url} -> response${message? `\n    ${message}`: ''}`, false);
+  };
+
+  logResponseError = (errorMessage: string) => {
+    this.localLogger.logError(`${this.method}: ${this.url} ->\n    Error:\n${errorMessage}`, false);
+  };
+}
+
+class LocalLogger {
+  constructor(fileName: string, logPath) {
+    this.fileName = fileName;
+    this.logger = simpleNodeLogger.createSimpleFileLogger(logPath);
+  }
+
+  getMethodLogger = (method: string, url: string) => {
+    return new MethodLogger(this, method, url);
+  }
+
+  logInfo = (message: string, spaceBefore: boolean = true) => {
+    this.logger.info(`${this.fileName}:${spaceBefore? ' ' : ''}${message}`);
+  };
+
+  logError = (message: string, spaceAfter: boolean = true) => {
+    this.logger.error(`${this.fileName}:${spaceAfter? ' ' : ''}${message}`);
+  };
+}
+
 export function getMockServer(settings: {
   signedTransaction?: (
     req: { body: SignedRequestInternal, ... },
