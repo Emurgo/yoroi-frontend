@@ -42,8 +42,8 @@ const txsLimit = 20;
 
 function _validateAddressesReq(
   { addresses }: { addresses: Array<string>, ... } = {},
-  localLogger: LocalLogger)
-  : boolean {
+  localLogger: LocalLogger
+): boolean {
   localLogger.logInfo(`Validate Addresses request`);
   if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
     localLogger.logError(`Addresses request length should be (0, ${addressesLimit})`);
@@ -87,13 +87,17 @@ class MethodLogger {
   }
 
   logRequest = (message?: string) => {
-    this.localLogger
-      .logInfo(`${this.method}: ${this.url} <- request${message? `\n    ${message}`: ''}`, false);
+    this.localLogger.logInfo(
+      `${this.method}: ${this.url} <- request${message ? `\n    ${message}` : ''}`,
+      false
+    );
   };
 
   logResponseSuccess = (message?: string) => {
-    this.localLogger
-      .logInfo(`${this.method}: ${this.url} -> response${message? `\n    ${message}`: ''}`, false);
+    this.localLogger.logInfo(
+      `${this.method}: ${this.url} -> response${message ? `\n    ${message}` : ''}`,
+      false
+    );
   };
 
   logResponseError = (errorMessage: string) => {
@@ -109,14 +113,14 @@ class LocalLogger {
 
   getMethodLogger = (method: string, url: string) => {
     return new MethodLogger(this, method, url);
-  }
+  };
 
   logInfo = (message: string, spaceBefore: boolean = true) => {
-    this.logger.info(`${this.fileName}:${spaceBefore? ' ' : ''}${message}`);
+    this.logger.info(`${this.fileName}:${spaceBefore ? ' ' : ''}${message}`);
   };
 
   logError = (message: string, spaceAfter: boolean = true) => {
-    this.logger.error(`${this.fileName}:${spaceAfter? ' ' : ''}${message}`);
+    this.logger.error(`${this.fileName}:${spaceAfter ? ' ' : ''}${message}`);
   };
 }
 
@@ -339,7 +343,7 @@ export function getMockServer(settings: {
         methodLogger.logResponseSuccess(JSON.stringify(result));
         return;
       }
-      methodLogger.logResponseError(`404 Transaction not found`)
+      methodLogger.logResponseError(`404 Transaction not found`);
       res.status(404);
       res.send('Transaction not found');
     });
@@ -361,9 +365,7 @@ export function getMockServer(settings: {
       const methodLogger = localLogger.getMethodLogger('POST', '/api/v2/tipStatus');
       methodLogger.logRequest(JSON.stringify(req.body));
       const { bestBlocks } = req.body.reference;
-      const tipStatus = await mockImporter.mockUtxoApi.getTipStatusWithReference(
-        bestBlocks
-      );
+      const tipStatus = await mockImporter.mockUtxoApi.getTipStatusWithReference(bestBlocks);
       if (tipStatus.result !== 'SUCCESS') {
         methodLogger.logResponseError('500 REFERENCE_POINT_BLOCK_NOT_FOUND');
         res.status(500);
@@ -390,24 +392,23 @@ export function getMockServer(settings: {
       const methodLogger = localLogger.getMethodLogger('POST', '/api/v2/txs/utxoAtPoint');
       methodLogger.logRequest(JSON.stringify(req.body));
       const { addresses, referenceBlockHash } = req.body;
-      const { value } = await mockImporter.mockUtxoApi.getUtxoAtPoint(
-        { addresses, referenceBlockHash }
-      );
+      const { value } = await mockImporter.mockUtxoApi.getUtxoAtPoint({
+        addresses,
+        referenceBlockHash,
+      });
       if (!value) {
         methodLogger.logResponseError('unexpected null value');
         throw new Error('unexpected null value');
       }
-      const response = value.map(v => (
-        {
-          utxo_id: v.utxoId,
-          tx_hash: v.txHash,
-          tx_index: v.txIndex,
-          block_num: v.blockNum,
-          receiver: v.receiver,
-          amount: v.amount,
-          assets: v.assets,
-        }
-      ));
+      const response = value.map(v => ({
+        utxo_id: v.utxoId,
+        tx_hash: v.txHash,
+        tx_index: v.txIndex,
+        block_num: v.blockNum,
+        receiver: v.receiver,
+        amount: v.amount,
+        assets: v.assets,
+      }));
       methodLogger.logResponseSuccess(JSON.stringify(response));
       res.send(response);
     });
@@ -416,9 +417,11 @@ export function getMockServer(settings: {
       const methodLogger = localLogger.getMethodLogger('POST', '/api/v2/txs/utxoDiffSincePoint');
       methodLogger.logRequest(req.body);
       const { addresses, untilBlockHash, afterBestBlock } = req.body;
-      const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint(
-        { addresses, untilBlockHash, afterBestBlock }
-      );
+      const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint({
+        addresses,
+        untilBlockHash,
+        afterBestBlock,
+      });
       if (result !== 'SUCCESS') {
         methodLogger.logResponseError('500 REFERENCE_POINT_BLOCK_NOT_FOUND');
         res.status(500);
