@@ -94,8 +94,7 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
 });
 
 
-export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
-  className: 'dapp-connector',
+export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
   route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
   icon: dappConnectorIcon,
   label: connectorMessages.dappConnector,
@@ -108,6 +107,7 @@ export const NOTICE_BOARD: SidebarCategory = registerCategory({
   icon: noticeBoardIcon,
   isVisible: _request => !environment.isProduction(),
 });
+
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
@@ -119,6 +119,7 @@ export type SidebarCategoryRevamp = {|
     currentRoute: string,
   |}) => boolean,
 |};
+
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   {
@@ -158,6 +159,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]
     isVisible: request => asGetStakingKey(request.selected) != null,
+  },
+  {
+    className: 'connected-websites',
+    route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: _request => true,
   },
   // {
   //   className: 'swap',
