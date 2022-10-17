@@ -2,7 +2,7 @@
 
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { WalletAuthEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { WalletAuthEntry } from '../../../chrome/extension/connector/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 

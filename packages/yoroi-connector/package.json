@@ -1,5 +1,5 @@
 {
-  "name": "yoroi-ergo-connector",
+  "name": "yoroi-connector",
   "version": "0.8.0",
   "description": "",
   "scripts": {
@@ -8,8 +8,8 @@
     "cardano": "npm start --prefix example-cardano",
     "prod:compress": "node ../../scripts/compress",
     "prod:custom": "node ./build.js",
-    "prod:nightly": "npm run prod:custom -- --yoroiExtensionId=poonlenmfdfbjfeeballhiibknlknepo && npm run prod:compress -- --env 'nightly' --app-id 'yoroi-ergo-connector-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-ergo-connector-nightly.crx' --key ./keys/nightly-key.pem",
-    "prod:stable": "npm run prod:custom -- --yoroiExtensionId=ffnbelfdoeiohenkjibnmadjiehjhajb && npm run prod:compress -- --env '' --app-id 'yoroi-ergo-connector' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-ergo-connector.crx' --key ./keys/production-key.pem"
+    "prod:nightly": "npm run prod:custom -- --yoroiExtensionId=poonlenmfdfbjfeeballhiibknlknepo && npm run prod:compress -- --env 'nightly' --app-id 'yoroi-connector-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-ergo-connector-nightly.crx' --key ./keys/nightly-key.pem",
+    "prod:stable": "npm run prod:custom -- --yoroiExtensionId=ffnbelfdoeiohenkjibnmadjiehjhajb && npm run prod:compress -- --env '' --app-id 'yoroi-connector' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-ergo-connector.crx' --key ./keys/production-key.pem"
   },
   "devDependencies": {
     "crx": "5.0.1",

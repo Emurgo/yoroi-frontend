@@ -14,7 +14,7 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type {
   PublicDeriverCache,
   ConnectingMessage,
-} from '../../../../chrome/extension/ergo-connector/types';
+} from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';

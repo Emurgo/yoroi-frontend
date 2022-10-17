@@ -163,7 +163,7 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
-import type { ForeignUtxoFetcher } from '../../ergo-connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 
 // ADA specific Request / Response params
 

@@ -34,7 +34,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     ],
     ergo: [
       customPath,
-      path.join(__dirname, '../chrome/extension/ergo-connector/index')
+      path.join(__dirname, '../chrome/extension/connector/index')
     ],
     ledger: [
       customPath,

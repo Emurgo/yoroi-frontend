@@ -34,7 +34,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type {
   PublicDeriverCache,
   WhitelistEntry,
-} from '../../../../chrome/extension/ergo-connector/types';
+} from '../../../../chrome/extension/connector/types';
 import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
 import { Box } from '@mui/system';

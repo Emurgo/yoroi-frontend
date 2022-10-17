@@ -26,8 +26,8 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
-import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types';
+import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
+import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';

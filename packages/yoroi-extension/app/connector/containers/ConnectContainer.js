@@ -10,7 +10,7 @@ import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectResponseData,
-} from '../../../chrome/extension/ergo-connector/types';
+} from '../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';

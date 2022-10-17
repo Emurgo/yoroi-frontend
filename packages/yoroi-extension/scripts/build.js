@@ -20,12 +20,12 @@ const shouldInjectConnector = argv.dontInjectConnector === undefined;
 const buildAndCopyInjector = (destDir: string, buildType: string) => {
   console.log('[Build injector]');
   console.log('-'.repeat(80));
-  shell.pushd('../yoroi-ergo-connector')
+  shell.pushd('../yoroi-connector')
   exec('npm run prod:custom -- --yoroiExtensionId=self');
   shell.popd();
   let injectScript: string;
   try {
-    const data = fs.readFileSync('../yoroi-ergo-connector/build/inject.js');
+    const data = fs.readFileSync('../yoroi-connector/build/inject.js');
     injectScript = Buffer.from(data).toString('utf-8');
   } catch (e) {
     console.error('Failed to read the connector inject script!', e);
