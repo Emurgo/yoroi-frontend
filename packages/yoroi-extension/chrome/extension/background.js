@@ -820,7 +820,7 @@ async function confirmConnect(
 
 // generic communication to the entire connector
 chrome.runtime.onMessageExternal.addListener((message, sender) => {
-  if (sender.id === environment.ergoConnectorExtensionId) {
+  if (sender.id === environment.connectorExtensionId) {
     if (message.type === 'open_browseraction_menu') {
       chrome.windows.getLastFocused(currentWindow => {
         if (currentWindow == null) return; // should not happen
@@ -838,7 +838,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
-  if (port.sender.id === environment.ergoConnectorExtensionId) {
+  if (port.sender.id === environment.connectorExtensionId) {
     handleInjectorConnect(port);
   } else {
     // disconnect?
