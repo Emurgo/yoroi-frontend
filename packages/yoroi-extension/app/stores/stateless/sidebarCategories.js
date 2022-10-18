@@ -95,6 +95,7 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
 
 
 export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
+  className: 'dapp-connector',
   route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
   icon: dappConnectorIcon,
   label: connectorMessages.dappConnector,
