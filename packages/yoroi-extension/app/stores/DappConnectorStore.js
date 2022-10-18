@@ -12,28 +12,18 @@ import type {
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
+import { connectorCall, getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
-function sendMsgConnect(): Promise<ConnectingMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedConnecting)
-      window.chrome.runtime.sendMessage((
-        { type: 'connect_retrieve_data' }: ConnectRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
 
-          resolve(response);
-          initedConnecting = true;
-        }
-      );
-  });
+async function sendMsgConnect(): Promise<?ConnectingMessage> {
+  if (!initedConnecting) {
+    const res = await connectorCall<ConnectRetrieveData, ConnectingMessage>({ type: 'connect_retrieve_data' })
+    initedConnecting = true
+    return res
+  }
 }
-
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|

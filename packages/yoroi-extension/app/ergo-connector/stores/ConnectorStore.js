@@ -80,7 +80,7 @@ import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/Publ
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
-function connectorCall<T, R>(message: T): Promise<R> {
+export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
     window.chrome.runtime.sendMessage(
       message,
