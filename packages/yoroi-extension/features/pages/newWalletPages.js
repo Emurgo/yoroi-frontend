@@ -38,7 +38,7 @@ export const restore24WordWallet: LocatorObject = {
   method: 'css',
 };
 export const walletRestoreDialog: LocatorObject = {
-  locator: '.WalletRestoreOptionDialog',
+  locator: '.WalletRestoreDialog',
   method: 'css',
 };
 export const getCurrencyButton = (currency: string): LocatorObject => {
