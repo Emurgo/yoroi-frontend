@@ -7,6 +7,7 @@ import { expect, assert } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 import {
   clearButton,
+  createNormalWalletButton,
   createOptionDialog,
   createPaperWalletButton,
   createPersonalWalletButton,
@@ -37,8 +38,8 @@ When(/^I select the currency ([^"]*)$/, async function (currency) {
 });
 
 When(/^I select Create Wallet$/, async function () {
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(createWalletButton);
+  await this.waitForElement(createOptionDialog);
+  await this.click(createNormalWalletButton);
 });
 When(/^I select Paper Wallet$/, async function () {
   await this.waitForElement(createOptionDialog);
