@@ -818,33 +818,6 @@ async function confirmConnect(
   });
 }
 
-// generic communication to the entire connector
-chrome.runtime.onMessageExternal.addListener((message, sender) => {
-  if (sender.id === environment.connectorExtensionId) {
-    if (message.type === 'open_browseraction_menu') {
-      chrome.windows.getLastFocused(currentWindow => {
-        if (currentWindow == null) return; // should not happen
-        const bounds = getBoundsForWindow(currentWindow);
-        chrome.windows.create({
-          ...popupProps,
-          url: chrome.extension.getURL(`/main_window_connector.html#/settings`),
-          left: (bounds.width + bounds.positionX) - popupProps.width,
-          top: bounds.positionY + 80,
-        });
-      });
-    }
-  }
-});
-
-// per-page connection to injected code in the connector
-chrome.runtime.onConnectExternal.addListener(port => {
-  if (port.sender.id === environment.connectorExtensionId) {
-    handleInjectorConnect(port);
-  } else {
-    // disconnect?
-  }
-});
-
 // per-page connection to injected code by Yoroi with connector
 chrome.runtime.onConnect.addListener(port => {
   handleInjectorConnect(port);

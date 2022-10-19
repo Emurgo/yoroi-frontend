@@ -106,7 +106,6 @@ export function buildDev(env: string) {
     config.baseDevConfig(
       argv.env,
       isNightly,
-      argv.connectorExtensionId,
       !shouldInjectConnector
     ),
     webpack,

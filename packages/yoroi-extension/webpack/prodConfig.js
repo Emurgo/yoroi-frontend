@@ -14,7 +14,6 @@ type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
   publicPath?: string,
-  connectorExtensionId?: ?string,
   isLight: "true" | "false"
 |};
 */
@@ -53,7 +52,6 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      env.connectorExtensionId,
       JSON.parse(env.isLight)
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),

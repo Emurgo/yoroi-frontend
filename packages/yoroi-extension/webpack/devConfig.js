@@ -15,7 +15,6 @@ const hotScript =
 const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  connectorExtensionId /*: ?string */,
   isLight /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
@@ -68,7 +67,6 @@ const baseDevConfig = (
       networkName,
       false,
       isNightly,
-      connectorExtensionId,
       Boolean(isLight)
     )),
     new webpack.HotModuleReplacementPlugin(),
