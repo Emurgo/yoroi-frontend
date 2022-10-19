@@ -105,7 +105,7 @@ import {
   uriAcceptComponent,
   uriPromptForm,
 } from '../pages/uriPromptPage';
-import { yoroiClassic } from '../pages/mainWindowPage';
+import { yoroiModern } from '../pages/mainWindowPage';
 import { extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 
@@ -528,7 +528,7 @@ Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(halfSecond);
-  await this.waitForElement(yoroiClassic);
+  await this.waitForElement(yoroiModern);
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -537,7 +537,7 @@ Given(/^I restart the browser$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(halfSecond);
-  await this.waitForElement(yoroiClassic);
+  await this.waitForElement(yoroiModern);
 });
 
 Given(/^There is no wallet stored$/, async function () {
@@ -564,7 +564,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(oneSecond + halfSecond);
-  await this.waitForElement(yoroiClassic);
+  await this.waitForElement(yoroiModern);
 });
 
 async function setLedgerWallet(client, serial) {
