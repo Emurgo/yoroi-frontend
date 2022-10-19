@@ -3,7 +3,7 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 import {
   clearButton,
@@ -18,10 +18,12 @@ import {
   createWalletPasswordInput,
   createWalletRepeatPasswordInput,
   getCurrencyButton,
+  getRecoveryPhraseWord,
   pickUpCurrencyDialog,
   recoveryPhraseButton,
   recoveryPhraseConfirmButton,
   securityWarning,
+  seedPhrasePlaceholder,
   walletRecoveryPhraseMnemonicComponent,
 } from '../pages/newWalletPages';
 import { continueButton } from '../pages/basicSetupPage';
@@ -115,16 +117,10 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 When(/^I enter random mnemonic phrase$/, async function () {
   await this.click(recoveryPhraseButton);
   for (let i = 15; i > 1; i--) {
-    await this.click({
-      locator: `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${i}]`,
-      method: 'xpath',
-    });
+    await this.click(getRecoveryPhraseWord(i));
   }
-  const words = await this.driver.findElement(By.css('.WalletRecoveryPhraseMnemonic_component'));
-  words
-    .getText()
-    .then(text => expect(text).to.not.equal(''))
-    .catch(err => assert.fail(err.message));
+  const allWordsComponentText = await this.getText(walletRecoveryPhraseMnemonicComponent);
+  expect(allWordsComponentText).to.not.equal(seedPhrasePlaceholder);
 });
 
 Then(/^I click Clear button$/, async function () {
@@ -132,7 +128,7 @@ Then(/^I click Clear button$/, async function () {
 });
 
 Then(/^I see All selected words are cleared$/, async function () {
-  await this.waitUntilText(walletRecoveryPhraseMnemonicComponent, '', 5000);
+  await this.waitUntilText(walletRecoveryPhraseMnemonicComponent, seedPhrasePlaceholder, 5000);
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
