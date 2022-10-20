@@ -98,10 +98,10 @@ Feature: Send transaction
     Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
-    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
+    And I open the amount dropdown and select send all
     And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
@@ -116,7 +116,7 @@ Feature: Send transaction
 
     Examples:
       | fee       | expectedTx |
-      | 0.209193  | "g6QAiYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoALENMAhoAAzEpAxoR/pTNoQKGhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQOgqSLhR8sUADEtWnvr6NjvmTSgZecfPXL4Rbu7TIp2UmflUqzzfx1vZ3J9wyB/h6smfq8mlqlqNVyNfO6j07A5YIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhAoi4s6bvzxVwn4Gkdsyewl2mPghpInwoRfQnmQIbGPcI1JoQpB64cB1cd9+f/w+uAt/t2aSU8DSFgkRkWddj9A1ggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDSvpZpGjk74C0E4gieWGRuFWhdnP4640l259qPRUzr5TnkUhc5BRq/ubxVC6LBqDd11PZa/g8XWGoFUJiY+toAWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQOCCXW2Lo0iUC+HsPqg/MgSbR3Rb+Z/WLxDhQ4t9qeZYnoXUDPOZWMOz9ToWLibo+75g5IzTK+CNWtrgM5BtmAdYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hATLVkXVaSCrYGXA3jOCO9JSZiqhyRYLG1IZaSVETBS9Xb9ovg+kCCX8V43NxNuwLVQ5udSiJKv5Sbf9CUhpfyAVggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEDjpBRrBC2WEwVLLgI0qgXRYmxNAtjRcPdEaFKTugqQ0/vup0jP1r4wMq6rqkqMWOWdaodtClZs3KBIW1cXWv0FWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g==" |
+      | 0.209237  | "g6QAiYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoALENMAhoAAzEpAxoR/pTNoQKGhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQOgqSLhR8sUADEtWnvr6NjvmTSgZecfPXL4Rbu7TIp2UmflUqzzfx1vZ3J9wyB/h6smfq8mlqlqNVyNfO6j07A5YIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhAoi4s6bvzxVwn4Gkdsyewl2mPghpInwoRfQnmQIbGPcI1JoQpB64cB1cd9+f/w+uAt/t2aSU8DSFgkRkWddj9A1ggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDSvpZpGjk74C0E4gieWGRuFWhdnP4640l259qPRUzr5TnkUhc5BRq/ubxVC6LBqDd11PZa/g8XWGoFUJiY+toAWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQOCCXW2Lo0iUC+HsPqg/MgSbR3Rb+Z/WLxDhQ4t9qeZYnoXUDPOZWMOz9ToWLibo+75g5IzTK+CNWtrgM5BtmAdYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hATLVkXVaSCrYGXA3jOCO9JSZiqhyRYLG1IZaSVETBS9Xb9ovg+kCCX8V43NxNuwLVQ5udSiJKv5Sbf9CUhpfyAVggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEDjpBRrBC2WEwVLLgI0qgXRYmxNAtjRcPdEaFKTugqQ0/vup0jP1r4wMq6rqkqMWOWdaodtClZs3KBIW1cXWv0FWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g==" |
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
