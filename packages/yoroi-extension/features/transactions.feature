@@ -319,10 +319,10 @@ Feature: Send transaction
     Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     When I go to the send transaction screen
-    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
+    And I open the amount dropdown and select send all
     And The transaction fees are "0.001100000"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
