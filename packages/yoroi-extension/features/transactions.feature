@@ -470,15 +470,13 @@ Feature: Send transaction
     Given There is a Shelley wallet stored named cardano-token-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
-
     And I open the token selection dropdown
     And I select token "nicoin"
-
-    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv         |
-    And The transaction fees are "0.169637"
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
+    And I open the amount dropdown and select send all
+    And The transaction fees are "0.169593"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
