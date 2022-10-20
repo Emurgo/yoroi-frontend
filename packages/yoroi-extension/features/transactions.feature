@@ -417,15 +417,14 @@ Feature: Send transaction
   @it-171
   Scenario: Can send all of a custom token (IT-171)
     Given There is an Ergo wallet stored named ergo-token-wallet
-    And I have a wallet with funds
+    And I have an ERGO wallet with funds
     When I go to the send transaction screen
-
     And I open the token selection dropdown
     And I select token "USD"
-    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
+    And I open the amount dropdown and select send all
     And The transaction fees are "0.001100000"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
