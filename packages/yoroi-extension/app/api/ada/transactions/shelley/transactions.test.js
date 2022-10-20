@@ -404,52 +404,6 @@ describe('Create unsigned TX from UTXO', () => {
     });
   });
 
-  it('Should exclude ada-only inputs smaller than fee to include them', async () => {
-    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
-    const sampleAdaAddresses = genSampleAdaAddresses();
-
-    const output = new MultiToken(
-      [{
-        // smaller than input
-        amount: new BigNumber(1001),
-        identifier: defaultIdentifier,
-        networkId: network.NetworkId,
-      }],
-      {
-        defaultIdentifier,
-        defaultNetworkId: network.NetworkId,
-      }
-    );
-
-    const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
-      [{
-        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: output,
-      }],
-      sampleAdaAddresses[0],
-      [utxos[0], utxos[1]],
-      new BigNumber(0),
-      {
-        // make sure the 1st utxo is excluded since it's too small
-        linearFeeCoefficient: new BigNumber(utxos[0].amount).plus(1).toString(),
-        linearFeeConstant: '500',
-        coinsPerUtxoWord: '1',
-        poolDeposit: '500',
-        keyDeposit: '500',
-        networkId: network.NetworkId,
-      },
-      [],
-      [],
-      true,
-    );
-    // input selection will only take 2 of the 3 inputs
-    // it takes 2 inputs because input selection algorithm
-    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('790305');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('209696');
-  });
-
   it('Should pick inputs with tokens when using input selection', async () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
@@ -486,7 +440,7 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will order utxos to have the ones with the required token at the top
     // it will take only one of the utxos because it covers the required token and the fee
-    expect(new Set(unsignedTxResponse.senderUtxos)).toEqual(new Set([utxos[4], utxos[2]]));
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4], utxos[2]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998056');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1946');
@@ -1053,7 +1007,7 @@ describe('Create signed transactions', () => {
         .minus(fee)
         .minus(5_000_000) // collateral
         .plus(withdrawAmount)
-        .plus(protocolParams.keyDeposit.to_str())
+        .plus(protocolParams.keyDeposit)
         .toString()
     );
 
