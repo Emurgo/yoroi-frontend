@@ -38,7 +38,7 @@ import {
 import { navDetailsAmount, sendTab } from '../pages/walletPage';
 import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
-import { unmangleButton } from '../pages/walletReceivePage';
+import { correctDelegationButton } from '../pages/walletReceivePage';
 import { fiveSeconds, halfSecond, oneMinute } from '../support/helpers/common-constants';
 import { stripZerosFromEnd } from '../support/helpers/transfer-helpers';
 
@@ -255,7 +255,7 @@ Then(/^I should see no warning block$/, async function () {
 });
 
 When(/^I click on the unmangle button$/, async function () {
-  await this.click(unmangleButton);
+  await this.click(correctDelegationButton);
 });
 
 When(/^I open the token selection dropdown$/, async function () {

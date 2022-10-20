@@ -7,6 +7,7 @@ import {
   defaultAssets,
 } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { getTokenName } from '../../../app/stores/stateless/tokenHelpers';
+import { amountField, totalAmountField } from '../../pages/confirmTransactionPage';
 
 type TransferSourceType = Array<{|
   fromAddress: string,
@@ -79,7 +80,7 @@ export async function checkTotalAmountIsCorrect(
   const totalAmountFormatted = `${totalAmount
     .dividedBy(amountPerUnit)
     .toFormat(decimalPlaces)} ${ticker}`;
-  await world.waitUntilText({ locator: '.TransferSummaryPage_amount', method: 'css' }, totalAmountFormatted);
+  await world.waitUntilText(amountField, totalAmountFormatted);
 }
 
 export async function checkFinalBalanceIsCorrect(
@@ -100,5 +101,5 @@ export async function checkFinalBalanceIsCorrect(
   const ticker = getTokenName(assetInfo);
   const finalBalance = `${finalAmount} ${ticker}`;
 
-  await world.waitUntilText({ locator: '.TransferSummaryPage_totalAmount', method: 'css' }, finalBalance);
+  await world.waitUntilText(totalAmountField, finalBalance);
 }

@@ -376,8 +376,8 @@ Feature: Send transaction
     | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 |
     When I click on the unmangle button
     Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | amount           |   
-    | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 | 10000000    |
+    | fromAddress                                                 | recoveredBalance           | fees |
+    | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 | 10 | 0.165457 |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
