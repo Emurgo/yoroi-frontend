@@ -438,12 +438,19 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       true,
     );
-    // input selection will order utxos to have the ones with the required token at the top
-    // it will take only one of the utxos because it covers the required token and the fee
-    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4], utxos[2]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998056');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1946');
+
+    // always take utxos[4], take either utxos[2] or utxos[3] randomly
+    try {
+      expect(new Set([utxos[4], utxos[2]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
+      expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998058');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1944');
+    } catch {
+      expect(new Set([utxos[4], utxos[3]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
+      expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('32000001');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998335');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1666');
+    }
 
     const assetInfo = identifierToCardanoAsset(testAssetId);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
