@@ -389,12 +389,10 @@ Feature: Send transaction
   @it-170
   Scenario Outline: Can send some of a custom token (IT-170)
     Given There is an Ergo wallet stored named ergo-token-wallet
-    And I have a wallet with funds
+    And I have an ERGO wallet with funds
     When I go to the send transaction screen
-
     And I open the token selection dropdown
     And I select token "USD"
-
     And I fill the form:
       | address                        | amount   |
       | <address>                      | <amount> |
