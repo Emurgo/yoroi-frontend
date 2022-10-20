@@ -14,6 +14,7 @@ import { walletSummaryBox, walletSummaryComponent } from '../pages/walletTransac
 import {
   amountInput,
   disabledSubmitButton,
+  getAmountItems,
   getTokenLocator,
   invalidAddressError,
   nextButton,
@@ -25,7 +26,6 @@ import {
   sendAllItem,
   sendInputDialogFeesText,
   sendConfirmationDialogAddressToText,
-  sendConfirmationDialogAmountText,
   sendConfirmationDialogError,
   sendConfirmationDialogFeesText,
   sendConfirmationDialogTotalAmountText,
@@ -113,10 +113,9 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
 
   await this.waitUntilText(sendConfirmationDialogAddressToText, truncateAddress(fields.address));
   await this.waitUntilContainsText(sendConfirmationDialogFeesText, stripZerosFromEnd(fields.fee));
-  await this.waitUntilContainsText(
-    sendConfirmationDialogAmountText,
-    stripZerosFromEnd(fields.amount)
-  );
+  const allItems = await getAmountItems(this);
+  const adaItem = allItems.filter(item => item.tokenName === 'ada')[0];
+  expect(adaItem.amount).to.be.equal(fields.amount);
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];

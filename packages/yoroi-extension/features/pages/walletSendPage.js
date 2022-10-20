@@ -4,6 +4,11 @@ import { truncateToken } from '../../app/utils/formatters';
 import { By } from 'selenium-webdriver';
 import type { LocatorObject } from '../support/webdriver';
 
+type AmountItem = {|
+  tokenName: string,
+  amount: string,
+|};
+
 // Modern theme. Old UI
 export const sendInputDialogFeesText: LocatorObject = {
   locator: '//div[@class="WalletSendForm_amountInput"]/div/p',
@@ -90,6 +95,19 @@ export const transactionPageButton: LocatorObject = {
 };
 
 // Send confirmation Dialog
+
+export const getAmountItems = async (customWorld: any): Promise<Array<AmountItem>> => {
+  const result = [];
+  const amountElements = await customWorld.findElements(sendConfirmationDialogAmountText);
+  for (const amountElement of amountElements) {
+    const [elAmount, elToken] = (await amountElement.getText()).split(' ');
+    result.push({
+      tokenName: elToken.toLowerCase(),
+      amount: elAmount,
+    });
+  }
+  return result;
+};
 
 export const sendConfirmationDialogAddressToText: LocatorObject = {
   locator: '.WalletSendConfirmationDialog_addressTo',

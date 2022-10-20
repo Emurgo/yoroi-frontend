@@ -441,19 +441,17 @@ Feature: Send transaction
     Given There is a Shelley wallet stored named cardano-token-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
-
     And I open the token selection dropdown
     And I select token "nicoin"
-
     And I fill the form:
       | address                        | amount   |
-      | <address>                      | <amount> |
+      | <address>                      | <tokensAmount> |
     And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I see CONFIRM TRANSACTION Pop up:
       | address   | amount    |fee      |
-      | <address> | 1.444443  |<fee>    |
+      | <address> | 1.344798  |<fee>    |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
@@ -464,8 +462,8 @@ Feature: Send transaction
     Then I should see the summary screen
 
     Examples:
-      | address                                             | amount       |fee         |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 24  |0.171397 |
+      | address                                             | tokensAmount       |fee         |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 24  |0.174301 |
 
   @it-179
   Scenario: Can send all of a custom Cardano token (IT-179)
