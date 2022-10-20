@@ -1241,7 +1241,6 @@ function handleInjectorConnect(port) {
                           valueExpected,
                           paginate,
                           coinsPerUtxoWord,
-                          network.NetworkId,
                         ),
                         isCBOR,
                       );

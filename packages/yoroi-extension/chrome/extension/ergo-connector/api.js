@@ -48,7 +48,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import {
   CoreAddressTypes,
-  PRIMARY_ASSET_CONSTANTS,
   TxStatusCodes,
 } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -66,7 +65,10 @@ import {
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
-import { signTransaction as shelleySignTransaction } from '../../../app/api/ada/transactions/shelley/transactions';
+import {
+  signTransaction as shelleySignTransaction,
+  toLibUTxO,
+} from '../../../app/api/ada/transactions/shelley/transactions';
 import {
   getCardanoHaskellBaseConfig,
   getErgoBaseConfig,
@@ -92,7 +94,6 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
-import { toLibUTxO } from '../../../app/api/ada/transactions/shelley/transactions';
 import {
   UTxOSet,
   Value as LibValue,
@@ -251,7 +252,7 @@ export async function connectorGetUtxosErgo(
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
-function stringToWasmValue(s: string): RustModule.WalletV4.Value {
+function _stringToWasmValue(s: string): RustModule.WalletV4.Value {
   if (/^\d+$/.test(s)) {
     // The string is an int number
     return RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(s));
@@ -271,7 +272,6 @@ export async function connectorGetUtxosCardano(
   valueExpected: ?Value,
   paginate: ?Paginate,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
-  networkId: number,
 ): Promise<Array<RemoteUnspentOutput>> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {

@@ -13,7 +13,6 @@ import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   AssetOverflowError,
   CannotSendBelowMinimumValueError,
-  NoOutputsError,
   NotEnoughMoneyToSendError
 } from '../../../common/errors';
 
@@ -572,9 +571,9 @@ export async function newAdaUnsignedTxFromUtxo(
   const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
   const sendRequest = await SendRequest.from(outputs.map(output => {
-    let defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
+    const defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
     const nondefaultTokens = output.amount.values.filter(
-      ({identifier}) => identifier !== outputs[0].amount.defaults.defaultIdentifier
+      ({ identifier }) => identifier !== outputs[0].amount.defaults.defaultIdentifier
     );
 
     return {
@@ -664,7 +663,7 @@ export async function newAdaUnsignedTxFromUtxo(
       values: libValueToMultiToken(
         unsignedTx.change.value,
         protocolParams.networkId,
-        '', //fixme
+        PRIMARY_ASSET_CONSTANTS.Cardano
       ),
     });
   }
@@ -855,7 +854,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       })
     )
   );
-  
+
   // must set TTL before specifying change address, otherwise the TX builder
   // miscalculate the tx fee by several bytes fewer
   if (ttl != null) {
@@ -876,13 +875,13 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   if (auxiliaryData.nativeScripts) {
     txBuilder.addNativeScripts(auxiliaryData.nativeScripts);
   }
-  
+
   txBuilder.addMint(mint);
 
   const sendRequest = await SendRequest.from(outputs.map(output => {
-    let defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
+    const defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
     const nondefaultTokens = output.amount.values.filter(
-      ({identifier}) => identifier !== outputs[0].amount.defaults.defaultIdentifier
+      ({ identifier }) => identifier !== outputs[0].amount.defaults.defaultIdentifier
     );
 
     return {
@@ -946,7 +945,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       values: libValueToMultiToken(
         unsignedTx.change.value,
         protocolParams.networkId,
-        '', //fixme
+        PRIMARY_ASSET_CONSTANTS.Cardano
       ),
     });
   }

@@ -501,14 +501,14 @@ test('create tx', async () => {
 
   expect(response.unsignedTx.get_fee_if_set()?.to_str()).toEqual('187369');
 
-  function cmpOutputs(o1, o2) {
+  function cmpOutputs(o1: any, o2: any): number {
     if (o1.address > o2.address) {
       return 1;
-    } else if (o1.address < o2.address) {
-      return -1;
-    } else {
-      return Number(o1.amount.coin) - Number(o2.amount.coin);
     }
+    if (o1.address < o2.address) {
+      return -1;
+    }
+    return Number(o1.amount.coin) - Number(o2.amount.coin);
   }
 
   const txJson = JSON.parse(response.unsignedTx.build_tx().to_json());
@@ -588,7 +588,7 @@ test('create tx', async () => {
           amount: {
             coin: '1155080',
             multiasset: {
-              'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c':  {
+              'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c': {
                 '474f4c44': '45000000',
               },
             },
@@ -610,7 +610,7 @@ test('create tx', async () => {
       required_signers: null,
       script_data_hash: null,
       total_collateral: null,
-      ttl: "70866176",
+      ttl: '70866176',
       update: null,
       validity_start_interval: null,
       withdrawals: null
