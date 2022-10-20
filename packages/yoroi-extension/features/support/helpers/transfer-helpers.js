@@ -20,7 +20,7 @@ type WithdrawSourceType = {|
   recoveredBalance: string | number,
 |};
 
-function stripZerosFromEnd(inputNumber: string) {
+export function stripZerosFromEnd(inputNumber: string): string {
   const inputLength = inputNumber.length;
   const inputArray = inputNumber.split('');
   for (let i = inputLength - 1; i >= 0; i--) {

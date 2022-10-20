@@ -4,6 +4,12 @@ import { truncateToken } from '../../app/utils/formatters';
 import { By } from 'selenium-webdriver';
 import type { LocatorObject } from '../support/webdriver';
 
+// Modern theme. Old UI
+export const sendInputDialogFeesText: LocatorObject = {
+  locator: '//div[@class="WalletSendForm_amountInput"]/div/p',
+  method: 'xpath'
+};
+
 export const assetSelector: LocatorObject = {
   locator: '.WalletSendForm_component .SimpleInput_input',
   method: 'css',
@@ -54,9 +60,12 @@ export const nextButton: LocatorObject = {
   method: 'css',
 };
 export const invalidAddressError: LocatorObject = {
-  locator: '.receiver .SimpleInput_errored',
-  method: 'css',
+  // [starts-with(@id, "receiver") and contains(@id, "-helper-text")]
+  locator: '//p[starts-with(@id, "receiver") and contains(@id, "-helper-text")]',
+  method: 'xpath',
 };
+
+export const invalidAddressErrorMessage = 'Invalid address. Please retype.';
 export const notEnoughAdaError: LocatorObject = {
   locator: '.FormFieldOverridesClassic_error',
   method: 'css',
@@ -72,7 +81,7 @@ export const sendMoneyConfirmationDialog: LocatorObject = {
 };
 export const submitButton: LocatorObject = { locator: '.confirmButton', method: 'css' };
 export const disabledSubmitButton: LocatorObject = {
-  locator: '.primary.SimpleButton_disabled',
+  locator: '.MuiButton-primary.Mui-disabled',
   method: 'css',
 };
 

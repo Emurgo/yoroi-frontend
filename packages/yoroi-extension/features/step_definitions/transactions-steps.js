@@ -1,7 +1,6 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, generateTransaction } from '../mock-chain/mockCardanoImporter';
@@ -17,6 +16,7 @@ import {
   disabledSubmitButton,
   getTokenLocator,
   invalidAddressError,
+  invalidAddressErrorMessage,
   nextButton,
   notEnoughAdaError,
   receiverInput,
@@ -24,6 +24,7 @@ import {
   selectSendingAmountDropDown,
   sendAllCheckbox,
   sendAllItem,
+  sendInputDialogFeesText,
   sendConfirmationDialogAddressToText,
   sendConfirmationDialogAmountText,
   sendConfirmationDialogError,
@@ -39,7 +40,8 @@ import { sendTab } from '../pages/walletPage';
 import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
 import { unmangleButton } from '../pages/walletReceivePage';
-import { halfSecond, oneMinute } from '../support/helpers/common-constants';
+import { fiveSeconds, halfSecond, oneMinute } from '../support/helpers/common-constants';
+import { stripZerosFromEnd } from '../support/helpers/transfer-helpers';
 
 const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
   const browserName = await customWorld.getBrowser();
@@ -99,7 +101,10 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
 
   await this.waitUntilText(sendConfirmationDialogAddressToText, truncateAddress(fields.address));
   await this.waitUntilContainsText(sendConfirmationDialogFeesText, fields.fee);
-  await this.waitUntilContainsText(sendConfirmationDialogAmountText, fields.amount);
+  await this.waitUntilContainsText(
+    sendConfirmationDialogAmountText,
+    stripZerosFromEnd(fields.amount)
+  );
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
@@ -123,14 +128,7 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  const result = await this.customWaiter(async () => {
-    const messageElement = await this.driver
-      .findElement(By.css('.WalletSendForm_amountInput'))
-      .findElement(By.xpath('//p'));
-    const messageText = await messageElement.getText();
-    return messageText === `+ ${fee} of fees`;
-  });
-  expect(result).to.be.true;
+  await this.waitUntilText(sendInputDialogFeesText, `+ ${fee} of fees`, fiveSeconds);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
@@ -189,6 +187,8 @@ Then(/^Revamp. I should see the summary screen$/, async function () {
 
 Then(/^I should see an invalid address error$/, async function () {
   await this.waitForElement(invalidAddressError);
+  const errorMessage = await this.getText(invalidAddressError);
+  expect(errorMessage).to.be.equal(invalidAddressErrorMessage, 'The received error is wrong');
 });
 
 Then(/^I should see a not enough ada error$/, async function () {
