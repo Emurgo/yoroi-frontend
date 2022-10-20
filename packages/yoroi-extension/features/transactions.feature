@@ -61,7 +61,7 @@ Feature: Send transaction
     And I fill the form:
       | address                        | amount   |
       | <address>                      | <amount> |
-    And The transaction fees are "0.640000"
+    And The transaction fees are "<fee>"
     And I click on the next button in the wallet send form
     And I see CONFIRM TRANSACTION Pop up:
       | address   | amount    |fee      |
@@ -69,7 +69,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.640000 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.199117 |
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
