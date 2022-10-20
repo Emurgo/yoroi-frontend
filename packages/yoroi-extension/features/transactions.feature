@@ -28,8 +28,8 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | expectedTx |
-      | 1.000000            | 0.640000  | "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY=" |
-      | 2.000000            | 0.460000  | "g6QAg4JYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABwTgAxoR/pTNoQKDhFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQLM12LTh1NoxSUm0bbVTQfygHhTVh6bLYXlVC4cnlUPGu45AojcnGEqZTE/+vItV7EvsBBlKTapopZofryrXrA5YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hAwPcLKhKTeclUAgVMRh7EHv2F+jv6zQ7fpsQwbSucHpESYz+8QamNsB45zU8ocp5K4WDesTR7nxE7I9lvBc0jAlggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoIRYIMx77WUfp7RKzGSCIG6trkNgf4x7dE0yGdo9SczB9h07WEBwOJ1TbOoaNh9Uf+erO5luL5/5sIvddiala/3VB2vFJXbohZnvvrJvQoi5Cc0AthRftjupDgna8dmSt25s7WYFWCBYgDZGS5hmdznviyN0PIgAm/XR3K5WTeC/7Go04Pu/v0Gg9g==" |
+      | 1.000000            | 0.191505  | "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY=" |
+      | 2.000000            | 0.199117  | "g6QAg4JYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABwTgAxoR/pTNoQKDhFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQLM12LTh1NoxSUm0bbVTQfygHhTVh6bLYXlVC4cnlUPGu45AojcnGEqZTE/+vItV7EvsBBlKTapopZofryrXrA5YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hAwPcLKhKTeclUAgVMRh7EHv2F+jv6zQ7fpsQwbSucHpESYz+8QamNsB45zU8ocp5K4WDesTR7nxE7I9lvBc0jAlggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoIRYIMx77WUfp7RKzGSCIG6trkNgf4x7dE0yGdo9SczB9h07WEBwOJ1TbOoaNh9Uf+erO5luL5/5sIvddiala/3VB2vFJXbohZnvvrJvQoi5Cc0AthRftjupDgna8dmSt25s7WYFWCBYgDZGS5hmdznviyN0PIgAm/XR3K5WTeC/7Go04Pu/v0Gg9g==" |
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
@@ -69,7 +69,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.199117 |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.191505 |
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
@@ -126,7 +126,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    And The transaction fees are "0.640000"
+    And The transaction fees are "0.191505"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -143,7 +143,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    And The transaction fees are "0.640000"
+    And The transaction fees are "0.191505"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -186,7 +186,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
-    And The transaction fees are "0.460000"
+    And The transaction fees are "0.199117"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     Then A successful tx gets sent from my wallet from another client
@@ -213,7 +213,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    And The transaction fees are "0.640000"
+    And The transaction fees are "0.191505"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -239,7 +239,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
-    And The transaction fees are "0.460000"
+    And The transaction fees are "0.199117"
     Then A pending tx gets sent from my wallet from another client
     Then I should see a warning block
 
@@ -289,8 +289,8 @@ Feature: Send transaction
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I see CONFIRM TRANSACTION Pop up:
-      | address   | amount    |fee      |
-      | <address> | <amount>  |<fee>    |
+      | address   | amount    |fee      | isErgo |
+      | <address> | <amount>  |<fee>    | 1    |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
@@ -301,7 +301,7 @@ Feature: Send transaction
 
     Examples:
       | address                                             | amount       |fee         |
-      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 5.000000000  |0.001100000 | 
+      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 5.000000000  |0.001100000 |
   
   @it-163
   Scenario: Send all from an ergo wallet (IT-163)
@@ -363,7 +363,7 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | expectedTx |
-      | 1.000000            | 0.167657  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxVcCGgACjukDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhAokhEoNLBWrk60+zXT7fcdHwV5A6j6BUyd8x2g52AGEjx6ckVVBpKSUWLfMCYiuz2m6Z+6zV7lMvgR/QL9qFDBvY=" |
+      | 1.000000            | 0.182001  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxVcCGgACjukDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhAokhEoNLBWrk60+zXT7fcdHwV5A6j6BUyd8x2g52AGEjx6ckVVBpKSUWLfMCYiuz2m6Z+6zV7lMvgR/QL9qFDBvY=" |
 
   @it-165
   Scenario: Can receive & unmangle utxo entries (IT-165)
@@ -400,8 +400,8 @@ Feature: Send transaction
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I see CONFIRM TRANSACTION Pop up:
-      | address   | amount    |fee      |
-      | <address> | 0.010000000  |<fee>    |
+      | address   | amount    |fee      | isErgo |
+      | <address> | 0.010000000  |<fee>    | 1   |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
@@ -411,7 +411,7 @@ Feature: Send transaction
     Then I should see the summary screen
 
     Examples:
-      | address                                             | amount       |fee         |
+      | address                                             | amount | fee |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 123  |0.001100000 |
 
   @it-171

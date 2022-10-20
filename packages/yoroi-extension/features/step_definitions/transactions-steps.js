@@ -114,8 +114,13 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   await this.waitUntilText(sendConfirmationDialogAddressToText, truncateAddress(fields.address));
   await this.waitUntilContainsText(sendConfirmationDialogFeesText, stripZerosFromEnd(fields.fee));
   const allItems = await getAmountItems(this);
-  const adaItem = allItems.filter(item => item.tokenName === 'ada')[0];
-  expect(adaItem.amount).to.be.equal(fields.amount);
+  let mainCoinItem;
+  if (fields.isErgo && fields.isErgo === '1'){
+    mainCoinItem = allItems.filter(item => item.tokenName === 'erg')[0];
+  } else {
+    mainCoinItem = allItems.filter(item => item.tokenName === 'ada')[0];
+  }
+  expect(mainCoinItem.amount).to.be.equal(stripZerosFromEnd(fields.amount));
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
