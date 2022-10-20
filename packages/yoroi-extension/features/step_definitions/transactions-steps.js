@@ -35,7 +35,7 @@ import {
   transactionPageButton,
   warningBox,
 } from '../pages/walletSendPage';
-import { sendTab } from '../pages/walletPage';
+import { navDetailsAmount, sendTab } from '../pages/walletPage';
 import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
 import { unmangleButton } from '../pages/walletReceivePage';
@@ -54,16 +54,29 @@ const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<a
   return fields;
 };
 
-Given(/^I have a wallet with funds$/, async function () {
-  await this.waitUntilContainsText(
-    { locator: '.NavWalletDetails_amount', method: 'css' },
-    'ADA',
-    oneMinute
-  );
-  const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
+const walletIsEmpty = async (customWorld: any): Promise<void > => {
+  const balanceTextElement = await customWorld.findElement(navDetailsAmount);
   const balanceText = await balanceTextElement.getText();
   const [balance, ] = balanceText.split(' ');
   expect(parseFloat(balance), 'The wallet is empty').to.be.above(0);
+};
+
+Given(/^I have a wallet with funds$/, async function () {
+  await this.waitUntilContainsText(
+    navDetailsAmount,
+    'ADA',
+    oneMinute
+  );
+  await walletIsEmpty(this);
+});
+
+Given(/^I have an ERGO wallet with funds$/, async function () {
+  await this.waitUntilContainsText(
+    navDetailsAmount,
+    'ERG',
+    oneMinute
+  );
+  await walletIsEmpty(this);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -99,7 +112,7 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
 
   await this.waitUntilText(sendConfirmationDialogAddressToText, truncateAddress(fields.address));
-  await this.waitUntilContainsText(sendConfirmationDialogFeesText, fields.fee);
+  await this.waitUntilContainsText(sendConfirmationDialogFeesText, stripZerosFromEnd(fields.fee));
   await this.waitUntilContainsText(
     sendConfirmationDialogAmountText,
     stripZerosFromEnd(fields.amount)
@@ -107,10 +120,10 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
-  const decimalPlaces = assetInfo.Metadata.numberOfDecimals;
+  const totalWithDecimals = total.toFixed(assetInfo.Metadata.numberOfDecimals);
   await this.waitUntilContainsText(
     sendConfirmationDialogTotalAmountText,
-    total.toFixed(decimalPlaces)
+    stripZerosFromEnd(totalWithDecimals)
   );
 });
 
@@ -127,7 +140,7 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  await this.waitUntilText(sendInputDialogFeesText, `+ ${fee} of fees`, fiveSeconds);
+  await this.waitUntilText(sendInputDialogFeesText, `+ ${stripZerosFromEnd(fee)} of fees`, fiveSeconds);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {

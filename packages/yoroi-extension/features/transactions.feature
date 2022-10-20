@@ -280,7 +280,7 @@ Feature: Send transaction
   @it-162
   Scenario Outline: Send from an ergo wallet (IT-162)
     Given There is an Ergo wallet stored named ergo-simple-wallet
-    And I have a wallet with funds
+    And I have an ERGO wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                        | amount   |
