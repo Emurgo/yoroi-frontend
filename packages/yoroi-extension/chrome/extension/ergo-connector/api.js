@@ -35,7 +35,11 @@ import JSONBigInt from 'json-bigint';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
 import { extractP2sKeysFromErgoBox, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
-import { SendTransactionApiError } from '../../../app/api/common/errors';
+import {
+  SendTransactionApiError,
+  CannotSendBelowMinimumValueError,
+  NotEnoughMoneyToSendError,
+} from '../../../app/api/common/errors';
 
 import axios from 'axios';
 import keyBy from 'lodash/keyBy';
@@ -97,6 +101,9 @@ import {
 } from '@emurgo/yoroi-eutxo-txs/dist/classes';
 import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
 import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
+import {
+  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
+} from'@emurgo/yoroi-eutxo-txs/dist/errors';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -303,11 +310,22 @@ export async function connectorGetUtxosCardano(
     new Amount(valueStr),
     NativeAssets.from([])
   );
-  const { selectedUtxos } = await coinSelectionClassificationStrategy(
-    utxoSet,
-    [value],
-    coinsPerUtxoWord.to_str(),
-  );
+  let selectedUtxos;
+  try {
+    selectedUtxos = (await coinSelectionClassificationStrategy(
+      utxoSet,
+      [value],
+      coinsPerUtxoWord.to_str(),
+    )).selectedUtxos;
+  } catch (error) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
+      throw new NotEnoughMoneyToSendError();
+    }
+    if (String(error).includes('less than the minimum UTXO value')) {
+      throw new CannotSendBelowMinimumValueError();
+    }
+    throw error;
+  }
 
   return selectedUtxos.asArray().map(utxo => ({
     utxo_id: `${utxo.tx}${utxo.index}`,
