@@ -1184,7 +1184,7 @@ function libValueToMultiToken(
   );
 }
 
-async function toLibUTxO(utxo: RemoteUnspentOutput): any {
+export async function toLibUTxO(utxo: RemoteUnspentOutput): any {
   return {
     address: await LibAddress.from(utxo.receiver),
     tx: utxo.tx_hash,

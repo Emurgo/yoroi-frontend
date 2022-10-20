@@ -78,7 +78,6 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
-import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelley/coinSelection';
 import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/ergo-connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
@@ -89,6 +88,15 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import { toLibUTxO } from '../../../app/api/ada/transactions/shelley/transactions';
+import {
+  UTxOSet,
+  Value as LibValue,
+  Amount,
+  NativeAssets,
+} from '@emurgo/yoroi-eutxo-txs/dist/classes';
+import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
+import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -283,21 +291,37 @@ export async function connectorGetUtxosCardano(
   if (valueStr.length === 0) {
     return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
-  const value = multiTokenFromCardanoValue(
-    stringToWasmValue(valueStr),
-    {
-      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      defaultNetworkId: networkId,
-    },
+
+  setRuntime(RustModule.CrossCsl.init());
+
+  const utxoSet = new UTxOSet(
+    await Promise.all(
+      formattedUtxos.map(toLibUTxO)
+    )
   );
-  const { selectedUtxo } = coinSelectionForValues(
-    formattedUtxos,
+  const value = new LibValue(
+    new Amount(valueStr),
+    NativeAssets.from([])
+  );
+  const { selectedUtxos } = await coinSelectionClassificationStrategy(
+    utxoSet,
     [value],
-    false,
-    coinsPerUtxoWord,
-    networkId,
+    coinsPerUtxoWord.to_str(),
   );
-  return Promise.resolve(selectedUtxo);
+
+  return selectedUtxos.asArray().map(utxo => ({
+    utxo_id: `${utxo.tx}${utxo.index}`,
+    tx_hash: utxo.tx,
+    tx_index: utxo.index,
+    receiver: utxo.address.hex,
+    amount: utxo.value.amount.toString(),
+    assets: utxo.value.assets.asArray().map(([nativeAsset, amount]) => ({
+      amount: amount.toString(),
+      assetId: nativeAsset.getHash(),
+      policyId: nativeAsset.policy.asHex(),
+      name: nativeAsset.name.asHex()
+    }))
+  }));
 }
 
 const MAX_COLLATERAL = new BigNumber('5000000');
