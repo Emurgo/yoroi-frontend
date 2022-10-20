@@ -60,15 +60,13 @@ export const nextButton: LocatorObject = {
   method: 'css',
 };
 export const invalidAddressError: LocatorObject = {
-  // [starts-with(@id, "receiver") and contains(@id, "-helper-text")]
   locator: '//p[starts-with(@id, "receiver") and contains(@id, "-helper-text")]',
   method: 'xpath',
 };
 
-export const invalidAddressErrorMessage = 'Invalid address. Please retype.';
-export const notEnoughAdaError: LocatorObject = {
-  locator: '.FormFieldOverridesClassic_error',
-  method: 'css',
+export const amountError: LocatorObject = {
+  locator: '//p[starts-with(@id, "amount") and contains(@id, "-helper-text")]',
+  method: 'xpath',
 };
 
 export const sendAllCheckbox: LocatorObject = {

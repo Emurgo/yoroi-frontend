@@ -16,9 +16,8 @@ import {
   disabledSubmitButton,
   getTokenLocator,
   invalidAddressError,
-  invalidAddressErrorMessage,
   nextButton,
-  notEnoughAdaError,
+  amountError,
   receiverInput,
   selectAssetDropDown,
   selectSendingAmountDropDown,
@@ -186,16 +185,17 @@ Then(/^Revamp. I should see the summary screen$/, async function () {
 });
 
 Then(/^I should see an invalid address error$/, async function () {
-  await this.waitForElement(invalidAddressError);
-  const errorMessage = await this.getText(invalidAddressError);
-  expect(errorMessage).to.be.equal(invalidAddressErrorMessage, 'The received error is wrong');
+  const errorMessage = await i18n.formatMessage(this.driver, {
+    id: 'wallet.send.form.errors.invalidAddress',
+  });
+  await this.waitUntilText(invalidAddressError, errorMessage);
 });
 
 Then(/^I should see a not enough ada error$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.NotEnoughMoneyToSendError',
   });
-  await this.waitUntilText(notEnoughAdaError, errorMessage);
+  await this.waitUntilText(amountError, errorMessage);
 });
 
 Then(/^I should not be able to submit$/, async function () {
