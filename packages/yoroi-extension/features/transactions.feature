@@ -4,120 +4,6 @@ Feature: Send transaction
     Given I have opened the extension
     And I have completed the basic setup
 
-  @it-54
-  Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
-    Given There is a Byron wallet stored named many-tx-wallet
-    And I have a wallet with funds
-    When I go to the send transaction screen
-    And I fill the form:
-      | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | <amount> |
-    And The transaction fees are "<fee>"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    Then I should see no warning block
-    And I enter the wallet password:
-      | password   |
-      | asdfasdfasdf |
-    Given The expected transaction is <expectedTx>
-    And I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
-    
-
-    Examples:
-      | amount              | fee       | expectedTx |
-      | 1.000000            | 0.191505  | "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY=" |
-      | 2.000000            | 0.199117  | "g6QAg4JYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABwTgAxoR/pTNoQKDhFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQLM12LTh1NoxSUm0bbVTQfygHhTVh6bLYXlVC4cnlUPGu45AojcnGEqZTE/+vItV7EvsBBlKTapopZofryrXrA5YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hAwPcLKhKTeclUAgVMRh7EHv2F+jv6zQ7fpsQwbSucHpESYz+8QamNsB45zU8ocp5K4WDesTR7nxE7I9lvBc0jAlggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoIRYIMx77WUfp7RKzGSCIG6trkNgf4x7dE0yGdo9SczB9h07WEBwOJ1TbOoaNh9Uf+erO5luL5/5sIvddiala/3VB2vFJXbohZnvvrJvQoi5Cc0AthRftjupDgna8dmSt25s7WYFWCBYgDZGS5hmdznviyN0PIgAm/XR3K5WTeC/7Go04Pu/v0Gg9g==" |
-
-  @it-90
-  Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
-    Given There is a Byron wallet stored named many-tx-wallet
-    And I have a wallet with funds
-    When I go to the send transaction screen
-    And I fill the form:
-      | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I enter the wallet password:
-      | password   |
-      | <password> |
-    And I submit the wallet send form
-    Then I should see an incorrect wallet password error message
-
-    Examples:
-      | password              | 
-      | secret_123            | 
-      | SECRET_123            |
-      | sECRET_123            |
-
-  @it-48
-  Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
-    Given There is a Byron wallet stored named many-tx-wallet
-    And I have a wallet with funds
-    When I go to the send transaction screen
-    And I fill the form:
-      | address                        | amount   |
-      | <address>                      | <amount> |
-    And The transaction fees are "<fee>"
-    And I click on the next button in the wallet send form
-    And I see CONFIRM TRANSACTION Pop up:
-      | address   | amount    |fee      |
-      | <address> | <amount>  |<fee>    |
-
-  Examples:
-      | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.191505 |
-
-  @it-46
-  Scenario: User can't send funds to the invalid address (IT-46)
-    Given There is a Byron wallet stored named many-tx-wallet
-    And I have a wallet with funds
-    When I go to the send transaction screen
-    And I fill the form:
-      | address                                                    | amount   | |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMC | 0.001000 | Some characters in address has been changed and removed|
-    Then I should see an invalid address error
-    And I should not be able to submit
-
-  @it-47
-  Scenario: User can't send more funds than he has (IT-47)
-    Given There is a Byron wallet stored named many-tx-wallet
-    And I have a wallet with funds
-    When I go to the send transaction screen
-    And I fill the form:
-      | address                                                     | amount     |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 9007199255 |
-    Then I should see a not enough ada error
-    And I should not be able to submit
-
-  @it-55
-  Scenario Outline: User can send all funds from one Yoroi wallet to another (IT-55)
-    Given There is a Byron wallet stored named many-tx-wallet
-    And I have a wallet with funds
-    When I go to the send transaction screen
-    And I fill the address of the form:
-      | address                                                     |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
-    And I open the amount dropdown and select send all
-    And The transaction fees are "<fee>"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I enter the wallet password:
-      | password   |
-      | asdfasdfasdf |
-    Given The expected transaction is <expectedTx>
-    And I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
-
-    Examples:
-      | fee       | expectedTx |
-      | 0.209237  | "g6QAiYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoALENMAhoAAzEpAxoR/pTNoQKGhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQOgqSLhR8sUADEtWnvr6NjvmTSgZecfPXL4Rbu7TIp2UmflUqzzfx1vZ3J9wyB/h6smfq8mlqlqNVyNfO6j07A5YIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhAoi4s6bvzxVwn4Gkdsyewl2mPghpInwoRfQnmQIbGPcI1JoQpB64cB1cd9+f/w+uAt/t2aSU8DSFgkRkWddj9A1ggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDSvpZpGjk74C0E4gieWGRuFWhdnP4640l259qPRUzr5TnkUhc5BRq/ubxVC6LBqDd11PZa/g8XWGoFUJiY+toAWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQOCCXW2Lo0iUC+HsPqg/MgSbR3Rb+Z/WLxDhQ4t9qeZYnoXUDPOZWMOz9ToWLibo+75g5IzTK+CNWtrgM5BtmAdYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hATLVkXVaSCrYGXA3jOCO9JSZiqhyRYLG1IZaSVETBS9Xb9ovg+kCCX8V43NxNuwLVQ5udSiJKv5Sbf9CUhpfyAVggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEDjpBRrBC2WEwVLLgI0qgXRYmxNAtjRcPdEaFKTugqQ0/vup0jP1r4wMq6rqkqMWOWdaodtClZs3KBIW1cXWv0FWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g==" |
-
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
     Given There is a Byron wallet stored named many-tx-wallet
@@ -152,6 +38,46 @@ Feature: Send transaction
     And I submit the wallet send form
     Then I should see an incorrect wallet password error message
 
+  @it-46
+  Scenario: User can't send funds to the invalid address (IT-46)
+    Given There is a Byron wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                    | amount   | |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMC | 0.001000 | Some characters in address has been changed and removed|
+    Then I should see an invalid address error
+    And I should not be able to submit
+
+  @it-47
+  Scenario: User can't send more funds than he has (IT-47)
+    Given There is a Byron wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount     |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 9007199255 |
+    Then I should see a not enough ada error
+    And I should not be able to submit
+
+  @it-48
+  Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
+    Given There is a Byron wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                        | amount   |
+      | <address>                      | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see CONFIRM TRANSACTION Pop up:
+      | address   | amount    |fee      |
+      | <address> | <amount>  |<fee>    |
+
+    Examples:
+      | address                                                     | amount    |fee      |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.191505 |
+
   @it-53
   Scenario: Sending a Tx changing a valid address for an invalid one (IT-53)
     Given There is a Byron wallet stored named many-tx-wallet
@@ -167,16 +93,59 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdXXXX | 0.001000 |
-    Then I should not be able to submit  
+    Then I should not be able to submit
 
-  @it-89
-  Scenario: Try to make a transactions from the empty wallet (IT-89)
-    Given There is a Byron wallet stored named empty-wallet
+  @it-54
+  Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
+    Given There is a Byron wallet stored named many-tx-wallet
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    Then I should see a not enough ada error
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    Then I should see no warning block
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is <expectedTx>
+    And I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
+    
+
+    Examples:
+      | amount              | fee       | expectedTx |
+      | 1.000000            | 0.191505  | "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY=" |
+      | 2.000000            | 0.199117  | "g6QAg4JYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABwTgAxoR/pTNoQKDhFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQLM12LTh1NoxSUm0bbVTQfygHhTVh6bLYXlVC4cnlUPGu45AojcnGEqZTE/+vItV7EvsBBlKTapopZofryrXrA5YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hAwPcLKhKTeclUAgVMRh7EHv2F+jv6zQ7fpsQwbSucHpESYz+8QamNsB45zU8ocp5K4WDesTR7nxE7I9lvBc0jAlggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoIRYIMx77WUfp7RKzGSCIG6trkNgf4x7dE0yGdo9SczB9h07WEBwOJ1TbOoaNh9Uf+erO5luL5/5sIvddiala/3VB2vFJXbohZnvvrJvQoi5Cc0AthRftjupDgna8dmSt25s7WYFWCBYgDZGS5hmdznviyN0PIgAm/XR3K5WTeC/7Go04Pu/v0Gg9g==" |
+
+  @it-55
+  Scenario Outline: User can send all funds from one Yoroi wallet to another (IT-55)
+    Given There is a Byron wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the address of the form:
+      | address                                                     |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
+    And I open the amount dropdown and select send all
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is <expectedTx>
+    And I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
+
+    Examples:
+      | fee       | expectedTx |
+      | 0.209237  | "g6QAiYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoALENMAhoAAzEpAxoR/pTNoQKGhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQOgqSLhR8sUADEtWnvr6NjvmTSgZecfPXL4Rbu7TIp2UmflUqzzfx1vZ3J9wyB/h6smfq8mlqlqNVyNfO6j07A5YIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhAoi4s6bvzxVwn4Gkdsyewl2mPghpInwoRfQnmQIbGPcI1JoQpB64cB1cd9+f/w+uAt/t2aSU8DSFgkRkWddj9A1ggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDSvpZpGjk74C0E4gieWGRuFWhdnP4640l259qPRUzr5TnkUhc5BRq/ubxVC6LBqDd11PZa/g8XWGoFUJiY+toAWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQOCCXW2Lo0iUC+HsPqg/MgSbR3Rb+Z/WLxDhQ4t9qeZYnoXUDPOZWMOz9ToWLibo+75g5IzTK+CNWtrgM5BtmAdYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hATLVkXVaSCrYGXA3jOCO9JSZiqhyRYLG1IZaSVETBS9Xb9ovg+kCCX8V43NxNuwLVQ5udSiJKv5Sbf9CUhpfyAVggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEDjpBRrBC2WEwVLLgI0qgXRYmxNAtjRcPdEaFKTugqQ0/vup0jP1r4wMq6rqkqMWOWdaodtClZs3KBIW1cXWv0FWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g==" |
 
   @it-59
   Scenario: Display warning if wallet changes during confirmation (IT-59)
@@ -242,6 +211,37 @@ Feature: Send transaction
     And The transaction fees are "0.199117"
     Then A pending tx gets sent from my wallet from another client
     Then I should see a warning block
+
+  @it-89
+  Scenario: Try to make a transactions from the empty wallet (IT-89)
+    Given There is a Byron wallet stored named empty-wallet
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
+    Then I should see a not enough ada error
+
+  @it-90
+  Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
+    Given There is a Byron wallet stored named many-tx-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | <password> |
+    And I submit the wallet send form
+    Then I should see an incorrect wallet password error message
+
+    Examples:
+      | password              | 
+      | secret_123            | 
+      | SECRET_123            |
+      | sECRET_123            |
 
   @it-137
   Scenario: Test Shelley wallet delegation (IT-137)
