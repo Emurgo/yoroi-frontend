@@ -89,7 +89,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     }],
   },
   {
-    amount: '10000001',
+    amount: '1000001',
     receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
       // external addr 0, staking key 0
       'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
@@ -584,12 +584,14 @@ describe('Create unsigned TX from UTXO', () => {
     )).toThrow(AssetOverflowError);
   });
 
-  it('Should skip inputs when sending where sum of tokens > 2^64', async () => {
+  it('Should fail when sending where sum of tokens > 2^64', async () => {
     const sampleUtxos = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
     const output = new MultiToken(
       [{
-        amount: new BigNumber(19001),
+        // need to include both the input txs to satisfy this amount,
+        // but the asset amount of them overflows when added
+        amount: new BigNumber(3000000),
         identifier: defaultIdentifier,
         networkId: network.NetworkId,
       }],
@@ -599,7 +601,7 @@ describe('Create unsigned TX from UTXO', () => {
       }
     );
 
-    const result = await newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         amount: output,
@@ -611,9 +613,7 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
-    );
-    // one of the inputs skipped to keep <= u64
-    expect(result.senderUtxos.length).toEqual(1);
+    )).rejects.toThrow(AssetOverflowError);
   });
 
   it('Should optimize away coin burn by using one extra input', async () => {

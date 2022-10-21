@@ -46,6 +46,7 @@ import {
 import {
   NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError,
   NoOutputError,
+  OverflowError,
 } from'@emurgo/yoroi-eutxo-txs/dist/errors';
 
 
@@ -603,6 +604,9 @@ export async function newAdaUnsignedTxFromUtxo(
   } catch (error) {
     if (error instanceof LibNotEnoughMoneyToSendError) {
       throw new NotEnoughMoneyToSendError();
+    }
+    if (error instanceof OverflowError) {
+      throw new AssetOverflowError();
     }
     if (String(error).includes('less than the minimum UTXO value')) {
       throw new CannotSendBelowMinimumValueError();
