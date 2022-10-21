@@ -62,8 +62,11 @@ When(/^I click on the HasBalance addresses button$/, async function () {
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {
-  for (let curr = 1; curr <= times; curr++) {
+  for (let curr = 0; curr < times; curr++) {
+    await this.scrollIntoView(generateAddressButton);
     await this.click(generateAddressButton);
+    const addrLocator = getGeneratedAddress(curr);
+    await this.scrollIntoView(addrLocator);
     await this.waitForElement(getGeneratedAddress(curr));
   }
 });
