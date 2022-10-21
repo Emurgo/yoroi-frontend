@@ -13,7 +13,8 @@ import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   AssetOverflowError,
   CannotSendBelowMinimumValueError,
-  NotEnoughMoneyToSendError
+  NotEnoughMoneyToSendError,
+  NoOutputsError,
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -43,7 +44,8 @@ import {
   WalletAddress,
 } from '@emurgo/yoroi-eutxo-txs/dist/classes';
 import {
-  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
+  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError,
+  NoOutputError,
 } from'@emurgo/yoroi-eutxo-txs/dist/errors';
 
 
@@ -650,7 +652,15 @@ export async function newAdaUnsignedTxFromUtxo(
 
   await txBuilder.addChangeAndFee(changeAddress);
 
-  const unsignedTx = await txBuilder.build();
+  let unsignedTx;
+  try {
+    unsignedTx = await txBuilder.build();
+  } catch (error) {
+    if (error instanceof NoOutputError) {
+      throw new NoOutputsError();
+    }
+    throw error;
+  }
 
   const signRequestChangeAddr = [];
   if (unsignedTx.change) {
