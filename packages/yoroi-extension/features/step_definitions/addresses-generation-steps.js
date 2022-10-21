@@ -22,13 +22,16 @@ import {
   walletAddressRow,
   getAddressFromAddressRow,
 } from '../pages/walletReceivePage';
+import { halfSecond, oneSecond } from '../support/helpers/common-constants';
 
 Given(/^Revamp. I go to the receive screen$/, async function () {
   await this.click(receiveTab);
+  await this.driver.sleep(oneSecond + halfSecond);
 });
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click(receiveTab);
+  await this.driver.sleep(oneSecond + halfSecond);
 });
 
 When(/^I click on the Generate new address button$/, async function () {
