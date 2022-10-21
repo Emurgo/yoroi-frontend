@@ -177,7 +177,7 @@ function getProtocolParams(): {|
 }
 
 describe('Create unsigned TX from UTXO', () => {
-  it('Should fail due to insufficient funds (bigger than all inputs)', () => {
+  it('Should fail due to insufficient funds (bigger than all inputs)', async () => {
     const sampleUtxos = genSampleUtxos();
     const output = new MultiToken(
       [{
@@ -193,7 +193,7 @@ describe('Create unsigned TX from UTXO', () => {
     );
 
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         amount: output,
@@ -208,7 +208,7 @@ describe('Create unsigned TX from UTXO', () => {
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to insufficient funds (no inputs)', () => {
+  it('Should fail due to insufficient funds (no inputs)', async () => {
     const output = new MultiToken(
       [{
         // bigger than input including fees
@@ -222,7 +222,7 @@ describe('Create unsigned TX from UTXO', () => {
       }
     );
 
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         amount: output,
@@ -237,7 +237,7 @@ describe('Create unsigned TX from UTXO', () => {
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to insufficient funds (not enough to cover fees)', () => {
+  it('Should fail due to insufficient funds (not enough to cover fees)', async () => {
     const sampleUtxos = genSampleUtxos();
     const output = new MultiToken(
       [{
@@ -253,7 +253,7 @@ describe('Create unsigned TX from UTXO', () => {
     );
 
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         amount: output,
@@ -268,11 +268,11 @@ describe('Create unsigned TX from UTXO', () => {
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to insufficient funds (no outputs disallowed)', () => {
+  it('Should fail due to insufficient funds (no outputs disallowed)', async () => {
     const sampleUtxos = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
     // should fail because we disallow burning extra ADA in fees
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [],
       sampleAdaAddresses[0],
       [sampleUtxos[1]],
@@ -287,7 +287,7 @@ describe('Create unsigned TX from UTXO', () => {
       false,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
     // should avoid failing by consuming the second UTXO
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [],
       sampleAdaAddresses[0],
       [sampleUtxos[1], sampleUtxos[0]],
@@ -301,7 +301,7 @@ describe('Create unsigned TX from UTXO', () => {
       false,
     )).resolves.not.toThrow(NotEnoughMoneyToSendError);
     // should pass because we can add a change
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [],
       sampleAdaAddresses[0],
       [sampleUtxos[1]],
@@ -316,10 +316,10 @@ describe('Create unsigned TX from UTXO', () => {
     )).resolves.not.toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to no outputs', () => {
+  it('Should fail due to no outputs', async () => {
     const sampleUtxos = genSampleUtxos();
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [],
       undefined,
       utxos,
@@ -488,7 +488,7 @@ describe('Create unsigned TX from UTXO', () => {
       }
     );
 
-    expect(newAdaUnsignedTxFromUtxo(
+    await expect(newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         amount: output,
@@ -546,7 +546,7 @@ describe('Create unsigned TX from UTXO', () => {
       }
     );
 
-    expect(newAdaUnsignedTxFromUtxo(
+    await  expect(newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         amount: output,
