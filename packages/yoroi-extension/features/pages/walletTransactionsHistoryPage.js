@@ -81,3 +81,11 @@ export const transactionAddressListElement: LocatorObject = {
   locator: '.Transaction_addressList',
   method: 'css',
 };
+export const confirmationCountText: LocatorObject = {
+  locator: '.confirmationCount',
+  method: 'css',
+};
+export const transactionIdText: LocatorObject = {
+  locator: '.txid',
+  method: 'css',
+};
