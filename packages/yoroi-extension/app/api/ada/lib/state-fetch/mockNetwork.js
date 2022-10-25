@@ -793,7 +793,13 @@ export class MockUtxoApi implements UtxoApiContract {
 
   async getUtxoAtPoint(req: UtxoAtPointRequest): Promise<UtxoApiResponse<Utxo[]>> {
     const { addresses, referenceBlockHash } = req;
-    const hexAddresses = addresses.map(a => fixAddresses(a, networks.CardanoMainnet));
+    const hexAddresses = addresses.map(a => {
+      const hex = fixAddresses(a, networks.CardanoMainnet);
+      if (hex.match(/^([a-f0-9][a-f0-9])+$/)) {
+        return hex;
+      }
+      return byronAddressToHex(a);
+    });
 
     let lastTxIndex;
     for (lastTxIndex = this.blockchain.length - 1; lastTxIndex >= 0; lastTxIndex--) {
@@ -856,7 +862,14 @@ export class MockUtxoApi implements UtxoApiContract {
   async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
     const { addresses, untilBlockHash, afterBestBlock, } = req;
 
-    const hexAddresses = addresses.map(a => fixAddresses(a, networks.CardanoMainnet));
+    const hexAddresses = addresses.map(a => {
+      const hex = fixAddresses(a, networks.CardanoMainnet);
+      if (hex.match(/^([a-f0-9][a-f0-9])+$/)) {
+        return hex;
+      }
+      return byronAddressToHex(a);
+    });
+
     let seenUntilBlock = false;
     const utxoDiffItems = [];
     for (let i = this.blockchain.length - 1; i >= 0; i--) {
