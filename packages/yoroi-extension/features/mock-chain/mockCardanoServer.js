@@ -313,7 +313,7 @@ export function getMockServer(settings: {
       const bestBlockHash = await mockImporter.mockUtxoApi.getBestBlock();
       const safeBlockHash = await mockImporter.mockUtxoApi.getSafeBlock();
       res.send({
-        safeBlocK: { hash: safeBlockHash },
+        safeBlock: { hash: safeBlockHash },
         bestBlock: { hash: bestBlockHash },
       });
     });
@@ -365,9 +365,14 @@ export function getMockServer(settings: {
     });
 
     server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
-      const { addresses, untilBlockHash, afterBestBlock } = req.body;
+      const { addresses, untilBlockHash, afterPoint } = req.body;
       const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint(
-        { addresses, untilBlockHash, afterBestBlock }
+        {
+          addresses,
+          untilBlockHash,
+          // ignore itemIndex and txHash
+          afterBestBlock: afterPoint.blockHash
+        },
       );
       if (result !== 'SUCCESS') {
         res.status(500);
@@ -392,7 +397,11 @@ export function getMockServer(settings: {
             tx_index: item.utxo.txIndex,
           };
         });
-        res.send({ diffItems });
+        res.send({
+          diffItems,
+          // no pagination, always return all at once
+          lastDiffPointSelected: { blockHash: untilBlockHash }
+        });
       }
     });
 

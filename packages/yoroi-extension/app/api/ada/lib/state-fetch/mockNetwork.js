@@ -19,7 +19,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 import { RollbackApiError, } from '../../../common/errors';
-import { toEnterprise, addressToKind, toHexOrBase58, } from '../storage/bridge/utils';
+import { toEnterprise, addressToKind, toHexOrBase58 } from '../storage/bridge/utils';
 import { CoreAddressTypes } from '../storage/database/primitives/enums';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
 import {
@@ -48,6 +48,15 @@ import type {
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib-core/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib-core/dist/utxo/models';
+
+function byronAddressToHex(byronAddrOrHex: string): string {
+  if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
+    return Buffer.from(
+      RustModule.WalletV4.ByronAddress.from_base58(byronAddrOrHex).to_bytes()
+    ).toString('hex');
+  }
+  return byronAddrOrHex;
+}
 
 /** convert bech32 address to bytes */
 function fixAddresses(
@@ -784,6 +793,8 @@ export class MockUtxoApi implements UtxoApiContract {
 
   async getUtxoAtPoint(req: UtxoAtPointRequest): Promise<UtxoApiResponse<Utxo[]>> {
     const { addresses, referenceBlockHash } = req;
+    const hexAddresses = addresses.map(a => fixAddresses(a, networks.CardanoMainnet));
+
     let lastTxIndex;
     for (lastTxIndex = this.blockchain.length - 1; lastTxIndex >= 0; lastTxIndex--) {
       const hash = this.blockchain[lastTxIndex].block_hash;
@@ -809,8 +820,10 @@ export class MockUtxoApi implements UtxoApiContract {
       // add new
       for (let outputIndex = 0; outputIndex < tx.outputs.length; outputIndex++) {
         const output = tx.outputs[outputIndex];
-
-        if (!addresses.includes(output.address)) {
+        if (!(
+          hexAddresses.includes(byronAddressToHex(output.address)) ||
+            hexAddresses.includes(Buffer.from(toEnterprise(output.address)?.to_address().to_bytes() || '').toString('hex'))
+        )) {
           continue;
         }
 
@@ -843,6 +856,7 @@ export class MockUtxoApi implements UtxoApiContract {
   async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
     const { addresses, untilBlockHash, afterBestBlock, } = req;
 
+    const hexAddresses = addresses.map(a => fixAddresses(a, networks.CardanoMainnet));
     let seenUntilBlock = false;
     const utxoDiffItems = [];
     for (let i = this.blockchain.length - 1; i >= 0; i--) {
@@ -861,7 +875,10 @@ export class MockUtxoApi implements UtxoApiContract {
         }
 
         tx.outputs.forEach((output, outputIndex) => {
-          if (!addresses.includes(output.address)) {
+          if (!(
+            hexAddresses.includes(byronAddressToHex(output.address)) ||
+              hexAddresses.includes(Buffer.from(toEnterprise(output.address)?.to_address().to_bytes() || '').toString('hex'))
+          )) {
             return;
           }
           const utxoId = `${tx.hash}${outputIndex}`
@@ -887,16 +904,18 @@ export class MockUtxoApi implements UtxoApiContract {
             }
           );
         });
-        tx.inputs.filter(input => addresses.includes(input.address))
-          .forEach(input => {
-            utxoDiffItems.push(
-              ({
-                type: 'input',
-                id: input.id,
-                amount: new BigNumber(input.amount),
-              }: UtxoDiffItem)
-            );
-          });
+        tx.inputs.filter(input =>
+          hexAddresses.includes(byronAddressToHex(input.address)) ||
+          hexAddresses.includes(Buffer.from(toEnterprise(input.address)?.to_address().to_bytes() || '').toString('hex'))
+        ).forEach(input => {
+          utxoDiffItems.push(
+            ({
+              type: 'input',
+              id: input.id,
+              amount: new BigNumber(input.amount),
+            }: UtxoDiffItem)
+          );
+        });
       }
     }
     if (!seenUntilBlock) {
