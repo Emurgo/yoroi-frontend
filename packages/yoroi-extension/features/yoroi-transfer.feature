@@ -171,7 +171,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                 | recoveredBalance | fees     |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -193,7 +193,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                 | recoveredBalance | fees     |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -215,7 +215,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -237,7 +237,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -259,7 +259,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -285,7 +285,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
