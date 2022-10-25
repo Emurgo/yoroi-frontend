@@ -273,11 +273,6 @@ export default class BaseProfileStore
       }
     }
 
-    // THEMES.YOROI_MODERN is the default theme
-    // TODO: Tests were written for the old theme so we need to use it for testing
-    if (environment.isTest()) {
-      return THEMES.YOROI_CLASSIC;
-    }
     return THEMES.YOROI_MODERN;
   }
 
