@@ -24,7 +24,6 @@ import {
   logsTitle,
   reportingAProblemTitle,
   cardanoPaymentsURLTitle,
-  currencyConversionText,
   removeWalletButton,
   resyncWalletButton,
   exportButton,

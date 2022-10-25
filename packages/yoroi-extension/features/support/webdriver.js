@@ -317,8 +317,8 @@ function CustomWorld(cmdInput: WorldInput) {
       (k, l, callback) => {
         window.yoroi.translations[l]
           .then(translation => callback(translation[k]))
-          // eslint-disable-next-line no-console
           .catch(e => {
+            // eslint-disable-next-line no-console
             console.error('Intl fail: ', e);
           });
       },
