@@ -908,7 +908,129 @@ function toggleConnectionUI(status) {
   }
 }
 
+function bldr(b) {
+  return new Proxy(b, {
+    get(target, name, receiver) {
+      let rv = Reflect.get(target, name, receiver);
+      return typeof rv === 'function' ? (...args) => {
+        let res = rv.bind(b)(...args);
+        b.free();
+        return name === 'build' ? res : bldr(res);
+      } : rv;
+    }
+  });
+}
+
+function WasmScope(cb) {
+  let scope = [];
+  function prox(x) {
+    return typeof x === 'object' || typeof x === 'function' ? new Proxy(x, {
+      get(target, name, receiver) {
+        let rv = Reflect.get(target, name, receiver);
+        if (typeof rv !== 'function' || rv.prototype != null) {
+          return prox(rv);
+        }
+        return function(...args) {
+          const res = rv.bind(x)(...args);
+          if (res.ptr != null && res.free != null) {
+            scope.push(res);
+          }
+          return prox(res);
+        }
+      }
+    }) : x;
+  }
+  let result = cb(prox(CardanoWasm));
+  scope.forEach(x => x.free());
+  return result;
+}
+
+function wfree(...args) {
+  args.forEach(x => x.free());
+}
+
+function foo1() {
+  return WasmScope(Wasm => {
+    return Wasm.BigNum.from_str('1000000')
+      .checked_add(Wasm.BigNum.from_str('2000000'))
+      .to_str();
+  });
+}
+
+function foo2() {
+  for (let i = 0; i < 1000; i++) {
+    setInterval(() => {
+      let arr = [];
+      for (let i = 0; i < 1000; i++) {
+        const a = CardanoWasm.BigNum.from_str('72');
+        const b = CardanoWasm.BigNum.from_str('1000');
+        const c = CardanoWasm.BigNum.from_str('172');
+        const d = CardanoWasm.BigNum.from_str('10000');
+        const e = CardanoWasm.UnitInterval.new(a, b);
+        const f = CardanoWasm.UnitInterval.new(c, d);
+        const g = CardanoWasm.BigNum.from_str('172000');
+        const h = CardanoWasm.BigNum.from_str('123456');
+        const i = CardanoWasm.BigNum.from_str('44000');
+        const j = CardanoWasm.LinearFee.new(h, i);
+        const k = CardanoWasm.BigNum.from_str('2000000');
+        const l = CardanoWasm.ExUnitPrices.new(e, f);
+        const m = CardanoWasm.BigNum.from_str('4000000');
+        let config = bldr(CardanoWasm.TransactionBuilderConfigBuilder.new())
+          .ex_unit_prices(l)
+          .coins_per_utxo_byte(g)
+          .fee_algo(j)
+          .key_deposit(k)
+          .pool_deposit(m)
+          .max_tx_size(123456765)
+          .max_value_size(123456765)
+          .build();
+        let builder = CardanoWasm.TransactionBuilder.new(config);
+        arr.push(builder);
+        wfree(a, b, c, d, e, f, g, h, i, j, k, l, m, config);
+      }
+      console.log(arr.length);
+      arr.forEach(x => x.free());
+    }, 1000);
+  }
+}
+
+function foo3() {
+  for (let i = 0; i < 1000; i++) {
+    setInterval(() => {
+      WasmScope(CardanoWasm => {
+        let arr = [];
+        for (let i = 0; i < 1000; i++) {
+          let config = CardanoWasm.TransactionBuilderConfigBuilder.new()
+            .ex_unit_prices(CardanoWasm.ExUnitPrices.new(
+              CardanoWasm.UnitInterval.new(
+                CardanoWasm.BigNum.from_str('72'),
+                CardanoWasm.BigNum.from_str('1000'),
+              ),
+              CardanoWasm.UnitInterval.new(
+                CardanoWasm.BigNum.from_str('172'),
+                CardanoWasm.BigNum.from_str('10000'),
+              )))
+            .coins_per_utxo_byte(CardanoWasm.BigNum.from_str('172000'))
+            .fee_algo(CardanoWasm.LinearFee.new(
+              CardanoWasm.BigNum.from_str('123456'),
+              CardanoWasm.BigNum.from_str('44000'),
+            ))
+            .key_deposit(CardanoWasm.BigNum.from_str('2000000'))
+            .pool_deposit(CardanoWasm.BigNum.from_str('4000000'))
+            .max_tx_size(123456765)
+            .max_value_size(123456765)
+            .build();
+          let builder = CardanoWasm.TransactionBuilder.new(config);
+          arr.push(builder);
+        }
+        console.log(arr.length);
+      });
+    }, 1000);
+  }
+}
+
 function onload() {
+  foo3();
   if (typeof window.cardano === 'undefined') {
     alertError('Cardano API not found');
   } else {
