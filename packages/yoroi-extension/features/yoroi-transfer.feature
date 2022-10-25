@@ -146,7 +146,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                 | reward | fees     |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5      | 0.173157 |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5      | 0.178877 |
     And I see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
