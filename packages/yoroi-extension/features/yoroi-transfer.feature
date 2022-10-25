@@ -65,7 +65,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | recoveredBalance | fees     |
-    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 3.110005         | 0.209237 |
+    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 6.110005         | 0.209237 |
     | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
     | Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3 |                  |          |
     | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
@@ -76,7 +76,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see wallet changed notice
     And I should see on the Yoroi transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 2.290005         | 0.201625 |
+      | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4.290005         | 0.201625 |
       | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
       | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
       | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
