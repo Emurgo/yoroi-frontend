@@ -30,9 +30,8 @@ export const confirmPinDialog: LocatorObject = {
 export const pinInput: LocatorObject = { locator: "input[name='pin']", method: 'css' };
 
 export const confirmPinDialogError: LocatorObject = {
-  locator:
-    '.ConfirmPinDialog_dialog .ConfirmPinDialog_pinInputContainer .FormFieldOverridesClassic_error',
-  method: 'css',
+  locator: '//p[starts-with(@id, "pin-") and contains(@id, "-helper-text")]',
+  method: 'xpath',
 };
 
 export const registerDialog: LocatorObject = { locator: '.RegisterDialog_dialog', method: 'css' };
