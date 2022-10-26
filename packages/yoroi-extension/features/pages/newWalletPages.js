@@ -2,6 +2,7 @@
 
 import type { LocatorObject } from '../support/webdriver';
 
+export const seedPhrasePlaceholder = 'Tap each word in the correct order to verify your recovery phrase';
 export const connectHwButton: LocatorObject = { locator: '.WalletAdd_btnConnectHW', method: 'css' };
 export const createWalletButton: LocatorObject = {
   locator: '.WalletAdd_btnCreateWallet',
@@ -131,6 +132,12 @@ export const recoveryPhraseConfirmButton: LocatorObject = {
 export const clearButton: LocatorObject = {
   locator: "//button[contains(text(), 'Clear')]",
   method: 'xpath',
+};
+export const getRecoveryPhraseWord = (indexNumber: number): LocatorObject => {
+  return {
+    locator: `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${indexNumber}]`,
+    method: 'xpath'
+  };
 };
 
 // Paper Wallet dialog
