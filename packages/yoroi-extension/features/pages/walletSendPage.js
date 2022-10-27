@@ -36,7 +36,7 @@ export const getMemoText = async (customWorld: Object): Promise<string> => {
   return await memoElem[0].getText();
 };
 export const memoContentInput: LocatorObject = {
-  locator: '//input[contains(@id, "memo")]',
+  locator: '//input[starts-with(@name, "memo")]',
   method: 'xpath',
 };
 export const editMemoButton: LocatorObject = { locator: '.editMemoButton', method: 'css' };
