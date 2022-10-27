@@ -350,7 +350,7 @@ async function restoreWallet (
   await customWorld.waitForElement(pickUpCurrencyDialog);
   await customWorld.click(getCurrencyButton('cardano'));
   customWorld.webDriverLogger.info(`Step:restoreWallet: Selected currency "cardano"`);
-  await customWorld.waitForElement(walletRestoreDialog);
+  await customWorld.waitForElement(walletRestoreOptionDialog);
 
   await customWorld.click(restoreNormalWallet);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Selected 15-word wallet`);
@@ -575,6 +575,7 @@ async function setLedgerWallet(client, serial) {
       .catch(err => done(err));
   }, serial);
 }
+// deprecated
 Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
   this.webDriverLogger.info(`Step: I connected Ledger device ${serial}`);
   await setLedgerWallet(this, serial);

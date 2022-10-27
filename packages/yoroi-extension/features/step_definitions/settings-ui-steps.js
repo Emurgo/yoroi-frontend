@@ -24,7 +24,6 @@ import {
   logsTitle,
   reportingAProblemTitle,
   cardanoPaymentsURLTitle,
-  currencyConversionText,
   removeWalletButton,
   resyncWalletButton,
   exportButton,
@@ -138,7 +137,6 @@ Then(/^I should see support screen$/, async function () {
 Then(/^I should see blockchain screen$/, async function () {
   await this.waitForElement(explorerSettingsDropdown);
   await this.waitForElement(cardanoPaymentsURLTitle);
-  await this.waitForElement(currencyConversionText);
 });
 
 When(/^I click on remove wallet$/, async function () {
@@ -174,5 +172,6 @@ Then(/^I sleep for ([^"]*)$/, async function (ms) {
 });
 
 Then(/^I should see "Incorrect wallet password." error message$/, async function () {
-  await this.waitUntilText(changePasswordDialogError, 'Incorrect wallet password.', 15000);
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.IncorrectPasswordError' });
+  await this.waitUntilText(changePasswordDialogError, errorMessage);
 });
