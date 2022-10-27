@@ -142,7 +142,7 @@ import {
 } from '../../database/utxo/api/read';
 import type {
   Utxo,
-} from '@emurgo/yoroi-lib-core/dist/utxo/models';
+} from '@emurgo/yoroi-lib/dist/utxo/models';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;

@@ -37,7 +37,7 @@ import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepa
 import { bech32 } from 'bech32';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
-import type { UtxoApiContract } from '@emurgo/yoroi-lib-core/dist/utxo/api';
+import type { UtxoApiContract } from '@emurgo/yoroi-lib/dist/utxo/api';
 import type {
   TipStatusReference,
   Utxo,
@@ -46,8 +46,8 @@ import type {
   UtxoDiff,
   UtxoDiffItem,
   UtxoDiffSincePointRequest
-} from '@emurgo/yoroi-lib-core/dist/utxo/models';
-import { UtxoApiResult, } from '@emurgo/yoroi-lib-core/dist/utxo/models';
+} from '@emurgo/yoroi-lib/dist/utxo/models';
+import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
   if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {

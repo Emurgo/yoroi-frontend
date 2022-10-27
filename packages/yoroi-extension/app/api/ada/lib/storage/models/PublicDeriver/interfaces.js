@@ -68,7 +68,7 @@ import type {
   GetUtxoAtSafePoint,
   GetUtxoDiffToBestBlock,
 } from '../../database/utxo/api/read';
-import { UtxoService } from '@emurgo/yoroi-lib-core/dist/utxo';
+import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 
 
