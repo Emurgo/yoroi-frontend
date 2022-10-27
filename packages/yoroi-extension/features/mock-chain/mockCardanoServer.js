@@ -342,7 +342,7 @@ export function getMockServer(settings: {
     });
 
     server.post('/api/v2/txs/utxoAtPoint', async (req, res) => {
-      const { addresses, referenceBlockHash } = req.body;
+      const { addresses, referenceBlockHash, page, pageSize } = req.body;
       const { value } = await mockImporter.mockUtxoApi.getUtxoAtPoint(
         { addresses, referenceBlockHash }
       );
@@ -350,7 +350,10 @@ export function getMockServer(settings: {
         throw new Error('unpected null value');
       }
       res.send(
-        value.map(v => (
+        value.slice(
+          (Number(page) - 1) * Number(pageSize),
+          Number(page) * Number(pageSize),
+        ).map(v => (
           {
             utxo_id: v.utxoId,
             tx_hash: v.txHash,
