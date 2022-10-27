@@ -1,6 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import { expect } from 'chai';
 import { truncateAddress } from '../../../app/utils/formatters';
 import {
   networks,
@@ -77,10 +78,14 @@ export async function checkTotalAmountIsCorrect(
   const decimalPlaces = assetInfo.Metadata.numberOfDecimals;
   const ticker = getTokenName(assetInfo);
   const amountPerUnit = new BigNumber(10).pow(decimalPlaces);
-  const totalAmountFormatted = `${totalAmount
+  const expectedTotalAmountFormatted = `${totalAmount
     .dividedBy(amountPerUnit)
     .toFormat(decimalPlaces)} ${ticker}`;
-  await world.waitUntilText(amountField, totalAmountFormatted);
+
+  await world.waitForElement(amountField);
+  const realAmountText = await world.getText(amountField);
+
+  expect(expectedTotalAmountFormatted).to.be.equal(realAmountText);
 }
 
 export async function checkFinalBalanceIsCorrect(
@@ -99,7 +104,10 @@ export async function checkFinalBalanceIsCorrect(
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
   const ticker = getTokenName(assetInfo);
-  const finalBalance = `${finalAmount} ${ticker}`;
+  const expectedBalance = `${finalAmount} ${ticker}`;
 
-  await world.waitUntilText(totalAmountField, finalBalance);
+  await world.waitForElement(totalAmountField);
+  const realFinalBalanceText = await world.getText(totalAmountField);
+
+  expect(expectedBalance).to.be.equal(realFinalBalanceText);
 }
