@@ -908,17 +908,8 @@ function toggleConnectionUI(status) {
   }
 }
 
-function bldr(b) {
-  return new Proxy(b, {
-    get(target, name, receiver) {
-      let rv = Reflect.get(target, name, receiver);
-      return typeof rv === 'function' ? (...args) => {
-        let res = rv.bind(b)(...args);
-        b.free();
-        return name === 'build' ? res : bldr(res);
-      } : rv;
-    }
-  });
+function isWasm(o) {
+  return o.ptr != null && o.free != null;
 }
 
 function WasmScope(cb) {
@@ -932,7 +923,7 @@ function WasmScope(cb) {
         }
         return function(...args) {
           const res = rv.bind(x)(...args);
-          if (res.ptr != null && res.free != null) {
+          if (isWasm(res)) {
             scope.push(res);
           }
           return prox(res);
@@ -942,6 +933,10 @@ function WasmScope(cb) {
   }
   let result = cb(prox(CardanoWasm));
   scope.forEach(x => x.free());
+  console.log(`[WasmScope] freed objects:`, scope.length);
+  if (isWasm(result)) {
+    throw new Error('A wasm object cannot be returned from wasm scope');
+  }
   return result;
 }
 
@@ -954,6 +949,15 @@ function foo1() {
     return Wasm.BigNum.from_str('1000000')
       .checked_add(Wasm.BigNum.from_str('2000000'))
       .to_str();
+  });
+}
+
+function foo12() {
+  WasmScope(Wasm => {
+    return Wasm.TransactionBuilderConfigBuilder.new()
+      .max_value_size(123456)
+      .max_tx_size(234567)
+      .pool_deposit(Wasm.BigNum.from_str('123'));
   });
 }
 
@@ -975,7 +979,7 @@ function foo2() {
         const k = CardanoWasm.BigNum.from_str('2000000');
         const l = CardanoWasm.ExUnitPrices.new(e, f);
         const m = CardanoWasm.BigNum.from_str('4000000');
-        let config = bldr(CardanoWasm.TransactionBuilderConfigBuilder.new())
+        let config = CardanoWasm.TransactionBuilderConfigBuilder.new()
           .ex_unit_prices(l)
           .coins_per_utxo_byte(g)
           .fee_algo(j)
@@ -1030,7 +1034,7 @@ function foo3() {
 }
 
 function onload() {
-  foo3();
+  foo12();
   if (typeof window.cardano === 'undefined') {
     alertError('Cardano API not found');
   } else {
