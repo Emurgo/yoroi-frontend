@@ -575,6 +575,7 @@ async function setLedgerWallet(client, serial) {
       .catch(err => done(err));
   }, serial);
 }
+// deprecated
 Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
   this.webDriverLogger.info(`Step: I connected Ledger device ${serial}`);
   await setLedgerWallet(this, serial);

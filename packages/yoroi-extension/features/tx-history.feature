@@ -4,21 +4,6 @@ Feature: Txs History
     Given I have opened the extension
     And I have completed the basic setup
 
-  @it-101
-  Scenario: Open the tx history of an empty wallet (IT-101)
-    Given There is a Byron wallet stored named empty-wallet
-    When I see the transactions summary
-    Then I should see that the number of transactions is 0
-    And I should see no transactions
-
-  @it-102
-  Scenario: Open the tx history of a simple wallet (IT-102)
-    Given There is a Byron wallet stored named simple-pending-wallet
-    When I see the transactions summary
-    Then I should see that the number of transactions is 3
-    And I should see 2 pending transactions
-    And I should see 1 successful transactions 
-
   @it-56
   Scenario: Check content of successful transaction (IT-56)
     Given There is a Byron wallet stored named many-tx-wallet
@@ -43,6 +28,30 @@ Feature: Txs History
     Given I sleep for 1500
     Then I verify top transaction content failed-single-tx
 
+  @it-96
+  Scenario: Tx from other client updates tx history (IT-96)
+    Given There is a Byron wallet stored named many-tx-wallet
+    Given I see the transactions summary
+    Then A successful tx gets sent from my wallet from another client
+    Then I see the transactions summary
+    And I should see that the number of transactions is 7
+    Then I should see the balance number "4.290005 ADA"
+
+  @it-101
+  Scenario: Open the tx history of an empty wallet (IT-101)
+    Given There is a Byron wallet stored named empty-wallet
+    When I see the transactions summary
+    Then I should see that the number of transactions is 0
+    And I should see no transactions
+
+  @it-102
+  Scenario: Open the tx history of a simple wallet (IT-102)
+    Given There is a Byron wallet stored named simple-pending-wallet
+    When I see the transactions summary
+    Then I should see that the number of transactions is 3
+    And I should see 2 pending transactions
+    And I should see 1 successful transactions
+
   @it-103
   Scenario: Open the tx history of a complex wallet (IT-103)
     Given There is a Byron wallet stored named many-tx-wallet
@@ -65,6 +74,17 @@ Feature: Txs History
     Then I see the transactions summary
     And I should see that the number of transactions is 3
 
+  @it-121 @TestAssuranceChain
+  Scenario: Number of confirmation increases overt time (IT-121)
+    Given There is a Byron wallet stored named small-single-tx
+    Given I see the transactions summary
+    Then I should see that the number of transactions is 1
+    Then I expand the top transaction
+    And The number of confirmations of the top tx is 199
+    Then A successful tx gets sent from my wallet from another client
+    Given I sleep for 1000
+    And The number of confirmations of the top tx is 201
+
   @it-139
   Scenario: Open the tx history of an already loaded wallet (IT-139)
     Given There is a Byron wallet stored named simple-pending-wallet
@@ -78,23 +98,3 @@ Feature: Txs History
     Then I navigate to wallet sidebar category
     # should be same number of transactions after the resync
     And I should see that the number of transactions is 3
-
-  @it-96
-  Scenario: Tx from other client updates tx history (IT-96)
-    Given There is a Byron wallet stored named many-tx-wallet
-    Given I see the transactions summary
-    Then A successful tx gets sent from my wallet from another client
-    Then I see the transactions summary
-    And I should see that the number of transactions is 7
-    Then I should see the balance number "2.290005 ADA"
-
-  @it-121 @TestAssuranceChain
-  Scenario: Number of confirmation increases overt time (IT-121)
-    Given There is a Byron wallet stored named small-single-tx
-    Given I see the transactions summary
-    Then I should see that the number of transactions is 1
-    Then I expand the top transaction
-    And The number of confirmations of the top tx is 199
-    Then A successful tx gets sent from my wallet from another client
-    Given I sleep for 1000
-    And The number of confirmations of the top tx is 201

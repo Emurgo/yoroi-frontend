@@ -1,5 +1,6 @@
 // @flow
 import { WebDriver } from 'selenium-webdriver';
+import { defaultRepeatPeriod, defaultWaitTimeout } from './helpers/common-constants';
 
 type WindowType = 'tab' | 'window';
 type CustomWindowHandle = {|
@@ -36,9 +37,24 @@ export class WindowManager {
     this.windowHandles.push({ title: windowTitle, handle: mainWindowHandle });
   }
 
+  async _waitWindowTitle(
+    timeoutMs: number = defaultWaitTimeout,
+    repeatPeriodMs: number = defaultRepeatPeriod): Promise<string> {
+    this.logger.info(`WindowManager:_waitWindowTitle: Waiting for the window title`);
+    const endTime = Date.now() + timeoutMs;
+
+    while (endTime >= Date.now()) {
+      const windowTitle = await this.driver.getTitle();
+      if (windowTitle !== '') return windowTitle;
+      await this.driver.sleep(repeatPeriodMs);
+    }
+    this.logger.error(`WindowManager:_waitWindowTitle: -> The window has the empty title`);
+    throw new WindowManagerError(`The window has the empty title`);
+  }
+
   async _getWindowTitle(): Promise<string> {
     this.logger.info(`WindowManager: Getting a window title`);
-    const windowTitle = await this.driver.getTitle();
+    const windowTitle = await this._waitWindowTitle();
     this.logger.info(`WindowManager: -> The window title is "${windowTitle}"`);
     if (windowTitle === extensionTabName) {
       return extensionTabName;
@@ -184,6 +200,7 @@ export class WindowManager {
     this.logger.info(
       `WindowManager: -> Switched to the new window ${JSON.stringify(popUpCustomHandle)}`
     );
+    await this._waitWindowTitle();
 
     return popUpCustomHandle;
   }

@@ -10,7 +10,7 @@ const getReceiveSubTabButton = (translatedText: string) => {
 
 export const getGeneratedAddress = (rowIndex: number): LocatorObject => {
   return {
-    locator: `.generatedAddress-${rowIndex + 1} .RawHash_hash`,
+    locator: `.generatedAddress-${rowIndex + 1} .WalletReceive_addressHash`,
     method: 'css',
   };
 };

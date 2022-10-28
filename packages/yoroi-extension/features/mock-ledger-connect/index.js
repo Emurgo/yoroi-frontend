@@ -33,6 +33,10 @@ import {
   StakeCredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
+/*
+Mocking a ledger device is not possible anymore after this update https://github.com/Emurgo/yoroi-frontend/pull/2896
+ */
+
 type WalletInfo = {|
   rootKey: RustModule.WalletV4.Bip32PrivateKey;
   serial: GetSerialResponse,

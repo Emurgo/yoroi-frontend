@@ -22,13 +22,16 @@ import {
   walletAddressRow,
   getAddressFromAddressRow,
 } from '../pages/walletReceivePage';
+import { halfSecond, oneSecond } from '../support/helpers/common-constants';
 
 Given(/^Revamp. I go to the receive screen$/, async function () {
   await this.click(receiveTab);
+  await this.driver.sleep(oneSecond + halfSecond);
 });
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click(receiveTab);
+  await this.driver.sleep(oneSecond + halfSecond);
 });
 
 When(/^I click on the Generate new address button$/, async function () {
@@ -62,8 +65,11 @@ When(/^I click on the HasBalance addresses button$/, async function () {
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {
-  for (let curr = 1; curr <= times; curr++) {
+  for (let curr = 0; curr < times; curr++) {
+    await this.scrollIntoView(generateAddressButton);
     await this.click(generateAddressButton);
+    const addrLocator = getGeneratedAddress(curr);
+    await this.scrollIntoView(addrLocator);
     await this.waitForElement(getGeneratedAddress(curr));
   }
 });
@@ -100,9 +106,11 @@ Then(/^I see every generated address is unique$/, async function () {
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {
   const rows = table.hashes();
-  const waitUntilAddressesAppeared = rows.map((row, index) =>
-    this.waitUntilText(getGeneratedAddress(index), truncateAddressShort(row.address))
-  );
+  const waitUntilAddressesAppeared = rows.map(async (row, index) => {
+    const addressLocator = getGeneratedAddress(index);
+    await this.scrollIntoView(addressLocator);
+    return this.waitUntilText(addressLocator, truncateAddressShort(row.address))
+  });
   const noMoreAddressAppeared = this.waitForElementNotPresent(
     getGeneratedAddress(rows.length + 1)
   );
