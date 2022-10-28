@@ -404,7 +404,7 @@ export default class WalletSendForm extends Component<Props> {
           return {
             label,
             value: token.value,
-            id: token.id
+            id: 'send-all'
           }
         })
       ]
@@ -452,7 +452,9 @@ export default class WalletSendForm extends Component<Props> {
                 }).TokenId
               }
               renderValue={value => (
-                <Box>{tokenOptions.filter(option => option.value === value)[0]?.label}</Box>
+                <Box id='tokenAssetsSelect'>
+                  {tokenOptions.filter(option => option.value === value)[0]?.label}
+                </Box>
               )}
             >
               <MenuItem
@@ -544,7 +546,7 @@ export default class WalletSendForm extends Component<Props> {
             }}
           >
             {sendAmountOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value} id={option.id}>
                 <TokenOptionRow displayName={option.label} nameOnly />
               </MenuItem>
             ))}

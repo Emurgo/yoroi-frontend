@@ -1,29 +1,31 @@
 // @flow
 
 import { Given, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import { truncateAddress, } from '../../app/utils/formatters';
-import { enterRecoveryPhrase } from '../support/helpers/helpers';
+import { truncateAddress } from '../../app/utils/formatters';
+import { enterRecoveryPhrase } from '../pages/restoreWalletPage';
+import { primaryButton } from '../pages/commonDialogPage';
+import {
+  addressElement,
+  getAddressesAmountButton,
+  paperWalletDialogSelect,
+} from '../pages/newWalletPages';
+import { fakeAddresses } from '../support/helpers/common-constants';
 
 // ========== Paper wallet ==========
 
 Then(/^I open Number of Adddresses selection dropdown$/, async function () {
-  await this.click({ locator: '.WalletPaperDialog_component .MuiSelect-select', method: 'css' });
+  await this.click(paperWalletDialogSelect);
 });
 
 Then(/^I select 2 addresses$/, async function () {
-  return this.click({ locator: '//li[contains(text(), "2")]', method: 'xpath' });
+  return this.click(getAddressesAmountButton('2'));
 });
 
 Then(/^I click the create paper wallet button$/, async function () {
-  await this.click({ locator: '.primary', method: 'css' });
+  await this.click(primaryButton);
 });
 
-const fakeAddresses = [
-  'Ae2tdPwUPEZBxVncTviWLPFDukXL7tDWfGXkLMw8CSjqZhPGB7SHkUFaASB',
-  'Ae2tdPwUPEZKTSRpuAt5GhVda8ZAoPXHTXzX9xSP2Ms7YyakwAyREYBpR11',
-];
 Then(/^I enter the paper recovery phrase$/, async function () {
   /**
  * Mnemomic is printed on the paper wallet and not present in the UI
@@ -50,7 +52,7 @@ Given(/^I swap the paper wallet addresses$/, async function () {
 });
 
 Then(/^I should see two addresses displayed$/, async function () {
-  const addressesElem = await this.driver.findElements(By.xpath("//span[contains(@class, 'RawHash_hash')]"));
+  const addressesElem = await this.findElements(addressElement);
   expect(addressesElem.length).to.be.equal(fakeAddresses.length);
   for (let i = 0; i < fakeAddresses.length; i++) {
     const address = await addressesElem[i].getText();

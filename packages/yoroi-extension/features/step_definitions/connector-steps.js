@@ -259,7 +259,7 @@ Then(/^I should see no password errors$/, async function () {
 });
 
 When(/^I click the back button \(Connector pop-up window\)$/, async function () {
-  this.webDriverLogger.info(`Step: I click the back button \(Connector pop-up window\)`);
+  this.webDriverLogger.info(`Step: I click the back button (Connector pop-up window)`);
   await this.waitForElement(backButton);
   await this.click(backButton);
 });
@@ -276,7 +276,9 @@ Then(/^I close the dApp-connector pop-up window$/, async function () {
 });
 
 Then(/^The wallet (.+) is connected to the website (.+)$/, async function (walletName, websiteUrl) {
-  this.webDriverLogger.info(`Step: The wallet ${walletName} is connected to the website ${websiteUrl}`);
+  this.webDriverLogger.info(
+    `Step: The wallet ${walletName} is connected to the website ${websiteUrl}`
+  );
   await this.windowManager.switchTo(extensionTabName);
   const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
   // it should be reworked by using ui components when it is done
@@ -323,7 +325,7 @@ Then(/^I should see "No Cardano wallets is found" message$/, async function () {
 });
 
 Then(/^I press the "Create wallet" button \(Connector pop-up window\)$/, async function () {
-  this.webDriverLogger.info(`Step: I press the "Create wallet" button \(Connector pop-up window\)`);
+  this.webDriverLogger.info(`Step: I press the "Create wallet" button (Connector pop-up window)`);
   await this.waitForElement(createWalletBtn);
   await this.click(createWalletBtn);
 });
@@ -379,10 +381,10 @@ When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
   await this.mockDAppPage.addCollateral(utxos);
 });
 
-Then(
-  /^The dApp should see collateral: (.+) for (.+)$/,
-  async function (expectedCollateral, utxosAmount) {
-    this.webDriverLogger.info(`Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`);
+Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expectedCollateral, utxosAmount) {
+    this.webDriverLogger.info(
+      `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
+    );
     const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
     const collateralJson = JSON.parse(collateral)[0];
     const expectedUtxos = JSON.parse(expectedCollateral);
@@ -390,10 +392,22 @@ Then(
   }
 );
 
-Then(/^I should see the connector popup to Add Collateral$/, async function () {
-  this.webDriverLogger.info(`Step: I should see the connector popup to Add Collateral`);
+Then(/^The dApp should receive collateral$/, async function (table) {
+  const fields = table.hashes()[0];
+  const utxosAmount = fields.forAmount;
+  const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+  const collateralJson = JSON.parse(collateral)[0];
+  expect(collateralJson.amount, 'Amount is different').to.equal(fields.amount);
+  expect(collateralJson.receiver, 'Receiver is different').to.equal(fields.receiver);
+});
+
+Then(/^I should see the connector popup to Add Collateral with fee info$/, async function (table) {
+  this.webDriverLogger.info(`Step: I should see the connector popup to Add Collateral with fee info`);
   await connectorPopUpIsDisplayed(this);
   await this.waitForElement(addCollateralTitle);
+  const fields = table.hashes()[0];
+  const realFee = await getTransactionFee(this);
+  expect(realFee, 'Fee is different').to.equal(fields.fee);
 });
 
 Then(/^I should see the collateral fee data:$/, async function (table) {
@@ -422,7 +436,9 @@ Then(/^I should see the collateral from address info:$/, async function (table) 
     addr =>
       addr.address === expectedFromAddress && addr.amount === parseFloat(expectedFromAddressAmount)
   );
-  this.webDriverLogger.info(`Step: I should see the collateral from address info: address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}`);
+  this.webDriverLogger.info(
+    `Step: I should see the collateral from address info: address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}`
+  );
   expect(
     foundFromAddresses.length,
     `Expected fromAddress:

@@ -114,7 +114,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
       const classicCardanoStakingPage = (
-        <div>
+        <div id='classicCardanoStakingPage'>
           {this.getDialog()}
           <SeizaFetcher
             urlTemplate={urlTemplate}
@@ -216,6 +216,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
 
     const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
+    if (balance == null) {
+      return null;
+    }
     const rewardBalance =
       delegationRequests.getDelegatedBalance.result == null
         ? new MultiToken([], publicDeriver.getParent().getDefaultToken())
@@ -223,8 +226,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const tokenInfo = genLookupOrFail(
       this.generated.stores.tokenInfoStore.tokenInfo
     )(rewardBalance.getDefaultEntry());
-
-    if (balance == null || rewardBalance == null) throw new Error(`${nameof(CardanoStakingPage)} balance or rewardBalance is null`)
     return balance
       .joinAddCopy(rewardBalance)
       .getDefaultEntry()

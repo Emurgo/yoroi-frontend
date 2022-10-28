@@ -36,6 +36,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
 import Support from './components/widgets/Support';
+import { trackNavigation } from './api/analytics';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -79,6 +80,9 @@ class App extends Component<Props, State> {
       runInAction(() => {
         this.mergedMessages = _mergedMessages;
       });
+    });
+    this.props.history.listen(({ pathname }) => {
+      trackNavigation(pathname);
     });
   }
 
@@ -140,7 +144,7 @@ class App extends Component<Props, State> {
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
-      return <CrashPage stores={stores} actions={actions} />;
+      return <CrashPage />;
     }
     if (stores.serverConnectionStore.isMaintenance) {
       return <MaintenancePage stores={stores} actions={actions} />;

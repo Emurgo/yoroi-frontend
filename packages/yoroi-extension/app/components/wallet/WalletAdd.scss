@@ -122,7 +122,7 @@ $linebreakWidth: 1540px;
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     background-image: url(../../assets/images/add-wallet/add-wallet-bg-modern.inline.svg);
     background-size: cover;

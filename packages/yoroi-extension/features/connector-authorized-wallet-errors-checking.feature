@@ -74,7 +74,7 @@ Feature: dApp connector errors checking
     And The user reject for signing is received
 
   @dApp-1017
-  Scenario: dApp, authorized wallet, unused address, signing data, cancel signing
+  Scenario: dApp, authorized wallet, unused address, signing data, cancel signing (DAPP-1017)
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -91,7 +91,7 @@ Feature: dApp connector errors checking
     And The user reject for signing data is received
 
   @dApp-1018
-  Scenario: dApp, authorized wallet, used address, signing data, cancel signing
+  Scenario: dApp, authorized wallet, used address, signing data, cancel signing (DAPP-1018)
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance

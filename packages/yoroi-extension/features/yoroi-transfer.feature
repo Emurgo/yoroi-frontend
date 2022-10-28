@@ -4,22 +4,32 @@ Feature: Transfer Yoroi Wallet funds
     Given I have opened the extension
     And I have completed the basic setup
     And I switched to the advanced level
+    And I navigate back to the main page
     Then I should see the Create wallet screen
 
-  @it-114
-  Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
+  @it-82
+  Scenario: User can transfer funds from another Yoroi paper wallet (IT-82)
+    # The recovery phrase and its balance(s) are defined in
+    # /features/mock-chain/TestWallets.js and
+    # /features/mock-chain/mockImporter.js
     Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
-    Then I select the Byron 15-word option
+    Then I select the yoroi paper wallet option
     And I enter the recovery phrase:
-    | recoveryPhrase                                                                                           |
-    | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
+      | recoveryPhrase                                                                                           |
+      | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
+    And I enter the paper wallet password "cool password"
     And I proceed with the recovery
-    Then I should see a plate XJOD-1073
+    Then I should see a plate KOTZ-1730
     Then I click the next button
-    Then I should see the Yoroi transfer error screen
+    Then I should see on the Yoroi transfer summary screen:
+      | fromAddress                                                 | recoveredBalance | fees     |
+      | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2                | 0.166425 |
+    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CwGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAG/pnAhoAAooZAxoR/pTNoQKBhFgg18n9dDSQAQOaCZv45nr6Siugpa1UECrB4PoeJf11D51YQH7FvLGwOx0vFm9SpYsA8qBlv3LmHh+Q/oQ82FRjrfcUdQEKy/1/oEX+8K/2CN+n8lKnouQovKGJNw0qfTaBbQBYIHos8jfmh7thEmh9Z4iWlGgVLpvfY779btjkhmBoW8dQQaD19g=="
+    When I confirm Yoroi transfer funds
+    Then I should see the Yoroi transfer success screen
   
   @it-111
   Scenario: User can transfer funds from another Yoroi wallet (IT-111)
@@ -64,7 +74,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | recoveredBalance | fees     |
-    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 3.110005         | 0.209237 |
+    | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 6.110005         | 0.209237 |
     | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
     | Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3 |                  |          |
     | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
@@ -75,7 +85,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see wallet changed notice
     And I should see on the Yoroi transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 2.290005         | 0.201625 |
+      | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4.290005         | 0.201625 |
       | Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj |                  |          |
       | Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD |                  |          |
       | Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w |                  |          |
@@ -84,25 +94,20 @@ Feature: Transfer Yoroi Wallet funds
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
-  @it-115
-  Scenario: User can transfer funds from a trezor wallet (IT-115)
+  @it-114
+  Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
     Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
-    Then I select the trezor option
+    Then I select the Byron 15-word option
     And I enter the recovery phrase:
-    | recoveryPhrase                                                                               |
-    | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
+      | recoveryPhrase                                                                                           |
+      | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
     And I proceed with the recovery
-    Then I should see a plate EDAO-9229
+    Then I should see a plate XJOD-1073
     Then I click the next button
-    Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | recoveredBalance | fees     |
-    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567.898765   | 0.166601 |
-    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11AQGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BsAAAEfcfibxAIaAAKKyQMaEf6UzaECgYRYIN55/74OwKqI0JZwK19fblZHm+7JEsg8OLft70zu5izcWEA97UHd+arHPWEd8xAv3ZQtmkL58YcVrg8ekQLoEMX3MO8CrtVCwWYUgfLSgaqja9/dLnvPy0zghsbnrVszs+QCWCBrIXiD9bpMpYOCltkXhx8TKeoGjp/lukIOg9Xs/MUkKkGg9fY="
-    When I confirm Yoroi transfer funds
-    Then I should see the Yoroi transfer success screen
+    Then I should see the Yoroi transfer error screen
 
   @it-141
   Scenario: User can transfer funds from a ledger wallet (IT-141)
@@ -124,30 +129,6 @@ Feature: Transfer Yoroi Wallet funds
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
 
-  @it-82
-  Scenario: User can transfer funds from another Yoroi paper wallet (IT-82)
-    # The recovery phrase and its balance(s) are defined in 
-    # /features/mock-chain/TestWallets.js and
-    # /features/mock-chain/mockImporter.js
-    Given There is a Byron wallet stored named empty-wallet
-    And I am on the transfer start screen
-    When I click on the byron button on the transfer screen
-    When I click on the icarus tab
-    Then I select the yoroi paper wallet option
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                                           |
-    | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
-    And I enter the paper wallet password "cool password"
-    And I proceed with the recovery
-    Then I should see a plate KOTZ-1730
-    Then I click the next button
-    Then I should see on the Yoroi transfer summary screen:
-    | fromAddress                                                 | recoveredBalance | fees     |
-    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2                | 0.166425 |
-    Given The expected transaction is "hKQAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11CwGBglgrgtgYWCGDWBwoHaM1MYhgfLim8H41W1iW2HF0vHYAe5aqHlfRoAAaC5i61BoAG/pnAhoAAooZAxoR/pTNoQKBhFgg18n9dDSQAQOaCZv45nr6Siugpa1UECrB4PoeJf11D51YQH7FvLGwOx0vFm9SpYsA8qBlv3LmHh+Q/oQ82FRjrfcUdQEKy/1/oEX+8K/2CN+n8lKnouQovKGJNw0qfTaBbQBYIHos8jfmh7thEmh9Z4iWlGgVLpvfY779btjkhmBoW8dQQaD19g=="
-    When I confirm Yoroi transfer funds
-    Then I should see the Yoroi transfer success screen
-
   @it-146
   Scenario: User can claim Shelley rewards w/ deregister (IT-146)
     Given There is a Shelley wallet stored named shelley-simple-15
@@ -165,7 +146,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                 | reward | fees     |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5      | 0.173157 |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5      | 0.178877 |
     And I see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -190,7 +171,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                 | recoveredBalance | fees     |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -212,7 +193,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                 | recoveredBalance | fees     |
-    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -234,7 +215,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -256,7 +237,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -278,7 +259,7 @@ Feature: Transfer Yoroi Wallet funds
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -304,7 +285,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | recoveredBalance | fees     |
-      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.171573 |
+      | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5                | 0.177293 |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
