@@ -412,11 +412,6 @@ function CustomWorld(cmdInput: WorldInput) {
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
   };
-
-  this.scrollIntoView = async (locator: LocatorObject) => {
-    const element = await this.getElementBy(locator);
-    await this.driver.executeScript('arguments[0].scrollIntoView();', element);
-  };
 }
 
 // no need to await

@@ -8,7 +8,8 @@ import i18n from '../support/helpers/i18n-helpers';
 import {
   confirmationCountText,
   failedTransactionElement,
-  getTopTx,
+  getLastTx,
+  getTxAmount,
   getTxStatus,
   noTransactionsComponent,
   numberOfTransactions,
@@ -16,12 +17,12 @@ import {
   pendingTransactionElement,
   showMoreButton,
   transactionAddressListElement,
-  transactionComponent, transactionIdText,
+  transactionComponent,
+  transactionIdText,
 } from '../pages/walletTransactionsHistoryPage';
 import { summaryTab } from '../pages/walletPage';
-import { displayInfo , txSuccessfulStatuses } from '../support/helpers/common-constants';
+import { displayInfo , txSuccessfulStatuses, adaToFiatPrices } from '../support/helpers/common-constants';
 import { getMethod } from '../support/helpers/helpers';
-import { adaToFiatPrices } from '../support/helpers/common-constants';
 
 const axios = require('axios');
 
@@ -211,7 +212,7 @@ Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async f
   this.webDriverLogger.info(`Step: I wait for ${minutes} minute(s) the last transaction is confirmed`);
   const startTime = Date.now();
   while (startTime + waitTimeMs > Date.now()){
-    const topTx = await getTopTx(this);
+    const topTx = await getLastTx(this);
     const topTxState = await getTxStatus(topTx);
     if(txSuccessfulStatuses.includes(topTxState.toLowerCase())){
       const endTime = Date.now();
@@ -231,7 +232,7 @@ Then(
     const response = await axios(adaToFiatPrices);
     const rate = await response.data.ticker.prices[currency];
 
-    const allTxsList = await this.findElements(txRowComponent);
+    const allTxsList = await this.findElements(transactionComponent);
     for (const txListElement of allTxsList) {
       const txAmount = await getTxAmount(txListElement);
       expect(txAmount).to.contain(currency);

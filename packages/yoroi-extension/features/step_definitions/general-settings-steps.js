@@ -3,7 +3,6 @@
 import { When, Then } from 'cucumber';
 import { camelCase } from 'lodash';
 import i18n from '../support/helpers/i18n-helpers';
-import { By, WebElement } from 'selenium-webdriver';
 import { expect } from 'chai';
 import {
   generalSettingsComponent,
@@ -23,39 +22,6 @@ import { adaToFiatPrices } from '../support/helpers/common-constants';
 import { loadingSpinnerWindow } from '../pages/commonComponentsPage';
 
 const axios = require('axios');
-
-export async function selectSubmenuSettings(customWorld: Object, buttonName: string) {
-  const formattedButtonName = camelCase(buttonName);
-  const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
-  await customWorld.click({ locator: buttonSelector, method: 'css' });
-  await customWorld.waitForElement({
-    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
-    method: 'css',
-  });
-}
-
-export async function goToSettings(customWorld: Object) {
-  await navigateTo.call(customWorld, '/settings');
-  await navigateTo.call(customWorld, '/settings/general');
-
-  await waitUntilUrlEquals.call(customWorld, '/settings/general');
-  await customWorld.waitForElement({ locator: '.SettingsLayout_component', method: 'css' });
-}
-
-export async function getComplexityLevelButton(
-  customWorld: Object,
-  isLow: boolean = true
-): Promise<WebElement> {
-  await customWorld.waitForElement({ locator: '.ComplexityLevelForm_cardsWrapper', method: 'css' });
-  const levels = await customWorld.driver.findElements(By.css('.ComplexityLevelForm_card'));
-  let card;
-  if (isLow) {
-    card = levels[0];
-  } else {
-    card = levels[levels.length - 1];
-  }
-  return await card.findElement(By.xpath('.//button'));
-}
 
 When(/^I navigate to the general settings screen$/, async function () {
   await goToSettings(this);
@@ -147,7 +113,7 @@ Then(
       parseFloat(adaAmount.replace('\n', '').replace(' ADA', '')).toFixed(2)
     );
 
-    const expectedValue = (await adaValue) * value;
+    const expectedValue = adaValue * value;
     expect(amountDisplayFiatValue).to.equal(`${expectedValue} ${currency}`);
   }
 );

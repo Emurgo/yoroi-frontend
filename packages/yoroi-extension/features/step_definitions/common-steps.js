@@ -85,7 +85,7 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
-import { walletSummaryBox } from '../pages/walletTransactionsPage';
+import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
 import { walletNameText, walletPlate } from '../pages/walletPage';
 import {
   continueButton,
@@ -778,10 +778,6 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
   await this.waitForElement(walletSummaryBox);
-});
-
-Then(/^I should see the dashboard screen$/, async function () {
-  await this.waitForElement({ locator: '.StakingDashboard_page', method: 'css' });
 });
 
 When(/^I go to General Settings$/, async function () {
