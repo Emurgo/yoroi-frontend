@@ -11,10 +11,7 @@ export const emailOptions = {
   headers: { 'Mailsac-Key': mailsacAPIKey },
 };
 
-export const adaToFiatPrices = {
-  method: 'get',
-  url: `https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current`,
-}
+export const adaToFiatPricesMainUrl = `https://iohk-mainnet.yoroiwallet.com/api/price/`;
 
 export const commonWalletPassword = 'asdfasdfasdf';
 export const txSuccessfulStatuses = ['high', 'medium', 'low'];

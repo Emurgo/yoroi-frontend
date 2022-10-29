@@ -96,7 +96,7 @@ When(
     await this.waitForElement(currencySelector);
     await this.scrollIntoView(currencySelector);
     await this.click(currencySelector);
-    await this.waitForElementNotPresent(loadingSpinnerWindow)
+    await this.waitForElementNotPresent(loadingSpinnerWindow);
   }
 );
 
