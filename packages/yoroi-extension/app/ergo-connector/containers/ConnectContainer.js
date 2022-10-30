@@ -44,7 +44,6 @@ export default class ConnectContainer extends Component<
     },
   };
   onUnload: (SyntheticEvent<>) => void = ev => {
-    ev.preventDefault();
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     chrome.runtime.sendMessage({
       type: 'connect_response',
@@ -57,7 +56,7 @@ export default class ConnectContainer extends Component<
   UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
-    window.addEventListener('unload', this.onUnload);
+    window.addEventListener('beforeunload', this.onUnload);
   }
 
   onConnect: (
