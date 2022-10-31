@@ -106,6 +106,7 @@ Then(/^I see every generated address is unique$/, async function () {
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {
   const rows = table.hashes();
+  await this.waitForElement(generateAddressButton);
   const waitUntilAddressesAppeared = rows.map(async (row, index) => {
     const addressLocator = getGeneratedAddress(index);
     await this.scrollIntoView(addressLocator);
