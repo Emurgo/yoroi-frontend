@@ -9,17 +9,20 @@ jobs:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check'))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Read .nvmrc
-        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
       - name: Cache node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-yoroi-extension-node-modules
         with:
@@ -32,9 +35,11 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: npm install
         run: |
           . install-all.sh
+
       - name: tests
         run: |
           npm run test
@@ -46,27 +51,33 @@ jobs:
       matrix:
         browser: ['chrome', 'firefox']
       fail-fast: false
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
         run: brew update && brew upgrade --cask google-chrome
+
       - name: Forcefully install Firefox for Developers browser
         if: matrix.browser=='firefox'
         run: |
           brew update
           brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
           echo "FIREFOX_DEV=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+
       - name: Read .nvmrc
-        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
       - name: Cache extension node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-yoroi-extension-node-modules
         with:
@@ -79,9 +90,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: Cache connector node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-yoroi-connector-node-modules
         with:
@@ -94,27 +106,32 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
       - name: npm install
         run: |
           . install-all.sh
+
       - name: Build the test version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build
+
       - name: Create the report's folder
         working-directory: ./packages/yoroi-extension
         run: |
           mkdir reports
           touch ./reports/cucumberReports.json
+
       - name: Run dapp connector tests
         working-directory: ./packages/yoroi-extension
         env:
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
         run: npm run test:run:e2e:dApp:${{ matrix.browser }}
+
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData_${{ matrix.browser }}
+          name: testRunsData_E2E_tests_dApp_${{ matrix.browser }}
           path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
 
   Trezor_Model_T_emulator:
@@ -124,6 +141,7 @@ jobs:
       matrix:
         browser: ['chrome', 'firefox']
       fail-fast: false
+
     steps:
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
@@ -178,13 +196,14 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Read .nvmrc
-        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
       - name: Cache extension node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
         uses: actions/cache@v3
@@ -221,7 +240,7 @@ jobs:
         run: |
           . install-all.sh
 
-      - name: Build the test version using emulators
+      - name: Build the test version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build
 
@@ -239,7 +258,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData_${{ matrix.browser }}
+          name: testRunsData_Trezor_Model_T_emulator_${{ matrix.browser }}
           path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
 
   E2E_smoke_tests:
@@ -249,8 +268,10 @@ jobs:
       matrix:
         browser: ['chrome', 'firefox']
       fail-fast: false
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
         run: |
@@ -268,17 +289,17 @@ jobs:
           echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
-        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
 
       - name: Cache extension node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-yoroi-extension-node-modules
         with:
@@ -294,7 +315,7 @@ jobs:
 
       - name: Cache connector node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-yoroi-connector-node-modules
         with:
@@ -334,7 +355,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData_${{ matrix.browser }}
+          name: testRunsData_E2E_smoke_tests_${{ matrix.browser }}
           path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
 
   E2E_regression_tests:
@@ -344,6 +365,7 @@ jobs:
       matrix:
         browser: [ 'chrome', 'firefox' ]
       fail-fast: false
+
     steps:
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
@@ -360,7 +382,6 @@ jobs:
           sudo rm -rf /opt/firefoxdev
           sudo mv /opt/firefox /opt/firefoxdev
           echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
-  
 
       - uses: actions/checkout@v3
 
@@ -372,6 +393,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
       - name: Cache extension node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
         uses: actions/cache@v3
@@ -408,7 +430,7 @@ jobs:
         run: |
           . install-all.sh
 
-      - name: Build the test version using emulators
+      - name: Build the test version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build
 
@@ -429,5 +451,5 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: testRunsData_${{ matrix.browser }}
+          name: testRunsData_E2E_regression_tests_${{ matrix.browser }}
           path: ./packages/yoroi-extension/testRunsData_${{ matrix.browser }}
