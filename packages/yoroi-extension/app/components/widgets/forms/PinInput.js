@@ -9,6 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import TextField from '../../common/TextField';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box } from '@mui/material';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
@@ -90,7 +91,7 @@ export default class PinInput extends Component<Props> {
     const pinField = form.$(this.props.fieldName);
 
     return (
-      <div>
+      <Box sx={{ width: '100%'}}>
         {this.props.disclaimer}
         <TextField
           className={this.props.fieldName}
@@ -99,7 +100,7 @@ export default class PinInput extends Component<Props> {
           error={pinField.error}
           done={this.props.done}
         />
-      </div>
+      </Box>
     );
   }
 }

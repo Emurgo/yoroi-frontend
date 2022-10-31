@@ -39,3 +39,24 @@ export function getMethod(
     }
   }
 }
+
+export function getLogDate(): string {
+  return new Date().toISOString().replace(/:/g, '_');
+}
+
+export function getCircularReplacer(): Object {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+}
+
+export const sleep = (milliseconds: number): Promise<any> => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}

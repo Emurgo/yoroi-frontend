@@ -22,12 +22,11 @@ import type { ConfigType } from '../../../config/config-types';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
 import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type {
-  NetworkRow,
-} from '../../api/ada/lib/storage/database/primitives/tables';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
+
+const SOURCE_CURRENCIES = ['ADA', 'ERG'];
 
 interface LoadingStore {
   getDatabase(): ?lf$Database
@@ -43,6 +42,7 @@ export default class BaseCoinPriceStore
       +stateFetchStore: StateFetchStore,
       +profile: {
         get unitOfAccount(): UnitOfAccountSettingType,
+        getUnitOfAccountBlock(): Promise<UnitOfAccountSettingType>,
         ...,
       },
       ...,
@@ -57,7 +57,7 @@ export default class BaseCoinPriceStore
 
   expirePriceDataTimeoutId: ?TimeoutID = null;
   // Cached public key to verify the price data.
-  @observable pubKeyData: ?RustModule.WalletV3.PublicKey = null;
+  @observable pubKeyData: ?RustModule.WalletV4.PublicKey = null;
 
   @observable getAllPrices: Request<GetAllPricesFunc>
     = new Request<GetAllPricesFunc>(getAllPrices);
@@ -70,6 +70,10 @@ export default class BaseCoinPriceStore
   priceMap: Map<string, $ReadOnly<PriceDataRow>> = new Map();
 
   setup(): void {
+  }
+
+  startPoll(): void {
+    this._pollRefresh();
     setInterval(this._pollRefresh, CONFIG.app.coinPriceRefreshInterval);
     document.addEventListener(
       'visibilitychange',
@@ -94,11 +98,16 @@ export default class BaseCoinPriceStore
         this.priceMap.set(key, price);
       }
     });
+    this.loadPubKeyData();
+  }
 
+  @action
+  loadPubKeyData: void => Promise<void> = async () => {
+    await RustModule.load();
     const storedKey: ?string = await this.api.localStorage.getCoinPricePubKeyData();
     Logger.debug(`${nameof(BaseCoinPriceStore)}: stored pubKeyData ${storedKey == null ? 'null' : storedKey}`);
     runInAction(() => {
-      this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(
+      this.pubKeyData = RustModule.WalletV4.PublicKey.from_bytes(Buffer.from(
         storedKey != null ? storedKey : CONFIG.app.pubKeyData,
         'hex'
       ));
@@ -110,7 +119,9 @@ export default class BaseCoinPriceStore
    * Since a ticker isn't enough to know which currency to to lookup
    * Since multiple tokens can have the same ticker
    */
-  getCurrentPrice(from: string, to: string): ?number {
+  getCurrentPrice: (from: string, to: string) => ?string = (
+    from: string, to: string
+  ) => {
     if (this.lastUpdateTimestamp === null) {
       return null;
     }
@@ -118,7 +129,25 @@ export default class BaseCoinPriceStore
     if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
     }
-    return getPrice(from, to, this.currentPriceTickers);
+    const normalizedFrom = from === 'TADA' ? 'ADA' : from;
+    const price = getPrice(normalizedFrom, to, this.currentPriceTickers);
+    if (price == null) {
+      return price;
+    }
+    return String(price);
+  }
+
+  getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string = (
+    from: string, to: string, timestamp: number,
+  ) => {
+    const normalizedFrom = from === 'TADA' ? 'ADA' : from;
+    const price = this.priceMap.get(
+      getPriceKey(normalizedFrom, to, new Date(timestamp))
+    );
+    if (price == null) {
+      return undefined;
+    }
+    return String(price.Price);
   }
 
   _pollRefresh: void => Promise<void> = async () => {
@@ -133,45 +162,46 @@ export default class BaseCoinPriceStore
     }
   };
 
-  @action refreshCurrentCoinPrice: $ReadOnly<NetworkRow> => Promise<void> = async () => {
-    const { unitOfAccount } = this.stores.profile;
+  @action refreshCurrentCoinPrice: () => Promise<void> = async () => {
+    const unitOfAccount= await this.stores.profile.getUnitOfAccountBlock();
     if (!unitOfAccount.enabled) return;
 
     const stateFetcher = this.stores.stateFetchStore.fetcher;
-    try {
-      const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
-        from: 'ADA',
-      });
+    for (const from of SOURCE_CURRENCIES) {
+      try {
+        const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
+          from,
+        });
 
-      if (response.error != null) {
-        throw new Error('coin price backend error: ' + response.error);
-      }
+        if (response.error != null) {
+          throw new Error('coin price backend error: ' + response.error);
+        }
 
-      if (response.pubKeyData != null && response.pubKeyDataSignature != null) {
-        await this._replacePubKeyData(
-          response.pubKeyData,
-          response.pubKeyDataSignature
+        if (response.pubKeyData != null && response.pubKeyDataSignature != null) {
+          await this._replacePubKeyData(
+            response.pubKeyData,
+            response.pubKeyDataSignature
+          );
+        }
+        if (!this.pubKeyData) {
+          throw new Error('missing pubKeyData - should never happen');
+        }
+        if (!verifyTicker(response.ticker, this.pubKeyData)) {
+          throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
+        }
+
+        // if we got here before the timeout expired, clear the timeout
+        if (this.expirePriceDataTimeoutId) {
+          clearTimeout(this.expirePriceDataTimeoutId);
+        }
+        // then recreate the timeout (similar to resetting it to 0)
+        this.expirePriceDataTimeoutId = setTimeout(
+          this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold
         );
+        this._updatePriceData(response, unitOfAccount.currency);
+      } catch (error) {
+        Logger.error(`${nameof(BaseCoinPriceStore)}::${nameof(this.refreshCurrentCoinPrice)} ` + stringifyError(error));
       }
-      if (!this.pubKeyData) {
-        throw new Error('missing pubKeyData - should never happen');
-      }
-      if (!verifyTicker(response.ticker, this.pubKeyData)) {
-        throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
-      }
-
-      // if we got here before the timeout expired, clear the timeout
-      if (this.expirePriceDataTimeoutId) {
-        clearTimeout(this.expirePriceDataTimeoutId);
-      }
-      // then recreate the timeout (similar to resetting it to 0)
-      this.expirePriceDataTimeoutId = setTimeout(
-        this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold
-      );
-
-      this._updatePriceData(response, unitOfAccount.currency);
-    } catch (error) {
-      Logger.error(`${nameof(BaseCoinPriceStore)}::${nameof(this.refreshCurrentCoinPrice)} ` + stringifyError(error));
     }
   }
 
@@ -186,7 +216,16 @@ export default class BaseCoinPriceStore
       )
     ).filter(ticker => ticker.To === currency);
 
-    this.currentPriceTickers.splice(0, this.currentPriceTickers.length, ...tickers);
+    for (const ticker of tickers) {
+      const index = this.currentPriceTickers.findIndex(
+        ({ From, To }) => From === ticker.From && To === ticker.To
+      );
+      if (index === -1) {
+        this.currentPriceTickers.push(ticker);
+      } else {
+        this.currentPriceTickers[index].Price = ticker.Price;
+      }
+    }
     this.lastUpdateTimestamp = response.ticker.timestamp;
   }
 
@@ -197,41 +236,47 @@ export default class BaseCoinPriceStore
   updateTransactionPriceData: {|
     db: lf$Database,
     timestamps: Array<number>,
+    defaultToken: string,
   |} => Promise<void> = async (request) => {
     const { unitOfAccount } = this.stores.profile;
     if (!unitOfAccount.enabled) return;
 
     const { timestamps } = request;
 
-    const missingPrices = timestamps.filter(
+    const from = request.defaultToken === 'TADA' ? 'ADA' : request.defaultToken;
+
+    const missingTimestamps = timestamps.filter(
       timestamp => this.priceMap.get(
-        getPriceKey('ADA', unitOfAccount.currency, new Date(timestamp))
+        getPriceKey(from, unitOfAccount.currency, new Date(timestamp))
       ) == null
     );
-    if (!missingPrices.length) {
+    if (!missingTimestamps.length) {
       return;
     }
-
     const stateFetcher = this.stores.stateFetchStore.fetcher;
     try {
       const response: HistoricalCoinPriceResponse =
-        await stateFetcher.getHistoricalCoinPrice({ from: 'ADA', timestamps });
+        await stateFetcher.getHistoricalCoinPrice(
+          { from, timestamps: missingTimestamps }
+        );
       if (response.error != null) {
         throw new Error('historical coin price query error: ' + response.error);
       }
-      if (response.tickers.length !== missingPrices.length) {
+      if (response.tickers.length !== missingTimestamps.length) {
         throw new Error('historical coin price query error: data length mismatch');
       }
 
-      for (let i = 0; i < missingPrices.length; i++) {
+      for (let i = 0; i < missingTimestamps.length; i++) {
         const ticker = response.tickers[i];
+        if (ticker == null) {
+          continue
+        }
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
         }
         if (!verifyTicker(ticker, this.pubKeyData)) {
           throw new Error('Invalid ticker signature: ' + JSON.stringify(ticker));
         }
-
         const tickers: Array<Ticker> =
           Object.entries(ticker.prices)
             .map(([To, Price]) => (
@@ -242,7 +287,7 @@ export default class BaseCoinPriceStore
           db: request.db,
           prices: tickers.map(singleTicker => ({
             ...singleTicker,
-            Time: new Date(missingPrices[i]),
+            Time: new Date(missingTimestamps[i]),
           })),
         });
         runInAction(() => {
@@ -277,7 +322,7 @@ export default class BaseCoinPriceStore
       return;
     }
     runInAction(() => {
-      this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(pubKeyData, 'hex'));
+      this.pubKeyData = RustModule.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyData, 'hex'));
     });
     await this.api.localStorage.setCoinPricePubKeyData(pubKeyData);
   }

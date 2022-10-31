@@ -2,9 +2,7 @@
 
 import type {
   ExtendedPublicKeyResp,
-  GetVersionRequest,
-  GetSerialRequest,
-} from '@emurgo/ledger-connect-handler';
+} from '../../app/utils/hwConnectHandler';
 import type {
   BIP32Path,
   DeriveAddressRequest,
@@ -35,6 +33,10 @@ import {
   StakeCredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
+/*
+Mocking a ledger device is not possible anymore after this update https://github.com/Emurgo/yoroi-frontend/pull/2896
+ */
+
 type WalletInfo = {|
   rootKey: RustModule.WalletV4.Bip32PrivateKey;
   serial: GetSerialResponse,
@@ -56,7 +58,7 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
       const rootKey = generateLedgerWalletRootKey(wallet.mnemonic);
       return {
         rootKey,
-        serial: { serial },
+        serial: { serialHex: serial },
         version: {
           version: mockDeviceVersion,
           compatibility: {
@@ -70,6 +72,9 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsPoolRegistrationAsOperator: true,
             supportsPoolRetirement: true,
             supportsMultisigTransaction: true,
+            supportsAlonzo: false,
+            supportsBabbage: false,
+            supportsReqSignersInOrdinaryTx: false,
           },
         },
       };
@@ -191,10 +196,10 @@ class MockLedgerConnect {
     }
     const selectedWallet = MockLedgerConnect.selectedWallet;
 
-    if (selectedWallet.serial.serial !== serial) {
+    if (selectedWallet.serial.serialHex !== serial) {
       throw new IncorrectDeviceError({
         expectedDeviceId: serial,
-        responseDeviceId: selectedWallet.serial.serial,
+        responseDeviceId: selectedWallet.serial.serialHex,
       });
     }
   }
@@ -504,7 +509,7 @@ class MockLedgerConnect {
 
   getVersion: {|
     serial: ?string,
-    params: GetVersionRequest,
+    params: void,
   |} => Promise<GetVersionResponse> = async (request) => {
     this.checkSerial(request.serial);
     if (MockLedgerConnect.selectedWallet == null) {
@@ -517,7 +522,7 @@ class MockLedgerConnect {
 
   getSerial: {|
     serial: ?string,
-    params: GetSerialRequest,
+    params: void,
   |} => Promise<GetSerialResponse> = async (request) => {
     this.checkSerial(request.serial);
     if (MockLedgerConnect.selectedWallet == null) {

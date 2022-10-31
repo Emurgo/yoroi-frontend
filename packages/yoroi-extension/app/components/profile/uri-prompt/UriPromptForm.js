@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './UriPromptForm.scss';
-import AboutUri from '../../../assets/images/uri/about-url.inline.svg';
-import AboutUriClassic from '../../../assets/images/uri/about-url-classic.inline.svg';
+import { ReactComponent as AboutUri }  from '../../../assets/images/uri/about-url.inline.svg';
+import { ReactComponent as AboutUriClassic }  from '../../../assets/images/uri/about-url-classic.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 

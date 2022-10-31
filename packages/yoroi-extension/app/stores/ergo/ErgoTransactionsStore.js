@@ -50,6 +50,7 @@ export default class ErgoTransactionsStore extends Store<StoresMap, ActionsMap> 
     this.stores.transactions.recordSubmittedTransaction(
       publicDeriver,
       transaction,
+      [],
     );
   }
 }

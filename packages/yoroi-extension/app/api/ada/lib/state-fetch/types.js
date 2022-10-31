@@ -353,6 +353,7 @@ export type CatalystRoundInfoRequest = {|
 
 export type CatalystRound = {|
   +id: number,
+  +name: string,
   +registrationStart: string,
   +registrationEnd: string,
   +votingStart: string,
@@ -379,7 +380,7 @@ export type MultiAssetMintMetadataRequest = {|
 |};
 
 export type MultiAssetMintMetadataRequestAsset = {|
-  name: string,
+  nameHex: string,
   policy: string
 |}
 
@@ -391,3 +392,30 @@ export type MultiAssetMintMetadataResponseAsset = {|
   key: string,
   metadata: {[key: string]: any}
 |}
+
+export type GetUtxoDataRequest = {|
+  ...BackendNetworkInfo,
+  utxos: Array<{|
+    txHash: string,
+    txIndex: number,
+  |}>
+|}
+
+export type UtxoData = {|
+  output: {|
+    +address: string,
+    +amount: string,
+    +dataHash: string | null,
+    +assets: Array<{|
+      +assetId: string,
+      +policyId: string,
+      +name: string,
+      +amount: string,
+    |}>,
+  |},
+  spendingTxHash: string | null,
+|};
+
+export type GetUtxoDataResponse = Array<UtxoData | null>;
+
+export type GetUtxoDataFunc = (body: GetUtxoDataRequest) => Promise<GetUtxoDataResponse>;

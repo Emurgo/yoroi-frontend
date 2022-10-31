@@ -2,42 +2,44 @@
 
 import { Given, When, Then } from 'cucumber';
 import { expect } from 'chai';
-import languageSelection, { clickContinue } from '../support/helpers/language-selection-helpers';
-
-const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
+import { ensureLanguageIsSelected } from '../support/helpers/language-selection-helpers';
+import {
+  confirmSelectedLanguageButton,
+  japaneseLaguageSelection,
+  languageSelectionForm,
+  languageSelectionFromDropdown,
+} from '../pages/basicSetupPage';
 
 Given(/^I have selected English language$/, async function () {
-  await languageSelection.ensureLanguageIsSelected(this, { language: 'en-US' });
+  await ensureLanguageIsSelected(this, { language: 'en-US' });
 });
 
 When(/^I am on the language selection screen$/, async function () {
-  await this.waitForElement({ locator: LANGUAGE_SELECTION_FORM, method: 'css' });
+  await this.waitForElement(languageSelectionForm);
 });
 
 When(/^I open language selection dropdown$/, async function () {
-  await this.click({ locator: `${LANGUAGE_SELECTION_FORM} .MuiInputBase-input`, method: 'css' });
+  await this.click(languageSelectionFromDropdown);
 });
 
 When(/^I select Japanese language$/, async function () {
-  return this.click({ locator: '//span[contains(text(), "日本語")]', method: 'xpath' });
+  await this.click(japaneseLaguageSelection);
 });
 
 When(/^I submit the language selection form$/, async function () {
-  await clickContinue(this);
+  await this.click(confirmSelectedLanguageButton);
 });
 
 Then(/^I should not see the language selection screen anymore$/, async function () {
-  await this.waitForElementNotPresent({
-    locator: LANGUAGE_SELECTION_FORM,
-    method: 'css'
-  });
+  await this.waitForElementNotPresent(languageSelectionForm);
 });
 
 Then(/^I should have Japanese language set$/, async function () {
-  const result = await this.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.profile.getProfileLocaleRequest.execute()
+  const result = await this.driver.executeAsyncScript(done => {
+    window.yoroi.stores.profile.getProfileLocaleRequest
+      .execute()
       .then(done)
-      .catch((error) => done(error));
+      .catch(error => done(error));
   });
   expect(result).to.equal('ja-JP');
 });

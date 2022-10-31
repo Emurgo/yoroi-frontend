@@ -1,7 +1,14 @@
 .component {
   font-size: 16px;
   min-width: 673px !important;
+  max-height: 90vh;
   padding-right: 0 !important;
+  padding-bottom: 0px !important;
+
+  & > div {
+    padding: 0px;
+    max-height: unset !important;
+  }
 
   .header {
     position: sticky;
@@ -11,10 +18,13 @@
 
     padding-top: 14px;
     padding-left: 40px;
+
   }
+
   .totalInfo {
     display: flex;
   }
+
   .amount {
     margin-right: 8px;
     color: var(--yoroi-palette-gray-600);
@@ -24,6 +34,11 @@
     }
     .value {
       font-weight: 500;
+      margin-top: 10px;
+      & > p {
+        color: var(--yoroi-palette-gray-600) !important;
+        font-size: 16px;
+      }
     }
   }
   .toggleButton {
@@ -31,26 +46,17 @@
     align-self: flex-end;
   }
 
+  .sectionHeader {
+    color: #A7AFC0;
+    font-size: 14px;
+    margin-top: 26px;
+  }
+
   .list {
     display: flex;
     flex-direction: column;
-    padding: 30px 0;
-    padding-left: 24px;
-    overflow-y: scroll;
-    min-height: 400px;
-  }
-  .footer {
-    position: sticky;
-    bottom: 0px;
-    background: var(--yoroi-comp-dialog-background);
-    border-top: 1px solid #dce0e9;
-    padding: 20px 0;
-    display: flex;
-    justify-content: center;
-    button {
-      font-weight: 500;
-      text-transform: uppercase;
-      color: var(--yoroi-palette-secondary-300);
-    }
+    padding: 15px 0px 30px 0;
+    overflow-y: auto;
   }
 }
+

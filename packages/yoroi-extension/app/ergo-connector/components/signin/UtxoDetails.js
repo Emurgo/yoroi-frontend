@@ -34,7 +34,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 @observer
@@ -98,7 +98,7 @@ class UtxoDetails extends Component<Props> {
     if (tokenInfo == null) return this.displayUnAvailableToken(request.entry);
     const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
+    if (false && this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(request.entry.identifier, currency);
       if (price != null) {

@@ -60,7 +60,6 @@ export default class ConnectContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-
   onConnect: (
     deriver: PublicDeriver<>,
     checksum: ?WalletChecksum,
@@ -235,6 +234,7 @@ export default class ConnectContainer extends Component<
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          // todo: import profile store for stablecoin display
         },
         connector: {
           connectingMessage: stores.connector.connectingMessage,

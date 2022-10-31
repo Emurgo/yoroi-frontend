@@ -8,8 +8,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
-import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
-import EditSvg from '../../../assets/images/edit.inline.svg';
+import { ReactComponent as AddMemoSvg }  from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as EditSvg }  from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
@@ -18,7 +18,7 @@ import type { TransactionDirectionType } from '../../../api/ada/transactions/typ
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
-import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
+import { ReactComponent as ExpandArrow }  from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
@@ -70,7 +70,7 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getCurrentPrice: (from: string, to: string) => ?number,
+  +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -153,13 +153,20 @@ export default class TransactionRevamp extends Component<Props, State> {
   getStatusString(
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
-    assuranceLevel: AssuranceLevel
+    assuranceLevel: AssuranceLevel,
+    isValid: boolean,
   ): string {
+    if (!isValid) {
+      return intl.formatMessage(stateTranslations.failed);
+    }
     if (state === TxStatusCodes.IN_BLOCK) {
       return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     }
     if (state === TxStatusCodes.PENDING) {
       return intl.formatMessage(stateTranslations.pending);
+    }
+    if (state === TxStatusCodes.SUBMITTED) {
+      return intl.formatMessage(stateTranslations.submitted);
     }
     if (state < 0) {
       return intl.formatMessage(stateTranslations.failed);
@@ -176,20 +183,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     const tokenInfo = this.props.getTokenInfo(request.entry);
     const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
-      const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(request.entry.identifier, currency);
-      if (price != null) {
-        return (
-          <>
-            {calculateAndFormatValue(shiftedAmount, price) + ' ' + currency}
-            <Typography as="span" fontWeight="inherit" fontSize="inherit">
-              {shiftedAmount.toString()} {getTokenName(tokenInfo)}
-            </Typography>
-          </>
-        );
-      }
-    }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
       tokenInfo.Metadata.numberOfDecimals
@@ -210,31 +203,80 @@ export default class TransactionRevamp extends Component<Props, State> {
     );
   };
 
-  renderFeeDisplay: ({|
-    amount: MultiToken,
-    type: TransactionDirectionType,
-  |}) => Node = request => {
-    if (this.props.shouldHideBalance) {
-      return <span>{hiddenAmount}</span>;
-    }
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+  renderAmountWithUnitOfAccount: ({|
+    entry: TokenEntry,
+    timestamp: number,
+  |}) => ?Node = request => {
+    const { currency } = this.props.unitOfAccountSetting;
 
-    if (this.props.unitOfAccountSetting.enabled === true) {
-      const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(defaultEntry.identifier, currency);
-      if (price != null) {
+    if (this.props.unitOfAccountSetting.enabled) {
+      if (this.props.shouldHideBalance) {
         return (
           <>
-            {calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency}
-            <Typography variant="body1" as="span">
-              {shiftedAmount.abs().toString()} {getTokenName(tokenInfo)}
-            </Typography>
+            <span>{hiddenAmount}</span>
+            {currency}
           </>
         );
       }
+
+      const tokenInfo = this.props.getTokenInfo(request.entry);
+      const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      if (currency == null) {
+        throw new Error(`unexpected unit of account ${String(currency)}`);
+      }
+      const price = this.props.getHistoricalPrice(
+        ticker,
+        currency,
+        request.timestamp,
+      );
+      let fiatDisplay;
+      if (price != null) {
+        const amount = calculateAndFormatValue(shiftedAmount, price);
+        const [beforeDecimal, afterDecimal] = amount.split('.');
+        const beforeDecimalWithSign = beforeDecimal.startsWith('-')
+          ? beforeDecimal
+          : '+' + beforeDecimal;
+        fiatDisplay = (
+          <>
+            {beforeDecimalWithSign}
+            {afterDecimal && (
+              <Typography as="span" fontWeight="inherit" fontSize="inherit">
+                .{afterDecimal}
+              </Typography>
+            )}
+          </>
+        );
+      }
+      return (
+        <>
+          {fiatDisplay}&nbsp;{currency}
+          <Typography>
+            {this.renderAmountDisplay({ entry: request.entry })}
+            {' '}
+            {this.getTicker(request.entry)}
+          </Typography>
+        </>
+      );
     }
+
+    return (
+      <>
+        {this.renderAmountDisplay({ entry: request.entry })}
+        {' '}
+        {this.getTicker(request.entry)}
+      </>
+    );
+  }
+
+  renderFeeDisplay: ({|
+    amount: MultiToken,
+    type: TransactionDirectionType,
+    timestamp: number,
+  |}) => Node = request => {
     if (request.type === transactionTypes.INCOME) {
       return (
         <Typography as="span" fontSize="inherit">
@@ -242,10 +284,62 @@ export default class TransactionRevamp extends Component<Props, State> {
         </Typography>
       );
     }
+    if (this.props.shouldHideBalance) {
+      return <span>{hiddenAmount}</span>;
+    }
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).abs();
+
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount.abs(),
+      shiftedAmount,
       tokenInfo.Metadata.numberOfDecimals
     );
+
+    if (this.props.unitOfAccountSetting.enabled) {
+      const { currency } = this.props.unitOfAccountSetting;
+      if (currency == null) {
+        throw new Error(`unexpected unit of account ${String(currency)}`);
+      }
+      const ticker = tokenInfo.Metadata.ticker;
+      if (ticker == null) {
+        throw new Error('unexpected main token type');
+      }
+      const price = this.props.getHistoricalPrice(
+        ticker,
+        currency,
+        request.timestamp,
+      );
+
+      let fiatDisplay;
+      if (price != null) {
+        const amount = calculateAndFormatValue(shiftedAmount, price);
+        const [beforeDecimal, afterDecimal] = amount.split('.');
+        fiatDisplay = (
+          <>
+            {beforeDecimal}
+            {afterDecimal && (
+              <span className={styles.afterDecimal}>
+                .{afterDecimal}
+              </span>
+            )}
+          </>
+        );
+      } else {
+        fiatDisplay = '-';
+      }
+      return (
+        <>
+          {fiatDisplay}&nbsp;{currency}
+          <Typography>
+            {beforeDecimalRewards}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+            {' '}
+            {this.getTicker(defaultEntry)}
+          </Typography>
+        </>
+      );
+    }
 
     return (
       <>
@@ -258,9 +352,6 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getTicker: TokenEntry => string = tokenEntry => {
-    if (this.props.unitOfAccountSetting.enabled === true) {
-      return this.props.unitOfAccountSetting.currency;
-    }
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
     return truncateToken(getTokenName(tokenInfo));
   };
@@ -283,7 +374,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })}{' '}{this.getTicker(entry)}
         </div>
       );
     }
@@ -310,7 +401,9 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length}
+        {' '}
+        {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
   };
@@ -397,8 +490,12 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
-    const isFailedTransaction = state < 0;
-    const isPendingTransaction = state === TxStatusCodes.PENDING;
+    const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
+    const isFailedTransaction = (state < 0) && !isSubmittedTransaction;
+    const isPendingTransaction = (state === TxStatusCodes.PENDING) || isSubmittedTransaction;
+    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
+      data.isValid :
+      true;
 
     const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
@@ -409,7 +506,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel);
+    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
 
     return (
       <Box className={styles.component}>
@@ -486,14 +583,15 @@ export default class TransactionRevamp extends Component<Props, State> {
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
+                  timestamp: data.date.valueOf(),
                 })}
               </Typography>
               <Box sx={columnTXStyles.amount}>
                 <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
-                  {this.renderAmountDisplay({
+                  {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
-                  })}{' '}
-                  {this.getTicker(data.amount.getDefaultEntry())}
+                    timestamp: data.date.valueOf(),
+                  })}
                 </Typography>
                 {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
               </Box>

@@ -1,4 +1,4 @@
-// // @flow
+// @flow
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -24,9 +24,11 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type { CardanoConnectorSignRequest } from '../types';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../types';
+import { Box } from '@mui/material';
+import AddCollateralPage from '../components/signin/AddCollateralPage';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -46,7 +48,7 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConfirm: (PublicDeriver<> => (string => Promise<void>)) = deriver => async (password) => {
+  onConfirm: (PublicDeriver<>) => string => Promise<void> = deriver => async password => {
     const withSigningKey = asGetSigningKey(deriver);
     if (!withSigningKey) {
       throw new Error(`[sign tx] no signing key`);
@@ -78,11 +80,6 @@ export default class SignTxContainer extends Component<
     const actions = this.generated.actions;
     const { uiNotifications } = this.generated.stores;
 
-    const tooltipNotification = {
-      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
-      message: globalMessages.copyTooltipMessage,
-    };
-
     const { signingMessage } = this.generated.stores.connector;
     if (signingMessage == null) return this.renderLoading();
 
@@ -95,7 +92,49 @@ export default class SignTxContainer extends Component<
       cacheEntry => selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId
     );
 
+    const tooltipNotification = {
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: globalMessages.copyTooltipMessage,
+    };
+
+    const handleCopyAddressTooltip = (address, elementId) => {
+      if (!uiNotifications.isOpen(elementId)) {
+        runInAction(() => {
+          this.notificationElementId = elementId;
+        });
+        actions.notifications.open.trigger({
+          id: elementId,
+          duration: tooltipNotification.duration,
+          message: tooltipNotification.message,
+        });
+      }
+    };
+
+    const getAddressToDisplay = addr =>
+      addressToDisplayString(addr, selectedWallet.publicDeriver.getParent().getNetworkInfo());
+
+    const handleConfirm = password => this.onConfirm(selectedWallet.publicDeriver)(password);
+
+    const notification =
+      this.notificationElementId == null
+        ? null
+        : uiNotifications.getTooltipActiveNotification(this.notificationElementId);
+
+    const signData =
+      signingMessage.sign.type === 'data'
+        ? { address: signingMessage.sign.address, payload: signingMessage.sign.payload }
+        : null;
+
+    const selectedExplorer =
+      this.generated.stores.explorers.selectedExplorer.get(
+        selectedWallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+      ) ??
+      (() => {
+        throw new Error('No explorer for wallet network');
+      })();
+
     let component = null;
+
     // TODO: handle other sign types
     switch (signingMessage.sign.type) {
       case 'tx': {
@@ -106,98 +145,61 @@ export default class SignTxContainer extends Component<
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
             connectedWebsite={connectedWebsite}
             selectedWallet={selectedWallet}
-            onCopyAddressTooltip={(address, elementId) => {
-              if (!uiNotifications.isOpen(elementId)) {
-                runInAction(() => {
-                  this.notificationElementId = elementId;
-                });
-                actions.notifications.open.trigger({
-                  id: elementId,
-                  duration: tooltipNotification.duration,
-                  message: tooltipNotification.message,
-                });
-              }
-            }}
-            notification={
-              this.notificationElementId == null
-                ? null
-                : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
-            }
+            onCopyAddressTooltip={handleCopyAddressTooltip}
+            notification={notification}
             tx={signingMessage.sign.tx}
             txData={txData}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
+            onConfirm={handleConfirm}
             onCancel={this.onCancel}
-            addressToDisplayString={addr =>
-              addressToDisplayString(
-                addr,
-                selectedWallet.publicDeriver.getParent().getNetworkInfo()
-              )
-            }
+            addressToDisplayString={getAddressToDisplay}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
-            selectedExplorer={
-              this.generated.stores.explorers.selectedExplorer.get(
-                selectedWallet.publicDeriver.getParent().getNetworkInfo().NetworkId
-              ) ??
-              (() => {
-                throw new Error('No explorer for wallet network');
-              })()
-            }
+            selectedExplorer={selectedExplorer}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           />
         );
         break;
       }
+      case 'tx-reorg/cardano': {
+        const txData = this.generated.stores.connector.adaTransaction;
+        if (txData == null && signData == null) return this.renderLoading();
+        component = (
+          <AddCollateralPage
+            txData={txData}
+            getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
+            onConfirm={handleConfirm}
+            onCancel={this.onCancel}
+            selectedExplorer={selectedExplorer}
+            submissionError={this.generated.stores.connector.submissionError}
+          />
+        );
+        break;
+      }
+      case 'data':
       case 'tx/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
-        if (txData == null) return this.renderLoading();
+        if (txData == null && signData == null) return this.renderLoading();
         component = (
           <CardanoSignTxPage
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
             connectedWebsite={connectedWebsite}
             selectedWallet={selectedWallet}
-            onCopyAddressTooltip={(address, elementId) => {
-              if (!uiNotifications.isOpen(elementId)) {
-                runInAction(() => {
-                  this.notificationElementId = elementId;
-                });
-                actions.notifications.open.trigger({
-                  id: elementId,
-                  duration: tooltipNotification.duration,
-                  message: tooltipNotification.message,
-                });
-              }
-            }}
-            notification={
-              this.notificationElementId == null
-                ? null
-                : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
-            }
-            tx={signingMessage.sign.tx}
+            onCopyAddressTooltip={handleCopyAddressTooltip}
+            notification={notification}
             txData={txData}
             getTokenInfo={genLookupOrNull(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={(password) => this.onConfirm(selectedWallet.publicDeriver)(password)}
+            onConfirm={handleConfirm}
             onCancel={this.onCancel}
-            addressToDisplayString={addr =>
-              addressToDisplayString(
-                addr,
-                selectedWallet.publicDeriver.getParent().getNetworkInfo()
-              )
-            }
+            addressToDisplayString={getAddressToDisplay}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
-            selectedExplorer={
-              this.generated.stores.explorers.selectedExplorer.get(
-                selectedWallet.publicDeriver.getParent().getNetworkInfo().NetworkId
-              ) ??
-              (() => {
-                throw new Error('No explorer for wallet network');
-              })()
-            }
+            selectedExplorer={selectedExplorer}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+            submissionError={this.generated.stores.connector.submissionError}
+            signData={signData}
           />
         );
         break;
@@ -206,7 +208,16 @@ export default class SignTxContainer extends Component<
         component = null;
     }
 
-    return <>{component}</>;
+    return (
+      <Box
+        sx={{
+          height: 'calc(100vh - 52px)',
+          backgroundColor: 'var(--yoroi-palette-common-white)',
+        }}
+      >
+        {component}
+      </Box>
+    );
   }
 
   @computed get generated(): {|
@@ -229,7 +240,7 @@ export default class SignTxContainer extends Component<
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       connector: {|
         signingMessage: ?SigningMessage,
@@ -237,6 +248,7 @@ export default class SignTxContainer extends Component<
         signingRequest: ?ISignRequest<any>,
         adaTransaction: ?CardanoConnectorSignRequest,
         currentConnectorWhitelist: Array<WhitelistEntry>,
+        submissionError: ?SignSubmissionErrorType,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -273,6 +285,7 @@ export default class SignTxContainer extends Component<
           signingRequest: stores.connector.signingRequest,
           adaTransaction: stores.connector.adaTransaction,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
+          submissionError: stores.connector.submissionError,
         },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,

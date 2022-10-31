@@ -24,7 +24,7 @@ $height: 128px;
       position: relative;
       top: calc(-#{$height} + 25px);
       height: calc(#{$height} - 25px);
-      overflow: overlay;
+      overflow: auto;
       margin-left: 30px;
       margin-right: 30px;
       display: flex;

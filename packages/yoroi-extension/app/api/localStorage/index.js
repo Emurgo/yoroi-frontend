@@ -15,6 +15,7 @@ import {
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -30,8 +31,10 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
-  SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
+  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
+  ANALYTICS_INSTANCE_ID: networkForLocalStorage + '-ANALYTICS',
+  CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
@@ -39,6 +42,12 @@ const storageKeys = {
 export type SetCustomUserThemeRequest = {|
   cssCustomPropObject: Object,
 |};
+
+export type WalletsNavigation = {|
+  ergo: number[],
+  cardano: number[],
+  quickAccess: number[],
+|}
 
 /**
  * This api layer provides access to the electron local storage
@@ -269,14 +278,22 @@ export default class LocalStorageApi {
 
 
   // ========== Sort wallets - Revamp ========== //
-  getSortedWallets: void => Promise<?Array<number>> = async () => {
-    const result = await getLocalItem(storageKeys.SORTED_WALLETS);
+  getWalletsNavigation: void => Promise<?WalletsNavigation> = async () => {
+    let result = await getLocalItem(storageKeys.WALLETS_NAVIGATION);
     if (result === undefined || result === null) return undefined;
-    return JSON.parse(result);
+    result = JSON.parse(result);
+    // Added for backward compatibility
+    if(Array.isArray(result)) return {
+      cardano: [],
+      ergo: [],
+      quickAccess: [],
+    }
+
+    return result
   };
 
-  setSortedWallets: (Array<number>) => Promise<void> = value =>
-    setLocalItem(storageKeys.SORTED_WALLETS, JSON.stringify(value ?? []));
+  setWalletsNavigation: (WalletsNavigation) => Promise<void> = value =>
+    setLocalItem(storageKeys.WALLETS_NAVIGATION, JSON.stringify(value));
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
@@ -320,6 +337,16 @@ export default class LocalStorageApi {
 
 }
 
+export type PersistedSubmittedTransaction = {|
+  publicDeriverId: number,
+  networkId: number,
+  transaction: Object,
+  usedUtxos: Array<{|
+    txHash: string,
+    index: number,
+  |}>,
+|};
+
 export function persistSubmittedTransactions(
   submittedTransactions: any,
 ): void {
@@ -335,4 +362,24 @@ export function loadSubmittedTransactions(): any {
     return null;
   }
   return JSON.parse(dataStr);
+}
+
+export async function loadAnalyticsInstanceId(): Promise<?string> {
+  return getLocalItem(storageKeys.ANALYTICS_INSTANCE_ID);
+}
+
+export async function saveAnalyticsInstanceId(id: string): Promise<void> {
+  await setLocalItem(storageKeys.ANALYTICS_INSTANCE_ID, id);
+}
+
+export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {
+  const json = await getLocalItem(storageKeys.CATALYST_ROUND_INFO);
+  if (!json) {
+    return undefined;
+  }
+  return JSON.parse(json);
+}
+
+export async function saveCatalystRoundInfo(data: CatalystRoundInfoResponse): Promise<void> {
+  await setLocalItem(storageKeys.CATALYST_ROUND_INFO, JSON.stringify(data));
 }

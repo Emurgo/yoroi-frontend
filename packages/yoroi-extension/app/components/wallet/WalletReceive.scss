@@ -150,10 +150,12 @@
   }
 }
 
-:global(.YoroiModern) .component {
-  .generatedAddresses {
-    .walletAddress {
-      padding: 12px 0;
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .component {
+    .generatedAddresses {
+      .walletAddress {
+        padding: 12px 0;
+      }
     }
   }
 }

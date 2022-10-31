@@ -2,7 +2,6 @@
 
 
 .component {
-
   .checkbox {
     margin-top: 30px;
 
@@ -57,7 +56,7 @@
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     text-align: left;
   }

@@ -17,6 +17,7 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
+import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
@@ -58,6 +59,20 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
+  @observable mergedMessages: null | {| [key: string]: string, |} = null;
+
+  componentDidMount: () => void = () => {
+    autorun(async () => {
+      const _mergedMessages = {
+        ...await translations['en-US'],
+        ...await translations[this.props.stores.profile.currentLocale]
+      };
+      runInAction(() => {
+        this.mergedMessages = _mergedMessages;
+      });
+    });
+  }
+
   state: State = {
     crashed: false,
   };
@@ -76,14 +91,13 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
+
     const { stores } = this.props;
     const locale = stores.profile.currentLocale;
-    // eslint-disable-next-line prefer-object-spread
-    const mergedMessages: { [key: string]: string, ... } = Object.assign(
-      {},
-      translations['en-US'],
-      translations[locale]
-    );
 
     const themeVars = Object.assign(stores.profile.currentThemeVars, {});
     const currentTheme = stores.profile.currentTheme;
@@ -108,7 +122,7 @@ class App extends Component<Props, State> {
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
-      return <CrashPage stores={stores} actions={actions} />;
+      return <CrashPage />;
     }
     return <Router history={history}>{Routes(stores, actions)}</Router>;
   };

@@ -4,7 +4,6 @@ import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { ComponentType, Node } from 'react';
 import {
-  genFormatTokenAmount,
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenStrictName,
@@ -16,10 +15,15 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
-import type { Match } from 'react-router-dom';
+import type { Match, Location } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
+import {
+  getAuthorFromTokenMetadata,
+  getDescriptionFromTokenMetadata,
+  getImageFromTokenMetadata,
+} from '../../utils/nftMetadata';
 
 export type GeneratedData = typeof NFTDetailPageRevamp.prototype.generated;
 type Props = {|
@@ -27,6 +31,7 @@ type Props = {|
 |};
 type MatchProps = {|
   match: Match,
+  location: Location,
 |};
 
 type AllProps = {| ...Props, ...MatchProps |};
@@ -37,7 +42,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver)
-      throw new Error(`Active wallet requiTokenDetails)}d for ${nameof(NFTDetailPageRevamp)}.`);
+      throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
     const network = publicDeriver.getParent().getNetworkInfo();
@@ -62,34 +67,41 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 ticker: token.info.Metadata.ticker ?? '-',
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-                nftMetadata: token.info.Metadata.assetMintMetadata
-                  && token.info.Metadata.assetMintMetadata.length > 0
-                  && token.info.Metadata.assetMintMetadata[0]['721']
-                  && token.info.Metadata.assetMintMetadata[0]['721'][policyId]
-                  && token.info.Metadata.assetMintMetadata[0]['721'][policyId][name]
-                  ? token.info.Metadata.assetMintMetadata[0]['721'][policyId][name]
-                  : undefined,
+                image: getImageFromTokenMetadata(policyId, name, token.info.Metadata),
+                description: getDescriptionFromTokenMetadata(
+                  policyId,
+                  name,
+                  token.info.Metadata
+                ),
+                author: getAuthorFromTokenMetadata(policyId, name, token.info.Metadata),
+                // $FlowFixMe
+                metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
               };
-            })
-            .map(item => ({
-              policyId: item.policyId,
-              lastUpdatedAt: item.lastUpdatedAt,
-              ticker: item.ticker,
-              assetName: item.assetName,
-              id: item.id,
-              amount: item.amount,
-              name: item.name,
-              image: item.nftMetadata?.image ?? '',
-              description: item.nftMetadata?.description ?? '',
-            }));
+            });
 
     const { nftId } = this.props.match.params;
-    const nftInfo = nftsList.find(nft => nft.name === nftId);
+    const currentNftIdx = nftsList.findIndex(nft => nft.id === nftId);
+    const nftsCount = nftsList.length;
+    const nftInfo = nftsList[currentNftIdx];
+
+    const nextNftId = currentNftIdx === nftsCount - 1 ?
+    nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id
+
+    const prevNftId = currentNftIdx === 0 ?
+    nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id
+
+    const urlPrams = new URLSearchParams(this.props.location.search);
+    const tab = urlPrams.get('tab')
 
     return (
-      <Box height="100%" overflow="overlay">
-        <NFTDetails nftInfo={nftInfo} nftsCount={nftsList.length} network={network} />
+      <Box width="100%" height="100%">
+        <NFTDetails
+          nftInfo={nftInfo}
+          network={network}
+          nextNftId={nextNftId}
+          prevNftId={prevNftId}
+          tab={tab}
+        />
       </Box>
     );
   }

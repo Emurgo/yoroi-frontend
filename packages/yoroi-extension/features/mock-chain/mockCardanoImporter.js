@@ -1,26 +1,24 @@
 // @flow
 
 import type {
-  SignedRequestInternal, SignedResponse,
+  SignedRequestInternal,
+  SignedResponse,
   RemoteTransaction,
   UtxoSumFunc,
   PoolInfoFunc,
   AddressUtxoFunc,
-  RewardHistoryRequest, RewardHistoryResponse, RewardHistoryFunc,
+  RewardHistoryRequest,
+  RewardHistoryResponse,
+  RewardHistoryFunc,
   AccountStateFunc,
   RemoteAccountState,
   HistoryFunc,
   BestBlockFunc,
+  UtxoData,
 } from '../../app/api/ada/lib/state-fetch/types';
-import {
-  ShelleyCertificateTypes
-} from '../../app/api/ada/lib/state-fetch/types';
-import type {
-  FilterFunc,
-} from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
-import type {
-  ServerStatusResponse,
-} from '../../app/api/common/lib/state-fetch/types';
+import { ShelleyCertificateTypes } from '../../app/api/ada/lib/state-fetch/types';
+import type { FilterFunc } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
+import type { ServerStatusResponse } from '../../app/api/common/lib/state-fetch/types';
 import BigNumber from 'bignumber.js';
 import {
   genGetTransactionsHistoryForAddresses,
@@ -34,9 +32,7 @@ import {
   getMangledAddressString,
   toRemoteByronTx,
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
-import {
-  networks,
-} from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -51,12 +47,14 @@ const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e
 const genesisAddress = 'Ae2tdPwUPEZLs4HtbuNey7tK4hTKrwNwYtGqp7bDfCy2WdR3P6735W5Yfpe';
 const genesisTxValue = 2000000000000000; // 2 billion ada
 const testAssetId = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26.6e69636f696e';
-const genesisAssets = [{
-  amount: '1234',
-  assetId: testAssetId,
-  policyId: testAssetId.split('.')[0],
-  name: testAssetId.split('.')[1],
-}];
+const genesisAssets = [
+  {
+    amount: '1234',
+    assetId: testAssetId,
+    policyId: testAssetId.split('.')[0],
+    name: testAssetId.split('.')[1],
+  },
+];
 
 // based on abandon x14 + address
 const genesisTxReceiver = 'Ae2tdPwUPEZ4YjgvykNpoFeYUxoyhNj2kg8KfKWN2FizsSpLUPv68MpTVDo';
@@ -82,6 +80,8 @@ export const generateTransaction = (): {|
   bip44TrezorTx2: RemoteTransaction,
   bip44TrezorTx3: RemoteTransaction,
   cip1852TrezorTx1: RemoteTransaction,
+  cip1852TrezorTx2: RemoteTransaction,
+  cip1852TrezorTx3: RemoteTransaction,
   shelleySimple15: RemoteTransaction,
   shelleyDelegatedTx1: RemoteTransaction,
   shelleyDelegatedTx2: RemoteTransaction,
@@ -92,11 +92,11 @@ export const generateTransaction = (): {|
   delegateMangledWallet: RemoteTransaction,
 |} => {
   /**
-  * To simplify, our genesis is a single address which gives all its ada to a "distributor"
-  * The distributor gives ADA to a bunch of addresses to setup the tests
-  *
-  * You can generate more data for these tests using the Cardano-Wallet WASM library
-  */
+   * To simplify, our genesis is a single address which gives all its ada to a "distributor"
+   * The distributor gives ADA to a bunch of addresses to setup the tests
+   *
+   * You can generate more data for these tests using the Cardano-Wallet WASM library
+   */
   const genesisTx = {
     hash: genesisTransaction,
     inputs: [
@@ -107,14 +107,14 @@ export const generateTransaction = (): {|
         txHash: '',
         index: 0,
         assets: genesisAssets,
-      }
+      },
     ],
     outputs: [
       {
         address: genesisTxReceiver,
         amount: genesisTxValue.toString(),
         assets: genesisAssets,
-      }
+      },
     ],
     height: 1,
     epoch: 0,
@@ -135,23 +135,20 @@ export const generateTransaction = (): {|
         index: 0,
         amount: genesisTxValue.toString(),
         assets: genesisAssets,
-      }
+      },
     ],
     outputs: [
       // small-single-tx
       {
         // index: 0
         // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
-        address: getSingleAddressString(
-          testWallets['small-single-tx'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['small-single-tx'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '20295',
         assets: [],
       },
@@ -159,16 +156,13 @@ export const generateTransaction = (): {|
       {
         // index: 1
         // Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV
-        address: getSingleAddressString(
-          testWallets['tx-big-input-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['tx-big-input-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '1234567898765',
         assets: [],
       },
@@ -176,96 +170,78 @@ export const generateTransaction = (): {|
       {
         // index: 2
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
-        address: getSingleAddressString(
-          testWallets['simple-pending-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['simple-pending-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '1000000',
         assets: [],
       },
       {
         // index: 3
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
-        address: getSingleAddressString(
-          testWallets['simple-pending-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['simple-pending-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '1000000',
         assets: [],
       },
       {
         // index: 4
         // Ae2tdPwUPEZ9uHfzhw3vXUrTFLowct5hMMHeNjfsrkQv5XSi5PhSs2yRNUb
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '1000000',
         assets: [],
       },
       {
         // index: 5
         // Ae2tdPwUPEZEXbmLnQ22Rxhv8a6hQ3C2673nkGsXKAgzqnuC1vqne9EtBkK
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1000000',
         assets: [],
       },
       {
         // index: 6
         // Ae2tdPwUPEYwBZD5hPWCm3PUDYdMBfnLHsQmgUiexnkvDMTFCQ4gzRkgAEQ
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            2
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          2,
+        ]),
         amount: '1000000',
         assets: [],
       },
       {
         // index: 7
         // Ae2tdPwUPEYvzFpWJEGmSjLdz3DNY9WL5CbPjsouuM5M6YMsYWB1vsCS8j4
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            3
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          3,
+        ]),
         amount: '1000000',
         assets: [],
       },
@@ -273,29 +249,28 @@ export const generateTransaction = (): {|
       {
         // index: 8
         // Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv
-        address: getSingleAddressString(
-          testWallets['failed-single-tx'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['failed-single-tx'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '1000000',
         assets: [],
       },
       // daedalus addresses
       // index: 9
       {
-        address: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
+        address:
+          'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
         amount: '2000000',
         assets: [],
       },
       // index: 10
       {
-        address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm',
+        address:
+          'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm',
         amount: '2000000',
         assets: [],
       },
@@ -310,176 +285,143 @@ export const generateTransaction = (): {|
       {
         // index: 12
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '2000000',
         assets: [],
       },
       {
         // index: 13
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '3000000',
         assets: [],
       },
       {
         // index: 14
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '2000000',
         assets: [],
       },
       {
         // index: 15
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '2000000',
         assets: [],
       },
       {
         // index: 16
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '7000000',
         assets: [],
       },
       {
         // index: 17
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '10000000',
         assets: [],
       },
       {
         // index: 18
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '10000000',
         assets: [],
       },
       {
         // index: 19
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '10000000',
         assets: [],
       },
       {
         // index: 20
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '10000000',
         assets: [],
       },
       {
         // index: 21
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '10000000',
         assets: [],
       },
       {
         // index: 22
         // addr1vxmlzg3gg6tc9fgkqw2ymj09axadhjkc0kkk7whuu9fkrvqpdrama
-        address: getSingleAddressString(
-          testWallets['shelley-enterprise'].mnemonic,
-          [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['shelley-enterprise'].mnemonic, [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '10000000',
         assets: [],
       },
@@ -494,12 +436,9 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            0
+            0,
           ],
-          Buffer.from(
-            '00000000000000000000000000000000000000000000000000000000',
-            'hex'
-          )
+          Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')
         ),
         amount: '10000000', // enough that it can be unmangled
         assets: [],
@@ -515,12 +454,9 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            0
+            0,
           ],
-          Buffer.from(
-            '00000000000000000000000000000000000000000000000000000000',
-            'hex'
-          )
+          Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')
         ),
         amount: '1', // too little to unmangle
         assets: [],
@@ -536,7 +472,7 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            0
+            0,
           ],
           CoreAddressTypes.CARDANO_BASE
         ),
@@ -554,17 +490,19 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            0
+            0,
           ],
           CoreAddressTypes.CARDANO_BASE
         ),
         amount: '4000000',
-        assets: [{
-          amount: '100',
-          assetId: testAssetId,
-          policyId: testAssetId.split('.')[0],
-          name: testAssetId.split('.')[1],
-        }]
+        assets: [
+          {
+            amount: '100',
+            assetId: testAssetId,
+            policyId: testAssetId.split('.')[0],
+            name: testAssetId.split('.')[1],
+          },
+        ],
       },
     ],
     height: 1,
@@ -574,7 +512,7 @@ export const generateTransaction = (): {|
     block_hash: '1',
     time: '2019-04-19T15:13:33.000Z',
     last_update: '2019-05-17T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   // =========================
@@ -586,36 +524,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
-        address: getSingleAddressString(
-          testWallets['simple-pending-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['simple-pending-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '2',
         index: 2,
         amount: '1000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEYw3yJyPX1LWKXpuUjKAt57TLdR5fF61PRvUyswE3m7WrKNbrr
-        address: getSingleAddressString(
-          testWallets['simple-pending-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['simple-pending-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -627,43 +559,37 @@ export const generateTransaction = (): {|
     epoch: null,
     slot: null,
     last_update: '2019-05-20T23:14:51.899Z',
-    tx_state: 'Pending'
+    tx_state: 'Pending',
   };
   const pendingTx2 = {
     hash: 'fa6f2c82fb511d0cc9c12a540b5fac6e5a9b0f288f2d140f909f981279e16fbe',
     inputs: [
       {
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
-        address: getSingleAddressString(
-          testWallets['simple-pending-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['simple-pending-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '3',
         index: 3,
         amount: '1000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEYwEnNsuY9uMAphecEWipHKEy9g8yZCJTJm4zxV1sTrQfTxPVX
-        address: getSingleAddressString(
-          testWallets['simple-pending-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            2
-          ]
-        ),
+        address: getSingleAddressString(testWallets['simple-pending-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          2,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -675,7 +601,7 @@ export const generateTransaction = (): {|
     epoch: null,
     slot: null,
     last_update: '2019-05-20T23:14:52.899Z',
-    tx_state: 'Pending'
+    tx_state: 'Pending',
   };
 
   // ==================
@@ -687,52 +613,43 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ9uHfzhw3vXUrTFLowct5hMMHeNjfsrkQv5XSi5PhSs2yRNUb
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '4',
         index: 4,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            9
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          9,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            0
-          ]
-        ),
-        amount: '820000',
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          0,
+        ]),
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -743,59 +660,50 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const manyTx2 = {
     hash: '60493bf26e60b0b98f143647613be2ec1c6f50bd5fc15a14a2ff518f5fa36be0',
     inputs: [
       {
         // Ae2tdPwUPEZEXbmLnQ22Rxhv8a6hQ3C2673nkGsXKAgzqnuC1vqne9EtBkK
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '5',
         index: 5,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            9
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          9,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            1
-          ]
-        ),
-        amount: '820000',
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          1,
+        ]),
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -806,59 +714,50 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const manyTx3 = {
     hash: 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e09ae808d71',
     inputs: [
       {
         // Ae2tdPwUPEYwBZD5hPWCm3PUDYdMBfnLHsQmgUiexnkvDMTFCQ4gzRkgAEQ
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            2
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          2,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '6',
         index: 6,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            9
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          9,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            2
-          ]
-        ),
-        amount: '820000',
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          2,
+        ]),
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -869,59 +768,50 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const manyTx4 = {
     hash: 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e09ae808d75',
     inputs: [
       {
         // Ae2tdPwUPEYvzFpWJEGmSjLdz3DNY9WL5CbPjsouuM5M6YMsYWB1vsCS8j4
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            3
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          3,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '7',
         index: 7,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            9
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          9,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            3
-          ]
-        ),
-        amount: '820000',
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          3,
+        ]),
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -932,7 +822,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   const useChange = {
@@ -940,51 +830,42 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          0,
+        ]),
         txHash: manyTx1.hash,
         id: manyTx1.hash + '1',
         index: 1,
         amount: '820000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            30
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          30,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            4
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          4,
+        ]),
         amount: '650000',
         assets: [],
       },
@@ -996,7 +877,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 200,
     last_update: '2019-05-21T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   const postLaunchSuccessfulTx = {
@@ -1004,36 +885,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          1,
+        ]),
         txHash: manyTx2.hash,
         id: manyTx2.hash + '1',
         index: 1,
         amount: '820000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZCdSLM7bHhoC6xptW9SRW155PFFf4WYCKnpX4JrxJPmFzi6G2
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '500000',
         assets: [],
       },
@@ -1045,7 +920,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 202,
     last_update: '2019-05-22T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   const postLaunchPendingTx = {
@@ -1053,36 +928,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3
-        address: getSingleAddressString(
-          testWallets['many-tx-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['many-tx-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          1,
+        ]),
         txHash: manyTx2.hash,
         id: manyTx2.hash + '1',
         index: 1,
         amount: '820000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZCdSLM7bHhoC6xptW9SRW155PFFf4WYCKnpX4JrxJPmFzi6G2
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '500000',
         assets: [],
       },
@@ -1094,7 +963,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 202,
     last_update: '2019-05-22T23:16:51.899Z',
-    tx_state: 'Pending'
+    tx_state: 'Pending',
   };
 
   // ====================
@@ -1106,51 +975,42 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv
-        address: getSingleAddressString(
-          testWallets['failed-single-tx'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['failed-single-tx'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '8',
         index: 8,
         amount: '1000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZCdSLM7bHhoC6xptW9SRW155PFFf4WYCKnpX4JrxJPmFzi6G2
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZCqWsJkibw8BK2SgbmJ1rRG142Ru1CjSnRvKwDWbL4UYPN3eU
-        address: getSingleAddressString(
-          testWallets['failed-single-tx'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            0
-          ]
-        ),
+        address: getSingleAddressString(testWallets['failed-single-tx'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          0,
+        ]),
         amount: '820000',
         assets: [],
       },
@@ -1162,7 +1022,7 @@ export const generateTransaction = (): {|
     epoch: null,
     slot: null,
     last_update: '2019-05-21T23:14:51.899Z',
-    tx_state: 'Failed'
+    tx_state: 'Failed',
   };
 
   // =================
@@ -1174,22 +1034,19 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '13',
         index: 13,
         amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
@@ -1201,7 +1058,7 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            0
+            0,
           ],
           true
         ),
@@ -1216,7 +1073,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 300,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   const cip1852LedgerTx1 = {
@@ -1224,36 +1081,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '18',
         index: 18,
         amount: '8500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -1261,7 +1112,8 @@ export const generateTransaction = (): {|
         // ledger-wallet base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q9mvu42dtppagyyy3l0m36vr7qvefgt9ka2nyt8efzeewpc0vckke6cmv4en56dpa4e0smct43dpv5z6q2yf0tcmudzs8tsuf0
-        address: '0176ce554d5843d410848fdfb8e983f01994a165b755322cf948b397070f662d6ceb1b65733a69a1ed72f86f0bac5a16505a028897af1be345',
+        address:
+          '0176ce554d5843d410848fdfb8e983f01994a165b755322cf948b397070f662d6ceb1b65733a69a1ed72f86f0bac5a16505a028897af1be345',
         amount: '5500000',
         assets: [],
       },
@@ -1273,7 +1125,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 301,
     last_update: '2019-05-20T23:17:11.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   // =================
@@ -1285,51 +1137,42 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '14',
         index: 14,
         amount: '3000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZ9qgUrkrTqqTa5iKkaURYNFqM1gSbPXicn21LYyF184ZXnQ5R
-        address: getSingleAddressString(
-          testWallets['trezor-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            2
-          ],
-        ),
+        address: getSingleAddressString(testWallets['trezor-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          2,
+        ]),
         amount: '2832006',
         assets: [],
       },
@@ -1341,58 +1184,49 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 301,
     last_update: '2019-05-20T23:17:11.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const bip44TrezorTx2 = {
     hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '15',
         index: 15,
         amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // Ae2tdPwUPEZLmqiKtMQ4kKL38emRfkyPqBsHqL64pf8uRz6uzsQCd7GAu9R
-        address: getSingleAddressString(
-          testWallets['trezor-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            1
-          ],
-        ),
+        address: getSingleAddressString(testWallets['trezor-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          1,
+        ]),
         amount: '1494128',
         assets: [],
       },
@@ -1404,43 +1238,37 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 302,
     last_update: '2019-05-20T23:17:31.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const bip44TrezorTx3 = {
     hash: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '16',
         index: 16,
         amount: '2000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEYw66yGJJfbzNxTerpKV3zQRcd746cUtNSFgAGSYx1YLHnQW6c
-        address: getSingleAddressString(
-          testWallets['trezor-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            7
-          ],
-        ),
+        address: getSingleAddressString(testWallets['trezor-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7,
+        ]),
         amount: '1000000',
         assets: [],
       },
@@ -1452,49 +1280,44 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 303,
     last_update: '2019-05-20T23:17:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const cip1852TrezorTx1 = {
     hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '15',
         index: 15,
         amount: '7000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
       {
         // trezor-wallet base address index 0'/0/2
-        address: '0101ea7455b13eceade036aa02c2eecfeb0c2f5fd7398f08c573717d1764238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+        address:
+          '0101ea7455b13eceade036aa02c2eecfeb0c2f5fd7398f08c573717d1764238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
         amount: '5500000',
         assets: [],
       },
@@ -1506,7 +1329,98 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 301,
     last_update: '2019-05-20T23:17:11.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
+  };
+
+  const cip1852TrezorTx2 = {
+    hash: '3677e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    type: 'shelley',
+    inputs: [
+      {
+        // shelley-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
+        address:
+          '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        txHash: cip1852TrezorTx1.hash,
+        id: cip1852TrezorTx1.hash + '1',
+        index: 1,
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // trezor-wallet base address index 0'/0/2
+        address:
+          '0101ea7455b13eceade036aa02c2eecfeb0c2f5fd7398f08c573717d1764238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+        amount: '5500000',
+        assets: [],
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        rewardAddress: 'e164238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+      },
+      {
+        certIndex: 1,
+        kind: ShelleyCertificateTypes.StakeDelegation,
+        rewardAddress: 'e164238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+        poolKeyHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', // YOROI
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 6,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful',
+  };
+
+  const cip1852TrezorTx3 = {
+    hash: '3699e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '15',
+        index: 15,
+        amount: '7000000',
+        assets: genesisAssets,
+      },
+    ],
+    outputs: [
+      {
+        // trezor-wallet base address index 0'/0/2
+        address:
+          '0101ea7455b13eceade036aa02c2eecfeb0c2f5fd7398f08c573717d1764238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+        amount: '5500000',
+        assets: genesisAssets,
+      },
+    ],
+    height: 301,
+    block_hash: '301',
+    tx_ordinal: 15,
+    time: '2019-04-20T15:15:53.000Z',
+    epoch: 0,
+    slot: 301,
+    last_update: '2019-05-20T23:17:11.899Z',
+    tx_state: 'Successful',
   };
 
   // =====================
@@ -1518,36 +1432,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '16',
         index: 16,
         amount: '10000000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -1555,7 +1463,8 @@ export const generateTransaction = (): {|
         // 0'/0/0
         // eslint-disable-next-line max-len
         // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
-        address: '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
+        address:
+          '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
         amount: '5500000',
         assets: [],
       },
@@ -1567,7 +1476,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 304,
     last_update: '2019-05-20T23:18:11.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   // =====================
@@ -1579,36 +1488,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '19',
         index: 19,
         amount: '8500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -1616,7 +1519,8 @@ export const generateTransaction = (): {|
         // shelley-delegated base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
-        address: '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        address:
+          '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
         amount: '5500000',
         assets: [],
       },
@@ -1628,7 +1532,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const shelleyDelegatedTx2 = {
     hash: '3677e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
@@ -1638,20 +1542,22 @@ export const generateTransaction = (): {|
         // shelley-delegated base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
-        address: '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        address:
+          '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
         txHash: shelleyDelegatedTx1.hash,
         id: shelleyDelegatedTx1.hash + '1',
         index: 1,
         amount: '5500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // shelley-delegated base address index 0'/1/0
         // eslint-disable-next-line max-len
         // addr1qxnhwn2yw8utcxprcqxl0hx0v2wq2g304tc5wyzmhx6cvgzkmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkaswuh3qd
-        address: '01a7774d4471f8bc1823c00df7dccf629c05222faaf147105bb9b5862056db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        address:
+          '01a7774d4471f8bc1823c00df7dccf629c05222faaf147105bb9b5862056db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
         amount: '3000000',
         assets: [],
       },
@@ -1680,7 +1586,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 200,
     last_update: '2019-05-21T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   // ============================
@@ -1692,36 +1598,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '20',
         index: 20,
         amount: '8500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -1729,7 +1629,8 @@ export const generateTransaction = (): {|
         // shelley-ledger-delegated base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q82e70f6t2v5va99t2mvc894235wz5kfc32vhs5khf0c9xw7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq4wu69r
-        address: '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        address:
+          '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
         amount: '5500000',
         assets: [],
       },
@@ -1741,7 +1642,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const shelleyLedgerDelegatedTx2 = {
     hash: '3688e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
@@ -1751,20 +1652,22 @@ export const generateTransaction = (): {|
         // shelley-ledger-delegated base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q82e70f6t2v5va99t2mvc894235wz5kfc32vhs5khf0c9xw7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq4wu69r
-        address: '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        address:
+          '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
         txHash: shelleyLedgerDelegatedTx1.hash,
         id: shelleyLedgerDelegatedTx1.hash + '1',
         index: 1,
         amount: '5500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // shelley-ledger-delegated base address index 0'/1/0
         // eslint-disable-next-line max-len
         // addr1q9mhtwlxextzp4kqe04ycj7gus5j8gd5jaz42xsklslcdzx7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq62plmk
-        address: '017775bbe6c99620d6c0cbea4c4bc8e42923a1b49745551a16fc3f8688deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        address:
+          '017775bbe6c99620d6c0cbea4c4bc8e42923a1b49745551a16fc3f8688deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
         amount: '3000000',
         assets: [],
       },
@@ -1793,7 +1696,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 200,
     last_update: '2019-05-21T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   // ============================
@@ -1805,36 +1708,30 @@ export const generateTransaction = (): {|
     inputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '21',
         index: 21,
         amount: '8500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
-        address: getSingleAddressString(
-          testWallets['dump-wallet'].mnemonic,
-          [
-            WalletTypePurpose.BIP44,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            1
-          ]
-        ),
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
         amount: '1',
         assets: [],
       },
@@ -1842,19 +1739,20 @@ export const generateTransaction = (): {|
         // shelley-just-registered base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q97p5s9fuhlymrqe2kr94krdfh6fujuvfyy67z53g7cmwrr4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2q0j0e6c
-        address: '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+        address:
+          '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
         amount: '5500000',
         assets: [],
       },
     ],
     height: 100,
     block_hash: '100',
-    tx_ordinal: 6,
+    tx_ordinal: 7,
     time: '2019-04-20T15:15:33.000Z',
     epoch: 0,
     slot: 100,
     last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const shelleyOnlyRegisteredTx2 = {
     hash: '3456e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
@@ -1864,20 +1762,22 @@ export const generateTransaction = (): {|
         // shelley-only-registered base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q97p5s9fuhlymrqe2kr94krdfh6fujuvfyy67z53g7cmwrr4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2q0j0e6c
-        address: '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+        address:
+          '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
         txHash: shelleyOnlyRegisteredTx1.hash,
         id: shelleyOnlyRegisteredTx1.hash + '1',
         index: 1,
         amount: '5500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
         // shelley-only-registered base address index 0'/1/0
         // eslint-disable-next-line max-len
         // addr1qxzjfpfhwq4474fk7ruxsjh59s9g2n504jm6reug68zwx2t4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2qgde07v
-        address: '0185248537702b5f5536f0f8684af42c0a854e8facb7a1e788d1c4e329756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+        address:
+          '0185248537702b5f5536f0f8684af42c0a854e8facb7a1e788d1c4e329756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
         amount: '3000000',
         assets: [],
       },
@@ -1900,7 +1800,7 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 200,
     last_update: '2019-05-21T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
 
   // ===================
@@ -1921,7 +1821,7 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            0
+            0,
           ],
           CoreAddressTypes.CARDANO_BASE
         ),
@@ -1930,7 +1830,7 @@ export const generateTransaction = (): {|
         index: 25,
         amount: '3500000',
         assets: [],
-      }
+      },
     ],
     outputs: [
       {
@@ -1943,7 +1843,7 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
-            1
+            1,
           ],
           CoreAddressTypes.CARDANO_BASE
         ),
@@ -1965,7 +1865,7 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.CHIMERIC_ACCOUNT,
-            0
+            0,
           ],
           CoreAddressTypes.CARDANO_REWARD
         ),
@@ -1981,7 +1881,7 @@ export const generateTransaction = (): {|
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.CHIMERIC_ACCOUNT,
-            0
+            0,
           ],
           CoreAddressTypes.CARDANO_REWARD
         ),
@@ -1997,9 +1897,8 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 200,
     last_update: '2019-05-21T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
-
 
   return {
     genesisTx,
@@ -2020,6 +1919,8 @@ export const generateTransaction = (): {|
     bip44TrezorTx2,
     bip44TrezorTx3,
     cip1852TrezorTx1,
+    cip1852TrezorTx2,
+    cip1852TrezorTx3,
     shelleySimple15,
     shelleyDelegatedTx1,
     shelleyDelegatedTx2,
@@ -2075,9 +1976,7 @@ export const MockChain = Object.freeze({
   Standard: 0,
   TestAssurance: 1,
 });
-export function resetChain(
-  chainToUse: $Values<typeof MockChain>,
-): void {
+export function resetChain(chainToUse: $Values<typeof MockChain>): void {
   // want to keep reference the same
   while (transactions.length > 0) {
     transactions.pop();
@@ -2108,6 +2007,8 @@ export function resetChain(
     addTransaction(txs.bip44TrezorTx2);
     addTransaction(txs.bip44TrezorTx3);
     addTransaction(txs.cip1852TrezorTx1);
+    addTransaction(txs.cip1852TrezorTx2);
+    addTransaction(txs.cip1852TrezorTx3);
     // shelley-simple-15
     addTransaction(txs.shelleySimple15);
     // shelley-delegated
@@ -2179,19 +2080,16 @@ function getApiStatus(): ServerStatusResponse {
   return apiStatuses[0];
 }
 
-const usedAddresses: FilterFunc = genCheckAddressesInUse(
-  transactions,
-  networks.CardanoMainnet,
-);
+const usedAddresses: FilterFunc = genCheckAddressesInUse(transactions, networks.CardanoMainnet);
 const history: HistoryFunc = genGetTransactionsHistoryForAddresses(
   transactions,
-  networks.CardanoMainnet,
+  networks.CardanoMainnet
 );
 const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
 const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   history,
   getBestBlock,
-  networks.CardanoMainnet,
+  networks.CardanoMainnet
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
@@ -2203,28 +2101,41 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 
 const getPoolInfo: PoolInfoFunc = genGetPoolInfo();
 const getRewardHistory: RewardHistoryFunc = async (
-  _body: RewardHistoryRequest,
+  _body: RewardHistoryRequest
 ): Promise<RewardHistoryResponse> => {
   return {
-    e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: [{
-      epoch: 210,
-      reward: '5000000',
-      poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
-    }],
-    e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb: [{
-      epoch: 210,
-      reward: '5000000',
-      poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
-    }],
-    e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060: [{
-      epoch: 210,
-      reward: '5000000',
-      poolHash: 'c34a7f59c556633dc88ec25c9743c5ebca3705e179a54db5638941cb',
-    }],
+    e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: [
+      {
+        epoch: 210,
+        reward: '5000000',
+        poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+      },
+    ],
+    e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb: [
+      {
+        epoch: 210,
+        reward: '5000000',
+        poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+      },
+    ],
+    e164238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2: [
+      {
+        epoch: 210,
+        reward: '5000000',
+        poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+      },
+    ],
+    e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060: [
+      {
+        epoch: 210,
+        reward: '5000000',
+        poolHash: 'c34a7f59c556633dc88ec25c9743c5ebca3705e179a54db5638941cb',
+      },
+    ],
   };
 };
 
-const getAccountState: AccountStateFunc = async (request) => {
+const getAccountState: AccountStateFunc = async request => {
   const totalRewards = new BigNumber(5000000);
   const totalWithdrawals = new BigNumber(0);
 
@@ -2261,14 +2172,70 @@ const getAccountState: AccountStateFunc = async (request) => {
         withdrawals: totalWithdrawals.toString(),
       },
     ],
+    [
+      // shelley-trezor
+      'e164238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+      {
+        poolOperator: null,
+        remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
+        rewards: totalRewards.toString(),
+        withdrawals: totalWithdrawals.toString(),
+      },
+    ],
   ]);
 
-  const result: {| [key: string]: (null | RemoteAccountState) |} = {};
+  const result: {| [key: string]: null | RemoteAccountState |} = {};
   for (const addr of request.addresses) {
     result[addr] = accountStateMap.get(addr) ?? null;
   }
 
   return result;
+};
+
+const mockScriptOutputs = [
+  {
+    txHash: '156f481d054e1e2798ef3cae84c0e7902b6ec18641c571d54c913e489327ab2d',
+    txIndex: 0,
+    output: {
+      address:
+        '31d7a345ebead42207d4321763c8172869843254c81d007dfa2a7ee279d7a345ebead42207d4321763c8172869843254c81d007dfa2a7ee279',
+      amount: '2000000',
+      dataHash: null,
+      assets: [],
+    },
+    spendingTxHash: '4a3f86762383f1d228542d383ae7ac89cf75cf7ff84dec8148558ea92b0b92d0',
+  },
+  {
+    txHash: 'e7db1f809fcc21d3dd108ced6218bf0f0cbb6a0f679f848ff1790b68d3a35872',
+    txIndex: 0,
+    output: {
+      address: 'addr1w9jur974vh5g5gygtef4lym426pygnfuqt75fhts3ql738sez7sqy',
+      amount: '1000000',
+      dataHash: null,
+      assets: [
+        {
+          assetId: '3652a89686608c45ca5b7768f44a961fe0e3459e21db4ea61b713aa6.4465764578',
+          policyId: '3652a89686608c45ca5b7768f44a961fe0e3459e21db4ea61b713aa6',
+          name: '4465764578',
+          amount: '10',
+        },
+      ],
+    },
+    spendingTxHash: null,
+  },
+];
+
+const getUtxoData = (txHash: string, txIndex: number): UtxoData | null => {
+  const output = mockScriptOutputs.find(
+    entry => entry.txHash === txHash && entry.txIndex === txIndex
+  );
+  if (!output) {
+    return null;
+  }
+  return {
+    output: output.output,
+    spendingTxHash: output.spendingTxHash,
+  };
 };
 
 export default {
@@ -2282,4 +2249,5 @@ export default {
   getPoolInfo,
   getRewardHistory,
   getAccountState,
+  getUtxoData,
 };

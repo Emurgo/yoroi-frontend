@@ -11,3 +11,12 @@ export function hexToBytes(hex: string): Buffer {
 export function hexToUtf(hex: string): string {
   return hexToBytes(hex).toString('utf-8');
 }
+
+export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
+  try {
+    return f();
+  } catch (e) {
+    console.error(typeof msg === 'string' ? msg : msg(e), e);
+    throw e;
+  }
+}

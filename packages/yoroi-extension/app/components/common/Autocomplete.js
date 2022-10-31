@@ -7,9 +7,9 @@ import { useCombobox, useMultipleSelection } from 'downshift';
 import { Input, Box, InputLabel, FormControl, FormHelperText, Chip, useTheme } from '@mui/material';
 import { styled } from '@mui/system';
 import { slice } from 'lodash';
-import SuccessIcon from '../../assets/images/forms/done.inline.svg';
-import ErrorIcon from '../../assets/images/forms/error.inline.svg';
-import CloseIcon from '../../assets/images/close-chip.inline.svg';
+import { ReactComponent as SuccessIcon }  from '../../assets/images/forms/done.inline.svg';
+import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
+import { ReactComponent as CloseIcon }  from '../../assets/images/close-chip.inline.svg';
 
 type Props = {|
   +options: Array<string>,
@@ -131,6 +131,7 @@ function Autocomplete({
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
         htmlFor={id ?? 'autocomplete-combobox'}
         {...getLabelProps()}
+        sx={{ backgroundColor: 'var(--yoroi-palette-common-white)', padding: '0px 6px' }}
       >
         {label}
       </InputLabel>

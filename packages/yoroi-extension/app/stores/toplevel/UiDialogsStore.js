@@ -71,7 +71,6 @@ export default class UiDialogsStore<
   getActiveData: <T>(number | string) => (void | T) = <T>(
     key: (number | string)
   ): (void | T) => (
-    // flowlint-next-line unnecessary-optional-chain:off
     this.dialogList[this.dialogList.length - 1]?.dataForActiveDialog.get(key)
   );
 

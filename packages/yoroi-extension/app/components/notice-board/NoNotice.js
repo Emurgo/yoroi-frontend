@@ -4,8 +4,8 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 
-import NoNoticeClassicSvg from '../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
-import NoNoticeModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import { ReactComponent as NoNoticeClassicSvg }  from '../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
+import { ReactComponent as NoNoticeModernSvg }  from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './NoNotice.scss';

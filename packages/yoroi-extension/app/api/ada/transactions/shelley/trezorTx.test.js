@@ -124,18 +124,6 @@ test('Create Trezor transaction', async () => {
     },
     assets: [],
   }, {
-    amount: '2832006',
-    // base
-    receiver: 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990',
-    tx_hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
-    tx_index: 1,
-    utxo_id: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba201',
-    addressing: {
-      path: [2147483692, 2147485463, 2147483648, 1, 2],
-      startLevel: 1
-    },
-    assets: [],
-  }, {
     amount: '1000000',
     // enterprise
     receiver: 'addr1vxq0nckg3ekgzuqg7w5p9mvgnd9ym28qh5grlph8xd2z92su77c6m',
@@ -156,6 +144,18 @@ test('Create Trezor transaction', async () => {
     utxo_id: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b36571',
     addressing: {
       path: [2147483692, 2147485463, 2147483648, 0, 7],
+      startLevel: 1
+    },
+    assets: [],
+  }, {
+    amount: '2832006',
+    // base
+    receiver: 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990',
+    tx_hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
+    tx_index: 1,
+    utxo_id: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba201',
+    addressing: {
+      path: [2147483692, 2147485463, 2147483648, 1, 2],
       startLevel: 1
     },
     assets: [],
@@ -247,10 +247,6 @@ test('Create Trezor transaction', async () => {
       prev_hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
       prev_index: 1,
     }, {
-      path: `m/44'/1815'/0'/1/2`,
-      prev_hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
-      prev_index: 1,
-    }, {
       path: `m/44'/1815'/0'/0/7`,
       prev_hash: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
       prev_index: 0,
@@ -258,6 +254,10 @@ test('Create Trezor transaction', async () => {
       path: `m/44'/1815'/0'/0/7`,
       prev_hash: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3658',
       prev_index: 0,
+    }, {
+      path: `m/44'/1815'/0'/1/2`,
+      prev_hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
+      prev_index: 1,
     }],
     outputs: [{
       address: 'Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe',

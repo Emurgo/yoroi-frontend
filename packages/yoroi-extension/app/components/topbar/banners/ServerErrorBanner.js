@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import styles from './ServerErrorBanner.scss';
-import WarningSvg from '../../../assets/images/warning.inline.svg';
+import { ReactComponent as WarningSvg }  from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -16,7 +16,7 @@ const messages = defineMessages({
   },
   networkErrorLabel: {
     id: 'networkError.label.message',
-    defaultMessage: '!!!WARNING: Connection to the server failed.<br>Please check your internet connection or <a target="blank" href="https://twitter.com/YoroiWallet">our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.',
+    defaultMessage: '!!!Server connection failed <br/> Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
   },
 });
 

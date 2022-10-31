@@ -1,7 +1,29 @@
 // @flow
+// routes to by tracked by analytics
+export const TRACKED_ROUTES: RegExp = new RegExp(
+  '^(' +
+  '(/my-wallets)|' +
+  '(/wallets/add)|' +
+  '(/wallets/transactions)|' +
+  '(/wallets/send)|' +
+  '(/wallets/assets)|' +
+  '(/wallets/receive/.+)|' +
+  '(/wallets/delegation-dashboard)|' +
+  '(/wallets/cardano-delegation)|' +
+  '(/wallets/voting)|' +
+  '(/settings/.+)|' +
+  '(/transfer(/.+)?)|' +
+  '(/send-from-uri)|' +
+  '(/notice-board)|' +
+  '(/staking)|' +
+  '(/assets/.*)|' +
+  '(/connector/connected-websites)|' +
+  '(/experimental/.*)' +
+  ')$'
+);
+
 export const ROUTES = {
   ROOT: '/',
-
   NIGHTLY_INFO: '/nightly',
   MY_WALLETS: '/my-wallets',
   PROFILE: {
@@ -56,15 +78,15 @@ export const ROUTES = {
   STAKING: '/staking',
   ASSETS: {
     ROOT: '/assets',
-    TOKENS: '/assets/tokens',
-    TOKEN_DETAILS: '/assets/tokens/:tokenId',
-    NFTS: '/assets/nfts',
-    NFT_DETAILS: '/assets/nfts/:nftId'
+    DETAILS: '/assets/tokens/:tokenId',
+  },
+  NFTS: {
+    ROOT: '/nfts',
+    DETAILS: '/nfts/:nftId'
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites'
   },
-  // Experimental
   EXPERIMENTAL: {
     YOROI_PALETTE: '/experimental/yoroi-palette',
     YOROI_COMPONENTS: '/experimental/components',
