@@ -60,7 +60,7 @@ Feature: Migration
 
     Examples:
       | amount              | fee       |
-      | 1.000000            | 0.168845  |
+      | 1.000000            | 0.180065  |
 
   @it-140
   Scenario: Upgrade from version that adds bip44 support (IT-140)

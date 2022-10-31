@@ -7,7 +7,7 @@ Feature: Main UI
   Scenario: Restore wallet and get balance with many addresses (IT-81)
     Given I have completed the basic setup
     And There is a Byron wallet stored named many-tx-wallet
-    Then I should see the balance number "3.110005 ADA"
+    Then I should see the balance number "6.110005 ADA"
 
   @it-15
   Scenario: Main Screen Tabs Switching (IT-15)
@@ -63,7 +63,7 @@ Feature: Main UI
     When I refresh the page
     Then I should see my balance hidden
     When I click on hide balance button
-    Then I should see the balance number "3.110005 ADA"
+    Then I should see the balance number "6.110005 ADA"
 
   @it-180
   Scenario: Ensure user can hide balance (IT-180)

@@ -253,6 +253,7 @@ export default class ConnectContainer extends Component<
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+          // todo: import profile store for stablecoin display
         },
         connector: {
           connectingMessage: stores.connector.connectingMessage,

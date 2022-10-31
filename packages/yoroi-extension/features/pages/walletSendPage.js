@@ -4,6 +4,17 @@ import { truncateToken } from '../../app/utils/formatters';
 import { By } from 'selenium-webdriver';
 import type { LocatorObject } from '../support/webdriver';
 
+type AmountItem = {|
+  tokenName: string,
+  amount: string,
+|};
+
+// Modern theme. Old UI
+export const sendInputDialogFeesText: LocatorObject = {
+  locator: '//div[@class="WalletSendForm_amountInput"]/div/p',
+  method: 'xpath'
+};
+
 export const assetSelector: LocatorObject = {
   locator: '.WalletSendForm_component .SimpleInput_input',
   method: 'css',
@@ -25,8 +36,8 @@ export const getMemoText = async (customWorld: Object): Promise<string> => {
   return await memoElem[0].getText();
 };
 export const memoContentInput: LocatorObject = {
-  locator: "input[name='memo']",
-  method: 'css',
+  locator: '//input[starts-with(@name, "memo")]',
+  method: 'xpath',
 };
 export const editMemoButton: LocatorObject = { locator: '.editMemoButton', method: 'css' };
 export const deleteMemo = async (customWorld: Object, confirmDeleting: boolean = true) => {
@@ -54,12 +65,13 @@ export const nextButton: LocatorObject = {
   method: 'css',
 };
 export const invalidAddressError: LocatorObject = {
-  locator: '.receiver .SimpleInput_errored',
-  method: 'css',
+  locator: '//p[starts-with(@id, "receiver") and contains(@id, "-helper-text")]',
+  method: 'xpath',
 };
-export const notEnoughAdaError: LocatorObject = {
-  locator: '.FormFieldOverridesClassic_error',
-  method: 'css',
+
+export const amountError: LocatorObject = {
+  locator: '//p[starts-with(@id, "amount") and contains(@id, "-helper-text")]',
+  method: 'xpath',
 };
 
 export const sendAllCheckbox: LocatorObject = {
@@ -72,7 +84,7 @@ export const sendMoneyConfirmationDialog: LocatorObject = {
 };
 export const submitButton: LocatorObject = { locator: '.confirmButton', method: 'css' };
 export const disabledSubmitButton: LocatorObject = {
-  locator: '.primary.SimpleButton_disabled',
+  locator: '.MuiButton-primary.Mui-disabled',
   method: 'css',
 };
 
@@ -83,6 +95,19 @@ export const transactionPageButton: LocatorObject = {
 };
 
 // Send confirmation Dialog
+
+export const getAmountItems = async (customWorld: any): Promise<Array<AmountItem>> => {
+  const result = [];
+  const amountElements = await customWorld.findElements(sendConfirmationDialogAmountText);
+  for (const amountElement of amountElements) {
+    const [elAmount, elToken] = (await amountElement.getText()).split(' ');
+    result.push({
+      tokenName: elToken.toLowerCase(),
+      amount: elAmount,
+    });
+  }
+  return result;
+};
 
 export const sendConfirmationDialogAddressToText: LocatorObject = {
   locator: '.WalletSendConfirmationDialog_addressTo',
