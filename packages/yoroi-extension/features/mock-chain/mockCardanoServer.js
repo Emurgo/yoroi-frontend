@@ -368,14 +368,22 @@ export function getMockServer(settings: {
     });
 
     server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
-      // ignore `blockCount` and returns all diff items at once
-      const { addresses, untilBlockHash, afterBlockHash, /* blockCount */ } = req.body;
+      const { addresses, untilBlockHash, afterPoint, diffLimit } = req.body;
+      if (afterPoint.lastPage) {
+        res.send({
+          diffItems: [],
+          lastDiffPointSelected: {
+            lastPage: true,
+          },
+        });
+        return;
+      }
+
       const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint(
         {
           addresses,
           untilBlockHash,
-          // ignore itemIndex and txHash
-          afterBestBlock: afterBlockHash
+          afterBestBlock: afterPoint.blockHash
         },
       );
       if (result !== 'SUCCESS') {
@@ -402,9 +410,13 @@ export function getMockServer(settings: {
           };
         });
         res.send({
-          diffItems,
           // no pagination, always return all at once
-          lastBlockHash: untilBlockHash,
+          diffItems,
+          // note this isn't exactly what the real server would return but
+          // this value is opaque to the client so it shouldn't break anything
+          lastDiffPointSelected: {
+            lastPage: true,
+          },
         });
       }
     });
