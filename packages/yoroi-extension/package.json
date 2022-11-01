@@ -244,7 +244,7 @@
     "trezor-connect": "8.2.4",
     "ua-parser-js": "0.7.24",
     "unorm": "1.6.0",
-    "validator": "13.5.2"
+    "validator": "13.7.0"
   },
   "engineStrict": true,
   "engine": {
