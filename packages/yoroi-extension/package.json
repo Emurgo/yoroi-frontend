@@ -205,7 +205,7 @@
     "crypto-browserify": "3.12.0",
     "crypto-random-string": "3.3.1",
     "downshift": "^6.1.7",
-    "dropbox": "4.0.30",
+    "dropbox": "10.33.0",
     "ergo-lib-wasm-browser": "^0.14.0",
     "es6-error": "4.1.1",
     "file-saver": "2.0.5",
