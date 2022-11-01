@@ -22,16 +22,16 @@ import {
   walletAddressRow,
   getAddressFromAddressRow,
 } from '../pages/walletReceivePage';
-import { halfSecond, oneSecond } from '../support/helpers/common-constants';
+import { oneSecond } from '../support/helpers/common-constants';
 
 Given(/^Revamp. I go to the receive screen$/, async function () {
   await this.click(receiveTab);
-  await this.driver.sleep(oneSecond + halfSecond);
+  await this.waitForElement(generateAddressButton);
 });
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click(receiveTab);
-  await this.driver.sleep(oneSecond + halfSecond);
+  await this.waitForElement(generateAddressButton);
 });
 
 When(/^I click on the Generate new address button$/, async function () {
@@ -105,8 +105,8 @@ Then(/^I see every generated address is unique$/, async function () {
 });
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {
+  await this.driver.sleep(2 * oneSecond);
   const rows = table.hashes();
-  await this.waitForElement(generateAddressButton);
   const waitUntilAddressesAppeared = rows.map(async (row, index) => {
     const addressLocator = getGeneratedAddress(index);
     await this.scrollIntoView(addressLocator);
