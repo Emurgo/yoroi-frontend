@@ -18,13 +18,8 @@ type EmailRequestType =
   'deleteById' |
   'check' |
   'getMessageText';
-type EmailRequest = {|
-  method: string,
-  url: string,
-  headers: any,
-|};
 
-const _buildEmailRequest = (request: EmailRequestType, messageId?: string): EmailRequest => {
+const _buildEmailRequest = (request: EmailRequestType, messageId: string = ''): any => {
   switch (request) {
     case 'count':
       return {
@@ -109,13 +104,13 @@ export const deleteAllEmails = async () => {
   }
 };
 
-export const deleteEmail = async (messageId) => {
+export const deleteEmail = async (messageId: string): Promise<any> => {
   const response = await axios(_buildEmailRequest('deleteById', messageId));
 
   return response.data;
 };
 
-export const checkEmail = async () => {
+export const checkEmail = async (): Promise<any> => {
   const response = await axios(_buildEmailRequest('check'));
 
   return response.data;
