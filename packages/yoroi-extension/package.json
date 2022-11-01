@@ -141,7 +141,7 @@
     "html-loader": "2.0.0",
     "html-webpack-harddisk-plugin": "2.0.0",
     "html-webpack-plugin": "5.1.0",
-    "jest": "26.6.3",
+    "jest": "29.2.2",
     "jest-canvas-mock": "2.3.1",
     "json-server": "0.16.3",
     "json-stable-stringify": "1.0.1",
