@@ -203,7 +203,7 @@
     "chacha": "2.1.0",
     "classnames": "2.2.6",
     "crypto-browserify": "3.12.0",
-    "crypto-random-string": "3.3.1",
+    "crypto-random-string": "5.0.0",
     "downshift": "^6.1.7",
     "dropbox": "4.0.30",
     "ergo-lib-wasm-browser": "^0.14.0",
