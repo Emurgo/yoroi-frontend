@@ -124,7 +124,7 @@
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "cucumber-html-reporter": "^5.5.0",
     "ergo-lib-wasm-nodejs": "^0.14.0",
-    "eslint": "7.20.0",
+    "eslint": "7.32.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-flowtype": "5.2.1",
