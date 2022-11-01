@@ -865,7 +865,7 @@ function createTxHandler(e) {
       toggleSpinner('hide');
       alertWarrning('Creating tx fails');
     });
-});
+}
 
 getCollateralUtxos.addEventListener('click', () => {
   toggleSpinner('show');
