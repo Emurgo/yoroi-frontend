@@ -22,6 +22,7 @@ import {
   walletAddressRow,
   getAddressFromAddressRow,
 } from '../pages/walletReceivePage';
+import { oneSecond } from '../support/helpers/common-constants';
 
 Given(/^Revamp. I go to the receive screen$/, async function () {
   await this.click(receiveTab);
@@ -104,6 +105,7 @@ Then(/^I see every generated address is unique$/, async function () {
 });
 
 Then(/^I should see the addresses exactly list them$/, async function (table) {
+  await this.driver.sleep(2 * oneSecond);
   const rows = table.hashes();
   const waitUntilAddressesAppeared = rows.map(async (row, index) => {
     const addressLocator = getGeneratedAddress(index);
