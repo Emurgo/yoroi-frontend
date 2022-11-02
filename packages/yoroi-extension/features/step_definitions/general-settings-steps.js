@@ -97,14 +97,14 @@ When(
     await this.scrollIntoView(currencySelector);
     await this.click(currencySelector);
     await this.waitForElementNotPresent(loadingSpinnerWindow);
+
+    await new Promise(resolve=>{setTimeout(resolve, 1000)});
   }
 );
 
 Then(
   /^I see the correct conversion value for (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) on header$/,
   async function (currency) {
-    await new Promise(resolve=>{setTimeout(resolve, 1000)});
-
     const amountDisplayFiatValue = await this.getText(amountDisplayFiat);
 
     const response = await axios(`${adaToFiatPricesMainUrl}ADA/current`);
