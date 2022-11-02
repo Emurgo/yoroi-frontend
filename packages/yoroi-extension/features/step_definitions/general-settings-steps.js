@@ -18,7 +18,7 @@ import {
   secondThemeSelected,
 } from '../pages/settingsPage';
 import type { LocatorObject } from '../support/webdriver';
-import { adaToFiatPrices } from '../support/helpers/common-constants';
+import { adaToFiatPricesMainUrl } from '../support/helpers/common-constants';
 import { loadingSpinnerWindow } from '../pages/commonComponentsPage';
 
 const axios = require('axios');
@@ -103,9 +103,11 @@ When(
 Then(
   /^I see the correct conversion value for (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) on header$/,
   async function (currency) {
+    await new Promise(resolve=>{setTimeout(resolve, 1000)});
+
     const amountDisplayFiatValue = await this.getText(amountDisplayFiat);
 
-    const response = await axios(adaToFiatPrices);
+    const response = await axios(`${adaToFiatPricesMainUrl}ADA/current`);
     const value = await response.data.ticker.prices[currency];
 
     const adaAmount = await this.getText(amountDisplayADA);
@@ -114,7 +116,7 @@ Then(
     );
 
     const expectedValue = adaValue * value;
-    expect(amountDisplayFiatValue).to.equal(`${expectedValue} ${currency}`);
+    expect(amountDisplayFiatValue).to.equal(`${expectedValue.toFixed(2)} ${currency}`);
   }
 );
 
