@@ -17,7 +17,7 @@ const CONFIG: ConfigType = {
     addressRequestSize: 50,
     txsBodiesRequestSize: 150,
     coinPriceRefreshInterval: 60000,
-    coinPriceFreshnessThreshold: 120000,
+    coinPriceFreshnessThreshold: 10*60*1000,
     pubKeyData: '',
     pubKeyMaster: '',
   },
