@@ -965,12 +965,6 @@ getNFTs.addEventListener('click', async () => {
   toggleSpinner('hide');
 })
 
-function alertError(text) {
-  toggleSpinner('hide');
-  alertEl.className = 'alert alert-danger';
-  alertEl.innerHTML = text;
-}
-
 function alertSuccess(text) {
   alertEl.className = 'alert alert-success';
   alertEl.innerHTML = text;
