@@ -395,10 +395,10 @@ window._getUtxos = function (value) {
   if (value != null && typeof value !== "string") {
     value = valueRequestObjectToWasmHex(value);
   }
-  cardanoApi.getUtxos(value).then((utxosResponse) => {
-    toggleSpinner("hide");
-    if (utxosResponse.length === 0) {
-      alertWarning("NO UTXOS");
+  cardanoApi.getUtxos(value).then(utxosResponse => {
+    toggleSpinner('hide');
+    if (utxosResponse == null || utxosResponse.length === 0) {
+      alertWarrning('NO UTXOS');
     } else {
       utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
       alertSuccess(
@@ -962,14 +962,18 @@ getCollateralUtxos.addEventListener("click", () => {
         CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
       ).toString("hex")
     )
-    .then((utxosResponse) => {
-      toggleSpinner("hide");
-      let utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
-      alertSuccess(
-        `<h2>Collateral UTxO (${utxos.length}):</h2><pre>` +
+    .then(utxosResponse => {
+      toggleSpinner('hide');
+      if (utxosResponse == null || utxosResponse.length === 0) {
+        alertWarrning('NO COLLATERAL UTXOS');
+      } else {
+        let utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
+        alertSuccess(
+          `<h2>Collateral UTxO (${utxos.length}):</h2><pre>` +
           JSON.stringify(utxos, undefined, 2) +
-          "</pre>"
-      );
+          '</pre>'
+        );
+      }
     })
     .catch((error) => {
       console.error(error);
