@@ -65,6 +65,10 @@ export const Generic = (): Node => {
         stores: {
           profile: {
             shouldHideBalance: false,
+            unitOfAccount: {
+              enabled: false,
+              currency: null,
+            }
           },
           connector: {
             connectingMessage: {
@@ -81,6 +85,9 @@ export const Generic = (): Node => {
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),
+          },
+          coinPriceStore: {
+            getCurrentPrice: (_from, _to) => null,
           },
         },
         actions: {
