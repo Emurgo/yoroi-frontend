@@ -18,7 +18,7 @@ import {
   secondThemeSelected,
 } from '../pages/settingsPage';
 import type { LocatorObject } from '../support/webdriver';
-import { adaToFiatPricesMainUrl } from '../support/helpers/common-constants';
+import { adaToFiatPricesMainUrl, oneSecond } from '../support/helpers/common-constants';
 import { loadingSpinnerWindow } from '../pages/commonComponentsPage';
 
 const axios = require('axios');
@@ -98,7 +98,7 @@ When(
     await this.click(currencySelector);
     await this.waitForElementNotPresent(loadingSpinnerWindow);
 
-    await new Promise(resolve=>{setTimeout(resolve, 1000)});
+    await this.driver.sleep(oneSecond);
   }
 );
 
@@ -115,8 +115,11 @@ Then(
       parseFloat(adaAmount.replace('\n', '').replace(' ADA', '')).toFixed(2)
     );
 
-    const expectedValue = adaValue * value;
-    expect(amountDisplayFiatValue).to.equal(`${expectedValue.toFixed(2)} ${currency}`);
+    const expectedValueNotFixed = adaValue * value;
+    const expectedValue = expectedValueNotFixed < 1
+      ? expectedValueNotFixed.toFixed(6)
+      : expectedValueNotFixed.toFixed(2);
+    expect(amountDisplayFiatValue).to.equal(`${expectedValue} ${currency}`);
   }
 );
 
