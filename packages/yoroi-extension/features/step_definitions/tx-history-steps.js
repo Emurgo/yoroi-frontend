@@ -21,7 +21,12 @@ import {
   transactionIdText,
 } from '../pages/walletTransactionsHistoryPage';
 import { summaryTab } from '../pages/walletPage';
-import { displayInfo , txSuccessfulStatuses, adaToFiatPrices } from '../support/helpers/common-constants';
+import {
+  displayInfo,
+  txSuccessfulStatuses,
+  adaToFiatPricesMainUrl,
+  oneSecond,
+} from '../support/helpers/common-constants';
 import { getMethod } from '../support/helpers/helpers';
 
 const axios = require('axios');
@@ -229,19 +234,26 @@ Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async f
 Then(
   /^I validate the transaction amount to (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) currency pairing$/,
   async function (currency) {
-    const response = await axios(adaToFiatPrices);
-    const rate = await response.data.ticker.prices[currency];
+    const TIMESTAMP = '1555773413000'; // the timestamp of the first tx of this wallet
+    const response = await axios(`${adaToFiatPricesMainUrl}ADA/${TIMESTAMP}`);
 
+    const rate = response.data.tickers[0].prices[currency];
+
+    await this.driver.sleep(oneSecond);
     const allTxsList = await this.findElements(transactionComponent);
     for (const txListElement of allTxsList) {
       const txAmount = await getTxAmount(txListElement);
+
       expect(txAmount).to.contain(currency);
 
       const amountList = txAmount.split('\n');
       const fiatAmount = amountList[0].replace(currency, '');
       const adaAmount = parseFloat(amountList[1].replace('ADA', ''));
 
-      const expectedValue = parseFloat((adaAmount * rate).toFixed(6));
+      const expectedValueNotFixed = adaAmount * rate;
+      const expectedValue = expectedValueNotFixed < 1
+        ? expectedValueNotFixed.toFixed(6)
+        : expectedValueNotFixed.toFixed(2);
       expect(fiatAmount).to.contain(`${expectedValue}`);
     }
   }
