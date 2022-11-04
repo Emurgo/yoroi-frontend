@@ -319,6 +319,11 @@ class SignTxPage extends Component<Props, State> {
                 shouldHideBalance={this.props.shouldHideBalance}
                 publicDeriver={this.props.selectedWallet}
                 getTokenInfo={this.props.getTokenInfo}
+                getCurrentPrice={(_from, _to) => null}
+                unitOfAccountSetting={({
+                  enabled: false,
+                  currency: null,
+                })}
               />
             </Box>
             <Box pt="32px">

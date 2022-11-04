@@ -1,15 +1,14 @@
 .layout {
   min-height: 100vh;
-  padding-bottom: 40px;
   border-radius: 2px;
-  background-color: #f0f3f5;
+  background-color: #FFFFFF;
   box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
   font-weight: 400;
 }
 
 .header {
   height: 52px;
-  background: linear-gradient(45deg, #244abf 0%, #4760ff 100%);
+  background: var(--yoroi-sidebar-background);
   display: flex;
   align-items: center;
   padding-right: 32px;
