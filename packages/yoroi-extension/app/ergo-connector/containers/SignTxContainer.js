@@ -46,6 +46,7 @@ export default class SignTxContainer extends Component<
   componentDidMount() {
     this.generated.actions.connector.refreshWallets.trigger();
     window.addEventListener('beforeunload', this.onUnload);
+    window.addEventListener('unload', this.onUnload);
   }
 
   onConfirm: (PublicDeriver<>) => string => Promise<void> = deriver => async password => {
@@ -59,11 +60,16 @@ export default class SignTxContainer extends Component<
       ...signingKeyFromStorage,
       password,
     });
+    window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
     this.generated.actions.connector.confirmSignInTx.trigger(password);
+    setTimeout(() => { window.close(); }, 100);
   };
   onCancel: () => void = () => {
+    window.removeEventListener('beforeunload', this.onUnload);
+    window.removeEventListener('unload', this.onUnload);
     this.generated.actions.connector.cancelSignInTx.trigger();
+    setTimeout(() => { window.close(); }, 100);
   };
 
   renderLoading(): Node {

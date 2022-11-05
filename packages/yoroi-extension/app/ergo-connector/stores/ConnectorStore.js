@@ -416,7 +416,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
   };
   @action
   _cancelSignInTx: void => void = () => {
@@ -430,7 +429,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       tabId: signingMessage.tabId,
     };
     window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
   };
 
   // ========== wallets info ========== //

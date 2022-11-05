@@ -57,6 +57,7 @@ export default class ConnectContainer extends Component<
     this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('beforeunload', this.onUnload);
+    window.addEventListener('unload', this.onUnload);
   }
 
   onConnect: (
@@ -111,7 +112,9 @@ export default class ConnectContainer extends Component<
       }: ConnectResponseData)
     );
 
-    connector.closeWindow.trigger();
+    // if we close the window immediately, the previous message may not be able to
+    // to reach the service worker
+    setTimeout(() => { connector.closeWindow.trigger(); }, 100);
   };
 
   onSelectWallet: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (
