@@ -353,7 +353,7 @@ export function getMockServer(settings: {
       methodLogger.logRequest();
       const bestBlockHash = await mockImporter.mockUtxoApi.getBestBlock();
       const safeBlockHash = await mockImporter.mockUtxoApi.getSafeBlock();
-      res.send({
+      const response = {
         safeBlock: { hash: safeBlockHash },
         bestBlock: { hash: bestBlockHash },
       };
