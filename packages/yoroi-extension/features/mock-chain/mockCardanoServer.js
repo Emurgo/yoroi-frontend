@@ -353,8 +353,8 @@ export function getMockServer(settings: {
       methodLogger.logRequest();
       const bestBlockHash = await mockImporter.mockUtxoApi.getBestBlock();
       const safeBlockHash = await mockImporter.mockUtxoApi.getSafeBlock();
-      const response = {
-        safeBlocK: { hash: safeBlockHash },
+      res.send({
+        safeBlock: { hash: safeBlockHash },
         bestBlock: { hash: bestBlockHash },
       };
       methodLogger.logResponseSuccess(JSON.stringify(response));
@@ -391,37 +391,45 @@ export function getMockServer(settings: {
     server.post('/api/v2/txs/utxoAtPoint', async (req, res) => {
       const methodLogger = localLogger.getMethodLogger('POST', '/api/v2/txs/utxoAtPoint');
       methodLogger.logRequest(JSON.stringify(req.body));
-      const { addresses, referenceBlockHash } = req.body;
-      const { value } = await mockImporter.mockUtxoApi.getUtxoAtPoint({
-        addresses,
-        referenceBlockHash,
-      });
+      const { addresses, referenceBlockHash, page, pageSize } = req.body;
+      const { value } = await mockImporter.mockUtxoApi.getUtxoAtPoint(
+        { addresses, referenceBlockHash }
+      );
       if (!value) {
         methodLogger.logResponseError('unexpected null value');
         throw new Error('unexpected null value');
       }
-      const response = value.map(v => ({
-        utxo_id: v.utxoId,
-        tx_hash: v.txHash,
-        tx_index: v.txIndex,
-        block_num: v.blockNum,
-        receiver: v.receiver,
-        amount: v.amount,
-        assets: v.assets,
-      }));
-      methodLogger.logResponseSuccess(JSON.stringify(response));
-      res.send(response);
-    });
+      const response = value.slice(
+          (Number(page) - 1) * Number(pageSize),
+          Number(page) * Number(pageSize),
+        ).map(v => (
+          {
+            utxo_id: v.utxoId,
+            tx_hash: v.txHash,
+            tx_index: v.txIndex,
+            block_num: v.blockNum,
+            receiver: v.receiver,
+            amount: v.amount,
+            assets: v.assets,
+          }
+        ));
+        methodLogger.logResponseSuccess(JSON.stringify(response));
+        res.send(response);
+      });
 
     server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
       const methodLogger = localLogger.getMethodLogger('POST', '/api/v2/txs/utxoDiffSincePoint');
       methodLogger.logRequest(req.body);
-      const { addresses, untilBlockHash, afterBestBlock } = req.body;
-      const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint({
-        addresses,
-        untilBlockHash,
-        afterBestBlock,
-      });
+      // ignore `blockCount` and returns all diff items at once
+      const { addresses, untilBlockHash, afterBlockHash, /* blockCount */ } = req.body;
+      const { result, value } = await mockImporter.mockUtxoApi.getUtxoDiffSincePoint(
+        {
+          addresses,
+          untilBlockHash,
+          // ignore itemIndex and txHash
+          afterBestBlock: afterBlockHash
+        },
+      );
       if (result !== 'SUCCESS') {
         methodLogger.logResponseError('500 REFERENCE_POINT_BLOCK_NOT_FOUND');
         res.status(500);
@@ -447,8 +455,9 @@ export function getMockServer(settings: {
             tx_index: item.utxo.txIndex,
           };
         });
-        methodLogger.logResponseSuccess({ diffItems });
-        res.send({ diffItems });
+        const response = { diffItems, lastBlockHash: untilBlockHash };
+        methodLogger.logResponseSuccess(response);
+        res.send(response);
       }
     });
 

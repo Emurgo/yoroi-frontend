@@ -39,7 +39,7 @@ import {
   GetKeyDerivation,
 } from '../../database/primitives/api/read';
 import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
-import { UtxoService } from '@emurgo/yoroi-lib-core/dist/utxo';
+import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 import UtxoApi from '../../../state-fetch/utxoApi';
 
