@@ -20,11 +20,13 @@ const isEnabledBtn = document.querySelector('#is-enabled');
 const getUtxos = document.querySelector('#get-utxos');
 const submitTx = document.querySelector('#submit-tx');
 const signTx = document.querySelector('#sign-tx');
+const showUtxos = document.querySelector('#show-utxos');
 const createTx = document.querySelector('#create-tx');
 const getCollateralUtxos = document.querySelector('#get-collateral-utxos');
 const signData = document.querySelector('#sign-data');
 const alertEl = document.querySelector('#alert');
 const spinner = document.querySelector('#spinner');
+const utxosContainer = document.querySelector('#utxos');
 const getNFTs = document.getElementById('nfts');
 const getNetworkId = document.getElementById('get-network-id');
 
@@ -32,6 +34,7 @@ let accessGranted = false;
 let cardanoApi;
 let returnType = 'cbor';
 let utxos;
+let selectedUtxoIdx = 0;
 let usedAddresses;
 let unusedAddresses;
 let changeAddress;
@@ -213,13 +216,11 @@ getAccountBalance.addEventListener('click', () => {
           (res, asset) => {
             res[asset.assetId] = asset.amount;
             return res;
-          },
-          {}
-        );
-      }
-      alertSuccess(`Account Balance: ${JSON.stringify(balanceJson, null, 2)}`);
-    });
-  }
+          }, {});
+        }
+        alertSuccess(`Account Balance: <pre>${JSON.stringify(balanceJson, null, 2)}</pre>`)
+      });
+    }
 });
 
 function addressesFromCborIfNeeded(addresses) {
@@ -372,7 +373,7 @@ window._getUtxos = function (value) {
   }
   cardanoApi.getUtxos(value).then(utxosResponse => {
     toggleSpinner('hide');
-    if (utxosResponse.length === 0) {
+    if (utxosResponse == null || utxosResponse.length === 0) {
       alertWarrning('NO UTXOS');
     } else {
       utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
@@ -521,17 +522,110 @@ signTx.addEventListener('click', () => {
         transactionHex = bytesToHex(transaction.to_bytes());
       }
 
-      unsignedTransactionHex = null;
-      alertSuccess('Signing tx succeeded: ' + transactionHex);
-    })
-    .catch(error => {
-      console.error(error);
-      toggleSpinner('hide');
-      alertWarrning('Signing tx fails');
-    });
-});
+    unsignedTransactionHex = null;
+    alertSuccess('Signing tx succeeded: ' + transactionHex)
 
-createTx.addEventListener('click', () => {
+  }).catch(error => {
+    console.error(error)
+    toggleSpinner('hide')
+    alertWarrning('Signing tx fails')
+  })
+})
+showUtxos.addEventListener('click', () => {
+
+  if (!accessGranted) {
+    alertError('Should request access first');
+    return;
+  }
+
+  if (!utxos || utxos.length === 0) {
+    alertError('Should request utxos first');
+    return
+  }
+
+  hideAlert()
+  renderUtxo()
+})
+
+function alertError (text) {
+    toggleSpinner('hide');
+    alertEl.className = 'alert alert-danger overflow-scroll'
+    alertEl.innerHTML = text
+}
+
+function alertSuccess(text) {
+    alertEl.className = 'alert alert-success overflow-scroll'
+    alertEl.innerHTML = text
+}
+
+function hideAlert() {
+  alertEl.className = 'd-none'
+  alert.innerHTML = ''
+}
+
+function alertWarrning(text) {
+    alertEl.className = 'alert alert-warning'
+    alertEl.innerHTML = text
+}
+
+function toggleSpinner(status){
+    if(status === 'show') {
+        spinner.className = 'spinner-border'
+        alertEl.className = 'd-none'
+    } else {
+        spinner.className = 'd-none'
+    }
+}
+
+function toggleConnectionUI(status) {
+  if (status === 'button') {
+    connectionStatus.classList.add('d-none');
+    cardanoAccessBtnRow.classList.remove('d-none');
+  } else {
+    cardanoAccessBtnRow.classList.add('d-none');
+    connectionStatus.classList.remove('d-none');
+  }
+}
+
+function selectUtxo(e) {
+ if (!e.target.id) {
+   alertError("Invalid idx")
+   return
+ }
+ selectedUtxoIdx = e.target.id
+ hideAlert()
+ renderUtxo()
+}
+
+function renderUtxo() {
+  let utxosHTML = ''
+  for(let idx in utxos) {
+    const utxo = utxos[idx]
+    utxosHTML+= `
+      <li id='${idx}' class="utxo-item list-group-item d-flex justify-content-between align-items-center ${selectedUtxoIdx == idx && 'bg-primary text-white'}" style='cursor: pointer;'>
+          <p id='${idx}' class='mb-0'>${utxo.utxo_id.slice(0, 50)}</p>
+          <span class="badge bg-primary rounded-pill">${utxo.amount}</span>
+      </li>
+    `
+  }
+
+  utxosHTML += `
+    <button id="create-tx" class="btn btn-light mt-3 w-100">[Experimental] Create Tx</button>
+  `
+  utxosContainer.innerHTML = utxosHTML
+  utxosContainer.classList.remove('d-none')
+  utxosContainer.classList.add('d-block', 'list-group', 'list-group-numbered', 'mb-5')
+  // Add select utxo handler for each list item
+  document.querySelectorAll('.utxo-item').forEach(el => {
+    el.addEventListener('click', selectUtxo)
+  })
+
+  // Add event handler for create tx button
+  document.querySelector('#create-tx').addEventListener('click', createTxHandler)
+}
+
+
+function createTxHandler(e) {
   toggleSpinner('show');
 
   if (!accessGranted) {
@@ -549,13 +643,13 @@ createTx.addEventListener('click', () => {
     return;
   }
 
-  const randomUtxo = utxos[Math.floor(Math.random() * utxos.length)];
-  if (!randomUtxo) {
+  const selectedUtxo = utxos[selectedUtxoIdx];
+  if (!selectedUtxo) {
     alertError('Failed to select a random utxo from the available list!');
     return;
   }
 
-  console.log('[createTx] Including random utxo input: ', randomUtxo);
+  console.log('[createTx] Including random utxo input: ', selectedUtxo);
 
   const usedAddress = usedAddresses[0];
   const keyHash = CardanoWasm.BaseAddress.from_address(CardanoWasm.Address.from_bech32(usedAddress))
@@ -591,8 +685,8 @@ createTx.addEventListener('click', () => {
 
   const outputHex = bytesToHex(
     CardanoWasm.TransactionOutput.new(
-      CardanoWasm.Address.from_bech32(randomUtxo.receiver),
-      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000000'))
+      CardanoWasm.Address.from_bech32(selectedUtxo.receiver),
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str('1000000')),
     ).to_bytes()
   );
 
@@ -600,7 +694,7 @@ createTx.addEventListener('click', () => {
   const includeOutputs = [];
   const includeTargets = [];
 
-  let targetAddress = randomUtxo.receiver;
+  let targetAddress = selectedUtxo.receiver;
   let targetDataHash = null;
 
   /****** FLAGS ******/
@@ -615,7 +709,7 @@ createTx.addEventListener('click', () => {
   /****** </FLAGS> ******/
 
   if (includeDefaultInputs) {
-    includeInputs.push(randomUtxo.utxo_id);
+    includeInputs.push(selectedUtxo.utxo_id);
   }
 
   // noinspection StatementWithEmptyBodyJS
@@ -750,7 +844,7 @@ createTx.addEventListener('click', () => {
       console.log('[createTx] Including asset:', asset);
       txReq.includeTargets.push({
         // do not specify value, the connector will use minimum value
-        address: randomUtxo.receiver,
+        address: selectedUtxo.receiver,
         assets: {
           [asset.assetId]: '1',
         },
@@ -763,7 +857,7 @@ createTx.addEventListener('click', () => {
     .createTx(txReq, true)
     .then(txHex => {
       toggleSpinner('hide');
-      alertSuccess('Creating tx succeeds: ' + txHex);
+      alertSuccess(`<p> Creating tx succeeds: ${txHex} <p/>`);
       unsignedTransactionHex = txHex;
     })
     .catch(error => {
@@ -771,7 +865,7 @@ createTx.addEventListener('click', () => {
       toggleSpinner('hide');
       alertWarrning('Creating tx fails');
     });
-});
+}
 
 getCollateralUtxos.addEventListener('click', () => {
   toggleSpinner('show');
@@ -790,12 +884,16 @@ getCollateralUtxos.addEventListener('click', () => {
     )
     .then(utxosResponse => {
       toggleSpinner('hide');
-      let utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
-      alertSuccess(
-        `<h2>Collateral UTxO (${utxos.length}):</h2><pre>` +
+      if (utxosResponse == null || utxosResponse.length === 0) {
+        alertWarrning('NO COLLATERAL UTXOS');
+      } else {
+        let utxos = isCBOR() ? mapCborUtxos(utxosResponse) : utxosResponse;
+        alertSuccess(
+          `<h2>Collateral UTxO (${utxos.length}):</h2><pre>` +
           JSON.stringify(utxos, undefined, 2) +
           '</pre>'
-      );
+        );
+      }
     })
     .catch(error => {
       console.error(error);
@@ -908,7 +1006,7 @@ function toggleConnectionUI(status) {
   }
 }
 
-window.onload = (() => {
+window.onload = () => {
   if (typeof window.cardano === 'undefined') {
     alertError('Cardano API not found');
   } else {
@@ -929,4 +1027,4 @@ window.onload = (() => {
       }
     );
   }
-})();
+};

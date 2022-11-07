@@ -1,12 +1,14 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import { expect } from 'chai';
 import { truncateAddress } from '../../../app/utils/formatters';
 import {
   networks,
   defaultAssets,
 } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { getTokenName } from '../../../app/stores/stateless/tokenHelpers';
+import { amountField, totalAmountField } from '../../pages/confirmTransactionPage';
 
 type TransferSourceType = Array<{|
   fromAddress: string,
@@ -20,7 +22,7 @@ type WithdrawSourceType = {|
   recoveredBalance: string | number,
 |};
 
-function stripZerosFromEnd(inputNumber: string) {
+export function stripZerosFromEnd(inputNumber: string): string {
   const inputLength = inputNumber.length;
   const inputArray = inputNumber.split('');
   for (let i = inputLength - 1; i >= 0; i--) {
@@ -76,10 +78,14 @@ export async function checkTotalAmountIsCorrect(
   const decimalPlaces = assetInfo.Metadata.numberOfDecimals;
   const ticker = getTokenName(assetInfo);
   const amountPerUnit = new BigNumber(10).pow(decimalPlaces);
-  const totalAmountFormatted = `${totalAmount
+  const expectedTotalAmountFormatted = `${totalAmount
     .dividedBy(amountPerUnit)
     .toFormat(decimalPlaces)} ${ticker}`;
-  await world.waitUntilText({ locator: '.TransferSummaryPage_amount', method: 'css' }, totalAmountFormatted);
+
+  await world.waitForElement(amountField);
+  const realAmountText = await world.getText(amountField);
+
+  expect(expectedTotalAmountFormatted).to.be.equal(realAmountText);
 }
 
 export async function checkFinalBalanceIsCorrect(
@@ -98,7 +104,10 @@ export async function checkFinalBalanceIsCorrect(
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
   const ticker = getTokenName(assetInfo);
-  const finalBalance = `${finalAmount} ${ticker}`;
+  const expectedBalance = `${finalAmount} ${ticker}`;
 
-  await world.waitUntilText({ locator: '.TransferSummaryPage_totalAmount', method: 'css' }, finalBalance);
+  await world.waitForElement(totalAmountField);
+  const realFinalBalanceText = await world.getText(totalAmountField);
+
+  expect(expectedBalance).to.be.equal(realFinalBalanceText);
 }
