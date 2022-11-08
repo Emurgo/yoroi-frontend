@@ -3,8 +3,8 @@
 // Somehow the dyanmic imports in `rustLoader.js` do not work in the background
 // service worker. This module replaces `rustLoader.js` in the background service
 // worker with the help of webpack NormalModuleReplacementPlugin.
-// Note this won't even here:
-// import typeof * as WasmV2 from 'cardano-wallet-browser';
+// Note this won't work even here:
+// import * as WasmV2 from 'cardano-wallet-browser';
 import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 import * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
