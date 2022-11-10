@@ -109,7 +109,9 @@ const backgroundServiceWorkerConfig = (
   devServer: {
     devMiddleware: {
       writeToDisk: true,
-    }
+    },
+    hot: false,
+    liveReload: false,
   },
   output: {
     path: path.join(__dirname, '../dev/js'),

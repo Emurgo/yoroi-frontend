@@ -18,6 +18,7 @@ import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/ty
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
 declare var chrome;
+declare var browser;
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -349,22 +350,25 @@ export type PersistedSubmittedTransaction = {|
   |}>,
 |};
 
+const STORAGE_API =  window.browser?.storage.local // firefox mv2
+  || chrome.storage.local; // chrome mv2 and mv3
+
 export async function persistSubmittedTransactions(
   submittedTransactions: any,
 ): Promise<void> {
-  await chrome.storage.local.set({
+  await STORAGE_API.set({
     [storageKeys.SUBMITTED_TRANSACTIONS]: JSON.stringify(submittedTransactions)
   });
 }
 
 export async function loadSubmittedTransactions(): any {
-  const json = (
-    await chrome.storage.local.get(storageKeys.SUBMITTED_TRANSACTIONS)
-  )[storageKeys.SUBMITTED_TRANSACTIONS];
-  if (!json) {
+  const stored = await new Promise(
+    resolve => STORAGE_API.get(storageKeys.SUBMITTED_TRANSACTIONS, resolve)
+  );
+  if (stored == null || stored[storageKeys.SUBMITTED_TRANSACTIONS] == null) {
     return [];
   }
-  return JSON.parse(json);
+  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
 }
 
 export async function loadAnalyticsInstanceId(): Promise<?string> {

@@ -95,18 +95,37 @@ const onYoroiIconClicked = () => {
   chrome.tabs.create({ url: 'main_window.html' });
 };
 
-chrome.action.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
+if (chrome.action) {
+  // manifest v3
+  chrome.action.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
+} else {
+  // manifest v2
+  chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
+}
 
 const STORAGE_KEY_PREFIX = 'background-';
 
+const STORAGE_API = chrome.storage.session // chrome mv3
+  || window.browser?.storage.local // firefox mv2
+  || chrome.storage.local; // chrome mv2
+
 async function setInStorage(key: string, value: any): Promise<void> {
-  await chrome.storage.session.set({ [STORAGE_KEY_PREFIX + key]: value });
+  await STORAGE_API.set({ [STORAGE_KEY_PREFIX + key]: value });
 }
 
 async function getFromStorage(key: string): Promise<any> {
   const storageKey = STORAGE_KEY_PREFIX + key;
-  const result = await chrome.storage.session.get(storageKey);
-  return result[storageKey];
+  return new Promise(resolve => {
+    // the chrome mv3 and firefox mv2 API also support returning the result as a promise
+    // but the chrome v2 API only support callback, so we use the universally supported interface
+    STORAGE_API.get(storageKey, result => {
+      if (result === undefined) {
+        resolve(undefined);
+      } else {
+        resolve(result[storageKey]);
+      }
+    });
+  });
 }
 
 function sendToInjector(tabId: number, message: any) {
@@ -199,8 +218,10 @@ async function setConnectedSite(tabId: number, connectedSite: ConnectedSite): Pr
 }
 
 function getDefaultBounds(): {| width: number, positionX: number, positionY: number |} {
+  const width = chrome.system?.display.width || // mv3
+    screen.availWidth; // mv2
   return {
-    width: chrome.system.display.width,
+    width,
     positionX: 0,
     positionY: 0,
   };
@@ -747,6 +768,7 @@ const yoroiMessageHandler = async (
       console.error(`couldn't find tabId: ${request.tabId}`);
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
+    await new Promise(resolve => { setTimeout(resolve, 1); });
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
       const connection = connectedSites[tabId];
@@ -767,10 +789,9 @@ const yoroiMessageHandler = async (
         }
       }
     }
-    // not sure if this should happen - close window if we can't find a tx to sign
-    sendResponse(null);
   } else if (request.type === 'connect_retrieve_data') {
     const connectedSites = await getAllConnectedSites();
+
     for (const tabId of Object.keys(connectedSites)) {
       const connection = connectedSites[tabId];
       if (connection.status != null) {
@@ -784,6 +805,7 @@ const yoroiMessageHandler = async (
             imgBase64Url,
             tabId: Number(tabId),
           }: ConnectingMessage));
+          return;
         }
       }
     }
@@ -858,7 +880,9 @@ chrome.runtime.onMessage.addListener(
   // Returning `true` is required by Firefox, see:
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
   (message, sender, sendResponse) => {
+    // only one of the branch of the two functions should run
     yoroiMessageHandler(message, sender, sendResponse);
+    handleInjectorMessage(message, sender);
     return true;
   }
 );
@@ -1013,9 +1037,6 @@ chrome.runtime.onMessageExternal.addListener(async (message, sender) => {
     await handleInjectorMessage(message, sender);
   }
 });
-
-// message from injected code of the connector bundled with Yoroi
-chrome.runtime.onMessage.addListener(handleInjectorMessage);
 
 async function handleInjectorMessage(message, sender) {
   const tabId = sender.tab.id;
@@ -1181,7 +1202,6 @@ async function handleInjectorMessage(message, sender) {
         }
         await RustModule.load();
         const { tx, partialSign, returnTx } = message.params[0];
-
         await confirmSign(
           tabId,
           {

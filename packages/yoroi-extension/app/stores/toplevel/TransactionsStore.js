@@ -886,19 +886,23 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         }
 
         if (isCardanoHaskell(network)) {
-          tx = new CardanoShelleyTransaction({
-            ...txCtorData,
-            certificates: transaction.certificates,
-            ttl: new BigNumber(transaction.ttl),
-            metadata: transaction.metadata,
-            withdrawals: transaction.withdrawals.map(({ address, value }) => ({
-              address,
-              value: MultiToken.from(value)
-            })),
-            isValid: transaction.isValid,
+          runInAction(() => {
+            tx = new CardanoShelleyTransaction({
+                ...txCtorData,
+              certificates: transaction.certificates,
+              ttl: new BigNumber(transaction.ttl),
+              metadata: transaction.metadata,
+              withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+                address,
+                value: MultiToken.from(value)
+              })),
+              isValid: transaction.isValid,
+            });
           });
         } else if (isErgo(network)) {
-          tx = new WalletTransaction(txCtorData);
+          runInAction(() => {
+            tx = new WalletTransaction(txCtorData);
+          });
         } else {
           return;
         }

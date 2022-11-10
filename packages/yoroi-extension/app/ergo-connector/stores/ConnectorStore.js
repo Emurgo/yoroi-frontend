@@ -90,6 +90,7 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: connect_retrieve_data ');
+            return;
           }
 
           resolve(response);
@@ -110,6 +111,7 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: connect_retrieve_data ');
+            return;
           }
 
           resolve(response);
@@ -127,6 +129,7 @@ export function getProtocol(): Promise<?Protocol> {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: get_protocol ');
+            return;
           }
 
           resolve(response);
@@ -151,6 +154,7 @@ export function getUtxosAndAddresses(
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: get_utxos/cardano ');
+            return;
           }
 
           resolve(response);
@@ -168,6 +172,7 @@ export function getConnectedSites(): Promise<ConnectedSites> {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: get_connected_sites ');
+            return;
           }
 
           resolve(response);
