@@ -258,8 +258,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen((password) => {
-      this._confirmSignInTx(password);
+    this.actions.connector.confirmSignInTx.listen(async (password) => {
+      await this._confirmSignInTx(password);
     });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.getSigningMsg.listen(this._getSigningMsg);

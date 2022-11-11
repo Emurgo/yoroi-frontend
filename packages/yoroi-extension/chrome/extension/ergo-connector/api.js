@@ -987,6 +987,7 @@ export async function connectorSendTxCardano(
   signedTx: Uint8Array,
   localStorage: LocalStorageApi,
 ): Promise<void> {
+  debugger
   const signedTx64 = Buffer.from(signedTx).toString('base64');
   const network = wallet.getParent().getNetworkInfo();
   const backend = network.Backend.BackendService;
@@ -1131,7 +1132,7 @@ export async function connectorRecordSubmittedErgoTransaction(
     transaction: submittedTx,
     networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
   });
-  persistSubmittedTransactions(submittedTxs);
+  await persistSubmittedTransactions(submittedTxs);
 }
 
 export async function connectorRecordSubmittedCardanoTransaction(
@@ -1282,7 +1283,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     usedUtxos,
   });
-  persistSubmittedTransactions(submittedTxs);
+  await persistSubmittedTransactions(submittedTxs);
 }
 
 const REORG_OUTPUT_AMOUNT  = '1000000';

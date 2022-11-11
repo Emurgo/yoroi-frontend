@@ -62,7 +62,7 @@ export default class SignTxContainer extends Component<
     });
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
-    this.generated.actions.connector.confirmSignInTx.trigger(password);
+    await this.generated.actions.connector.confirmSignInTx.trigger(password);
     setTimeout(() => { window.close(); }, 100);
   };
   onCancel: () => void = () => {
