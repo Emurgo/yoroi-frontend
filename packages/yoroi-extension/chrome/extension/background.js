@@ -217,9 +217,16 @@ async function setConnectedSite(tabId: number, connectedSite: ConnectedSite): Pr
   await setInStorage(STORAGE_KEY_CONNECTED_SITES, connectedSites);
 }
 
-function getDefaultBounds(): {| width: number, positionX: number, positionY: number |} {
-  const width = chrome.system?.display.width || // mv3
-    screen.availWidth; // mv2
+async function getDefaultBounds(
+): Promise<{| width: number, positionX: number, positionY: number |}> {
+  let width;
+  if (window.screen != null) { // mv2
+    width = window.screen.availWidth;
+  } else { // mv3
+    const displayUnitInfoArr = await chrome.system.display.getInfo();
+    width = displayUnitInfoArr[0].bounds.width;
+  }
+
   return {
     width,
     positionX: 0,
@@ -227,10 +234,10 @@ function getDefaultBounds(): {| width: number, positionX: number, positionY: num
   };
 }
 
-function getBoundsForWindow(
+async function getBoundsForWindow(
   targetWindow
-): {| width: number, positionX: number, positionY: number |} {
-  const defaults = getDefaultBounds();
+): Promise<{| width: number, positionX: number, positionY: number |}> {
+  const defaults = await getDefaultBounds();
 
   const bounds = {
       width: targetWindow.width ?? defaults.width,
@@ -1017,9 +1024,9 @@ async function confirmConnect(
 chrome.runtime.onMessageExternal.addListener((message, sender) => {
   if (sender.id === environment.ergoConnectorExtensionId) {
     if (message.type === 'open_browseraction_menu') {
-      chrome.windows.getLastFocused(currentWindow => {
+      chrome.windows.getLastFocused(async (currentWindow) => {
         if (currentWindow == null) return; // should not happen
-        const bounds = getBoundsForWindow(currentWindow);
+        const bounds = await getBoundsForWindow(currentWindow);
         chrome.windows.create({
           ...popupProps,
           url: chrome.runtime.getURL(`/main_window_connector.html#/settings`),
