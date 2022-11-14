@@ -43,7 +43,7 @@ export default class ConnectContainer extends Component<
       checksum: null,
     },
   };
-  onUnload: (SyntheticEvent<>) => void = ev => {
+  onUnload: () => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     chrome.runtime.sendMessage({
       type: 'connect_response',

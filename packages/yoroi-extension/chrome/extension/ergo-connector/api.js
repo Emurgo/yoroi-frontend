@@ -987,7 +987,6 @@ export async function connectorSendTxCardano(
   signedTx: Uint8Array,
   localStorage: LocalStorageApi,
 ): Promise<void> {
-  debugger
   const signedTx64 = Buffer.from(signedTx).toString('base64');
   const network = wallet.getParent().getNetworkInfo();
   const backend = network.Backend.BackendService;

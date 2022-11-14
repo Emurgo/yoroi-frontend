@@ -889,6 +889,7 @@ chrome.runtime.onMessage.addListener(
   (message, sender, sendResponse) => {
     // only one of the branch of the two functions should run
     yoroiMessageHandler(message, sender, sendResponse);
+    // eslint-disable-next-line no-floating-promise/no-floating-promise
     handleInjectorMessage(message, sender);
     return true;
   }

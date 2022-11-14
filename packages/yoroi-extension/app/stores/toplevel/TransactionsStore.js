@@ -913,6 +913,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           tokenIds.set(networkId, tokenIdSet);
         }
 
+        // just to please flow
+        if (tx == null) {
+          return;
+        }
+
         tx.addresses.from.flatMap(
           ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
         ).forEach(tokenId => tokenIdSet?.add(tokenId));

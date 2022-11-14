@@ -238,7 +238,7 @@ export default class SignTxContainer extends Component<
         cancelSignInTx: {|
           trigger: (params: void) => void,
         |},
-        confirmSignInTx: {| trigger: (params: string) => void |},
+        confirmSignInTx: {| trigger: (params: string) => Promise<void> |},
         refreshWallets: {|
           trigger: (params: void) => Promise<void>,
         |},

@@ -172,7 +172,7 @@ const genBaseProps: {|
           trigger: action('cancelSignInTx'),
         },
         confirmSignInTx: {
-          trigger: action('confirmSignInTx'),
+          trigger: async () => { action('confirmSignInTx') },
         },
       },
     },
