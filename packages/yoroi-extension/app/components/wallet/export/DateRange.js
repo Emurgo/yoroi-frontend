@@ -1,10 +1,9 @@
 // @flow
 import { Component } from 'react'
 import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
-import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { observer } from 'mobx-react';
 
 type Props = {|
@@ -15,24 +14,24 @@ type Props = {|
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
     render() {
-        const { date, setDate } = this.props;
+        const { date, setStartDate, setEndDate } = this.props;
         return (
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            localeText={{ start: 'Check-in', end: 'Check-out' }}
-          >
-            <DateRangePicker
-              value={date}
-              onChange={(newDate) => {
-                setDate(newDate);
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Start"
+              value={date.startDate}
+              onChange={(newValue) => {
+                setStartDate(newValue);
               }}
-              renderInput={(startProps, endProps) => (
-                <>
-                  <TextField {...startProps} />
-                  <Box sx={{ mx: 2 }}> to </Box>
-                  <TextField {...endProps} />
-                </>
-              )}
+              renderInput={(params) => <TextField {...params} />}
+            />
+            <DatePicker
+              label="End"
+              value={date.setEndDate}
+              onChange={(newValue) => {
+                setEndDate(newValue);
+              }}
+              renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
         )

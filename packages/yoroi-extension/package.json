@@ -187,7 +187,7 @@
     "@ledgerhq/hw-transport-webusb": "5.49.0",
     "@mui/lab": "^5.0.0-alpha.51",
     "@mui/material": "^5.0.4",
-    "@mui/x-date-pickers-pro": "^5.0.8",
+    "@mui/x-date-pickers": "^5.0.8",
     "@svgr/webpack": "5.5.0",
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",

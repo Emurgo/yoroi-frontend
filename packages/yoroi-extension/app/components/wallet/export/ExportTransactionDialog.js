@@ -50,7 +50,7 @@ export default class ExportTransactionDialog extends Component<Props> {
   state = {
     startDate: null,
     endDate: null,
-  } 
+  }
 
   render(): Node {
     const { intl } = this.context;
@@ -86,7 +86,15 @@ export default class ExportTransactionDialog extends Component<Props> {
         onClose={cancel}
       >
         {infoBlock}
-        <DateRange  date={[startDate, endDate]}/>
+        <DateRange
+          date={{ startDate, endDate }}
+          setStartDate={(date) => {
+            this.setState({ startDate: date })}
+          }
+          setEndDate={(date) => {
+            this.setState({ endDate: date })}
+          }
+        />
         <div className={styles.includeTxIds}>
           <CheckboxLabel
             label={intl.formatMessage(messages.includeTxIds)}
