@@ -14,6 +14,7 @@ import globalMessages from '../../../i18n/global-messages';
 
 import styles from './ExportTransactionDialog.scss';
 import CheckboxLabel from '../../common/CheckboxLabel';
+import DateRange from './DateRange'
 
 const messages = defineMessages({
   dialogTitle: {
@@ -46,6 +47,11 @@ export default class ExportTransactionDialog extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  state = {
+    startDate: null,
+    endDate: null,
+  } 
+
   render(): Node {
     const { intl } = this.context;
     const {
@@ -56,6 +62,7 @@ export default class ExportTransactionDialog extends Component<Props> {
       toggleIncludeTxIds,
       shouldIncludeTxIds
     } = this.props;
+    const { startDate, endDate } = this.state;
 
     const infoBlock = (
       <div className={styles.infoBlock}>
@@ -79,6 +86,7 @@ export default class ExportTransactionDialog extends Component<Props> {
         onClose={cancel}
       >
         {infoBlock}
+        <DateRange  date={[startDate, endDate]}/>
         <div className={styles.includeTxIds}>
           <CheckboxLabel
             label={intl.formatMessage(messages.includeTxIds)}

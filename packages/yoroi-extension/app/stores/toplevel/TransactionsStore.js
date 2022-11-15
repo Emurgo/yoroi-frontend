@@ -645,10 +645,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const continuation = await this.exportTransactionsToFile({
-        publicDeriver: request.publicDeriver,
-        exportRequest: request.exportRequest,
-      });
+      const continuation = await this.exportTransactionsToFile(request);
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
@@ -718,6 +715,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         ...request.exportRequest,
         getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
       });
+      console.log(JSON.parse(JSON.stringify(rows)))
 
       /**
        * NOTE: The rewards export currently supports only Haskell Shelley
