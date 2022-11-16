@@ -57,7 +57,6 @@ export default class ConnectContainer extends Component<
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
-    this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
   }
 
@@ -201,9 +200,6 @@ export default class ConnectContainer extends Component<
         closeWindow: {|
           trigger: (params: void) => void,
         |},
-        getConnectorWhitelist: {|
-          trigger: (params: void) => Promise<void>,
-        |},
         updateHideBalance: {|
           trigger: (params: void) => Promise<void>,
         |},
@@ -268,7 +264,6 @@ export default class ConnectContainer extends Component<
         connector: {
           refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
-          getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
           updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },
