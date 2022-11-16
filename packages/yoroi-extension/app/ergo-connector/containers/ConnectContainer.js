@@ -195,9 +195,6 @@ export default class ConnectContainer extends Component<
   @computed get generated(): {|
     actions: {|
       connector: {|
-        getResponse: {|
-          trigger: (params: void) => Promise<void>,
-        |},
         refreshWallets: {|
           trigger: (params: void) => Promise<void>,
         |},
@@ -269,7 +266,6 @@ export default class ConnectContainer extends Component<
       },
       actions: {
         connector: {
-          getResponse: { trigger: actions.connector.getResponse.trigger },
           refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },

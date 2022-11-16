@@ -249,7 +249,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    this.actions.connector.getResponse.listen(this._getConnectingMsg);
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
@@ -257,7 +256,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       this._confirmSignInTx(password);
     });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
-    this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
