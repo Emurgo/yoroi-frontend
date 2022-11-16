@@ -4,22 +4,21 @@ import { When, Then } from 'cucumber';
 import { By, Key } from 'selenium-webdriver';
 import { votingTab } from '../pages/walletPage';
 import {
-  confirmPinButton,
+  confirmButton,
   confirmPinDialog,
   confirmPinDialogError,
   errorBlock,
-  generatedPinButton,
   generatedPinStepElement,
   generatePinDialog,
   pinInput,
   qrCodeDialog,
   registerButton,
   registerDialog,
-  registerDialogNextButton,
   votingRegTxDialog,
   votingRegTxDialogError,
 } from '../pages/walletVotingPage';
 import i18n from '../support/helpers/i18n-helpers';
+import { expect } from 'chai';
 
 When(/^I go to the voting page$/, async function () {
   await this.click(votingTab);
@@ -41,7 +40,7 @@ Then(/^I see the Auto generated Pin Steps$/, async function () {
 });
 
 When(/^I click next on the generated pin step$/, async function () {
-  await this.click(generatedPinButton);
+  await this.click(confirmButton);
 });
 
 Then(/^I see the confirm Pin step$/, async function () {
@@ -54,7 +53,7 @@ Then(/^I enter the generated pin$/, async function () {
 });
 
 When(/^I click next on the confirm pin step$/, async function () {
-  await this.click(confirmPinButton);
+  await this.click(confirmButton);
 });
 
 Then(/^I see register step with spending password$/, async function () {
@@ -62,7 +61,7 @@ Then(/^I see register step with spending password$/, async function () {
 });
 
 When(/^I click next on the register step$/, async function () {
-  await this.click(registerDialogNextButton);
+  await this.click(confirmButton);
 });
 
 Then(/^I see confirm transaction step$/, async function () {
@@ -80,12 +79,13 @@ Then(/^I enter the wrong pin$/, async function () {
 });
 
 Then(/^I see should see pin mismatch error$/, async function () {
-  const errorMessage = await i18n.formatMessage(this.driver, {
+  const expectedErrorMessage = await i18n.formatMessage(this.driver, {
     id: 'global.errors.pinDoesNotMatch',
   });
 
-  // following selector is used as the error is deeply nested
-  await this.waitUntilText(confirmPinDialogError, errorMessage);
+  await this.waitForElement(confirmPinDialogError);
+  const realErrorMessage = await this.getText(confirmPinDialogError);
+  expect(realErrorMessage, 'The error message is different').to.be.equal(expectedErrorMessage);
 
   // clear the wrong pin at the end
   // we are doing backspace 4 times for pin length of 4
