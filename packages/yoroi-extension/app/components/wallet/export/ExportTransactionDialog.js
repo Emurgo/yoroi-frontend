@@ -4,17 +4,15 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
-
-import styles from './ExportTransactionDialog.scss';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange'
+import { Box } from '@mui/system';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -65,9 +63,19 @@ export default class ExportTransactionDialog extends Component<Props> {
     const { startDate, endDate } = this.state;
 
     const infoBlock = (
-      <div className={styles.infoBlock}>
+      <Box
+        sx={{
+          fontWeight: 400,
+          fontSize: '15px',
+          lineHeight: 1.2,
+          opacity: 0.7,
+          textAlign: 'center',
+          padding: '10px 0 0 0',
+          mb: '25px',
+        }}
+      >
         <span>{intl.formatMessage(messages.infoText1)}</span>
-      </div>);
+      </Box>);
 
     const dialogActions = [{
       label: intl.formatMessage(globalMessages.exportButtonLabel),
@@ -78,7 +86,7 @@ export default class ExportTransactionDialog extends Component<Props> {
 
     return (
       <Dialog
-        className={classnames([styles.component, 'ExportTransactionDialog'])}
+        className={classnames(['ExportTransactionDialog'])}
         title={intl.formatMessage(messages.dialogTitle)}
         actions={dialogActions}
         closeOnOverlayClick={false}
@@ -95,13 +103,11 @@ export default class ExportTransactionDialog extends Component<Props> {
             this.setState({ endDate: date })}
           }
         />
-        <div className={styles.includeTxIds}>
-          <CheckboxLabel
-            label={intl.formatMessage(messages.includeTxIds)}
-            onChange={toggleIncludeTxIds}
-            checked={shouldIncludeTxIds}
-          />
-        </div>
+        <CheckboxLabel
+          label={intl.formatMessage(messages.includeTxIds)}
+          onChange={toggleIncludeTxIds}
+          checked={shouldIncludeTxIds}
+        />
         {error && <ErrorBlock error={error} />}
       </Dialog>);
   }
