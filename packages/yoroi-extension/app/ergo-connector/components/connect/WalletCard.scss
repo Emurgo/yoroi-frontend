@@ -1,22 +1,44 @@
 .card {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   letter-spacing: 0;
   line-height: 22px;
+  padding: 18px;
+  border: 2px solid #fff;
+  border-radius: 10px;
+
+  &:hover {
+    border-color: var(--yoroi-palette-gray-50);
+  }
+
   & .avatar {
     margin-right: 13px;
-    width: 32px;
-    height: 32px;
     border-radius: 50%;
     overflow: hidden;
     object-fit: cover;
+    height: 50px;
+    width: 50px;
   }
+
+  & .wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  & .nameWrapper {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+  }
+
   & .name {
     flex: 1;
     text-align: left;
   }
+
   & .balance {
-    font-weight: 500;
+    font-weight: 400;
   }
 }

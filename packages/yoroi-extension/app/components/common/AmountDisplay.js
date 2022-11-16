@@ -30,13 +30,7 @@ export default class AmountDisplay extends Component<Props> {
   };
 
   render(): Node {
-    const {
-      amount,
-      shouldHideBalance,
-      showFiat,
-      showAmount,
-      unitOfAccountSetting,
-    } = this.props
+    const { amount, shouldHideBalance, showFiat, showAmount, unitOfAccountSetting } = this.props;
     if (amount == null) {
       return <div className={styles.isLoading} />;
     }
@@ -91,7 +85,7 @@ export default class AmountDisplay extends Component<Props> {
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
           </p>
         )}
-        {(showFiat === true && unitOfAccountSetting.enabled) && (
+        {showFiat === true && unitOfAccountSetting.enabled && (
           <p className={styles.fiat}>
             {fiatDisplay} {currency}
           </p>
@@ -99,7 +93,7 @@ export default class AmountDisplay extends Component<Props> {
       </>
     );
   }
-};
+}
 
 export function FiatDisplay(props: {|
   shouldHideBalance: boolean,
@@ -107,7 +101,11 @@ export function FiatDisplay(props: {|
   currency: string,
 |}): Node {
   if (props.shouldHideBalance) {
-    return <span>{hiddenAmount} {props.currency}</span>;
+    return (
+      <span className={styles.fiat}>
+        {hiddenAmount} {props.currency}
+      </span>
+    );
   }
 
   if (props.amount == null) {
