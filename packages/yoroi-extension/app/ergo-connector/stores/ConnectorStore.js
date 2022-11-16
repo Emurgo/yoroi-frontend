@@ -310,9 +310,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           if (response.sign.type === 'tx/cardano') {
             this.createAdaTransaction();
           }
-          if (response.sign.type === 'tx-create-req/cardano') {
-            this.generateAdaTransaction();
-          }
           if (response.sign.type === 'tx-reorg/cardano') {
             this.generateReorgTransaction();
           }
@@ -393,8 +390,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     } else if (
       signingMessage.sign.type === 'tx' ||
         signingMessage.sign.type === 'tx_input' ||
-        signingMessage.sign.type === 'tx/cardano' ||
-        signingMessage.sign.type === 'tx-create-req/cardano'
+        signingMessage.sign.type === 'tx/cardano'
     ) {
       sendData = {
         type: 'sign_confirmed',
@@ -463,7 +459,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
       if (
         this.signingMessage?.sign.type !== 'tx/cardano' &&
-          this.signingMessage?.sign.type !== 'tx-create-req/cardano' &&
           this.signingMessage?.sign.type !== 'tx-reorg/cardano'
       ) {
         await this._getTxAssets(filteredWallets);
@@ -482,9 +477,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
         this.createAdaTransaction();
-      }
-      if (this.signingMessage?.sign.type === 'tx-create-req/cardano') {
-        this.generateAdaTransaction();
       }
       if (this.signingMessage?.sign.type === 'tx-reorg/cardano') {
         this.generateReorgTransaction();
@@ -766,75 +758,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         })
       };
     }
-
-  generateAdaTransaction: void => Promise<void> = async () => {
-    if (this.signingMessage == null) return;
-    const { signingMessage } = this;
-    const selectedWallet = this.wallets.find(
-      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
-    );
-
-    if (selectedWallet == null) return undefined;
-    if (!signingMessage.sign.tx) return undefined;
-
-    const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
-
-    if (isCardanoHaskell(network)) {
-      const withUtxos = asGetAllUtxos(selectedWallet.publicDeriver);
-      if (withUtxos == null) {
-        throw new Error(`missing utxo functionality`);
-      }
-
-      const withHasUtxoChains = asHasUtxoChains(withUtxos);
-      if (withHasUtxoChains == null) {
-        throw new Error(`missing chains functionality`);
-      }
-
-      const fullConfig = getCardanoHaskellBaseConfig(network);
-      const timeToSlot = await genTimeToSlot(fullConfig);
-      const absSlotNumber = new BigNumber(timeToSlot({
-        time: new Date(),
-      }).slot);
-
-      const foreignUtxoFetcher: ForeignUtxoFetcher = ConnectorStore.createForeignUtxoFetcher(
-        this.stores.substores.ada.stateFetchStore.fetcher,
-        selectedWallet.publicDeriver.getParent().getNetworkInfo(),
-      )
-      const result = await this.api.ada.createUnsignedTxForConnector(
-        {
-          publicDeriver: withHasUtxoChains,
-          absSlotNumber,
-          cardanoTxRequest: (signingMessage.sign: any).tx,
-          submittedTxs: [],
-          utxos: [],
-        },
-        foreignUtxoFetcher,
-      );
-      const fee = {
-        tokenId: result.fee().getDefaultEntry().identifier,
-        networkId: result.fee().getDefaultEntry().networkId,
-        amount: result.fee().getDefaultEntry().amount.toString(),
-      };
-      const { amount, total } = await this._calculateAmountAndTotal(
-        selectedWallet.publicDeriver,
-        result.inputs(),
-        result.outputs(),
-        fee,
-        [],
-      );
-      runInAction(() => {
-        this.adaTransaction = {
-          inputs: result.inputs(),
-          outputs: result.outputs(),
-          fee,
-          amount,
-          total,
-        };
-      });
-    } else {
-      throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
-    }
-  }
 
   generateReorgTransaction: void => Promise<void> = async () => {
     if (this.signingMessage == null) return;
