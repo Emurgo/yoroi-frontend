@@ -59,6 +59,12 @@ import {
 } from '../../api/localStorage';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import dayjs from 'dayjs'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrBefore)
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -712,10 +718,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (!withLevels) return;
       const rows = await this.api[apiType].getTransactionRowsToExport({
         publicDeriver: withLevels,
-        ...request.exportRequest,
         getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
       });
-      console.log(JSON.parse(JSON.stringify(rows)))
+
 
       /**
        * NOTE: The rewards export currently supports only Haskell Shelley
@@ -759,6 +764,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       respTxRows.push(...rows);
     }).promise;
 
+    const { startDate, endDate } = request.exportRequest;
+    if (startDate && endDate) {
+      respTxRows = respTxRows.filter(row => {
+        const txDate = dayjs(row.date);
+        return txDate.isSameOrAfter(startDate) && txDate.isSameOrBefore(endDate)
+      })
+    }
     respTxRows = respTxRows.sort((a, b) => {
       return b.date - a.date;
     });

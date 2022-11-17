@@ -81,7 +81,7 @@ export default class ExportTransactionDialog extends Component<Props> {
       label: intl.formatMessage(globalMessages.exportButtonLabel),
       primary: true,
       isSubmitting: isActionProcessing || false,
-      onClick: submit,
+      onClick: () => submit({ startDate, endDate }),
     }];
 
     return (
