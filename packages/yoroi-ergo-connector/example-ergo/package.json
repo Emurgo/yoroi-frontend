@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server --host localhost --port 8081"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.0",
