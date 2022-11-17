@@ -29,16 +29,13 @@ import type {
 import { LoadingWalletStates } from '../types';
 import { getWallets } from '../../api/common/index';
 import {
-  getCardanoHaskellBaseConfig,
   getErgoBaseConfig,
   isCardanoHaskell,
   isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
-  asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asHasUtxoChains,
   asGetSigningKey,
   asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -52,7 +49,6 @@ import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 import { Logger } from '../../utils/logging';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
-import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
