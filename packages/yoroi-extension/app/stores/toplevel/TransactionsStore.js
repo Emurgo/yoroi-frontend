@@ -60,12 +60,6 @@ import {
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import dayjs from 'dayjs'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-
-// Todo: should be removed
-dayjs.extend(isSameOrAfter)
-dayjs.extend(isSameOrBefore)
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,

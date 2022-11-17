@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -61,7 +60,6 @@ export default class ExportTransactionDialog extends Component<Props> {
       shouldIncludeTxIds
     } = this.props;
     const { startDate, endDate } = this.state;
-
     const infoBlock = (
       <Box
         sx={{
@@ -81,12 +79,16 @@ export default class ExportTransactionDialog extends Component<Props> {
       label: intl.formatMessage(globalMessages.exportButtonLabel),
       primary: true,
       isSubmitting: isActionProcessing || false,
+      disabled: (
+        (startDate === null && endDate === null) ||
+        (startDate && endDate && startDate.isAfter(endDate))
+      ) ,
       onClick: () => submit({ startDate, endDate }),
     }];
 
     return (
       <Dialog
-        className={classnames(['ExportTransactionDialog'])}
+        className='ExportTransactionDialog'
         title={intl.formatMessage(messages.dialogTitle)}
         actions={dialogActions}
         closeOnOverlayClick={false}
