@@ -63,6 +63,7 @@ import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
+// Todo: should be removed
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
 
@@ -765,10 +766,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }).promise;
 
     const { startDate, endDate } = request.exportRequest;
-    if (startDate && endDate) {
+    if (startDate || endDate) {
+      const dateFormat = 'MM-DD-YYYY'
       respTxRows = respTxRows.filter(row => {
-        const txDate = dayjs(row.date);
-        return txDate.isSameOrAfter(startDate) && txDate.isSameOrBefore(endDate)
+        const txDate = dayjs(row.date).format(dateFormat)
+        if (
+          (startDate !== null && startDate.isAfter(txDate, 'day')) ||
+          (endDate !== null && endDate.isBefore(txDate, 'day'))
+        ) return false;
+        return true
       })
     }
     respTxRows = respTxRows.sort((a, b) => {
