@@ -25,10 +25,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  date: {
+  date: {|
     startDate: Dayjs | null,
     endDate: Dayjs | null,
-  },
+  |},
   setStartDate(Dayjs | null): void,
   setEndDate(Dayjs | null): void
 |}

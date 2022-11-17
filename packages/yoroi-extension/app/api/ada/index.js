@@ -2285,7 +2285,6 @@ export default class AdaApi {
       const fetchedTxs = await getAllTransactions({
         publicDeriver: request.publicDeriver,
       });
-      console.log(JSON.parse(JSON.stringify({fetchedTxs})))
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.getTransactionRowsToExport)}: success`);
       return convertAdaTransactionsToExportRows(
         fetchedTxs.txs,
