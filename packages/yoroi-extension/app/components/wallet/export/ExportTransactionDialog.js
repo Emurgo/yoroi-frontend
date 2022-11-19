@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TransactionRowsToExportRequest } from '../../../actions/common/transactions-actions';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -12,6 +13,7 @@ import globalMessages from '../../../i18n/global-messages';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange'
 import { Box } from '@mui/system';
+import { Dayjs } from 'dayjs';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -31,20 +33,25 @@ const messages = defineMessages({
 type Props = {|
   +isActionProcessing: ?boolean,
   +error: ?LocalizableError,
-  +submit: void => PossiblyAsync<void>,
+  +submit: TransactionRowsToExportRequest => PossiblyAsync<void>,
   +toggleIncludeTxIds: void => void,
   +shouldIncludeTxIds: boolean,
   +cancel: void => void,
 |};
 
+type State = {|
+  startDate: typeof Dayjs | null,
+  endDate: typeof Dayjs | null,
+|}
+
 @observer
-export default class ExportTransactionDialog extends Component<Props> {
+export default class ExportTransactionDialog extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  state = {
+  state: State = {
     startDate: null,
     endDate: null,
   }
@@ -79,10 +86,7 @@ export default class ExportTransactionDialog extends Component<Props> {
       label: intl.formatMessage(globalMessages.exportButtonLabel),
       primary: true,
       isSubmitting: isActionProcessing || false,
-      disabled: (
-        (startDate === null && endDate === null) ||
-        (startDate && endDate && startDate.isAfter(endDate))
-      ) ,
+      disabled: !startDate || !endDate || startDate.isAfter(endDate),
       onClick: () => submit({ startDate, endDate }),
     }];
 

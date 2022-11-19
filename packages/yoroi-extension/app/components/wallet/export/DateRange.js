@@ -1,5 +1,6 @@
 // @flow
 import { Component } from 'react'
+import type { Node } from 'react'
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -26,11 +27,11 @@ const messages = defineMessages({
 
 type Props = {|
   date: {|
-    startDate: Dayjs | null,
-    endDate: Dayjs | null,
+    startDate: typeof Dayjs | null,
+    endDate: typeof Dayjs | null,
   |},
-  setStartDate(Dayjs | null): void,
-  setEndDate(Dayjs | null): void
+  setStartDate(typeof Dayjs | null): void,
+  setEndDate(typeof Dayjs | null): void
 |}
 
 @observer
@@ -40,7 +41,7 @@ export default class ExportTransactionDialog extends Component<Props> {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { date, setStartDate, setEndDate } = this.props;
     const invalidInterval = (

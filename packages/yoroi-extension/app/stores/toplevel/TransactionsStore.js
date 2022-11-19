@@ -60,6 +60,9 @@ import {
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
+
+dayjs.extend(isBetween)
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -760,20 +763,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }).promise;
 
     const { startDate, endDate } = request.exportRequest;
-    if (startDate || endDate) {
-      const dateFormat = 'MM-DD-YYYY'
-      respTxRows = respTxRows.filter(row => {
-        const txDate = dayjs(row.date).format(dateFormat)
-        if (
-          (startDate !== null && startDate.isAfter(txDate, 'day')) ||
-          (endDate !== null && endDate.isBefore(txDate, 'day'))
-        ) return false;
-        return true
-      })
-    }
-    respTxRows = respTxRows.sort((a, b) => {
-      return b.date - a.date;
-    });
+    respTxRows = respTxRows.filter(row => {
+      const txDate = dayjs(row.date)
+      // 4th param `[]` means that the start and end date are included
+      return txDate.isBetween(startDate, endDate, 'day', '[]')
+    }).sort((a, b) => b.date - a.date);
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
