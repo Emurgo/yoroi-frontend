@@ -2,7 +2,7 @@
 
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
-import { By, Key } from 'selenium-webdriver';
+import { Key } from 'selenium-webdriver';
 import { truncateLongName } from '../../app/utils/formatters';
 import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
