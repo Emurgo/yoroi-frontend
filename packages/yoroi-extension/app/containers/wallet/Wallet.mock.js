@@ -39,10 +39,10 @@ export const mockWalletProps: {
       profile: {
         isClassicTheme: true,
         shouldShowRevampDialog: false,
+        currentTheme: THEMES.YOROI_CLASSIC,
       },
       uiDialogs: {
         isOpen: () => false,
-        currentTheme: THEMES.YOROI_CLASSIC,
       },
       wallets: {
         selected: request.selected,

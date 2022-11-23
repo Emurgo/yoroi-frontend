@@ -316,10 +316,10 @@ class Wallet extends Component<AllProps> {
       profile: {|
         isClassicTheme: boolean,
         shouldShowRevampDialog: boolean,
+        currentTheme: Theme,
       |},
       uiDialogs: {|
         isOpen: any => boolean,
-        currentTheme: Theme,
       |},
     |}
     |} {

@@ -68,7 +68,8 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import RevampSwitchDialog from '../../../components/wallet/staking/dashboard/RevampSwitchDialog';
-import { Theme, THEMES } from '../../../styles/utils';
+import { THEMES } from '../../../styles/utils';
+import type { Theme } from '../../../styles/utils';
 import { generateGraphData } from '../../../utils/graph';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;

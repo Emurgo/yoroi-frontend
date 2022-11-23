@@ -47,7 +47,6 @@ export const Generic = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
-          updateTheme: { trigger: async (req) => action('updateTheme')(req) },
         }
       }
     }}
@@ -87,7 +86,6 @@ export const NonTier1 = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
-          updateTheme: { trigger: async (req) => action('updateTheme')(req) },
         }
       }
     }}
@@ -124,7 +122,6 @@ export const IsExecuting = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
-          updateTheme: { trigger: async (req) => action('updateTheme')(req) },
         }
       }
     }}
@@ -157,7 +154,6 @@ export const ServerError = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
-          updateTheme: { trigger: async (req) => action('updateTheme')(req) },
         }
       }
     }}
