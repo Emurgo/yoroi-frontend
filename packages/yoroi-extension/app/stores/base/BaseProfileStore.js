@@ -295,7 +295,7 @@ export default class BaseProfileStore
       }
     }
 
-    return THEMES.YOROI_MODERN;
+    return THEMES.YOROI_REVAMP;
   }
 
   @computed get isModernTheme(): boolean {
