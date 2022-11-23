@@ -22,6 +22,7 @@ import { errorBlockComponent, primaryButton } from '../pages/commonDialogPage';
 import { walletNameInput } from '../pages/restoreWalletPage';
 import { verifyAddressButton, verifyAddressHWButton } from '../pages/walletReceivePage';
 
+// deprecated
 When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click(connectHwButton);
   await this.waitForElement(pickUpCurrencyDialog);
@@ -30,6 +31,7 @@ When(/^I select a Byron-era Ledger device$/, async function () {
   await this.click(ledgerWalletButton);
   await this.click(byronEraButton);
 });
+// deprecated
 When(/^I select a Shelley-era Ledger device$/, async function () {
   await this.click(connectHwButton);
   await this.waitForElement(pickUpCurrencyDialog);
@@ -38,6 +40,7 @@ When(/^I select a Shelley-era Ledger device$/, async function () {
   await this.click(ledgerWalletButton);
   await this.click(shelleyEraButton);
 });
+// deprecated
 When(/^I restore the Ledger device$/, async function () {
   await this.waitForElement(checkDialog);
   await this.click(primaryButton);
@@ -95,7 +98,7 @@ When(/^I see the verification address "([^"]*)"$/, async function (expectAddress
 When(/^I see the derivation path "([^"]*)"$/, async function (path) {
   await this.waitUntilText(derivationField, path);
 });
-
+// deprecated
 Then(/^I verify the address on my ledger device$/, async function () {
   await this.click(verifyAddressHWButton);
   await this.waitDisable(verifyAddressHWButton); // disable when communicating with device

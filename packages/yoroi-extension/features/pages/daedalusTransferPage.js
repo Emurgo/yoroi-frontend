@@ -7,8 +7,8 @@ export const nextButton: LocatorObject = {
   method: 'xpath',
 };
 export const backButton: LocatorObject = {
-  locator: "//button[contains(@label, 'Back')]",
-  method: 'xpath',
+  locator: '.secondary',
+  method: 'css',
 };
 export const formFieldOverridesClassicError: LocatorObject = {
   locator: '.FormFieldOverridesClassic_error',

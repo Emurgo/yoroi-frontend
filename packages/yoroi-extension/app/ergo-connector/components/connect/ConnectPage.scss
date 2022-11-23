@@ -1,5 +1,7 @@
 .component {
-  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px);
   overflow: auto;
   &.isNightly {
     height: calc(100vh - 138px);
@@ -30,8 +32,21 @@
     font-size: 18px;
     font-weight: 500;
   }
-
 }
+
+.titleWallet {
+  display: flex;
+  margin-left: 20px;
+
+  & * + * {
+    padding-left: 10px;
+  }
+}
+
+.toggleButton {
+  cursor: pointer;
+} 
+
 .noWallets {
   display: flex;
   align-items: center;
@@ -54,7 +69,7 @@
   }
 
   .createWallet {
-    color: #17D1AA;
+    color: #17d1aa;
     font-size: 16px;
     line-height: 24px;
     cursor: pointer;
@@ -67,8 +82,6 @@
 
 .list {
   & .listItem {
-    padding-top: 15px;
-    padding-bottom: 15px;
     & > div {
       width: 100%;
     }
@@ -81,20 +94,13 @@
 }
 
 .bottom {
-  padding-left: 32px;
-  padding-right: 32px;
+  border-top: 1px solid #dce0e9;
+  padding: 15px 32px;
 
   .infoText {
     color: var(--yoroi-palette-gray-600);
     font-size: 12px;
-    margin-bottom: 32px;
     line-height: 20px;
-  }
-  & .wrapperBtn {
-    display: flex;
-    button + button {
-      margin-left: 22px;
-    }
   }
 }
 .errorMessage {
@@ -105,7 +111,6 @@
     overflow-wrap: break-word;
   }
 }
-
 
 @media (min-width: 678px) {
   .component {

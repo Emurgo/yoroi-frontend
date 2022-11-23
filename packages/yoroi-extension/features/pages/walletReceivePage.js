@@ -10,7 +10,7 @@ const getReceiveSubTabButton = (translatedText: string) => {
 
 export const getGeneratedAddress = (rowIndex: number): LocatorObject => {
   return {
-    locator: `.generatedAddress-${rowIndex + 1} .RawHash_hash`,
+    locator: `.generatedAddress-${rowIndex + 1} .WalletReceive_addressHash`,
     method: 'css',
   };
 };
@@ -84,9 +84,9 @@ export const verifyAddressHWButton: LocatorObject = {
   locator: '.VerifyAddressDialog_component .primary',
   method: 'css',
 };
-export const unmangleButton: LocatorObject = {
-  locator: '.MangledHeader_submitButton ',
-  method: 'css',
+export const correctDelegationButton: LocatorObject = {
+  locator: '//div[@class="WarningHeader_component"]/button[contains(text(), "Correct delegation")]',
+  method: 'xpath',
 };
 
 export const generateUriIcon: LocatorObject = {
