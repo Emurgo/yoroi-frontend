@@ -1,17 +1,17 @@
 /* eslint-disable promise/always-return */
 // @flow
 import { observable, computed } from 'mobx';
-import Request from './lib/LocalizedRequest';
-import Store from './base/Store';
+import Request from '../lib/LocalizedRequest';
+import Store from '../base/Store';
 import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
   RemoveWalletFromWhitelistData,
-} from '../../chrome/extension/ergo-connector/types';
-import type { ActionsMap } from '../actions/index';
-import type { StoresMap } from './index';
-import { getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
+} from '../../../chrome/extension/ergo-connector/types';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
+import { getConnectedSites } from '../../ergo-connector/stores/ConnectorStore';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
