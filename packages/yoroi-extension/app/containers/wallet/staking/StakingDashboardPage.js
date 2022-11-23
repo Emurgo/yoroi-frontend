@@ -68,7 +68,7 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import RevampSwitchDialog from '../../../components/wallet/staking/dashboard/RevampSwitchDialog';
-import type { Theme } from '../../../styles/utils';
+import { Theme, THEMES } from '../../../styles/utils';
 import { generateGraphData } from '../../../utils/graph';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
@@ -165,7 +165,7 @@ export default class StakingDashboardPage extends Component<Props> {
             dialog: RevampSwitchDialog,
           })
         }}
-        currentTheme={this.generated.stores.profile.currentTheme}
+        isRevampTheme={this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP}
       />
     );
 

@@ -19,8 +19,6 @@ import ErrorBlock from '../../../widgets/ErrorBlock';
 import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import RevampAnnouncement from './RevampAnnouncement';
-import { THEMES } from '../../../../styles/utils';
-import type { Theme } from '../../../../styles/utils';
 import { Skeleton, Typography } from '@mui/material';
 import environment from '../../../../environment';
 
@@ -68,7 +66,7 @@ export type GraphData = {|
 
 type Props = {|
   +graphData: GraphData,
-  +currentTheme: Theme,
+  +isRevampTheme: boolean,
   +openRevampAnnouncementDialog: void => void,
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node | void> |},
   +userSummary: Node,
@@ -93,7 +91,7 @@ export default class StakingDashboard extends Component<Props> {
   render(): Node {
     const {
       graphData,
-      currentTheme
+      isRevampTheme
     } = this.props;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
@@ -131,8 +129,7 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
-          {(environment.isNightly() || environment.isDev())
-          && currentTheme !== THEMES.YOROI_REVAMP && (
+          {(environment.isNightly() || environment.isDev()) && !isRevampTheme && (
           <RevampAnnouncement
             onClick={this.props.openRevampAnnouncementDialog}
           />)}
