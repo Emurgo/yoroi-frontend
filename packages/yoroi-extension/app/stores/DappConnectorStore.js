@@ -1,29 +1,17 @@
 /* eslint-disable promise/always-return */
 // @flow
-import { observable, action, runInAction, computed } from 'mobx';
+import { observable, computed } from 'mobx';
 import Request from './lib/LocalizedRequest';
 import Store from './base/Store';
 import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
-  ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { connectorCall, getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
-
-// Need to run only once - Connecting wallets
-let initedConnecting = false;
-
-async function sendMsgConnect(): Promise<?ConnectingMessage> {
-  if (!initedConnecting) {
-    const res = await connectorCall<ConnectRetrieveData, ConnectingMessage>({ type: 'connect_retrieve_data' })
-    initedConnecting = true
-    return res
-  }
-}
+import { getConnectedSites } from '../ergo-connector/stores/ConnectorStore';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -62,19 +50,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   teardown(): void {
     super.teardown();
   }
-
-  // ========== connecting wallets ========== //
-  @action
-  _getConnectingMsg: () => Promise<void> = async () => {
-    await sendMsgConnect()
-      .then(response => {
-        runInAction(() => {
-          this.connectingMessage = response;
-        });
-      })
-      // eslint-disable-next-line no-console
-      .catch(err => console.error(err));
-  };
 
   // ========== whitelist ========== //
   @computed get currentConnectorWhitelist(): Array<WhitelistEntry> {

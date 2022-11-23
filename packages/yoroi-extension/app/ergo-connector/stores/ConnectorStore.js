@@ -88,6 +88,7 @@ export function connectorCall<T, R>(message: T): Promise<R> {
         if (window.chrome.runtime.lastError) {
           // eslint-disable-next-line prefer-promise-reject-errors
           reject(`Could not establish connection: ${JSON.stringify(typeof message === 'object' ? message : '')}`);
+          return;
         }
         resolve(response);
       }
