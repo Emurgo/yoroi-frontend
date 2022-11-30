@@ -763,6 +763,25 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }).promise;
 
     const { startDate, endDate } = request.exportRequest;
+
+    const config = getCardanoHaskellBaseConfig(
+      request.publicDeriver.getParent().getNetworkInfo()
+    )
+    const timeToSlot = await timeUtils.genTimeToSlot(config);
+    const toRelativeSlotNumber = await timeUtils.genToRelativeSlotNumber(config);
+
+    const dateFormat = 'YYYY-MM-DD';
+    const dateToSlot = (date: string) => {
+      return toRelativeSlotNumber(
+        timeToSlot({
+          time: new Date(`${date}T23:59:59`), // Get the slot at the last second in the day
+        }).slot
+      );
+    }
+
+    const startSlot = dateToSlot(startDate.subtract(1, 'day').format(dateFormat));
+    const endSlot = dateToSlot(endDate.format(dateFormat));
+
     respTxRows = respTxRows.filter(row => {
       const txDate = dayjs(row.date)
       // 4th param `[]` means that the start and end date are included
