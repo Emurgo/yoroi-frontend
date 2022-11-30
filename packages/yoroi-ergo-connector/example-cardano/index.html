@@ -6,7 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">    <title>Cardano Test dApp</title>
   </head>
   <body>
-    <div class="container">
+    <div class="" style="max-width: 700px; margin: auto;">
       <div class="my-3">
         <h1 class="display-4 text-center">Cardano dApp Example</h1>
       </div>
@@ -49,7 +49,7 @@
           <button id="get-utxos" class="btn btn-light w-100" >Get Utxos</button>
         </div>
         <div class="col-6 mb-4">
-          <button id="create-tx" class="btn btn-light w-100">[Experimental] Create Tx</button>
+          <button id="show-utxos" class="btn btn-light w-100">[Experimental] Create Tx</button>
         </div>
         <div class="col-6 mb-4">
           <button id="sign-tx" class="btn btn-light w-100">Sign Tx</button>
@@ -72,6 +72,7 @@
         </div>
       </div>
       <div class="d-none" id="alert" role="alert"></div>
+      <div id="utxos"></div>
     </div>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
