@@ -123,7 +123,7 @@
     "css-loader": "5.0.2",
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "cucumber-html-reporter": "^5.5.0",
-    "ergo-lib-wasm-nodejs": "^0.14.0",
+    "ergo-lib-wasm-nodejs": "^0.21.1",
     "eslint": "7.20.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "7.2.0",
