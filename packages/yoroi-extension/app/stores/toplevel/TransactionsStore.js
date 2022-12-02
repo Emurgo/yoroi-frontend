@@ -782,15 +782,29 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const startSlot = dateToSlot(startDate.subtract(1, 'day').format(dateFormat));
     const endSlot = dateToSlot(endDate.format(dateFormat));
 
+    const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
+    console.log({
+      s: this.stores.substores.ada.stateFetchStore.fetcher,
+    })
+    const res =  await this.stores.substores.ada.stateFetchStore.fetcher.getLatestBlockBySlot({
+      network: selectedNetwork,
+      slots: [
+        [startSlot.epoch, startSlot.slot],
+        [endSlot.epoch, endSlot.slot],
+      ]
+    });
+
+    console.log({res})
+
     respTxRows = respTxRows.filter(row => {
       const txDate = dayjs(row.date)
       // 4th param `[]` means that the start and end date are included
       return txDate.isBetween(startDate, endDate, 'day', '[]')
     }).sort((a, b) => b.date - a.date);
 
-    if (respTxRows.length < 1) {
+    // if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
-    }
+    // }
 
     const withPubKey = asGetPublicKey(request.publicDeriver);
     const plate = withPubKey == null

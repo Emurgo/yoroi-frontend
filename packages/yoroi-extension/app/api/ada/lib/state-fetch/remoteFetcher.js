@@ -29,6 +29,7 @@ import type {
   MultiAssetMintMetadataResponse,
   GetUtxoDataRequest,
   GetUtxoDataResponse,
+  GetLatestBlockBySlotFunc,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -488,31 +489,28 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  getLastBlockBySlot = async () => {
+  getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => {
     const { BackendService } = body.network.Backend;
-    if (body.utxos.length !== 1) {
-      throw new Error('the RemoteFetcher.getUtxoData expects 1 UTXO');
-    }
-    const { txHash, txIndex } = body.utxos[0];
     if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
     return axios(
-      `${BackendService}/api/txs/io/${txHash}/o/${txIndex}`,
+      `http://localhost:8082/v2.1/lastBlockBySlot`, // Todo: Swich back to BackendService
       {
-        method: 'get',
+        method: 'post',
+        data: {
+          slots: body.slots,
+        },
         timeout: 2 * CONFIG.app.walletRefreshInterval,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => [ response.data ])
+    ).then(response => response.data)
       .catch((error) => {
-        if (error.response.status === 404 && error.response.data === 'Transaction not found') {
-          return [ null ];
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        return {
+          blockHashes: {},
         }
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUtxoData)} error: ` + stringifyError(error));
-        throw new GetUtxoDataError();
       });
-
   }
 }
