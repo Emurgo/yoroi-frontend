@@ -371,7 +371,7 @@ export function genUtxoSumForAddresses(
 export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
-  isLedger?: boolean = false,
+  isLedger: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
@@ -413,7 +413,7 @@ export function getMangledAddressString(
   mnemonic: string,
   path: Array<number>,
   stakingKey: Buffer,
-  isLedger?: boolean = false,
+  isLedger: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');

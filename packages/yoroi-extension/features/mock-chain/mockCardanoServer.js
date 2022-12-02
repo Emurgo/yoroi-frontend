@@ -409,6 +409,7 @@ export function getMockServer(settings: {
             tx_index: item.utxo.txIndex,
           };
         });
+        const { lastFoundBestBlock, lastFoundSafeBlock } = (value: any).reference;
         res.send({
           // no pagination, always return all at once
           diffItems,
@@ -417,6 +418,10 @@ export function getMockServer(settings: {
           lastDiffPointSelected: {
             lastPage: true,
           },
+          ...(afterBestblocks ? {
+              lastFoundSafeblock: lastFoundSafeBlock,
+              lastFoundBestblock: lastFoundBestBlock,
+            } : {})
         });
       }
     });
