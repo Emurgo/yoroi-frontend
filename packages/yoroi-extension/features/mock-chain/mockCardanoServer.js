@@ -368,7 +368,7 @@ export function getMockServer(settings: {
     });
 
     server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
-      const { addresses, untilBlockHash, afterPoint, diffLimit } = req.body;
+      const { addresses, untilBlockHash, afterPoint, afterBestblocks } = req.body;
       if (afterPoint.lastPage) {
         res.send({
           diffItems: [],
@@ -383,7 +383,7 @@ export function getMockServer(settings: {
         {
           addresses,
           untilBlockHash,
-          afterBestBlock: afterPoint.blockHash
+          afterBestBlocks: afterBestblocks
         },
       );
       if (result !== 'SUCCESS') {
