@@ -383,7 +383,7 @@ export function getMockServer(settings: {
         {
           addresses,
           untilBlockHash,
-          afterBestBlocks: afterBestblocks
+          afterBestBlocks: afterBestblocks || [afterPoint.blockHash],
         },
       );
       if (result !== 'SUCCESS') {
