@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.17.0",
+  "version": "4.17.001",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -185,6 +185,7 @@
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
+    "@emurgo/yoroi-lib": "0.2.0",
     "@mui/lab": "^5.0.0-alpha.51",
     "@mui/material": "^5.0.4",
     "@svgr/webpack": "5.5.0",
