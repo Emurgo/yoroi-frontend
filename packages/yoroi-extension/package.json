@@ -158,7 +158,7 @@
     "rimraf": "3.0.2",
     "sass-loader": "11.0.1",
     "selenium-webdriver": "4.0.0-alpha.7",
-    "shelljs": "0.8.4",
+    "shelljs": "0.8.5",
     "simple-node-logger": "^21.8.12",
     "storycap": "2.3.5",
     "style-loader": "2.0.0",
