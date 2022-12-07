@@ -1,4 +1,5 @@
 .component {
+  overflow: hidden;
   position: absolute;
   display: flex;
   z-index: 1;
@@ -50,8 +51,8 @@
   }  
 }
 .visible {
-  opacity: 1;
 }
 .hidden {
-  opacity: 0;
+  width: 10px;
+  height: 10px;
 }
