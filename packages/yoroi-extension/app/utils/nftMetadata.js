@@ -100,8 +100,11 @@ export function getImageFromTokenMetadata(
   if (typeof nftMetadata.image === 'string') {
     return nftMetadata.image;
   }
-  if (typeof nftMetadata.image?.[0] === 'string') {
-    return nftMetadata.image[0];
+  if (
+    isArray(nftMetadata.image) &&
+      nftMetadata.image.every(s => typeof s === 'string')
+  ) {
+    return nftMetadata.image.join('');
   }
   return null;
 }

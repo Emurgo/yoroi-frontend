@@ -1,15 +1,19 @@
 # Yoroi dApp Connector
 
-This experimental extension is the first in a modular design to interface the [Yoroi frontend extension](https://github.com/Emurgo/yoroi-frontend) with dApps. It targets the [Ergo](https://ergoplatform.org/en/) cryptocurrency.
+~~This experimental extension is the first in a modular design to interface the [Yoroi frontend extension](https://github.com/Emurgo/yoroi-frontend) with dApps. It targets the [Ergo](https://ergoplatform.org/en/) cryptocurrency.~~
 
-The implementation will follow our [EIP-0012](https://github.com/ergoplatform/eips/pull/23) spec.
+~~The implementation will follow our [EIP-0012](https://github.com/ergoplatform/eips/pull/23) spec.~~
+
+This project is used only as an example application.
+
+All related to the dApp is moved to the folder `packages/yoroi-extension/app/ergo-connector`.
 
 ### Testing
 
-1. Run the Yoroi Extension and get its extension ID
-1. Use `npm run prod:custom -- --yoroiExtensionId=extension-id-here`
-1. Select "load unpacked" in your browser and select the build folder (or ZIP file also works in prod/nightly builds)
-1. Note the extension ID of the connector extension. Now, when you re-build Yoroi passing `--connectorExtensionId=connector-extension-id-here` as a build argument.
-Example: `npm run dev:stable -- --connectorExtensionId=ebnncddeiookdmpglbhiamljhpdgbjcm`
-1. Build the example project in the `example` folder (`npm install && npm run start`)
-1. Open the page from the example project
+1. Build the test version of the extension. (Read how to build the test app [here](../yoroi-extension/docs/TEST.md#e2e-tests))
+2. Use `npm run test:run:e2e:dApp:chrome` to run all dApp-connector related tests
+
+### Running dApp example page
+
+1. Install node modules
+2. Run example for cardano network `npm run cardano` or run example for ergo network `npm run ergo`

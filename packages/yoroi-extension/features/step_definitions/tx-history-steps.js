@@ -6,6 +6,7 @@ import { expect, AssertionError } from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
 import {
+  confirmationCountText,
   failedTransactionElement,
   getTopTx,
   getTxStatus,
@@ -15,10 +16,11 @@ import {
   pendingTransactionElement,
   showMoreButton,
   transactionAddressListElement,
-  transactionComponent,
+  transactionComponent, transactionIdText,
 } from '../pages/walletTransactionsHistoryPage';
 import { summaryTab } from '../pages/walletPage';
 import { displayInfo , txSuccessfulStatuses } from '../support/helpers/common-constants';
+import { getMethod } from '../support/helpers/helpers';
 
 function verifyAllTxsFields(
   txType,
@@ -128,8 +130,12 @@ Then(/^I verify top transaction content ([^"]*)$/, async function (walletName) {
   const topTx = actualTxsList[0];
 
   let status = 'successful';
-  const pending = await topTx.findElements(By.css('.Transaction_pendingLabel'));
-  const failed = await topTx.findElements(By.css('.Transaction_failedLabel'));
+  const pending = await topTx.findElements(
+    getMethod(pendingTransactionElement.method)(pendingTransactionElement.locator)
+  );
+  const failed = await topTx.findElements(
+    getMethod(failedTransactionElement.method)(failedTransactionElement.locator)
+  );
   if (pending.length > 0) {
     status = 'pending';
   } else if (failed.length > 0) {
@@ -138,7 +144,9 @@ Then(/^I verify top transaction content ([^"]*)$/, async function (walletName) {
 
   await topTx.click();
 
-  const txList = await topTx.findElements(transactionAddressListElement);
+  const txList = await topTx.findElements(
+    getMethod(transactionAddressListElement.method)(transactionAddressListElement.locator)
+  );
   const fromTxInfo = await parseTxInfo(txList[0]);
   const toTxInfo = await parseTxInfo(txList[1]);
 
@@ -149,13 +157,17 @@ Then(/^I verify top transaction content ([^"]*)$/, async function (walletName) {
   const expectedTx = displayInfo[walletName];
 
   const txId = await (async () => {
-    const elem = await topTx.findElement(By.css('.txid'));
+    const elem = await topTx.findElement(
+      getMethod(transactionIdText.method)(transactionIdText.locator)
+    );
     return await elem.getText();
   })();
   const txConfirmation =
     status === 'successful'
       ? await (async () => {
-          const txConfirmationsCount = await topTx.findElement(By.css('.confirmationCount'));
+          const txConfirmationsCount = await topTx.findElement(
+            getMethod(confirmationCountText.method)(confirmationCountText.locator)
+          );
           const txConfirmationParentElem = await txConfirmationsCount.findElement(By.xpath('./..'));
           return await txConfirmationParentElem.getText();
         })()
@@ -180,7 +192,9 @@ Then(
     await this.waitForElement(transactionComponent);
     const actualTxsList = await this.getElementsBy(transactionComponent);
     const topTx = actualTxsList[0];
-    const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
+    const assuranceElem = await topTx.findElements(
+      getMethod(confirmationCountText.method)(confirmationCountText.locator)
+    );
     const confirmationCount = await assuranceElem[0].getText();
     expect(confirmationCount).to.equal(count);
 });

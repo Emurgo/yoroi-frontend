@@ -10,15 +10,18 @@ import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 import {
   GetUtxoTxOutputsWithTx,
 } from '../../database/transactionModels/utxo/api/read';
-import type { UtxoTxOutput } from '../../database/transactionModels/utxo/api/read';
-
 import type {
+  ErgoFields,
+} from '../../database/transactionModels/utxo/tables';
+import type {
+  TokenRow,
   AddressRow,
   KeyRow,
   CanonicalAddressInsert,
   CanonicalAddressRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
+
 import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTypes/core/tables';
 
 import type {
@@ -37,6 +40,7 @@ import {
   GetKeyDerivation,
   GetKey,
   GetAddress,
+  GetToken,
 } from '../../database/primitives/api/read';
 import type {
   CoreAddressT,
@@ -60,6 +64,13 @@ import type {
 } from '../../database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
+import type {
+  GetUtxoAtSafePoint,
+  GetUtxoDiffToBestBlock,
+} from '../../database/utxo/api/read';
+import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
+import { UtxoStorageApi, } from '../utils';
+
 
 export type Address = {|
   +address: string,
@@ -99,6 +110,8 @@ export interface IPublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> {
   getPathToPublic(): Array<number>;
   getDerivationId(): number;
   getFullPublicDeriverInfo(): Promise<$ReadOnly<PublicDeriverRow>>;
+  getUtxoService: void => UtxoService;
+  getUtxoStorageApi: void => UtxoStorageApi;
 }
 
 export type PathRequest = void;
@@ -137,6 +150,19 @@ export interface IGetPublic {
   +changePubDeriverPassword: IChangePasswordRequestFunc,
 }
 
+type GetAllUtxosOutput = {|
+  Transaction: { +Hash: string, ... },
+  UtxoTransactionOutput: $ReadOnly<{
+    OutputIndex: number,
+    ...WithNullableFields<ErgoFields>,
+    ...
+  }>,
+  +tokens: $ReadOnlyArray<$ReadOnly<{|
+    +TokenList: $ReadOnly<{ +Amount: string, ... }>,
+    +Token: $ReadOnly<TokenRow>,
+  |}>>
+|};
+
 export type IGetAllUtxoAddressesRequest = PathRequest;
 export type IGetAllUtxoAddressesResponse = Array<UtxoAddressPath>;
 export type IGetAllUtxoAddressesFunc = (
@@ -144,7 +170,7 @@ export type IGetAllUtxoAddressesFunc = (
 ) => Promise<IGetAllUtxoAddressesResponse>;
 export type IGetAllUtxosRequest = void;
 export type IGetAllUtxosResponse = Array<{|
-  output: $ReadOnly<UtxoTxOutput>;
+  output: $ReadOnly<GetAllUtxosOutput>;
   ...Addressing,
   ...Address,
 |}>;
@@ -158,11 +184,15 @@ export interface IGetAllUtxos {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllUtxosRequest
   >;
   +getAllUtxos: IGetAllUtxosFunc;
+  +getAllUtxosFromOldDb: IGetAllUtxosFunc;
 
   +rawGetAllUtxoAddresses: RawTableVariation<
     IGetAllUtxoAddressesFunc,
@@ -287,6 +317,9 @@ export interface IGetUtxoBalance {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetUtxoBalanceRequest

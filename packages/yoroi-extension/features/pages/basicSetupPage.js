@@ -25,6 +25,11 @@ export const continueButton: LocatorObject = {
   locator: '//button[text()="Continue"]',
   method: 'xpath',
 };
+
+export const confirmSelectedLanguageButton: LocatorObject = {
+  locator: `${LANGUAGE_SELECTION_FORM} > .LanguageSelectionForm_centeredBox > .MuiButton-primary`,
+  method: 'css'
+};
 // ToS page
 export const termsOfUseComponent: LocatorObject = {
   locator: '.TermsOfUseForm_component',
