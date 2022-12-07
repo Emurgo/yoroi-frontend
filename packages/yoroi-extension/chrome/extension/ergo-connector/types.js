@@ -463,10 +463,6 @@ export type PendingSignData = {|
   uid: RpcUid,
   tx: CardanoTx,
 |} | {|
-  type: 'tx-create-req/cardano',
-  uid: RpcUid,
-  tx: CardanoTxRequest,
-|} | {|
   type: 'tx-reorg/cardano',
   uid: RpcUid,
   tx: {|
