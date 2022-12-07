@@ -599,7 +599,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             {
               ...batchRequest,
               // only the first call should update from remote
-              isLocalRequest: i > 0,
+              isLocalRequest: request.isLocalRequest || i > 0,
             }
           );
         if (batchResult.transactions.length === 0) {
