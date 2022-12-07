@@ -39,13 +39,14 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
         .filter(item => item.info.IsNFT)
         .map(token => {
           const policyId = token.entry.identifier.split('.')[0];
-          const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+          const fullName = getTokenStrictName(token.info);
+          const name = truncateToken(fullName ?? '-');
           return {
             name,
             id: getTokenIdentifierIfExists(token.info) ?? '-',
             image: getImageFromTokenMetadata(
               policyId,
-              name,
+              fullName,
               token.info.Metadata,
             ),
           };

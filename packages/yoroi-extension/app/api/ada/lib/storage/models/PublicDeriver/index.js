@@ -39,6 +39,9 @@ import {
   GetKeyDerivation,
 } from '../../database/primitives/api/read';
 import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
+import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
+import { UtxoStorageApi, } from '../utils';
+import UtxoApi from '../../../state-fetch/utxoApi';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
@@ -51,7 +54,10 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
   +parent: Parent;
   derivationId: number;
   pathToPublic: Array<number>;
-
+  utxoService: UtxoService;
+  // The UtxoStorage depended on by the above UtxoService.
+  // Exposed because sometimes we need to directly manipulate it.
+  utxoStorageApi: UtxoStorageApi;
   /**
    * This constructor it will NOT populate functionality from db
    */
@@ -60,6 +66,15 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
     this.parent = data.parent;
     this.pathToPublic = data.pathToPublic;
     this.derivationId = data.derivationId;
+
+    const { BackendService } = this.parent.getNetworkInfo().Backend;
+    if (!BackendService) {
+      throw new Error('missing backend service URL');
+    }
+    const utxoApi = new UtxoApi(BackendService);
+    this.utxoStorageApi = new UtxoStorageApi(this.publicDeriverId);
+    this.utxoService = new UtxoService(utxoApi, this.utxoStorageApi);
+
     return this;
   }
 
@@ -170,6 +185,9 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       async tx => this.rawGetLastSyncInfo(tx, deps, body)
     );
   }
+
+  getUtxoService: void => UtxoService = () => this.utxoService;
+  getUtxoStorageApi: void => UtxoStorageApi = () => this.utxoStorageApi;
 }
 
 export async function refreshPublicDeriverFunctionality(
