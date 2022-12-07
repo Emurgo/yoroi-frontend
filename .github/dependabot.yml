@@ -12,7 +12,6 @@ updates:
     - dependency-name: "@cardano-foundation/ledgerjs-hw-app-cardano"
     - dependency-name: "@emurgo/*"
     - dependency-name: "cardano-*"
-    - dependency-name: "ergo-*"
     - dependency-name: "lodash"
     - dependency-name: "mobx*"
     - dependency-name: "react*"
