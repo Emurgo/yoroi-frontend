@@ -19,7 +19,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 import { RollbackApiError, } from '../../../common/errors';
-import { toEnterprise, addressToKind, toHexOrBase58, } from '../storage/bridge/utils';
+import { toEnterprise, addressToKind, toHexOrBase58 } from '../storage/bridge/utils';
 import { CoreAddressTypes } from '../storage/database/primitives/enums';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
 import {
@@ -37,6 +37,26 @@ import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepa
 import { bech32 } from 'bech32';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
+import type { UtxoApiContract } from '@emurgo/yoroi-lib/dist/utxo/api';
+import type {
+  TipStatusReference,
+  Utxo,
+  UtxoApiResponse,
+  UtxoAtPointRequest,
+  UtxoDiff,
+  UtxoDiffItem,
+  UtxoDiffSincePointRequest
+} from '@emurgo/yoroi-lib/dist/utxo/models';
+import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
+
+function byronAddressToHex(byronAddrOrHex: string): string {
+  if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
+    return Buffer.from(
+      RustModule.WalletV4.ByronAddress.from_base58(byronAddrOrHex).to_bytes()
+    ).toString('hex');
+  }
+  return byronAddrOrHex;
+}
 
 /** convert bech32 address to bytes */
 function fixAddresses(
@@ -351,7 +371,7 @@ export function genUtxoSumForAddresses(
 export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
-  isLedger?: boolean = false,
+  isLedger: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
@@ -393,7 +413,7 @@ export function getMangledAddressString(
   mnemonic: string,
   path: Array<number>,
   stakingKey: Buffer,
-  isLedger?: boolean = false,
+  isLedger: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
@@ -677,4 +697,260 @@ export function genGetTokenInfo(
 export function genGetMultiAssetMetadata(
 ): MultiAssetMintMetadataFunc {
   return async (_) => ({});
+}
+
+
+export class MockUtxoApi implements UtxoApiContract {
+  blockchain: Array<RemoteTransaction>;
+  safeConfirmations: number;
+
+  constructor(
+    blockchain: Array<RemoteTransaction>,
+    safeConfirmations: number,
+  ) {
+    this.blockchain = blockchain;
+    this.safeConfirmations = safeConfirmations;
+  }
+
+  _getLastSafeBlockTxIndex(): number {
+    let lastHeight = null;
+    let i;
+    for (i = this.blockchain.length - 1; i >= 0; i --) {
+      if (this.blockchain[i].tx_state === 'Successful') {
+        lastHeight = this.blockchain[i].height;
+        break;
+      }
+    }
+    if (lastHeight == null) {
+      throw new Error('no successful tx');
+    }
+    for (; i >= 0; i --) {
+      const currentHeight = this.blockchain[i].height;
+      if (
+        currentHeight != null &&
+          lastHeight - currentHeight >= this.safeConfirmations
+      ) {
+        break;
+      }
+    }
+    if (i === -1) {
+      throw new Error('not enough blocks for a safe block');
+    } else {
+      return i;
+    }
+  }
+
+  async getBestBlock(): Promise<string> {
+    for (let i = this.blockchain.length - 1; i >= 0; i --) {
+      if (this.blockchain[i].tx_state === 'Successful') {
+        const hash = this.blockchain[i].block_hash;
+        if (!hash) {
+          throw new Error('expect hash');
+        }
+        return hash;
+      }
+    }
+    throw new Error('no successful tx');
+  }
+
+  async getSafeBlock(): Promise<string> {
+    const hash =  this.blockchain[this._getLastSafeBlockTxIndex()].block_hash;
+    if (!hash) {
+      throw new Error('expect hash');
+    }
+    return hash;
+  }
+
+  async getTipStatusWithReference(
+    bestBlocks: string[]
+  ): Promise<UtxoApiResponse<TipStatusReference>> {
+    const blocks = bestBlocks.map(
+      hash => {
+        const index = this.blockchain.findIndex(tx => tx.block_hash === hash);
+        if (index === -1) {
+          return { index, height: null, hash };
+        }
+        const height = this.blockchain[index].height;
+        return { index, height, hash };
+      }
+    ).filter(b => b.index !== -1).sort((b1, b2) => b1.index - b2.index);
+    if (blocks.length === 0) {
+      return {
+        result: UtxoApiResult.SAFEBLOCK_ROLLBACK
+      };
+    }
+
+    return {
+      result: UtxoApiResult.SUCCESS,
+      value: {
+        reference: {
+          lastFoundBestBlock: blocks[blocks.length - 1].hash,
+          lastFoundSafeBlock: blocks[0].hash,
+        }
+      }
+    };
+  }
+
+  async getUtxoAtPoint(req: UtxoAtPointRequest): Promise<UtxoApiResponse<Utxo[]>> {
+    const { addresses, referenceBlockHash } = req;
+    const hexAddresses = addresses.map(a => {
+      const hex = fixAddresses(a, networks.CardanoMainnet);
+      if (hex.match(/^([a-f0-9][a-f0-9])+$/)) {
+        return hex;
+      }
+      return byronAddressToHex(a);
+    });
+
+    let lastTxIndex;
+    for (lastTxIndex = this.blockchain.length - 1; lastTxIndex >= 0; lastTxIndex--) {
+      const hash = this.blockchain[lastTxIndex].block_hash;
+      if (hash === referenceBlockHash) {
+        break;
+      }
+    }
+    if (lastTxIndex === -1) {
+      throw new Error('block not found');
+    }
+    let utxos = [];
+    for (let i = 0; i <= lastTxIndex; i++) {
+      const tx = this.blockchain[i];
+      if (tx.tx_state !== 'Successful') {
+        continue;
+      }
+      // remove spent
+      utxos = utxos.filter(
+        utxo => !tx.inputs.some(
+          input => input.txHash === utxo.txHash && input.index === utxo.txIndex
+        )
+      );
+      // add new
+      for (let outputIndex = 0; outputIndex < tx.outputs.length; outputIndex++) {
+        const output = tx.outputs[outputIndex];
+        if (!(
+          hexAddresses.includes(byronAddressToHex(output.address)) ||
+            hexAddresses.includes(Buffer.from(toEnterprise(output.address)?.to_address().to_bytes() || '').toString('hex'))
+        )) {
+          continue;
+        }
+
+        const { height } = tx;
+        if (height == null) {
+          throw new Error('expect height');
+        }
+        utxos.push({
+          utxoId: `${tx.hash}${outputIndex}`,
+          txHash: tx.hash,
+          txIndex: outputIndex,
+          receiver: output.address,
+          amount: new BigNumber(output.amount),
+          assets: output.assets.map(asset => ({
+            assetId: asset.assetId,
+            policyId: asset.policyId,
+            name: asset.name,
+            amount: asset.amount,
+          })),
+          blockNum: height,
+        });
+      };
+    }
+    return {
+      result: UtxoApiResult.SUCCESS,
+      value: utxos,
+    };
+  }
+
+  async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
+    const { addresses, untilBlockHash, afterBestBlocks, } = req;
+
+    const hexAddresses = addresses.map(a => {
+      const hex = fixAddresses(a, networks.CardanoMainnet);
+      if (hex.match(/^([a-f0-9][a-f0-9])+$/)) {
+        return hex;
+      }
+      return byronAddressToHex(a);
+    });
+
+    let seenUntilBlock = false;
+    const utxoDiffItems = [];
+    let lastFoundBestBlock = null;
+    for (let i = this.blockchain.length - 1; i >= 0; i--) {
+      const tx = this.blockchain[i];
+      if (tx.tx_state !== 'Successful') {
+        continue;
+      }
+
+      if (tx.block_hash === untilBlockHash) {
+        seenUntilBlock = true;
+      }
+
+      const txInAfterBestblocks = afterBestBlocks.includes(tx.block_hash);
+      if (txInAfterBestblocks && lastFoundBestBlock == null) {
+        lastFoundBestBlock = tx.block_hash;
+      }
+
+      if (seenUntilBlock) {
+        if (txInAfterBestblocks) {
+          break;
+        }
+
+        tx.outputs.forEach((output, outputIndex) => {
+          if (!(
+            hexAddresses.includes(byronAddressToHex(output.address)) ||
+              hexAddresses.includes(Buffer.from(toEnterprise(output.address)?.to_address().to_bytes() || '').toString('hex'))
+          )) {
+            return;
+          }
+          const utxoId = `${tx.hash}${outputIndex}`
+          utxoDiffItems.push(
+            {
+              type: 'output',
+              id: utxoId,
+              amount: new BigNumber(output.amount),
+              utxo: {
+                utxoId,
+                txHash: tx.hash,
+                txIndex: outputIndex,
+                receiver: output.address,
+                amount: new BigNumber(output.amount),
+                assets: output.assets.map(asset => ({
+                  assetId: asset.assetId,
+                  policyId: asset.policyId,
+                  name: asset.name,
+                  amount: asset.amount,
+                })),
+                blockNum: tx.height,
+              }
+            }
+          );
+        });
+        tx.inputs.filter(input =>
+          hexAddresses.includes(byronAddressToHex(input.address)) ||
+          hexAddresses.includes(Buffer.from(toEnterprise(input.address)?.to_address().to_bytes() || '').toString('hex'))
+        ).forEach(input => {
+          utxoDiffItems.push(
+            ({
+              type: 'input',
+              id: input.id,
+              amount: new BigNumber(input.amount),
+            }: UtxoDiffItem)
+          );
+        });
+      }
+    }
+    if (!seenUntilBlock || lastFoundBestBlock == null) {
+      return {
+        result: UtxoApiResult.BESTBLOCK_ROLLBACK
+      };
+    }
+    return {
+      result: UtxoApiResult.SUCCESS,
+      value: {
+        diffItems: utxoDiffItems,
+        reference: {
+          lastFoundBestBlock,
+          lastFoundSafeBlock: afterBestBlocks.length > 1 ? afterBestBlocks[1] : undefined,
+        }
+      },
+    };
+  }
 }

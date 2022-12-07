@@ -21,7 +21,8 @@ import {
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
-  genGetMultiAssetMetadata
+  genGetMultiAssetMetadata,
+  MockUtxoApi,
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -39,12 +40,14 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
+  updateUtxos,
   updateTransactions,
 } from '../updateTransactions';
 import {
   networks,
 } from '../../database/prepackaged/networks';
-import { TransactionType } from '../../database/primitives/tables';
+import UtxoApi from '../../../state-fetch/utxoApi';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 jest.mock('../../database/initialSeed');
 
@@ -200,6 +203,10 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
   metadata: null,
 });
 
+beforeAll(async () => {
+  await RustModule.load();
+});
+
 beforeEach(() => {
   mockDate();
 });
@@ -207,11 +214,13 @@ beforeEach(() => {
 async function syncingSimpleTransaction(
   purposeForTest: WalletTypePurposeT,
 ): Promise<void> {
+  const txHistory = networkTransactions(purposeForTest);
+  UtxoApi.utxoApiFactory = (_: string) => new MockUtxoApi(txHistory, 0);
+
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
   const network = networks.CardanoMainnet;
-  const txHistory = networkTransactions(purposeForTest);
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory,
@@ -235,6 +244,11 @@ async function syncingSimpleTransaction(
   }
 
   {
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -266,28 +280,14 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
-            Type: TransactionType.CardanoByron,
-            ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-            Digest: 8.191593645542673e-27,
-            Ordinal: 0,
-            BlockId: 1,
-            LastUpdateTime: 1568392636000,
-            Status: 1,
-            TransactionId: 1,
-            Extra: null,
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
-            IsUnspent: true,
             OutputIndex: 0,
-            TransactionId: 1,
-            UtxoTransactionOutputId: 1,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoRegisters: null,
             ErgoTree: null,
-            TokenListId: 1,
           },
           tokens: [{
             Token: {
@@ -308,9 +308,6 @@ async function syncingSimpleTransaction(
             },
             TokenList: {
               Amount: '2100000',
-              ListId: 1,
-              TokenId: 1,
-              TokenListItemId: 2,
             },
           }],
         }
@@ -348,6 +345,11 @@ async function syncingSimpleTransaction(
   {
     txHistory.push(nextRegularSpend(purposeForTest));
 
+    await updateUtxos(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+    );
     await updateTransactions(
       db,
       basePubDeriver,
@@ -386,32 +388,14 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
-            Type: TransactionType.CardanoShelley,
-            ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-            Digest: 1.249559827714551e-31,
-            Ordinal: 0,
-            BlockId: 2,
-            LastUpdateTime: 1568392656000,
-            Status: 1,
-            TransactionId: 2,
-            Extra: {
-              Fee: '100000',
-              IsValid: true,
-              Metadata: null,
-            },
           },
           UtxoTransactionOutput: {
-            AddressId: 21,
-            IsUnspent: true,
             OutputIndex: 0,
-            TransactionId: 2,
-            UtxoTransactionOutputId: 3,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoRegisters: null,
             ErgoTree: null,
-            TokenListId: 5,
           },
           tokens: [{
             Token: {
@@ -432,9 +416,6 @@ async function syncingSimpleTransaction(
             },
             TokenList: {
               Amount: '1100000',
-              ListId: 5,
-              TokenId: 1,
-              TokenListItemId: 6,
             },
           }],
         }
@@ -451,32 +432,14 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
-            Type: TransactionType.CardanoShelley,
-            ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-            Digest: 1.249559827714551e-31,
-            Ordinal: 0,
-            BlockId: 2,
-            LastUpdateTime: 1568392656000,
-            Status: 1,
-            TransactionId: 2,
-            Extra: {
-              Fee: '100000',
-              IsValid: true,
-              Metadata: null,
-            },
           },
           UtxoTransactionOutput: {
-            AddressId: 20,
-            IsUnspent: true,
             OutputIndex: 1,
-            TransactionId: 2,
-            UtxoTransactionOutputId: 4,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoRegisters: null,
             ErgoTree: null,
-            TokenListId: 6,
           },
           tokens: [{
             Token: {
@@ -497,9 +460,6 @@ async function syncingSimpleTransaction(
             },
             TokenList: {
               Amount: '900000',
-              ListId: 6,
-              TokenId: 1,
-              TokenListItemId: 7,
             },
           }],
         },

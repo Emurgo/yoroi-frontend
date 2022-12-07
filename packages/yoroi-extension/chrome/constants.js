@@ -74,6 +74,6 @@ export function genCSP(request: {|
     `object-src 'self' ${objectSrc.join(' ')};`,
     `connect-src ${connectSrc.join(' ')};`,
     `style-src * ${evalStyle} 'self' ${styleSrc.join(' ')} blob:;`,
-    `img-src 'self' ${imgSrc.join(' ')} data: ;`,
+    `img-src 'self' ${imgSrc.join(' ')} https: data: ;`,
   ].join(' ');
 }
