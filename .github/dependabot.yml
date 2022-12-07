@@ -20,5 +20,4 @@ updates:
     - dependency-name: "chromedriver"
   assignees:
     - "vsubhuman"
-    - "javimaravillas"
   rebase-strategy: disabled
