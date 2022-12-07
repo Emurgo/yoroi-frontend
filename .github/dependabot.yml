@@ -4,10 +4,10 @@ updates:
   directory: "/packages/yoroi-extension"
   schedule:
     interval: weekly
-    day: monday
+    day: friday
     time: 03:00
     timezone: UTC
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 5
   allow:
     - dependency-name: "@cardano-foundation/ledgerjs-hw-app-cardano"
     - dependency-name: "@emurgo/*"
