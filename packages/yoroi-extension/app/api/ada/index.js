@@ -21,6 +21,7 @@ import {
   getPendingTransactions,
   removeAllTransactions,
   updateTransactions,
+  updateUtxos,
 } from './lib/storage/bridge/updateTransactions';
 import {
   addrContainsAccountKey,
@@ -674,6 +675,11 @@ export default class AdaApi {
     const { skip = 0, limit } = request;
     try {
       if (!request.isLocalRequest) {
+        await updateUtxos(
+          request.publicDeriver.getDb(),
+          request.publicDeriver,
+          request.checkAddressesInUse,
+        );
         await updateTransactions(
           request.publicDeriver.getDb(),
           request.publicDeriver,

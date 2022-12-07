@@ -64,27 +64,38 @@ export const Generic = (): Node => {
       generated={{
         stores: {
           profile: {
-            shouldHideBalance: false
+            shouldHideBalance: false,
+            unitOfAccount: {
+              enabled: false,
+              currency: null,
+            }
           },
           connector: {
-            connectingMessage: undefined,
+            connectingMessage: {
+              imgBase64Url: '',
+              protocol: 'cardano',
+              tabId: 0,
+              url: 'localhost'
+            },
             filteredWallets: wallets,
             errorWallets,
             loadingWallets: walletsState,
             currentConnectorWhitelist: [],
-            protocol: '',
+            protocol: ''
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),
           },
+          coinPriceStore: {
+            getCurrentPrice: (_from, _to) => null,
+          },
         },
         actions: {
           connector: {
-            getResponse: { trigger: async (req) => action('getResponse')(req) },
-            getConnectorWhitelist: { trigger: async (req) => action('getConnectorWhitelist')(req) },
             updateConnectorWhitelist: { trigger: async (req) => action('updateConnectorWhitelist')(req) },
             refreshWallets: { trigger: async (req) => action('refreshWallets')(req) },
             closeWindow: { trigger: action('closeWindow') },
+            updateHideBalance: { trigger: async (req) => action('refreshWallets')(req) }
           },
         },
       }}

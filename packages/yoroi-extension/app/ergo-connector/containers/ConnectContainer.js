@@ -11,10 +11,11 @@ import type {
   WhitelistEntry,
   ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
-import { LoadingWalletStates } from '../types';
-import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { LoadingWalletStates } from '../types';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { createAuthEntry } from '../api';
 
@@ -56,7 +57,6 @@ export default class ConnectContainer extends Component<
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
-    this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
   }
 
@@ -154,8 +154,12 @@ export default class ConnectContainer extends Component<
   };
 
   hidePasswordForm: void => void = () => {
-    this.setState({ isAppAuth: false })
-  }
+    this.setState({ isAppAuth: false });
+  };
+
+  updateHideBalance: void => Promise<void> = async () => {
+    await this.generated.actions.connector.updateHideBalance.trigger();
+  };
 
   render(): Node {
     const responseMessage = this.generated.stores.connector.connectingMessage;
@@ -180,6 +184,9 @@ export default class ConnectContainer extends Component<
         network={network}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        unitOfAccount={this.generated.stores.profile.unitOfAccount}
+        getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+        onUpdateHideBalance={this.updateHideBalance}
       />
     );
   }
@@ -187,16 +194,13 @@ export default class ConnectContainer extends Component<
   @computed get generated(): {|
     actions: {|
       connector: {|
-        getResponse: {|
-          trigger: (params: void) => Promise<void>,
-        |},
         refreshWallets: {|
           trigger: (params: void) => Promise<void>,
         |},
         closeWindow: {|
           trigger: (params: void) => void,
         |},
-        getConnectorWhitelist: {|
+        updateHideBalance: {|
           trigger: (params: void) => Promise<void>,
         |},
         updateConnectorWhitelist: {|
@@ -209,6 +213,10 @@ export default class ConnectContainer extends Component<
     stores: {|
       profile: {|
         shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       connector: {|
         connectingMessage: ?ConnectingMessage,
@@ -234,6 +242,10 @@ export default class ConnectContainer extends Component<
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          unitOfAccount: stores.profile.unitOfAccount,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
           // todo: import profile store for stablecoin display
         },
         connector: {
@@ -250,11 +262,10 @@ export default class ConnectContainer extends Component<
       },
       actions: {
         connector: {
-          getResponse: { trigger: actions.connector.getResponse.trigger },
           refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
-          getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },
       },
     });

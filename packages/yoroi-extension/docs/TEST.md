@@ -25,6 +25,8 @@ You **must** run `npm run test:build` **before** running the tests!
 
 Rerun `test:build` anytime you make changes to the application itself. If you only change test files, you do not need to rerun it.
 
+You **must** create the folder `reports` inside the folder `yoroi-extension` before running tests.
+
 ```bash
 # features (command to run all existing tests)
 npm run test:run:e2e:chrome
@@ -74,8 +76,12 @@ After executing the above commands to run tests, cucumber-html-reporter can be u
 
 ```bash
 # How to create html reports after a test run
-node reportGenerator.js
+npm run create-report
 ```
+
+The html report file will be automatically opened in your browser.
+
+The report file `cucumberReport.html` will be located in the `reports` folder.
 
 ### Storybook
 
