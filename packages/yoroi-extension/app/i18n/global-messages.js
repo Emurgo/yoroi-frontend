@@ -1013,8 +1013,13 @@ export const connectorMessages: * = defineMessages({
   },
   dappConnector: {
     id: 'connector.appName',
-    defaultMessage: 'Dapp Connector',
+    defaultMessage: '!!!Dapp Connector',
   },
+  connector: {
+    id: 'connector.appNameShort',
+    defaultMessage: '!!!Connector'
+  }
+
 });
 
 export function listOfTranslators(contributorsList: string, contributorsAck: string): string {
