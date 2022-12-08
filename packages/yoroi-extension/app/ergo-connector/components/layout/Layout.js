@@ -31,7 +31,7 @@ export default class Layout extends Component<Props> {
 
     return (
       <div className={styles.layout}>
-        <TestnetWarningBanner isTestnet={environment.isTest()} />
+        <TestnetWarningBanner isTestnet={environment.isTest()} isErgo={false} />
         <div className={styles.header}>
           <div className={styles.menu}>
             <YoroiLogo />
