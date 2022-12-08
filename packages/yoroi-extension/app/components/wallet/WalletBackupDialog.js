@@ -25,7 +25,7 @@ type Props = {|
     index: number,
   |}>,
   +onCancelBackup: void => void,
-  +onTogglePrivacyNotice: void => void,
+  +togglePrivacyNotice: void => void,
   +onContinue: void => void,
   +onBack: void => void,
   +onStartWalletBackup: void => void,
