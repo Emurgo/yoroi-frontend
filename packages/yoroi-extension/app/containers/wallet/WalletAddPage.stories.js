@@ -298,7 +298,7 @@ const walletBackupProps: {|
       finishWalletBackup: { trigger: async (req) => action('finishWalletBackup')(req), },
       removeOneMnemonicWord: { trigger: action('removeOneMnemonicWord'), },
       continueToPrivacyWarning: { trigger: action('continueToPrivacyWarning'), },
-      acceptPrivacyNoticeForWalletBackup: { trigger: action('acceptPrivacyNoticeForWalletBackup'), },
+      togglePrivacyNoticeForWalletBackup: { trigger: action('togglePrivacyNoticeForWalletBackup'), },
       continueToRecoveryPhraseForWalletBackup: { trigger: action('continueToRecoveryPhraseForWalletBackup'), },
     },
   },
