@@ -49,7 +49,7 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
     const a = this.actions.walletBackup;
     a.initiateWalletBackup.listen(this._initiateWalletBackup);
     a.continueToPrivacyWarning.listen(this._continueToPrivacyWarning);
-    a.acceptPrivacyNoticeForWalletBackup.listen(this._acceptPrivacyNoticeForWalletBackup);
+    a.togglePrivacyNoticeForWalletBackup.listen(this._togglePrivacyNoticeForWalletBackup);
     a.continueToRecoveryPhraseForWalletBackup.listen(this._continueToRecoveryPhraseForWalletBackup);
     a.startWalletBackup.listen(this._startWalletBackup);
     a.addWordToWalletBackupVerification.listen(this._addWordToWalletBackupVerification);
@@ -100,8 +100,8 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
     this.currentStep = 'privacyWarning';
   };
 
-  @action _acceptPrivacyNoticeForWalletBackup: void => void = () => {
-    this.isPrivacyNoticeAccepted = true;
+  @action _togglePrivacyNoticeForWalletBackup: void => void = () => {
+    this.isPrivacyNoticeAccepted = !this.isPrivacyNoticeAccepted;
   };
 
   @action _continueToRecoveryPhraseForWalletBackup: void => void = () => {

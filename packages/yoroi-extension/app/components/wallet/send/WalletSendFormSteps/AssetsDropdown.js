@@ -10,6 +10,7 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as DefaultNFTIcon  }from '../../../../assets/images/nft-no.inline.svg';
 import type { FormattedNFTDisplay, FormattedTokenDisplay, } from '../../../../utils/wallet';
+import { urlResolveIpfs } from '../../../../coreUtils';
 
 type Props = {|
     +tokens: FormattedTokenDisplay[],
@@ -56,7 +57,7 @@ export default class AssetsDropdown extends Component<Props, State> {
         return (
           <div className={styles.nft}>
             <div className={styles.nftImg}>
-              {image ? <img src={`https://ipfs.io/ipfs/${image}`} alt={nft.name} loading="lazy" /> : <DefaultNFTIcon />}
+              {image ? <img src={urlResolveIpfs(image)} alt={nft.name} loading="lazy" /> : <DefaultNFTIcon />}
             </div>
             <p className={styles.name}>{nft.name}</p>
           </div>
