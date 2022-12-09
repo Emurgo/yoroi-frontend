@@ -873,6 +873,7 @@ export class MockUtxoApi implements UtxoApiContract {
     let seenUntilBlock = false;
     const utxoDiffItems = [];
     let lastFoundBestBlock = null;
+    let lastFoundSafeBlock = null;
     for (let i = this.blockchain.length - 1; i >= 0; i--) {
       const tx = this.blockchain[i];
       if (tx.tx_state !== 'Successful') {
@@ -886,6 +887,9 @@ export class MockUtxoApi implements UtxoApiContract {
       const txInAfterBestblocks = afterBestBlocks.includes(tx.block_hash);
       if (txInAfterBestblocks && lastFoundBestBlock == null) {
         lastFoundBestBlock = tx.block_hash;
+      }
+      if (txInAfterBestblocks && lastFoundSafeBlock == null && i <= this._getLastSafeBlockTxIndex()) {
+        lastFoundSafeBlock = tx.block_hash;
       }
 
       if (seenUntilBlock) {
@@ -948,7 +952,7 @@ export class MockUtxoApi implements UtxoApiContract {
         diffItems: utxoDiffItems,
         reference: {
           lastFoundBestBlock,
-          lastFoundSafeBlock: afterBestBlocks.length > 1 ? afterBestBlocks[1] : undefined,
+          ...(lastFoundSafeBlock == null ? {} : { lastFoundSafeBlock }),
         }
       },
     };

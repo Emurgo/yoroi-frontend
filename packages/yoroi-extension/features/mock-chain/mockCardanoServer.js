@@ -369,7 +369,7 @@ export function getMockServer(settings: {
 
     server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
       const { addresses, untilBlockHash, afterPoint, afterBestblocks } = req.body;
-      if (afterPoint.lastPage) {
+      if (afterPoint && afterPoint.lastPage) {
         res.send({
           diffItems: [],
           lastDiffPointSelected: {
@@ -418,10 +418,8 @@ export function getMockServer(settings: {
           lastDiffPointSelected: {
             lastPage: true,
           },
-          ...(afterBestblocks ? {
-              lastFoundSafeblock: lastFoundSafeBlock,
-              lastFoundBestblock: lastFoundBestBlock,
-            } : {})
+          lastFoundSafeblock: lastFoundSafeBlock,
+          lastFoundBestblock: lastFoundBestBlock,
         });
       }
     });
