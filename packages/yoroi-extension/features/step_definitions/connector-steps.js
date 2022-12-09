@@ -33,7 +33,7 @@ import { connectorButton } from '../pages/sidebarPage';
 
 const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
-const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
+const mockDAppUrl = `http://localhost:${Ports.DevBackendServer}/mock-dapp`;
 
 const connectorPopUpIsDisplayed = async (customWorld: Object) => {
   await customWorld.driver.sleep(2000);
@@ -174,7 +174,7 @@ When(/^I request signing the transaction:$/, async function (table) {
   const fields = table.hashes()[0];
   const normalizedAmount = `${parseFloat(fields.amount) * parseFloat('1000000')}`;
   this.webDriverLogger.info(
-    `Step: I request signing the transaction: ${normalizedAmount} to address: ${fields.address}`
+    `Step: I request signing the transaction: ${normalizedAmount} to address: ${fields.toAddress}`
   );
   await this.mockDAppPage.requestSigningTx(normalizedAmount, fields.toAddress);
 });

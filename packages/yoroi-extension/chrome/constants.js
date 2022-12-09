@@ -34,7 +34,7 @@ export function genCSP(request: {|
     scriptSrc.push(portToPermission(Ports.ReactDevTools));
 
     connectSrc.push(portToPermission(Ports.WebpackDev));
-    connectSrc.push(portToPermission(Ports.DevBackendServe));
+    connectSrc.push(portToPermission(Ports.DevBackendServer));
     connectSrc.push(portToPermission(Ports.ReactDevTools));
     connectSrc.push(portToSocketPermission(Ports.WebpackDev));
 
