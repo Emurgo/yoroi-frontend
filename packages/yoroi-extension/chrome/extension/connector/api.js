@@ -79,9 +79,9 @@ import type {
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelley/coinSelection';
 import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
-import { cip8Sign } from '../../../app/ergo-connector/api';
+import { cip8Sign } from '../../../app/connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
-import type { ForeignUtxoFetcher } from '../../../app/ergo-connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
 import {
   getAllSchemaTables,

@@ -21,7 +21,7 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-} from './ergo-connector/types';
+} from './connector/types';
 import {
   APIErrorCodes,
   asPaginate,
@@ -31,7 +31,7 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
-} from './ergo-connector/types';
+} from './connector/types';
 import {
   connectorCreateCardanoTx,
   connectorGenerateReorgTx,
@@ -53,7 +53,7 @@ import {
   connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
-} from './ergo-connector/api';
+} from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
   updateTransactions as cardanoUpdateTransactions
@@ -79,12 +79,12 @@ import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { authSignHexPayload } from '../../app/ergo-connector/api';
+import { authSignHexPayload } from '../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
-import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import ConnectorStore from '../../app/connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 
 /*::
@@ -1020,31 +1020,6 @@ async function confirmConnect(
     top: bounds.positionY + 80,
   });
 }
-
-// generic communication to the entire connector
-chrome.runtime.onMessageExternal.addListener((message, sender) => {
-  if (sender.id === environment.ergoConnectorExtensionId) {
-    if (message.type === 'open_browseraction_menu') {
-      chrome.windows.getLastFocused(async (currentWindow) => {
-        if (currentWindow == null) return; // should not happen
-        const bounds = await getBoundsForWindow(currentWindow);
-        chrome.windows.create({
-          ...popupProps,
-          url: chrome.runtime.getURL(`/main_window_connector.html#/settings`),
-          left: (bounds.width + bounds.positionX) - popupProps.width,
-          top: bounds.positionY + 80,
-        });
-      });
-    }
-  }
-});
-
-// message from injected code of the standalone connector
-chrome.runtime.onMessageExternal.addListener(async (message, sender) => {
-  if (sender.id === environment.ergoConnectorExtensionId) {
-    await handleInjectorMessage(message, sender);
-  }
-});
 
 async function handleInjectorMessage(message, sender) {
   const tabId = sender.tab.id;

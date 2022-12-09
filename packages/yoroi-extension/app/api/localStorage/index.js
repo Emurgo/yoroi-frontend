@@ -14,7 +14,7 @@ import {
   TabIdKeys,
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
 declare var chrome;

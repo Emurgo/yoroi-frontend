@@ -10,7 +10,6 @@ const customPath = path.join(__dirname, './customPublicPath');
 const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  ergoConnectorExtensionId /*: ?string */,
   isLight /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
@@ -25,7 +24,7 @@ const baseDevConfig = (
     ],
     ergo: [
       customPath,
-      path.join(__dirname, '../chrome/extension/ergo-connector/index')
+      path.join(__dirname, '../chrome/extension/connector/index')
     ],
     ledger: [
       customPath,
@@ -53,7 +52,6 @@ const baseDevConfig = (
       networkName,
       false,
       isNightly,
-      ergoConnectorExtensionId,
       Boolean(isLight)
     )),
     new webpack.HotModuleReplacementPlugin(),

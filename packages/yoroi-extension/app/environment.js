@@ -41,7 +41,6 @@ export const environment = ((
     getWalletRefreshInterval: () => CONFIG.app.walletRefreshInterval,
     getServerStatusRefreshInterval: () => CONFIG.app.serverStatusRefreshInterval,
     userAgentInfo,
-    ergoConnectorExtensionId: process.env.ERGO_CONNECTOR_EXTENSION_ID ?? '',
   }
 ): {
     getNetworkName: void => Network,
@@ -58,7 +57,6 @@ export const environment = ((
     getWalletRefreshInterval: void => number,
     getServerStatusRefreshInterval: void => number,
     userAgentInfo: UserAgentInfo,
-    ergoConnectorExtensionId: string,
     isLight: boolean,
     ...
 });
