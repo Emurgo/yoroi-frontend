@@ -3,10 +3,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type {
-  PublicDeriverCache,
-  ConnectingMessage,
-} from '../../../../chrome/extension/ergo-connector/types';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -19,6 +15,10 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import type {
+  PublicDeriverCache,
+  ConnectingMessage,
+} from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
 import { environment } from '../../../environment';
@@ -36,36 +36,35 @@ import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-walle
 
 const messages = defineMessages({
   subtitle: {
-    id: 'ergo-connector.label.connect',
+    id: 'connector.label.connect',
     defaultMessage: '!!!Connect to',
   },
   connectWallet: {
-    id: 'ergo-connector.label.connectWallet',
+    id: 'connector.label.connectWallet',
     defaultMessage: '!!!Connect Wallet',
   },
   connectWalletAuthRequest: {
-    id: 'ergo-connector.label.connectWalletAuthRequest',
-    defaultMessage:
-      '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
+    id: 'connector.label.connectWalletAuthRequest',
+    defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
   },
   connectWalletNoHardwareSupported: {
-    id: 'ergo-connector.label.connectWalletNoHardwareSupported',
+    id: 'connector.label.connectWalletNoHardwareSupported',
     defaultMessage: '!!!Note, hardware wallets are not supported for the dapp connecting yet.',
   },
   yourWallets: {
-    id: 'ergo-connector.label.yourWallets',
+    id: 'connector.label.yourWallets',
     defaultMessage: '!!!Your Wallets',
   },
   selectAllWallets: {
-    id: 'ergo-connector.label.selectAllWallets',
+    id: 'connector.label.selectAllWallets',
     defaultMessage: '!!!Select all wallets',
   },
   connectInfo: {
-    id: 'ergo-connector.connect.info',
+    id: 'connector.connect.info',
     defaultMessage: '!!!Your connection preferences will be saved to your Yoroi dApp list.',
   },
   noWalletsFound: {
-    id: 'ergo-connector.connect.noWalletsFound',
+    id: 'connector.connect.noWalletsFound',
     defaultMessage: '!!!Ooops, no {network} wallets found',
   },
   incorrectWalletPasswordError: {
@@ -73,7 +72,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Incorrect wallet password.',
   },
   createWallet: {
-    id: 'ergo-connector.connect.createWallet',
+    id: 'connector.connect.createWallet',
     defaultMessage: '!!!create wallet',
   },
 });

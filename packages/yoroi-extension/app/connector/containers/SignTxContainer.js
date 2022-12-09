@@ -13,7 +13,7 @@ import type {
   SigningMessage,
   PublicDeriverCache,
   WhitelistEntry,
-} from '../../../chrome/extension/ergo-connector/types';
+} from '../../../chrome/extension/connector/types';
 import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';

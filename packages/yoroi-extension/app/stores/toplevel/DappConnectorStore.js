@@ -8,10 +8,10 @@ import type {
   WhitelistEntry,
   ConnectedSites,
   RemoveWalletFromWhitelistData,
-} from '../../../chrome/extension/ergo-connector/types';
+} from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getConnectedSites } from '../../ergo-connector/stores/ConnectorStore';
+import { getConnectedSites } from '../../connector/stores/ConnectorStore';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|

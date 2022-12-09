@@ -34,7 +34,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
     }),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/main_window_connector.html`),
-      template: path.join(__dirname, '../chrome/views/ergo-connector/main_window.html'),
+      template: path.join(__dirname, '../chrome/views/connector/main_window.html'),
       chunks: ['ergo'],
       alwaysWriteToDisk: true,
       title: 'Yoroi dApp Connector',
@@ -213,20 +213,8 @@ const definePlugin = (
   networkName /*: string */,
   isProd /*: boolean */,
   isNightly /*: boolean */,
-  ergoConnectorExtensionId /*: ?string */,
   isLight /*: boolean */ = false
 ) /*: * */ => {
-  const ERGO_CONNECTOR_EXTENSION_ID = (() => {
-    if (ergoConnectorExtensionId != null) return ergoConnectorExtensionId;
-
-    if (isNightly) return 'chifollcalpmjdiokipacefnpmbgjnle';
-    if (isProd) return 'ebnncddeiookdmpglbhiamljhpdgbjcm'; // TODO: real value for this
-
-    console.warn('Build has no connector ID set and so the connector will not work');
-    return '';
-  })();
-  console.log(`dapp connector ID set to ${ERGO_CONNECTOR_EXTENSION_ID}`);
-
   return {
     'process.env': {
       NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
@@ -234,7 +222,6 @@ const definePlugin = (
       BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
       NIGHTLY: isNightly,
       POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
-      ERGO_CONNECTOR_EXTENSION_ID: JSON.stringify(ERGO_CONNECTOR_EXTENSION_ID),
       IS_LIGHT: isLight ,
     }
   };

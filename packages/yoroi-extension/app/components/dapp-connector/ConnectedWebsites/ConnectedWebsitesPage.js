@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { WhitelistEntry } from '../../../../chrome/extension/ergo-connector/types'
+import type { WhitelistEntry } from '../../../../chrome/extension/connector/types'
 import styles from './ConnectedWebsitesPage.scss'
 import { ReactComponent as NoItemsFoundImg }  from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

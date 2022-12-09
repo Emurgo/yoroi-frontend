@@ -20,7 +20,7 @@ import type {
   WhitelistEntry,
   GetUtxosRequest,
   GetConnectionProtocolData,
-} from '../../../chrome/extension/ergo-connector/types';
+} from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
 import type {
@@ -47,7 +47,7 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
-import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
+import { mintedTokenInfo } from '../../../chrome/extension/connector/utils';
 import { Logger } from '../../utils/logging';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
@@ -57,7 +57,7 @@ import {
   connectorSendTxCardano,
   connectorGenerateReorgTx,
   connectorRecordSubmittedCardanoTransaction,
-} from '../../../chrome/extension/ergo-connector/api';
+} from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { loadSubmittedTransactions } from '../../api/localStorage';
