@@ -101,7 +101,6 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      env.ergoConnectorExtensionId,
       JSON.parse(env.isLight)
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),

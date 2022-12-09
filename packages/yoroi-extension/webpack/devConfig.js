@@ -90,7 +90,6 @@ const baseDevConfig = (
 const backgroundServiceWorkerConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  ergoConnectorExtensionId /*: ?string */,
   isLight /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
@@ -126,7 +125,6 @@ const backgroundServiceWorkerConfig = (
       networkName,
       false,
       isNightly,
-      ergoConnectorExtensionId,
       Boolean(isLight)
     )),
     new webpack.IgnorePlugin({

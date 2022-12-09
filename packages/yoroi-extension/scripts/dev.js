@@ -29,7 +29,6 @@ function devMainWindow(env: string) {
   const config = baseDevConfig(
     argv.env,
     isNightly,
-    argv.ergoConnectorExtensionId,
     !shouldInjectConnector
   );
 
@@ -43,7 +42,6 @@ function devBackgroundServiceWorker() {
   const config = backgroundServiceWorkerConfig(
     argv.env,
     isNightly,
-    argv.ergoConnectorExtensionId,
     !shouldInjectConnector
   );
 
