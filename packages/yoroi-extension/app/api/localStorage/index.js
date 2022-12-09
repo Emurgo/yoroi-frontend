@@ -351,7 +351,7 @@ export type PersistedSubmittedTransaction = {|
 |};
 
 const STORAGE_API =  window.browser?.storage.local // firefox mv2
-  || chrome.storage.local; // chrome mv2 and mv3
+  || window.chrome?.storage.local; // chrome mv2 and mv3
 
 export async function persistSubmittedTransactions(
   submittedTransactions: any,
