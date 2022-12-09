@@ -498,7 +498,7 @@ export class MockDAppWebpage {
   async getCollateralUtxos(amount: string): Promise<string> {
     this.logger.info(`MockDApp: Getting Collateral Utxos`);
 
-    Buffer.from(
+    const convertedAmount = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
 
@@ -506,15 +506,18 @@ export class MockDAppWebpage {
       const callback = args[args.length - 1];
 
       window.api
-        .getCollateralUtxos('1a004ac4a0')
+        .getCollateralUtxos(args[0])
         // eslint-disable-next-line promise/always-return
         .then(utxosResponse => {
+          if (utxosResponse == null || utxosResponse.length === 0) {
+            callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
+          }
           callback({ success: true, retValue: utxosResponse });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
-    });
+    }, convertedAmount);
     if (collateralResponse.success) {
       const utxos = this._mapCborUtxos(collateralResponse.retValue);
       return JSON.stringify(utxos, undefined, 2);
