@@ -31,6 +31,7 @@ import {
   getAddressForType,
   getMangledAddressString,
   toRemoteByronTx,
+  MockUtxoApi,
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import {
@@ -623,7 +624,7 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '4',
         index: 4,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
       },
     ],
@@ -649,7 +650,7 @@ export const generateTransaction = (): {|
           ChainDerivations.INTERNAL,
           0,
         ]),
-        amount: '820000',
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -677,7 +678,7 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '5',
         index: 5,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
       },
     ],
@@ -703,7 +704,7 @@ export const generateTransaction = (): {|
           ChainDerivations.INTERNAL,
           1,
         ]),
-        amount: '820000',
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -731,7 +732,7 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '6',
         index: 6,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
       },
     ],
@@ -757,7 +758,7 @@ export const generateTransaction = (): {|
           ChainDerivations.INTERNAL,
           2,
         ]),
-        amount: '820000',
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -785,7 +786,7 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '7',
         index: 7,
-        amount: '1000000',
+        amount: '2000000',
         assets: [],
       },
     ],
@@ -811,7 +812,7 @@ export const generateTransaction = (): {|
           ChainDerivations.INTERNAL,
           3,
         ]),
-        amount: '820000',
+        amount: '1820000',
         assets: [],
       },
     ],
@@ -1937,6 +1938,7 @@ export const generateTransaction = (): {|
 // =================
 
 const transactions: Array<MockTx> = [];
+const mockUtxoApi: MockUtxoApi = new MockUtxoApi(transactions, 1);
 
 export function addTransaction(tx: MockTx): void {
   // need to insert txs in order they appear in the blockchain
@@ -2250,4 +2252,5 @@ export default {
   getRewardHistory,
   getAccountState,
   getUtxoData,
+  mockUtxoApi,
 };

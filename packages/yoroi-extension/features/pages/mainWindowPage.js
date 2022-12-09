@@ -3,6 +3,7 @@
 import type { LocatorObject } from '../support/webdriver';
 
 export const yoroiClassic: LocatorObject = { locator: '.YoroiClassic', method: 'css' };
+export const yoroiModern: LocatorObject = { locator: '.YoroiModern', method: 'css' };
 export const serverErrorBanner: LocatorObject = {
   locator: '.ServerErrorBanner_serverError',
   method: 'css',

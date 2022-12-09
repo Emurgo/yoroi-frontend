@@ -149,7 +149,3 @@ export const cardanoPaymentsURLTitle: LocatorObject = {
   locator: "//h2[contains(text(), 'Cardano Payment URLs')]",
   method: 'xpath',
 };
-export const currencyConversionText: LocatorObject = {
-  locator: "//h2[contains(text(), 'Currency Conversion')]",
-  method: 'xpath',
-};

@@ -317,8 +317,8 @@ function CustomWorld(cmdInput: WorldInput) {
       (k, l, callback) => {
         window.yoroi.translations[l]
           .then(translation => callback(translation[k]))
-          // eslint-disable-next-line no-console
           .catch(e => {
+            // eslint-disable-next-line no-console
             console.error('Intl fail: ', e);
           });
       },
@@ -403,6 +403,11 @@ function CustomWorld(cmdInput: WorldInput) {
     this.webDriverLogger.info(`Webdriver:hoverOnElement: Hovering on element "${JSON.stringify(locator)}"`);
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
+  };
+
+  this.scrollIntoView = async (locator: LocatorObject) => {
+    const element = await this.getElementBy(locator);
+    await this.driver.executeScript('arguments[0].scrollIntoView();', element);
   };
 }
 

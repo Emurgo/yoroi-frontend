@@ -40,7 +40,10 @@ import {
 import { GetDerivationSpecific, } from '../../database/walletTypes/common/api/read';
 import { rawGetAddressRowsForWallet } from '../traitUtils';
 import { isCardanoHaskell, isJormungandr, isErgo } from '../../database/prepackaged/networks';
-
+import {
+  ModifyUtxoAtSafePoint,
+  ModifyUtxoDiffToBestBlock,
+} from '../../database/utxo/api/write';
 
 export async function removePublicDeriver(request: {|
   publicDeriver: IPublicDeriver<>,
@@ -65,6 +68,8 @@ export async function removePublicDeriver(request: {|
     FreeBlocks,
     GetCertificates,
     ModifyTokenList,
+    ModifyUtxoAtSafePoint,
+    ModifyUtxoDiffToBestBlock,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -177,6 +182,17 @@ export async function removePublicDeriver(request: {|
           walletAddressIds
         );
       }
+
+      // 3) remove utxos
+      await ModifyUtxoAtSafePoint.remove(
+        db, dbTx,
+        request.publicDeriver.getPublicDeriverId()
+      );
+      await ModifyUtxoDiffToBestBlock.removeAll(
+        db, dbTx,
+        request.publicDeriver.getPublicDeriverId()
+      );
+
       await deps.RemovePublicDeriver.remove(
         db, dbTx,
         { publicDeriverId: request.publicDeriver.getPublicDeriverId() }
