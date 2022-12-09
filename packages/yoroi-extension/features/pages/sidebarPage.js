@@ -11,6 +11,7 @@ export const stakingButton: LocatorObject = { locator: 'sidebar.staking', method
 export const assetsButton: LocatorObject = { locator: 'sidebar.assets', method: 'id' };
 export const votingButton: LocatorObject = { locator: 'sidebar.voting', method: 'id' };
 export const settingsButton: LocatorObject = { locator: 'sidebar.settings', method: 'id' };
+export const connectorButton: LocatorObject = { locator: 'connector.appNameShort', method: 'id' };
 export const faqButton: LocatorObject = { locator: '.SidebarRevamp_faq', method: 'css' };
 
 // Classic version elements
