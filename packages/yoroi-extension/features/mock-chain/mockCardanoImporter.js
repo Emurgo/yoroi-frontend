@@ -1457,7 +1457,7 @@ export const generateTransaction = (): {|
           ChainDerivations.EXTERNAL,
           1,
         ]),
-        amount: '1',
+        amount: '4500000', //amount: '1', 
         assets: [],
       },
       {
@@ -1466,7 +1466,16 @@ export const generateTransaction = (): {|
         // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
         address:
           '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
-        amount: '5500000',
+        amount: '1000000',
+        assets: [],
+      },
+      {
+        // 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
+        address:
+          '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
+        amount: '4500000',
         assets: [],
       },
     ],
