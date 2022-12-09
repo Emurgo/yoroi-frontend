@@ -364,10 +364,11 @@ export default class WalletSendForm extends Component<Props, State> {
       ({ token }) => token.IsNFT === true
     ).map(({ token }) => {
       const policyId = token.Identifier.split('.')[0];
-      const name = truncateToken(getTokenStrictName(token) ?? '-');
+      const fullName = getTokenStrictName(token);
+      const name = truncateToken(fullName ?? '-');
       return {
         name,
-        image: getImageFromTokenMetadata(policyId, name, token.Metadata),
+        image: getImageFromTokenMetadata(policyId, fullName, token.Metadata),
         info: token,
       };
     });

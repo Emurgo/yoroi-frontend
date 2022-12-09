@@ -25,7 +25,7 @@ type Props = {|
     index: number,
   |}>,
   +onCancelBackup: void => void,
-  +onAcceptPrivacyNotice: void => void,
+  +togglePrivacyNotice: void => void,
   +onContinue: void => void,
   +onBack: void => void,
   +onStartWalletBackup: void => void,
@@ -47,7 +47,7 @@ export default class WalletBackupDialog extends Component<Props> {
     const {
       currentStep, onCancelBackup,
       canPhraseBeShown, isPrivacyNoticeAccepted,
-      countdownRemaining, onAcceptPrivacyNotice,
+      countdownRemaining, togglePrivacyNotice,
       onContinue, onBack, recoveryPhrase,
       onStartWalletBackup, isTermDeviceAccepted,
       enteredPhrase, removeWord, hasWord,
@@ -63,7 +63,7 @@ export default class WalletBackupDialog extends Component<Props> {
           canPhraseBeShown={canPhraseBeShown}
           isPrivacyNoticeAccepted={isPrivacyNoticeAccepted}
           countdownRemaining={countdownRemaining}
-          onAcceptPrivacyNotice={onAcceptPrivacyNotice}
+          togglePrivacyNotice={togglePrivacyNotice}
           onCancelBackup={onCancelBackup}
           onContinue={onContinue}
           classicTheme={classicTheme}

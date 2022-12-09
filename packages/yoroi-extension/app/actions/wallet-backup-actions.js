@@ -11,7 +11,7 @@ export default class WalletBackupActions {
     password: string,
   |}> = new Action();
   continueToPrivacyWarning: Action<void> = new Action();
-  acceptPrivacyNoticeForWalletBackup: Action<void> = new Action();
+  togglePrivacyNoticeForWalletBackup: Action<void> = new Action();
   continueToRecoveryPhraseForWalletBackup: Action<void> = new Action();
   addWordToWalletBackupVerification: Action<{| word: string, index: number |}> = new Action();
   clearEnteredRecoveryPhrase: Action<void> = new Action();

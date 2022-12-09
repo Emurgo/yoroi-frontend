@@ -55,6 +55,7 @@
   "buysell.dialog.manual": "I will add my address manually",
   "buysell.dialog.selectAddress": "Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ",
   "connector.appName": "Dapp Connector",
+  "connector.appNameShort": "Connector",
   "connector.connect.connectedWallets": "Connected Wallets",
   "connector.connect.connectedWallets.active": "Active",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
