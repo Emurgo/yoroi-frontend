@@ -1,39 +1,17 @@
 /* eslint-disable promise/always-return */
 // @flow
-import { observable, action, runInAction, computed } from 'mobx';
-import Request from './lib/LocalizedRequest';
-import Store from './base/Store';
+import { observable, computed } from 'mobx';
+import Request from '../lib/LocalizedRequest';
+import Store from '../base/Store';
 import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
-  ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
-} from '../../chrome/extension/connector/types';
-import type { ActionsMap } from '../actions/index';
-import type { StoresMap } from './index';
-import { getConnectedSites } from '../connector/stores/ConnectorStore';
-
-// Need to run only once - Connecting wallets
-let initedConnecting = false;
-function sendMsgConnect(): Promise<ConnectingMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedConnecting)
-      window.chrome.runtime.sendMessage((
-        { type: 'connect_retrieve_data' }: ConnectRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedConnecting = true;
-        }
-      );
-  });
-}
-
+} from '../../../chrome/extension/connector/types';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
+import { getConnectedSites } from '../../connector/stores/ConnectorStore';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -72,19 +50,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   teardown(): void {
     super.teardown();
   }
-
-  // ========== connecting wallets ========== //
-  @action
-  _getConnectingMsg: () => Promise<void> = async () => {
-    await sendMsgConnect()
-      .then(response => {
-        runInAction(() => {
-          this.connectingMessage = response;
-        });
-      })
-      // eslint-disable-next-line no-console
-      .catch(err => console.error(err));
-  };
 
   // ========== whitelist ========== //
   @computed get currentConnectorWhitelist(): Array<WhitelistEntry> {

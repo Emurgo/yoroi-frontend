@@ -19,6 +19,7 @@ import type {
   TxSignWindowRetrieveData,
   WhitelistEntry,
   GetUtxosRequest,
+  GetConnectionProtocolData,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -75,60 +76,46 @@ import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/Publ
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
+export function connectorCall<T, R>(message: T): Promise<R> {
+  return new Promise((resolve, reject) => {
+    window.chrome.runtime.sendMessage(
+      message,
+      response => {
+        if (window.chrome.runtime.lastError) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject(`Could not establish connection: ${JSON.stringify(typeof message === 'object' ? message : '')}`);
+          return;
+        }
+        resolve(response);
+      }
+    );
+  })
+}
+
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
-function sendMsgConnect(): Promise<ConnectingMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedConnecting)
-      window.chrome.runtime.sendMessage((
-        { type: 'connect_retrieve_data' }: ConnectRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedConnecting = true;
-        }
-      );
-  });
+async function sendMsgConnect(): Promise<?ConnectingMessage> {
+  if (!initedConnecting) {
+    const res = await connectorCall<ConnectRetrieveData, ConnectingMessage>({ type: 'connect_retrieve_data' })
+    initedConnecting = true
+    return res
+  }
 }
 
 // Need to run only once - Sign Tx Confirmation
 let initedSigning = false;
-function sendMsgSigningTx(): Promise<SigningMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'tx_sign_window_retrieve_data' }: TxSignWindowRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedSigning = true;
-        }
-      );
-  });
+async function sendMsgSigningTx(): Promise<?SigningMessage> {
+  if (!initedSigning) {
+    const res = await connectorCall<TxSignWindowRetrieveData, SigningMessage>({
+      type: 'tx_sign_window_retrieve_data',
+    });
+    initedSigning = true;
+    return res;
+  }
 }
 
-export function getProtocol(): Promise<?Protocol> {
-  return new Promise((resolve, reject) => {
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_protocol' }),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_protocol ');
-          }
-
-          resolve(response);
-        }
-      );
-  });
+export async function getProtocol(): Promise<?Protocol> {
+  return connectorCall<GetConnectionProtocolData, Protocol>({ type: 'get_protocol' })
 }
 
 export function getUtxosAndAddresses(
