@@ -59,7 +59,8 @@ class NFTDetailPageRevamp extends Component<AllProps> {
             .filter(item => item.info.IsNFT)
             .map(token => {
               const policyId = token.entry.identifier.split('.')[0];
-              const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+              const fullName = getTokenStrictName(token.info);
+              const name = truncateToken(fullName ?? '-');
               return {
                 policyId,
                 name,
@@ -67,13 +68,13 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 ticker: token.info.Metadata.ticker ?? '-',
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                image: getImageFromTokenMetadata(policyId, name, token.info.Metadata),
+                image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
                 description: getDescriptionFromTokenMetadata(
                   policyId,
-                  name,
+                  fullName,
                   token.info.Metadata
                 ),
-                author: getAuthorFromTokenMetadata(policyId, name, token.info.Metadata),
+                author: getAuthorFromTokenMetadata(policyId, fullName, token.info.Metadata),
                 // $FlowFixMe
                 metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
               };
