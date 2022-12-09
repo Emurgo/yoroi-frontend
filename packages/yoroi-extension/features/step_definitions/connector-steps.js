@@ -29,6 +29,7 @@ import {
 import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
 import { addCollateralTitle } from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
+import { connectorButton } from '../pages/sidebarPage';
 
 const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
@@ -280,9 +281,8 @@ Then(/^The wallet (.+) is connected to the website (.+)$/, async function (walle
     `Step: The wallet ${walletName} is connected to the website ${websiteUrl}`
   );
   await this.windowManager.switchTo(extensionTabName);
-  const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
   // it should be reworked by using ui components when it is done
-  await this.driver.get(connectedWebsitesAddress);
+  await this.click(connectorButton);
   const wallets = await getWalletsWithConnectedWebsites(this);
   const result = wallets.filter(
     wallet => wallet.walletTitle === walletName && wallet.websiteTitle === websiteUrl
@@ -294,9 +294,8 @@ Then(/^The wallet (.+) is connected to the website (.+)$/, async function (walle
 Then(/^I disconnect the wallet (.+) from the dApp (.+)$/, async function (walletName, dAppUrl) {
   this.webDriverLogger.info(`Step: I disconnect the wallet ${walletName} from the dApp ${dAppUrl}`);
   await this.windowManager.switchTo(extensionTabName);
-  const connectedWebsitesAddress = `${this.getExtensionUrl()}#/connector/connected-websites`;
   // it should be reworked by using ui components when it is done
-  await this.driver.get(connectedWebsitesAddress);
+  await this.click(connectorButton);
   await disconnectWallet(this, walletName, dAppUrl);
 });
 

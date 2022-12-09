@@ -49,7 +49,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       finishWalletBackup,
       removeOneMnemonicWord,
       continueToPrivacyWarning,
-      acceptPrivacyNoticeForWalletBackup,
+      togglePrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
     const { createWalletRequest } = stores.wallets;
@@ -63,7 +63,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         canPhraseBeShown={isPrivacyNoticeAccepted && countdownRemaining === 0}
         isPrivacyNoticeAccepted={isPrivacyNoticeAccepted}
         countdownRemaining={countdownRemaining}
-        onAcceptPrivacyNotice={acceptPrivacyNoticeForWalletBackup.trigger}
+        togglePrivacyNotice={togglePrivacyNoticeForWalletBackup.trigger}
         onBack={continueToPrivacyWarning.trigger}
         onContinue={continueToRecoveryPhraseForWalletBackup.trigger}
         // Props for WalletRecoveryPhraseDisplayDialog
@@ -94,7 +94,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
   @computed get generated(): {|
     actions: {|
       walletBackup: {|
-        acceptPrivacyNoticeForWalletBackup: {|
+        togglePrivacyNoticeForWalletBackup: {|
           trigger: (params: void) => void
         |},
         acceptWalletBackupTermDevice: {|
@@ -217,8 +217,8 @@ export default class WalletBackupDialogContainer extends Component<Props> {
           continueToPrivacyWarning: {
             trigger: actions.walletBackup.continueToPrivacyWarning.trigger,
           },
-          acceptPrivacyNoticeForWalletBackup: {
-            trigger: actions.walletBackup.acceptPrivacyNoticeForWalletBackup.trigger,
+          togglePrivacyNoticeForWalletBackup: {
+            trigger: actions.walletBackup.togglePrivacyNoticeForWalletBackup.trigger,
           },
           continueToRecoveryPhraseForWalletBackup: {
             trigger: actions.walletBackup.continueToRecoveryPhraseForWalletBackup.trigger,

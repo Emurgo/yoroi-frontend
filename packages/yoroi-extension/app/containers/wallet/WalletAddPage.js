@@ -142,7 +142,7 @@ class WalletAddPage extends Component<AllProps> {
         onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoMainnet)}
         onCardanoTestnet={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoTestnet)}
         onCardanoPreprodTestnet={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoPreprodTestnet)}
-        onErgo={uiDialogs.isOpen(WalletConnectHWOptionDialog)
+        onErgo={(uiDialogs.isOpen(WalletConnectHWOptionDialog) || uiDialogs.isOpen(WalletCreateOptionDialog))
           ? undefined
           : () => actions.profile.setSelectedNetwork.trigger(networks.ErgoMainnet)}
         onAlonzoTestnet={

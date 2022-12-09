@@ -19,6 +19,7 @@ import type { NetworkRow, CardanoAssetMintMetadata } from '../../../api/ada/lib/
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
+import { urlResolveIpfs } from '../../../coreUtils';
 
 // Overwrite current theme
 // Temporary solution untill the new design system.
@@ -324,7 +325,7 @@ function NFTDetails({
           }}
           onClick={onClose}
         >
-          <img style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }} src={nftInfo.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')} alt={nftInfo.name} title={nftInfo.name} loading='lazy' />
+          <img style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }} src={urlResolveIpfs(nftInfo.image)} alt={nftInfo.name} title={nftInfo.name} loading='lazy' />
         </Box>
       </Modal>
     </Box>

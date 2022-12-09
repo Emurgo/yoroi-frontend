@@ -25,6 +25,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { useState, useEffect } from 'react';
 import globalMessages from '../../../i18n/global-messages';
+import { urlResolveIpfs } from '../../../coreUtils';
 
 type Props = {|
   list: Array<{| id: string, name: string, image: string | null |}>,
@@ -183,7 +184,7 @@ export function NftImage({ imageUrl, name, width, height }: {|
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  let url = imageUrl !== null ? imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/'): null;
+  const url = urlResolveIpfs(imageUrl);
 
   useEffect(() => {
     if (url !== null)

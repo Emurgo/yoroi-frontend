@@ -88,8 +88,8 @@ jobs:
           # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
           # But we put node version into the cache key and cache node_modules.
-          path: packages/yoroi-ergo-connector/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          path: packages/yoroi-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-connector/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -210,8 +210,8 @@ jobs:
           # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
           # But we put node version into the cache key and cache node_modules.
-          path: packages/yoroi-ergo-connector/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          path: packages/yoroi-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-connector/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -301,8 +301,8 @@ jobs:
           # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
           # But we put node version into the cache key and cache node_modules.
-          path: packages/yoroi-ergo-connector/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-ergo-connector/package-lock.json') }}
+          path: packages/yoroi-connector/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-connector/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-

@@ -6,7 +6,7 @@
 
 This project is used only as an example application.
 
-All related to the dApp is moved to the folder `packages/yoroi-extension/app/ergo-connector`.
+All related to the dApp is moved to the folder `packages/yoroi-extension/app/connector`.
 
 ### Testing
 

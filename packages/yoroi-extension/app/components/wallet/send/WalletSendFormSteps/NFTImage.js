@@ -4,6 +4,7 @@ import { Component } from 'react';
 import { ReactComponent as DefaultNFT } from '../../../../assets/images/nft-no.inline.svg';
 import { checkNFTImage } from '../../../../utils/wallet';
 import type { Node } from 'react';
+import { urlResolveIpfs } from '../../../../coreUtils';
 
 type Props = {|
     name: string,
@@ -26,7 +27,7 @@ export default class NFTImage extends Component<Props, State> {
     componentDidMount() {
         const { image } = this.props;
         if (image === null) return
-        const imageUrl = image.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        const imageUrl = urlResolveIpfs(image);
         checkNFTImage(
             imageUrl,
             () => { this.setState({ loading: false, error: false }) },
@@ -38,7 +39,7 @@ export default class NFTImage extends Component<Props, State> {
         const { image, name, width, height } = this.props;
         const { loading, error } = this.state;
         if (image === null || error) return <DefaultNFT />
-        const imageUrl = image.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        const imageUrl = urlResolveIpfs(image);
 
         return (
             loading ? (
