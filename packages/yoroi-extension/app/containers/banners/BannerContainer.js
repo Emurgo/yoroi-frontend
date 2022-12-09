@@ -13,7 +13,7 @@ import environment from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isTestnet, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet, isCardanoHaskell, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
@@ -31,6 +31,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletErgo = selected == null
+      ? false
+      : isErgo(selected.getParent().getNetworkInfo());
 
     const deprecationBanner = this.getDeprecationBanner();
     return (
@@ -44,7 +47,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
-        <TestnetWarningBanner isTestnet={isWalletTestnet} />
+        <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
       </>

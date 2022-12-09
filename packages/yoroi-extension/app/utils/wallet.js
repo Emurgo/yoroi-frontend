@@ -63,11 +63,12 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
     .filter(token => token.info.IsNFT)
     .map(token => {
         const policyId = token.entry.identifier.split('.')[0];
-        const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+        const fullName = getTokenStrictName(token.info);
+        const name = truncateToken(fullName ?? '-');
         return {
             name,
             id: getTokenIdentifierIfExists(token.info) ?? '-',
-            image: getImageFromTokenMetadata(policyId, name, token.info.Metadata),
+            image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
             info: token.info,
         };
     });
