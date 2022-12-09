@@ -29,7 +29,7 @@
   }
 }
 
-:global(.YoroiModern):not(:global(.YoroiShelley)), :global(.YoroiRevamp) .component {
+:global(.YoroiModern):not(:global(.YoroiShelley)) .component, :global(.YoroiRevamp):not(:global(.YoroiShelley)) .component {
   .successImg {
     background-image: url('../../assets/images/transfer-success.inline.svg');
     background-size: auto;
@@ -39,7 +39,7 @@
     margin: auto;
   }
 }
-:global(.YoroiModern):global(.YoroiShelley) .component {
+:global(.YoroiModern):global(.YoroiShelley) .component, :global(.YoroiRevamp):global(.YoroiShelley) .component {
   .successImg {
     background-image: url('../../assets/images/transfer-success-shelley.inline.svg');
     background-size: auto;

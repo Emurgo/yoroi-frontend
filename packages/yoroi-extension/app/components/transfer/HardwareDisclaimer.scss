@@ -35,7 +35,7 @@
   }
 }
 
-:global(.YoroiModern) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .headerIcon {
     content: url(../../assets/images/attention-modern.inline.svg);
   }

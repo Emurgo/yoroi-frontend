@@ -27,6 +27,7 @@ import { removeAllTransactions } from './bridge/updateTransactions';
 import { removePublicDeriver } from './bridge/walletBuilder/remove';
 import {
   asHasLevels,
+  asGetAllUtxos,
 } from './models/PublicDeriver/traits';
 import {
   ConceptualWallet,
@@ -41,6 +42,13 @@ import {
 import {
   isCardanoHaskell, isErgo, networks
 } from './database/prepackaged/networks';
+import {
+  getAllSchemaTables,
+  raii,
+} from './database/utils';
+import type { BlockRow } from './database/primitives/tables';
+import { GetBlock } from './database/primitives/api/read';
+import { ModifyUtxoAtSafePoint } from './database/utxo/api/write';
 
 export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
@@ -110,6 +118,9 @@ export async function migrateToLatest(
     }],
     ['<3.9.6', async () => {
       return await ergoTxHistoryReset(persistentDb);
+    }],
+    ['<4.18', async () => {
+      return await populateNewUtxodata(persistentDb);
     }],
   ];
 
@@ -357,6 +368,118 @@ export async function ergoTxHistoryReset(
       throw new Error(`${nameof(ergoTxHistoryReset)} missing levels`);
     }
     await removeAllTransactions({ publicDeriver: withLevels });
+  }
+
+  return true;
+}
+
+export async function populateNewUtxodata(
+  persistentDb: lf$Database,
+): Promise<boolean> {
+  const wallets = await loadWalletsFromStorage(persistentDb);
+  if (wallets.length === 0) {
+    return false;
+  }
+
+  for (const publicDeriver of wallets) {
+    try {
+      if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+        continue;
+      }
+
+      const withGetAllUtxos = asGetAllUtxos(publicDeriver);
+      if (!withGetAllUtxos) {
+        throw new Error('unexpected missing trait');
+      }
+
+      const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+      const utxos = await withGetAllUtxos.getAllUtxosFromOldDb();
+
+      const blockIds = utxos.map(utxo => {
+        // We are using the old getAllUtxos, it does have the BlockId field
+        // $FlowFixMe[prop-missing]
+        const blockId = utxo.output.Transaction.BlockId;
+        if (blockId == null) {
+          throw new Error('expect transaction to have block ID');
+        }
+        return blockId;
+      });
+
+      const db = publicDeriver.getDb();
+      const blocks = await raii<$ReadOnlyArray<$ReadOnly<BlockRow>>>(
+        db,
+        getAllSchemaTables(db, GetBlock),
+        tx => GetBlock.byIds(db, tx, blockIds)
+      );
+      // block ID => block height
+      const blockMap = new Map<number, number>(
+        blocks.map(block => [block.BlockId, block.Height])
+      );
+      const newUtxos = utxos.map(utxo => {
+        const txIndex = utxo.output.UtxoTransactionOutput.OutputIndex;
+        const txHash = utxo.output.Transaction.Hash;
+        const defaultTokenId = '';
+        const isDefaultToken = token => token.Token.Identifier === defaultTokenId;
+        const defaultToken = utxo.output.tokens.find(isDefaultToken);
+        const assets = utxo.output.tokens
+          .filter(token => !isDefaultToken(token))
+          .map(token => {
+            const { Metadata } = token.Token;
+            if (Metadata.type !== 'Cardano') {
+              throw new Error('unexpected token metadata type');
+            }
+            return {
+              assetId: token.Token.Identifier,
+              policyId: Metadata.policyId,
+              name: Metadata.assetName,
+              amount: token.TokenList.Amount,
+            }
+          });
+        // We are using the old getAllUtxos, it does have the BlockId field
+        // $FlowFixMe[prop-missing]
+        const blockId = utxo.output.Transaction.BlockId;
+        if (blockId == null) {
+          throw new Error('expect transaction to have block ID');
+        }
+        const blockNum = blockMap.get(blockId);
+        if (blockNum == null) {
+          throw new Error(`can't find block info for ${blockId}`);
+        }
+        if (defaultToken == null) {
+          throw new Error(`missing default token`);
+        }
+        return {
+          utxoId: `${txHash}${txIndex}`,
+          txHash,
+          txIndex,
+          receiver: utxo.address,
+          amount: defaultToken.TokenList.Amount,
+          assets,
+          blockNum
+        };
+      });
+      const blockHash = lastSyncInfo.BlockHash;
+      if (blockHash == null) {
+        throw new Error('missing block hash');
+      }
+      await raii<void>(
+        db,
+        getAllSchemaTables(db, ModifyUtxoAtSafePoint),
+        tx => ModifyUtxoAtSafePoint.addOrReplace(
+          db,
+          tx,
+          publicDeriver.getPublicDeriverId(),
+          {
+            lastSafeBlockHash: blockHash,
+            utxos: newUtxos
+          }
+        )
+      );
+    } catch(error) {
+       Logger.warn(`UTXO storage migration failed: ${error}`);
+       // It's OK to leave the UTXO storage empty, as Yoroi-lib UtxoService will
+       // sync from the beginning
+    }
   }
 
   return true;

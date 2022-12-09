@@ -27,5 +27,10 @@
     background-color: #f0f3f5;
     padding: 10px;
     border-radius: 8px;
+
+    canvas {
+      max-width: 160px;
+      max-height: 160px;
+    }
   }
 }

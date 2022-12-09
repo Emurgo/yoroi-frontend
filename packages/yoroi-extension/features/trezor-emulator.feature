@@ -12,7 +12,7 @@ Feature: Trezor wallet emulator
     Then I should see a plate PXCA-2349
 
   @Trezor-001
-  Scenario: Trezor (emulator). Send ADA.
+  Scenario: Trezor (emulator). Send ADA. (Trezor-001)
     Given I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -29,7 +29,7 @@ Feature: Trezor wallet emulator
     Then I should see the summary screen
 
   @Trezor-002
-  Scenario: Trezor (emulator). Verify address.
+  Scenario: Trezor (emulator). Verify address. (Trezor-002)
     When I go to the receive screen
     Given I should see the Receive screen
     And I click on the verify address button
@@ -38,7 +38,7 @@ Feature: Trezor wallet emulator
     And I verify the address on the trezor emulator
 
   @Trezor-003
-  Scenario: Trezor (emulator). Test Shelley Trezor delegation
+  Scenario: Trezor (emulator). Test Shelley Trezor delegation. (Trezor-003)
     When I go to the delegation by id screen
     And I fill the delegation id form:
       | stakePoolId                                              |
@@ -54,7 +54,7 @@ Feature: Trezor wallet emulator
     Then I should see the dashboard screen
 
   @Trezor-004
-  Scenario: Trezor (emulator). Withdraw rewards w/ deregistration.
+  Scenario: Trezor (emulator). Withdraw rewards w/ deregistration. (Trezor-004)
     When I go to the dashboard screen
     And I click on the withdraw button
     And I click on the checkbox
@@ -71,7 +71,7 @@ Feature: Trezor wallet emulator
     Then I should see the transactions screen
 
   @Trezor-005
-  Scenario: Trezor (emulator). Send Assets.
+  Scenario: Trezor (emulator). Send Assets. (Trezor-005)
     Given I go to the send transaction screen
     And I select the asset "nicoin" on the form
     And I fill the form:
@@ -89,8 +89,8 @@ Feature: Trezor wallet emulator
     Then I should see the summary screen
 
   @Trezor-006
-  Scenario: Trezor (emulator). User can transfer funds from a trezor wallet
-    Given I switch to the advanced level
+  Scenario: Trezor (emulator). User can transfer funds from a trezor wallet. (Trezor-006)
+    Given I switched to the advanced level
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab

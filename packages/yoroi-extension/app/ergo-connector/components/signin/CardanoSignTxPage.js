@@ -2,9 +2,9 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button, Typography, Alert } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -23,7 +23,7 @@ import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database
 import {
   getTokenName,
   getTokenIdentifierIfExists,
-  assetNameFromIdentifier
+  assetNameFromIdentifier,
 } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -35,10 +35,7 @@ import type {
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../../chrome/extension/ergo-connector/types';
-import type {
-  CardanoConnectorSignRequest,
-  SignSubmissionErrorType
-} from '../../types';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
@@ -46,7 +43,7 @@ import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
-import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,
@@ -64,7 +61,6 @@ type Props = {|
   +shouldHideBalance: boolean,
   +selectedWallet: PublicDeriverCache,
   +connectedWebsite: ?WhitelistEntry,
-  +isReorg: boolean,
   +submissionError: ?SignSubmissionErrorType,
   +signData: ?{| address: string, payload: string |},
 |};
@@ -74,14 +70,6 @@ const messages = defineMessages({
     id: 'api.errors.IncorrectPasswordError',
     defaultMessage: '!!!Incorrect wallet password.',
   },
-  reorgTitle: {
-    id: 'connector.signin.reorg.title',
-    defaultMessage: '!!!Add Collateral',
-  },
-  reorgMessage: {
-    id: 'connector.signin.reorg.message',
-    defaultMessage: '!!!<span>Collateral is a guarantee that prevents smart contract transaction failings and scams. It means you should make a 0 ADA transaction to generate collateral. <a>Learn more</a> about collateral.</span>'
-  },
   sendError: {
     id: 'connector.signin.error.sendError',
     defaultMessage: '!!!An error occured when sending the transaction.',
@@ -90,7 +78,7 @@ const messages = defineMessages({
 
 type State = {|
   isSubmitting: boolean,
-|}
+|};
 
 @observer
 class SignTxPage extends Component<Props, State> {
@@ -100,7 +88,7 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     isSubmitting: false,
-  }
+  };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -139,18 +127,21 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true })
-        this.props.onConfirm(walletPassword).finally(() => {
-          this.setState({ isSubmitting: false });
-        }).catch(error => {
-          if (error instanceof WrongPassphraseError) {
-            this.form.$('walletPassword').invalidate(
-              this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
-            )
-          } else {
-            throw error;
-          }
-        });
+        this.setState({ isSubmitting: true });
+        this.props
+          .onConfirm(walletPassword)
+          .finally(() => {
+            this.setState({ isSubmitting: false });
+          })
+          .catch(error => {
+            if (error instanceof WrongPassphraseError) {
+              this.form
+                .$('walletPassword')
+                .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+            } else {
+              throw error;
+            }
+          });
       },
       onError: () => {},
     });
@@ -206,18 +197,17 @@ class SignTxPage extends Component<Props, State> {
     }
 
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
-    const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
-    const ticker = tokenInfo ? this.getTicker(tokenInfo)
+    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
+    const ticker = tokenInfo
+      ? this.getTicker(tokenInfo)
       : assetNameFromIdentifier(request.entry.identifier);
 
     let fiatAmountDisplay = null;
 
+    // this is a feature flag
     if (false && this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(
-        getTokenName(tokenInfo),
-        currency
-      );
+      const price = this.props.getCurrentPrice(getTokenName(tokenInfo), currency);
       if (price != null) {
         const fiatAmount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = fiatAmount.split('.');
@@ -230,10 +220,7 @@ class SignTxPage extends Component<Props, State> {
         fiatAmountDisplay = (
           <>
             <span>{beforeDecimalSigned}</span>
-            {afterDecimal && (
-              <span>.{afterDecimal}</span>
-            )}
-            {' '}{currency}
+            {afterDecimal && <span>.{afterDecimal}</span>} {currency}
           </>
         );
       }
@@ -258,23 +245,14 @@ class SignTxPage extends Component<Props, State> {
     if (fiatAmountDisplay) {
       return (
         <>
-          <div>
-            {fiatAmountDisplay}
-          </div>
-          <div>
-            {cryptoAmountDisplay}
-          </div>
+          <div>{fiatAmountDisplay}</div>
+          <div>{cryptoAmountDisplay}</div>
         </>
       );
     }
-    return (
-      <>
-        <div>
-          {cryptoAmountDisplay}
-        </div>
-      </>
-    );
-  }
+
+    return <div>{cryptoAmountDisplay}</div>;
+  };
 
   renderRow: ({|
     kind: string,
@@ -350,14 +328,7 @@ class SignTxPage extends Component<Props, State> {
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const {
-      txData,
-      onCancel,
-      connectedWebsite,
-      isReorg,
-      submissionError,
-      signData,
-    } = this.props;
+    const { txData, onCancel, connectedWebsite, signData } = this.props;
 
     const { isSubmitting } = this.state;
 
@@ -388,13 +359,13 @@ class SignTxPage extends Component<Props, State> {
             <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="center"
+              alignItems="flex-start"
               color="var(--yoroi-palette-gray-600)"
               py="6px"
               px="10px"
             >
               <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-              <Typography>
+              <Typography textAlign='right'>
                 {this.renderAmountDisplay({
                   entry: {
                     identifier: txData.fee.tokenId,
@@ -410,13 +381,13 @@ class SignTxPage extends Component<Props, State> {
               mt="10px"
               display="flex"
               justifyContent="space-between"
-              alignItems="center"
+              alignItems="flex-start"
               borderRadius="6px"
               backgroundColor="var(--yoroi-palette-primary-300)"
               color="var(--yoroi-palette-common-white)"
             >
               <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
-              <Typography variant="h3">
+              <Typography variant="h3" textAlign='right'>
                 {this.renderAmountDisplay({
                   entry: {
                     identifier: txAmountDefaultToken,
@@ -458,9 +429,7 @@ class SignTxPage extends Component<Props, State> {
             border="1px solid var(--yoroi-palette-gray-100)"
             borderRadius="6px"
           >
-            <pre>
-              {this.renderPayload(signData.payload)}
-            </pre>
+            <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
         </Box>
       );
@@ -473,65 +442,66 @@ class SignTxPage extends Component<Props, State> {
       <SignTxTabs
         overviewContent={
           <Box paddingTop="8px" overflowWrap="break-word">
-            {isReorg && (
-              <>
-                <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-                  {intl.formatMessage(messages.reorgTitle)}
-                </Typography>
-                <Typography>
-                  <FormattedHTMLMessage {...messages.reorgMessage} />
-                </Typography>
-              </>
-            )}
-            <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-              {intl.formatMessage(signTxMessages.connectedTo)}
-            </Typography>
-            <Box
-              display="flex"
-              alignItems="center"
-              px="28px"
-              py="20px"
-              border="1px solid var(--yoroi-palette-gray-100)"
-              borderRadius="6px"
-              minHeight="88px"
-              mb="8px"
-            >
-              <Box
-                sx={{
-                  marginRight: '12px',
-                  width: '32px',
-                  height: '32px',
-                  border: '1px solid #a7afc0',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: '#f8f8f8',
-                  img: {
-                    width: '20px',
-                  },
-                }}
-              >
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
-              </Box>
-              <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
-                {url}
+            <Box mb="20px" mt="20px">
+              <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+                {intl.formatMessage(signTxMessages.connectedTo)}
               </Typography>
-            </Box>
-            <Box
-              display="flex"
-              alignItems="center"
-              px="28px"
-              py="20px"
-              border="1px solid var(--yoroi-palette-gray-100)"
-              borderRadius="6px"
-              minHeight="88px"
-            >
-              <WalletCard
-                shouldHideBalance={this.props.shouldHideBalance}
-                publicDeriver={this.props.selectedWallet}
-                getTokenInfo={this.props.getTokenInfo}
-              />
+              <Box
+                display="flex"
+                alignItems="center"
+                px="28px"
+                py="20px"
+                border="1px solid var(--yoroi-palette-gray-100)"
+                borderRadius="6px"
+                minHeight="88px"
+                mb="8px"
+              >
+                <Box
+                  sx={{
+                    marginRight: '12px',
+                    width: '32px',
+                    height: '32px',
+                    border: '1px solid #a7afc0',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#f8f8f8',
+                    img: {
+                      width: '20px',
+                    },
+                  }}
+                >
+                  {faviconUrl != null && faviconUrl !== '' ? (
+                    <img src={faviconUrl} alt={`${url} favicon`} />
+                  ) : (
+                    <NoDappIcon />
+                  )}
+                </Box>
+                <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
+                  {url}
+                </Typography>
+              </Box>
+              <Box
+                display="flex"
+                alignItems="center"
+                px="28px"
+                py="20px"
+                border="1px solid var(--yoroi-palette-gray-100)"
+                borderRadius="6px"
+                minHeight="88px"
+              >
+                <WalletCard
+                  shouldHideBalance={this.props.shouldHideBalance}
+                  publicDeriver={this.props.selectedWallet}
+                  getTokenInfo={this.props.getTokenInfo}
+                  getCurrentPrice={(_from, _to) => null}
+                  unitOfAccountSetting={({
+                    enabled: false,
+                    currency: null,
+                  })}
+                />
+              </Box>
             </Box>
             {content}
             <Box mt="46px">
@@ -540,18 +510,7 @@ class SignTxPage extends Component<Props, State> {
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
               />
-              {isReorg && (submissionError === 'SEND_TX_ERROR') && (
-                <Alert severity="error">
-                  {intl.formatMessage(messages.sendError)}
-                </Alert>
-              )}
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gridGap: '15px',
-                }}
-              >
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '15px' }}>
                 <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
                   {intl.formatMessage(globalMessages.cancel)}
                 </Button>

@@ -36,14 +36,14 @@
   }
 }
 
-:global(.YoroiModern) .component {
-  padding: 30px;
-
-  .poolIdInput {
-    letter-spacing: 0;
-  }
-
-  .nextButton {
-    margin: 20px auto 0;
-  }
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .component {
+    padding: 30px;
+    .poolIdInput {
+      letter-spacing: 0;
+    }
+    .nextButton {
+      margin: 20px auto 0;
+    }
+  } 
 }

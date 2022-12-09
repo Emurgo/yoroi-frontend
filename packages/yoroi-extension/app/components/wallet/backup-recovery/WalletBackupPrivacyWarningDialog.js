@@ -30,7 +30,7 @@ type Props = {|
   +countdownRemaining: number,
   +canPhraseBeShown: boolean,
   +isPrivacyNoticeAccepted: boolean,
-  +onAcceptPrivacyNotice: void => void,
+  +togglePrivacyNotice: void => void,
   +onContinue: void => void,
   +onCancelBackup: void => void,
   +classicTheme: boolean
@@ -48,7 +48,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
     const {
       countdownRemaining,
       canPhraseBeShown,
-      onAcceptPrivacyNotice,
+      togglePrivacyNotice,
       onCancelBackup,
       isPrivacyNoticeAccepted,
       onContinue,
@@ -85,7 +85,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         <div className={styles.checkbox}>
           <CheckboxLabel
             label={intl.formatMessage(messages.termNobodyWatching)}
-            onChange={onAcceptPrivacyNotice}
+            onChange={togglePrivacyNotice}
             checked={isPrivacyNoticeAccepted}
             labelSx={{ fontSize: '0.875rem' }}
             sx={{ marginTop: '20px' }}

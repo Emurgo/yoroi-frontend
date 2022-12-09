@@ -2,8 +2,16 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  PublicDeriverCache,
+  ConnectingMessage,
+} from '../../../../chrome/extension/ergo-connector/types';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { intlShape, defineMessages } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
@@ -11,25 +19,20 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type {
-  PublicDeriverCache,
-  ConnectingMessage,
-} from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
-import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { environment } from '../../../environment';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors'
-import { ReactComponent as NoWalletImage }  from '../../assets/images/no-websites-connected.inline.svg'
-import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { ReactComponent as NoWalletImage } from '../../assets/images/no-websites-connected.inline.svg';
+import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 
 const messages = defineMessages({
   subtitle: {
@@ -42,7 +45,8 @@ const messages = defineMessages({
   },
   connectWalletAuthRequest: {
     id: 'ergo-connector.label.connectWalletAuthRequest',
-    defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
+    defaultMessage:
+      '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
   },
   connectWalletNoHardwareSupported: {
     id: 'ergo-connector.label.connectWalletNoHardwareSupported',
@@ -96,6 +100,9 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
+  +unitOfAccount: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?string,
+  +onUpdateHideBalance: void => Promise<void>,
 |};
 
 @observer
@@ -138,9 +145,9 @@ class ConnectPage extends Component<Props> {
   );
 
   hidePasswordForm: void => void = () => {
-    this.form.$('walletPassword').clear()
-    this.props.hidePasswordForm()
-  }
+    this.form.$('walletPassword').clear();
+    this.props.hidePasswordForm();
+  };
 
   submit: void => void = () => {
     this.form.submit({
@@ -150,9 +157,9 @@ class ConnectPage extends Component<Props> {
         if (deriver && checksum) {
           this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
             if (error instanceof WrongPassphraseError) {
-              this.form.$('walletPassword').invalidate(
-                this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
-              )
+              this.form
+                .$('walletPassword')
+                .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
             } else {
               throw error;
             }
@@ -169,11 +176,11 @@ class ConnectPage extends Component<Props> {
 
   onCreateWallet: void => void = () => {
     window.chrome.tabs.create({
-      url: `${window.location.origin}/main_window.html#/wallets/add`
-    })
+      url: `${window.location.origin}/main_window.html#/wallets/add`,
+    });
 
-    this.props.onCancel()
-  }
+    this.props.onCancel();
+  };
 
   render(): Node {
     const { intl } = this.context;
@@ -186,6 +193,7 @@ class ConnectPage extends Component<Props> {
       network,
       shouldHideBalance,
       isAppAuth,
+      onUpdateHideBalance,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -213,7 +221,7 @@ class ConnectPage extends Component<Props> {
             </button>
           </div>
         </div>
-      )
+      );
     }
 
     const walletPasswordField = this.form.$('walletPassword');
@@ -221,26 +229,21 @@ class ConnectPage extends Component<Props> {
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
 
     const passwordForm = (
-      <>
+      <Box p="26px">
         <div>
-          <Typography
-            variant="h4"
-            align='center'
-            color="var(--yoroi-palette-gray-900)"
-            marginBottom="40px"
-            paddingLeft="32px"
-            fontWeight="400"
-          >
-            {intl.formatMessage(messages.connectWalletAuthRequest)}
-          </Typography>
           <TextField
             type="password"
             {...walletPasswordField.bind()}
             error={walletPasswordField.error}
           />
         </div>
-        <Stack direction="row" spacing={2} mt="15px">
-          <Button fullWidth variant="secondary" onClick={this.hidePasswordForm} sx={{ minWidth: 'auto' }}>
+        <Stack direction="row" spacing={4} mt="15px">
+          <Button
+            fullWidth
+            variant="secondary"
+            onClick={this.hidePasswordForm}
+            sx={{ minWidth: 'auto' }}
+          >
             {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
           <Button
@@ -253,7 +256,7 @@ class ConnectPage extends Component<Props> {
             {intl.formatMessage(globalMessages.confirm)}
           </Button>
         </Stack>
-      </>
+      </Box>
     );
 
     return (
@@ -273,7 +276,11 @@ class ConnectPage extends Component<Props> {
             </Typography>
             <div className={styles.connectWrapper}>
               <div className={styles.image}>
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} />: <NoDappIcon />}
+                {faviconUrl != null && faviconUrl !== '' ? (
+                  <img src={faviconUrl} alt={`${url} favicon`} />
+                ) : (
+                  <NoDappIcon />
+                )}
               </div>
               <Box marginTop="16px">
                 <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-900)">
@@ -286,65 +293,63 @@ class ConnectPage extends Component<Props> {
             </div>
           </>
         ) : null}
-        <Box flex={1} padding="0 32px 17px">
+        <Box flex={1} padding="0 10px 18px">
           {isAppAuth ? (
             passwordForm
           ) : (
             <>
-              <Box borderBottom="1px solid #dce0e9">
-                {isError ? <div className={styles.errorMessage}>{error}</div> : null}
-                {isLoading ? (
-                  <div className={styles.loading}>
-                    <LoadingSpinner />
-                  </div>
-                ) : hasWallets ? (
-                  <Box>
-                    <Typography
-                      variant="h5"
-                      fontWeight="300"
-                      color="var(--yoroi-palette-gray-600)"
-                      mb="14px"
-                    >
+              {isError ? <div className={styles.errorMessage}>{error}</div> : null}
+              {isLoading ? (
+                <div className={styles.loading}>
+                  <LoadingSpinner />
+                </div>
+              ) : hasWallets ? (
+                <Box>
+                  <div className={styles.titleWallet}>
+                    <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-600)">
                       {intl.formatMessage(messages.yourWallets)}
                     </Typography>
-                    <ul className={styles.list}>
-                      {publicDerivers.map(item => (
-                        <li
-                          key={item.publicDeriver.getPublicDeriverId()}
-                          className={styles.listItem}
+                    <button
+                      type="button"
+                      className={styles.toggleButton}
+                      onClick={onUpdateHideBalance}
+                    >
+                      {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+                    </button>
+                  </div>
+
+                  <ul className={styles.list}>
+                    {publicDerivers.map(item => (
+                      <li key={item.publicDeriver.getPublicDeriverId()} className={styles.listItem}>
+                        <WalletButton
+                          onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
                         >
-                          <WalletButton
-                            onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
-                          >
-                            <WalletCard
-                              shouldHideBalance={shouldHideBalance}
-                              publicDeriver={item}
-                              getTokenInfo={this.props.getTokenInfo}
-                            />
-                          </WalletButton>
-                        </li>
-                      ))}
-                    </ul>
-                  </Box>
-                ) : null}
-              </Box>
-              <Typography
-                align='left'
-                color="var(--yoroi-palette-gray-600)"
-                marginTop="20px"
-              >
-                {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
-              </Typography>
+                          <WalletCard
+                            shouldHideBalance={shouldHideBalance}
+                            publicDeriver={item}
+                            getTokenInfo={this.props.getTokenInfo}
+                            unitOfAccountSetting={this.props.unitOfAccount}
+                            getCurrentPrice={this.props.getCurrentPrice}
+                          />
+                        </WalletButton>
+                      </li>
+                    ))}
+                  </ul>
+                </Box>
+              ) : null}
             </>
           )}
         </Box>
-
-        {hasWallets && isAppAuth ? (
+        {hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
-            <div className={styles.infoText}>
-              <p>{intl.formatMessage(messages.connectInfo)}</p>
-              <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
-            </div>
+            <p className={styles.infoText}>
+              {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
+            </p>
+
+            <p className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</p>
+            <p className={styles.infoText}>
+              {intl.formatMessage(connectorMessages.messageReadOnly)}
+            </p>
           </div>
         ) : null}
       </div>

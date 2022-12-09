@@ -168,6 +168,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
   },
+  smartContracts: {
+    id: 'global.labels.smartContracts',
+    defaultMessage: '!!!Smart contracts',
+  },
   walletLabel: {
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
@@ -1009,8 +1013,13 @@ export const connectorMessages: * = defineMessages({
   },
   dappConnector: {
     id: 'connector.appName',
-    defaultMessage: 'Dapp Connector',
+    defaultMessage: '!!!Dapp Connector',
   },
+  connector: {
+    id: 'connector.appNameShort',
+    defaultMessage: '!!!Connector'
+  }
+
 });
 
 export function listOfTranslators(contributorsList: string, contributorsAck: string): string {
