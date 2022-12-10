@@ -1,13 +1,9 @@
 // @flow
 import { observer } from 'mobx-react';
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import type { ComponentType, Node } from 'react';
-import {
-  genLookupOrFail,
-  getTokenIdentifierIfExists,
-  getTokenStrictName,
-} from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName, } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import { computed } from 'mobx';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
@@ -15,7 +11,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
-import type { Match, Location } from 'react-router-dom';
+import type { Location, Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
@@ -75,8 +71,8 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                   token.info.Metadata
                 ),
                 author: getAuthorFromTokenMetadata(policyId, fullName, token.info.Metadata),
-                // $FlowFixMe
-                metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
+                // $FlowFixMe[prop-missing]
+                metadata: token.info.Metadata.assetMintMetadata?.[0] || null,
               };
             });
 
@@ -85,11 +81,11 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const nftsCount = nftsList.length;
     const nftInfo = nftsList[currentNftIdx];
 
-    const nextNftId = currentNftIdx === nftsCount - 1 ?
-    nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id
-
-    const prevNftId = currentNftIdx === 0 ?
-    nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id
+    const lastIndex = nftsCount - 1;
+    // $FlowFixMe[unnecessary-optional-chain]
+    const nextNftId = nftsList[currentNftIdx === lastIndex ? 0 : currentNftIdx + 1]?.id;
+    // $FlowFixMe[unnecessary-optional-chain]
+    const prevNftId = nftsList[currentNftIdx === 0 ? lastIndex : currentNftIdx - 1]?.id;
 
     const urlPrams = new URLSearchParams(this.props.location.search);
     const tab = urlPrams.get('tab')

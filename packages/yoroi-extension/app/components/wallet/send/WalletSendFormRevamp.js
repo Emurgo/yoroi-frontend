@@ -347,10 +347,10 @@ export default class WalletSendForm extends Component<Props, State> {
     const tokens = plannedTxInfoMap.filter(
       ({ token }) => token.IsNFT === false && token.IsDefault === false
     ).map(({ token, amount }) => {
-      const formattedAmount = amount ? new BigNumber(amount)
+      const formattedAmount = amount == null ? undefined : new BigNumber(amount)
         .shiftedBy(-token.Metadata.numberOfDecimals)
         .decimalPlaces(token.Metadata.numberOfDecimals)
-        .toString(): undefined;
+        .toString();
 
       return {
         label: truncateToken(getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'),
@@ -429,7 +429,7 @@ export default class WalletSendForm extends Component<Props, State> {
       defaultNetworkId: this.props.defaultToken.NetworkId,
     });
 
-    const amountInputError = transactionFeeError || amountField.error;
+    const amountInputError = transactionFeeError ?? amountField.error;
     const [tokens, nfts] = this.getTokensAndNFTs(totalAmount);
 
     const defaultTokenInfo = this.props.getTokenInfo({
@@ -542,10 +542,8 @@ export default class WalletSendForm extends Component<Props, State> {
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning
                     ])}
                     onClick={() => {
-                      const hasTokens = (
-                        spendableBalance && spendableBalance.nonDefaultEntries().length !== 0
-                      )
-                      if (hasTokens || !spendableBalance) {
+                      const hasTokens = spendableBalance && spendableBalance.nonDefaultEntries().length !== 0
+                      if (hasTokens === true || !spendableBalance) {
                         this.props.calculateMaxAmount()
                         return
                       }

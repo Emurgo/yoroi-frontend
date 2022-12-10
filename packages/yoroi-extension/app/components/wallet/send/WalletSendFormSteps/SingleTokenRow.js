@@ -83,8 +83,7 @@ export default class SingleTokenRow extends Component<Props> {
             </div>
             <div className={styles.amountInput}>
               <AmountInputRevamp
-                value={!amount ? null
-                : formattedAmountToBigNumber(amount)}
+                value={amount == null ? null : formattedAmountToBigNumber(amount)}
                 onChange={this.onAmountUpdate.bind(this)}
                 decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp

@@ -18,9 +18,9 @@
 flow/declarations/
 
 [lints]
-sketchy-null=warn
+sketchy-null=error
 sketchy-number=warn
-unnecessary-optional-chain=warn
+unnecessary-optional-chain=error
 ambiguous-object-type=error
 unnecessary-invariant=warn
 deprecated-utility=error

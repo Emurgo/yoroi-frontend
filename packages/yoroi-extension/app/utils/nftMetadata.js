@@ -20,14 +20,15 @@ export function find721metadata(
     return null;
   }
   const metadata = metadataWrapper['721'];
-  if (metadata.version && metadata.version !== '1.0') {
+  if (metadata.version != null && metadata.version !== '1.0') {
     return null;
   }
 
   const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
     c => String.fromCharCode(c)
   ).join('');
-  const asset: any = metadata[policyId]?.[assetName] || metadata[policyId]?.[assetNameHex];
+  const assetEntry = metadata[policyId] ?? {};
+  const asset: any = assetEntry[assetName] || assetEntry[assetNameHex];
   if (!asset) {
     return null;
   }

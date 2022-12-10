@@ -378,7 +378,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     const { walletType } = this.props;
     if (walletType === 'mnemonic') {
       const { txError }  = this.state;
-      if (txError) {
+      if (txError != null) {
         return (
           <div className={styles.txError}>
             {txError}

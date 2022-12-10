@@ -547,7 +547,7 @@ const yoroiMessageHandler = async (
     if (connection?.status?.requestType != null) {
       if (request.accepted === true) {
         connectContinuation(
-          connection?.status?.requestType,
+          connection.status.requestType,
           request.publicDeriverId,
           request.auth,
           tabId,
@@ -559,7 +559,7 @@ const yoroiMessageHandler = async (
         await setConnectedSite(tabId, connection);
       } else {
         connectContinuation(
-          connection?.status?.requestType,
+          connection.status.requestType,
           null,
           null,
           tabId,
@@ -649,7 +649,7 @@ const yoroiMessageHandler = async (
           return;
         }
         const { returnTx } = responseData.continuationData;
-        if (!returnTx && resp?.ok != null) {
+        if (!returnTx && resp.ok != null) {
           const witnessSetResp = Buffer.from(
             RustModule.WalletV4.Transaction.from_bytes(
               Buffer.from(resp.ok, 'hex'),
@@ -1638,7 +1638,7 @@ async function handleInjectorMessage(message, sender) {
               const nfts = {};
 
               for (const metadata of tokenMetadata) {
-                if (!metadata.IsNFT) {
+                if (metadata.IsNFT == null || metadata.IsNFT === false) {
                   continue;
                 }
                 if (metadata.Metadata.type !== 'Cardano') {

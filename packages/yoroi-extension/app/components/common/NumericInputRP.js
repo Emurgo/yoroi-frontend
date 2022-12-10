@@ -14,6 +14,7 @@ import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import styles from './AmountInput.scss'
+import { isEmptyOrNullString } from '../../coreUtils';
 
 type NumericInputValue = null | number | string | BigNumber;
 
@@ -507,7 +508,7 @@ class AmountInput extends Component<AmountInputProps> {
             textTransform: 'uppercase',
           }}
         >
-          {(error === null || error === '') && total ? `= ${total.toString()} ` : null}
+          {isEmptyOrNullString(error) && total != null ? `= ${total.toString()} ` : null}
           {currency}
         </Typography>
       </Box>

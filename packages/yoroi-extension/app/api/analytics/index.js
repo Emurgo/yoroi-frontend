@@ -22,7 +22,7 @@ export async function trackStartup(stores_: StoresMap): Promise<void> {
   let event;
   if (await (new LocalStorageApi()).getUserLocale() != null) {
     INSTANCE_ID = await loadAnalyticsInstanceId();
-    if (INSTANCE_ID) {
+    if (INSTANCE_ID != null) {
       emitEvent(INSTANCE_ID, 'launch');
       return;
     }

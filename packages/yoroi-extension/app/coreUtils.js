@@ -26,6 +26,22 @@ export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
  * In any other case there will be no change in the returned result.
  */
 export function urlResolveIpfs<T: ?string>(url: T): T {
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-return]
   return url?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+}
+
+export function last<T>(arr: Array<T>): T | void {
+  return arr.length > 0 ? arr[arr.length - 1] : undefined;
+}
+
+export function isNonEmptyString(str: ?string): boolean {
+  return (str?.length ?? 0) > 0;
+}
+
+export function isEmptyOrNullString(str: ?string): boolean {
+  return isNonEmptyString(str) === false;
+}
+
+export function emptyStringToNull(str: ?string): ?string {
+  return isNonEmptyString(str) ? str : null;
 }

@@ -68,7 +68,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
     this.derivationId = data.derivationId;
 
     const { BackendService } = this.parent.getNetworkInfo().Backend;
-    if (!BackendService) {
+    if (BackendService == null || BackendService === '') {
       throw new Error('missing backend service URL');
     }
     const utxoApi = new UtxoApi(BackendService);

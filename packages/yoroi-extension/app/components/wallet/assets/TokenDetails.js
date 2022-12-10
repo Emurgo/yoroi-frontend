@@ -213,13 +213,14 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           />
         </Box>
 
-        {tokenInfo.description &&
-        <Box marginTop="22px">
-          <LabelWithValue
-            label={intl.formatMessage(tokenMessages.description)}
-            value={tokenInfo.description}
-          />
-        </Box>}
+        {tokenInfo.description == null ? null : (
+          <Box marginTop="22px">
+            <LabelWithValue
+              label={intl.formatMessage(tokenMessages.description)}
+              value={tokenInfo.description}
+            />
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -706,7 +706,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
         const foreignInputs = utxoIds.map((id: string) => {
           // tx hash length is 64
-          if ((id?.length ?? 0) < 65) {
+          if ((id.length ?? 0) < 65) {
             throw new Error(`Invalid utxo ID "${id}", expected \`{hash}{index}\` with no separator`);
           }
           try {

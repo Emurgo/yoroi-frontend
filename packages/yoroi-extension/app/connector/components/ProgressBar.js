@@ -10,8 +10,8 @@ type Props = {|
 |};
 
 const ProgressBar = (props: Props): Node => {
-  const step = props.step || 1;
-  const max = props.max || 3
+  const step = props.step ?? 1;
+  const max = props.max ?? 3
 
   return (
     <div className={styles.component}>

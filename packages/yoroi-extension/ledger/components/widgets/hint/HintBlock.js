@@ -47,7 +47,7 @@ export default class HintBlock extends React.Component<Props> {
             <div className={styles.primaryText}>
               <FormattedHTMLMessage {...text} />
             </div>
-            {secondaryText && (
+            {secondaryText == null ? null : (
               <div className={styles.secondaryText}>
                 {secondaryText}
               </div>

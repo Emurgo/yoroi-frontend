@@ -453,7 +453,7 @@ export default class WalletSendForm extends Component<Props> {
               }
               renderValue={value => (
                 <Box id='tokenAssetsSelect'>
-                  {tokenOptions.filter(option => option.value === value)[0]?.label}
+                  {tokenOptions.find(option => option.value === value)?.label}
                 </Box>
               )}
             >

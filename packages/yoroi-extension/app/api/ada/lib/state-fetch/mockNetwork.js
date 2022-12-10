@@ -744,7 +744,7 @@ export class MockUtxoApi implements UtxoApiContract {
     for (let i = this.blockchain.length - 1; i >= 0; i --) {
       if (this.blockchain[i].tx_state === 'Successful') {
         const hash = this.blockchain[i].block_hash;
-        if (!hash) {
+        if (hash == null || hash === '') {
           throw new Error('expect hash');
         }
         return hash;
@@ -755,7 +755,7 @@ export class MockUtxoApi implements UtxoApiContract {
 
   async getSafeBlock(): Promise<string> {
     const hash =  this.blockchain[this._getLastSafeBlockTxIndex()].block_hash;
-    if (!hash) {
+    if (hash == null || hash === '') {
       throw new Error('expect hash');
     }
     return hash;

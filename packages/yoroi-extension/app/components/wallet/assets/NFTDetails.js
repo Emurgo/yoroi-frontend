@@ -19,7 +19,7 @@ import type { NetworkRow, CardanoAssetMintMetadata } from '../../../api/ada/lib/
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
-import { urlResolveIpfs } from '../../../coreUtils';
+import { emptyStringToNull, urlResolveIpfs } from '../../../coreUtils';
 
 // Overwrite current theme
 // Temporary solution untill the new design system.
@@ -141,6 +141,9 @@ function NFTDetails({
   // Todo: Should be handling by displaying an error page
   if (nftInfo == null) return null;
 
+  const author = emptyStringToNull(nftInfo.author) ?? '-';
+  const description = emptyStringToNull(nftInfo.description) ?? '-';
+  const nftName = emptyStringToNull(nftInfo.name) ?? '-';
   return (
     <Box sx={{ overflowX: 'hidden' }}>
       <Box sx={{ display: 'inline-block' }}>
@@ -175,7 +178,7 @@ function NFTDetails({
         }}
       >
         <ImageItem sx={{ cursor: nftInfo.image !== null ? 'zoom-in' : 'auto', padding: below1400 ? '10px' : '24px' }} onClick={() => nftInfo.image !== null && setOpen(true)}>
-          <NftImage imageUrl={nftInfo.image} name={nftInfo.name || '-'} width='532px' height='510px' />
+          <NftImage imageUrl={nftInfo.image} name={nftName} width='532px' height='510px' />
         </ImageItem>
         <Box flex={1} sx={{ paddingTop: below1400 ? '10px' : '24px', paddingBottom: '22px' }}>
           <Stack
@@ -239,8 +242,8 @@ function NFTDetails({
                 value={tabs[0].id}
               >
                 <Stack spacing='24px'>
-                  <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} />
-                  <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} />
+                  <LabelWithValue label={intl.formatMessage(messages.description)} value={description} />
+                  <LabelWithValue label={intl.formatMessage(messages.author)} value={author} />
                   <LabelWithValue
                     label={intl.formatMessage(globalMessages.fingerprint)}
                     value={

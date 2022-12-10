@@ -381,7 +381,7 @@ export async function saveAnalyticsInstanceId(id: string): Promise<void> {
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {
   const json = await getLocalItem(storageKeys.CATALYST_ROUND_INFO);
-  if (!json) {
+  if (json == null) {
     return undefined;
   }
   return JSON.parse(json);
