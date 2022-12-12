@@ -384,7 +384,7 @@ Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expected
     this.webDriverLogger.info(
       `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
     );
-    const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+    const collateral = await this.mockDAppPage.getCollateral(utxosAmount);
     const collateralJson = JSON.parse(collateral)[0];
     const expectedUtxos = JSON.parse(expectedCollateral);
     expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
@@ -394,7 +394,7 @@ Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expected
 Then(/^The dApp should receive collateral$/, async function (table) {
   const fields = table.hashes()[0];
   const utxosAmount = fields.forAmount;
-  const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+  const collateral = await this.mockDAppPage.getCollateralResult();
   const collateralJson = JSON.parse(collateral)[0];
   expect(collateralJson.amount, 'Amount is different').to.equal(fields.amount);
   expect(collateralJson.receiver, 'Receiver is different').to.equal(fields.receiver);

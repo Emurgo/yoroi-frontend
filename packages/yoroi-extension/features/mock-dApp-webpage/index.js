@@ -495,7 +495,7 @@ export class MockDAppWebpage {
     return signingResult;
   }
 
-  async getCollateralUtxos(amount: string): Promise<string> {
+  async getCollateral(amount: string): Promise<string> {
     this.logger.info(`MockDApp: Getting Collateral Utxos`);
 
     const convertedAmount = Buffer.from(
@@ -506,7 +506,7 @@ export class MockDAppWebpage {
       const callback = args[args.length - 1];
 
       window.api
-        .getCollateralUtxos(args[0])
+        .getCollateral(args[0])
         // eslint-disable-next-line promise/always-return
         .then(utxosResponse => {
           if (utxosResponse == null || utxosResponse.length === 0) {
@@ -528,12 +528,35 @@ export class MockDAppWebpage {
 
   async addCollateral(amount: string) {
     this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
-    const utxosHex = Buffer.from(
+    const amountHex = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
 
     this.driver.executeScript(utxos => {
-      window.collateralPromise = window.api.getCollateralUtxos(utxos);
-    }, utxosHex);
+      window.collateralPromise = window.api.getCollateral(utxos);
+    }, amountHex);
+  }
+
+  async getCollateralResult(): Promise<string> {
+    this.logger.info(`MockDApp: Getting collateral data result`);
+    const collateralResult = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.collateralPromise
+        .then(utxosResponse => {
+          if (utxosResponse == null || utxosResponse.length === 0) {
+            callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
+          }
+          callback({ success: true, retValue: utxosResponse });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (collateralResult.success) {
+      const utxos = this._mapCborUtxos(collateralResult.retValue);
+      return JSON.stringify(utxos, undefined, 2);
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${collateralResult.errMsg}`);
+    throw new MockDAppWebpageError(collateralResult.errMsg);
   }
 }
