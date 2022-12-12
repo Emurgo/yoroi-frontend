@@ -84,6 +84,7 @@ export const generateTransaction = (): {|
   cip1852TrezorTx2: RemoteTransaction,
   cip1852TrezorTx3: RemoteTransaction,
   shelleySimple15: RemoteTransaction,
+  shelleyCollateral: RemoteTransaction,
   shelleyDelegatedTx1: RemoteTransaction,
   shelleyDelegatedTx2: RemoteTransaction,
   shelleyLedgerDelegatedTx1: RemoteTransaction,
@@ -1466,25 +1467,7 @@ export const generateTransaction = (): {|
         // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
         address:
           '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
-        amount: '1000000',
-        assets: [],
-      },
-      {
-        // 0'/0/0
-        // eslint-disable-next-line max-len
-        // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
-        address:
-          '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
-        amount: '1000000',
-        assets: [],
-      },
-      {
-        // 0'/0/0
-        // eslint-disable-next-line max-len
-        // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
-        address:
-          '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
-        amount: '3500000',
+        amount: '5500000',
         assets: [],
       },
     ],
@@ -1494,6 +1477,71 @@ export const generateTransaction = (): {|
     time: '2019-04-20T15:16:53.000Z',
     epoch: 0,
     slot: 304,
+    last_update: '2019-05-20T23:18:11.899Z',
+    tx_state: 'Successful',
+  };
+
+  // =====================
+  //   shelley-collateral
+  // =====================
+
+  const shelleyCollateral = {
+    hash: '021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f607',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '17',
+        index: 17,
+        amount: '7000000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        amount: '5000000',
+        assets: [],
+      },
+      {
+        // 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06
+        address:
+          '0166cab16b0952f7856bb2b930d65708dbaf41094d905ed9f0eb986ee8ec488e4dc9a59298dcf4ef39f8b3c826ae34b1bced770507fbf920d7',
+        amount: '1000000',
+        assets: [],
+      },
+      {
+        // 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06
+        address:
+          '0166cab16b0952f7856bb2b930d65708dbaf41094d905ed9f0eb986ee8ec488e4dc9a59298dcf4ef39f8b3c826ae34b1bced770507fbf920d7',
+        amount: '1000000',
+        assets: [],
+      },
+    ],
+    height: 305,
+    block_hash: '305',
+    tx_ordinal: 0,
+    time: '2019-04-20T15:16:53.000Z',
+    epoch: 0,
+    slot: 305,
     last_update: '2019-05-20T23:18:11.899Z',
     tx_state: 'Successful',
   };
@@ -1941,6 +1989,7 @@ export const generateTransaction = (): {|
     cip1852TrezorTx2,
     cip1852TrezorTx3,
     shelleySimple15,
+    shelleyCollateral,
     shelleyDelegatedTx1,
     shelleyDelegatedTx2,
     shelleyLedgerDelegatedTx1,
@@ -1983,6 +2032,7 @@ export function addTransaction(tx: MockTx): void {
     if (txOrdinal == null) return true;
     if (txOrdinal > newTxOrdinal) return true;
     if (txOrdinal < newTxOrdinal) return false;
+    console.log(`DEBUG::\nepoch -> ${epoch}\nslot -> ${slot}\ntxOrdinal -> ${txOrdinal}`);
     throw new Error(`Transaction ${tx.hash} occurs at same position as an existing transactions`);
   });
   if (insertionIndex === -1) {
@@ -2031,6 +2081,8 @@ export function resetChain(chainToUse: $Values<typeof MockChain>): void {
     addTransaction(txs.cip1852TrezorTx3);
     // shelley-simple-15
     addTransaction(txs.shelleySimple15);
+    // shelley-collateral
+    addTransaction(txs.shelleyCollateral);
     // shelley-delegated
     addTransaction(txs.shelleyDelegatedTx1);
     addTransaction(txs.shelleyDelegatedTx2);
