@@ -171,12 +171,12 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(changeAddresses.errMsg);
   }
 
-  async _getUTXOs(): Promise<Array<Utxo>> {
+  async _getUTXOs(amount?: string): Promise<Array<Utxo>> {
     this.logger.info(`MockDApp: Getting UTXOs`);
     const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
-        .getUtxos()
+        .getUtxos(args[0])
         .then(utxosResponse => {
           // eslint-disable-next-line promise/always-return
           if (utxosResponse.length === 0) {
@@ -188,7 +188,7 @@ export class MockDAppWebpage {
         .catch(error => {
           callback({ success: false, errMsg: JSON.stringify(error) });
         });
-    });
+    }, amount);
     this.logger.info(
       `MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`
     );
@@ -353,7 +353,7 @@ export class MockDAppWebpage {
     this.logger.info(
       `MockDApp: Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
     );
-    const UTXOs = await this._getUTXOs();
+    const UTXOs = await this._getUTXOs(amount);
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
     const utxo = UTXOs[0];
@@ -466,13 +466,9 @@ export class MockDAppWebpage {
     }
     this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
 
-    this.driver.executeScript(
-      (addr, plHex) => {
-        window.signDataPromise = window.api.signData(addr, plHex);
-      },
-      address,
-      payloadHex
-    );
+    const scriptString = `window.signDataPromise = window.api.signData(${JSON.stringify(address)}, ${JSON.stringify(payloadHex)});`;
+
+    this.driver.executeScript(scriptString);
   }
 
   async getSigningDataResult(): Promise<string> {
@@ -526,15 +522,14 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(collateralResponse.errMsg);
   }
 
-  async addCollateral(amount: string) {
+  addCollateral(amount: string) {
     this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
     const amountHex = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
+    const scriptString = `window.collateralPromise = window.api.getCollateral(${JSON.stringify(amountHex)});`;
 
-    this.driver.executeScript(utxos => {
-      window.collateralPromise = window.api.getCollateral(utxos);
-    }, amountHex);
+    this.driver.executeScript(scriptString);
   }
 
   async getCollateralResult(): Promise<string> {
