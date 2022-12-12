@@ -33,7 +33,7 @@ import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
-import ConnectorStore from './DappConnectorStore'
+import ConnectorStore from './toplevel/DappConnectorStore'
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
   stateFetchStore: StateFetchStore,

@@ -25,7 +25,7 @@ import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
 import { RollbackApiError, } from '../../../common/errors';
 import { getErgoBaseConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
-import { parseEIP0004Data } from '../../../../../chrome/extension/ergo-connector/utils';
+import { parseEIP0004Data } from '../../../../../chrome/extension/connector/utils';
 
 // note: this function assumes mainnet
 export function getErgoAddress(
