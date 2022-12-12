@@ -46,15 +46,15 @@ Feature: dApp connector get collateral
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-simple-15 is connected to the website localhost
-    Then I ask to get Collateral for 2000000 Utxos
+    Then I ask to get Collateral for 1 ADA
     Then I should see the connector popup to Add Collateral with fee info
       | fee   |
       | 0.171177 |
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     Then The dApp should receive collateral
-      | forAmount | amount  | receiver |
-      | 2000000   | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
+      | amount  | receiver |
+      | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
 
   @dApp-1026
   Scenario: dApp, anonymous wallet, get collateral, connector popup (DAPP-1026)
@@ -67,12 +67,12 @@ Feature: dApp connector get collateral
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-simple-15 is connected to the website localhost
-    Then I ask to get Collateral for 2000000 Utxos
+    Then I ask to get Collateral for 1 ADA
     Then I should see the connector popup to Add Collateral with fee info
       | fee   |
       | 0.171177 |
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     Then The dApp should receive collateral
-      | forAmount | amount  | receiver |
-      | 2000000   | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
+      | amount  | receiver |
+      | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
