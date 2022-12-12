@@ -162,10 +162,10 @@ export class WindowManager {
     return newWindowHandles.filter(handle => !oldHandles.includes(handle));
   }
 
-  async findNewWindows(): Promise<Array<string>> {
+  async findNewWindows(tries: number = 50): Promise<Array<string>> {
     this.logger.info(`WindowManager: Finding a new window`);
     let newWindowHandles: Array<string> = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < tries; i++) {
       this.logger.info(`WindowManager: -> Try ${i} to find a new window`);
       await new Promise(resolve => setTimeout(resolve, 100));
       newWindowHandles = await this.getAllWindowHandles();
