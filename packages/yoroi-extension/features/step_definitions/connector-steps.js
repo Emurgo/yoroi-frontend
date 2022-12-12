@@ -375,9 +375,15 @@ Then(/^The user reject for signing data is received$/, async function () {
   expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });
 
-When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
-  this.webDriverLogger.info(`Step: I ask to get Collateral for ${utxos} Utxos`);
-  await this.mockDAppPage.addCollateral(utxos);
+When(/^I ask to get Collateral for (.+) ADA$/, async function (amount) {
+  this.webDriverLogger.info(`Step: I ask to get Collateral for ${amount} ADA`);
+  const amountString = (parseFloat(amount) * 1000000).toString();
+  await this.mockDAppPage.addCollateral(amountString);
+  const newWindow = this.windowManager.findNewWindows(20);
+  if (newWindow.length == 0) {
+    this.webDriverLogger.info(`Step: -> Asking again for collateral`);
+    this.mockDAppPage.addCollateral(amountString);
+  }
 });
 
 Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expectedCollateral, utxosAmount) {
@@ -393,7 +399,6 @@ Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expected
 
 Then(/^The dApp should receive collateral$/, async function (table) {
   const fields = table.hashes()[0];
-  const utxosAmount = fields.forAmount;
   const collateral = await this.mockDAppPage.getCollateralResult();
   const collateralJson = JSON.parse(collateral)[0];
   expect(collateralJson.amount, 'Amount is different').to.equal(fields.amount);
