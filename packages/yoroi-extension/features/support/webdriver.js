@@ -1,7 +1,7 @@
 // @flow
 
 import { setWorldConstructor } from 'cucumber';
-import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
+import { Builder, Key, until, error, promise, WebElement, logging } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
@@ -57,8 +57,11 @@ function getBraveBuilder() {
 }
 
 function getChromeBuilder() {
+  const prefs = new logging.Preferences();
+  prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
   return new Builder()
     .forBrowser('chrome')
+    .setLoggingPrefs(prefs)
     .setChromeOptions(
       new chrome.Options()
         .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))

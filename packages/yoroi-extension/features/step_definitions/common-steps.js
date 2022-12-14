@@ -106,7 +106,7 @@ import {
   uriPromptForm,
 } from '../pages/uriPromptPage';
 import { yoroiModern } from '../pages/mainWindowPage';
-import { extensionTabName, WindowManager } from '../support/windowManager';
+import { backgroungTabName, extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 
 const simpleNodeLogger = require('simple-node-logger');
@@ -237,6 +237,13 @@ After(async function (scenario) {
     if (this.getBrowser() !== 'firefox') {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
+      // getting logs from background
+      const currentTabName = this.windowManager.getCurrentWindowName();
+      const backgroundPageUrl = `${this.getExtensionUrl()}/background.html`;
+      await this.windowManager.openNewWindow(backgroungTabName, backgroundPageUrl);
+      await this.windowManager.switchTo(backgroungTabName);
+      await getLogs(this.driver, 'background', logging.Type.BROWSER);
+      await this.windowManager.switchTo(currentTabName);
     }
   }
   await this.windowManager.switchTo(extensionTabName);
@@ -331,7 +338,7 @@ async function getLogs(driver, name, loggingType) {
 
   const dir = await createDirInTestRunsData(driver, `${log}Logs`);
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-${log}-log.json`;
-  const logEntries = await driver.manage().logs().get(loggingType);
+  const logEntries = await driver.manage().logs().get(loggingType, logging.Level.ALL);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
