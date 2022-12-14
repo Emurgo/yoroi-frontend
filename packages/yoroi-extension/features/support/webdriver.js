@@ -169,6 +169,10 @@ function CustomWorld(cmdInput: WorldInput) {
     return `moz-extension://${firefoxExtensionId}/main_window.html`;
   };
 
+  this.getBackgroundUrl = (): string => {
+    return `${this.getExtensionUrl()}/background.html`
+  };
+
   this.get = async (url: string) => {
     for (let i = 0; i < 6; i++) {
       try {

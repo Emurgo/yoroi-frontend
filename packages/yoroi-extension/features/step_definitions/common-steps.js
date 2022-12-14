@@ -238,9 +238,6 @@ After(async function (scenario) {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
       // getting logs from background
-      await this.windowManager.switchTo(extensionTabName);
-      const backgroundPageUrl = `${this.getExtensionUrl()}/background.html`;
-      await this.windowManager.openNewTab(backgroungTabName, backgroundPageUrl);
       await this.windowManager.switchTo(backgroungTabName);
       await getLogs(this.driver, 'background', logging.Type.BROWSER);
       await this.windowManager.switchTo(extensionTabName);
@@ -524,6 +521,8 @@ async function acceptUriPrompt(world: any) {
 Given(/^I have opened the extension$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the extension`);
   await this.get(this.getExtensionUrl());
+  await this.windowManager.openNewTab(backgroungTabName, this.getBackgroundUrl());
+  await this.windowManager.switchTo(extensionTabName);
   const browserName = await this.getBrowser();
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();
