@@ -416,6 +416,42 @@ function CustomWorld(cmdInput: WorldInput) {
     const element = await this.getElementBy(locator);
     await this.driver.executeScript('arguments[0].scrollIntoView();', element);
   };
+
+  this.getInfoFromIndexedDB = async (tableName: string) => {
+    await this.driver.executeScript(() => {
+      window.allDBsPromise = window.indexedDB.databases();
+    });
+
+    const allDBs = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.allDBsPromise
+        .then(reponse => {
+          callback(reponse);
+        })
+        .catch(error => {
+          callback(error);
+        });
+    });
+    const {name, version} = allDBs[0];
+    
+    await this.driver.executeScript((dbName, dbVersion, table) => {
+      const request = window.indexedDB.open(dbName, dbVersion);
+      request.onsuccess = function (event) {
+          const db = event.target.result;
+          window.tableContent = db
+            .transaction(table, "readonly")
+            .objectStore(table)
+            .getAll();
+      }
+    },
+      name,
+      version,
+      tableName
+    );
+    const tableContent = await this.driver.executeScript(() => window.tableContent.result);
+
+    return tableContent;
+  };
 }
 
 // no need to await
