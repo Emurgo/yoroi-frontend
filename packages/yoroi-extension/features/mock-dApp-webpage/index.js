@@ -522,14 +522,14 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(collateralResponse.errMsg);
   }
 
-  addCollateral(amount: string) {
+  async addCollateral(amount: string) {
     this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
     const amountHex = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
     const scriptString = `window.collateralPromise = window.api.getCollateral(${JSON.stringify(amountHex)});`;
 
-    this.driver.executeScript(scriptString);
+    await this.driver.executeScript(scriptString);
   }
 
   async getCollateralResult(): Promise<string> {

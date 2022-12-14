@@ -2048,7 +2048,6 @@ export function addTransaction(tx: MockTx): void {
     if (txOrdinal == null) return true;
     if (txOrdinal > newTxOrdinal) return true;
     if (txOrdinal < newTxOrdinal) return false;
-    console.log(`DEBUG::\nepoch -> ${epoch}\nslot -> ${slot}\ntxOrdinal -> ${txOrdinal}`);
     throw new Error(`Transaction ${tx.hash} occurs at same position as an existing transactions`);
   });
   if (insertionIndex === -1) {
