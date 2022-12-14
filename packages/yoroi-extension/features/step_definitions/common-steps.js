@@ -238,12 +238,12 @@ After(async function (scenario) {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
       // getting logs from background
-      const currentTabName = this.windowManager.getCurrentWindowName();
+      await this.windowManager.switchTo(extensionTabName);
       const backgroundPageUrl = `${this.getExtensionUrl()}/background.html`;
-      await this.windowManager.openNewWindow(backgroungTabName, backgroundPageUrl);
+      await this.windowManager.openNewTab(backgroungTabName, backgroundPageUrl);
       await this.windowManager.switchTo(backgroungTabName);
       await getLogs(this.driver, 'background', logging.Type.BROWSER);
-      await this.windowManager.switchTo(currentTabName);
+      await this.windowManager.switchTo(extensionTabName);
     }
   }
   await this.windowManager.switchTo(extensionTabName);
