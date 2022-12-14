@@ -32,10 +32,10 @@ import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
-import WalletCard from '../connect/WalletCard';
+import WalletCard from '../connect/ConnectedWallet';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
-import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +tx: Tx,
@@ -60,6 +60,10 @@ export const signTxMessages: Object = defineMessages({
   title: {
     id: 'connector.signin.title',
     defaultMessage: '!!!Sign transaction',
+  },
+  summary: {
+    id: 'connector.signin.summary',
+    defaultMessage: '!!!Summary',
   },
   txDetails: {
     id: 'connector.signin.txDetails',
@@ -87,7 +91,7 @@ export const signTxMessages: Object = defineMessages({
   },
   more: {
     id: 'connector.signin.more',
-    defaultMessage: '!!!more'
+    defaultMessage: '!!!more',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
@@ -101,7 +105,7 @@ export const signTxMessages: Object = defineMessages({
 
 type State = {|
   isSubmitting: boolean,
-|}
+|};
 
 @observer
 class SignTxPage extends Component<Props, State> {
@@ -111,8 +115,7 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     isSubmitting: false,
-  }
-
+  };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -151,16 +154,18 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true })
+        this.setState({ isSubmitting: true });
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
-            this.form.$('walletPassword').invalidate(
-              this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
-            )
+            this.form
+              .$('walletPassword')
+              .invalidate(
+                this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
+              );
           } else {
             throw error;
           }
-          this.setState({ isSubmitting: false })
+          this.setState({ isSubmitting: false });
         });
       },
       onError: () => {},
@@ -269,63 +274,8 @@ class SignTxPage extends Component<Props, State> {
 
     return (
       <SignTxTabs
-        overviewContent={
+        connectionContent={
           <Box paddingTop="8px" overflowWrap="break-word">
-            <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-              {intl.formatMessage(signTxMessages.connectedTo)}
-            </Typography>
-            <Box
-              display="flex"
-              alignItems="center"
-              px="28px"
-              py="20px"
-              border="1px solid var(--yoroi-palette-gray-100)"
-              borderRadius="6px"
-              minHeight="88px"
-              mb="8px"
-            >
-              <Box
-                sx={{
-                  marginRight: '12px',
-                  width: '32px',
-                  height: '32px',
-                  border: '1px solid #a7afc0',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: '#f8f8f8',
-                  img: {
-                    width: '20px',
-                  },
-                }}
-              >
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
-              </Box>
-              <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
-                {url}
-              </Typography>
-            </Box>
-            <Box
-              display="flex"
-              alignItems="center"
-              px="28px"
-              py="20px"
-              border="1px solid var(--yoroi-palette-gray-100)"
-              borderRadius="6px"
-              minHeight="88px"
-            >
-              <WalletCard
-                shouldHideBalance={this.props.shouldHideBalance}
-                publicDeriver={this.props.selectedWallet}
-                getTokenInfo={this.props.getTokenInfo}
-                getCurrentPrice={(_from, _to) => null}
-                unitOfAccountSetting={({
-                  enabled: false,
-                  currency: null,
-                })}
-              />
-            </Box>
             <Box pt="32px">
               <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
                 {intl.formatMessage(signTxMessages.totals)}
@@ -409,7 +359,8 @@ class SignTxPage extends Component<Props, State> {
             </Box>
           </Box>
         }
-        utxoAddressContent={
+        detailsContent={null}
+        utxosContent={
           <Box>
             <UtxoDetails
               txData={txData}

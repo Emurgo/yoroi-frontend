@@ -11,7 +11,7 @@ import { intlShape, defineMessages } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
-import WalletCard from './WalletCard';
+import WalletCard from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';

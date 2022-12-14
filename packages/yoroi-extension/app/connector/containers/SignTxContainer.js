@@ -211,6 +211,7 @@ export default class SignTxContainer extends Component<
     return (
       <Box
         sx={{
+          width: '480px',
           height: 'calc(100vh - 52px)',
           backgroundColor: 'var(--yoroi-palette-common-white)',
         }}

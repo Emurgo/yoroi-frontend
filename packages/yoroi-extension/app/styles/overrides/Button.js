@@ -117,6 +117,32 @@ const ModernButton = {
       },
     },
     {
+      props: { variant: 'secondary-blue' },
+      style: {
+        backgroundColor: 'var(--yoroi-comp-button-secondary-background)',
+        color: 'var(--yoroi-comp-button-primary-text)',
+        border: '2px solid',
+        borderColor: 'var(--yoroi-comp-button-primary-border)',
+        ':hover': {
+          color: 'var(--yoroi-comp-button-primary-text)',
+          borderColor: 'var(--yoroi-comp-button-primary-border-hover)',
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-hover)',
+        },
+        '&.Mui-active': {
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-active)',
+        },
+        '&.Mui-disabled': {
+          border: '2px solid',
+          opacity: 0.4,
+          borderColor: 'var(--yoroi-comp-button-primary-border)',
+          color: 'var(--yoroi-comp-button-primary-text)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-primary-text)',
+        },
+      },
+    },
+    {
       props: { variant: 'secondary' },
       style: {
         backgroundColor: 'var(--yoroi-comp-button-secondary-background)',
