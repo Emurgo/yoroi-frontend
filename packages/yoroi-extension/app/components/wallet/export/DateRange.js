@@ -6,7 +6,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { observer } from 'mobx-react';
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -44,21 +44,19 @@ export default class ExportTransactionDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { date, setStartDate, setEndDate } = this.props;
-    const invalidInterval = (
-      date.startDate && date.endDate && date.startDate.isAfter(date.endDate)
-    );
+
     return (
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           label={intl.formatMessage(messages.startDate)}
           value={date.startDate}
+          maxDate={dayjs()} // Today
           onChange={(newDate) => {
             setStartDate(newDate);
           }}
           renderInput={(params) => (
             <TextField
               {...params}
-              error={invalidInterval}
               sx={{ mb: '10px' }}
             />
           )}
@@ -66,14 +64,14 @@ export default class ExportTransactionDialog extends Component<Props> {
         <DatePicker
           label={intl.formatMessage(messages.endDate)}
           value={date.endDate}
+          minDate={date.startDate !== null ? date.startDate : undefined}
+          maxDate={dayjs()} // Today
           onChange={(newDate) => {
             setEndDate(newDate);
           }}
           renderInput={(params) => (
             <TextField
               {...params}
-              error={invalidInterval}
-              helperText={invalidInterval ? 'Invalid interval' : ''}
               sx={{ mb: '10px' }}
             />
           )}

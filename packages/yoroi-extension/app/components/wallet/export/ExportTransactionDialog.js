@@ -56,6 +56,15 @@ export default class ExportTransactionDialog extends Component<Props, State> {
     endDate: null,
   }
 
+  componentWillUnmount() {
+    const {
+      toggleIncludeTxIds,
+      shouldIncludeTxIds
+    } = this.props;
+    // Reset `includeTxIds` state
+    if (shouldIncludeTxIds) toggleIncludeTxIds()
+  }
+
   render(): Node {
     const { intl } = this.context;
     const {
@@ -86,7 +95,11 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       label: intl.formatMessage(globalMessages.exportButtonLabel),
       primary: true,
       isSubmitting: isActionProcessing || false,
-      disabled: !startDate || !endDate || startDate.isAfter(endDate),
+      disabled: (
+        !startDate || !endDate ||
+        startDate.isAfter(endDate) ||
+        !startDate.isValid() || !endDate.isValid()
+      ),
       onClick: () => submit({ startDate, endDate }),
     }];
 
