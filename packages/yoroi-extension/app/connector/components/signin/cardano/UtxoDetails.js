@@ -14,7 +14,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import {
   getTokenName,
   getTokenIdentifierIfExists,
-  assetNameFromIdentifier
+  assetNameFromIdentifier,
 } from '../../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
@@ -83,7 +83,6 @@ class CardanoUtxoDetails extends Component<Props> {
   renderAmountDisplay: ({|
     entry: TokenEntry,
   |}) => Node = request => {
-
     const nameFromIdentifier = assetNameFromIdentifier(request.entry.identifier);
     const tokenInfo: ?$ReadOnly<TokenRow> = this._resolveTokenInfo(request.entry);
 
@@ -111,10 +110,7 @@ class CardanoUtxoDetails extends Component<Props> {
         fiatAmountDisplay = (
           <>
             <span>{beforeDecimalSigned}</span>
-            {afterDecimal && (
-              <span>.{afterDecimal}</span>
-            )}
-            {' '}{currency}
+            {afterDecimal && <span>.{afterDecimal}</span>} {currency}
           </>
         );
       }
@@ -139,27 +135,24 @@ class CardanoUtxoDetails extends Component<Props> {
     if (fiatAmountDisplay) {
       return (
         <>
-          <div>
-            {fiatAmountDisplay}
-          </div>
-          <div>
-            {cryptoAmountDisplay}
-          </div>
+          <div>{fiatAmountDisplay}</div>
+          <div>{cryptoAmountDisplay}</div>
         </>
       );
     }
     return (
       <>
-        <div>
-          {cryptoAmountDisplay}
-        </div>
+        <div>{cryptoAmountDisplay}</div>
       </>
     );
-  }
+  };
 
   renderRow: ({|
     kind: string,
-    address: {| address: string, value: MultiToken |},
+    address: {|
+      address: string,
+      value: MultiToken,
+    |},
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
@@ -184,14 +177,11 @@ class CardanoUtxoDetails extends Component<Props> {
       <Box
         key={divKey(request.address.value.getDefaultEntry().identifier)}
         display="grid"
-        gridTemplateColumns="20px 180px 1fr"
+        gridTemplateColumns="180px 1fr"
         alignItems="flex-start"
         py="12px"
-        px="16px"
-        backgroundColor={request.addressIndex % 2 === 0 ? 'initial' : '#EEF7FC'}
         borderRadius="8px"
       >
-        <Typography py="4px">{request.addressIndex + 1}</Typography>
         <CopyableAddress
           hash={this.props.addressToDisplayString(request.address.address)}
           elementId={notificationElementId}
@@ -241,23 +231,22 @@ class CardanoUtxoDetails extends Component<Props> {
     const { txData } = this.props;
 
     return (
-      <Box p="8px" px="0">
-        <Box marginBottom="40px">
-          <Box display="grid" gridTemplateColumns="180px 1fr" px="16px" pb="10px">
+      <Box>
+        <Box
+          sx={{
+            border: '1px solid #DCE0E9',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '40px',
+          }}
+        >
+          <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
             <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
-              {intl.formatMessage(globalMessages.fromAddresses)}{' '}
-              <span>({txData.inputs.length})</span>
-            </Typography>
-            <Typography
-              textAlign="right"
-              variant="body1"
-              fontWeight="500"
-              color="var(--yoroi-palette-gray-900)"
-            >
-              {intl.formatMessage(globalMessages.amount)}
+              {intl.formatMessage(globalMessages.fromAddresses)}
+              <span>: {txData.inputs.length}</span>
             </Typography>
           </Box>
-          <Box paddingBottom="24px">
+          <Box>
             {txData.inputs.map((address, addressIndex) => {
               return this.renderRow({
                 kind: 'in',
@@ -268,22 +257,20 @@ class CardanoUtxoDetails extends Component<Props> {
             })}
           </Box>
         </Box>
-        <Box>
-          <Box display="grid" gridTemplateColumns="180px 1fr" px="16px" pb="10px">
+        <Box
+          sx={{
+            border: '1px solid #DCE0E9',
+            borderRadius: '8px',
+            padding: '16px',
+          }}
+        >
+          <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
             <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
-              {intl.formatMessage(globalMessages.toAddresses)}{' '}
-              <span>({txData.outputs.length})</span>
-            </Typography>
-            <Typography
-              textAlign="right"
-              variant="body1"
-              fontWeight="500"
-              color="var(--yoroi-palette-gray-900)"
-            >
-              {intl.formatMessage(globalMessages.amount)}
+              {intl.formatMessage(globalMessages.toAddresses)}
+              <span>: {txData.outputs.length}</span>
             </Typography>
           </Box>
-          <Box paddingBottom="24px">
+          <Box>
             {txData.outputs.map((address, addressIndex) => {
               return this.renderRow({
                 kind: 'in',
