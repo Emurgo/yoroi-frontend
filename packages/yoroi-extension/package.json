@@ -181,7 +181,7 @@
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@emurgo/cardano-message-signing-browser": "1.0.1",
-    "@emurgo/cardano-serialization-lib-browser": "11.0.5",
+    "@emurgo/cardano-serialization-lib-browser": "11.2.0",
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
