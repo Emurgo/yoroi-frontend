@@ -13,7 +13,7 @@ import globalMessages from '../../../i18n/global-messages';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange'
 import { Box } from '@mui/system';
-import { Dayjs } from 'dayjs';
+import { Moment } from 'moment'
 
 const messages = defineMessages({
   dialogTitle: {
@@ -40,8 +40,8 @@ type Props = {|
 |};
 
 type State = {|
-  startDate: typeof Dayjs | null,
-  endDate: typeof Dayjs | null,
+  startDate: typeof Moment | null,
+  endDate: typeof Moment | null,
 |}
 
 @observer
@@ -76,6 +76,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       shouldIncludeTxIds
     } = this.props;
     const { startDate, endDate } = this.state;
+    console.log({startDate})
     const infoBlock = (
       <Box
         sx={{
