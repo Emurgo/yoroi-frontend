@@ -7,6 +7,7 @@
 .*/.circleci/.*
 <PROJECT_ROOT>/dev/.*
 <PROJECT_ROOT>/build/.*
+<PROJECT_ROOT>/node_modules/@emurgo/yoroi-lib/node_modules/resolve/test/resolver/malformed_package_json/package.json
 
 [include]
 ../node_modules/eslint-plugin-jsx-a11y

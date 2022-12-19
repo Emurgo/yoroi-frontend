@@ -20,3 +20,12 @@ export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
     throw e;
   }
 }
+
+/**
+ * In case the URL is at the IPFS protocol it will be resolved into HTTPS.
+ * In any other case there will be no change in the returned result.
+ */
+export function urlResolveIpfs<T: ?string>(url: T): T {
+  // $FlowFixMe
+  return url?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+}

@@ -1,0 +1,2122 @@
+{
+  "name": "yoroi-schema",
+  "version": 17,
+  "tables": {
+    "Network": [
+      {
+        "NetworkId": 0,
+        "NetworkName": "Cardano Mainnet",
+        "Backend": {
+          "BackendService": "https://iohk-mainnet.yoroiwallet.com",
+          "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
+          "TokenInfoService": "https://cdn.yoroiwallet.com"
+        },
+        "BaseConfig": [
+          {
+            "StartAt": 0,
+            "ChainNetworkId": "1",
+            "ByronNetworkId": 764824073,
+            "GenesisDate": "1506203091000",
+            "SlotsPerEpoch": 21600,
+            "SlotDuration": 20
+          },
+          {
+            "StartAt": 208,
+            "SlotsPerEpoch": 432000,
+            "SlotDuration": 1,
+            "PerEpochPercentageReward": 69344,
+            "LinearFee": {
+              "coefficient": "44",
+              "constant": "155381"
+            },
+            "MinimumUtxoVal": "1000000",
+            "CoinsPerUtxoWord": "34482",
+            "PoolDeposit": "500000000",
+            "KeyDeposit": "2000000"
+          }
+        ],
+        "CoinType": 2147485463,
+        "Fork": 0
+      },
+      {
+        "NetworkId": 100,
+        "NetworkName": "Jormungandr Mainnet",
+        "Backend": {
+          "BackendService": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
+          "WebSocket": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443"
+        },
+        "BaseConfig": [
+          {
+            "StartAt": 0,
+            "Discriminant": 0,
+            "ChainNetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
+            "ByronNetworkId": 764824073,
+            "GenesisDate": "1576264417000",
+            "SlotsPerEpoch": 43200,
+            "SlotDuration": 2,
+            "PerEpochPercentageReward": 19666,
+            "LinearFee": {
+              "constant": "200000",
+              "coefficient": "100000",
+              "certificate": "400000",
+              "per_certificate_fees": {
+                "certificate_pool_registration": "500000000",
+                "certificate_stake_delegation": "400000"
+              }
+            }
+          }
+        ],
+        "CoinType": 2147485463,
+        "Fork": 1
+      },
+      {
+        "NetworkId": 200,
+        "NetworkName": "Ergo Mainnet",
+        "Backend": {
+          "BackendService": "https://ergo-backend.yoroiwallet.com"
+        },
+        "BaseConfig": [
+          {
+            "StartAt": 0,
+            "ChainNetworkId": "0",
+            "MinimumBoxValue": "100000",
+            "FeeAddress": "031005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a573046eebdc83"
+          }
+        ],
+        "CoinType": 2147484077,
+        "Fork": 0
+      },
+      {
+        "NetworkId": 300,
+        "NetworkName": "Cardano Testnet",
+        "Backend": {
+          "BackendService": "https://testnet-backend.yoroiwallet.com",
+          "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
+          "TokenInfoService": "https://stage-cdn.yoroiwallet.com"
+        },
+        "BaseConfig": [
+          {
+            "StartAt": 0,
+            "ChainNetworkId": "0",
+            "ByronNetworkId": 1097911063,
+            "GenesisDate": "1563999616000",
+            "SlotsPerEpoch": 21600,
+            "SlotDuration": 20
+          },
+          {
+            "StartAt": 74,
+            "SlotsPerEpoch": 432000,
+            "SlotDuration": 1,
+            "PerEpochPercentageReward": 69344,
+            "LinearFee": {
+              "coefficient": "44",
+              "constant": "155381"
+            },
+            "CoinsPerUtxoWord": "34482",
+            "MinimumUtxoVal": "1000000",
+            "PoolDeposit": "500000000",
+            "KeyDeposit": "2000000"
+          }
+        ],
+        "CoinType": 2147485463,
+        "Fork": 0
+      },
+      {
+        "NetworkId": 400,
+        "NetworkName": "Alonzo Testnet",
+        "Backend": {
+          "BackendService": "https://alonzo-backend.yoroiwallet.com",
+          "WebSocket": "wss://alonzo-backend.yoroiwallet.com:443",
+          "TokenInfoService": "https://stage-cdn.yoroiwallet.com"
+        },
+        "BaseConfig": [
+          {
+            "StartAt": 0,
+            "ChainNetworkId": "0",
+            "ByronNetworkId": 1097911063,
+            "GenesisDate": "1563999616000",
+            "SlotsPerEpoch": 21600,
+            "SlotDuration": 20
+          },
+          {
+            "StartAt": 0,
+            "SlotsPerEpoch": 432000,
+            "SlotDuration": 1,
+            "PerEpochPercentageReward": 69344,
+            "LinearFee": {
+              "coefficient": "44",
+              "constant": "155381"
+            },
+            "CoinsPerUtxoWord": "34482",
+            "MinimumUtxoVal": "1000000",
+            "PoolDeposit": "500000000",
+            "KeyDeposit": "2000000"
+          }
+        ],
+        "CoinType": 2147485463,
+        "Fork": 0
+      }
+    ],
+    "Key": [
+      {
+        "Hash": "0ab93dd86df170df4df0cfe61f62f29e89d89add5b937ebbe43cdcfb77816f2c3fbe0d10e77ba03198b53d9ce2f33b7bd5dff8a868266f514bf2adc2d437cd339e06de43dbbac2b30656fc1e002dc21141bddc9f5902819b18f9d82a6d8e6920b176fd3a3753efd065a0b931698b2aaf5d06cd8eb617b5e00cab14145f8844af60b2b34268bad953d5555eb62534199a3944de5d72a8c4b1adfd8d01",
+        "IsEncrypted": true,
+        "PasswordLastUpdate": null,
+        "Type": 0,
+        "KeyId": 1
+      },
+      {
+        "Hash": "30037ce72ab2163c2e2d8f864b974c7176f64c53b66a81db18640f267eed13b36fb042cc7a78843824c8d1afddd3ccb3a37be249881bbacf85c3192f2dca7060",
+        "IsEncrypted": false,
+        "PasswordLastUpdate": null,
+        "Type": 0,
+        "KeyId": 2
+      }
+    ],
+    "Address": [
+      {
+        "Digest": -5.18814298093809e+161,
+        "Hash": "Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf",
+        "Type": 0,
+        "AddressId": 1
+      },
+      {
+        "Digest": 4.005897187270229e+39,
+        "Hash": "Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM",
+        "Type": 0,
+        "AddressId": 2
+      },
+      {
+        "Digest": -1.9091532612969177e-131,
+        "Hash": "Ae2tdPwUPEZ8gpDazyi8VtcGMnMrkpKxts6ppCT45mdT6WMZEwHXs7pP8Tg",
+        "Type": 0,
+        "AddressId": 3
+      },
+      {
+        "Digest": -2.400376372464157e+124,
+        "Hash": "Ae2tdPwUPEZBFhEBZgvm3fQeuW2zBPochfQehFtXn6tCRQy7zsQ9Px88jsH",
+        "Type": 0,
+        "AddressId": 4
+      },
+      {
+        "Digest": 9.948420953505185e-47,
+        "Hash": "Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo",
+        "Type": 0,
+        "AddressId": 5
+      },
+      {
+        "Digest": 9.326602089821879e-30,
+        "Hash": "Ae2tdPwUPEYxzZH7sSyyXK6DDmjCxRajXUXFqbEjtxfPN7HZzQfXr4hxKwT",
+        "Type": 0,
+        "AddressId": 6
+      },
+      {
+        "Digest": 4.871145213048404e-43,
+        "Hash": "Ae2tdPwUPEZMUQdcxu6AEoq9wzL8mtSCKhWUNhYjXqq1aenwimnLaCit1FY",
+        "Type": 0,
+        "AddressId": 7
+      },
+      {
+        "Digest": 6.75274668731026e+61,
+        "Hash": "Ae2tdPwUPEYw9VvB1BQqgGd8XzNfgz4mv9gBjB9P8EtvPQfz4D8Gt4xnQog",
+        "Type": 0,
+        "AddressId": 8
+      },
+      {
+        "Digest": -7.631163428764417e+276,
+        "Hash": "Ae2tdPwUPEYxYn4T89ffVqpDwqwsMDAZTcfnWBqAkjoem5sgaVKGU3FUB2E",
+        "Type": 0,
+        "AddressId": 9
+      },
+      {
+        "Digest": -1.6017303425870374e-101,
+        "Hash": "Ae2tdPwUPEZBZ9aYboQuf5PFcjuZRCosBhLkUCxSQw1vqk3iyK5qGo5CJWe",
+        "Type": 0,
+        "AddressId": 10
+      },
+      {
+        "Digest": -6.537349771934158e+223,
+        "Hash": "Ae2tdPwUPEZ4yCaYs3j7pPPaM9iA3KLruJkKjmUBBLKYzpJUHutWdS6EkKa",
+        "Type": 0,
+        "AddressId": 11
+      },
+      {
+        "Digest": -5.3866774008751e-237,
+        "Hash": "Ae2tdPwUPEZ5zV8wqC9gPvkDtr2MS3Ys2vQbyPdM4wsdnzevbqnaJFg62hk",
+        "Type": 0,
+        "AddressId": 12
+      },
+      {
+        "Digest": 1.382203475035168e-237,
+        "Hash": "Ae2tdPwUPEZAD1KmgTQ4zS6Q5s4VXWDXqB3ZmM1abQGoyrGN8qCsZyXc3vf",
+        "Type": 0,
+        "AddressId": 13
+      },
+      {
+        "Digest": 2.490260903712286e+254,
+        "Hash": "Ae2tdPwUPEZ1SFwQMGroCTabfCPJ1RiK8D2F11C1vTMi14tX1XK2uogRWqM",
+        "Type": 0,
+        "AddressId": 14
+      },
+      {
+        "Digest": 1.1423435570016581e+77,
+        "Hash": "Ae2tdPwUPEZJ8CiSFVipoupUVBGRAVbmbpmKPCXsExcwzZd6FcNpAcExY1r",
+        "Type": 0,
+        "AddressId": 15
+      },
+      {
+        "Digest": 1.1025868598519032e-268,
+        "Hash": "Ae2tdPwUPEZCeLRPNcreMQAAfJFs9ZzBeFK9pUXhMnL3ooQP9TajasVsYKK",
+        "Type": 0,
+        "AddressId": 16
+      },
+      {
+        "Digest": 6.802372910540179e+76,
+        "Hash": "Ae2tdPwUPEZGvzYwTSUZhTxDviZSKqLZDYVkcT4rLqckFXvdTMv21CinTCd",
+        "Type": 0,
+        "AddressId": 17
+      },
+      {
+        "Digest": 1.0898173340677806e+293,
+        "Hash": "Ae2tdPwUPEZKEsQJxXQvRJHLCWRGFQNWFgHhroEw9GGXV25wRBH8TAmwCRi",
+        "Type": 0,
+        "AddressId": 18
+      },
+      {
+        "Digest": -1.4835020475302562e+52,
+        "Hash": "Ae2tdPwUPEZ6u2i2u4iLhd9Rq4rUBsVaMpqQWuTCXMitMmugcsr9iANjNEE",
+        "Type": 0,
+        "AddressId": 19
+      },
+      {
+        "Digest": 1.0753995066668421e+154,
+        "Hash": "Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G",
+        "Type": 0,
+        "AddressId": 20
+      },
+      {
+        "Digest": 1.5842207841682243e-196,
+        "Hash": "Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ",
+        "Type": 0,
+        "AddressId": 21
+      },
+      {
+        "Digest": 1.8819557589593857e+126,
+        "Hash": "Ae2tdPwUPEYzRJEAdyX24mYTmKx8dMHYQgxkBcgnsdFHPPvmySMS9cspZmj",
+        "Type": 0,
+        "AddressId": 22
+      },
+      {
+        "Digest": -1.6768419216602427e+93,
+        "Hash": "Ae2tdPwUPEZ5yxTy5wcVmUXP5xkkDSXfrgqWp8Px6knmUiFjJEytBGXfWoS",
+        "Type": 0,
+        "AddressId": 23
+      },
+      {
+        "Digest": -2.5950200694100975e-154,
+        "Hash": "Ae2tdPwUPEZ3pKEVL1tMmz8EzaE9Hyn2cVJKf3TFVCjw7xeLFBdJngUXPXG",
+        "Type": 0,
+        "AddressId": 24
+      },
+      {
+        "Digest": -6.28195010657389e+125,
+        "Hash": "Ae2tdPwUPEZLhFMGWjMpCWwsUiN58DkKmtg6r7dFJfXhmUyzNGPb2Crg141",
+        "Type": 0,
+        "AddressId": 25
+      },
+      {
+        "Digest": 1.8038527609850763e-30,
+        "Hash": "Ae2tdPwUPEZBTYWkpudmAYdyQM9CHcV9orEVnVSan6EP2xNApB5bLE1XsKF",
+        "Type": 0,
+        "AddressId": 26
+      },
+      {
+        "Digest": -3.2738732077215015e+237,
+        "Hash": "Ae2tdPwUPEYzdEoDVNdvLz6kFgVsjEyUJ1z3mHzAT1HotQk31tRvGNM4tge",
+        "Type": 0,
+        "AddressId": 27
+      },
+      {
+        "Digest": 6.009965811065196e+234,
+        "Hash": "Ae2tdPwUPEZ2NvzdECB18z3SBTc8SVvx1PJuxPKsnncygEZeeKNaAeBeLDg",
+        "Type": 0,
+        "AddressId": 28
+      },
+      {
+        "Digest": -3.412056347004804e-256,
+        "Hash": "Ae2tdPwUPEZ3iMfnFWSM3zeqpNwAdT62jNgiA27x1ZEacpfVbViYWb7gyNP",
+        "Type": 0,
+        "AddressId": 29
+      },
+      {
+        "Digest": -1.4607797017835113e-25,
+        "Hash": "Ae2tdPwUPEYykz6FbkuRf9ScRwZc8F1xobMPyzECjsdMyqobn2tVpL6pdDW",
+        "Type": 0,
+        "AddressId": 30
+      },
+      {
+        "Digest": -1.5492234544082762e+72,
+        "Hash": "Ae2tdPwUPEZ8SUET76NhRhJ6TNLW48csZ4e87hu6JYobQvVTKSYDMPBU5Xa",
+        "Type": 0,
+        "AddressId": 31
+      },
+      {
+        "Digest": 6.397199081168596e-249,
+        "Hash": "Ae2tdPwUPEZBryPRKuib729PQNSBxzgXsTVwmg3CWQjZaAS7pj4WZNa3VR6",
+        "Type": 0,
+        "AddressId": 32
+      },
+      {
+        "Digest": 2.699654694740964e-163,
+        "Hash": "Ae2tdPwUPEZ6yyMqXFEYmLvqXqktpU8LR6oW8qVbaap7R2YJGc9xDbs2Eb6",
+        "Type": 0,
+        "AddressId": 33
+      },
+      {
+        "Digest": 3.2672025499521527e-301,
+        "Hash": "Ae2tdPwUPEZ4gRK6Qhj3Mo4tSU4LkRiqVgsQm6rg8YBGC6fqVLNqA9REr7c",
+        "Type": 0,
+        "AddressId": 34
+      },
+      {
+        "Digest": 5.473082144527723e-299,
+        "Hash": "Ae2tdPwUPEZ3xWm3GHFVNtVWcnyTGpSF6AjyhZJY3DuSGvf3WvwLzkBisFw",
+        "Type": 0,
+        "AddressId": 35
+      },
+      {
+        "Digest": -9.504830601258996e-107,
+        "Hash": "Ae2tdPwUPEZL9BqYXyY6zQQoatsWbkcN6g46NfvCfaE8mQppcVgentdAXeo",
+        "Type": 0,
+        "AddressId": 36
+      },
+      {
+        "Digest": -2.255481392460208e-13,
+        "Hash": "Ae2tdPwUPEYzxRSsoqFY2Ym7zQfSdosY1bdK8KZTEjPjcobHd3GbZ3qZpvB",
+        "Type": 0,
+        "AddressId": 37
+      },
+      {
+        "Digest": -3.382255898780831e+65,
+        "Hash": "Ae2tdPwUPEZEdntBfWRH5ucNrQd7RwPjZ2QZEkxJbsJDBrCGnTtjqfb8Aph",
+        "Type": 0,
+        "AddressId": 38
+      },
+      {
+        "Digest": 6.040400230567571e+220,
+        "Hash": "Ae2tdPwUPEZKDMDuUZBUSokAzeJwNpqHorYEPuycXBMMFameoVFkxwpLheC",
+        "Type": 0,
+        "AddressId": 39
+      },
+      {
+        "Digest": -1.2798377351521785e-185,
+        "Hash": "Ae2tdPwUPEZ2E4XNPVarvndsmkC8n2vS9rXJfCxny9oVacViLRDpeKioaAc",
+        "Type": 0,
+        "AddressId": 40
+      },
+      {
+        "Digest": -1.3416871383074957e-161,
+        "Hash": "Ae2tdPwUPEYxD5EgazsN7DcLp2fFiak1RTco6CoDNioKVuodftS4oNeabwz",
+        "Type": 0,
+        "AddressId": 41
+      },
+      {
+        "Digest": 2.414293239739638e-47,
+        "Hash": "Ae2tdPwUPEZFqcMbS757FyZrABDZUVtzEW4sPvzZj3UYBcn8BSWFBxmQK2n",
+        "Type": 0,
+        "AddressId": 42
+      },
+      {
+        "Digest": 1.1036862858872953e+216,
+        "Hash": "Ae2tdPwUPEZGR3uPidVc5p1cSnV9KDzDxrrembeFhLYMgFAa4KHpTqmncFQ",
+        "Type": 0,
+        "AddressId": 43
+      },
+      {
+        "Digest": -2.938948476649332e-97,
+        "Hash": "Ae2tdPwUPEZEvn7nMBBaBMCc773zeMCPsS93tDsFvyZw4quRbnq5bnP1i8F",
+        "Type": 0,
+        "AddressId": 44
+      },
+      {
+        "Digest": 8.159203653530658e-92,
+        "Hash": "Ae2tdPwUPEZAzQ7FdZ8ksAjK7iVGzjMKUxWqkQLF52oGxWBNfyDRocqJwBT",
+        "Type": 0,
+        "AddressId": 45
+      },
+      {
+        "Digest": -1.2688708748746819e-61,
+        "Hash": "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
+        "Type": 0,
+        "AddressId": 46
+      },
+      {
+        "Digest": 3.0263387081779602e-151,
+        "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
+        "Type": 0,
+        "AddressId": 47
+      },
+      {
+        "Digest": 3.748999811104187e+228,
+        "Hash": "Ae2tdPwUPEZ4JpbhPGtK8RZyMLGq7R6wVBHErTxBYUuSKyUbhc7fegtU3dF",
+        "Type": 0,
+        "AddressId": 48
+      },
+      {
+        "Digest": 2.6120787617673514e-30,
+        "Hash": "Ae2tdPwUPEZBdtWRV8KXaHdiV7DL5pG96iETwYoBy1My4VLBCyU9k5kMUfJ",
+        "Type": 0,
+        "AddressId": 49
+      },
+      {
+        "Digest": -1.0123492942107734e-165,
+        "Hash": "Ae2tdPwUPEYy1r4T3wX9KmWPA5XP9dgxCiZ2Dz6SbS1tgxpwkHLr7EutFSi",
+        "Type": 0,
+        "AddressId": 50
+      },
+      {
+        "Digest": -3.074319404454647e-200,
+        "Hash": "Ae2tdPwUPEZE9zHeyCoYJF2AViqdj4iz1LzzrZaNDGqsBGaVMvzFrnvhmjC",
+        "Type": 0,
+        "AddressId": 51
+      },
+      {
+        "Digest": -1.488820380175102e+175,
+        "Hash": "Ae2tdPwUPEYzrgMT2ZCnohBmEkhL4WETjSo7pJJv3tifWP2yD8HcbRpcsuz",
+        "Type": 0,
+        "AddressId": 52
+      },
+      {
+        "Digest": 2.3902554625601016e-104,
+        "Hash": "Ae2tdPwUPEYxhJZmF3nx3hd8KuWWg4wxTuCzHiwELTMz5DNj2RVVp3GvSXk",
+        "Type": 0,
+        "AddressId": 53
+      },
+      {
+        "Digest": 2.909739229935528e-145,
+        "Hash": "Ae2tdPwUPEZ1QKYKaWjQQYhLY9C9hQQjiEAYj8X6VszRheb1uzdUJ1PQi5A",
+        "Type": 0,
+        "AddressId": 54
+      },
+      {
+        "Digest": -3.512532923970995e-268,
+        "Hash": "Ae2tdPwUPEZJxz9udJ5AiGNAypTimc5tW8aeHMmXx1Gz1i8vXT7ds1CJePD",
+        "Type": 0,
+        "AddressId": 55
+      },
+      {
+        "Digest": -1.4587970711938662e-273,
+        "Hash": "Ae2tdPwUPEZ1CQ8Mxz3xCVwg11dxMHLVsfsyaq12wTuwyTsVw55EFHgTRba",
+        "Type": 0,
+        "AddressId": 56
+      },
+      {
+        "Digest": -5.101875829381085e-120,
+        "Hash": "Ae2tdPwUPEZ5MLs4hNC7W7hRWZzDaNa3XT7nae5FBA2W3We7JbAKtTYhcg2",
+        "Type": 0,
+        "AddressId": 57
+      },
+      {
+        "Digest": 2.5502116477786873e+76,
+        "Hash": "Ae2tdPwUPEZETaqb1tkBX7XxtuLcda2RHsG4G8DsDQdNeV5SSWcc1MJcraP",
+        "Type": 0,
+        "AddressId": 58
+      },
+      {
+        "Digest": -4.51175714903157e+254,
+        "Hash": "Ae2tdPwUPEZ8d86PnvnuKuT1v3Fqy4UEtcAtHcYpzCfa6SQX7jkW4hjXQZw",
+        "Type": 0,
+        "AddressId": 59
+      },
+      {
+        "Digest": 1.1003732905385264e+77,
+        "Hash": "Ae2tdPwUPEZL8tfFQnZpYNVZPx58ix3TsJbRGudMqqiesmyYDyQiMP7p4V3",
+        "Type": 0,
+        "AddressId": 60
+      },
+      {
+        "Digest": -3.183586286561401e+74,
+        "Hash": "Ae2tdPwUPEZBWaoj9gwh2jtmQSBr2giZVTyt3J5pyRh9wcn971ZugRG8ZHB",
+        "Type": 0,
+        "AddressId": 61
+      },
+      {
+        "Digest": -1.7284293980886233e+143,
+        "Hash": "Ae2tdPwUPEZ2oSkjKqo3Z4CUQJg8xxP5fZnjf1mmqpGWB9FS84kjUnziRQG",
+        "Type": 0,
+        "AddressId": 62
+      },
+      {
+        "Digest": 12486396901266293000,
+        "Hash": "Ae2tdPwUPEZELvmKtHpL6HAWt5H2dYc4hGf8yHJKuyWSocqVHhmhVHaf6nX",
+        "Type": 0,
+        "AddressId": 63
+      },
+      {
+        "Digest": 5.1141046639172445e+261,
+        "Hash": "619a57f784ef8f9a9d3d25a905e4df27d46843d7a0b93d162cdfae6cdc",
+        "Type": 3,
+        "AddressId": 64
+      }
+    ],
+    "EncryptionMeta": [
+      {
+        "AddressSeed": 1690513609,
+        "TransactionSeed": 769388545,
+        "BlockSeed": 371536492,
+        "TokenSeed": 493718318,
+        "EncryptionMetaId": 0
+      }
+    ],
+    "KeyDerivation": [
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": 1,
+        "Parent": null,
+        "Index": null,
+        "KeyDerivationId": 1
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 1,
+        "Index": 2147483692,
+        "KeyDerivationId": 2
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 2,
+        "Index": 2147485463,
+        "KeyDerivationId": 3
+      },
+      {
+        "PublicKeyId": 2,
+        "PrivateKeyId": null,
+        "Parent": 3,
+        "Index": 2147483648,
+        "KeyDerivationId": 4
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 4,
+        "Index": 0,
+        "KeyDerivationId": 5
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 0,
+        "KeyDerivationId": 6
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 1,
+        "KeyDerivationId": 7
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 2,
+        "KeyDerivationId": 8
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 3,
+        "KeyDerivationId": 9
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 4,
+        "KeyDerivationId": 10
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 5,
+        "KeyDerivationId": 11
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 6,
+        "KeyDerivationId": 12
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 7,
+        "KeyDerivationId": 13
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 8,
+        "KeyDerivationId": 14
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 9,
+        "KeyDerivationId": 15
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 10,
+        "KeyDerivationId": 16
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 11,
+        "KeyDerivationId": 17
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 12,
+        "KeyDerivationId": 18
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 13,
+        "KeyDerivationId": 19
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 14,
+        "KeyDerivationId": 20
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 15,
+        "KeyDerivationId": 21
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 16,
+        "KeyDerivationId": 22
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 17,
+        "KeyDerivationId": 23
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 18,
+        "KeyDerivationId": 24
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 19,
+        "KeyDerivationId": 25
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 4,
+        "Index": 1,
+        "KeyDerivationId": 26
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 0,
+        "KeyDerivationId": 27
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 1,
+        "KeyDerivationId": 28
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 2,
+        "KeyDerivationId": 29
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 3,
+        "KeyDerivationId": 30
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 4,
+        "KeyDerivationId": 31
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 5,
+        "KeyDerivationId": 32
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 6,
+        "KeyDerivationId": 33
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 7,
+        "KeyDerivationId": 34
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 8,
+        "KeyDerivationId": 35
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 9,
+        "KeyDerivationId": 36
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 10,
+        "KeyDerivationId": 37
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 11,
+        "KeyDerivationId": 38
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 12,
+        "KeyDerivationId": 39
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 13,
+        "KeyDerivationId": 40
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 14,
+        "KeyDerivationId": 41
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 15,
+        "KeyDerivationId": 42
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 16,
+        "KeyDerivationId": 43
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 17,
+        "KeyDerivationId": 44
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 18,
+        "KeyDerivationId": 45
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 19,
+        "KeyDerivationId": 46
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 20,
+        "KeyDerivationId": 47
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 21,
+        "KeyDerivationId": 48
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 22,
+        "KeyDerivationId": 49
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 23,
+        "KeyDerivationId": 50
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 24,
+        "KeyDerivationId": 51
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 25,
+        "KeyDerivationId": 52
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 26,
+        "KeyDerivationId": 53
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 27,
+        "KeyDerivationId": 54
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 28,
+        "KeyDerivationId": 55
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 29,
+        "KeyDerivationId": 56
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 30,
+        "KeyDerivationId": 57
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 31,
+        "KeyDerivationId": 58
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 32,
+        "KeyDerivationId": 59
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 33,
+        "KeyDerivationId": 60
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 34,
+        "KeyDerivationId": 61
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 35,
+        "KeyDerivationId": 62
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 36,
+        "KeyDerivationId": 63
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 37,
+        "KeyDerivationId": 64
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 38,
+        "KeyDerivationId": 65
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 5,
+        "Index": 39,
+        "KeyDerivationId": 66
+      },
+      {
+        "PublicKeyId": null,
+        "PrivateKeyId": null,
+        "Parent": 26,
+        "Index": 20,
+        "KeyDerivationId": 67
+      }
+    ],
+    "Block": [
+      {
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "BlockTime": "2019-09-13T16:37:16.000Z",
+        "Height": 218608,
+        "SlotNum": 219650,
+        "Digest": -9.690691258114666e-56,
+        "BlockId": 1
+      },
+      {
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+        "BlockTime": "2019-09-13T16:37:36.000Z",
+        "Height": 218609,
+        "SlotNum": 219651,
+        "Digest": -6.352946211521613e-51,
+        "BlockId": 2
+      }
+    ],
+    "Transaction": [
+      {
+        "Type": 0,
+        "Extra": null,
+        "BlockId": 1,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+        "Digest": 8.191593645542673e-27,
+        "Ordinal": 0,
+        "LastUpdateTime": 1568392636000,
+        "Status": 1,
+        "ErrorMessage": null,
+        "TransactionId": 1
+      },
+      {
+        "Type": 1,
+        "Extra": {
+          "Fee": "100000",
+          "Metadata": null,
+          "IsValid": true
+        },
+        "BlockId": 2,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "Digest": 1.249559827714551e-31,
+        "Ordinal": 0,
+        "LastUpdateTime": 1568392656000,
+        "Status": 1,
+        "ErrorMessage": null,
+        "TransactionId": 2
+      }
+    ],
+    "CanonicalAddress": [
+      {
+        "KeyDerivationId": 6,
+        "CanonicalAddressId": 1
+      },
+      {
+        "KeyDerivationId": 7,
+        "CanonicalAddressId": 2
+      },
+      {
+        "KeyDerivationId": 8,
+        "CanonicalAddressId": 3
+      },
+      {
+        "KeyDerivationId": 9,
+        "CanonicalAddressId": 4
+      },
+      {
+        "KeyDerivationId": 10,
+        "CanonicalAddressId": 5
+      },
+      {
+        "KeyDerivationId": 11,
+        "CanonicalAddressId": 6
+      },
+      {
+        "KeyDerivationId": 12,
+        "CanonicalAddressId": 7
+      },
+      {
+        "KeyDerivationId": 13,
+        "CanonicalAddressId": 8
+      },
+      {
+        "KeyDerivationId": 14,
+        "CanonicalAddressId": 9
+      },
+      {
+        "KeyDerivationId": 15,
+        "CanonicalAddressId": 10
+      },
+      {
+        "KeyDerivationId": 16,
+        "CanonicalAddressId": 11
+      },
+      {
+        "KeyDerivationId": 17,
+        "CanonicalAddressId": 12
+      },
+      {
+        "KeyDerivationId": 18,
+        "CanonicalAddressId": 13
+      },
+      {
+        "KeyDerivationId": 19,
+        "CanonicalAddressId": 14
+      },
+      {
+        "KeyDerivationId": 20,
+        "CanonicalAddressId": 15
+      },
+      {
+        "KeyDerivationId": 21,
+        "CanonicalAddressId": 16
+      },
+      {
+        "KeyDerivationId": 22,
+        "CanonicalAddressId": 17
+      },
+      {
+        "KeyDerivationId": 23,
+        "CanonicalAddressId": 18
+      },
+      {
+        "KeyDerivationId": 24,
+        "CanonicalAddressId": 19
+      },
+      {
+        "KeyDerivationId": 25,
+        "CanonicalAddressId": 20
+      },
+      {
+        "KeyDerivationId": 27,
+        "CanonicalAddressId": 21
+      },
+      {
+        "KeyDerivationId": 28,
+        "CanonicalAddressId": 22
+      },
+      {
+        "KeyDerivationId": 29,
+        "CanonicalAddressId": 23
+      },
+      {
+        "KeyDerivationId": 30,
+        "CanonicalAddressId": 24
+      },
+      {
+        "KeyDerivationId": 31,
+        "CanonicalAddressId": 25
+      },
+      {
+        "KeyDerivationId": 32,
+        "CanonicalAddressId": 26
+      },
+      {
+        "KeyDerivationId": 33,
+        "CanonicalAddressId": 27
+      },
+      {
+        "KeyDerivationId": 34,
+        "CanonicalAddressId": 28
+      },
+      {
+        "KeyDerivationId": 35,
+        "CanonicalAddressId": 29
+      },
+      {
+        "KeyDerivationId": 36,
+        "CanonicalAddressId": 30
+      },
+      {
+        "KeyDerivationId": 37,
+        "CanonicalAddressId": 31
+      },
+      {
+        "KeyDerivationId": 38,
+        "CanonicalAddressId": 32
+      },
+      {
+        "KeyDerivationId": 39,
+        "CanonicalAddressId": 33
+      },
+      {
+        "KeyDerivationId": 40,
+        "CanonicalAddressId": 34
+      },
+      {
+        "KeyDerivationId": 41,
+        "CanonicalAddressId": 35
+      },
+      {
+        "KeyDerivationId": 42,
+        "CanonicalAddressId": 36
+      },
+      {
+        "KeyDerivationId": 43,
+        "CanonicalAddressId": 37
+      },
+      {
+        "KeyDerivationId": 44,
+        "CanonicalAddressId": 38
+      },
+      {
+        "KeyDerivationId": 45,
+        "CanonicalAddressId": 39
+      },
+      {
+        "KeyDerivationId": 46,
+        "CanonicalAddressId": 40
+      },
+      {
+        "KeyDerivationId": 47,
+        "CanonicalAddressId": 41
+      },
+      {
+        "KeyDerivationId": 48,
+        "CanonicalAddressId": 42
+      },
+      {
+        "KeyDerivationId": 49,
+        "CanonicalAddressId": 43
+      },
+      {
+        "KeyDerivationId": 50,
+        "CanonicalAddressId": 44
+      },
+      {
+        "KeyDerivationId": 51,
+        "CanonicalAddressId": 45
+      },
+      {
+        "KeyDerivationId": 52,
+        "CanonicalAddressId": 46
+      },
+      {
+        "KeyDerivationId": 53,
+        "CanonicalAddressId": 47
+      },
+      {
+        "KeyDerivationId": 54,
+        "CanonicalAddressId": 48
+      },
+      {
+        "KeyDerivationId": 55,
+        "CanonicalAddressId": 49
+      },
+      {
+        "KeyDerivationId": 56,
+        "CanonicalAddressId": 50
+      },
+      {
+        "KeyDerivationId": 57,
+        "CanonicalAddressId": 51
+      },
+      {
+        "KeyDerivationId": 58,
+        "CanonicalAddressId": 52
+      },
+      {
+        "KeyDerivationId": 59,
+        "CanonicalAddressId": 53
+      },
+      {
+        "KeyDerivationId": 60,
+        "CanonicalAddressId": 54
+      },
+      {
+        "KeyDerivationId": 61,
+        "CanonicalAddressId": 55
+      },
+      {
+        "KeyDerivationId": 62,
+        "CanonicalAddressId": 56
+      },
+      {
+        "KeyDerivationId": 63,
+        "CanonicalAddressId": 57
+      },
+      {
+        "KeyDerivationId": 64,
+        "CanonicalAddressId": 58
+      },
+      {
+        "KeyDerivationId": 65,
+        "CanonicalAddressId": 59
+      },
+      {
+        "KeyDerivationId": 66,
+        "CanonicalAddressId": 60
+      },
+      {
+        "KeyDerivationId": 67,
+        "CanonicalAddressId": 61
+      }
+    ],
+    "AddressMapping": [
+      {
+        "KeyDerivationId": 6,
+        "AddressId": 1,
+        "AddressMappingId": 1
+      },
+      {
+        "KeyDerivationId": 7,
+        "AddressId": 2,
+        "AddressMappingId": 2
+      },
+      {
+        "KeyDerivationId": 8,
+        "AddressId": 3,
+        "AddressMappingId": 3
+      },
+      {
+        "KeyDerivationId": 9,
+        "AddressId": 4,
+        "AddressMappingId": 4
+      },
+      {
+        "KeyDerivationId": 10,
+        "AddressId": 5,
+        "AddressMappingId": 5
+      },
+      {
+        "KeyDerivationId": 11,
+        "AddressId": 6,
+        "AddressMappingId": 6
+      },
+      {
+        "KeyDerivationId": 12,
+        "AddressId": 7,
+        "AddressMappingId": 7
+      },
+      {
+        "KeyDerivationId": 13,
+        "AddressId": 8,
+        "AddressMappingId": 8
+      },
+      {
+        "KeyDerivationId": 14,
+        "AddressId": 9,
+        "AddressMappingId": 9
+      },
+      {
+        "KeyDerivationId": 15,
+        "AddressId": 10,
+        "AddressMappingId": 10
+      },
+      {
+        "KeyDerivationId": 16,
+        "AddressId": 11,
+        "AddressMappingId": 11
+      },
+      {
+        "KeyDerivationId": 17,
+        "AddressId": 12,
+        "AddressMappingId": 12
+      },
+      {
+        "KeyDerivationId": 18,
+        "AddressId": 13,
+        "AddressMappingId": 13
+      },
+      {
+        "KeyDerivationId": 19,
+        "AddressId": 14,
+        "AddressMappingId": 14
+      },
+      {
+        "KeyDerivationId": 20,
+        "AddressId": 15,
+        "AddressMappingId": 15
+      },
+      {
+        "KeyDerivationId": 21,
+        "AddressId": 16,
+        "AddressMappingId": 16
+      },
+      {
+        "KeyDerivationId": 22,
+        "AddressId": 17,
+        "AddressMappingId": 17
+      },
+      {
+        "KeyDerivationId": 23,
+        "AddressId": 18,
+        "AddressMappingId": 18
+      },
+      {
+        "KeyDerivationId": 24,
+        "AddressId": 19,
+        "AddressMappingId": 19
+      },
+      {
+        "KeyDerivationId": 25,
+        "AddressId": 20,
+        "AddressMappingId": 20
+      },
+      {
+        "KeyDerivationId": 27,
+        "AddressId": 21,
+        "AddressMappingId": 21
+      },
+      {
+        "KeyDerivationId": 28,
+        "AddressId": 22,
+        "AddressMappingId": 22
+      },
+      {
+        "KeyDerivationId": 29,
+        "AddressId": 23,
+        "AddressMappingId": 23
+      },
+      {
+        "KeyDerivationId": 30,
+        "AddressId": 24,
+        "AddressMappingId": 24
+      },
+      {
+        "KeyDerivationId": 31,
+        "AddressId": 25,
+        "AddressMappingId": 25
+      },
+      {
+        "KeyDerivationId": 32,
+        "AddressId": 26,
+        "AddressMappingId": 26
+      },
+      {
+        "KeyDerivationId": 33,
+        "AddressId": 27,
+        "AddressMappingId": 27
+      },
+      {
+        "KeyDerivationId": 34,
+        "AddressId": 28,
+        "AddressMappingId": 28
+      },
+      {
+        "KeyDerivationId": 35,
+        "AddressId": 29,
+        "AddressMappingId": 29
+      },
+      {
+        "KeyDerivationId": 36,
+        "AddressId": 30,
+        "AddressMappingId": 30
+      },
+      {
+        "KeyDerivationId": 37,
+        "AddressId": 31,
+        "AddressMappingId": 31
+      },
+      {
+        "KeyDerivationId": 38,
+        "AddressId": 32,
+        "AddressMappingId": 32
+      },
+      {
+        "KeyDerivationId": 39,
+        "AddressId": 33,
+        "AddressMappingId": 33
+      },
+      {
+        "KeyDerivationId": 40,
+        "AddressId": 34,
+        "AddressMappingId": 34
+      },
+      {
+        "KeyDerivationId": 41,
+        "AddressId": 35,
+        "AddressMappingId": 35
+      },
+      {
+        "KeyDerivationId": 42,
+        "AddressId": 36,
+        "AddressMappingId": 36
+      },
+      {
+        "KeyDerivationId": 43,
+        "AddressId": 37,
+        "AddressMappingId": 37
+      },
+      {
+        "KeyDerivationId": 44,
+        "AddressId": 38,
+        "AddressMappingId": 38
+      },
+      {
+        "KeyDerivationId": 45,
+        "AddressId": 39,
+        "AddressMappingId": 39
+      },
+      {
+        "KeyDerivationId": 46,
+        "AddressId": 40,
+        "AddressMappingId": 40
+      },
+      {
+        "KeyDerivationId": 47,
+        "AddressId": 41,
+        "AddressMappingId": 41
+      },
+      {
+        "KeyDerivationId": 48,
+        "AddressId": 42,
+        "AddressMappingId": 42
+      },
+      {
+        "KeyDerivationId": 49,
+        "AddressId": 43,
+        "AddressMappingId": 43
+      },
+      {
+        "KeyDerivationId": 50,
+        "AddressId": 44,
+        "AddressMappingId": 44
+      },
+      {
+        "KeyDerivationId": 51,
+        "AddressId": 45,
+        "AddressMappingId": 45
+      },
+      {
+        "KeyDerivationId": 52,
+        "AddressId": 48,
+        "AddressMappingId": 46
+      },
+      {
+        "KeyDerivationId": 53,
+        "AddressId": 49,
+        "AddressMappingId": 47
+      },
+      {
+        "KeyDerivationId": 54,
+        "AddressId": 50,
+        "AddressMappingId": 48
+      },
+      {
+        "KeyDerivationId": 55,
+        "AddressId": 51,
+        "AddressMappingId": 49
+      },
+      {
+        "KeyDerivationId": 56,
+        "AddressId": 52,
+        "AddressMappingId": 50
+      },
+      {
+        "KeyDerivationId": 57,
+        "AddressId": 53,
+        "AddressMappingId": 51
+      },
+      {
+        "KeyDerivationId": 58,
+        "AddressId": 54,
+        "AddressMappingId": 52
+      },
+      {
+        "KeyDerivationId": 59,
+        "AddressId": 55,
+        "AddressMappingId": 53
+      },
+      {
+        "KeyDerivationId": 60,
+        "AddressId": 56,
+        "AddressMappingId": 54
+      },
+      {
+        "KeyDerivationId": 61,
+        "AddressId": 57,
+        "AddressMappingId": 55
+      },
+      {
+        "KeyDerivationId": 62,
+        "AddressId": 58,
+        "AddressMappingId": 56
+      },
+      {
+        "KeyDerivationId": 63,
+        "AddressId": 59,
+        "AddressMappingId": 57
+      },
+      {
+        "KeyDerivationId": 64,
+        "AddressId": 60,
+        "AddressMappingId": 58
+      },
+      {
+        "KeyDerivationId": 65,
+        "AddressId": 61,
+        "AddressMappingId": 59
+      },
+      {
+        "KeyDerivationId": 66,
+        "AddressId": 62,
+        "AddressMappingId": 60
+      },
+      {
+        "KeyDerivationId": 67,
+        "AddressId": 63,
+        "AddressMappingId": 61
+      }
+    ],
+    "Certificate": [],
+    "CertificateAddress": [],
+    "Token": [
+      {
+        "Digest": 6.262633522161549e-167,
+        "NetworkId": 0,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": {
+          "type": "Cardano",
+          "policyId": "",
+          "assetName": "",
+          "ticker": "ADA",
+          "longName": null,
+          "numberOfDecimals": 6
+        },
+        "TokenId": 1
+      },
+      {
+        "Digest": 6.262633522161549e-167,
+        "NetworkId": 100,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": {
+          "type": "Cardano",
+          "policyId": "",
+          "assetName": "",
+          "ticker": "ADA",
+          "longName": null,
+          "numberOfDecimals": 6
+        },
+        "TokenId": 2
+      },
+      {
+        "Digest": 6.262633522161549e-167,
+        "NetworkId": 200,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": {
+          "type": "Ergo",
+          "height": 0,
+          "boxId": "",
+          "ticker": "ERG",
+          "longName": null,
+          "numberOfDecimals": 9,
+          "description": null
+        },
+        "TokenId": 3
+      },
+      {
+        "Digest": 6.262633522161549e-167,
+        "NetworkId": 300,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": {
+          "type": "Cardano",
+          "policyId": "",
+          "assetName": "",
+          "ticker": "TADA",
+          "longName": null,
+          "numberOfDecimals": 6
+        },
+        "TokenId": 4
+      },
+      {
+        "Digest": 6.262633522161549e-167,
+        "NetworkId": 400,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": {
+          "type": "Cardano",
+          "policyId": "",
+          "assetName": "",
+          "ticker": "TADA",
+          "longName": null,
+          "numberOfDecimals": 6
+        },
+        "TokenId": 5
+      },
+      {
+        "Digest": -9.311162321367395e-257,
+        "NetworkId": 0,
+        "Identifier": "0ccb954ed44c1cd267f21f628317637679887033564eef61857a0b62.616263",
+        "IsDefault": false,
+        "TokenId": 6,
+        "IsNFT": false,
+        "Metadata": {
+          "type": "Cardano",
+          "ticker": null,
+          "longName": null,
+          "numberOfDecimals": 0,
+          "assetName": "616263",
+          "policyId": "0ccb954ed44c1cd267f21f628317637679887033564eef61857a0b62",
+          "lastUpdatedAt": null,
+          "assetMintMetadata": []
+        }
+      }
+    ],
+    "TokenList": [
+      {
+        "Amount": "4000000",
+        "ListId": 0,
+        "TokenId": 1,
+        "TokenListItemId": 1
+      },
+      {
+        "Amount": "1",
+        "ListId": 0,
+        "TokenId": 6,
+        "TokenListItemId": 2
+      },
+      {
+        "Amount": "2100000",
+        "ListId": 1,
+        "TokenId": 1,
+        "TokenListItemId": 3
+      },
+      {
+        "Amount": "1",
+        "ListId": 1,
+        "TokenId": 6,
+        "TokenListItemId": 4
+      },
+      {
+        "Amount": "1731391",
+        "ListId": 2,
+        "TokenId": 1,
+        "TokenListItemId": 5
+      },
+      {
+        "Amount": "2100000",
+        "ListId": 3,
+        "TokenId": 1,
+        "TokenListItemId": 6
+      },
+      {
+        "Amount": "1",
+        "ListId": 3,
+        "TokenId": 6,
+        "TokenListItemId": 7
+      },
+      {
+        "Amount": "1000",
+        "ListId": 4,
+        "TokenId": 1,
+        "TokenListItemId": 8
+      },
+      {
+        "Amount": "1100000",
+        "ListId": 5,
+        "TokenId": 1,
+        "TokenListItemId": 9
+      },
+      {
+        "Amount": "1",
+        "ListId": 5,
+        "TokenId": 6,
+        "TokenListItemId": 10
+      },
+      {
+        "Amount": "900000",
+        "ListId": 6,
+        "TokenId": 1,
+        "TokenListItemId": 11
+      },
+      {
+        "Amount": "900000",
+        "ListId": 7,
+        "TokenId": 1,
+        "TokenListItemId": 12
+      }
+    ],
+    "ConceptualWallet": [
+      {
+        "NetworkId": 0,
+        "Name": "My Test Wallet",
+        "ConceptualWalletId": 1
+      }
+    ],
+    "PublicDeriver": [
+      {
+        "ConceptualWalletId": 1,
+        "KeyDerivationId": 4,
+        "Name": "",
+        "Index": 0,
+        "LastSyncInfoId": 1,
+        "PublicDeriverId": 1
+      }
+    ],
+    "LastSyncInfo": [
+      {
+        "LastSyncInfoId": 1,
+        "Time": "1970-01-01T00:00:00.001Z",
+        "SlotNum": 219651,
+        "BlockHash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+        "Height": 218609
+      }
+    ],
+    "HwWalletMeta": [],
+    "RootDerivation": [
+      {
+        "KeyDerivationId": 1,
+        "RootDerivationId": 1
+      }
+    ],
+    "PurposeDerivation": [
+      {
+        "KeyDerivationId": 2,
+        "PurposeDerivationId": 1
+      }
+    ],
+    "CoinTypeDerivation": [
+      {
+        "KeyDerivationId": 3,
+        "CoinTypeDerivationId": 1
+      }
+    ],
+    "Bip44Account": [
+      {
+        "KeyDerivationId": 4,
+        "Bip44AccountId": 1
+      }
+    ],
+    "Bip44Chain": [
+      {
+        "Bip44ChainId": 1,
+        "KeyDerivationId": 5,
+        "DisplayCutoff": 19
+      },
+      {
+        "KeyDerivationId": 26,
+        "DisplayCutoff": null,
+        "Bip44ChainId": 2
+      }
+    ],
+    "Bip44Wrapper": [
+      {
+        "ConceptualWalletId": 1,
+        "SignerLevel": 0,
+        "PublicDeriverLevel": 3,
+        "PrivateDeriverKeyDerivationId": 1,
+        "PrivateDeriverLevel": 0,
+        "RootKeyDerivationId": 1
+      }
+    ],
+    "Cip1852Wrapper": [],
+    "UtxoTransactionInput": [
+      {
+        "TransactionId": 1,
+        "AddressId": 46,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+        "IndexInParentTx": 0,
+        "IndexInOwnTx": 0,
+        "TokenListId": 0,
+        "UtxoTransactionInputId": 1
+      },
+      {
+        "TransactionId": 2,
+        "AddressId": 5,
+        "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+        "IndexInParentTx": 0,
+        "IndexInOwnTx": 0,
+        "TokenListId": 3,
+        "UtxoTransactionInputId": 2
+      }
+    ],
+    "UtxoTransactionOutput": [
+      {
+        "UtxoTransactionOutputId": 1,
+        "TransactionId": 1,
+        "AddressId": 5,
+        "OutputIndex": 0,
+        "TokenListId": 1,
+        "IsUnspent": false,
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
+        "ErgoRegisters": null
+      },
+      {
+        "TransactionId": 1,
+        "AddressId": 47,
+        "OutputIndex": 1,
+        "IsUnspent": true,
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoRegisters": null,
+        "ErgoTree": null,
+        "TokenListId": 2,
+        "UtxoTransactionOutputId": 2
+      },
+      {
+        "TransactionId": 2,
+        "AddressId": 21,
+        "OutputIndex": 0,
+        "TokenListId": 5,
+        "IsUnspent": true,
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoRegisters": null,
+        "ErgoTree": null,
+        "UtxoTransactionOutputId": 3
+      },
+      {
+        "TransactionId": 2,
+        "AddressId": 20,
+        "OutputIndex": 1,
+        "TokenListId": 6,
+        "IsUnspent": true,
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoRegisters": null,
+        "ErgoTree": null,
+        "UtxoTransactionOutputId": 4
+      },
+      {
+        "TransactionId": 2,
+        "AddressId": 64,
+        "OutputIndex": 2,
+        "TokenListId": 7,
+        "IsUnspent": true,
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoRegisters": null,
+        "ErgoTree": null,
+        "UtxoTransactionOutputId": 5
+      }
+    ],
+    "AccountingTransactionInput": [
+      {
+        "TransactionId": 2,
+        "AddressId": 64,
+        "SpendingCounter": 0,
+        "IndexInOwnTx": 0,
+        "TokenListId": 4,
+        "AccountingTransactionInputId": 1
+      }
+    ],
+    "AccountingTransactionOutput": [],
+    "TxMemo": [],
+    "PriceData": [],
+    "Explorer": [
+      {
+        "ExplorerId": 106,
+        "NetworkId": 0,
+        "IsBackup": true,
+        "Endpoints": {
+          "address": "https://cardanoscan.io/address/",
+          "transaction": "https://cardanoscan.io/transaction/",
+          "pool": "https://cardanoscan.io/pool/",
+          "stakeAddress": "https://cardanoscan.io/stakeKey/",
+          "token": "https://cardanoscan.io/token/"
+        },
+        "Name": "CardanoScan"
+      },
+      {
+        "ExplorerId": 108,
+        "NetworkId": 0,
+        "IsBackup": false,
+        "Endpoints": {
+          "stakeAddress": "https://adastat.net/addresses/",
+          "address": "https://adastat.net/addresses/",
+          "transaction": "https://adastat.net/transactions/",
+          "pool": "https://adastat.net/pools/"
+        },
+        "Name": "AdaStat"
+      },
+      {
+        "ExplorerId": 104,
+        "NetworkId": 0,
+        "IsBackup": false,
+        "Endpoints": {
+          "address": "https://explorer.cardano.org/en/address?address=",
+          "transaction": "https://explorer.cardano.org/en/transaction?id="
+        },
+        "Name": "CardanoExplorer"
+      },
+      {
+        "ExplorerId": 100,
+        "NetworkId": 0,
+        "IsBackup": false,
+        "Endpoints": {
+          "stakeAddress": "https://adaex.org/",
+          "address": "https://adaex.org/",
+          "transaction": "https://adaex.org/",
+          "pool": "https://adapools.org/pool/"
+        },
+        "Name": "ADAex.org"
+      },
+      {
+        "ExplorerId": 102,
+        "NetworkId": 0,
+        "IsBackup": false,
+        "Endpoints": {
+          "address": "https://blockchair.com/cardano/address/",
+          "transaction": "https://blockchair.com/cardano/transaction/"
+        },
+        "Name": "Blockchair"
+      },
+      {
+        "ExplorerId": 105,
+        "NetworkId": 0,
+        "IsBackup": false,
+        "Endpoints": {
+          "stakeAddress": "https://adapools.org/stake/",
+          "address": "https://adapools.org/address/",
+          "transaction": "https://adapools.org/transactions/",
+          "pool": "https://adapools.org/pool/"
+        },
+        "Name": "ADApools"
+      },
+      {
+        "ExplorerId": 107,
+        "NetworkId": 0,
+        "IsBackup": false,
+        "Endpoints": {
+          "pool": "https://pooltool.io/pool/"
+        },
+        "Name": "PoolTool"
+      },
+      {
+        "ExplorerId": 400,
+        "NetworkId": 300,
+        "IsBackup": true,
+        "Endpoints": {
+          "address": "https://explorer.cardano-testnet.iohkdev.io/en/address?address=",
+          "transaction": "https://explorer.cardano-testnet.iohkdev.io/en/transaction?id="
+        },
+        "Name": "CardanoExplorer"
+      },
+      {
+        "ExplorerId": 200,
+        "NetworkId": 100,
+        "IsBackup": true,
+        "Endpoints": {
+          "address": "https://adastat.net/address/",
+          "transaction": "https://adastat.net/transaction/",
+          "pool": "https://adastat.net/pool/"
+        },
+        "Name": "AdaStat"
+      },
+      {
+        "ExplorerId": 201,
+        "NetworkId": 100,
+        "IsBackup": false,
+        "Endpoints": {
+          "address": "https://itnexplorer.cardano.org/en/address/",
+          "transaction": "https://itnexplorer.cardano.org/en/transaction/"
+        },
+        "Name": "CardanoExplorer"
+      },
+      {
+        "ExplorerId": 300,
+        "NetworkId": 200,
+        "IsBackup": true,
+        "Endpoints": {
+          "address": "https://explorer.ergoplatform.com/en/addresses/",
+          "transaction": "https://explorer.ergoplatform.com/en/transactions/"
+        },
+        "Name": "ErgoPlatform"
+      },
+      {
+        "ExplorerId": 500,
+        "NetworkId": 400,
+        "IsBackup": true,
+        "Endpoints": {
+          "address": "https://explorer.alonzo-white.dev.cardano.org/en/address?address=",
+          "transaction": "https://explorer.alonzo-white.dev.cardano.org/en/transaction?id="
+        },
+        "Name": "CardanoExplorer"
+      }
+    ],
+    "PreferredExplorer": []
+  }
+}

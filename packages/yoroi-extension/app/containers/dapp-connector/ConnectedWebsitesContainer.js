@@ -21,7 +21,7 @@ import FullscreenLayout from '../../components/layout/FullscreenLayout'
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types'
+import type { WhitelistEntry } from '../../../chrome/extension/connector/types'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
 import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment'
