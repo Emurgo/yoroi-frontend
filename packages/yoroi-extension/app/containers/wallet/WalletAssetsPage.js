@@ -13,7 +13,6 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 
 
 export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
@@ -26,7 +25,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletAssetsPage)}.`);
     const network = publicDeriver.getParent().getNetworkInfo()
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
+    const spendableBalance = this.generated.stores.transactions.balance;
     const getTokenInfo= genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
 
     const assetsList = (() => {
@@ -43,8 +42,8 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         }));
       })();
 
-    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-    const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
+    const assetDeposit = this.generated.stores.transactions.assetDeposit;
+
     const { stores } = this.generated;
     const { profile } = stores;
     const isNonZeroDeposit = !assetDeposit?.isEmpty();
@@ -66,10 +65,8 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-        getTxRequests: (PublicDeriver<>) => TxRequests
+        balance: ?MultiToken,
+        assetDeposit: MultiToken | null,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
@@ -94,17 +91,8 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null) return {
-              result: undefined,
-            };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
+          assetDeposit: stores.transactions.assetDeposit,
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,

@@ -42,7 +42,6 @@ import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore'
 import { asGetPublicKey, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits'
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import NavPlate from '../../../components/topbar/NavPlate';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { ROUTES } from '../../../routes-config';
@@ -194,9 +193,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         const plate = withPubKey == null
           ? null
           : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-          const txRequests: TxRequests = this.generated.stores.transactions
-          .getTxRequests(publicDeriver);
-          const balance = txRequests.requests.getBalanceRequest.result ?? null;
+        const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
         return (
           <WalletAlreadyExistDialog
@@ -436,7 +433,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         shouldHideBalance: boolean,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests
+        getBalance: (PublicDeriver<>) => MultiToken | null,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -501,7 +498,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,

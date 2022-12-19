@@ -77,7 +77,7 @@ class Wallet extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const spendableBalance = this.generated.stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const activeCategory = categories.find(
@@ -144,7 +144,7 @@ class Wallet extends Component<AllProps> {
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
+    const spendableBalance = this.generated.stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
@@ -266,11 +266,7 @@ class Wallet extends Component<AllProps> {
         firstSync: ?number,
       |},
       router: {| location: any |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-      |},
+      transactions: {| balance: MultiToken | null |},
       profile: {|
         currentTheme: Theme,
       |},
@@ -300,16 +296,7 @@ class Wallet extends Component<AllProps> {
           location: stores.router.location,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null) return {
-              result: undefined,
-            };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
+          balance: stores.transactions.balance,
         },
         profile: {
           currentTheme: stores.profile.currentTheme,

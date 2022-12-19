@@ -18,12 +18,13 @@ import {
 } from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
   genGetMultiAssetMetadata,
   MockUtxoApi,
+  genGetRecentTransactionHashes,
+  genGetTransactionsByHashes,
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -313,13 +314,11 @@ async function syncingSimpleTransaction(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory,
-    network,
-  );
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
+  const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -345,7 +344,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -446,7 +446,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -580,7 +581,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -626,7 +628,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -650,11 +653,6 @@ async function syncingSimpleTransaction(
 
   // test rollback
   {
-    // mock network best block is based on the highest tx in the mock chain
-    // so if we get rid of txs, the best block on the mock chain goes down
-    // but this causes rollbacks to stop happening (since it goes back more than k slots)
-    // so to avoid this, we save the best block and force return it later
-    const bestBlock = getBestBlock({ network });
     txHistory.pop();
     txHistory.pop();
 
@@ -667,8 +665,9 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
-      () => bestBlock,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
+      getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
     );
@@ -713,7 +712,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -780,13 +780,11 @@ async function utxoCreatedAndUsed(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory,
-    network
-  );
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
+  const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -814,7 +812,8 @@ async function utxoCreatedAndUsed(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata

@@ -15,7 +15,6 @@ import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import TokensPage from '../../components/wallet/assets/Tokens';
 
 export type GeneratedData = typeof TokensPageRevamp.prototype.generated;
@@ -26,7 +25,7 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(TokensPageRevamp)}.`);
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const spendableBalance = this.generated.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
 
     const assetsList = (() => {
@@ -47,8 +46,7 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
         }));
     })();
 
-    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-    const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
+    const assetDeposit = this.generated.stores.transactions.getAssetDeposit(publicDeriver);
 
     const { stores } = this.generated;
     const { profile } = stores;
@@ -70,10 +68,8 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        balance: MultiToken | null,
+        getAssetDeposit: (PublicDeriver<>) => MultiToken | null,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
@@ -98,18 +94,8 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
+          getAssetDeposit: stores.transactions.getAssetDeposit,
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,

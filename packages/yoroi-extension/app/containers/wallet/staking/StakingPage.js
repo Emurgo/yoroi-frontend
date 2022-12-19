@@ -7,7 +7,6 @@ import type { GeneratedData as SidebarContainerData } from '../../SidebarContain
 import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import type { ConfigType } from '../../../../config/config-types';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { DelegationRequests, PoolMeta } from '../../../stores/toplevel/DelegationStore';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
@@ -357,8 +356,7 @@ class StakingPage extends Component<AllProps> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
     }
-    const txRequests = stores.transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result;
+    const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
@@ -563,7 +561,7 @@ class StakingPage extends Component<AllProps> {
       transactions: {|
         showWalletEmptyBanner: boolean,
         showDelegationBanner: boolean,
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken,
       |},
       time: {|
         getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
@@ -625,7 +623,7 @@ class StakingPage extends Component<AllProps> {
         transactions: {
           showWalletEmptyBanner: stores.transactions.showWalletEmptyBanner,
           showDelegationBanner: stores.transactions.showDelegationBanner,
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,

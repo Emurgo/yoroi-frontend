@@ -71,32 +71,7 @@ export default class TokenInfoStore<
   setup(): void {
     super.setup();
     this.tokenInfo = new Map();
-    // the Ergo connector doesn't have this action
-    if (this.actions.wallets?.setActiveWallet) {
-      this.actions.wallets.setActiveWallet.listen(
-        ({ wallet }) => { this.fetchMissingTokenInfoForWallet(wallet) }
-      );
-    }
   }
-
-  @action fetchMissingTokenInfoForWallet: (
-    wallet: PublicDeriver<>,
-  ) => Promise<void> = async (wallet) => {
-    // the Ergo connector doesn't have this store, but it this function won't be invoked
-    if (!this.stores.transactions) {
-      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.fetchMissingTokenInfo)} missing transactions store`);
-    }
-
-    const { requests } = this.stores.transactions.getTxRequests(wallet);
-
-    await requests.allRequest;
-
-    const  tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
-
-    const networkId = wallet.getParent().networkInfo.NetworkId;
-
-    await this.fetchMissingTokenInfo(networkId, tokenIds);
-  };
 
   fetchMissingTokenInfo: (number, Array<string>) => Promise<void> = async (
     networkId,

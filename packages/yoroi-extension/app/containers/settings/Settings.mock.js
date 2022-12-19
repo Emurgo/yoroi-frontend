@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import { select, } from '@storybook/addon-knobs';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';

@@ -188,7 +188,7 @@ exports[`Syncing with failed bip44 1`] = `
         \\"Digest\\": 8.191593645542673e-27,
         \\"Ordinal\\": 0,
         \\"LastUpdateTime\\": 1568392656000,
-        \\"Status\\": -2,
+        \\"Status\\": 1,
         \\"ErrorMessage\\": null,
         \\"TransactionId\\": 1
       },
@@ -381,7 +381,7 @@ exports[`Syncing with failed bip44 1`] = `
         \\"Digest\\": 1.249559827714551e-31,
         \\"Ordinal\\": 0,
         \\"LastUpdateTime\\": 1568392636000,
-        \\"Status\\": -2,
+        \\"Status\\": 1,
         \\"ErrorMessage\\": null,
         \\"TransactionId\\": 2
       },
@@ -897,10 +897,10 @@ Array [
   Object {
     "LastSyncInfo": Array [
       Object {
-        "BlockHash": null,
-        "Height": 0,
+        "BlockHash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "Height": 218608,
         "LastSyncInfoId": 1,
-        "SlotNum": null,
+        "SlotNum": 219650,
         "Time": 1970-01-01T00:00:00.004Z,
       },
     ],
@@ -1068,7 +1068,7 @@ Array [
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
         "LastUpdateTime": 1568392656000,
         "Ordinal": 0,
-        "Status": -2,
+        "Status": 1,
         "TransactionId": 1,
         "Type": 0,
       },
@@ -1080,7 +1080,7 @@ Array [
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
         "LastUpdateTime": 1568392636000,
         "Ordinal": 0,
-        "Status": -2,
+        "Status": 1,
         "TransactionId": 2,
         "Type": 0,
       },
@@ -1210,7 +1210,7 @@ exports[`Syncing with pending bip44 1`] = `
         \\"Digest\\": 1.9060984568373646e-36,
         \\"Ordinal\\": null,
         \\"LastUpdateTime\\": 1568392676000,
-        \\"Status\\": -2,
+        \\"Status\\": -3,
         \\"ErrorMessage\\": null,
         \\"TransactionId\\": 3
       },
@@ -1384,7 +1384,7 @@ exports[`Syncing with pending bip44 1`] = `
         \\"Digest\\": 8.191593645542673e-27,
         \\"Ordinal\\": 0,
         \\"LastUpdateTime\\": 1568392656000,
-        \\"Status\\": -2,
+        \\"Status\\": 1,
         \\"ErrorMessage\\": null,
         \\"TransactionId\\": 1
       },
@@ -1577,7 +1577,7 @@ exports[`Syncing with pending bip44 1`] = `
         \\"Digest\\": 1.249559827714551e-31,
         \\"Ordinal\\": 0,
         \\"LastUpdateTime\\": 1568392636000,
-        \\"Status\\": -2,
+        \\"Status\\": 1,
         \\"ErrorMessage\\": null,
         \\"TransactionId\\": 2
       },
@@ -2093,10 +2093,10 @@ Array [
   Object {
     "LastSyncInfo": Array [
       Object {
-        "BlockHash": null,
-        "Height": 0,
+        "BlockHash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "Height": 218608,
         "LastSyncInfoId": 1,
-        "SlotNum": null,
+        "SlotNum": 219650,
         "Time": 1970-01-01T00:00:00.004Z,
       },
     ],
@@ -2264,7 +2264,7 @@ Array [
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
         "LastUpdateTime": 1568392656000,
         "Ordinal": 0,
-        "Status": -2,
+        "Status": 1,
         "TransactionId": 1,
         "Type": 0,
       },
@@ -2276,7 +2276,7 @@ Array [
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
         "LastUpdateTime": 1568392636000,
         "Ordinal": 0,
-        "Status": -2,
+        "Status": 1,
         "TransactionId": 2,
         "Type": 0,
       },
@@ -2288,7 +2288,7 @@ Array [
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
         "LastUpdateTime": 1568392676000,
         "Ordinal": null,
-        "Status": -2,
+        "Status": -3,
         "TransactionId": 3,
         "Type": 0,
       },

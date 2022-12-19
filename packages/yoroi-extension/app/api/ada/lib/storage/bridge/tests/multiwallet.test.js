@@ -30,6 +30,8 @@ import {
   genGetTokenInfo,
   genGetMultiAssetMetadata,
   MockUtxoApi,
+  genGetRecentTransactionHashes,
+  genGetTransactionsByHashes,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -396,13 +398,11 @@ async function syncingSimpleTransaction(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory,
-    network,
-  );
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
+  const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
   const withUtxos1 = asGetAllUtxos(publicDeriver1);
   expect(withUtxos1 != null).toEqual(true);
@@ -426,7 +426,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos1,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -471,7 +472,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -503,19 +505,19 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
     );
     await checkPub2IsEmpty(publicDeriver2);
     {
-      // make sure last sync info got reset to ensure rollback did happen
       const response = await publicDeriver2.getLastSyncInfo();
       expect(response).toEqual({
-        BlockHash: null,
+        BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba24',
         LastSyncInfoId: 2,
-        SlotNum: null,
+        SlotNum: 0,
         Height: 0,
         Time: new Date(2),
       });
@@ -553,7 +555,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata

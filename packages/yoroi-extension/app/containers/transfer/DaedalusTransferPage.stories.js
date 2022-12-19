@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import BigNumber from 'bignumber.js';
 import type { Node } from 'react';

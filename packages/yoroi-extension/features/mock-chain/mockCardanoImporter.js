@@ -15,6 +15,8 @@ import type {
   HistoryFunc,
   BestBlockFunc,
   UtxoData,
+  GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
 import { ShelleyCertificateTypes } from '../../app/api/ada/lib/state-fetch/types';
 import type { FilterFunc } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
@@ -32,6 +34,8 @@ import {
   getMangledAddressString,
   toRemoteByronTx,
   MockUtxoApi,
+  genGetTransactionsByHashes,
+  genGetRecentTransactionHashes,
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import {
@@ -2094,6 +2098,10 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   networks.CardanoMainnet
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
+
+const getTransactionsByHashes: GetTransactionsByHashesFunc = genGetTransactionsByHashes(transactions);
+const getRecentTransactionHashes: GetRecentTransactionHashesFunc = genGetRecentTransactionHashes(transactions);
+
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
   const remoteTx = toRemoteByronTx(transactions, request);
 
@@ -2253,4 +2261,6 @@ export default {
   getAccountState,
   getUtxoData,
   mockUtxoApi,
+  getRecentTransactionHashes,
+  getTransactionsByHashes,
 };

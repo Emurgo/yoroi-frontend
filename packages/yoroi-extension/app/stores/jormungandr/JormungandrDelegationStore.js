@@ -274,7 +274,7 @@ export default class JormungandrDelegationStore extends Store<StoresMap, Actions
     this._recalculateDelegationInfoDisposer.push(reaction(
       () => [
         // update if tx history changes
-        this.stores.transactions.hash,
+        this.stores.transactions.recent,
       ],
       async () => {
         for (const requests of this.stores.delegation.delegationRequests) {

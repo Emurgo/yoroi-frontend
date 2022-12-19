@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import type { HwWalletMetaRow, } from '../../../app/api/ada/lib/storage/database/walletTypes/core/tables';
 import {

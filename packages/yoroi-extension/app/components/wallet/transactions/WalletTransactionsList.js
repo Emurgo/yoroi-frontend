@@ -133,7 +133,6 @@ export default class WalletTransactionsList extends Component<Props> {
       notification,
       onCopyAddressTooltip
     } = this.props;
-
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
     const loadingSpinner = isLoadingTransactions ? (

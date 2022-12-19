@@ -33,8 +33,10 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore'
 import type { DelegationRequests } from '../../stores/toplevel/DelegationStore'
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore'
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore'
-import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces'
+import type {
+  IGetPublic,
+  IGetLastSyncInfoResponse,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces'
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables'
 import { MultiToken } from '../../api/common/lib/MultiToken'
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore'
@@ -245,9 +247,7 @@ class MyWalletsPage extends Component<AllProps> {
       );
     })();
 
-    const txRequests: TxRequests = this.generated.stores.transactions
-      .getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+    const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null
@@ -259,6 +259,10 @@ class MyWalletsPage extends Component<AllProps> {
     );
 
     const isLoading = this.generated.stores.transactions.isWalletLoading(
+      publicDeriver
+    );
+
+    const lastSyncInfo = this.generated.stores.transactions.getLastSyncInfo(
       publicDeriver
     );
 
@@ -286,11 +290,7 @@ class MyWalletsPage extends Component<AllProps> {
         }
         walletSync={
           <WalletSync
-            time={
-              txRequests.lastSyncInfo.Time
-                ? moment(txRequests.lastSyncInfo.Time).fromNow()
-                : null
-            }
+            time={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}
             isRefreshing={isRefreshing}
             isLoading={isLoading}
           />
@@ -435,7 +435,8 @@ class MyWalletsPage extends Component<AllProps> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
+        getLastSyncInfo: (PublicDeriver<>) => IGetLastSyncInfoResponse,
         isWalletRefreshing: (PublicDeriver<>) => boolean,
         isWalletLoading: (PublicDeriver<>) => boolean,
       |},
@@ -475,9 +476,10 @@ class MyWalletsPage extends Component<AllProps> {
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
           isWalletRefreshing: stores.transactions.isWalletRefreshing,
           isWalletLoading: stores.transactions.isWalletLoading,
+          getLastSyncInfo: stores.transactions.getLastSyncInfo,
         },
         walletSettings: {
           getConceptualWalletSettingsCache:

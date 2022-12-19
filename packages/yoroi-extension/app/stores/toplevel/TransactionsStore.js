@@ -59,23 +59,20 @@ import {
 } from '../../api/localStorage';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import { FETCH_TXS_BATCH_SIZE } from '../../api/ada';
 
-export type TxRequests = {|
+export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
   lastSyncInfo: IGetLastSyncInfoResponse,
+  txs: Array<WalletTransaction>,
+  hasMoreToLoad: boolean,
   requests: {|
     pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
-    /**
-    * Should ONLY be executed to cache query WITH search options
-    */
-    recentRequest: CachedRequest<GetTransactionsFunc>,
-    /**
-    * Should ONLY be executed to cache query WITHOUT search options.
-    * To reduce memory footprint, this request does not store the whole transaction
-    *  list, but instead only derived data from it.
-    *
-    */
-    allRequest: CachedRequest<GetTransactionsDataFunc>,
+    // used to initially load the saved txs and then periodically refresh for
+    // new txs
+    headRequest: CachedRequest<GetTransactionsFunc>,
+    // used to "load more transactions"
+    tailRequest: CachedRequest<GetTransactionsFunc>,
     /**
      * in lovelaces
      */
@@ -89,12 +86,6 @@ export type TxRequests = {|
 
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
-
-/** How many transactions to display */
-export const INITIAL_SEARCH_LIMIT: number = 5;
-
-/** Skip first n transactions from api */
-export const SEARCH_SKIP: number = 0;
 
 type SubmittedTransactionEntry = {|
   networkId: number,
@@ -116,24 +107,14 @@ function newMultiToken(
   return new MultiToken(values, defaultTokenInfo)
 }
 
-const TRANSACTION_LIST_COMPUTATION_BATCH_SIZE = 60;
-
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
-  /** How many additional transactions to display when user wants to show more */
-  SEARCH_LIMIT_INCREASE: number = 5;
-
   /** Track transactions for a set of wallets */
-  @observable transactionsRequests: Array<TxRequests> = [];
+  @observable txHistoryStates: Array<TxHistoryState> = [];
 
   /** Track banners open status */
   @observable showWalletEmptyBanner: boolean = true;
   @observable showDelegationBanner: boolean = true;
-
-  @observable _searchOptionsForWallets: Array<{|
-    publicDeriver: PublicDeriver<>,
-    options: GetTransactionsRequestOptions,
-  |}> = [];
 
   @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
@@ -150,7 +131,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     const actions = this.actions.transactions;
-    actions.loadMoreTransactions.listen(this._increaseSearchLimit);
+    actions.loadMoreTransactions.listen(this._loadMore);
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
     actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
@@ -169,39 +150,27 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       incoming: [],
       outgoing: [],
     };
-
-    // Get current public deriver
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return defaultUnconfirmedAmount;
-
-    // Get current transactions for public deriver
-    const txRequests = this.getTxRequests(publicDeriver);
-    const result = txRequests.requests.allRequest.result;
-    if (!result || !result.unconfirmedAmount) return defaultUnconfirmedAmount;
-
-    return result.unconfirmedAmount;
+    return defaultUnconfirmedAmount;
   }
-
-
-  @action _increaseSearchLimit: PublicDeriver<> => Promise<void> = async (
-    publicDeriver
-  ) => {
-    if (this.searchOptions != null) {
-      this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
-      await this.refreshLocal(publicDeriver);
-    }
-  };
 
   @action toggleIncludeTxIds: void => void = () => {
     this.shouldIncludeTxIds = !this.shouldIncludeTxIds
   }
 
-  @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
+  @computed get headTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.recentTransactionsRequest)} no wallet selected`);
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.headTransactionsRequest)} no wallet selected`);
     }
-    return this.getTxRequests(publicDeriver).requests.recentRequest;
+    return this.getTxHistoryState(publicDeriver).requests.headRequest;
+  }
+
+  @computed get tailTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.tailTransactionsRequest)} no wallet selected`);
+    }
+    return this.getTxHistoryState(publicDeriver).requests.tailRequest;
   }
 
   @computed get lastSyncInfo(): IGetLastSyncInfoResponse {
@@ -209,74 +178,42 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`);
     }
-    const result = this.getTxRequests(publicDeriver).lastSyncInfo;
+    const result = this.getTxHistoryState(publicDeriver).lastSyncInfo;
     return result;
-  }
-
-  /** Get (or create) the search options for the active wallet (if any)  */
-  @computed get searchOptions(): ?GetTransactionsRequestOptions {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return null;
-    const foundSearchOptions = find(
-      this._searchOptionsForWallets,
-      { publicDeriver }
-    );
-    if (!foundSearchOptions) {
-      throw new Error(`${nameof(this.searchOptions)} no option found`);
-    }
-    return foundSearchOptions.options;
-  }
-
-
-  /**
-   * generate a hash of the transaction history
-   * we can use this to trigger mobx updates
-   */
-  @computed get hash(): number {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return 0;
-    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
-    if (result == null) return 0;
-
-    return result.hash;
   }
 
   @computed get recent(): Array<WalletTransaction> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
-    const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
+    const { txs } = this.getTxHistoryState(publicDeriver);
     return  [
       ...this.getSubmittedTransactions(publicDeriver),
-      ...(result ? result.transactions : [])
+      ...txs,
     ];
   }
 
   @computed get hasAny(): boolean {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return false;
-    const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
-    return result ? result.transactions.length > 0 : false;
+    return this.recent.length > 0;
   }
 
   @computed get hasAnyPending(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    const result = this.getTxRequests(publicDeriver).requests.pendingRequest.result;
+    const result = this.getTxHistoryState(publicDeriver).requests.pendingRequest.result;
     return result ? result.length > 0 : false;
   }
 
-  @computed get totalAvailable(): number {
+  @computed get hasMoreToLoad(): boolean {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return 0;
-    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
-    return result ? result.totalAvailable : 0;
+    if (!publicDeriver) return false;
+    return this.getTxHistoryState(publicDeriver).hasMoreToLoad;
   }
 
   // This method ensures that at any time, there is only one refreshing process
   // for each wallet.
   refreshTransactionData: {|
     publicDeriver: PublicDeriver<>,
-    localRequest: boolean,
+    isLocalRequest: boolean,
   |} => Promise<void> = async (request) => {
     const { publicDeriverId } = request.publicDeriver;
     if (this.ongoingRefreshing.has(publicDeriverId)) {
@@ -295,18 +232,57 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
+  @computed get balance(): MultiToken | null {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return null;
+    return this.getTxHistoryState(publicDeriver).requests.getBalanceRequest.result || null;
+  }
+
+  @computed get isLoadingMore(): boolean {
+    const request = this.tailTransactionsRequest;
+    return request.isExecuting;
+  }
+
+  @computed get isLoading(): boolean {
+    const request = this.headTransactionsRequest;
+    return !request.wasExecuted;
+  }
+
+  @computed get assetDeposit(): MultiToken | null {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return null;
+    return this.getTxHistoryState(publicDeriver).requests.getAssetDepositRequest.result || null;
+  }
+
   isWalletRefreshing:  PublicDeriver<> => boolean = (publicDeriver) => {
     return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
   }
 
   isWalletLoading:  PublicDeriver<> => boolean = (publicDeriver) => {
-    return !this.getTxRequests(publicDeriver).requests.recentRequest.wasExecuted;
+    return !this.getTxHistoryState(publicDeriver).requests.headRequest.wasExecuted;
   }
 
-  /** Refresh transaction data for all wallets and update wallet balance */
+  clearCache: PublicDeriver<> => void = (publicDeriver) => {
+    const txs = this.getTxHistoryState(publicDeriver).txs;
+    txs.splice(0, txs.length - 1);
+  }
+
+  getBalance: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
+    return this.getTxHistoryState(publicDeriver).requests.getBalanceRequest.result || null;
+  }
+
+  getAssetDeposit: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
+    return this.getTxHistoryState(publicDeriver).requests.getAssetDepositRequest.result || null;
+  }
+
+  getLastSyncInfo: PublicDeriver<> => IGetLastSyncInfoResponse = (publicDeriver) => {
+    return this.getTxHistoryState(publicDeriver).lastSyncInfo;
+  }
+
+  /** Refresh transaction history and update wallet balance */
   @action _refreshTransactionData: {|
     publicDeriver: PublicDeriver<>,
-    localRequest: boolean,
+    isLocalRequest: boolean,
   |} => Promise<void> = async (request) => {
     const publicDeriver = asHasLevels<
       ConceptualWallet,
@@ -316,22 +292,31 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       return;
     }
 
-    // All Request
-    const allRequest = this.getTxRequests(request.publicDeriver).requests.allRequest;
+    const {
+      headRequest,
+      getBalanceRequest,
+      getAssetDepositRequest
+    } = this.getTxHistoryState(request.publicDeriver).requests;
 
-    const oldHash = allRequest.result ? allRequest.result.hash : 0;
-    allRequest.invalidate({ immediately: false });
-    allRequest.execute({
+    headRequest.invalidate({ immediately: false });
+    headRequest.execute({
       publicDeriver,
-      isLocalRequest: request.localRequest,
+      isLocalRequest: request.isLocalRequest
     });
-
-    if (!allRequest.promise) throw new Error('should never happen');
-
-    const result = await allRequest.promise;
-
-    const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
-    const newHash = result.hash;
+    if (headRequest.promise == null) {
+      throw new Error('unexpected nullish headRequest.promise');
+    }
+    const result = await headRequest.promise;
+    const { txs } = this.getTxHistoryState(request.publicDeriver);
+    runInAction(() => {
+      for (let i = 0; i < result.length; i++) {
+        const tx = result[i];
+        if (tx.txid === txs[0]?.txid) {
+          break;
+        }
+        txs.splice(i, 0, tx);
+      }
+    });
 
     // update last sync (note: changes even if no new transaction is found)
     {
@@ -339,18 +324,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         getLastSyncInfo: publicDeriver.getLastSyncInfo
       });
       runInAction(() => {
-        this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
+        this.getTxHistoryState(request.publicDeriver).lastSyncInfo = lastUpdateDate;
       });
     }
 
-    // only recalculate cache if
-    // 1) the tx history changed
-    // 2) if it's the first time computing for this wallet
-    if (oldHash !== newHash || !recentRequest.wasExecuted) {
-      await this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
+    const timestamps: Set<number> = new Set();
+    const remoteTransactionIds: Set<string> = new Set();
+    for (const { txid, date } of result) {
+      timestamps.add(date.valueOf());
+      remoteTransactionIds.add(txid);
     }
-
-    // sync these regardless of whether or not new txs are found
 
     // note: possible existing memos were modified on a difference instance, etc.
     await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
@@ -364,11 +347,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }
     await this.stores.coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
-      timestamps: result.timestamps,
+      timestamps: Array.from(timestamps),
       defaultToken: ticker,
     });
-
-    const remoteTransactionIds = result.remoteTransactionIds;
 
     let submittedTransactionsChanged = false;
     runInAction(() => {
@@ -384,22 +365,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (submittedTransactionsChanged) {
       this._persistSubmittedTransactions();
     }
-  };
-
-  @action reactToTxHistoryUpdate: {|
-    publicDeriver: PublicDeriver<>,
-  |} => Promise<void> = async (request) => {
-    const publicDeriver = asHasLevels<
-      ConceptualWallet,
-      IGetLastSyncInfo
-    >(request.publicDeriver);
-    if (publicDeriver == null) {
-      return;
-    }
 
     // update token info cache
     await this.stores.tokenInfoStore.refreshTokenInfo();
 
+    // update balance
     const deriverParent = request.publicDeriver.getParent();
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
@@ -411,25 +381,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     // <TODO:PLUTUS_SUPPORT>
     const utxoHasDataHash = false;
 
-    // calculate pending transactions just to cache the result
-    const requests = this.getTxRequests(request.publicDeriver).requests;
-    {
-      const { pendingRequest } = requests;
-      pendingRequest.invalidate({ immediately: false });
-      pendingRequest.execute(
-        { publicDeriver }
-      );
-      if (!pendingRequest.promise) throw new Error('should never happen');
-      await pendingRequest.promise;
-    }
-
-    // update balance
     await (async () => {
       const canGetBalance = asGetBalance(publicDeriver);
       if (canGetBalance == null) {
         return;
       }
-      const { getBalanceRequest, getAssetDepositRequest } = requests;
       getBalanceRequest.invalidate({ immediately: false });
       getAssetDepositRequest.invalidate({ immediately: false });
       getBalanceRequest.execute({
@@ -483,41 +439,35 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise) throw new Error('should never happen');
       await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
     })();
-
-    // refresh local history
-    await this.refreshLocal(request.publicDeriver);
   }
 
-  @action refreshLocal: (
-    PublicDeriver<> & IGetLastSyncInfo
-  ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
+  @action _loadMore: (
+    PublicDeriver<> & IGetLastSyncInfo,
+  ) => Promise<void> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const limit = this.searchOptions
-      ? this.searchOptions.limit
-      : INITIAL_SEARCH_LIMIT;
-    const skip = this.searchOptions
-      ? this.searchOptions.skip
-      : SEARCH_SKIP;
-
     const withLevels = asHasLevels<
       ConceptualWallet,
       IGetLastSyncInfo
     >(publicDeriver);
     if (withLevels == null) {
-      throw new Error(`${nameof(this.refreshLocal)} no levels`);
+      throw new Error(`${nameof(this._loadMore)} no levels`);
     }
-    const requestParams: BaseGetTransactionsRequest = {
+    const state = this.getTxHistoryState(publicDeriver);
+    const { tailRequest } = state.requests;
+
+    tailRequest.invalidate({ immediately: false });
+    tailRequest.execute({
       publicDeriver: withLevels,
-      isLocalRequest: true,
-      limit,
-      skip,
-    };
-    const recentRequest = this.getTxRequests(publicDeriver).requests.recentRequest;
-    recentRequest.invalidate({ immediately: false });
-    recentRequest.execute(requestParams); // note: different params/cache than allRequests
-    if (!recentRequest.promise) throw new Error('should never happen');
-    return recentRequest.promise;
+      isLocalRequest: false,
+      afterTxs: state.txs,
+    });
+    if (!tailRequest.promise) throw new Error('should never happen');
+    const result = await tailRequest.promise;
+    runInAction(() => {
+      state.txs.splice(state.txs.length, 0, ...result);
+      state.hasMoreToLoad = result.length === FETCH_TXS_BATCH_SIZE;
+    });
   }
 
   /** Add a new public deriver to track and refresh the data */
@@ -530,22 +480,24 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     const foundRequest = find(
-      this.transactionsRequests,
+      this.txHistoryStates,
       { publicDeriver: request.publicDeriver }
     );
     if (foundRequest != null) {
       return;
     }
-    this.transactionsRequests.push({
+    this.txHistoryStates.push({
       publicDeriver: request.publicDeriver,
       lastSyncInfo: request.lastSyncInfo,
+      txs: [],
+      hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise 
       requests: {
         // note: this captures the right API for the wallet
-        recentRequest: new CachedRequest<GetTransactionsFunc>(
+        headRequest: new CachedRequest<GetTransactionsFunc>(
           this.stores.substores[apiType].transactions.refreshTransactions
         ),
-        allRequest: new CachedRequest<GetTransactionsDataFunc>(
-          this.genComputeOnAllTransactions(apiType),
+        tailRequest: new CachedRequest<GetTransactionsFunc>(
+          this.stores.substores[apiType].transactions.refreshTransactions
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
@@ -554,85 +506,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         ),
       },
     });
-    this._searchOptionsForWallets.push({
-      publicDeriver: request.publicDeriver,
-      options: {
-        limit: INITIAL_SEARCH_LIMIT,
-        skip: SEARCH_SKIP
-      }
-    });
   }
 
-  genComputeOnAllTransactions: string => GetTransactionsDataFunc = (apiType) => {
-    return async (request) => {
-      const publicDeriver = request.publicDeriver;
-
-      // Get current transactions for public deriver
-      const txRequests = this.getTxRequests((publicDeriver: any));
-
-      const { assuranceMode } = this.stores.walletSettings
-            .getPublicDeriverSettingsCache((publicDeriver: any));
-
-      let cursor = 0;
-
-      const reducers = [
-        new HashReducer(),
-        new TotalAvailableReducer(),
-        new UnconfirmedAmountReducer(
-          txRequests.lastSyncInfo.Height,
-          assuranceMode,
-        ),
-        new RemoteTransactionIdsReducer(),
-        new TimestampsReducer(),
-        new AssetIdsReducer(),
-      ];
-
-      for (let i = 0; ; i++) {
-        const batchRequest = {
-          ...request,
-          skip: cursor,
-          limit: TRANSACTION_LIST_COMPUTATION_BATCH_SIZE,
-        };
-
-        const batchResult =
-          await this.stores.substores[apiType].transactions.refreshTransactions(
-            {
-              ...batchRequest,
-              // only the first call should update from remote
-              isLocalRequest: request.isLocalRequest || i > 0,
-            }
-          );
-        if (batchResult.transactions.length === 0) {
-          break;
-        }
-        cursor += TRANSACTION_LIST_COMPUTATION_BATCH_SIZE;
-
-        for (const reducer of reducers) {
-          reducer.reduce(batchResult.transactions);
-        }
-      }
-
-      return {
-        hash: reducers[0].result,
-        totalAvailable: reducers[1].result,
-        unconfirmedAmount: reducers[2].result,
-        remoteTransactionIds: reducers[3].result,
-        timestamps: reducers[4].result,
-        assetIds: [...reducers[5].result],
-      };
-    };
-  }
-
-  getTxRequests: (
+  getTxHistoryState: (
     PublicDeriver<>
-  ) => TxRequests = (
+  ) => TxHistoryState = (
     publicDeriver
   ) => {
-    const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest == null) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.getTxRequests)} no requests found`);
+    const foundState = find(this.txHistoryStates, { publicDeriver });
+    if (foundState == null) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.getTxHistoryState)} no state found`);
     }
-    return foundRequest;
+    return foundState;
   };
 
   @action _exportTransactionsToFile: {|
@@ -937,126 +822,5 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       console.error(error);
     }
-  }
-}
-
-class HashReducer {
-  hash: number = 0;
-  reduce(transactions: Array<WalletTransaction>): void {
-    const seed = 858499202; // random seed
-    for (const tx of transactions) {
-      this.hash = digestForHash(this.hash.toString(16) + tx.uniqueKey, seed);
-    }
-  }
-  get result(): number {
-    return this.hash;
-  }
-}
-
-class TotalAvailableReducer {
-  length: number = 0;
-  reduce(transactions: Array<WalletTransaction>): void {
-    this.length += transactions.length;
-  }
-  get result(): number {
-    return this.length;
-  }
-}
-
-class UnconfirmedAmountReducer {
-  amount: UnconfirmedAmount;
-  lastSyncHeight: number;
-  assuranceMode: AssuranceMode;
-
-  constructor(
-    lastSyncHeight: number,
-    assuranceMode: AssuranceMode,
-  ) {
-    this.amount = {
-      incoming: [],
-      outgoing: [],
-    };
-
-    this.lastSyncHeight = lastSyncHeight;
-    this.assuranceMode = assuranceMode;
-  }
-
-  reduce(transactions: Array<WalletTransaction>): void {
-    for (const transaction of transactions) {
-      // skip any failed transactions
-      if (transaction.state < 0) continue;
-
-      const assuranceForTx = transaction.getAssuranceLevelForMode(
-        this.assuranceMode,
-        this.lastSyncHeight
-      );
-
-      if (assuranceForTx !== assuranceLevels.HIGH) {
-        // outgoing
-        if (transaction.type === transactionTypes.EXPEND) {
-          this.amount.outgoing.push({
-            amount: transaction.amount.absCopy(),
-            timestamp: transaction.date.valueOf(),
-          });
-        }
-
-        // incoming
-        if (transaction.type === transactionTypes.INCOME) {
-          this.amount.incoming.push({
-            amount: transaction.amount.absCopy(),
-            timestamp: transaction.date.valueOf(),
-          });
-        }
-      }
-    }
-  }
-  get result(): UnconfirmedAmount {
-    return this.amount;
-  }
-}
-
-class RemoteTransactionIdsReducer {
-  ids: Set<string> = new Set();
-  reduce(transactions: Array<WalletTransaction>): void {
-    for (const { txid } of transactions) {
-      this.ids.add(txid);
-    }
-  }
-  get result(): Set<string> {
-    return this.ids;
-  }
-}
-
-class TimestampsReducer {
-  timestamps: Set<number> = new Set();
-  reduce(transactions: Array<WalletTransaction>): void {
-    for (const { date } of transactions) {
-      this.timestamps.add(date.valueOf());
-    }
-  }
-  get result(): Array<number> {
-    return Array.from(this.timestamps);
-  }
-}
-
-// Collect all asset IDs that appear in the transaction list
-class AssetIdsReducer {
-  assetIds: Set<string> = new Set();
-  reduce(transactions: Array<WalletTransaction>): void {
-    for (const tx of transactions) {
-      for (const io of tx.addresses.from) {
-        for (const tokenEntry of io.value.values) {
-          this.assetIds.add(tokenEntry.identifier);
-        }
-      }
-      for (const io of tx.addresses.to) {
-        for (const tokenEntry of io.value.values) {
-          this.assetIds.add(tokenEntry.identifier);
-        }
-      }
-    }
-  }
-  get result(): Set<string> {
-    return this.assetIds;
   }
 }

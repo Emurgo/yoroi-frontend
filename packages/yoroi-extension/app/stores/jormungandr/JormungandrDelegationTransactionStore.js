@@ -35,7 +35,7 @@ export default class JormungandrDelegationTransactionStore extends Store<StoresM
     () => [
       this.stores.wallets.selected,
       // update if tx history changes
-      this.stores.transactions.hash,
+      this.stores.transactions.recent,
     ],
     () => {
       if (this.createDelegationTx.wasExecuted) {

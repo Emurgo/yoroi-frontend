@@ -22,6 +22,8 @@ import {
   genGetTokenInfo,
   genGetMultiAssetMetadata,
   MockUtxoApi,
+  genGetRecentTransactionHashes,
+  genGetTransactionsByHashes,
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -273,13 +275,11 @@ async function syncingSimpleTransaction(
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory,
-    network,
-  );
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
+  const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -304,7 +304,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -421,7 +422,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata

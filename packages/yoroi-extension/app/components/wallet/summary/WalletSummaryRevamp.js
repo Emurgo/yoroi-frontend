@@ -32,7 +32,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
@@ -175,7 +174,6 @@ export default class WalletSummaryRevamp extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
     } = this.props;
@@ -200,20 +198,6 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 alignItems: 'center',
               }}
             >
-              <Typography
-                variant="h2"
-                as="p"
-                sx={{ fontWeight: 400, color: 'var(--yoroi-palette-gray-600)' }}
-              >
-                {intl.formatMessage({ id: 'wallet.summary.page.transactionsLabel' })}:{' '}
-                <Typography
-                  variant="h2"
-                  as="span"
-                  sx={{ fontWeight: 400, color: 'var(--yoroi-palette-gray-900)' }}
-                >
-                  {numberOfTransactions}
-                </Typography>
-              </Typography>
               <Button
                 variant="ternary"
                 sx={{

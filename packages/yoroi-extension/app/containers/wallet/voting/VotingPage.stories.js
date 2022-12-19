@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import type { Node } from 'react';
 

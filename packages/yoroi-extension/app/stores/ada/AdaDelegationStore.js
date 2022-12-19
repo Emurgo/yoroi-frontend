@@ -323,7 +323,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
     this._recalculateDelegationInfoDisposer.push(reaction(
       () => [
         // update if tx history changes
-        this.stores.transactions.hash,
+        this.stores.transactions.recent,
       ],
       async () => {
         for (const requests of this.stores.delegation.delegationRequests) {

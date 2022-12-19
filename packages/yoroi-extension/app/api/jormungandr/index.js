@@ -341,10 +341,7 @@ export default class JormungandrApi {
           defaultToken: request.publicDeriver.getParent().getDefaultToken(),
         });
       });
-      return {
-        transactions: mappedTransactions,
-        total: mappedTransactions.length
-      };
+      return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
