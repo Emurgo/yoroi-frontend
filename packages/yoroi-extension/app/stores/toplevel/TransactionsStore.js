@@ -59,10 +59,7 @@ import {
 } from '../../api/localStorage';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
-import dayjs from 'dayjs'
-import isBetween from 'dayjs/plugin/isBetween'
-
-dayjs.extend(isBetween)
+import moment from 'moment';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -603,7 +600,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             {
               ...batchRequest,
               // only the first call should update from remote
-              isLocalRequest: i > 0,
+              isLocalRequest: request.isLocalRequest || i > 0,
             }
           );
         if (batchResult.transactions.length === 0) {
@@ -797,9 +794,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     console.log({res})
 
     respTxRows = respTxRows.filter(row => {
-      const txDate = dayjs(row.date)
       // 4th param `[]` means that the start and end date are included
-      return txDate.isBetween(startDate, endDate, 'day', '[]')
+      return moment(row.date).isBetween(startDate, endDate, 'day', '[]')
     }).sort((a, b) => b.date - a.date);
 
     // if (respTxRows.length < 1) {

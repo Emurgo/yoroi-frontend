@@ -2,13 +2,13 @@
 import { Component } from 'react'
 import type { Node } from 'react'
 import TextField from '@mui/material/TextField';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { observer } from 'mobx-react';
-import { Dayjs } from 'dayjs'
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import moment from 'moment';
 
 const messages = defineMessages({
   startDate: {
@@ -27,11 +27,11 @@ const messages = defineMessages({
 
 type Props = {|
   date: {|
-    startDate: typeof Dayjs | null,
-    endDate: typeof Dayjs | null,
+    startDate: Date | null,
+    endDate: Date | null,
   |},
-  setStartDate(typeof Dayjs | null): void,
-  setEndDate(typeof Dayjs | null): void
+  setStartDate(Date | null): void,
+  setEndDate(Date| null): void
 |}
 
 @observer
@@ -44,40 +44,42 @@ export default class ExportTransactionDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { date, setStartDate, setEndDate } = this.props;
-    const invalidInterval = (
-      date.startDate && date.endDate && date.startDate.isAfter(date.endDate)
-    );
+
+    const dates = [
+      {
+        id: 1,
+        label: messages.startDate,
+        value: date.startDate,
+        setDateHandler: setStartDate,
+        minDate: undefined,
+      },
+      {
+        id: 2,
+        label: messages.endDate,
+        value: date.endDate,
+        setDateHandler: setEndDate,
+        minDate: date.startDate !== null ? date.startDate : undefined,
+      },
+    ]
+
     return (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          label={intl.formatMessage(messages.startDate)}
-          value={date.startDate}
-          onChange={(newDate) => {
-            setStartDate(newDate);
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              error={invalidInterval}
-              sx={{ mb: '10px' }}
-            />
-          )}
-        />
-        <DatePicker
-          label={intl.formatMessage(messages.endDate)}
-          value={date.endDate}
-          onChange={(newDate) => {
-            setEndDate(newDate);
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              error={invalidInterval}
-              helperText={invalidInterval ? 'Invalid interval' : ''}
-              sx={{ mb: '10px' }}
-            />
-          )}
-        />
+      <LocalizationProvider dateAdapter={AdapterMoment}>
+        {dates.map(({ id, label, value, setDateHandler, minDate }) => (
+          <DatePicker
+            key={id}
+            label={intl.formatMessage(label)}
+            value={value}
+            maxDate={moment()} // Today
+            minDate={minDate}
+            onChange={setDateHandler}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                sx={{ mb: '10px' }}
+              />
+            )}
+          />
+        ))}
       </LocalizationProvider>
     )
   }
