@@ -38,7 +38,8 @@ export default function ConnectionInfoComponent({ intl, connectedWebsite, connec
       </Box>
       <Box mt="32px">
         <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
-          {intl.formatMessage(signTxMessages.connectedTo)}
+          {/* TODO: use intl */}
+          From wallet
         </Typography>
         <ConnectedWallet publicDeriver={connectedWallet} />
       </Box>
