@@ -39,7 +39,9 @@ type Props = {|
 
 @observer
 class CardanoUtxoDetails extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+  static contextTypes: {|
+    intl: $npm$ReactIntl$IntlFormat,
+  |} = {
     intl: intlShape.isRequired,
   };
 
@@ -179,7 +181,7 @@ class CardanoUtxoDetails extends Component<Props> {
         display="grid"
         gridTemplateColumns="180px 1fr"
         alignItems="flex-start"
-        py="12px"
+        py="16px"
         borderRadius="8px"
       >
         <CopyableAddress
@@ -233,52 +235,90 @@ class CardanoUtxoDetails extends Component<Props> {
     return (
       <Box>
         <Box>
-          <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
+          <Box pb="10px">
             <Typography variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(globalMessages.fromAddresses)}
               <span>: {txData.inputs.length}</span>
             </Typography>
           </Box>
           <Panel>
-            <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
+            <Box>
               <Typography variant="body1" fontWeight="500" color="#4A5065">
                 {/* TODO: use intl */}
                 Your Addresses
               </Typography>
+              <Box>
+                {txData.inputs.map((address, addressIndex) => {
+                  return this.renderRow({
+                    kind: 'in',
+                    address,
+                    addressIndex,
+                    transform: amount => amount.abs().negated(),
+                  });
+                })}
+              </Box>
             </Box>
+            {/* TODO: create logic to diferentiate between owned & foreign addresses */}
+            <Separator />
             <Box>
-              {txData.inputs.map((address, addressIndex) => {
-                return this.renderRow({
-                  kind: 'in',
-                  address,
-                  addressIndex,
-                  transform: amount => amount.abs().negated(),
-                });
-              })}
+              <Typography variant="body1" fontWeight="500" color="#4A5065">
+                {/* TODO: use intl */}
+                Foreign Addresses
+              </Typography>
+              <Box>
+                {txData.inputs.map((address, addressIndex) => {
+                  return this.renderRow({
+                    kind: 'in',
+                    address,
+                    addressIndex,
+                    transform: amount => amount.abs().negated(),
+                  });
+                })}
+              </Box>
             </Box>
           </Panel>
         </Box>
         <Box>
-          <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
+          <Box pb="10px">
             <Typography variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(globalMessages.toAddresses)}
               <span>: {txData.outputs.length}</span>
             </Typography>
           </Box>
           <Panel withMargin={false}>
-            {/* TODO: use intl */}
-            <Typography variant="body1" fontWeight="500" color="#4A5065">
-              Your Addresses
-            </Typography>
             <Box>
-              {txData.outputs.map((address, addressIndex) => {
-                return this.renderRow({
-                  kind: 'in',
-                  address,
-                  addressIndex,
-                  transform: amount => amount.abs(),
-                });
-              })}
+              {/* TODO: use intl */}
+              <Typography variant="body1" fontWeight="500" color="#4A5065">
+                Your Addresses
+              </Typography>
+              <Box>
+                {txData.outputs.map((address, addressIndex) => {
+                  return this.renderRow({
+                    kind: 'in',
+                    address,
+                    addressIndex,
+                    transform: amount => amount.abs(),
+                  });
+                })}
+              </Box>
+            </Box>
+            {/* TODO: create logic to diferentiate between owned & foreign addresses */}
+            <Separator />
+            <Box>
+              {/* TODO: use intl */}
+              <Typography variant="body1" fontWeight="500" color="#4A5065">
+                Foreign Addresses
+              </Typography>
+              <Box>
+                {txData.outputs.map((address, addressIndex) => {
+                  return this.renderRow({
+                    kind: 'in',
+                    address,
+                    addressIndex,
+                    transform: amount => amount.abs(),
+                  });
+                })}
+              </Box>
             </Box>
           </Panel>
         </Box>
@@ -298,6 +338,10 @@ const Panel = ({ children, withMargin = true }) => (
   >
     {children}
   </Box>
+);
+
+const Separator = () => (
+  <Box sx={{ height: '1px', width: '100%', backgroundColor: '#DCE0E9', mt: '16px', mb: '16px' }} />
 );
 
 export default CardanoUtxoDetails;
