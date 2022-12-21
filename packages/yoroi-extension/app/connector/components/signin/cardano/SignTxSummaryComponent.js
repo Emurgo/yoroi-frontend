@@ -7,7 +7,7 @@ export default function CardanoSignTxSummaryComponent({ txTotalAmount, intl }) {
       p="16px"
       display="flex"
       justifyContent="space-between"
-      alignItems="flex-start"
+      alignItems="center"
       borderRadius="8px"
       color="var(--yoroi-palette-common-white)"
       sx={{ background: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)' }}
@@ -16,7 +16,7 @@ export default function CardanoSignTxSummaryComponent({ txTotalAmount, intl }) {
         {intl.formatMessage(signTxMessages.summary)}
       </Typography>
       <Typography variant="h3" fontSize="24px" textAlign="right">
-        {txTotalAmount}
+        {txTotalAmount.cryptoAmount} {txTotalAmount.ticker}
       </Typography>
     </Box>
   );

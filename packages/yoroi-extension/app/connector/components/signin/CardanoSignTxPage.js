@@ -41,7 +41,6 @@ import WalletCard from '../connect/ConnectedWallet';
 import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import { LoadingButton } from '@mui/lab';
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import CardanoSignTxComponent from './cardano/SignTxComponent';
 import ConnectionInfoComponent from './cardano/ConnectionInfoComponent';
@@ -173,10 +172,6 @@ class SignTxPage extends Component<Props, State> {
     return undefined;
   };
 
-  _resolveTokenInfo: TokenEntry => ?$ReadOnly<TokenRow> = tokenEntry => {
-    return this.props.getTokenInfo(tokenEntry);
-  };
-
   renderBundle: ({|
     amount: MultiToken,
     render: TokenEntry => Node,
@@ -191,21 +186,20 @@ class SignTxPage extends Component<Props, State> {
     );
   };
 
-  renderAmountDisplay: ({|
-    entry: TokenEntry,
-  |}) => Node = request => {
-    const tokenInfo = this._resolveTokenInfo(request.entry);
+  getDisplayAmount: TokenEntry => Object = request => {
+    const tokenInfo = this.props.getTokenInfo(request);
     if (!tokenInfo) {
       throw new Error('missing token info');
     }
 
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
-    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
+    const shiftedAmount = request.amount.shiftedBy(-numberOfDecimals);
     const ticker = tokenInfo
       ? this.getTicker(tokenInfo)
-      : assetNameFromIdentifier(request.entry.identifier);
+      : assetNameFromIdentifier(request.identifier);
 
     let fiatAmountDisplay = null;
+    let fiatCurrency = null;
 
     // this is a feature flag
     if (this.props.unitOfAccountSetting.enabled === true) {
@@ -214,18 +208,8 @@ class SignTxPage extends Component<Props, State> {
       if (price != null) {
         const fiatAmount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = fiatAmount.split('.');
-        let beforeDecimalSigned;
-        if (beforeDecimal.startsWith('-')) {
-          beforeDecimalSigned = beforeDecimal;
-        } else {
-          beforeDecimalSigned = '+' + beforeDecimal;
-        }
-        fiatAmountDisplay = (
-          <>
-            <span>{beforeDecimalSigned}</span>
-            {afterDecimal && <span>.{afterDecimal}</span>} {currency}
-          </>
-        );
+        fiatAmountDisplay = beforeDecimal + (afterDecimal ? '.' + afterDecimal : '.00');
+        fiatCurrency = currency;
       }
     }
 
@@ -237,92 +221,12 @@ class SignTxPage extends Component<Props, State> {
     const fixedTwoDecimals =
       Number((Number(afterDecimalRewards) / 10 ** afterDecimalRewards.length).toFixed(2)) * 100;
 
-    // we may need to explicitly add + for positive values
-    // const adjustedBefore = beforeDecimalRewards.startsWith('-')
-    //   ? beforeDecimalRewards
-    //   : '+' + beforeDecimalRewards;
-
-    const cryptoAmountDisplay = (
-      <>
-        <span>{beforeDecimalRewards.replace('-', '')}</span>
-        <span>{fixedTwoDecimals}</span> {ticker}
-      </>
-    );
-
-    if (fiatAmountDisplay) {
-      return (
-        <>
-          <div>{fiatAmountDisplay}</div>
-          <div>{cryptoAmountDisplay}</div>
-        </>
-      );
-    }
-
-    return <div>{cryptoAmountDisplay}</div>;
-  };
-
-  renderRow: ({|
-    kind: string,
-    address: {|
-      address: string,
-      value: MultiToken,
-    |},
-    addressIndex: number,
-    transform?: BigNumber => BigNumber,
-  |}) => Node = request => {
-    const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
-    const divKey = identifier =>
-      `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
-    const renderAmount = entry => {
-      return (
-        <div>
-          {this.renderAmountDisplay({
-            entry: {
-              ...entry,
-              amount: request.transform ? request.transform(entry.amount) : entry.amount,
-            },
-          })}
-        </div>
-      );
+    return {
+      fiatAmount: fiatAmountDisplay,
+      currency: fiatCurrency,
+      cryptoAmount: beforeDecimalRewards + (fixedTwoDecimals || '.00'),
+      ticker: ticker,
     };
-
-    return (
-      // eslint-disable-next-line react/no-array-index-key
-      <div key={divKey(request.address.value.getDefaultEntry().identifier)}>
-        <CopyableAddress
-          hash={this.props.addressToDisplayString(request.address.address)}
-          elementId={notificationElementId}
-          onCopyAddress={() =>
-            this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
-          }
-          notification={this.props.notification}
-        >
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            hash={this.props.addressToDisplayString(request.address.address)}
-            light
-            linkType="address"
-          >
-            <Typography
-              as="span"
-              variant="body2"
-              color="var(--yoroi-palette-gray-600)"
-              sx={{ marginBottom: '8px', marginTop: '4px' }}
-            >
-              {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
-            </Typography>
-          </ExplorableHashContainer>
-        </CopyableAddress>
-        {renderAmount(request.address.value.getDefaultEntry())}
-        {request.address.value.nonDefaultEntries().map(entry => (
-          <React.Fragment key={divKey(entry.identifier)}>
-            <div />
-            <div />
-            {renderAmount(entry)}
-          </React.Fragment>
-        ))}
-      </div>
-    );
   };
 
   renderPayload(payloadHex: string): string {
@@ -353,19 +257,20 @@ class SignTxPage extends Component<Props, State> {
       const txAmount = txData.amount.get(txAmountDefaultToken) ?? new BigNumber('0');
       const txFeeAmount = new BigNumber(txData.fee.amount).negated();
       const txTotalAmount = txAmount.plus(txFeeAmount);
-      const txFeeAmountRender = this.renderAmountDisplay({
-        entry: {
-          identifier: txData.fee.tokenId,
-          networkId: txData.fee.networkId,
-          amount: txFeeAmount,
-        },
+      const displayTxFeeAmount = this.getDisplayAmount({
+        identifier: txData.fee.tokenId,
+        networkId: txData.fee.networkId,
+        amount: txFeeAmount,
       });
-      const txTotalAmountRender = this.renderAmountDisplay({
-        entry: {
-          identifier: txAmountDefaultToken,
-          networkId: txData.amount.defaults.defaultNetworkId,
-          amount: txTotalAmount,
-        },
+      const displayTxAmount = this.getDisplayAmount({
+        identifier: txAmountDefaultToken,
+        networkId: txData.amount.defaults.defaultNetworkId,
+        amount: txAmount,
+      });
+      const displayTxTotalAmount = this.getDisplayAmount({
+        identifier: txAmountDefaultToken,
+        networkId: txData.amount.defaults.defaultNetworkId,
+        amount: txTotalAmount,
       });
 
       content = (
@@ -373,8 +278,9 @@ class SignTxPage extends Component<Props, State> {
           <CardanoSignTxComponent
             intl={intl}
             isOnlyTxFee={txAmount.toNumber() === 0}
-            txFeeAmount={txFeeAmountRender}
-            txTotalAmount={txTotalAmountRender}
+            txFeeAmount={displayTxFeeAmount}
+            txAmount={displayTxAmount}
+            txTotalAmount={displayTxTotalAmount}
             passwordFormField={
               <TextField
                 type="password"
@@ -389,7 +295,7 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = (
         <Box>
           <Box mb="32px">
-            <CardanoSignTxSummaryComponent txTotalAmount={txTotalAmountRender} intl={intl} />
+            <CardanoSignTxSummaryComponent txTotalAmount={displayTxTotalAmount} intl={intl} />
           </Box>
           <CardanoUtxoDetails
             txData={txData}
@@ -440,19 +346,18 @@ class SignTxPage extends Component<Props, State> {
         />
         <Box p="32px" sx={{ borderTop: '1px solid #DCE0E9', maxWidth: '100%' }}>
           <Box sx={{ display: 'flex', gap: '15px' }}>
-            <Button sx={{ minWidth: 0 }} fullWidth variant="primary" onClick={onCancel}>
+            <Button sx={{ minWidth: 0 }} fullWidth variant="secondary" onClick={onCancel}>
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
-            <LoadingButton
+            <Button
               variant="primary"
               fullWidth
               disabled={!walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
-              loading={isSubmitting}
               sx={{ minWidth: 0 }}
             >
               {intl.formatMessage(globalMessages.confirm)}
-            </LoadingButton>
+            </Button>
           </Box>
         </Box>
       </Box>
