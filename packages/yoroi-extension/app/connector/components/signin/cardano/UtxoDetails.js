@@ -232,58 +232,72 @@ class CardanoUtxoDetails extends Component<Props> {
 
     return (
       <Box>
-        <Box
-          sx={{
-            border: '1px solid #DCE0E9',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '40px',
-          }}
-        >
+        <Box>
           <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
-            <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
+            <Typography variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(globalMessages.fromAddresses)}
               <span>: {txData.inputs.length}</span>
             </Typography>
           </Box>
-          <Box>
-            {txData.inputs.map((address, addressIndex) => {
-              return this.renderRow({
-                kind: 'in',
-                address,
-                addressIndex,
-                transform: amount => amount.abs().negated(),
-              });
-            })}
-          </Box>
+          <Panel>
+            <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
+              <Typography variant="body1" fontWeight="500" color="#4A5065">
+                {/* TODO: use intl */}
+                Your Addresses
+              </Typography>
+            </Box>
+            <Box>
+              {txData.inputs.map((address, addressIndex) => {
+                return this.renderRow({
+                  kind: 'in',
+                  address,
+                  addressIndex,
+                  transform: amount => amount.abs().negated(),
+                });
+              })}
+            </Box>
+          </Panel>
         </Box>
-        <Box
-          sx={{
-            border: '1px solid #DCE0E9',
-            borderRadius: '8px',
-            padding: '16px',
-          }}
-        >
+        <Box>
           <Box display="grid" gridTemplateColumns="180px 1fr" pb="10px">
-            <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
+            <Typography variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(globalMessages.toAddresses)}
               <span>: {txData.outputs.length}</span>
             </Typography>
           </Box>
-          <Box>
-            {txData.outputs.map((address, addressIndex) => {
-              return this.renderRow({
-                kind: 'in',
-                address,
-                addressIndex,
-                transform: amount => amount.abs(),
-              });
-            })}
-          </Box>
+          <Panel withMargin={false}>
+            {/* TODO: use intl */}
+            <Typography variant="body1" fontWeight="500" color="#4A5065">
+              Your Addresses
+            </Typography>
+            <Box>
+              {txData.outputs.map((address, addressIndex) => {
+                return this.renderRow({
+                  kind: 'in',
+                  address,
+                  addressIndex,
+                  transform: amount => amount.abs(),
+                });
+              })}
+            </Box>
+          </Panel>
         </Box>
       </Box>
     );
   }
 }
+
+const Panel = ({ children, withMargin = true }) => (
+  <Box
+    sx={{
+      border: '1px solid #DCE0E9',
+      borderRadius: '8px',
+      padding: '16px',
+      marginBottom: withMargin ? '40px' : 0,
+    }}
+  >
+    {children}
+  </Box>
+);
 
 export default CardanoUtxoDetails;
