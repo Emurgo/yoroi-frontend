@@ -60,8 +60,8 @@ import {
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import { getAllSchemaTables, raii } from '../../api/ada/lib/storage/database/utils';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
+import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -785,21 +785,22 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
     const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-    const res =  await fetcher.getLatestBlockBySlot({
+    const { blockHashes } =  await fetcher.getLatestBlockBySlot({
       network: selectedNetwork,
       slots: [startSlot, endSlot]
     });
-    await this._getTxsFromRemote(request.publicDeriver)
-    console.log({res})
+    const startBlockHash = blockHashes[startSlot];
+    const endBlockHash = blockHashes[endSlot];
+    const txs = await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash);
 
     respTxRows = respTxRows.filter(row => {
       // 4th param `[]` means that the start and end date are included
       return moment(row.date).isBetween(startDate, endDate, 'day', '[]')
     }).sort((a, b) => b.date - a.date);
 
-    // if (respTxRows.length < 1) {
+    if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
-    // }
+    }
 
     const withPubKey = asGetPublicKey(request.publicDeriver);
     const plate = withPubKey == null
@@ -826,9 +827,20 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _getTxsFromRemote: (
     publicDeriver: PublicDeriver<>,
-  ) => void = async (publicDeriver) => {
+    startBlock: string,
+    endBlock: string,
+  ) => void = async (publicDeriver, startBlock, endBlock) => {
+    // todo: add return types
     const addresses = await getAllAddressesForWallet(publicDeriver)
-    console.log({addresses})
+    const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    const network = publicDeriver.getParent().getNetworkInfo()
+    const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses({
+      after: { block: startBlock },
+      untilBlock: endBlock,
+      network,
+      addresses: toRequestAddresses(addresses),
+    });
+    console.log({txsFromNetwork})
   }
 
   @action

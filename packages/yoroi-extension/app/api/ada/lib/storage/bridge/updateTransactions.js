@@ -2917,7 +2917,7 @@ async function rawUpdateUtxos(
   await utxoService.syncUtxoState(toRequestAddresses(addresses));
 }
 
-function toRequestAddresses(
+export function toRequestAddresses(
   addresses: {|
     utxoAddresses: Array<$ReadOnly<AddressRow>>,
     accountingAddresses: Array<$ReadOnly<AddressRow>>,
