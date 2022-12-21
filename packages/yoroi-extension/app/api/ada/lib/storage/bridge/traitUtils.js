@@ -10,6 +10,7 @@ import {
   asGetAllAccounting,
   asHasLevels,
 } from '../models/PublicDeriver/traits';
+import { PublicDeriver } from '../models/PublicDeriver/index';
 import type {
   IPublicDeriver,
   Address, AddressType, Value, Addressing, UsedStatus,
@@ -164,6 +165,39 @@ export async function getAllAddressesForDisplay(
       derivationTables,
     )
   );
+}
+
+export async function getAllAddressesForWallet(
+  publicDeriver: PublicDeriver<>,
+): Promise<> {
+  const p = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!p) {
+      throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
+    }
+    const derivationTables = p.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
+
+    return await raii(
+      publicDeriver.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(publicDeriver.getDb(), derivationTables),
+      ],
+      dbTx => rawGetAddressRowsForWallet(
+        dbTx,
+        deps,
+        { publicDeriver },
+        derivationTables,
+      ),
+    );
 }
 
 export async function rawGetAddressRowsForWallet(

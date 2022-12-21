@@ -60,6 +60,8 @@ import {
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import moment from 'moment';
+import { getAllSchemaTables, raii } from '../../api/ada/lib/storage/database/utils';
+import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -769,28 +771,25 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     const dateFormat = 'YYYY-MM-DD';
     const dateToSlot = (date: string) => {
-      return toRelativeSlotNumber(
+       const relativeSlot = toRelativeSlotNumber(
         timeToSlot({
           time: new Date(`${date}T23:59:59`), // Get the slot at the last second in the day
         }).slot
       );
+
+      return [relativeSlot.epoch, relativeSlot.slot]
     }
 
     const startSlot = dateToSlot(startDate.subtract(1, 'day').format(dateFormat));
     const endSlot = dateToSlot(endDate.format(dateFormat));
 
     const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
-    console.log({
-      s: this.stores.substores.ada.stateFetchStore.fetcher,
-    })
-    const res =  await this.stores.substores.ada.stateFetchStore.fetcher.getLatestBlockBySlot({
+    const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    const res =  await fetcher.getLatestBlockBySlot({
       network: selectedNetwork,
-      slots: [
-        [startSlot.epoch, startSlot.slot],
-        [endSlot.epoch, endSlot.slot],
-      ]
+      slots: [startSlot, endSlot]
     });
-
+    await this._getTxsFromRemote(request.publicDeriver)
     console.log({res})
 
     respTxRows = respTxRows.filter(row => {
@@ -823,6 +822,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         shouldIncludeTxIds: this.shouldIncludeTxIds,
       }).promise;
     };
+  }
+
+  _getTxsFromRemote: (
+    publicDeriver: PublicDeriver<>,
+  ) => void = async (publicDeriver) => {
+    const addresses = await getAllAddressesForWallet(publicDeriver)
+    console.log({addresses})
   }
 
   @action
