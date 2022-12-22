@@ -472,6 +472,7 @@ const GetAllUtxosMixin = (
       },
       derivationTables,
     );
+    console.log('>>>>> [externalAddresses.len]', externalAddresses.length);
     const internalAddresses = await rawGetBip44AddressesByPath(
       super.getDb(), tx,
       deps,
@@ -485,6 +486,7 @@ const GetAllUtxosMixin = (
       },
       derivationTables,
     );
+    console.log('>>>>> [internalAddresses.len]', internalAddresses.length);
     return [
       ...externalAddresses,
       ...internalAddresses,

@@ -2914,6 +2914,7 @@ async function rawUpdateUtxos(
   utxoStorageApi.setDb(db);
   utxoStorageApi.setDbTx(dbTx);
 
+  console.log('2>>>> [addresses.len]', addresses.utxoAddresses.length);
   await utxoService.syncUtxoState(toRequestAddresses(addresses));
 }
 
