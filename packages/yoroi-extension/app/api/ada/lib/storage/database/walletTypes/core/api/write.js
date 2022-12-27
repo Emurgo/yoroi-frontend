@@ -164,6 +164,7 @@ export class AddPublicDeriver {
     tx: lf$Transaction,
     request: PublicDeriverRequest<Insert>,
   ): Promise<AddPublicDeriverResponse<Row>> {
+    console.log('+++++++++++++>>>>>>> [AddPublicDeriver.add] ', JSON.stringify(request));
     const levelResult = await AddPublicDeriver.depTables.AddDerivation.add<Insert, Row>(
       db, tx,
       request.addLevelRequest,

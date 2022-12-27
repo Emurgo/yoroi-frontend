@@ -125,6 +125,7 @@ async function scanChain(request: {|
     request.checkAddressesInUse,
     request.network,
   );
+  console.log('********>>>>>>> [scanChain][discoverAllAddressesFrom.len]', addresses?.length);
 
   const config = getCardanoHaskellBaseConfig(
     request.network
@@ -206,6 +207,7 @@ async function scanAccount(request: {|
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });
+  console.log('********>>>>>>> [scanAccount][externalAddresses]', externalAddresses?.length);
   const internalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
@@ -214,7 +216,7 @@ async function scanAccount(request: {|
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });
-
+  console.log('********>>>>>>> [scanAccount][internalAddresses]', internalAddresses?.length);
   const accountAddress = [0].map(i => ({
     index: i,
     insert: async insertRequest => {

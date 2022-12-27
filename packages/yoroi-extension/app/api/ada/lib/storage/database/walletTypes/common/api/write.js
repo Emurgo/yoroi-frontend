@@ -50,6 +50,7 @@ export class AddDerivationTree {
     const parentId = tree.derivationId;
 
     const result = [];
+    console.log('============>>>>>>>> [AddDerivationTree.excludingParent] ', tree.children.length);
     for (let i = 0; i < tree.children.length; i++) {
       const tableName = derivationTables.get(level + 1);
       if (tableName == null) {
@@ -115,9 +116,11 @@ export class AddDerivationTree {
       Array.from(derivationTables.values()),
       tableName,
     );
+    const rootTree = tree(root.KeyDerivation.KeyDerivationId);
+    console.log('============>>>>>>>> [AddDerivationTree.includingParent] ', rootTree.children.length);
     const children = await AddDerivationTree.excludingParent(
       db, tx,
-      tree(root.KeyDerivation.KeyDerivationId),
+      rootTree,
       derivationTables,
       startingLevel + 1,
     );

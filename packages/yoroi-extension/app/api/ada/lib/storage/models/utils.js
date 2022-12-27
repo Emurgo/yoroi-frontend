@@ -154,13 +154,11 @@ export async function rawGetBip44AddressesByPath(
     Bip44DerivationLevels.ADDRESS.level,
     derivationTables,
   );
-  console.log('...>>>>>> [canonicalAddresses] ', canonicalAddresses.length, JSON.stringify(canonicalAddresses));
   const family = await deps.GetAddress.fromCanonical(
     db, tx,
     canonicalAddresses.map(addr => addr.row.KeyDerivationId),
     undefined,
   );
-  console.log('...>>>>>> [family] ', Object.entries(family).length, JSON.stringify(family));
   return canonicalAddresses.map(canonical => {
     const addrs = family.get(canonical.row.KeyDerivationId);
     if (addrs == null) {

@@ -733,6 +733,7 @@ const AddBip44FromPublicMixin = (
     if (pubDeriver === undefined) {
       throw new Error(`${nameof(AddBip44FromPublic)}::${nameof(this.rawAddBip44FromPublic)} pubDeriver`);
     }
+    console.log('==============>>>>> [rawAddBip44FromPublic] ', body?.tree?.children?.length);
     await deps.AddDerivationTree.excludingParent(
       super.getDb(), tx,
       {
@@ -781,6 +782,7 @@ const AddBip44FromPublicMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    console.log('==============>>>>> [addBip44FromPublic] ', body?.tree?.children?.length);
     return await raii<IAddBip44FromPublicResponse>(
       super.getDb(),
       [
@@ -2268,7 +2270,7 @@ const ScanUtxoAccountAddressesMixin = (
       },
       derivationTables,
     );
-
+    console.log('==============>>>>> [ScanUtxoAccountAddressesMixin.rawScanAddresses] ', newToInsert?.children?.length);
     await this.rawAddBip44FromPublic(
       tx,
       {
@@ -2423,7 +2425,7 @@ const ScanUtxoChainAddressesMixin = (
       },
       derivationTables,
     );
-
+    console.log('==============>>>>> [ScanUtxoChainAddressesMixin.rawScanAddresses] ', newToInsert?.children?.length);
     await this.rawAddBip44FromPublic(
       tx,
       {

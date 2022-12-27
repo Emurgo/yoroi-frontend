@@ -33,6 +33,7 @@ export async function discoverAllAddressesFrom(
 
   // keep scanning until no new used addresses are found in batch
   let shouldScanNewBatch = true;
+  let iter = 0;
   while (shouldScanNewBatch) {
     const newFetchedAddressesInfo =
       // eslint-disable-next-line no-await-in-loop
@@ -55,7 +56,14 @@ export async function discoverAllAddressesFrom(
     );
 
     shouldScanNewBatch = highestUsedIndex !== newHighestUsedIndex;
+
+    console.log('@@@@@@>>>>>>> [discoverAllAddressesFrom][iter]', iter++, JSON.stringify({ shouldScanNewBatch, highestUsedIndex, newHighestUsedIndex }));
+
     highestUsedIndex = newHighestUsedIndex;
+
+    console.log('@@@@@@>>>>>>> [discoverAllAddressesFrom][fetchedAddressesInfo]', fetchedAddressesInfo.length, JSON.stringify(fetchedAddressesInfo));
+    console.log('@@@@@@>>>>>>> [discoverAllAddressesFrom][newFetchedAddressesInfo]', newFetchedAddressesInfo.length, JSON.stringify(newFetchedAddressesInfo));
+
     fetchedAddressesInfo = newFetchedAddressesInfo;
   }
 
@@ -65,6 +73,9 @@ export async function discoverAllAddressesFrom(
       highestInBatch = i;
     }
   }
+  console.log('@@@@@@>>>>>>> [discoverAllAddressesFrom][fetchedAddressesInfo.len, highestInBatch, scanSize, requestSize]',
+    fetchedAddressesInfo.length, highestInBatch, scanSize, requestSize);
+
   return fetchedAddressesInfo
     // bip-44 requires scanSize buffer
     .slice(0, (highestInBatch + scanSize) + 1) // +1 since range is exclusive
