@@ -2895,7 +2895,7 @@ function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>):
   const isUpdating = prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash;
   if (isUpdating) {
     // <TODO:REMOVE_AFTER_YOROI_LIB_UPGRADE>
-    console.debug('/// utxo state mut be cleared:', id, requestAddresseHash, prevRequestAddressHash);
+    console.debug('/// utxo state must be cleared:', id, requestAddresseHash, prevRequestAddressHash);
     localStorage.setItem(localStorageKey, requestAddresseHash);
   }
   return isUpdating;
