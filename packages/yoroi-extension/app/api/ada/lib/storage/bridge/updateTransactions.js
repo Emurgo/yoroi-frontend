@@ -2892,12 +2892,13 @@ function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>):
   const requestAddresseHash = ObjectHash.sha1(requestAddresseSet);
   const localStorageKey = `TMP/UTXO_REQUEST_ADDRESSES_HASH/${id}`;
   const prevRequestAddressHash = localStorage.getItem(localStorageKey);
-  if (prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash) {
-    console.log('[rawUpdateUtxos] clearing utxo state.', requestAddresseHash, prevRequestAddressHash);
+  const isUpdating = prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash;
+  if (isUpdating) {
+    // <TODO:REMOVE_AFTER_YOROI_LIB_UPGRADE>
+    console.debug('/// utxo state mut be cleared:', id, requestAddresseHash, prevRequestAddressHash);
     localStorage.setItem(localStorageKey, requestAddresseHash);
-    return true;
   }
-  return false;
+  return isUpdating;
 }
 
 async function rawUpdateUtxos(
