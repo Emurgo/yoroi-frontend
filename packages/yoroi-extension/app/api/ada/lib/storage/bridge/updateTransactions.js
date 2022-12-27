@@ -2,6 +2,7 @@
 
 import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
+import ObjectHash from 'object-hash';
 import type {
   lf$Database, lf$Transaction,
 } from 'lovefield';
@@ -2886,6 +2887,19 @@ async function certificateToDb(
   return result;
 }
 
+function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>): boolean {
+  const requestAddresseSet = new Set(addresses);
+  const requestAddresseHash = ObjectHash.sha1(requestAddresseSet);
+  const localStorageKey = `TMP/UTXO_REQUEST_ADDRESSES_HASH/${id}`;
+  const prevRequestAddressHash = localStorage.getItem(localStorageKey);
+  if (prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash) {
+    console.log('[rawUpdateUtxos] clearing utxo state.', requestAddresseHash, prevRequestAddressHash);
+    localStorage.setItem(localStorageKey, requestAddresseHash);
+    return true;
+  }
+  return false;
+}
+
 async function rawUpdateUtxos(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -2914,7 +2928,11 @@ async function rawUpdateUtxos(
   utxoStorageApi.setDb(db);
   utxoStorageApi.setDbTx(dbTx);
 
-  await utxoService.syncUtxoState(toRequestAddresses(addresses));
+  const requestAddresses = toRequestAddresses(addresses);
+  if (compareAndSetIfNewAddressSetHash(publicDeriver.getPublicDeriverId(), requestAddresses)) {
+    await utxoStorageApi.clearUtxoState();
+  }
+  await utxoService.syncUtxoState(requestAddresses);
 }
 
 function toRequestAddresses(
