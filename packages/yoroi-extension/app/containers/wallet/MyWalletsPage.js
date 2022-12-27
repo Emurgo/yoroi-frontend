@@ -105,13 +105,10 @@ class MyWalletsPage extends Component<AllProps> {
     const { uiDialogs } = stores;
 
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
-
     const wallets = this.generated.stores.wallets.publicDerivers;
-
     const navbarTitle = (
       <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />
     );
-
     const navbarElementClassic = (
       <NavBar
         title={navbarTitle}

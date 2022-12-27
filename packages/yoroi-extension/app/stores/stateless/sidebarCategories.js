@@ -50,6 +50,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
     request.selected == null &&
     matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) === false,
 });
+
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
   className: 'wallets',
   route: ROUTES.WALLETS.ROOT,
@@ -125,7 +126,7 @@ export type SidebarCategoryRevamp = {|
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   {
     className: 'wallets',
-    route: ROUTES.MY_WALLETS,
+    route: ROUTES.WALLETS.ROOT,
     icon: walletIcon,
     label: globalMessages.walletLabel,
     isVisible: _request => true,

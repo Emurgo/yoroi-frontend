@@ -56,6 +56,15 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
+
+    const publicDeriver = this.generated.stores.wallets.selected;
+    const publicDerivers = this.generated.stores.wallets.publicDerivers;
+    const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
+
+    if (publicDeriver == null && isRevamp) {
+      this.generated.actions.wallets.setActiveWallet.trigger({ wallet: publicDerivers[0] })
+    }
+
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
@@ -66,16 +75,14 @@ class Wallet extends Component<AllProps> {
   }
 
   checkRoute(): void | string {
-    let categories;
-    if (this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP) {
-      categories = allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD);
-    } else {
-      categories = allCategories;
-    }
+    const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
+    const categories = isRevamp ?
+        allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD)
+        : allCategories;
+
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
@@ -291,7 +298,8 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
-          firstSync: stores.wallets.firstSync
+          publicDerivers: stores.wallets.publicDerivers,
+          firstSync: stores.wallets.firstSync,
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
@@ -320,6 +328,9 @@ class Wallet extends Component<AllProps> {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
         },
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        }
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
