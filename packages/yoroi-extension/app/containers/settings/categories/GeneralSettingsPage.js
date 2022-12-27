@@ -12,7 +12,7 @@ import AboutYoroiSettingsBlock from '../../../components/settings/categories/gen
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
-import type { Theme } from '../../../styles/utils';
+import { Theme, THEMES } from '../../../styles/utils';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
@@ -62,22 +62,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
-  };
-
-  switchWallet: (PublicDeriver<>) => void = publicDeriver => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: this.generated.stores.app.currentRoute,
-      publicDeriver,
-    });
-  };
-
-  handleSwitchToFirstWallet: void => void = () => {
-    const selectedWallet = this.generated.stores.wallets.selected;
-    if (selectedWallet == null) {
-      const wallets = this.generated.stores.wallets.publicDerivers;
-      const firstWallet = wallets[0];
-      this.switchWallet(firstWallet);
-    }
   };
 
   onSelectUnitOfAccount: string => Promise<void> = async (value) => {
@@ -143,8 +127,19 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         />
         <ThemeSettingsBlock
           currentTheme={currentTheme}
-          switchToFirstWallet={this.handleSwitchToFirstWallet}
-          selectTheme={this.generated.actions.profile.updateTheme.trigger}
+          onSubmit={(theme: string) => {
+            if (theme === THEMES.YOROI_REVAMP) {
+              const publicDeriver = this.generated.stores.wallets.selected;
+              const publicDerivers = this.generated.stores.wallets.publicDerivers;
+
+              if (publicDeriver == null && publicDerivers.length !== 0) {
+                this.generated.actions.wallets.setActiveWallet.trigger({
+                  wallet: publicDerivers[0],
+                });
+              }
+            }
+            this.generated.actions.profile.updateTheme.trigger({ theme })
+          }}
           onExternalLinkClick={handleExternalLinkClick}
         />
         <AboutYoroiSettingsBlock
@@ -258,6 +253,9 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         },
       },
       actions: {
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
         profile: {
           updateLocale: { trigger: actions.profile.updateLocale.trigger },
           updateTheme: { trigger: actions.profile.updateTheme.trigger },

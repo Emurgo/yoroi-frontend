@@ -56,12 +56,11 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
-
     const publicDeriver = this.generated.stores.wallets.selected;
     const publicDerivers = this.generated.stores.wallets.publicDerivers;
     const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
 
-    if (publicDeriver == null && isRevamp) {
+    if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
       this.generated.actions.wallets.setActiveWallet.trigger({ wallet: publicDerivers[0] })
     }
 
@@ -83,6 +82,7 @@ class Wallet extends Component<AllProps> {
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null && !isRevamp) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
