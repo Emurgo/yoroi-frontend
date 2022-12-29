@@ -28,12 +28,7 @@ import {
 } from '../pages/connector-signingTxPage';
 import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
 import { addCollateralTitle } from '../pages/connector-getCollateralPage';
-import {
-  backgroungTabName,
-  mockDAppName,
-  extensionTabName,
-  popupConnectorName
-} from '../support/windowManager';
+import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 import { connectorButton } from '../pages/sidebarPage';
 
 const userRejectMsg = 'user reject';
@@ -50,8 +45,6 @@ const connectorPopUpIsDisplayed = async (customWorld: Object) => {
 Given(/^I have opened the mock dApp$/, async function () {
   this.webDriverLogger.info(`Step: I have opened the mock dApp`);
   await this.get(mockDAppUrl);
-  await this.windowManager.openNewTab(backgroungTabName, this.getBackgroundUrl());
-  await this.windowManager.switchTo(mockDAppName);
 });
 
 Then(/^I open the mock dApp tab$/, async function () {

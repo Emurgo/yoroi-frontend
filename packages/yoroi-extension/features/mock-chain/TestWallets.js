@@ -36,8 +36,8 @@ function createWallet(payload: {|
 
 export type WalletNames =
   'shelley-simple-24' |
-  'shelley-simple-15' |
   'shelley-collateral' |
+  'shelley-simple-15' |
   'shelley-delegated' |
   'shelley-ledger-delegated' |
   'shelley-only-registered' |
@@ -125,14 +125,14 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     plate: 'DSKC-9213',
   }),
   createWallet({
-    name: ('shelley-simple-15': WalletNames),
-    mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
-    plate: 'ZDDC-9858',
-  }),
-  createWallet({
     name: ('shelley-collateral': WalletNames),
     mnemonic: 'deal calm cloth world refuse pledge grant tuna inner body fat afford absorb off barely',
     plate: 'HLBZ-9462',
+  }),
+  createWallet({
+    name: ('shelley-simple-15': WalletNames),
+    mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
+    plate: 'ZDDC-9858',
   }),
   createWallet({
     name: ('shelley-delegated': WalletNames),

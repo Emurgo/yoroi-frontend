@@ -2003,8 +2003,8 @@ export const generateTransaction = (): {|
     cip1852TrezorTx1,
     cip1852TrezorTx2,
     cip1852TrezorTx3,
-    shelleySimple15,
     shelleyCollateral,
+    shelleySimple15,
     shelleyDelegatedTx1,
     shelleyDelegatedTx2,
     shelleyLedgerDelegatedTx1,
@@ -2095,10 +2095,10 @@ export function resetChain(chainToUse: $Values<typeof MockChain>): void {
     addTransaction(txs.cip1852TrezorTx1);
     addTransaction(txs.cip1852TrezorTx2);
     addTransaction(txs.cip1852TrezorTx3);
-    // shelley-simple-15
-    addTransaction(txs.shelleySimple15);
     // shelley-collateral
     addTransaction(txs.shelleyCollateral);
+    // shelley-simple-15
+    addTransaction(txs.shelleySimple15);
     // shelley-delegated
     addTransaction(txs.shelleyDelegatedTx1);
     addTransaction(txs.shelleyDelegatedTx2);
