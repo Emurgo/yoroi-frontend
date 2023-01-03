@@ -178,6 +178,7 @@ export type AddressInsert = {|
   Digest: number,
   Type: CoreAddressT,
   Hash: string,
+  IsUsed: boolean,
 |};
 export type AddressRow = {|
   AddressId: number,
@@ -193,6 +194,7 @@ export const AddressSchema: {|
     Digest: 'Digest',
     Type: 'Type',
     Hash: 'Hash',
+    IsUsed: 'IsUsed',
   }
 };
 
@@ -650,6 +652,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(AddressSchema.properties.Digest, Type.NUMBER)
     .addColumn(AddressSchema.properties.Type, Type.NUMBER)
     .addColumn(AddressSchema.properties.Hash, Type.STRING)
+    .addColumn(AddressSchema.properties.IsUsed, Type.BOOLEAN)
     .addPrimaryKey(
       ([AddressSchema.properties.AddressId]: Array<string>),
       true,

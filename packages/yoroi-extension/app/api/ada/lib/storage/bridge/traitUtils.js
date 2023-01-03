@@ -166,6 +166,45 @@ export async function getAllAddressesForDisplay(
   );
 }
 
+export async function getAddressRowsForWallet(
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
+  |},
+): Promise<Array<$ReadOnly<AddressRow>>> {
+  const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+  const derivationTables = withLevels == null
+    ? new Map()
+    : withLevels.getParent().getDerivationTables();
+  const deps = Object.freeze({
+    GetAddress,
+    GetPathWithSpecific,
+    GetDerivationSpecific,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
+  const result = await raii<PromisslessReturnType<typeof rawGetAddressRowsForWallet>>(
+    request.publicDeriver.getDb(),
+    [
+      ...depTables,
+      ...mapToTables(
+        request.publicDeriver.getDb(),
+        derivationTables
+      ),
+    ],
+    async tx => await rawGetAddressRowsForWallet(
+      tx,
+      deps,
+      {
+        publicDeriver: request.publicDeriver,
+      },
+      derivationTables,
+    )
+  );
+  return [...result.utxoAddresses, ...result.accountingAddresses];
+}
+
 export async function rawGetAddressRowsForWallet(
   tx: lf$Transaction,
   deps: {|
