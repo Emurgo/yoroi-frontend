@@ -1001,19 +1001,12 @@ export function genGetRecentTransactionHashes(
   return async (
     body: GetRecentTransactionHashesRequest
   ): Promise<GetRecentTransactionHashesResponse> => {
-    const hexAddresses = body.addresses.map(a => {
-      const hex = fixAddresses(a, networks.CardanoMainnet);
-      let addr;
-      if (hex.match(/^([a-f0-9][a-f0-9])+$/)) {
-        addr = hex;
-      } else {
-        addr = byronAddressToHex(a);
-      }
-      return addr;
+    const fixedAddresses = body.addresses.map(a => {
+      return fixAddresses(a, networks.CardanoMainnet);
     });
 
     // ignore the "before" parameter because in tests we don't expect pagination
-    const ownAddresses = new Set(hexAddresses);
+    const ownAddresses = new Set(fixedAddresses);
     const result = {};
     for (const tx of transactions) {
       for (const addr of ourAddressesInTx(tx, ownAddresses)) {
