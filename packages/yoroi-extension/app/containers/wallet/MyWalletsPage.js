@@ -48,6 +48,7 @@ import NavBarRevamp from '../../components/topbar/NavBarRevamp'
 import { withLayout } from '../../styles/context/layout'
 import type { LayoutComponentMap } from '../../styles/context/layout'
 import { Box } from '@mui/system'
+import { THEMES } from '../../styles/utils'
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -76,7 +77,14 @@ class MyWalletsPage extends Component<AllProps> {
   }
 
   componentDidMount () {
-    this.generated.actions.wallets.unselectWallet.trigger();
+    const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
+    if (isRevamp) {
+      this.generated.actions.router.goToRoute.trigger({
+        route: ROUTES.WALLETS.ROOT,
+      });
+    } else {
+      this.generated.actions.wallets.unselectWallet.trigger();
+    }
   }
 
   handleWalletNavItemClick: PublicDeriver<> => void = (
@@ -418,7 +426,10 @@ class MyWalletsPage extends Component<AllProps> {
       |},
     |},
     stores: {|
-      profile: {| shouldHideBalance: boolean |},
+      profile: {|
+          shouldHideBalance: boolean,
+          currentTheme: Theme,
+      |},
       uiDialogs: {|
         isOpen: any => boolean
       |},
@@ -459,6 +470,7 @@ class MyWalletsPage extends Component<AllProps> {
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          currentTheme: stores.profile.currentTheme,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
