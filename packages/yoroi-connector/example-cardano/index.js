@@ -1055,7 +1055,7 @@ function renderJonsResponse(title, response) {
   );
 }
 
-window.onload = () => {
+const onload = () => {
   if (typeof window.cardano === "undefined") {
     alertError("Cardano API not found");
   } else {
@@ -1082,3 +1082,5 @@ window.onload = () => {
       );
   }
 };
+
+setTimeout(onload, 100);
