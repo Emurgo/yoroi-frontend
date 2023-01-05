@@ -262,9 +262,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return !this.getTxHistoryState(publicDeriver).requests.headRequest.wasExecuted;
   }
 
+  @action
   clearCache: PublicDeriver<> => void = (publicDeriver) => {
     const txs = this.getTxHistoryState(publicDeriver).txs;
-    txs.splice(0, txs.length - 1);
+    txs.splice(0, txs.length);
   }
 
   getBalance: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
