@@ -421,6 +421,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos1,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata
     );
     await updateTransactions(
       db,
@@ -467,6 +469,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata
     );
     await updateTransactions(
       db,
@@ -500,6 +504,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata
     );
     await updateTransactions(
       db,
@@ -550,6 +556,8 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata
     );
     await updateTransactions(
       db,

@@ -280,6 +280,49 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return this.getTxHistoryState(publicDeriver).lastSyncInfo;
   }
 
+  // various actions that need to be performed after getting new transactions
+  _afterLoadingNewTxs: (
+    Array<WalletTransaction>,
+    PublicDeriver<>,
+  ) => Promise<void> = async (result, publicDeriver) => {
+    const timestamps: Set<number> = new Set();
+    const remoteTransactionIds: Set<string> = new Set();
+    for (const { txid, date } of result) {
+      timestamps.add(date.valueOf());
+      remoteTransactionIds.add(txid);
+    }
+    const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId,
+    );
+    const ticker = defaultTokenInfo.Metadata.ticker;
+    if (ticker == null) {
+      throw new Error('unexpected default token type');
+    }
+    await this.stores.coinPriceStore.updateTransactionPriceData({
+      db: publicDeriver.getDb(),
+      timestamps: Array.from(timestamps),
+      defaultToken: ticker,
+    });
+
+    let submittedTransactionsChanged = false;
+    runInAction(() => {
+      for (let i = 0; i < this._submittedTransactions.length;) {
+        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+          this._submittedTransactions.splice(i, 1);
+          submittedTransactionsChanged = true;
+        } else {
+          i++;
+        }
+      }
+    });
+    if (submittedTransactionsChanged) {
+      this._persistSubmittedTransactions();
+    }
+
+    // reload token info cache
+    await this.stores.tokenInfoStore.refreshTokenInfo();
+  }
+
   /** Refresh transaction history and update wallet balance */
   @action _refreshTransactionData: {|
     publicDeriver: PublicDeriver<>,
@@ -329,46 +372,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       });
     }
 
-    const timestamps: Set<number> = new Set();
-    const remoteTransactionIds: Set<string> = new Set();
-    for (const { txid, date } of result) {
-      timestamps.add(date.valueOf());
-      remoteTransactionIds.add(txid);
-    }
-
     // note: possible existing memos were modified on a difference instance, etc.
     await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
-
-    const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
-      publicDeriver.getParent().getNetworkInfo().NetworkId
-    );
-    const ticker = defaultTokenInfo.Metadata.ticker;
-    if (ticker == null) {
-      throw new Error('unexpected default token type');
-    }
-    await this.stores.coinPriceStore.updateTransactionPriceData({
-      db: publicDeriver.getDb(),
-      timestamps: Array.from(timestamps),
-      defaultToken: ticker,
-    });
-
-    let submittedTransactionsChanged = false;
-    runInAction(() => {
-      for (let i = 0; i < this._submittedTransactions.length;) {
-        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
-          this._submittedTransactions.splice(i, 1);
-          submittedTransactionsChanged = true;
-        } else {
-          i++;
-        }
-      }
-    });
-    if (submittedTransactionsChanged) {
-      this._persistSubmittedTransactions();
-    }
-
-    // update token info cache
-    await this.stores.tokenInfoStore.refreshTokenInfo();
 
     // update balance
     const deriverParent = request.publicDeriver.getParent();
@@ -440,6 +445,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise) throw new Error('should never happen');
       await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
     })();
+
+    await this._afterLoadingNewTxs(
+      result,
+      request.publicDeriver,
+    );
   }
 
   @action _loadMore: (
@@ -469,6 +479,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       state.txs.splice(state.txs.length, 0, ...result);
       state.hasMoreToLoad = result.length === FETCH_TXS_BATCH_SIZE;
     });
+
+    await this._afterLoadingNewTxs(
+      result,
+      publicDeriver,
+    );
   }
 
   /** Add a new public deriver to track and refresh the data */

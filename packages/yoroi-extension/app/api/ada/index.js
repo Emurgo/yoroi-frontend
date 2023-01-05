@@ -700,6 +700,8 @@ export default class AdaApi {
             request.publicDeriver.getDb(),
             request.publicDeriver,
             request.checkAddressesInUse,
+            request.getTokenInfo,
+            request.getMultiAssetMetadata,
           );
         }
 

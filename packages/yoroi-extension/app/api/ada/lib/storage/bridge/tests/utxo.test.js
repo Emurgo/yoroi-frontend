@@ -299,6 +299,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata
     );
     await updateTransactions(
       db,
@@ -417,6 +419,8 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,

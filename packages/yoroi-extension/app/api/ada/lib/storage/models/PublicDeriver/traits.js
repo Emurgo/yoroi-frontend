@@ -288,10 +288,25 @@ const GetAllUtxosMixin = (
           } else {
             amount = utxo.assets[i-1].amount;
           }
-          const token = tokenMap.get(tokenId);
-          if (!token) {
-            throw new Error(`missing token ID in UTXO: ${tokenId}`);
-          }
+          const token = tokenMap.get(tokenId) || {
+            // Note this is dummy placeholder value and only the `Identifier` value
+            // matters. The only scenario this is needed is when during `updateUtxos`,
+            // new UTXOs with unseen tokens are added and before it requests the token
+            // info.
+            TokenId: -1,
+            NetworkId: networkId,
+            IsDefault: false,
+            Digest: 0,
+            Identifier: tokenId,
+            Metadata: {
+              type: 'Cardano',
+              policyId: tokenId.split('.')[0],
+              assetName: tokenId.split('.')[1],
+              numberOfDecimals: 0,
+              ticker: null,
+              longName: null
+            },
+          };
           return { Token: token, TokenList: { Amount: amount.toString() } };
         });
         return {

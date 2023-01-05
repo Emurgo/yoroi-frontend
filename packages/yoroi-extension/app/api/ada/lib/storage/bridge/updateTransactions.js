@@ -88,7 +88,7 @@ import {
   PRIMARY_ASSET_CONSTANTS,
 } from '../database/primitives/enums';
 import {
-  asScanAddresses, asHasLevels,
+  asScanAddresses, asHasLevels, asGetAllUtxos,
 } from '../models/PublicDeriver/traits';
 import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
@@ -912,12 +912,15 @@ export async function updateUtxos(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
+  getTokenInfo: TokenInfoFunc,
+  getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
     ? new Map<number, string>()
     : withLevels.getParent().getDerivationTables();
 
+  // sync our address set with remote to make sure txs are identified as ours
   const scanAddrTables = Object.freeze({
     GetKeyForPublicDeriver,
     GetAddress,
@@ -932,7 +935,6 @@ export async function updateUtxos(
     GetKeyDerivation,
   });
 
-  // sync our address set with remote to make sure txs are identified as ours
   await raii(
     db,
     [
@@ -966,6 +968,7 @@ export async function updateUtxos(
     }
   );
 
+  // have Yoroi-lib update
   const getAddrTables = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
@@ -988,6 +991,37 @@ export async function updateUtxos(
         derivationTables,
       );
     }
+  );
+
+  // new UTXOs may contain new tokens so update token info
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (withUtxos == null) {
+    throw new Error('wallet doesn\'t support IGetAllUtxos');
+  }
+  const utxos = await withUtxos.getAllUtxos();
+  const tokenIds = utxos.flatMap(utxo => utxo.output.tokens.map(token => token.Token.Identifier));
+  const updateTokenTables =  Object.freeze({
+    ModifyToken,
+    GetToken,
+  });
+
+  await raii(
+    db,
+    Object
+      .keys(updateTokenTables)
+      .map(key => updateTokenTables[key])
+      .flatMap(table => getAllSchemaTables(db, table)),
+    dbTx => (
+      genCardanoAssetMap(
+        db,
+        dbTx,
+        updateTokenTables,
+        tokenIds,
+        getTokenInfo,
+        getMultiAssetMintMetadata,
+        publicDeriver.getParent().getNetworkInfo(),
+      )
+    )
   );
 }
 

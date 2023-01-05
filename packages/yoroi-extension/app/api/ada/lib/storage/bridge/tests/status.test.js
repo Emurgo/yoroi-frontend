@@ -346,6 +346,8 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
@@ -399,6 +401,8 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
@@ -408,7 +412,7 @@ async function baseTest(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
     );
 
     {
@@ -532,6 +536,8 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
@@ -720,6 +726,8 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
@@ -897,6 +905,8 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
@@ -1072,6 +1082,8 @@ async function pendingDropped(
     db,
     basePubDeriver,
     checkAddressesInUse,
+    getTokenInfo,
+    getMultiAssetMetadata,
   );
   await updateTransactions(
     db,
@@ -1092,6 +1104,8 @@ async function pendingDropped(
     db,
     basePubDeriver,
     checkAddressesInUse,
+    getTokenInfo,
+    getMultiAssetMetadata,
   );
   await updateTransactions(
     db,
