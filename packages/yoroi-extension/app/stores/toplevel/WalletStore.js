@@ -95,17 +95,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @observable firstSync: ?number;
   @observable publicDerivers: Array<PublicDeriver<>>;
-
   @observable selected: null | PublicDeriver<>;
-
-  @observable getSelectedWalletIdReq: Request<(void) => Promise<?number>> = new Request<
-    (void) => Promise<?number>
-  >(this.api.localStorage.getSelectedWalletId);
-
-  @observable setSelectedWalletIdReq: Request<(number) => Promise<void>> = new Request<
-    (number) => Promise<void>
-  >(this.api.localStorage.setSelectedWalletId);
-
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
 
   @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>> = new Request<
@@ -393,7 +383,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.actions.profile.setSelectedNetwork.trigger(walletToSelect.getParent().getNetworkInfo());
       this.selected = walletToSelect;
       // Cache select wallet
-      // this.setSelectedWalletIdReq.execute(walletToSelect.getPublicDeriverId());
       this.api.localStorage.setSelectedWalletId(walletToSelect.getPublicDeriverId())
       // do not await on purpose since the UI will handle adding loaders while refresh is happening
       this.refreshWalletFromRemote(walletToSelect);
