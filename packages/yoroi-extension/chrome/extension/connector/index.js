@@ -19,7 +19,7 @@ configure({ enforceActions: 'always' });
 BigNumber.DEBUG = true;
 
 // Entry point into our application
-const initializeErgoConnector: void => Promise<void> = async () => {
+const initializeYoroiConnector: void => Promise<void> = async () => {
   const api = await setupApi();
   const router = new RouterStore();
   const hashHistory = createHashHistory();
@@ -47,4 +47,4 @@ const initializeErgoConnector: void => Promise<void> = async () => {
 
 addCloseListener(TabIdKeys.ErgoConnector);
 
-window.addEventListener('load', initializeErgoConnector);
+window.addEventListener('load', initializeYoroiConnector);

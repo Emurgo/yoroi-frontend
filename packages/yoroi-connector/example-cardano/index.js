@@ -21,7 +21,6 @@ const getUtxos = document.querySelector("#get-utxos");
 const submitTx = document.querySelector("#submit-tx");
 const signTx = document.querySelector("#sign-tx");
 const showUtxos = document.querySelector("#show-utxos");
-const createTx = document.querySelector("#create-tx");
 const getCollateralUtxos = document.querySelector("#get-collateral-utxos");
 const signData = document.querySelector("#sign-data");
 const alertEl = document.querySelector("#alert");
@@ -753,7 +752,7 @@ function createTxHandler(e) {
   const includeOutputs = [];
   const includeTargets = [];
 
-  let targetAddress = selectedUtxo.receiver;
+  let targetAddress = 'addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e';
   let targetDataHash = null;
 
   /****** FLAGS ******/

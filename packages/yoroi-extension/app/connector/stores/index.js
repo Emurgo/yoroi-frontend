@@ -6,6 +6,7 @@ import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
 import UiDialogsStore from '../../stores/toplevel/UiDialogsStore';
 import ConnectorCoinPriceStore from './toplevel/ConnectorCoinPriceStore';
 import TokenInfoStore from '../../stores/toplevel/TokenInfoStore';
+import AddressesStore from '../../stores/toplevel/AddressesStore';
 import ConnectorStore from './ConnectorStore';
 import ConnectorLoadingStore from './toplevel/ConnectorLoadingStore';
 import type { ActionsMap } from '../actions';
@@ -28,6 +29,7 @@ const storeClasses = Object.freeze({
   connector: ConnectorStore,
   tokenInfoStore: TokenInfoStore,
   explorers: ExplorerStore,
+  addresses: AddressesStore,
 });
 
 export type StoresMap = {|
@@ -40,6 +42,7 @@ export type StoresMap = {|
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
   tokenInfoStore: TokenInfoStore<StoresMap, ActionsMap>,
+  addresses: AddressesStore,
   substores: {|
     ada: AdaStoresMap,
     ergo: ErgoStoresMap,
@@ -60,6 +63,7 @@ const stores: StoresMap = (observable({
   loading: null,
   connector: null,
   tokenInfoStore: null,
+  addresses: null,
   substores: null,
 }): any);
 

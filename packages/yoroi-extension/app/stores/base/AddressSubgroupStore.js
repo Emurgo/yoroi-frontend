@@ -39,10 +39,11 @@ export class AddressTypeStore {
 
   @computed get all(): $ReadOnlyArray<$ReadOnly<StandardAddress>> {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
-    if (result == null) return [];
-    return result;
+    return publicDeriver ? this.allWithDeriver(publicDeriver) : [];
+  }
+
+  allWithDeriver(publicDeriver: PublicDeriver<>): $ReadOnlyArray<$ReadOnly<StandardAddress>> {
+    return this._flowCoerceResult(this._getRequest(publicDeriver)) ?? [];
   }
 
   @computed get wasExecuted(): boolean {

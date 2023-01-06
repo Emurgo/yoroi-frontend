@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 // @flow
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed, toJS } from 'mobx';
+import { action, computed, observable, runInAction, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
@@ -11,6 +11,8 @@ import type {
   ConnectRetrieveData,
   FailedSignData,
   GetConnectedSitesData,
+  GetConnectionProtocolData,
+  GetUtxosRequest,
   Protocol,
   PublicDeriverCache,
   RemoveWalletFromWhitelistData,
@@ -18,22 +20,13 @@ import type {
   Tx,
   TxSignWindowRetrieveData,
   WhitelistEntry,
-  GetUtxosRequest,
-  GetConnectionProtocolData,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import type {
-  CardanoConnectorSignRequest,
-  SignSubmissionErrorType,
-} from '../types';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType, } from '../types';
 import { LoadingWalletStates } from '../types';
 import { getWallets } from '../../api/common/index';
-import {
-  getErgoBaseConfig,
-  isCardanoHaskell,
-  isErgo,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getErgoBaseConfig, isCardanoHaskell, isErgo, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   asGetBalance,
   asGetPublicKey,
@@ -51,30 +44,25 @@ import { mintedTokenInfo } from '../../../chrome/extension/connector/utils';
 import { Logger } from '../../utils/logging';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  connectorGetUsedAddresses,
-  connectorGetUnusedAddresses,
-  connectorGetChangeAddress,
-  connectorSendTxCardano,
   connectorGenerateReorgTx,
+  connectorGetChangeAddress,
+  connectorGetUnusedAddresses,
+  connectorGetUsedAddresses,
   connectorRecordSubmittedCardanoTransaction,
+  connectorSendTxCardano,
 } from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { loadSubmittedTransactions } from '../../api/localStorage';
-import {
-  signTransaction as shelleySignTransaction
-} from '../../api/ada/transactions/shelley/transactions';
+import { signTransaction as shelleySignTransaction } from '../../api/ada/transactions/shelley/transactions';
 import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import type {
-  HaskellShelleyTxSignRequest
-} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { genAddressStoreLookup } from '../../stores/stateless/addressStores';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -534,7 +522,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     // $FlowFixMe[prop-missing]
     const { tx/* , partialSign */, tabId } = signingMessage.sign.tx;
 
-    const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
+    const publicDeriver = selectedWallet.publicDeriver;
+    const network = publicDeriver.getParent().getNetworkInfo();
 
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
@@ -548,7 +537,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const submittedTxs = loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(response.utxos),
-      selectedWallet.publicDeriver,
+      publicDeriver,
       submittedTxs,
     );
 
@@ -612,15 +601,22 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const outputs = [];
+    // <TODO:do this on connect>
+    this.stores.addresses.addObservedWallet(publicDeriver);
+    await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
+    const addressLookup =
+      genAddressStoreLookup(publicDeriver, this.stores.addresses.addressSubgroupMap);
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
+      const isForeign = addressLookup(address)?.address == null;
       outputs.push(
         {
           address,
+          isForeign,
           value: multiTokenFromCardanoValue(
             output.amount(),
-            selectedWallet.publicDeriver.getParent().getDefaultToken(),
+            publicDeriver.getParent().getDefaultToken(),
           ),
         }
       );
@@ -639,7 +635,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ])
 
     const { amount, total } = await this._calculateAmountAndTotal(
-      selectedWallet.publicDeriver,
+      publicDeriver,
       inputs,
       outputs,
       fee,
@@ -650,7 +646,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (foreignInputs.length) {
       const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData(
         {
-          network: selectedWallet.publicDeriver.getParent().networkInfo,
+          network: publicDeriver.getParent().networkInfo,
           utxos: foreignInputs,
         }
       )

@@ -57,6 +57,7 @@ export type SubgroupCtorData = {|
 |}
 export interface IAddressTypeUiSubset {
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+  +allWithDeriver: PublicDeriver<> => $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +wasExecuted: boolean,
 }
 export interface IAddressTypeStore {
@@ -438,7 +439,7 @@ export function genAddressStoreLookup(
       if (request == null) throw new Error('Should never happen');
 
       const displayAddress = addressToDisplayString(address, networkInfo);
-      const addressInfo = request.all.find(
+      const addressInfo = request.allWithDeriver(publicDeriver).find(
         addressInStore => addressInStore.address === displayAddress
       );
       if (addressInfo != null) {
