@@ -97,7 +97,17 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   @observable publicDerivers: Array<PublicDeriver<>>;
 
   @observable selected: null | PublicDeriver<>;
+
+  @observable getSelectedWalletIdReq: Request<(void) => Promise<?number>> = new Request<
+    (void) => Promise<?number>
+  >(this.api.localStorage.getSelectedWalletId);
+
+  @observable setSelectedWalletIdReq: Request<(number) => Promise<void>> = new Request<
+    (number) => Promise<void>
+  >(this.api.localStorage.setSelectedWalletId);
+
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
+
   @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>> = new Request<
     DeferredCall<CreateWalletResponse>
   >(async create => {
@@ -157,6 +167,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       'visibilitychange',
       debounce((_e) => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
     );
+
   }
 
   @action
@@ -374,13 +385,24 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void = ({ wallet }) => {
-    this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
+  @action _setActiveWallet: ({| wallet: PublicDeriver<>, formCacheFirst?: boolean |}) => void =
+    ({ wallet, formCacheFirst }) => {
+      const lastSelectedWallet = this._getLastSelectedWallet();
+      const walletToSelect = formCacheFirst && lastSelectedWallet ? lastSelectedWallet : wallet;
 
-    this.selected = wallet;
-    // do not await on purpose since the UI will handle adding loaders while refresh is happening
-    this.refreshWalletFromRemote(wallet);
-  };
+      this.actions.profile.setSelectedNetwork.trigger(walletToSelect.getParent().getNetworkInfo());
+      this.selected = walletToSelect;
+      // Cache select wallet
+      // this.setSelectedWalletIdReq.execute(walletToSelect.getPublicDeriverId());
+      this.api.localStorage.setSelectedWalletId(walletToSelect.getPublicDeriverId())
+      // do not await on purpose since the UI will handle adding loaders while refresh is happening
+      this.refreshWalletFromRemote(walletToSelect);
+    };
+
+  _getLastSelectedWallet: void => ?PublicDeriver<> = () => {
+    const walletId = this.api.localStorage.getSelectedWalletId();
+    return this.publicDerivers.find(pd => pd.getPublicDeriverId() === walletId);
+  }
 
   @action _unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);

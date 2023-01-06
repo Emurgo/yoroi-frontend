@@ -42,17 +42,16 @@ import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpe
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import type { WalletInfo } from '../../components/buySell/BuySellDialog';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks'
-import NavBarRevamp from '../../components/topbar/NavBarRevamp'
-import { withLayout } from '../../styles/context/layout'
-import type { LayoutComponentMap } from '../../styles/context/layout'
-import { Box } from '@mui/system'
-import { THEMES } from '../../styles/utils'
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import NavBarRevamp from '../../components/topbar/NavBarRevamp';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
+import { Box } from '@mui/system';
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
-type Props = InjectedOrGenerated<GeneratedData>
+type Props = InjectedOrGenerated<GeneratedData>;
 
 type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedProps |};
@@ -77,7 +76,7 @@ class MyWalletsPage extends Component<AllProps> {
   }
 
   componentDidMount () {
-    const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
     if (isRevamp) {
       this.generated.actions.router.goToRoute.trigger({
         route: ROUTES.WALLETS.ROOT,
@@ -428,7 +427,7 @@ class MyWalletsPage extends Component<AllProps> {
     stores: {|
       profile: {|
           shouldHideBalance: boolean,
-          currentTheme: Theme,
+          isRevampTheme: boolean,
       |},
       uiDialogs: {|
         isOpen: any => boolean
@@ -470,7 +469,7 @@ class MyWalletsPage extends Component<AllProps> {
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
-          currentTheme: stores.profile.currentTheme,
+          isRevampTheme: stores.profile.isRevampTheme,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

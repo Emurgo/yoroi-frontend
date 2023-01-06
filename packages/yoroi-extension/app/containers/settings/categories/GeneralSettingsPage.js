@@ -135,6 +135,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
               if (publicDeriver == null && publicDerivers.length !== 0) {
                 this.generated.actions.wallets.setActiveWallet.trigger({
                   wallet: publicDerivers[0],
+                  formCacheFirst: true,
                 });
               }
             }

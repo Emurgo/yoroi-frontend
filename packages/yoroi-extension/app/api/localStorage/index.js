@@ -37,6 +37,7 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
+  SELECTED_WALLET: 'SELECTED_WALLET',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -118,6 +119,19 @@ export default class LocalStorageApi {
   setUserTheme: string => Promise<void> = (theme) => setLocalItem(storageKeys.THEME, theme);
 
   unsetUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.THEME);
+
+  // ========== Select Wallet ========== //
+
+  getSelectedWalletId: void => number | null = () => {
+    const id = localStorage.getItem(storageKeys.SELECTED_WALLET);
+    if (!id) return null
+    if (isNaN(Number(id))) throw new Error(`Invalid wallet Id: ${id}`);
+    return Number(id)
+  }
+
+  setSelectedWalletId: number => void = (id) => {
+    localStorage.setItem(storageKeys.SELECTED_WALLET, id.toString())
+  }
 
   // ========== Custom User Theme ========== //
 

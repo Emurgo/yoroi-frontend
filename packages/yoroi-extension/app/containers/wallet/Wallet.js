@@ -30,8 +30,6 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
-import { THEMES } from '../../styles/utils';
-import type { Theme } from '../../styles/utils';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -58,10 +56,13 @@ class Wallet extends Component<AllProps> {
   componentDidMount() {
     const publicDeriver = this.generated.stores.wallets.selected;
     const publicDerivers = this.generated.stores.wallets.publicDerivers;
-    const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
 
     if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
-      this.generated.actions.wallets.setActiveWallet.trigger({ wallet: publicDerivers[0] })
+      this.generated.actions.wallets.setActiveWallet.trigger({
+        wallet: publicDerivers[0],
+        formCacheFirst: true,
+      })
     }
 
     // reroute to the default path for the wallet
@@ -74,7 +75,7 @@ class Wallet extends Component<AllProps> {
   }
 
   checkRoute(): void | string {
-    const isRevamp = this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
     const categories = isRevamp ?
         allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD)
         : allCategories;
@@ -117,7 +118,7 @@ class Wallet extends Component<AllProps> {
     if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
         <WalletSyncingOverlay
-          classicTheme={this.generated.stores.profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={this.generated.stores.profile.isClassicTheme}
           onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
       )
@@ -279,7 +280,8 @@ class Wallet extends Component<AllProps> {
         |},
       |},
       profile: {|
-        currentTheme: Theme,
+        isRevampTheme: boolean,
+        isClassicTheme: boolean,
       |},
     |}
     |} {
@@ -320,7 +322,8 @@ class Wallet extends Component<AllProps> {
           })(),
         },
         profile: {
-          currentTheme: stores.profile.currentTheme,
+          isRevampTheme: stores.profile.isRevampTheme,
+          isClassicTheme: stores.profile.isClassicTheme,
         }
       },
       actions: {
