@@ -119,7 +119,6 @@ import type {
   AccountStateFunc,
   AddressUtxoFunc,
   BestBlockFunc,
-  HistoryFunc,
   MultiAssetMintMetadataFunc,
   SendFunc,
   SignedRequest,

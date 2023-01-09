@@ -2099,8 +2099,10 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 
-const getTransactionsByHashes: GetTransactionsByHashesFunc = genGetTransactionsByHashes(transactions);
-const getRecentTransactionHashes: GetRecentTransactionHashesFunc = genGetRecentTransactionHashes(transactions);
+const getTransactionsByHashes: GetTransactionsByHashesFunc =
+  genGetTransactionsByHashes(transactions);
+const getRecentTransactionHashes: GetRecentTransactionHashesFunc =
+  genGetRecentTransactionHashes(transactions);
 
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
   const remoteTx = toRemoteByronTx(transactions, request);

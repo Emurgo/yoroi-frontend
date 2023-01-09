@@ -1,5 +1,5 @@
-//fixme: broken flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import { select, } from '@storybook/addon-knobs';
 import type { Node } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';

@@ -1,5 +1,5 @@
-//fixme: broken flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import { select, } from '@storybook/addon-knobs';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';

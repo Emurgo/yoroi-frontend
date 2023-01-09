@@ -1,5 +1,5 @@
-//fixme broken flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { select, } from '@storybook/addon-knobs';

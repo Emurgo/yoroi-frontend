@@ -17,7 +17,6 @@ import {
 } from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
@@ -322,10 +321,6 @@ async function baseTest(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions,
-    network,
-  );
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
@@ -1061,10 +1056,6 @@ async function pendingDropped(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions,
-    network
-  );
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();

@@ -24,7 +24,6 @@ import {
 import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
 import {
   genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,

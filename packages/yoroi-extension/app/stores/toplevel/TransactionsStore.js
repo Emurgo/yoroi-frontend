@@ -8,11 +8,8 @@ import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
-  BaseGetTransactionsRequest,
   ExportTransactionsFunc,
   GetTransactionsFunc,
-  GetTransactionsDataFunc,
-  GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
 import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -27,7 +24,6 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { digestForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
 import { getApiForNetwork, } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -52,13 +48,10 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
-import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
 import {
   persistSubmittedTransactions,
   loadSubmittedTransactions
 } from '../../api/localStorage';
-import { assuranceLevels } from '../../config/transactionAssuranceConfig';
-import { transactionTypes } from '../../api/ada/transactions/types';
 import { FETCH_TXS_BATCH_SIZE } from '../../api/ada';
 import LegacyTransactionsStore from './LegacyTransactionsStore';
 import type { Api } from '../../api/index';
@@ -608,7 +601,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       publicDeriver: request.publicDeriver,
       lastSyncInfo: request.lastSyncInfo,
       txs: [],
-      hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise 
+      hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise
       requests: {
         // note: this captures the right API for the wallet
         headRequest: new CachedRequest<GetTransactionsFunc>(

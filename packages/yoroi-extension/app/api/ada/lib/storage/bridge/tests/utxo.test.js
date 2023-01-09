@@ -16,7 +16,6 @@ import {
 } from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,

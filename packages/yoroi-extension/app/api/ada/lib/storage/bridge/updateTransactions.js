@@ -127,7 +127,7 @@ import { RollbackApiError } from '../../../../common/errors';
 import { getFromUserPerspective, identifierToCardanoAsset, } from '../../../transactions/utils';
 
 import type {
-  HistoryFunc, BestBlockFunc,
+  BestBlockFunc,
   RemoteTxState,
   RemoteTransaction,
   RemoteCertificate,
@@ -1467,10 +1467,10 @@ async function rawUpdateTransactions(
         },
         {
           publicDeriver,
-          getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.byTime(
+          getTxAndBlock: async (hashes) => await deps.GetTxAndBlock.byTime(
             db, dbTx,
             {
-              txIds,
+              txIds: hashes,
             }
           )
         },

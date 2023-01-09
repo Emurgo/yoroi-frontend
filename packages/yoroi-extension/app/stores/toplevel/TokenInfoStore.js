@@ -1,6 +1,6 @@
 // @flow
 
-import { observable, runInAction, action } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 
 import type {
@@ -24,7 +24,6 @@ import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
 import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
