@@ -63,41 +63,65 @@ class Module {
    */
   async WasmScope<T>(callback: Module => Promise<T>): Promise<T> {
     /*
-       * The main idea here is that we create a proxy of some root object (module itself)
-       * and then we intercept every single field-getting access, including all functions,
-       * and we check if the result of the function call is a Wasm pointer object.
-       * If we detect a pointer - we add it into the tracked scope and free at the end of the call.
+       * The main idea here is that we create a proxy of the root object (module itself)
+       * and then we recursively intercept every single function call and we check
+       * whether the result of the call is a Wasm pointer object. If we detect a pointer,
+       * we add it into the tracked scope and free at the end of the execution.
        * This way ANY wasm pointer produced within the callback will be automatically destroyed,
        * but only as long as it's created using the injected proxied module reference.
        */
     const scope = [];
-    const proxyHandler: Proxy$traps<E> = {
-      // We are intercepting when any field is trying to be accessed on the original object
-      get(target: E, name: string, receiver: Proxy<E>): any {
-        if (name === '____is_wasm_proxy') {
-          return true;
-        }
-        // Get the actual field value from the original object
-        const realValue = Reflect.get(target, name, receiver);
-        if (name === 'prototype') {
-          return realValue;
-        }
-        /* If the real value of the field is not a function,
-         * then we just want to recursively wrap it in a same proxy.
-         */
-        if (typeof realValue !== 'function' || realValue.prototype != null) {
+    function recursiveProxy<E>(originalObject: E): E {
+      const proxyHandler: Proxy$traps<E> = {
+        // We are intercepting when any field is trying to be accessed on the original object
+        get(target: E, name: string, receiver: Proxy<E>): any {
+          // Synthetic flag to identify our own proxies
+          if (name === '____is_wasm_proxy') {
+            return true;
+          }
+          // Get the actual field value from the original object
+          const realValue = Reflect.get(target, name, receiver);
+          // Never proxy the prototype field
+          if (name === 'prototype') {
+            return realValue;
+          }
+          // In case the real field value is a function, we implement a special wrapper
+          if (typeof realValue === 'function' && realValue.prototype == null) {
+            /* Note that we're also checking that the function has no prototype.
+             * The reason for this is that a field like `RustModule.WalletV4.BigNum`
+             * also has a type `function`, because it's a class constructor,
+             * but it is never used as a constructor directly, and instead only used
+             * to access static fields, including Rust constructor functions like `.new()`.
+             * The only thing that distinguishes it from a regular function is that
+             * it has a non-null prototype, that's why we check for it and rather wrap
+             * classes as regular objects.
+             */
+            /*
+             * A wrapper function is returned instead.
+             */
+            return function (...args: any[]): any {
+              // Call the actual function bound to the original object.
+              const res = realValue.bind(target)(...args);
+              if (isWasmPointer(res)) {
+                /*
+                 * If the result of the function call is a wasm pointer object,
+                 * we track it in our hidder scope array so we can free it after
+                 * the callack is finished. This is pretty much the main point
+                 * of this entire scope thing.
+                 */
+                scope.push(res);
+              }
+              // The result of the function call is then also recursively proxied.
+              // Whether it's a wasm object or not.
+              return recursiveProxy(res);
+            }
+          }
+          /* If the real value of the field ISN'T a function or IS a class,
+           * then we just want to recursively wrap it in a similar proxy.
+           */
           return recursiveProxy(realValue);
         }
-        return function(...args: any[]): any {
-          const res = realValue.bind(target)(...args);
-          if (isWasmPointer(res)) {
-            scope.push(res);
-          }
-          return recursiveProxy(res);
-        }
-      }
-    };
-    function recursiveProxy<E>(originalObject: E): E {
+      };
       // Make sure the original object is not already a proxy
       if (originalObject.____is_wasm_proxy !== true) {
         // We only proxy objects and functions, the check is mostly for primitive values
