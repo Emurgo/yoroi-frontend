@@ -611,6 +611,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
     }
 
+    const ownAddresses = new Set([
+      ...response.utxos.map(utxo => utxo.address),
+      ...response.usedAddresses,
+      ...response.unusedAddresses,
+      response.changeAddress
+    ])
+
     const outputs = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
@@ -618,6 +625,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       outputs.push(
         {
           address,
+          isForeign: !ownAddresses.has(address),
           value: multiTokenFromCardanoValue(
             output.amount(),
             selectedWallet.publicDeriver.getParent().getDefaultToken(),
@@ -630,13 +638,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       networkId: defaultToken.NetworkId,
       amount: txBody.fee().to_str(),
     };
-
-    const ownAddresses = new Set([
-      ...response.utxos.map(utxo => utxo.address),
-      ...response.usedAddresses,
-      ...response.unusedAddresses,
-      response.changeAddress
-    ])
 
     const { amount, total } = await this._calculateAmountAndTotal(
       selectedWallet.publicDeriver,
