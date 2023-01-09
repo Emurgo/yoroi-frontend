@@ -2,8 +2,12 @@
 
 import typeof * as WasmV2 from 'cardano-wallet-browser';
 import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
+import type {
+  BigNum,
+  LinearFee,
+  TransactionBuilder
+} from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 
@@ -13,8 +17,8 @@ const MAX_TX_BYTES = 16384;
 
 type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
-function isWasmPointer(o: any): boolean {
-  return o.ptr != null && o.free != null;
+function isWasmPointer(o: ?any): boolean {
+  return o != null && o.ptr != null && o.free != null;
 }
 
 class Module {
@@ -67,35 +71,46 @@ class Module {
        * but only as long as it's created using the injected proxied module reference.
        */
     const scope = [];
-    function recursiveProxy<E>(originalObject: E): E {
-      const proxyHandler: Proxy$traps<E> = {
-        // We are intercepting when any field is trying to be accessed on the original object
-        get(target: E, name: string, receiver: Proxy<E>): any {
-          // Get the actual field value from the original object
-          const realValue = Reflect.get(target, name, receiver);
-          /* If the real value of the field is not a function,
-           * then we just want to recursively wrap it in a same proxy.
-           */
-          if (typeof realValue !== 'function' || realValue.prototype != null) {
-            return recursiveProxy(realValue);
-          }
-          return function(...args: any[]): any {
-            const res = realValue.bind(originalObject)(...args);
-            if (isWasmPointer(res)) {
-              scope.push(res);
-            }
-            return recursiveProxy(res);
-          }
+    const proxyHandler: Proxy$traps<E> = {
+      // We are intercepting when any field is trying to be accessed on the original object
+      get(target: E, name: string, receiver: Proxy<E>): any {
+        if (name === '____is_wasm_proxy') {
+          return true;
         }
-      };
-      // We only proxy objects and functions, the check is mostly for primitive values
-      return typeof originalObject === 'object' || typeof originalObject === 'function'
-        ? new Proxy(originalObject, proxyHandler) : originalObject;
+        // Get the actual field value from the original object
+        const realValue = Reflect.get(target, name, receiver);
+        if (name === 'prototype') {
+          return realValue;
+        }
+        /* If the real value of the field is not a function,
+         * then we just want to recursively wrap it in a same proxy.
+         */
+        if (typeof realValue !== 'function' || realValue.prototype != null) {
+          return recursiveProxy(realValue);
+        }
+        return function(...args: any[]): any {
+          const res = realValue.bind(target)(...args);
+          if (isWasmPointer(res)) {
+            scope.push(res);
+          }
+          return recursiveProxy(res);
+        }
+      }
+    };
+    function recursiveProxy<E>(originalObject: E): E {
+      // Make sure the original object is not already a proxy
+      if (originalObject.____is_wasm_proxy !== true) {
+        // We only proxy objects and functions, the check is mostly for primitive values
+        if (typeof originalObject === 'object' || typeof originalObject === 'function') {
+          return new Proxy(originalObject, proxyHandler);
+        }
+      }
+      return originalObject;
     }
     // We are proxying the `RustModule` itself to pass it into the callback.
     // Note that we create a new proxy every time, because each proxy instance
     // is linked to the specific scope that will be destroyed.
-    const result = await callback(recursiveProxy(Module));
+    const result = await callback(recursiveProxy(RustModule));
     scope.forEach(x => x.free());
     if (isWasmPointer(result)) {
       throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
