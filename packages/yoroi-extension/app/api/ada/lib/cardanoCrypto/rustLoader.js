@@ -13,6 +13,10 @@ const MAX_TX_BYTES = 16384;
 
 type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
+function isWasmPointer(o: any): boolean {
+  return o.ptr != null && o.free != null;
+}
+
 class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
@@ -37,6 +41,66 @@ class Module {
     } else {
       this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
     }
+  }
+
+  /**
+   * The argument to this function is an async callback.
+   * The callback will receive a link to the `RustModule` class.
+   * Any wasm pointer created within the callback will be automatically destroyed
+   * after the callback ends, but only if it was created using the passed module.
+   *
+   * NOTE: If you use an external module reference to create wasm objects within the callback,
+   * then they will not be able to get intercepted and removed.
+   *
+   * NOTE: The return from the callback will be returned from this function call,
+   * BUT the result cannot be a wasm object as all pointers are getting destroyed
+   * before this function returns. If the result will be detected to be a wasm pointer,
+   * an exception will be raised.
+   */
+  async WasmScope<T>(callback: Module => Promise<T>): Promise<T> {
+    /*
+       * The main idea here is that we create a proxy of some root object (module itself)
+       * and then we intercept every single field-getting access, including all functions,
+       * and we check if the result of the function call is a Wasm pointer object.
+       * If we detect a pointer - we add it into the tracked scope and free at the end of the call.
+       * This way ANY wasm pointer produced within the callback will be automatically destroyed,
+       * but only as long as it's created using the injected proxied module reference.
+       */
+    const scope = [];
+    function recursiveProxy<E>(originalObject: E): E {
+      const proxyHandler: Proxy$traps<E> = {
+        // We are intercepting when any field is trying to be accessed on the original object
+        get(target: E, name: string, receiver: Proxy<E>): any {
+          // Get the actual field value from the original object
+          const realValue = Reflect.get(target, name, receiver);
+          /* If the real value of the field is not a function,
+           * then we just want to recursively wrap it in a same proxy.
+           */
+          if (typeof realValue !== 'function' || realValue.prototype != null) {
+            return recursiveProxy(realValue);
+          }
+          return function(...args: any[]): any {
+            const res = realValue.bind(originalObject)(...args);
+            if (isWasmPointer(res)) {
+              scope.push(res);
+            }
+            return recursiveProxy(res);
+          }
+        }
+      };
+      // We only proxy objects and functions, the check is mostly for primitive values
+      return typeof originalObject === 'object' || typeof originalObject === 'function'
+        ? new Proxy(originalObject, proxyHandler) : originalObject;
+    }
+    // We are proxying the `RustModule` itself to pass it into the callback.
+    // Note that we create a new proxy every time, because each proxy instance
+    // is linked to the specific scope that will be destroyed.
+    const result = await callback(recursiveProxy(Module));
+    scope.forEach(x => x.free());
+    if (isWasmPointer(result)) {
+      throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
+    }
+    return result;
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
