@@ -421,7 +421,9 @@ class MyWalletsPage extends Component<AllProps> {
       |},
       wallets: {|
         unselectWallet: {| trigger: (params: void) => void |},
-        setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
+        setActiveWallet: {| trigger: (params: {|
+          wallet: PublicDeriver<>,
+        |}) => void |},
       |},
     |},
     stores: {|

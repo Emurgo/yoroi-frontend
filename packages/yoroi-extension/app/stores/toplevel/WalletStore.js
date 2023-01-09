@@ -375,20 +375,17 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| wallet: PublicDeriver<>, formCacheFirst?: boolean |}) => void =
-    ({ wallet, formCacheFirst }) => {
-      const lastSelectedWallet = this._getLastSelectedWallet();
-      const walletToSelect = formCacheFirst && lastSelectedWallet ? lastSelectedWallet : wallet;
-
-      this.actions.profile.setSelectedNetwork.trigger(walletToSelect.getParent().getNetworkInfo());
-      this.selected = walletToSelect;
+  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void =
+    ({ wallet }) => {
+      this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
+      this.selected = wallet;
       // Cache select wallet
-      this.api.localStorage.setSelectedWalletId(walletToSelect.getPublicDeriverId())
+      this.api.localStorage.setSelectedWalletId(wallet.getPublicDeriverId())
       // do not await on purpose since the UI will handle adding loaders while refresh is happening
-      this.refreshWalletFromRemote(walletToSelect);
+      this.refreshWalletFromRemote(wallet);
     };
 
-  _getLastSelectedWallet: void => ?PublicDeriver<> = () => {
+  getLastSelectedWallet: void => ?PublicDeriver<> = () => {
     const walletId = this.api.localStorage.getSelectedWalletId();
     return this.publicDerivers.find(pd => pd.getPublicDeriverId() === walletId);
   }

@@ -54,15 +54,16 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
-    const publicDeriver = this.generated.stores.wallets.selected;
-    const publicDerivers = this.generated.stores.wallets.publicDerivers;
+    const { wallets } = this.generated.stores;
+    const publicDeriver = wallets.selected;
+    const publicDerivers = wallets.publicDerivers;
     const isRevamp = this.generated.stores.profile.isRevampTheme;
 
     if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
+      const lastSelectedWallet = wallets.getLastSelectedWallet();
       this.generated.actions.wallets.setActiveWallet.trigger({
-        wallet: publicDerivers[0],
-        formCacheFirst: true,
-      })
+        wallet: lastSelectedWallet ?? publicDerivers[0],
+      });
     }
 
     // reroute to the default path for the wallet
@@ -83,7 +84,7 @@ class Wallet extends Component<AllProps> {
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null && !isRevamp) throw new Error(`${nameof(Wallet)} no public deriver`);
+    if (publicDeriver == null) return;
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
@@ -104,7 +105,6 @@ class Wallet extends Component<AllProps> {
       }
       return firstValidCategory.route;
     }
-    return undefined;
   }
 
   navigateToMyWallets: string => void = destination => {
@@ -263,6 +263,13 @@ class Wallet extends Component<AllProps> {
           |}) => void,
         |},
       |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
@@ -271,7 +278,9 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
+        publicDerivers: Array<PublicDeriver<>>,
         firstSync: ?number,
+        getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       router: {| location: any |},
       transactions: {|
@@ -302,6 +311,7 @@ class Wallet extends Component<AllProps> {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
           firstSync: stores.wallets.firstSync,
+          getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,

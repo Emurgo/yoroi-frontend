@@ -12,7 +12,8 @@ import AboutYoroiSettingsBlock from '../../../components/settings/categories/gen
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
-import { Theme, THEMES } from '../../../styles/utils';
+import { THEMES } from '../../../styles/utils';
+import type { Theme } from '../../../styles/utils';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
@@ -129,13 +130,14 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentTheme={currentTheme}
           onSubmit={(theme: string) => {
             if (theme === THEMES.YOROI_REVAMP) {
-              const publicDeriver = this.generated.stores.wallets.selected;
-              const publicDerivers = this.generated.stores.wallets.publicDerivers;
+              const { wallets } = this.generated.stores;
+              const publicDeriver = wallets.selected;
+              const publicDerivers = wallets.publicDerivers;
 
               if (publicDeriver == null && publicDerivers.length !== 0) {
+                const lastSelectedWallet = wallets.getLastSelectedWallet();
                 this.generated.actions.wallets.setActiveWallet.trigger({
-                  wallet: publicDerivers[0],
-                  formCacheFirst: true,
+                  wallet: lastSelectedWallet ?? publicDerivers[0],
                 });
               }
             }
@@ -178,6 +180,13 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           |}) => void,
         |},
       |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
@@ -202,6 +211,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
       wallets: {|
         selected: null | PublicDeriver<>,
         publicDerivers: Array<PublicDeriver<>>,
+        getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       coinPriceStore: {|
         getCurrentPrice: (
@@ -244,6 +254,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         wallets: {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
+          getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
