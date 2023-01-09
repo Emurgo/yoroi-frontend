@@ -4,7 +4,6 @@ import { find } from 'lodash';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
-import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
@@ -39,8 +38,6 @@ import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
-  isErgo,
-  networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../api/common/lib/MultiToken';
 import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiToken';
@@ -53,10 +50,6 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import {
-  persistSubmittedTransactions,
-  loadSubmittedTransactions
-} from '../../api/localStorage';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
 
@@ -96,13 +89,6 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 /** Skip first n transactions from api */
 export const SEARCH_SKIP: number = 0;
 
-type SubmittedTransactionEntry = {|
-  networkId: number,
-  publicDeriverId: number,
-  transaction: WalletTransaction,
-  usedUtxos: Array<{| txHash: string, index: number |}>,
-|};
-
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
   const config = getCardanoHaskellBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
@@ -135,8 +121,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     options: GetTransactionsRequestOptions,
   |}> = [];
 
-  @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
-
   getTransactionRowsToExportRequest: LocalizedRequest<(void => Promise<void>) => Promise<void>>
     = new LocalizedRequest<(void => Promise<void>) => Promise<void>>(func => func());
   exportTransactions: LocalizedRequest<ExportTransactionsFunc>
@@ -146,22 +130,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable shouldIncludeTxIds: boolean = false;
 
   ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
-
-  setup(): void {
-    super.setup();
-    const actions = this.actions.transactions;
-    actions.loadMoreTransactions.listen(this._increaseSearchLimit);
-    actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
-    actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
-    actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
-    actions.closeDelegationBanner.listen(this._closeDelegationBanner);
-    this._loadSubmittedTransactions();
-    window.chrome.runtime.onMessage.addListener((message) => {
-      if (message === 'connector-tx-submitted') {
-        runInAction(this._loadSubmittedTransactions);
-      }
-    });
-  }
 
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
@@ -246,8 +214,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) return [];
     const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
     return  [
-      ...this.getSubmittedTransactions(publicDeriver),
-      ...(result ? result.transactions : [])
+      ...this.stores.transactions.getSubmittedTransactions(publicDeriver),
+      ...(result ? result : [])
     ];
   }
 
@@ -255,7 +223,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
     const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
-    return result ? result.transactions.length > 0 : false;
+    return result ? result.length > 0 : false;
+  }
+
+  @computed get hasMore(): boolean {
+    if (!this.searchOptions) {
+      // can return any value
+      return true;
+    }
+    return this.totalAvailable > this.searchOptions.limit;
   }
 
   @computed get hasAnyPending(): boolean {
@@ -270,6 +246,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) return 0;
     const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
     return result ? result.totalAvailable : 0;
+  }
+
+  @computed get balance(): MultiToken | null {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return null;
+    return this.getTxRequests(publicDeriver).requests.getBalanceRequest.result || null;
   }
 
   // This method ensures that at any time, there is only one refreshing process
@@ -372,9 +354,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     let submittedTransactionsChanged = false;
     runInAction(() => {
-      for (let i = 0; i < this._submittedTransactions.length;) {
-        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
-          this._submittedTransactions.splice(i, 1);
+      const submittedTransactions = this.stores.transactions._submittedTransactions;
+      for (let i = 0; i < submittedTransactions.length ;) {
+        if (remoteTransactionIds.has(submittedTransactions[i].transaction.txid)) {
+          submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
         } else {
           i++;
@@ -382,7 +365,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       }
     });
     if (submittedTransactionsChanged) {
-      this._persistSubmittedTransactions();
+      this.stores.transactions._persistSubmittedTransactions();
     }
   };
 
@@ -791,153 +774,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       }).promise;
     };
   }
-
-  @action
-  recordSubmittedTransaction: (
-    PublicDeriver<>,
-    WalletTransaction,
-    Array<{| txHash: string, index: number |}>,
-  ) => void = (
-    publicDeriver,
-    transaction,
-    usedUtxos,
-  ) => {
-    this._submittedTransactions.push({
-      publicDeriverId: publicDeriver.publicDeriverId,
-      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
-      transaction,
-      usedUtxos,
-    });
-    this._persistSubmittedTransactions();
-  }
-
-  getSubmittedTransactions: (
-    PublicDeriver<>,
-  ) => Array<WalletTransaction> = (
-    publicDeriver
-  ) => {
-    return this._submittedTransactions.filter(({ publicDeriverId }) =>
-      publicDeriverId === publicDeriver.publicDeriverId
-    ).map(tx => tx.transaction);
-  }
-
-  @action
-  clearSubmittedTransactions: (
-    PublicDeriver<>,
-  ) => void = (
-    publicDeriver
-  ) => {
-    for (let i = 0; i < this._submittedTransactions.length;) {
-      if (
-        this._submittedTransactions[i].publicDeriverId ===
-          publicDeriver.publicDeriverId
-      ) {
-        this._submittedTransactions.splice(i, 1);
-      } else {
-        i++;
-      }
-    }
-    this._persistSubmittedTransactions();
-  }
-
-  _persistSubmittedTransactions: () => void = () => {
-    persistSubmittedTransactions(this._submittedTransactions);
-  }
-
-  _loadSubmittedTransactions: () => Promise<void> = async () => {
-    try {
-      const data = loadSubmittedTransactions();
-      if (!data) {
-        return;
-      }
-      // token id set in submitted transactions, grouped by the network id
-      const tokenIds: Map<number, Set<string>> = new Map();
-      const txs = data.map(({ publicDeriverId, transaction, networkId }) => {
-        if (transaction.block) {
-          throw new Error('submitted transaction should not have block data');
-        }
-        const txCtorData = {
-          txid: transaction.txid,
-          block: null,
-          type: transaction.type,
-          amount: MultiToken.from(transaction.amount),
-          fee: MultiToken.from(transaction.fee),
-          date: new Date(transaction.date),
-          addresses: {
-            from: transaction.addresses.from.map(({ address, value }) => ({
-              address,
-              value: MultiToken.from(value)
-            })),
-            to: transaction.addresses.to.map(({ address, value }) => ({
-              address,
-              value: MultiToken.from(value)
-            })),
-          },
-          state: transaction.state,
-          errorMsg: transaction.errorMsg,
-        };
-        let tx;
-
-        const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
-          ({ NetworkId }) => NetworkId === networkId
-        );
-        if (!network) {
-          return;
-        }
-
-        if (isCardanoHaskell(network)) {
-          tx = new CardanoShelleyTransaction({
-            ...txCtorData,
-            certificates: transaction.certificates,
-            ttl: new BigNumber(transaction.ttl),
-            metadata: transaction.metadata,
-            withdrawals: transaction.withdrawals.map(({ address, value }) => ({
-              address,
-              value: MultiToken.from(value)
-            })),
-            isValid: transaction.isValid,
-          });
-        } else if (isErgo(network)) {
-          tx = new WalletTransaction(txCtorData);
-        } else {
-          return;
-        }
-
-        let tokenIdSet = tokenIds.get(networkId);
-        if (!tokenIdSet) {
-          tokenIdSet = new Set();
-          tokenIds.set(networkId, tokenIdSet);
-        }
-
-        tx.addresses.from.flatMap(
-          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-        ).forEach(tokenId => tokenIdSet?.add(tokenId));
-        tx.addresses.to.flatMap(
-          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-        ).forEach(tokenId => tokenIdSet?.add(tokenId));
-
-        return {
-          publicDeriverId,
-          transaction: tx,
-          networkId,
-        };
-      }).filter(Boolean);
-
-      for (const [networkId, tokenIdSet] of tokenIds.entries()) {
-        await this.stores.tokenInfoStore.fetchMissingTokenInfo(
-          networkId,
-          [...tokenIdSet]
-        );
-      }
-
-      runInAction(() => {
-        this._submittedTransactions.splice(0, 0, ...txs);
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-  }
 }
 
 class HashReducer {
@@ -1060,3 +896,4 @@ class AssetIdsReducer {
     return this.assetIds;
   }
 }
+

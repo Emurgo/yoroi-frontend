@@ -60,6 +60,8 @@ import {
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import { FETCH_TXS_BATCH_SIZE } from '../../api/ada';
+import LegacyTransactionsStore from './LegacyTransactionsStore';
+import type { Api } from '../../api/index';
 
 export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
@@ -128,6 +130,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
 
+  ergoTransactionsStore: LegacyTransactionsStore;
+
+  constructor(stores: StoresMap, api: Api, actions: ActionsMap) {
+    super(stores, api, actions);
+    this.ergoTransactionsStore = new LegacyTransactionsStore(stores, api, actions);
+  }
+
   setup(): void {
     super.setup();
     const actions = this.actions.transactions;
@@ -144,8 +153,20 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
+  isErgoWalletSelected: () => boolean = () => {
+    const { selected } = this.stores.wallets;
+    if (!selected) {
+      throw new Error('no wallet selected');
+    }
+    return isErgo(selected.getParent().getNetworkInfo());
+  }
+
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.unconfirmedAmount;
+    }
+
     const defaultUnconfirmedAmount = {
       incoming: [],
       outgoing: [],
@@ -154,26 +175,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action toggleIncludeTxIds: void => void = () => {
+    this.ergoTransactionsStore.toggleIncludeTxIds();
     this.shouldIncludeTxIds = !this.shouldIncludeTxIds
   }
 
-  @computed get headTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.headTransactionsRequest)} no wallet selected`);
-    }
-    return this.getTxHistoryState(publicDeriver).requests.headRequest;
-  }
-
-  @computed get tailTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.tailTransactionsRequest)} no wallet selected`);
-    }
-    return this.getTxHistoryState(publicDeriver).requests.tailRequest;
-  }
-
   @computed get lastSyncInfo(): IGetLastSyncInfoResponse {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.lastSyncInfo;
+    }
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`);
@@ -183,6 +192,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get recent(): Array<WalletTransaction> {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.recent;
+    }
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const { txs } = this.getTxHistoryState(publicDeriver);
@@ -193,10 +205,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get hasAny(): boolean {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.hasAny;
+    }
+
     return this.recent.length > 0;
   }
 
   @computed get hasAnyPending(): boolean {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.hasAnyPending;
+    }
+
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
     const result = this.getTxHistoryState(publicDeriver).requests.pendingRequest.result;
@@ -204,6 +224,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get hasMoreToLoad(): boolean {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.hasMore;
+    }
+
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
     return this.getTxHistoryState(publicDeriver).hasMoreToLoad;
@@ -215,6 +239,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     isLocalRequest: boolean,
   |} => Promise<void> = async (request) => {
+    if (isErgo(request.publicDeriver.getParent().getNetworkInfo())) {
+      return this.ergoTransactionsStore.refreshTransactionData({
+        publicDeriver: request.publicDeriver,
+        localRequest: request.isLocalRequest,
+      });
+    }
+
     const { publicDeriverId } = request.publicDeriver;
     if (this.ongoingRefreshing.has(publicDeriverId)) {
       return this.ongoingRefreshing.get(publicDeriverId);
@@ -233,50 +264,111 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get balance(): MultiToken | null {
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.balance;
+    }
+
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;
     return this.getTxHistoryState(publicDeriver).requests.getBalanceRequest.result || null;
   }
 
   @computed get isLoadingMore(): boolean {
-    const request = this.tailTransactionsRequest;
-    return request.isExecuting;
+    if (this.isErgoWalletSelected()) {
+      const { recentTransactionsRequest } = this.ergoTransactionsStore;
+      return !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting;
+    }
+
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoadingMore)} no wallet selected`);
+    }
+    const { tailRequest } = this.getTxHistoryState(publicDeriver).requests;
+
+    return tailRequest.isExecuting;
   }
 
   @computed get isLoading(): boolean {
-    const request = this.headTransactionsRequest;
-    return !request.wasExecuted;
+    if (this.isErgoWalletSelected()) {
+      const { recentTransactionsRequest } = this.ergoTransactionsStore;
+      return !recentTransactionsRequest.wasExecuted;
+    }
+
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoading)} no wallet selected`);
+    }
+    const { headRequest } = this.getTxHistoryState(publicDeriver).requests;
+
+    return !headRequest.wasExecuted;
   }
 
   @computed get assetDeposit(): MultiToken | null {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;
+
+    if (this.isErgoWalletSelected()) {
+      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
+      return requests.getAssetDepositRequest.result || null;
+    }
+
     return this.getTxHistoryState(publicDeriver).requests.getAssetDepositRequest.result || null;
   }
 
   isWalletRefreshing:  PublicDeriver<> => boolean = (publicDeriver) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      return this.ergoTransactionsStore.isWalletRefreshing(publicDeriver);
+    }
     return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
   }
 
   isWalletLoading:  PublicDeriver<> => boolean = (publicDeriver) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
+      return requests.recentRequest.wasExecuted;
+    }
+
     return !this.getTxHistoryState(publicDeriver).requests.headRequest.wasExecuted;
   }
 
   @action
   clearCache: PublicDeriver<> => void = (publicDeriver) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
+      for (const txRequest of Object.keys(requests)) {
+        requests[txRequest].reset();
+      }
+
+      return;
+    }
+
     const txs = this.getTxHistoryState(publicDeriver).txs;
     txs.splice(0, txs.length);
   }
 
   getBalance: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
+      return requests.getBalanceRequest.result || null;
+    }
+
     return this.getTxHistoryState(publicDeriver).requests.getBalanceRequest.result || null;
   }
 
   getAssetDeposit: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
+      return requests.getAssetDepositRequest.result || null;
+    }
+
     return this.getTxHistoryState(publicDeriver).requests.getAssetDepositRequest.result || null;
   }
 
   getLastSyncInfo: PublicDeriver<> => IGetLastSyncInfoResponse = (publicDeriver) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      return this.ergoTransactionsStore.getTxRequests(publicDeriver).lastSyncInfo;
+    }
+
     return this.getTxHistoryState(publicDeriver).lastSyncInfo;
   }
 
@@ -457,6 +549,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<void> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
+    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      this.ergoTransactionsStore._increaseSearchLimit(publicDeriver);
+      return;
+    }
+
     const withLevels = asHasLevels<
       ConceptualWallet,
       IGetLastSyncInfo
@@ -493,6 +590,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   |} => void = (
     request
   ) => {
+    if (isErgo(request.publicDeriver.getParent().getNetworkInfo())) {
+      this.ergoTransactionsStore.addObservedWallet(request);
+      return;
+    }
+
     const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     const foundRequest = find(
@@ -540,6 +642,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
   |} => Promise<void> = async (request) => {
+    if (isErgo(request.publicDeriver.getParent().getNetworkInfo())) {
+      await this.ergoTransactionsStore._exportTransactionsToFile(request);
+      return;
+    }
+
     try {
       this._setExporting(true);
 
