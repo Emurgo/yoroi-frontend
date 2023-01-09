@@ -8,12 +8,14 @@
   }
 }
 
-:global(.YoroiModern) .dialog {
-  min-width: var(--yoroi-comp-dialog-min-width-lg);
-  max-width: var(--yoroi-comp-dialog-min-width-lg);
-  font-weight: 400;
-
-  .walletPassword {
-    margin-top: 0;
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .dialog {
+    min-width: var(--yoroi-comp-dialog-min-width-lg);
+    max-width: var(--yoroi-comp-dialog-min-width-lg);
+    font-weight: 400;
+    
+    .walletPassword {
+      margin-top: 0;
+    }
   }
 }

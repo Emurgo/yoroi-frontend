@@ -2,6 +2,7 @@
 
 import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
+import ObjectHash from 'object-hash';
 import type {
   lf$Database, lf$Transaction,
 } from 'lovefield';
@@ -150,6 +151,7 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
+import { UtxoStorageApi } from '../models/utils';
 
 type TokensMintMetadata = {|
 ...{[key: string]: TokenMintMetadata[]}
@@ -870,6 +872,10 @@ export async function removeAllTransactions(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
+  const updateUtxoTables = Object
+    .keys(UtxoStorageApi.depsTables)
+    .map(key => UtxoStorageApi.depsTables[key])
+    .flatMap(table => getAllSchemaTables(db, table));
 
   return await raii<PromisslessReturnType<typeof removeAllTransactions>>(
     db,
@@ -878,13 +884,107 @@ export async function removeAllTransactions(
       ...db.getSchema().tables(),
       ...depTables,
       ...mapToTables(db, derivationTables),
+      ...updateUtxoTables,
     ],
-    async dbTx => rawRemoveAllTransactions(
-      db, dbTx,
-      deps,
-      request.publicDeriver.getParent().getDerivationTables(),
-      { publicDeriver: request.publicDeriver },
-    )
+    async dbTx => {
+      await UtxoStorageApi.depsTables.ModifyUtxoAtSafePoint.remove(
+        db, dbTx,
+        request.publicDeriver.getPublicDeriverId(),
+      );
+      await UtxoStorageApi.depsTables.ModifyUtxoDiffToBestBlock.removeAll(
+        db, dbTx,
+        request.publicDeriver.getPublicDeriverId(),
+      );
+      return rawRemoveAllTransactions(
+        db, dbTx,
+        deps,
+        request.publicDeriver.getParent().getDerivationTables(),
+        { publicDeriver: request.publicDeriver },
+      );
+    }
+  );
+}
+
+export async function updateUtxos(
+  db: lf$Database,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  checkAddressesInUse: FilterFunc,
+): Promise<void> {
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+  const derivationTables = withLevels == null
+    ? new Map<number, string>()
+    : withLevels.getParent().getDerivationTables();
+
+  const scanAddrTables = Object.freeze({
+    GetKeyForPublicDeriver,
+    GetAddress,
+    GetPathWithSpecific,
+    GetUtxoTxOutputsWithTx,
+    ModifyAddress,
+    GetPublicDeriver,
+    AddDerivationTree,
+    ModifyDisplayCutoff,
+    GetDerivationsByPath,
+    GetDerivationSpecific,
+    GetKeyDerivation,
+  });
+
+  // sync our address set with remote to make sure txs are identified as ours
+  await raii(
+    db,
+    [
+      ...Object.keys(scanAddrTables).map(key => scanAddrTables[key])
+        .flatMap(table => getAllSchemaTables(db, table)),
+      ...mapToTables(db, derivationTables),
+    ],
+    async dbTx => {
+      const canScan = asScanAddresses(publicDeriver);
+      if (canScan != null) {
+        await canScan.rawScanAddresses(
+          dbTx,
+          {
+            GetKeyForPublicDeriver: scanAddrTables.GetKeyForPublicDeriver,
+            GetAddress: scanAddrTables.GetAddress,
+            GetPathWithSpecific: scanAddrTables.GetPathWithSpecific,
+            GetUtxoTxOutputsWithTx: scanAddrTables.GetUtxoTxOutputsWithTx,
+            ModifyAddress: scanAddrTables.ModifyAddress,
+            GetPublicDeriver: scanAddrTables.GetPublicDeriver,
+            AddDerivationTree: scanAddrTables.AddDerivationTree,
+            ModifyDisplayCutoff: scanAddrTables.ModifyDisplayCutoff,
+            GetDerivationsByPath: scanAddrTables.GetDerivationsByPath,
+            GetDerivationSpecific: scanAddrTables.GetDerivationSpecific,
+            GetKeyDerivation: scanAddrTables.GetKeyDerivation,
+          },
+          // TODO: race condition because we don't pass in best block here
+          { checkAddressesInUse },
+          derivationTables,
+        );
+      }
+    }
+  );
+
+  const getAddrTables = Object.freeze({
+    GetPathWithSpecific,
+    GetAddress,
+    GetDerivationSpecific,
+  });
+
+  await raii(
+    db,
+    [
+      ...Object.keys(UtxoStorageApi.depsTables).map(key => UtxoStorageApi.depsTables[key])
+        .flatMap(table => getAllSchemaTables(db, table)),
+      ...Object.keys(getAddrTables).map(key => getAddrTables[key])
+        .flatMap(table => getAllSchemaTables(db, table)),
+    ],
+    async dbTx => {
+      await rawUpdateUtxos(
+        db, dbTx,
+        publicDeriver,
+        getAddrTables,
+        derivationTables,
+      );
+    }
   );
 }
 
@@ -902,6 +1002,7 @@ export async function updateTransactions(
     ? new Map<number, string>()
     : withLevels.getParent().getDerivationTables();
   let lastSyncInfo = undefined;
+
   try {
     const updateDepTables = Object.freeze({
       GetLastSyncForPublicDeriver,
@@ -960,7 +1061,6 @@ export async function updateTransactions(
           remainingDeps,
           publicDeriver,
           lastSyncInfo,
-          checkAddressesInUse,
           getTransactionsHistoryForAddresses,
           getBestBlock,
           derivationTables,
@@ -1220,7 +1320,6 @@ async function rawUpdateTransactions(
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
-  checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
@@ -1249,29 +1348,7 @@ async function rawUpdateTransactions(
   if (bestBlock.hash != null) {
     const untilBlock = bestBlock.hash;
 
-    // 2) sync our address set with remote to make sure txs are identified as ours
-    const canScan = asScanAddresses(publicDeriver);
-    if (canScan != null) {
-      await canScan.rawScanAddresses(
-        dbTx,
-        {
-          GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver,
-          GetAddress: deps.GetAddress,
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
-          ModifyAddress: deps.ModifyAddress,
-          GetPublicDeriver: deps.GetPublicDeriver,
-          AddDerivationTree: deps.AddDerivationTree,
-          ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
-          GetDerivationsByPath: deps.GetDerivationsByPath,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetKeyDerivation: deps.GetKeyDerivation,
-        },
-        // TODO: race condition because we don't pass in best block here
-        { checkAddressesInUse },
-        derivationTables,
-      );
-    }
+    // 2) address syncing has been done by scanUtxos so no need to do it here again
 
     // 3) get new txs from fetcher
 
@@ -1308,31 +1385,7 @@ async function rawUpdateTransactions(
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
       network,
-      addresses: [
-        // needs to send legacy addresses directly since they don't use the payment key method
-        ...addresses.utxoAddresses
-          .filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY)
-          .map(address => address.Hash),
-        // payment keys will fetch all addresses with the same payment key
-        ...addresses.utxoAddresses
-          .filter(address => address.Type === CoreAddressTypes.CARDANO_ENTERPRISE)
-          .reduce(
-            (list, next) => {
-              const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(next.Hash, 'hex'));
-              const enterpriseWasm = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
-              if (enterpriseWasm == null) return list;
-              const keyHash = enterpriseWasm.payment_cred().to_keyhash();
-              if (keyHash == null) return list;
-              list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
-              return list;
-            },
-            []
-          ),
-        // note: sending account addresses is required
-        // since for example, the staking key registration certificate doesn't need a witness
-        // so a tx where no input/output belongs to you could register your staking key
-        ...addresses.accountingAddresses.map(address => address.Hash),
-      ],
+       addresses: toRequestAddresses(addresses),
       untilBlock,
     });
 
@@ -2832,4 +2885,86 @@ async function certificateToDb(
     }
   }
   return result;
+}
+
+function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>): boolean {
+  const requestAddresseSet = new Set(addresses);
+  const requestAddresseHash = ObjectHash.sha1(requestAddresseSet);
+  const localStorageKey = `TMP/UTXO_REQUEST_ADDRESSES_HASH/${id}`;
+  const prevRequestAddressHash = localStorage.getItem(localStorageKey);
+  const isUpdating = prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash;
+  if (isUpdating) {
+    // <TODO:REMOVE_AFTER_YOROI_LIB_UPGRADE>
+    console.debug('/// utxo state must be cleared:', id, requestAddresseHash, prevRequestAddressHash);
+    localStorage.setItem(localStorageKey, requestAddresseHash);
+  }
+  return isUpdating;
+}
+
+async function rawUpdateUtxos(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  publicDeriver: IPublicDeriver<>,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+  |},
+  derivationTables: Map<number, string>,
+): Promise<void> {
+  const addresses = await rawGetAddressRowsForWallet(
+    dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    { publicDeriver },
+    derivationTables,
+  );
+
+  const utxoStorageApi = publicDeriver.getUtxoStorageApi();
+  const utxoService = publicDeriver.getUtxoService();
+
+  utxoStorageApi.setDb(db);
+  utxoStorageApi.setDbTx(dbTx);
+
+  const requestAddresses = toRequestAddresses(addresses);
+  if (compareAndSetIfNewAddressSetHash(publicDeriver.getPublicDeriverId(), requestAddresses)) {
+    await utxoStorageApi.clearUtxoState();
+  }
+  await utxoService.syncUtxoState(requestAddresses);
+}
+
+function toRequestAddresses(
+  addresses: {|
+    utxoAddresses: Array<$ReadOnly<AddressRow>>,
+    accountingAddresses: Array<$ReadOnly<AddressRow>>,
+  |}
+): Array<string> {
+  return [
+    // needs to send legacy addresses directly since they don't use the payment key method
+    ...addresses.utxoAddresses
+      .filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY)
+      .map(address => address.Hash),
+    // payment keys will fetch all addresses with the same payment key
+    ...addresses.utxoAddresses
+      .filter(address => address.Type === CoreAddressTypes.CARDANO_ENTERPRISE)
+      .reduce(
+        (list, next) => {
+          const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(next.Hash, 'hex'));
+          const enterpriseWasm = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+          if (enterpriseWasm == null) return list;
+          const keyHash = enterpriseWasm.payment_cred().to_keyhash();
+          if (keyHash == null) return list;
+          list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
+          return list;
+        },
+        []
+      ),
+    // note: sending account addresses is required
+    // since for example, the staking key registration certificate doesn't need a witness
+    // so a tx where no input/output belongs to you could register your staking key
+    ...addresses.accountingAddresses.map(address => address.Hash),
+  ];
 }

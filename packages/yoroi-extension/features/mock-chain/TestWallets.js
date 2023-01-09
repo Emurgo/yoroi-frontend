@@ -1,5 +1,7 @@
 // @flow
 
+import { commonWalletPassword } from '../support/helpers/common-constants';
+
 export type RestorationInput = {|
   name: string,
   password: string,
@@ -7,6 +9,10 @@ export type RestorationInput = {|
   plate: string,
   deviceId?: ?string,
 |};
+
+function getMnemonicFromEnv(walletName): string {
+  return process.env[walletName] ?? '';
+}
 
 function createWallet(payload: {|
   name: string,
@@ -20,7 +26,7 @@ function createWallet(payload: {|
     name,
     mnemonic,
     plate,
-    password: 'asdfasdfasdf',
+    password: commonWalletPassword,
     deviceId: payload.deviceId,
   } };
 }
@@ -28,7 +34,7 @@ function createWallet(payload: {|
 // You can use this website to generate more mnemonics if you need for testing
 // https://iancoleman.io/bip39/
 
-type WalletNames =
+export type WalletNames =
   'shelley-simple-24' |
   'shelley-simple-15' |
   'shelley-delegated' |
@@ -48,7 +54,10 @@ type WalletNames =
   'shelley-enterprise' |
   'shelley-mangled' |
   'ergo-token-wallet' |
-  'cardano-token-wallet';
+  'cardano-token-wallet' |
+  'First-Smoke-Test-Wallet' |
+  'Second-Smoke-Test-Wallet' |
+  'Second-Smoke-Test-Wallet-FF';
 
 // eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object.assign(
@@ -160,5 +169,20 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('cardano-token-wallet': WalletNames),
     mnemonic: 'rent sword help dynamic enhance collect biology drama agent raven grape bike march length leisure',
     plate: 'HZPX-1482',
+  }),
+  createWallet({
+    name: ('First-Smoke-Test-Wallet': WalletNames),
+    mnemonic: getMnemonicFromEnv('FIRST_SMOKE_TEST_WALLET'),
+    plate: 'XONT-4910'
+  }),
+  createWallet({
+    name: ('Second-Smoke-Test-Wallet': WalletNames),
+    mnemonic: getMnemonicFromEnv('SECOND_SMOKE_TEST_WALLET'),
+    plate: 'XZHD-1651',
+  }),
+  createWallet({
+    name: ('Second-Smoke-Test-Wallet-FF': WalletNames),
+    mnemonic: getMnemonicFromEnv('SECOND_SMOKE_TEST_WALLET_FF'),
+    plate: 'CJBE-8896'
   }),
 );

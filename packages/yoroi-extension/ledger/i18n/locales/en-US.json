@@ -42,6 +42,8 @@
   "hint.sendTx.confirmAddress": "Confirm the receiver's address by pressing <strong>both</strong> buttons.",
   "hint.nanoX.sendTx.confirmAddress": "Confirm the receiver's address by pressing the <strong>right</strong> button to scroll through the entire address. Then press <strong>both</strong> buttons.",
   "hint.pointer": "Make sure the pointer shown on your Ledger is the same as the one shown below, then press <strong>both</strong> buttons.",
+  "hint.sendTx.confirmAssetAmount": "Confirm the token amount by pressing <strong>both</strong> buttons",
+  "hint.sendTx.confirmAssetFingerprint": "Confirm the asset fingerprint by pressing <strong>both</strong> buttons",
   "hint.sendTx.confirmFee": "Confirm Transaction Fee by pressing <strong>both</strong> buttons.",
   "hint.sendTx.confirmTx": "Confirm the transaction by pressing the <strong>right</strong> button.",
   "hint.sendTx.ttl": "Confirm the time-to-live by pressing <strong>both</strong> buttons.",

@@ -1,7 +1,9 @@
 @import '../../../themes/mixins/underline';
 
-:global(.YoroiModern) .component {
-  min-width: var(--yoroi-comp-dialog-min-width-md);
+:global(.YoroiModern), :global(.YoroiRevamp)  {
+  .component {
+    min-width: var(--yoroi-comp-dialog-min-width-md);
+  } 
 }
 
 .component {

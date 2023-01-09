@@ -208,6 +208,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       this.stores.wallets.selected,
       // update if tx history changes
       this.stores.transactions.hash,
+      this.receiver,
     ],
     async () => {
       this._updateTxBuilder()
