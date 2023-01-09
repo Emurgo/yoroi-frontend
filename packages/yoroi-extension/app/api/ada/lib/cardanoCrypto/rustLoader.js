@@ -22,7 +22,7 @@ function isWasmPointer(o: ?any): boolean {
 }
 
 function createWasmScope(): {
-  proxiedModule: Module,
+  RustModule: Module,
   free: () => void;
 } {
   /*
@@ -98,7 +98,7 @@ function createWasmScope(): {
   // Note that we create a new proxy every time, because each proxy instance
   // is linked to the specific scope that will be destroyed.
   return {
-    proxiedModule: recursiveProxy(RustModule),
+    RustModule: recursiveProxy(RustModule),
     free: () => { scope.forEach(x => x.free()); },
   }
 }
@@ -145,7 +145,7 @@ class Module {
    */
   async WasmScope<T>(callback: Module => Promise<T>): Promise<T> {
     const scope = createWasmScope();
-    const result = await callback(scope.proxiedModule);
+    const result = await callback(scope.RustModule);
     scope.free();
     if (isWasmPointer(result)) {
       throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
