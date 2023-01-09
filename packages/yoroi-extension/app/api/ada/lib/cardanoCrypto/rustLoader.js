@@ -21,6 +21,88 @@ function isWasmPointer(o: ?any): boolean {
   return o != null && o.ptr != null && o.free != null;
 }
 
+function createWasmScope(): {
+  proxiedModule: Module,
+  free: () => void;
+} {
+  /*
+   * The main idea here is that we create a proxy of the root object (module itself)
+   * and then we recursively intercept every single function call and we check
+   * whether the result of the call is a Wasm pointer object. If we detect a pointer,
+   * we add it into the tracked scope and free at the end of the execution.
+   * This way ANY wasm pointer produced within the callback will be automatically destroyed,
+   * but only as long as it's created using the injected proxied module reference.
+   */
+  const scope = [];
+  function recursiveProxy<E>(originalObject: E): E {
+    const proxyHandler: Proxy$traps<E> = {
+      // We are intercepting when any field is trying to be accessed on the original object
+      get(target: E, name: string, receiver: Proxy<E>): any {
+        // Synthetic flag to identify our own proxies
+        if (name === '____is_wasm_proxy') {
+          return true;
+        }
+        // Get the actual field value from the original object
+        const realValue = Reflect.get(target, name, receiver);
+        // Never proxy the prototype field
+        if (name === 'prototype') {
+          return realValue;
+        }
+        // In case the real field value is a function, we implement a special wrapper
+        if (typeof realValue === 'function' && realValue.prototype == null) {
+          /* Note that we're also checking that the function has no prototype.
+           * The reason for this is that a field like `RustModule.WalletV4.BigNum`
+           * also has a type `function`, because it's a class constructor,
+           * but it is never used as a constructor directly, and instead only used
+           * to access static fields, including Rust constructor functions like `.new()`.
+           * The only thing that distinguishes it from a regular function is that
+           * it has a non-null prototype, that's why we check for it and rather wrap
+           * classes as regular objects.
+           */
+          /*
+           * A wrapper function is returned instead.
+           */
+          return function (...args: any[]): any {
+            // Call the actual function bound to the original object.
+            const res = realValue.bind(target)(...args);
+            if (isWasmPointer(res)) {
+              /*
+               * If the result of the function call is a wasm pointer object,
+               * we track it in our hidder scope array so we can free it after
+               * the callack is finished. This is pretty much the main point
+               * of this entire scope thing.
+               */
+              scope.push(res);
+            }
+            // The result of the function call is then also recursively proxied.
+            // Whether it's a wasm object or not.
+            return recursiveProxy(res);
+          }
+        }
+        /* If the real value of the field ISN'T a function or IS a class,
+         * then we just want to recursively wrap it in a similar proxy.
+         */
+        return recursiveProxy(realValue);
+      }
+    };
+    // We only proxy objects and functions, the check is mostly for primitive values
+    if (typeof originalObject === 'object' || typeof originalObject === 'function') {
+      // Make sure the original object is not already a proxy
+      if (originalObject.____is_wasm_proxy !== true) {
+        return new Proxy(originalObject, proxyHandler);
+      }
+    }
+    return originalObject;
+  }
+  // We are proxying the `RustModule` itself to pass it into the callback.
+  // Note that we create a new proxy every time, because each proxy instance
+  // is linked to the specific scope that will be destroyed.
+  return {
+    proxiedModule: recursiveProxy(RustModule),
+    free: () => { scope.forEach(x => x.free()); },
+  }
+}
+
 class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
@@ -62,80 +144,9 @@ class Module {
    * an exception will be raised.
    */
   async WasmScope<T>(callback: Module => Promise<T>): Promise<T> {
-    /*
-       * The main idea here is that we create a proxy of the root object (module itself)
-       * and then we recursively intercept every single function call and we check
-       * whether the result of the call is a Wasm pointer object. If we detect a pointer,
-       * we add it into the tracked scope and free at the end of the execution.
-       * This way ANY wasm pointer produced within the callback will be automatically destroyed,
-       * but only as long as it's created using the injected proxied module reference.
-       */
-    const scope = [];
-    function recursiveProxy<E>(originalObject: E): E {
-      const proxyHandler: Proxy$traps<E> = {
-        // We are intercepting when any field is trying to be accessed on the original object
-        get(target: E, name: string, receiver: Proxy<E>): any {
-          // Synthetic flag to identify our own proxies
-          if (name === '____is_wasm_proxy') {
-            return true;
-          }
-          // Get the actual field value from the original object
-          const realValue = Reflect.get(target, name, receiver);
-          // Never proxy the prototype field
-          if (name === 'prototype') {
-            return realValue;
-          }
-          // In case the real field value is a function, we implement a special wrapper
-          if (typeof realValue === 'function' && realValue.prototype == null) {
-            /* Note that we're also checking that the function has no prototype.
-             * The reason for this is that a field like `RustModule.WalletV4.BigNum`
-             * also has a type `function`, because it's a class constructor,
-             * but it is never used as a constructor directly, and instead only used
-             * to access static fields, including Rust constructor functions like `.new()`.
-             * The only thing that distinguishes it from a regular function is that
-             * it has a non-null prototype, that's why we check for it and rather wrap
-             * classes as regular objects.
-             */
-            /*
-             * A wrapper function is returned instead.
-             */
-            return function (...args: any[]): any {
-              // Call the actual function bound to the original object.
-              const res = realValue.bind(target)(...args);
-              if (isWasmPointer(res)) {
-                /*
-                 * If the result of the function call is a wasm pointer object,
-                 * we track it in our hidder scope array so we can free it after
-                 * the callack is finished. This is pretty much the main point
-                 * of this entire scope thing.
-                 */
-                scope.push(res);
-              }
-              // The result of the function call is then also recursively proxied.
-              // Whether it's a wasm object or not.
-              return recursiveProxy(res);
-            }
-          }
-          /* If the real value of the field ISN'T a function or IS a class,
-           * then we just want to recursively wrap it in a similar proxy.
-           */
-          return recursiveProxy(realValue);
-        }
-      };
-      // Make sure the original object is not already a proxy
-      if (originalObject.____is_wasm_proxy !== true) {
-        // We only proxy objects and functions, the check is mostly for primitive values
-        if (typeof originalObject === 'object' || typeof originalObject === 'function') {
-          return new Proxy(originalObject, proxyHandler);
-        }
-      }
-      return originalObject;
-    }
-    // We are proxying the `RustModule` itself to pass it into the callback.
-    // Note that we create a new proxy every time, because each proxy instance
-    // is linked to the specific scope that will be destroyed.
-    const result = await callback(recursiveProxy(RustModule));
-    scope.forEach(x => x.free());
+    const scope = createWasmScope();
+    const result = await callback(scope.proxiedModule);
+    scope.free();
     if (isWasmPointer(result)) {
       throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
     }
