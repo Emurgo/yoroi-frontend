@@ -21,6 +21,10 @@ function isWasmPointer(o: ?any): boolean {
   return o != null && o.ptr != null && o.free != null;
 }
 
+function isPromise(o: ?any): boolean {
+  return o != null && (typeof o.then === 'function') && (typeof o.catch === 'function');
+}
+
 /**
  * Creates a new proxied RustModule scope.
  * Return fields:
@@ -109,7 +113,14 @@ function createWasmScope(): {|
   // is linked to the specific scope that will be destroyed.
   return {
     RustModule: recursiveProxy(RustModule),
-    free: () => { scope.forEach(x => x.free()); },
+    free: () => {
+      scope.forEach(x => {
+        // Checking just to avoid a null-pointer crash
+        if (x.ptr !== 0) {
+          x.free()
+        }
+      });
+    },
   }
 }
 
@@ -155,16 +166,24 @@ class Module {
    */
   WasmScope<T>(callback: Module => T): T {
     const scope = createWasmScope();
-    const result = callback(scope.RustModule);
-    function resolve(res: T): T {
+    function onSuccess(res: T): T {
       scope.free();
       if (isWasmPointer(res)) {
         throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
       }
       return res;
     }
-    // $FlowFixMe[incompatible-type]
-    return typeof result.then === 'function' ? result.then(resolve) : resolve(result);
+    function onFailure(err: Error): void {
+      scope.free();
+      throw err;
+    }
+    let result;
+    try {
+      result = callback(scope.RustModule);
+    } catch (e) { onFailure(e); }
+    return isPromise(result)
+      ? result.then(onSuccess, onFailure)
+      : onSuccess(result);
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
