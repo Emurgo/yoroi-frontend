@@ -3,113 +3,154 @@
 import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
 import ObjectHash from 'object-hash';
-import type { lf$Database, lf$Transaction, } from 'lovefield';
-
-import { getAllSchemaTables, mapToTables, raii, } from '../database/utils';
 import type {
-  AddressRow,
-  BlockInsert,
-  BlockRow,
-  CardanoAssetMintMetadata,
+  lf$Database, lf$Transaction,
+} from 'lovefield';
+
+import {
+  getAllSchemaTables,
+  raii,
+  mapToTables,
+} from '../database/utils';
+import type {
+  BlockInsert, BlockRow,
+  TransactionInsert, TransactionRow,
   CardanoByronTransactionInsert,
   CardanoShelleyTransactionInsert,
-  DbBlock,
   NetworkRow,
-  TokenListInsert,
+  DbBlock,
+  AddressRow,
   TokenRow,
-  TransactionInsert,
-  TransactionRow,
+  TokenListInsert,
+  CardanoAssetMintMetadata,
 } from '../database/primitives/tables';
-import { TransactionType, } from '../database/primitives/tables';
-import type { CertificateRelationType, CoreAddressT, TxStatusCodesType, } from '../database/primitives/enums';
 import {
-  CertificateRelation,
-  CoreAddressTypes,
-  PRIMARY_ASSET_CONSTANTS,
-  TxStatusCodes,
+  TransactionType,
+} from '../database/primitives/tables';
+import type {
+  TxStatusCodesType,
+  CertificateRelationType,
+  CoreAddressT,
 } from '../database/primitives/enums';
 import {
-  AssociateToken,
   GetAddress,
   GetBlock,
-  GetCertificates,
-  GetDerivationsByPath,
   GetEncryptionMeta,
-  GetKeyDerivation,
   GetPathWithSpecific,
-  GetToken,
+  GetDerivationsByPath,
   GetTransaction,
   GetTxAndBlock,
+  GetCertificates,
+  GetKeyDerivation,
+  GetToken,
+  AssociateToken,
 } from '../database/primitives/api/read';
-import type { AddCertificateRequest } from '../database/primitives/api/write';
 import {
-  FreeBlocks,
   ModifyAddress,
+  ModifyTransaction,
+  FreeBlocks,
   ModifyToken,
   ModifyTokenList,
-  ModifyTransaction,
 } from '../database/primitives/api/write';
-import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from '../database/transactionModels/multipart/api/write';
+import type { AddCertificateRequest } from '../database/primitives/api/write';
+import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from  '../database/transactionModels/multipart/api/write';
 import { digestForHash, } from '../database/primitives/api/utils';
-import { MarkUtxo, } from '../database/transactionModels/utxo/api/write';
 import {
+  MarkUtxo,
+} from '../database/transactionModels/utxo/api/write';
+import {
+  GetUtxoTxOutputsWithTx,
+  GetUtxoInputs,
   AssociateTxWithUtxoIOs,
   createTokenListIdGenFunction,
-  GetUtxoInputs,
-  GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-import { AssociateTxWithAccountingIOs, } from '../database/transactionModels/account/api/read';
 import {
-  CardanoByronAssociateTxWithIOs,
-  CardanoShelleyAssociateTxWithIOs,
+  AssociateTxWithAccountingIOs,
+} from '../database/transactionModels/account/api/read';
+import {
+  CardanoByronAssociateTxWithIOs, CardanoShelleyAssociateTxWithIOs,
 } from '../database/transactionModels/multipart/api/read';
-import type { UserAnnotation, } from '../../../transactions/types';
-import type { ToAbsoluteSlotNumberFunc, } from '../../../../common/lib/storage/bridge/timeUtils';
 import type {
-  UtxoTransactionInputInsert,
-  UtxoTransactionOutputInsert,
+  UserAnnotation,
+} from '../../../transactions/types';
+import type {
+  ToAbsoluteSlotNumberFunc,
+} from '../../../../common/lib/storage/bridge/timeUtils';
+import type {
+  UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
-import type { AccountingTransactionInputInsert, } from '../database/transactionModels/account/tables';
-import { asHasLevels, asScanAddresses, } from '../models/PublicDeriver/traits';
+import type {
+  AccountingTransactionInputInsert,
+} from '../database/transactionModels/account/tables';
+import {
+  TxStatusCodes,
+  CoreAddressTypes,
+  CertificateRelation,
+  PRIMARY_ASSET_CONSTANTS,
+} from '../database/primitives/enums';
+import {
+  asScanAddresses, asHasLevels,
+} from '../models/PublicDeriver/traits';
 import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
-import type { IPublicDeriver, } from '../models/PublicDeriver/interfaces';
+import type {
+  IPublicDeriver,
+} from '../models/PublicDeriver/interfaces';
 import {
-  GetKeyForPublicDeriver,
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
+  GetKeyForPublicDeriver,
 } from '../database/walletTypes/core/api/read';
 import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
 import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
 import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
 import { getCardanoHaskellBaseConfig, } from '../database/prepackaged/networks';
-import { DeleteAllTransactions, ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
+import {
+  ModifyLastSyncInfo,
+  DeleteAllTransactions,
+} from '../database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../database/transactionModels/multipart/tables';
-import { rawGetAddressRowsForWallet, } from './traitUtils';
-import { genToAbsoluteSlotNumber, } from './timeUtils';
-import type { FindOwnAddressFunc, HashToIdsFunc, } from '../../../../common/lib/storage/bridge/hashMapper';
-import { rawGenFindOwnAddress, rawGenHashToIdsFunc, } from '../../../../common/lib/storage/bridge/hashMapper';
+import {
+  rawGetAddressRowsForWallet,
+} from  './traitUtils';
+import {
+  genToAbsoluteSlotNumber,
+} from './timeUtils';
+import {
+  rawGenHashToIdsFunc, rawGenFindOwnAddress,
+} from '../../../../common/lib/storage/bridge/hashMapper';
+import type {
+  HashToIdsFunc, FindOwnAddressFunc,
+} from '../../../../common/lib/storage/bridge/hashMapper';
 import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
 import { getFromUserPerspective, identifierToCardanoAsset, } from '../../../transactions/utils';
 
 import type {
-  BestBlockFunc,
-  HistoryFunc,
-  MultiAssetMintMetadataFunc,
-  RemoteCertificate,
-  RemoteTransaction,
+  HistoryFunc, BestBlockFunc,
   RemoteTxState,
-  TokenInfoFunc
+  RemoteTransaction,
+  RemoteCertificate,
+  TokenInfoFunc,
+  MultiAssetMintMetadataFunc
 } from '../../state-fetch/types';
-import { RemoteTransactionTypes, ShelleyCertificateTypes, } from '../../state-fetch/types';
-import type { FilterFunc, } from '../../../../common/lib/state-fetch/currencySpecificTypes';
+import {
+  ShelleyCertificateTypes,
+  RemoteTransactionTypes,
+} from '../../state-fetch/types';
+import type {
+  FilterFunc,
+} from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
-import type { DefaultTokenEntry, } from '../../../../common/lib/MultiToken';
-import { MultiToken, } from '../../../../common/lib/MultiToken';
+import {
+  MultiToken,
+} from '../../../../common/lib/MultiToken';
+import type {
+  DefaultTokenEntry,
+} from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
 import { bytesToHex, hexToBytes } from '../../../../../coreUtils';
 
