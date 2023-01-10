@@ -2660,7 +2660,7 @@ async function certificateToDb(
             ownerStakeCredentialHexes.push(ownerStakeCredentialHex);
           }
 
-          let poolMetadata = null;
+          let poolMetadata = undefined;
           if (cert.poolParams.poolMetadata != null) {
             const metadata = cert.poolParams.poolMetadata;
             poolMetadata = Module.WalletV4.PoolMetadata.new(

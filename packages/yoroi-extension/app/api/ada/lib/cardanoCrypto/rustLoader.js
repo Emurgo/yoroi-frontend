@@ -180,8 +180,9 @@ class Module {
     let result;
     try {
       result = callback(scope.RustModule);
-    } catch (e) { onFailure(e); }
+    } catch (e) { onFailure(e); throw e; }
     return isPromise(result)
+      // $FlowFixMe[incompatible-use]
       ? result.then(onSuccess, onFailure)
       : onSuccess(result);
   }
