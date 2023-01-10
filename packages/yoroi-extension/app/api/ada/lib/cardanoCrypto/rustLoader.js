@@ -21,6 +21,12 @@ function isWasmPointer(o: ?any): boolean {
   return o != null && o.ptr != null && o.free != null;
 }
 
+/**
+ * Creates a new proxied RustModule scope.
+ * Return fields:
+ * - RustModule - the proxied module
+ * - free() - the function that will free all the wasm pointers created within the scope so far.
+ */
 function createWasmScope(): {
   RustModule: Module,
   free: () => void;
