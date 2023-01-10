@@ -151,8 +151,8 @@ class Module {
   }
 
   /**
-   * The argument to this function is an async callback.
-   * The callback will receive a link to the `RustModule` class.
+   * The argument to this function is a callback.
+   * The callback will receive a link to a `RustModule` instance.
    * Any wasm pointer created within the callback will be automatically destroyed
    * after the callback ends, but only if it was created using the passed module.
    *
@@ -163,6 +163,11 @@ class Module {
    * BUT the result cannot be a wasm object as all pointers are getting destroyed
    * before this function returns. If the result will be detected to be a wasm pointer,
    * an exception will be raised.
+   *
+   * NOTE: the callback can be an async function or any function that returns a promise.
+   * In that case the return of this function will also be a promise that will resolve
+   * to the same result from the callback. The wasm pointers will be destroyed once the
+   * callback promise resolves.
    */
   WasmScope<T>(callback: Module => T): T {
     const scope = createWasmScope();
