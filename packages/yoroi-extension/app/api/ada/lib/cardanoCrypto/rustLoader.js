@@ -153,14 +153,17 @@ class Module {
    * before this function returns. If the result will be detected to be a wasm pointer,
    * an exception will be raised.
    */
-  async WasmScope<T>(callback: Module => Promise<T>): Promise<T> {
+  WasmScope<T>(callback: Module => T): T {
     const scope = createWasmScope();
-    const result = await callback(scope.RustModule);
-    scope.free();
-    if (isWasmPointer(result)) {
-      throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
+    const result = callback(scope.RustModule);
+    function resolve(res): T {
+      scope.free();
+      if (isWasmPointer(res)) {
+        throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
+      }
+      return res;
     }
-    return result;
+    return typeof result.then === 'function' ? result.then(resolve) : resolve(result);
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
