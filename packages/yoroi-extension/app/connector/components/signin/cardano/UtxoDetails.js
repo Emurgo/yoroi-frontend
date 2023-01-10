@@ -154,6 +154,7 @@ class CardanoUtxoDetails extends Component<Props> {
     address: {|
       address: string,
       value: MultiToken,
+      isForeign: ?Boolean,
     |},
     addressIndex: number,
     transform?: BigNumber => BigNumber,
@@ -231,7 +232,9 @@ class CardanoUtxoDetails extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { txData } = this.props;
-
+    const foreignOutputs = txData.outputs.filter(o => {
+      return o.isForeign;
+    });
     return (
       <Box>
         <Box>
@@ -258,24 +261,28 @@ class CardanoUtxoDetails extends Component<Props> {
                 })}
               </Box>
             </Box>
-            {/* TODO: create logic to diferentiate between owned & foreign addresses */}
-            <Separator />
-            <Box>
-              <Typography variant="body1" fontWeight="500" color="#4A5065">
-                {/* TODO: use intl */}
-                Foreign Addresses
-              </Typography>
-              <Box>
-                {txData.inputs.map((address, addressIndex) => {
-                  return this.renderRow({
-                    kind: 'in',
-                    address,
-                    addressIndex,
-                    transform: amount => amount.abs().negated(),
-                  });
-                })}
-              </Box>
-            </Box>
+
+            {txData.foreignInputs.length > 0 && (
+              <>
+                <Separator />
+                <Box>
+                  <Typography variant="body1" fontWeight="500" color="#4A5065">
+                    {/* TODO: use intl */}
+                    Foreign Addresses
+                  </Typography>
+                  <Box>
+                    {txData.foreignInputs.map((address, addressIndex) => {
+                      return this.renderRow({
+                        kind: 'in',
+                        address,
+                        addressIndex,
+                        transform: amount => amount.abs().negated(),
+                      });
+                    })}
+                  </Box>
+                </Box>
+              </>
+            )}
           </Panel>
         </Box>
         <Box>
@@ -292,34 +299,39 @@ class CardanoUtxoDetails extends Component<Props> {
                 Your Addresses
               </Typography>
               <Box>
-                {txData.outputs.map((address, addressIndex) => {
-                  return this.renderRow({
-                    kind: 'in',
-                    address,
-                    addressIndex,
-                    transform: amount => amount.abs(),
-                  });
-                })}
+                {txData.outputs
+                  .filter(o => !o.isForeign)
+                  .map((address, addressIndex) => {
+                    return this.renderRow({
+                      kind: 'in',
+                      address,
+                      addressIndex,
+                      transform: amount => amount.abs(),
+                    });
+                  })}
               </Box>
             </Box>
-            {/* TODO: create logic to diferentiate between owned & foreign addresses */}
-            <Separator />
-            <Box>
-              {/* TODO: use intl */}
-              <Typography variant="body1" fontWeight="500" color="#4A5065">
-                Foreign Addresses
-              </Typography>
-              <Box>
-                {txData.outputs.map((address, addressIndex) => {
-                  return this.renderRow({
-                    kind: 'in',
-                    address,
-                    addressIndex,
-                    transform: amount => amount.abs(),
-                  });
-                })}
-              </Box>
-            </Box>
+            {foreignOutputs.length > 0 && (
+              <>
+                <Separator />
+                <Box>
+                  {/* TODO: use intl */}
+                  <Typography variant="body1" fontWeight="500" color="#4A5065">
+                    Foreign Addresses
+                  </Typography>
+                  <Box>
+                    {foreignOutputs.map((address, addressIndex) => {
+                      return this.renderRow({
+                        kind: 'in',
+                        address,
+                        addressIndex,
+                        transform: amount => amount.abs(),
+                      });
+                    })}
+                  </Box>
+                </Box>
+              </>
+            )}
           </Panel>
         </Box>
       </Box>

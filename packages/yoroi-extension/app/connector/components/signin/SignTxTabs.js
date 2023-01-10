@@ -67,6 +67,7 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
               ({ label, component, id }) =>
                 component !== null && (
                   <StyledTab
+                    key={id}
                     disableRipple
                     label={
                       <Typography variant="body1" fontWeight={500}>
@@ -97,6 +98,7 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
                   pr: '12px', // since overflow scroll adds 20px of right padding
                 }}
                 value={id}
+                key={id}
               >
                 {component}
               </TabPanel>

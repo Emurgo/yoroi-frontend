@@ -12,9 +12,16 @@ export const LoadingWalletStates = Object.freeze({
 export type CardanoConnectorSignRequest = {|
   inputs: Array<{|
     address: string,
+    isForeign: ?Boolean,
+    value: MultiToken,
+  |}>,
+  foreignInputs: Array<{|
+    address: string,
+    isForeign: ?Boolean,
     value: MultiToken,
   |}>,
   outputs: Array<{|
+    isForeign: ?Boolean,
     address: string,
     value: MultiToken,
   |}>,

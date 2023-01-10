@@ -1,31 +1,34 @@
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext } from 'react';
+import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import { signTxMessages } from '../SignTxPage';
 import CardanoSignTxSummaryComponent from './SignTxSummaryComponent';
 
-export default function CardanoSignTxComponent({
-  intl,
-  isOnlyTxFee,
-  txFeeAmount,
-  txAmount,
-  txTotalAmount,
-  passwordFormField,
-}) {
+const getAssetDisplayValue = ({ amount, tokenInfo }) => {
+  const tokenName = getTokenName(tokenInfo);
+  return `${tokenInfo.IsNFT && amount == 1 ? '' : amount + ' '}${tokenName}`;
+};
+
+export default function CardanoSignTxComponent({ intl, txAssetsData, passwordFormField }) {
+  const { total, isOnlyTxFee, sent, received } = txAssetsData;
+  const isSendingNativeToken = Number(total.cryptoAmount) < 0;
+  const isReceivingNativeToken = Number(total.cryptoAmount) > 0;
+
   return (
     <Box>
-      <CardanoSignTxSummaryComponent txTotalAmount={txTotalAmount} intl={intl} />
+      <CardanoSignTxSummaryComponent txAssetsData={txAssetsData} intl={intl} />
       <Panel>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start">
           <Typography color="#4A5065" fontWeight={500}>
             {intl.formatMessage(signTxMessages.transactionFee)}
           </Typography>
           <Typography textAlign="right" color="#242838">
-            {txFeeAmount.cryptoAmount.replace('-', '')} {txFeeAmount.ticker}
+            {total.cryptoFee} {total.ticker}
           </Typography>
         </Box>
       </Panel>
-      {!isOnlyTxFee && (
+      {(!isOnlyTxFee || sent.length > 0 || received.length > 0) && (
         <>
           <Panel>
             <Box display="flex" justifyContent="space-between" alignItems="flex-start">
@@ -34,9 +37,25 @@ export default function CardanoSignTxComponent({
                 Send
               </Typography>
             </Box>
-            <AsseetValueDisplay>
-              {txAmount.cryptoAmount.replace('-', '')} {txAmount.ticker}
-            </AsseetValueDisplay>
+
+            {isSendingNativeToken && (
+              <AsseetValueDisplay>
+                {total.cryptoAmount} {total.ticker}
+              </AsseetValueDisplay>
+            )}
+
+            {sent.length > 0 && (
+              <>
+                {sent.map(asset => (
+                  <AsseetValueDisplay>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
+                ))}
+              </>
+            )}
+
+            {/* TODO: use intl */}
+            {!isSendingNativeToken && sent.length === 0 && (
+              <AsseetValueDisplay>No assets sent</AsseetValueDisplay>
+            )}
           </Panel>
           <Panel>
             <Box display="flex" justifyContent="space-between" alignItems="flex-start">
@@ -45,10 +64,24 @@ export default function CardanoSignTxComponent({
                 Receive
               </Typography>
             </Box>
-            <AsseetValueDisplay>
-              {/* TODO: use intl */}
-              No assets received
-            </AsseetValueDisplay>
+
+            {isReceivingNativeToken && (
+              <AsseetValueDisplay>
+                {total.cryptoAmount} {total.ticker}
+              </AsseetValueDisplay>
+            )}
+
+            {received.length > 0 && (
+              <>
+                {received.map(asset => (
+                  <AsseetValueDisplay>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
+                ))}
+              </>
+            )}
+            {/* TODO: use intl */}
+            {!isReceivingNativeToken && received.length === 0 && (
+              <AsseetValueDisplay>No assets received</AsseetValueDisplay>
+            )}
           </Panel>
         </>
       )}

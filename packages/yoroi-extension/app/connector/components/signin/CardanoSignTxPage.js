@@ -16,7 +16,7 @@ import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils
 import type {
   DefaultTokenEntry,
   TokenLookupKey,
-  TokenEntry,
+  CustomTokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
@@ -172,21 +172,7 @@ class SignTxPage extends Component<Props, State> {
     return undefined;
   };
 
-  renderBundle: ({|
-    amount: MultiToken,
-    render: TokenEntry => Node,
-  |}) => Node = request => {
-    return (
-      <>
-        {request.render(request.amount.getDefaultEntry())}
-        {request.amount.nonDefaultEntries().map(entry => (
-          <React.Fragment key={entry.identifier}>{request.render(entry)}</React.Fragment>
-        ))}
-      </>
-    );
-  };
-
-  getDisplayAmount: TokenEntry => Object = request => {
+  getDisplayAmount: CustomTokenEntry => Object = request => {
     const tokenInfo = this.props.getTokenInfo(request);
     if (!tokenInfo) {
       throw new Error('missing token info');
@@ -194,6 +180,12 @@ class SignTxPage extends Component<Props, State> {
 
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
     const shiftedAmount = request.amount.shiftedBy(-numberOfDecimals);
+    const shiftedFee = request.fee.shiftedBy(-numberOfDecimals);
+    const onlyFeeOrSend = request.amount.toNumber() === 0 || request.amount.toNumber() < 0;
+    const shiftedTotal = request.amount
+      .plus(onlyFeeOrSend ? request.fee.negated() : request.fee)
+      .shiftedBy(-numberOfDecimals);
+
     const ticker = tokenInfo
       ? this.getTicker(tokenInfo)
       : assetNameFromIdentifier(request.identifier);
@@ -213,20 +205,77 @@ class SignTxPage extends Component<Props, State> {
       }
     }
 
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount,
-      numberOfDecimals
-    );
-
-    const fixedTwoDecimals =
-      Number((Number(afterDecimalRewards) / 10 ** afterDecimalRewards.length).toFixed(2)) * 100;
+    const [beforeDecimalAmount, afterDecimalAmount] = splitAmount(shiftedAmount, numberOfDecimals);
+    const [beforeDecimalFee, afterDecimalFee] = splitAmount(shiftedFee, numberOfDecimals);
+    const [beforeDecimalTotal, afterDecimalTotal] = splitAmount(shiftedTotal, numberOfDecimals);
 
     return {
       fiatAmount: fiatAmountDisplay,
       currency: fiatCurrency,
-      cryptoAmount: beforeDecimalRewards + (fixedTwoDecimals || '.00'),
+      cryptoAmount: beforeDecimalAmount + (afterDecimalAmount || ''),
+      cryptoFee: beforeDecimalFee + (afterDecimalFee || ''),
+      cryptoTotal: beforeDecimalTotal + (afterDecimalTotal || ''),
       ticker: ticker,
     };
+  };
+
+  getAssetsExplorerLink: Object = () => {
+    return null;
+  };
+
+  getUniqueAssets: Array<any> = assets => {
+    return assets.reduce((acc, curr) => {
+      const newAcc = [].concat(acc);
+      const defaultId = curr.value.getDefaultEntry().identifier;
+
+      if (!newAcc.includes(defaultId) && defaultId) newAcc.push(defaultId);
+
+      curr.value.nonDefaultEntries().forEach(e => {
+        if (!newAcc.some(a => a.Identifier === e.identifier)) {
+          const tokenInfo = this.props.getTokenInfo(e);
+          tokenInfo && newAcc.push(Object.assign({ tokenInfo, amount: e.amount }));
+        }
+      });
+
+      return newAcc;
+    }, []);
+  };
+
+  getSummaryAssetsData: Object = () => {
+    const { txData } = this.props;
+
+    const assetsData = {
+      total: {},
+      isOnlyTxFee: false,
+      sent: [],
+      received: [],
+    };
+
+    if (txData) {
+      const defaultTokenId = txData.amount.defaults.defaultIdentifier;
+      const defaultNetworkId = txData.amount.defaults.defaultNetworkId;
+      const defaultTokenAmount = txData.amount.get(defaultTokenId) ?? new BigNumber('0');
+      const txFeeAmount = new BigNumber(txData.fee.amount);
+      const sentAssets = this.getUniqueAssets(txData.inputs);
+      const receivedAssets = this.getUniqueAssets(txData.outputs);
+
+      //only tx fee (no sign) & one asset sent/received
+      assetsData.total = this.getDisplayAmount({
+        identifier: txData.fee.tokenId,
+        networkId: txData.fee.networkId,
+        amount: defaultTokenAmount,
+        fee: txFeeAmount,
+      });
+
+      assetsData.isOnlyTxFee = defaultTokenAmount.toNumber() === 0;
+
+      // More than 1 asset sent/received (rather is NFT or not)
+      if (sentAssets.length > 1 || receivedAssets.length > 1) {
+        assetsData.sent = sentAssets.filter(Boolean);
+        assetsData.received = receivedAssets.filter(Boolean);
+      }
+    }
+    return assetsData;
   };
 
   renderPayload(payloadHex: string): string {
@@ -252,35 +301,13 @@ class SignTxPage extends Component<Props, State> {
     let content;
     let utxosContent;
     if (txData) {
-      // signing a tx
-      const txAmountDefaultToken = txData.amount.defaults.defaultIdentifier;
-      const txAmount = txData.amount.get(txAmountDefaultToken) ?? new BigNumber('0');
-      const txFeeAmount = new BigNumber(txData.fee.amount).negated();
-      const txTotalAmount = txAmount.plus(txFeeAmount);
-      const displayTxFeeAmount = this.getDisplayAmount({
-        identifier: txData.fee.tokenId,
-        networkId: txData.fee.networkId,
-        amount: txFeeAmount,
-      });
-      const displayTxAmount = this.getDisplayAmount({
-        identifier: txAmountDefaultToken,
-        networkId: txData.amount.defaults.defaultNetworkId,
-        amount: txAmount,
-      });
-      const displayTxTotalAmount = this.getDisplayAmount({
-        identifier: txAmountDefaultToken,
-        networkId: txData.amount.defaults.defaultNetworkId,
-        amount: txTotalAmount,
-      });
+      const summaryAssetsData = this.getSummaryAssetsData();
 
       content = (
         <Box>
           <CardanoSignTxComponent
             intl={intl}
-            isOnlyTxFee={txAmount.toNumber() === 0}
-            txFeeAmount={displayTxFeeAmount}
-            txAmount={displayTxAmount}
-            txTotalAmount={displayTxTotalAmount}
+            txAssetsData={summaryAssetsData}
             passwordFormField={
               <TextField
                 type="password"
@@ -295,7 +322,7 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = (
         <Box>
           <Box mb="32px">
-            <CardanoSignTxSummaryComponent txTotalAmount={displayTxTotalAmount} intl={intl} />
+            <CardanoSignTxSummaryComponent txAssetsData={summaryAssetsData} intl={intl} />
           </Box>
           <CardanoUtxoDetails
             txData={txData}
@@ -346,11 +373,18 @@ class SignTxPage extends Component<Props, State> {
         />
         <Box p="32px" sx={{ borderTop: '1px solid #DCE0E9', maxWidth: '100%' }}>
           <Box sx={{ display: 'flex', gap: '15px' }}>
-            <Button sx={{ minWidth: 0 }} fullWidth variant="secondary" onClick={onCancel}>
+            <Button
+              sx={{ minWidth: 0 }}
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={onCancel}
+            >
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
             <Button
-              variant="primary"
+              variant="contained"
+              color="primary"
               fullWidth
               disabled={!walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
