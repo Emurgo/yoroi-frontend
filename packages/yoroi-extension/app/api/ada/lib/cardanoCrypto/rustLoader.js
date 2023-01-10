@@ -156,13 +156,14 @@ class Module {
   WasmScope<T>(callback: Module => T): T {
     const scope = createWasmScope();
     const result = callback(scope.RustModule);
-    function resolve(res): T {
+    function resolve(res: T): T {
       scope.free();
       if (isWasmPointer(res)) {
         throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
       }
       return res;
     }
+    // $FlowFixMe[incompatible-type]
     return typeof result.then === 'function' ? result.then(resolve) : resolve(result);
   }
 
