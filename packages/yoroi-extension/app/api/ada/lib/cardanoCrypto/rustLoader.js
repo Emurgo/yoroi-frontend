@@ -27,10 +27,10 @@ function isWasmPointer(o: ?any): boolean {
  * - RustModule - the proxied module
  * - free() - the function that will free all the wasm pointers created within the scope so far.
  */
-function createWasmScope(): {
+function createWasmScope(): {|
   RustModule: Module,
   free: () => void;
-} {
+|} {
   /*
    * The main idea here is that we create a proxy of the root object (module itself)
    * and then we recursively intercept every single function call and we check
@@ -41,6 +41,9 @@ function createWasmScope(): {
    */
   const scope = [];
   function recursiveProxy<E>(originalObject: E): E {
+    if (originalObject == null) {
+      return originalObject;
+    }
     const proxyHandler: Proxy$traps<E> = {
       // We are intercepting when any field is trying to be accessed on the original object
       get(target: E, name: string, receiver: Proxy<E>): any {
@@ -95,7 +98,8 @@ function createWasmScope(): {
     if (typeof originalObject === 'object' || typeof originalObject === 'function') {
       // Make sure the original object is not already a proxy
       if (originalObject.____is_wasm_proxy !== true) {
-        return new Proxy(originalObject, proxyHandler);
+        // $FlowFixMe[incompatible-return]
+        return new Proxy<E>(originalObject, proxyHandler);
       }
     }
     return originalObject;
