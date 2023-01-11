@@ -618,7 +618,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       response.changeAddress
     ])
 
-    const outputs = [];
+    const outputs: Array<{| address: string, isForeign: boolean, value: MultiToken |}> = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
@@ -642,7 +642,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const { amount, total } = await this._calculateAmountAndTotal(
       selectedWallet.publicDeriver,
       inputs,
-      outputs,
+      outputs.map(({ address, value }) => ({ address, value })),
       fee,
       response.utxos,
       ownAddresses,
