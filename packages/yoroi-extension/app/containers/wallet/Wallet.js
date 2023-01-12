@@ -77,9 +77,7 @@ class Wallet extends Component<AllProps> {
 
   checkRoute(): void | string {
     const isRevamp = this.generated.stores.profile.isRevampTheme;
-    const categories = isRevamp ?
-        allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD)
-        : allCategories;
+    const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
 
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to

@@ -292,7 +292,6 @@ export default class VotingPage extends Component<Props> {
     const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
     const fundName = catalystRoundInfo?.currentFund?.name || round.toString();
     return (
-      //
       <div>
         {activeDialog}
         <Voting

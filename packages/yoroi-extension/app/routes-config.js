@@ -47,6 +47,7 @@ export const ROUTES = {
     ADAPOOL_DELEGATION_SIMPLE: '/wallets/delegation-simple',
     CARDANO_DELEGATION: '/wallets/cardano-delegation',
     CATALYST_VOTING: '/wallets/voting',
+    TRANSFER: '/wallets/transfer',
   },
   SETTINGS: {
     ROOT: '/settings',
