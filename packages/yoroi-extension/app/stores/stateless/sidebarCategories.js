@@ -110,27 +110,32 @@ export const NOTICE_BOARD: SidebarCategory = registerCategory({
   isVisible: _request => !environment.isProduction(),
 });
 
+type isVisibleFunc = ({|
+    hasAnyWallets: boolean,
+    selected: null | PublicDeriver<>,
+    currentRoute: string,
+  |}) => boolean;
+
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
   +icon: string,
   +label?: MessageDescriptor,
-  +isVisible: ({|
-    hasAnyWallets: boolean,
-    selected: null | PublicDeriver<>,
-    currentRoute: string,
-  |}) => boolean,
+  +isVisible: isVisibleFunc,
 |};
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
-  {
-    className: 'wallets',
-    route: ROUTES.WALLETS.ROOT,
-    icon: walletIcon,
-    label: globalMessages.walletLabel,
-    isVisible: _request => true,
-  },
+  // Open `/wallets` only if the user is on any other page other than `/wallets/add`
+  makeWalletCategory(
+    ROUTES.WALLETS.ROOT,
+    ({ currentRoute }) => currentRoute !== ROUTES.WALLETS.ADD
+  ),
+  // Open `/wallets/transactions` if the user is on the `/wallet/add`
+  makeWalletCategory(
+    ROUTES.WALLETS.TRANSACTIONS,
+    ({ currentRoute }) => currentRoute === ROUTES.WALLETS.ADD
+  ),
   {
     className: 'staking',
     route: ROUTES.STAKING,
@@ -198,3 +203,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   //   isVisible: _request => true,
   // },
 ];
+
+function makeWalletCategory(route: string, isVisible: isVisibleFunc): SidebarCategoryRevamp {
+  return {
+    className: 'wallets',
+    route,
+    icon: walletIcon,
+    label: globalMessages.walletLabel,
+    isVisible,
+  }
+};
