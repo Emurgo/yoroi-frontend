@@ -161,7 +161,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'voting',
-    route: ROUTES.WALLETS.CATALYST_VOTING,
+    route: ROUTES.REVAMP.CATALYST_VOTING,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]

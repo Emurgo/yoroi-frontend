@@ -227,7 +227,6 @@ export const Routes = (
           )
         )}
       />
-
       <Route
         path={ROUTES.NFTS.ROOT}
         component={(props) => (
@@ -237,7 +236,6 @@ export const Routes = (
           )
         )}
       />
-
       <Route
         exact
         path={ROUTES.WALLETS.ADD}
@@ -300,6 +298,11 @@ export const Routes = (
         path={ROUTES.SWITCH}
         component={(props) => <WalletSwitch {...props} stores={stores} actions={actions} />}
       />
+      <Route
+        exact
+        path={ROUTES.REVAMP.CATALYST_VOTING}
+        component={(props) => <VotingPage {...props} stores={stores} actions={actions} />}
+      />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </Suspense>
@@ -354,7 +357,7 @@ const WalletsSubpages = (stores, actions) => (
     />
     <Route
       exact
-      path={ROUTES.WALLETS.TRANSFER}
+      path={ROUTES.REVAMP.TRANSFER}
       component={(props) => <Transfer {...props} stores={stores} actions={actions} />}
     />
   </Switch>
