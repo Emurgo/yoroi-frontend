@@ -36,10 +36,17 @@ import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import globalMessages from '../../../i18n/global-messages';
 import { withLayout } from '../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../styles/context/layout'
+import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer'
+import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer'
+import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
-type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+type Props = InjectedOrGenerated<GeneratedData>
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {|
+  ...Props,
+  ...InjectedProps,
 |};
 
 const messages: * = defineMessages({
@@ -82,7 +89,7 @@ const messages: * = defineMessages({
 });
 
 @observer
-class VotingPage extends Component<Props> {
+class VotingPage extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   onClose: void => void = () => {
