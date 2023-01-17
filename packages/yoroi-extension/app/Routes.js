@@ -11,6 +11,9 @@ import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
 import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
+import LoadingPage from './containers/LoadingPage';
+import StakingPage from './containers/wallet/staking/StakingPage';
+import Wallet from './containers/wallet/Wallet';
 
 // PAGES
 const WalletAddPagePromise = () => import('./containers/wallet/WalletAddPage');
@@ -38,15 +41,15 @@ const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
 const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
 const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
 
+//! Todo: Remove unnecessary promises
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 const LoadingPagePromise = () => import('./containers/LoadingPage');
-const LoadingPage = React.lazy(LoadingPagePromise);
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
 
 const WalletPromise = () => import('./containers/wallet/Wallet');
-const Wallet = React.lazy(WalletPromise);
+const WalletLazy = React.lazy(WalletPromise);
 
 const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
 const MyWalletsPage = React.lazy(MyWalletsPagePromise);
@@ -97,7 +100,7 @@ const WalletSwitchPromise = () => import('./containers/WalletSwitch');
 const WalletSwitch = React.lazy(WalletSwitchPromise);
 
 const StakingPagePromise = () => import('./containers/wallet/staking/StakingPage');
-const StakingPage = React.lazy(StakingPagePromise);
+const StakingPageLazy = React.lazy(StakingPagePromise);
 
 const AssetsWrapperPromise = () => import('./containers/wallet/AssetsWrapper');
 const AssetsWrapper = React.lazy(AssetsWrapperPromise);
@@ -310,9 +313,7 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.TRANSACTIONS}
-      component={(props) => {
-        return <WalletSummaryPage {...props} stores={stores} actions={actions} />
-      }}
+      component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
@@ -425,7 +426,6 @@ const NFTsSubPages = (stores, actions) => (
     />
   </Switch>
 )
-/* eslint-enable max-len */
 
 export function wrapSettings(
   settingsProps: InjectedOrGenerated<SettingsData>,
@@ -435,7 +435,9 @@ export function wrapSettings(
     <Settings
       {...settingsProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </Settings>
   );
 }
@@ -448,7 +450,9 @@ export function wrapAssets(
     <AssetsWrapper
       {...assetsProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </AssetsWrapper>
   );
 }
@@ -461,7 +465,9 @@ export function wrapNFTs(
     <NFTsWrapper
       {...assetsProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </NFTsWrapper>
   );
 }
@@ -474,7 +480,9 @@ export function wrapWallet(
     <Wallet
       {...walletProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </Wallet>
   );
 }

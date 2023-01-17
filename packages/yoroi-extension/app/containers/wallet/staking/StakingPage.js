@@ -442,9 +442,8 @@ class StakingPage extends Component<AllProps> {
               onNext={() => {
                 // note: purposely don't await
                 // since the next dialog will properly render the spinner
-                this.generated.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger(
-                  { publicDeriver }
-                );
+                const { delegationTransaction } = this.generated.actions.ada;
+                delegationTransaction.createWithdrawalTxForWallet.trigger({ publicDeriver });
                 this.generated.actions.dialogs.open.trigger({
                   dialog: WithdrawalTxDialogContainer,
                 });
