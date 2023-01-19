@@ -240,6 +240,46 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  CardanoPreviewTestnet: ({
+    NetworkId: 3_00,
+    NetworkName: 'Cardano Preview Testnet',
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://preview-backend.emurgornd.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000'
+        : 'wss://preview-backend.emurgornd.com:443',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
+    },
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 1,
+        GenesisDate: '1654041600000',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 0,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        CoinsPerUtxoWord: '34482',
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
+  }: NetworkRow),
 });
 
 export function isTestnet(
@@ -247,7 +287,8 @@ export function isTestnet(
 ): boolean {
   return network.NetworkId === networks.JormungandrMainnet.NetworkId
     || network.NetworkId === networks.CardanoTestnet.NetworkId
-    || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId;
+    || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId
+    || network.NetworkId === networks.CardanoPreviewTestnet.NetworkId;
 
 }
 
@@ -330,7 +371,10 @@ export const defaultAssets: Array<
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
           assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
           ticker:
-            (network === networks.CardanoTestnet || network === networks.CardanoPreprodTestnet || network === networks.AlonzoTestnet)
+            (network === networks.CardanoTestnet
+              || network === networks.CardanoPreprodTestnet
+              || network === networks.CardanoPreviewTestnet
+              || network === networks.AlonzoTestnet)
               ? 'TADA'
               : 'ADA',
           longName: null,
