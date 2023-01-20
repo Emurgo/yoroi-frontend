@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import { Component, lazy, Suspense } from 'react';
 import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -15,7 +15,6 @@ import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
-import WalletTransferPage from './WalletTransferPage';
 import type { GeneratedData as WalletTransferPageData } from './WalletTransferPage';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
@@ -29,6 +28,9 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import SubMenu from '../../components/topbar/SubMenu';
 import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
+
+export const WalletTransferPagePromise = () => import('./WalletTransferPage');
+const WalletTransferPage = lazy(WalletTransferPagePromise);
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -113,10 +115,12 @@ class Transfer extends Component<AllProps> {
       <>
         <HorizontalLine />
         <BackgroundColoredLayout>
-          <WalletTransferPage
-            {...this.generated.WalletTransferPageProps}
-            publicDeriver={wallet}
-          />
+          <Suspense fallback={null}>
+            <WalletTransferPage
+              {...this.generated.WalletTransferPageProps}
+              publicDeriver={wallet}
+            />
+          </Suspense>
         </BackgroundColoredLayout>
       </>
     );

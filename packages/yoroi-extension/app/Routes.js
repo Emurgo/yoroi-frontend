@@ -14,6 +14,9 @@ import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrap
 import LoadingPage from './containers/LoadingPage';
 import StakingPage from './containers/wallet/staking/StakingPage';
 import Wallet from './containers/wallet/Wallet';
+import Settings from './containers/settings/Settings';
+import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
+import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 
 // PAGES
 const WalletAddPagePromise = () => import('./containers/wallet/WalletAddPage');
@@ -26,8 +29,6 @@ const UriPromptPagePromise = () => import('./containers/profile/UriPromptPage');
 const UriPromptPage = React.lazy(UriPromptPagePromise);
 
 // SETTINGS
-const SettingsPromise = () => import('./containers/settings/Settings');
-const Settings = React.lazy(SettingsPromise);
 const GeneralSettingsPagePromise = () => import('./containers/settings/categories/GeneralSettingsPage');
 const GeneralSettingsPage = React.lazy(GeneralSettingsPagePromise);
 const WalletSettingsPagePromise = () => import('./containers/settings/categories/WalletSettingsPage');
@@ -41,15 +42,9 @@ const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
 const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
 const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
 
-//! Todo: Remove unnecessary promises
-// Dynamic container loading - resolver loads file relative to '/app/' directory
-const LoadingPagePromise = () => import('./containers/LoadingPage');
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
-
-const WalletPromise = () => import('./containers/wallet/Wallet');
-const WalletLazy = React.lazy(WalletPromise);
 
 const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
 const MyWalletsPage = React.lazy(MyWalletsPagePromise);
@@ -68,9 +63,6 @@ const WalletReceivePage = React.lazy(WalletReceivePagePromise);
 
 const URILandingPagePromise = () => import('./containers/uri/URILandingPage');
 const URILandingPage = React.lazy(URILandingPagePromise);
-
-const TransferPromise = () => import('./containers/transfer/Transfer');
-const Transfer = React.lazy(TransferPromise);
 
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
@@ -99,9 +91,6 @@ const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 const WalletSwitchPromise = () => import('./containers/WalletSwitch');
 const WalletSwitch = React.lazy(WalletSwitchPromise);
 
-const StakingPagePromise = () => import('./containers/wallet/staking/StakingPage');
-const StakingPageLazy = React.lazy(StakingPagePromise);
-
 const AssetsWrapperPromise = () => import('./containers/wallet/AssetsWrapper');
 const AssetsWrapper = React.lazy(AssetsWrapperPromise);
 
@@ -120,9 +109,6 @@ const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
 const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
 const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
 
-const ConnectedWebsitesPagePromise = () => import('./containers/dapp-connector/ConnectedWebsitesContainer');
-const ConnectedWebsitesPage = React.lazy(ConnectedWebsitesPagePromise);
-
 const YoroiPalettePagePromise = () => import('./containers/experimental/YoroiPalette');
 const YoroiPalettePage = React.lazy(YoroiPalettePagePromise);
 
@@ -134,23 +120,20 @@ export const LazyLoadPromises: Array<() => any> = [
   LanguageSelectionPagePromise,
   TermsOfUsePagePromise,
   UriPromptPagePromise,
-  SettingsPromise,
   GeneralSettingsPagePromise,
   WalletSettingsPagePromise,
   ExternalStorageSettingsPagePromise,
   OAuthDropboxPagePromise,
   TermsOfUseSettingsPagePromise,
   SupportSettingsPagePromise,
-  LoadingPagePromise,
   NightlyPagePromise,
-  WalletPromise,
   MyWalletsPagePromise,
   WalletSummaryPagePromise,
   WalletSendPagePromise,
   WalletAssetsPagePromise,
   WalletReceivePagePromise,
   URILandingPagePromise,
-  TransferPromise,
+  WalletTransferPagePromise,
   ReceivePromise,
   StakingDashboardPagePromise,
   CardanoStakingPagePromise,
@@ -160,7 +143,6 @@ export const LazyLoadPromises: Array<() => any> = [
   ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
   WalletSwitchPromise,
-  StakingPagePromise,
   AssetsWrapperPromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
@@ -219,6 +201,7 @@ export const Routes = (
       <Route
         exact
         path={ROUTES.STAKING}
+        // Todo: Fix the staking page
         component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
       />
       <Route
