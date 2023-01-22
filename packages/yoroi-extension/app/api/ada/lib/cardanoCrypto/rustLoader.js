@@ -21,6 +21,35 @@ function isWasmPointer(o: ?any): boolean {
   return o != null && o.ptr != null && o.free != null;
 }
 
+/*
+ * Some classes must not be proxied, as there is no need for it,
+ * but also it breaks some other libraries working with that type.
+ * For example, `Buffer.from` fails if the `Uint8Array` is proxied.
+ */
+const NON_PROXY_CLASSES = Object.freeze([Uint8Array]);
+function isNonProxyClass(o: any): boolean {
+  return NON_PROXY_CLASSES.some(c => o instanceof c);
+}
+
+function isProxyCompatibleType(o: any): boolean {
+  // We only proxy objects and functions, the check is mostly for primitive values
+  return typeof o === 'object' || typeof o === 'function'
+}
+
+/* Fake flag name used to identify our own proxies  */
+const WASM_PROXY_FAKE_FLAG_NAME = '____is_wasm_proxy';
+function isNotAlreadyAProxy(o: any): boolean {
+  // Make sure the original object is not already a proxy
+  return o[WASM_PROXY_FAKE_FLAG_NAME] !== true
+}
+
+function isProxiable(o: ?any): boolean {
+  return o != null
+    && isProxyCompatibleType(o)
+    && !isNonProxyClass(o)
+    && isNotAlreadyAProxy(o);
+}
+
 /**
  * Creates a new proxied RustModule scope.
  * Return fields:
@@ -41,14 +70,14 @@ function createWasmScope(): {|
    */
   const scope = [];
   function recursiveProxy<E>(originalObject: E): E {
-    if (originalObject == null) {
+    if (!isProxiable(originalObject)) {
       return originalObject;
     }
     const proxyHandler: Proxy$traps<E> = {
       // We are intercepting when any field is trying to be accessed on the original object
       get(target: E, name: string, receiver: Proxy<E>): any {
         // Synthetic flag to identify our own proxies
-        if (name === '____is_wasm_proxy') {
+        if (name === WASM_PROXY_FAKE_FLAG_NAME) {
           return true;
         }
         // Get the actual field value from the original object
@@ -94,15 +123,8 @@ function createWasmScope(): {|
         return recursiveProxy(realValue);
       }
     };
-    // We only proxy objects and functions, the check is mostly for primitive values
-    if (typeof originalObject === 'object' || typeof originalObject === 'function') {
-      // Make sure the original object is not already a proxy
-      if (originalObject.____is_wasm_proxy !== true) {
-        // $FlowFixMe[incompatible-return]
-        return new Proxy<E>(originalObject, proxyHandler);
-      }
-    }
-    return originalObject;
+    // $FlowFixMe[incompatible-return]
+    return new Proxy<E>(originalObject, proxyHandler);
   }
   // We are proxying the `RustModule` itself to pass it into the callback.
   // Note that we create a new proxy every time, because each proxy instance
