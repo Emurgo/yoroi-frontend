@@ -1,7 +1,6 @@
 // @flow
 import '../test-config';
 import { RustModule } from './rustLoader';
-import { CatalystLabels, generateRegistration } from './catalyst';
 import { bytesToHex } from '../../../../coreUtils';
 
 beforeAll(async () => {
