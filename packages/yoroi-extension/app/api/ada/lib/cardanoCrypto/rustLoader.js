@@ -21,10 +21,6 @@ function isWasmPointer(o: ?any): boolean {
   return o != null && o.ptr != null && o.free != null;
 }
 
-function isPromise(o: ?any): boolean {
-  return o != null && (typeof o.then === 'function') && (typeof o.catch === 'function');
-}
-
 /**
  * Creates a new proxied RustModule scope.
  * Return fields:
@@ -186,8 +182,8 @@ class Module {
     try {
       result = callback(scope.RustModule);
     } catch (e) { onFailure(e); throw e; }
-    return isPromise(result)
-      // $FlowFixMe[incompatible-use]
+    return (result instanceof Promise)
+      // $FlowFixMe[incompatible-return]
       ? result.then(onSuccess, onFailure)
       : onSuccess(result);
   }
