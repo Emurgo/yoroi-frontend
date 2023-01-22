@@ -18,7 +18,7 @@ const MAX_TX_BYTES = 16384;
 type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
 function isWasmPointer(o: ?any): boolean {
-  return o != null && o.ptr != null && o.free != null;
+  return o != null && (typeof o.ptr === 'number') && (typeof o.free === 'function');
 }
 
 /*
@@ -58,7 +58,9 @@ function isProxiable(o: ?any): boolean {
  */
 function createWasmScope(): {|
   RustModule: Module,
-  free: () => void;
+  free: () => void,
+  size: () => number,
+  isFree: () => boolean,
 |} {
   /*
    * The main idea here is that we create a proxy of the root object (module itself)
@@ -68,7 +70,7 @@ function createWasmScope(): {|
    * This way ANY wasm pointer produced within the callback will be automatically destroyed,
    * but only as long as it's created using the injected proxied module reference.
    */
-  const scope = [];
+  const scope: Array<{ ptr: number, free: () => void, ... }> = [];
   function recursiveProxy<E>(originalObject: E): E {
     if (!isProxiable(originalObject)) {
       return originalObject;
@@ -139,6 +141,8 @@ function createWasmScope(): {|
         }
       });
     },
+    size: () => scope.length,
+    isFree: () => scope.every(x => x.ptr === 0),
   }
 }
 
@@ -168,6 +172,41 @@ class Module {
     }
   }
 
+  __WasmScopeInternal<T>(callback: Module => T): {|
+    result: T,
+    scopeSize: number,
+    scopeIsFree: boolean,
+  |} {
+    const scope = createWasmScope();
+    function onSuccess(result: T): {|
+      result: T,
+      scopeSize: number,
+      scopeIsFree: boolean,
+    |} {
+      scope.free();
+      if (isWasmPointer(result)) {
+        throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
+      }
+      return {
+        result,
+        scopeSize: scope.size(),
+        scopeIsFree: scope.isFree(),
+      };
+    }
+    function onFailure(err: Error): void {
+      scope.free();
+      throw err;
+    }
+    let result;
+    try {
+      result = callback(scope.RustModule);
+    } catch (e) { onFailure(e); throw e; }
+    return (result instanceof Promise)
+      // $FlowFixMe[incompatible-exact]
+      ? result.then(onSuccess, onFailure)
+      : onSuccess(result);
+  }
+
   /**
    * The argument to this function is a callback.
    * The callback will receive a link to a `RustModule` instance.
@@ -188,26 +227,7 @@ class Module {
    * callback promise resolves.
    */
   WasmScope<T>(callback: Module => T): T {
-    const scope = createWasmScope();
-    function onSuccess(res: T): T {
-      scope.free();
-      if (isWasmPointer(res)) {
-        throw new Error('A wasm object cannot be returned from wasm scope, all pointers are destroyed.');
-      }
-      return res;
-    }
-    function onFailure(err: Error): void {
-      scope.free();
-      throw err;
-    }
-    let result;
-    try {
-      result = callback(scope.RustModule);
-    } catch (e) { onFailure(e); throw e; }
-    return (result instanceof Promise)
-      // $FlowFixMe[incompatible-return]
-      ? result.then(onSuccess, onFailure)
-      : onSuccess(result);
+    return this.__WasmScopeInternal(callback).result;
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
