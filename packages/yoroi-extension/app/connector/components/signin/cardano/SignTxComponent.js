@@ -1,16 +1,22 @@
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import { signTxMessages } from '../SignTxPage';
 import CardanoSignTxSummaryComponent from './SignTxSummaryComponent';
+import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expand.inline.svg';
 
 const getAssetDisplayValue = ({ amount, tokenInfo }) => {
   const tokenName = getTokenName(tokenInfo);
   return `${tokenInfo.IsNFT && amount == 1 ? '' : amount + ' '}${tokenName}`;
 };
 
-export default function CardanoSignTxComponent({ intl, txAssetsData, passwordFormField }) {
+export default function CardanoSignTxComponent({
+  intl,
+  txAssetsData,
+  // getAddressUrlHash,
+  passwordFormField,
+}) {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const isSendingNativeToken = Number(total.cryptoAmount) < 0;
   const isReceivingNativeToken = Number(total.cryptoAmount) > 0;
@@ -30,65 +36,81 @@ export default function CardanoSignTxComponent({ intl, txAssetsData, passwordFor
       </Panel>
       {(!isOnlyTxFee || sent.length > 0 || received.length > 0) && (
         <>
-          <Panel>
-            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-              <Typography color="#4A5065" fontWeight={500}>
-                {/* TODO: use intl */}
-                Send
-              </Typography>
-            </Box>
-
-            {isSendingNativeToken && (
-              <AsseetValueDisplay>
-                {total.cryptoAmount} {total.ticker}
-              </AsseetValueDisplay>
-            )}
-
-            {sent.length > 0 && (
-              <>
-                {sent.map(asset => (
-                  <AsseetValueDisplay>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
-                ))}
-              </>
-            )}
-
-            {/* TODO: use intl */}
-            {!isSendingNativeToken && sent.length === 0 && (
-              <AsseetValueDisplay>No assets sent</AsseetValueDisplay>
-            )}
-          </Panel>
-          <Panel>
-            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-              <Typography color="#4A5065" fontWeight={500}>
-                {/* TODO: use intl */}
-                Receive
-              </Typography>
-            </Box>
-
-            {isReceivingNativeToken && (
-              <AsseetValueDisplay>
-                {total.cryptoAmount} {total.ticker}
-              </AsseetValueDisplay>
-            )}
-
-            {received.length > 0 && (
-              <>
-                {received.map(asset => (
-                  <AsseetValueDisplay>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
-                ))}
-              </>
-            )}
-            {/* TODO: use intl */}
-            {!isReceivingNativeToken && received.length === 0 && (
-              <AsseetValueDisplay>No assets received</AsseetValueDisplay>
-            )}
-          </Panel>
+          <ExpandableAssetsPanel
+            total={total}
+            hasNativeToken={isSendingNativeToken}
+            assets={sent}
+            action="sent"
+            panelTitle="Send" // TODO: use intl
+          />
+          <ExpandableAssetsPanel
+            total={total}
+            hasNativeToken={isReceivingNativeToken}
+            assets={received}
+            action="received"
+            panelTitle="Receive"
+          />
         </>
       )}
       <Box mt="32px">{passwordFormField}</Box>
     </Box>
   );
 }
+
+const ExpandableAssetsPanel = ({ assets = [], total, panelTitle, action, hasNativeToken }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isExpandable = assets.length > 1;
+
+  return (
+    <Panel>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="flex-end"
+        sx={{ cursor: 'pointer' }}
+        onClick={() => setIsExpanded(expanded => !expanded)}
+      >
+        <Typography color="#4A5065" fontWeight={500}>
+          {panelTitle}
+        </Typography>
+        {isExpandable && (
+          <Box sx={{ rotate: isExpanded ? '180deg' : 'none' }}>
+            <ExpandArrow />
+          </Box>
+        )}
+      </Box>
+
+      {(hasNativeToken || assets.length !== 0) && (
+        <AsseetValueDisplay>
+          {total.cryptoAmount} {total.ticker}
+        </AsseetValueDisplay>
+      )}
+
+      {!isExpandable && assets.length === 1 && (
+        <AsseetValueDisplay>{getAssetDisplayValue(assets[0])}</AsseetValueDisplay>
+      )}
+
+      {isExpandable && isExpanded && (
+        <>
+          {assets.map(asset => (
+            <AsseetValueDisplay>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
+          ))}
+        </>
+      )}
+
+      {isExpandable && !isExpanded && (
+        <AsseetValueDisplay>
+          {assets.length} assets {action}
+        </AsseetValueDisplay>
+      )}
+
+      {/* TODO: use intl */}
+      {!hasNativeToken && assets.length === 0 && (
+        <AsseetValueDisplay>No assets {action}</AsseetValueDisplay>
+      )}
+    </Panel>
+  );
+};
 
 const AsseetValueDisplay = ({ children }) => (
   <Box mt="16px">

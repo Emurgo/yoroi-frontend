@@ -25,6 +25,7 @@ import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import type { CardanoConnectorSignRequest } from '../../../types';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
+import { ReactComponent as ExternalLinkIcon } from '../../../assets/images/external-link.inline.svg';
 
 type Props = {|
   +txData: CardanoConnectorSignRequest,
@@ -54,7 +55,7 @@ class CardanoUtxoDetails extends Component<Props> {
         light
         linkType="token"
       >
-        <span>{truncateToken(getTokenName(tokenInfo))}</span>
+        <span>{truncateToken(getTokenName(tokenInfo))}</span> <ExternalLinkIcon />
       </ExplorableHashContainer>
     ) : (
       truncateToken(getTokenName(tokenInfo))
@@ -175,6 +176,8 @@ class CardanoUtxoDetails extends Component<Props> {
       );
     };
 
+    const addressHash = this.props.addressToDisplayString(request.address.address);
+
     return (
       // eslint-disable-next-line react/no-array-index-key
       <Box
@@ -186,7 +189,7 @@ class CardanoUtxoDetails extends Component<Props> {
         borderRadius="8px"
       >
         <CopyableAddress
-          hash={this.props.addressToDisplayString(request.address.address)}
+          hash={addressHash}
           elementId={notificationElementId}
           onCopyAddress={() =>
             this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
@@ -195,12 +198,12 @@ class CardanoUtxoDetails extends Component<Props> {
         >
           <ExplorableHashContainer
             selectedExplorer={this.props.selectedExplorer}
-            hash={this.props.addressToDisplayString(request.address.address)}
+            hash={addressHash}
             light
             linkType="address"
           >
             <Typography as="span" color="var(--yoroi-palette-gray-600)">
-              {truncateAddressShort(this.props.addressToDisplayString(request.address.address), 10)}
+              {truncateAddressShort(addressHash, 10)}
             </Typography>
           </ExplorableHashContainer>
         </CopyableAddress>
@@ -232,9 +235,8 @@ class CardanoUtxoDetails extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { txData } = this.props;
-    const foreignOutputs = txData.outputs.filter(o => {
-      return o.isForeign;
-    });
+    const foreignOutputs = txData.outputs.filter(o => o.isForeign);
+
     return (
       <Box>
         <Box>
