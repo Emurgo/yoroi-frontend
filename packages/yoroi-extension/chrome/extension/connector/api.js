@@ -776,7 +776,7 @@ export async function connectorSignCardanoTx(
     ...requiredScriptSignKeys,
   ]);
 
-  console.log('totalAdditionalRequiredSignKeys', JSON.stringify(totalAdditionalRequiredSignKeys));
+  console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
   const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
 
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
@@ -789,9 +789,20 @@ export async function connectorSignCardanoTx(
     return Promise.resolve([]);
   }
 
-  const [utxos, allBaseAddresses] = await Promise.all([
+  const queryAllRewardAddresses = (): Promise<Array<FullAddressPayload>> => {
+    if (additionalSignaturesRequired) {
+      return getAllAddressesForDisplay({
+        publicDeriver,
+        type: CoreAddressTypes.CARDANO_REWARD,
+      });
+    }
+    return Promise.resolve([]);
+  }
+
+  const [utxos, allBaseAddresses, allRewardAddresses] = await Promise.all([
     withHasUtxoChains.getAllUtxos(),
     queryAllBaseAddresses(),
+    queryAllRewardAddresses(),
   ]);
 
   const requiredTxSignAddresses = new Set<string>();
@@ -822,7 +833,7 @@ export async function connectorSignCardanoTx(
       console.log('requiredAddress', requiredAddress.to_bech32());
       requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
-    console.log('requiredTxSignAddresses', JSON.stringify(requiredTxSignAddresses));
+    console.log('requiredTxSignAddresses', [...requiredTxSignAddresses]);
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
       if (requiredTxSignAddresses.delete(address)) {
@@ -832,7 +843,13 @@ export async function connectorSignCardanoTx(
         break;
       }
     }
-    console.log('otherRequiredSigners', JSON.stringify(otherRequiredSigners));
+    for (const rewardAddress of allRewardAddresses) {
+      const { address, addressing } = rewardAddress;
+      if (totalAdditionalRequiredSignKeys.has(address.slice(2))) {
+        otherRequiredSigners.push({ address, addressing });
+      }
+    }
+    console.log('otherRequiredSigners', [...otherRequiredSigners]);
   }
 
   const submittedTxs = loadSubmittedTransactions() || [];
