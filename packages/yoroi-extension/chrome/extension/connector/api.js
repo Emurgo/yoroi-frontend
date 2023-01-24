@@ -89,6 +89,7 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import cbor from 'cbor';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -744,16 +745,21 @@ export async function connectorSignCardanoTx(
   let txBody: RustModule.WalletV4.TransactionBody;
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
   let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
+  let rawTxBody: Buffer;
   const bytes = Buffer.from(txHex, 'hex');
   try {
     const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
     txBody = fullTx.body();
     witnessSet = fullTx.witness_set();
     auxiliaryData = fullTx.auxiliary_data();
+    rawTxBody = cbor.encodeCanonical(
+      cbor.decodeFirstSync(bytes)[0]
+    );
   } catch (originalErr) {
     try {
       // Try parsing as body for backward compatibility
       txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+      rawTxBody = bytes;
     } catch (_e) {
       throw originalErr;
     }
@@ -895,7 +901,7 @@ export async function connectorSignCardanoTx(
 
   const signedTx = shelleySignTransaction(
     usedUtxos,
-    txBody,
+    rawTxBody,
     withLevels.getParent().getPublicDeriverLevel(),
     RustModule.WalletV4.Bip32PrivateKey.from_bytes(
       Buffer.from(normalizedKey.prvKeyHex, 'hex')
