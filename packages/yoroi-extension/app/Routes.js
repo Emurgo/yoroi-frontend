@@ -195,7 +195,6 @@ export const Routes = (
       <Route
         exact
         path={ROUTES.STAKING}
-        // Todo: Fix the staking page
         component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
       />
       <Route
