@@ -334,7 +334,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       try {
         await connectorSendTxCardano(
           wallet.publicDeriver,
-          signedTx.to_bytes(),
+          Buffer.from(signedTx.to_bytes()),
           this.api.localStorage,
         );
       } catch {

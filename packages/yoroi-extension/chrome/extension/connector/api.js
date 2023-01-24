@@ -1022,10 +1022,10 @@ export async function connectorSendTx(
 
 export async function connectorSendTxCardano(
   wallet: IPublicDeriver</* ConceptualWallet */>,
-  signedTx: Uint8Array,
+  signedTx: Buffer,
   localStorage: LocalStorageApi,
 ): Promise<void> {
-  const signedTx64 = Buffer.from(signedTx).toString('base64');
+  const signedTx64 = signedTx.toString('base64');
   const network = wallet.getParent().getNetworkInfo();
   const backend = network.Backend.BackendService;
   if (backend == null) {
