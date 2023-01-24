@@ -12,7 +12,7 @@ import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
 import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
 import LoadingPage from './containers/LoadingPage';
-import StakingPage from './containers/wallet/staking/StakingPage';
+import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
@@ -112,6 +112,7 @@ const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
+  StakingPageContentPromise,
   LanguageSelectionPagePromise,
   TermsOfUsePagePromise,
   UriPromptPagePromise,
