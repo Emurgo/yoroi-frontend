@@ -32,7 +32,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../api/common/lib/MultiToken'
 
 
-export const ConnectedWebsitesPagePromise = () => import('../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage');
+export const ConnectedWebsitesPagePromise: void => Promise<any> = () => import('../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage');
 const ConnectedWebsitesPage = lazy(ConnectedWebsitesPagePromise);
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;

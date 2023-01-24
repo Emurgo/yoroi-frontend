@@ -29,7 +29,7 @@ import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContai
 import SubMenu from '../../components/topbar/SubMenu';
 import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 
-export const WalletTransferPagePromise = () => import('./WalletTransferPage');
+export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
 const WalletTransferPage = lazy(WalletTransferPagePromise);
 
 export type GeneratedData = typeof Transfer.prototype.generated;

@@ -17,10 +17,11 @@ import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
+import WalletAddPage, { AddAnotherWalletPromise } from './containers/wallet/WalletAddPage'
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import NFTsWrapper from './containers/wallet/NFTsWrapper';
 
 // PAGES
-const WalletAddPagePromise = () => import('./containers/wallet/WalletAddPage');
-const WalletAddPage = React.lazy(WalletAddPagePromise);
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
 const LanguageSelectionPage = React.lazy(LanguageSelectionPagePromise);
 const TermsOfUsePagePromise = () => import('./containers/profile/TermsOfUsePage');
@@ -91,12 +92,6 @@ const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 const WalletSwitchPromise = () => import('./containers/WalletSwitch');
 const WalletSwitch = React.lazy(WalletSwitchPromise);
 
-const AssetsWrapperPromise = () => import('./containers/wallet/AssetsWrapper');
-const AssetsWrapper = React.lazy(AssetsWrapperPromise);
-
-const NFTsWrapperPromise = () => import('./containers/wallet/NFTsWrapper');
-const NFTsWrapper = React.lazy(NFTsWrapperPromise);
-
 const TokensPageRevampPromise = () => import('./containers/wallet/TokensPageRevamp');
 const TokensPageRevamp = React.lazy(TokensPageRevampPromise);
 
@@ -116,7 +111,7 @@ const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThem
 const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [
-  WalletAddPagePromise,
+  AddAnotherWalletPromise,
   LanguageSelectionPagePromise,
   TermsOfUsePagePromise,
   UriPromptPagePromise,
@@ -143,7 +138,6 @@ export const LazyLoadPromises: Array<() => any> = [
   ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
   WalletSwitchPromise,
-  AssetsWrapperPromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
   NFTsPageRevampPromise,
