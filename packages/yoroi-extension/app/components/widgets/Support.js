@@ -8,15 +8,15 @@ type Props = {||}
 
 export default class Support extends Component <Props> {
 
-  loadScript(src: string, id: string): void {
-      const script = document.createElement('script')
-      script.src = src
-      script.id = id
-      document.body?.appendChild(script)
-  }
+  // loadScript(src: string, id: string): void {
+  //     const script = document.createElement('script')
+  //     script.src = src
+  //     script.id = id
+  //     document.body?.appendChild(script)
+  // }
 
   componentDidMount() {
-      this.loadScript('https://static.zdassets.com/ekr/snippet.js?key=68b95d72-6354-4343-8a64-427979a6f5d6', 'ze-snippet');
+      // this.loadScript('https://static.zdassets.com/ekr/snippet.js?key=68b95d72-6354-4343-8a64-427979a6f5d6', 'ze-snippet');
 
       const interval = setInterval(()=>{
         if (typeof window.zE !== 'undefined' && typeof window.zE.hide === 'function') {
