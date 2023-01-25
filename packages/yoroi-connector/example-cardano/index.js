@@ -750,9 +750,10 @@ function createTxHandler(e) {
     expectedPolicyId,
   });
 
+  let receiver = get('#create-tx-receiver').value || selectedUtxo.receiver;
   const outputHex = bytesToHex(
     CardanoWasm.TransactionOutput.new(
-      CardanoWasm.Address.from_bech32(selectedUtxo.receiver),
+      CardanoWasm.Address.from_bech32(receiver),
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str("1000000"))
     ).to_bytes()
   );
@@ -761,7 +762,7 @@ function createTxHandler(e) {
   const includeOutputs = [];
   const includeTargets = [];
 
-  let targetAddress = selectedUtxo.receiver;
+  let targetAddress = receiver;
   let targetDataHash = null;
 
   /****** FLAGS ******/
@@ -929,7 +930,6 @@ function createTxHandler(e) {
 
     if (utxoWithAssets) {
       const asset = utxoWithAssets.assets[0];
-      const receiver = get('#create-tx-receiver').value || selectedUtxo.receiver;
       console.log("[createTx] Including asset:", asset);
       txReq.includeTargets.push({
         // do not specify value, the connector will use minimum value
