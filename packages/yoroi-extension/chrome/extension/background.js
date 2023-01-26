@@ -24,7 +24,7 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-} from './ergo-connector/types';
+} from './connector/types';
 import {
   APIErrorCodes,
   asPaginate,
@@ -34,7 +34,7 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
-} from './ergo-connector/types';
+} from './connector/types';
 import {
   connectorCreateCardanoTx,
   connectorGenerateReorgTx,
@@ -56,7 +56,7 @@ import {
   connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
-} from './ergo-connector/api';
+} from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
   updateTransactions as cardanoUpdateTransactions
@@ -82,12 +82,12 @@ import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { authSignHexPayload } from '../../app/ergo-connector/api';
+import { authSignHexPayload } from '../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
-import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import ConnectorStore from '../../app/connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 
 /*::
@@ -817,33 +817,6 @@ async function confirmConnect(
     }
   });
 }
-
-// generic communication to the entire connector
-chrome.runtime.onMessageExternal.addListener((message, sender) => {
-  if (sender.id === environment.ergoConnectorExtensionId) {
-    if (message.type === 'open_browseraction_menu') {
-      chrome.windows.getLastFocused(currentWindow => {
-        if (currentWindow == null) return; // should not happen
-        const bounds = getBoundsForWindow(currentWindow);
-        chrome.windows.create({
-          ...popupProps,
-          url: chrome.extension.getURL(`/main_window_connector.html#/settings`),
-          left: (bounds.width + bounds.positionX) - popupProps.width,
-          top: bounds.positionY + 80,
-        });
-      });
-    }
-  }
-});
-
-// per-page connection to injected code in the connector
-chrome.runtime.onConnectExternal.addListener(port => {
-  if (port.sender.id === environment.ergoConnectorExtensionId) {
-    handleInjectorConnect(port);
-  } else {
-    // disconnect?
-  }
-});
 
 // per-page connection to injected code by Yoroi with connector
 chrome.runtime.onConnect.addListener(port => {

@@ -10,7 +10,7 @@ import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectResponseData,
-} from '../../../chrome/extension/ergo-connector/types';
+} from '../../../chrome/extension/connector/types';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
