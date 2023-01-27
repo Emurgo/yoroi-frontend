@@ -241,7 +241,7 @@ export const networks = Object.freeze({
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
   CardanoPreviewTestnet: ({
-    NetworkId: 3_00,
+    NetworkId: 3_50,
     NetworkName: 'Cardano Preview Testnet',
     Backend: {
       BackendService: environment.isTest()
