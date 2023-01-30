@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../../components/widgets/CopyableAddress';
 import type { Notification } from '../../../../types/notificationType';
@@ -74,15 +74,6 @@ class CardanoUtxoDetails extends Component<Props> {
     return this.props.getTokenInfo(tokenEntry);
   };
 
-  displayUnAvailableToken: TokenEntry => Node = tokenEntry => {
-    return (
-      <>
-        <span>+{tokenEntry.amount.toString()}</span>{' '}
-        <span>{truncateAddressShort(tokenEntry.identifier)}</span>
-      </>
-    );
-  };
-
   renderAmountDisplay: ({|
     entry: TokenEntry,
   |}) => Node = request => {
@@ -93,31 +84,14 @@ class CardanoUtxoDetails extends Component<Props> {
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
     const ticker = tokenInfo ? this.getTicker(tokenInfo) : nameFromIdentifier;
 
-    let fiatAmountDisplay = null;
-
-    if (false && this.props.unitOfAccountSetting.enabled === true) {
-      const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(
-        tokenInfo ? getTokenName(tokenInfo) : nameFromIdentifier,
-        currency
+    if (Boolean(tokenInfo?.IsNFT)) {
+      return (
+        <div>
+          <span>{ticker}</span>
+        </div>
       );
-      if (price != null) {
-        const fiatAmount = calculateAndFormatValue(shiftedAmount, price);
-        const [beforeDecimal, afterDecimal] = fiatAmount.split('.');
-        let beforeDecimalSigned;
-        if (beforeDecimal.startsWith('-')) {
-          beforeDecimalSigned = beforeDecimal;
-        } else {
-          beforeDecimalSigned = '+' + beforeDecimal;
-        }
-        fiatAmountDisplay = (
-          <>
-            <span>{beforeDecimalSigned}</span>
-            {afterDecimal && <span>.{afterDecimal}</span>} {currency}
-          </>
-        );
-      }
     }
+
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
       numberOfDecimals
@@ -128,25 +102,11 @@ class CardanoUtxoDetails extends Component<Props> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    const cryptoAmountDisplay = (
-      <>
+    return (
+      <div>
         <span>{adjustedBefore}</span>
         <span>{afterDecimalRewards}</span> {ticker}
-      </>
-    );
-
-    if (fiatAmountDisplay) {
-      return (
-        <>
-          <div>{fiatAmountDisplay}</div>
-          <div>{cryptoAmountDisplay}</div>
-        </>
-      );
-    }
-    return (
-      <>
-        <div>{cryptoAmountDisplay}</div>
-      </>
+      </div>
     );
   };
 
@@ -182,9 +142,9 @@ class CardanoUtxoDetails extends Component<Props> {
       // eslint-disable-next-line react/no-array-index-key
       <Box
         key={divKey(request.address.value.getDefaultEntry().identifier)}
-        display="grid"
-        gridTemplateColumns="180px 1fr"
+        display="flex"
         alignItems="flex-start"
+        justifyContent="space-between"
         py="16px"
         borderRadius="8px"
       >
@@ -202,7 +162,7 @@ class CardanoUtxoDetails extends Component<Props> {
             light
             linkType="address"
           >
-            <Typography as="span" color="var(--yoroi-palette-gray-600)">
+            <Typography as="span" color="#242838">
               {truncateAddressShort(addressHash, 10)}
             </Typography>
           </ExplorableHashContainer>
@@ -242,15 +202,13 @@ class CardanoUtxoDetails extends Component<Props> {
         <Box>
           <Box pb="10px">
             <Typography variant="body1" fontWeight="500" color="#000">
-              {intl.formatMessage(globalMessages.fromAddresses)}
-              <span>: {txData.inputs.length}</span>
+              {intl.formatMessage(connectorMessages.fromAddresses, { qty: txData.inputs.length })}
             </Typography>
           </Box>
           <Panel>
             <Box>
               <Typography variant="body1" fontWeight="500" color="#4A5065">
-                {/* TODO: use intl */}
-                Your Addresses
+                {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box>
                 {txData.inputs.map((address, addressIndex) => {
@@ -269,13 +227,12 @@ class CardanoUtxoDetails extends Component<Props> {
                 <Separator />
                 <Box>
                   <Typography variant="body1" fontWeight="500" color="#4A5065">
-                    {/* TODO: use intl */}
-                    Foreign Addresses
+                    {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box>
                     {txData.foreignInputs.map((address, addressIndex) => {
                       return this.renderRow({
-                        kind: 'in',
+                        kind: 'in-foreign',
                         address,
                         addressIndex,
                         transform: amount => amount.abs().negated(),
@@ -290,22 +247,20 @@ class CardanoUtxoDetails extends Component<Props> {
         <Box>
           <Box pb="10px">
             <Typography variant="body1" fontWeight="500" color="#000">
-              {intl.formatMessage(globalMessages.toAddresses)}
-              <span>: {txData.outputs.length}</span>
+              {intl.formatMessage(connectorMessages.toAddresses, { qty: txData.outputs.length })}
             </Typography>
           </Box>
           <Panel withMargin={false}>
             <Box>
-              {/* TODO: use intl */}
               <Typography variant="body1" fontWeight="500" color="#4A5065">
-                Your Addresses
+                {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box>
                 {txData.outputs
                   .filter(o => !o.isForeign)
                   .map((address, addressIndex) => {
                     return this.renderRow({
-                      kind: 'in',
+                      kind: 'out',
                       address,
                       addressIndex,
                       transform: amount => amount.abs(),
@@ -317,14 +272,13 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box>
-                  {/* TODO: use intl */}
                   <Typography variant="body1" fontWeight="500" color="#4A5065">
-                    Foreign Addresses
+                    {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box>
                     {foreignOutputs.map((address, addressIndex) => {
                       return this.renderRow({
-                        kind: 'in',
+                        kind: 'out-foreign',
                         address,
                         addressIndex,
                         transform: amount => amount.abs(),

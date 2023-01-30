@@ -867,11 +867,11 @@ const globalMessages: * = defineMessages({
   },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
-    defaultMessage: '!!!From addresses (inputs)',
+    defaultMessage: '!!!From addresses',
   },
   toAddresses: {
     id: 'wallet.transaction.addresses.to',
-    defaultMessage: '!!!To addresses (outputs)',
+    defaultMessage: '!!!To addresses',
   },
   resyncButtonLabel: {
     id: 'wallet.settings.resync.buttonLabel',
@@ -1019,6 +1019,50 @@ export const connectorMessages: * = defineMessages({
   connector: {
     id: 'connector.appNameShort',
     defaultMessage: '!!!Connector',
+  },
+  yourAddresses: {
+    id: 'connector.yourAddresses',
+    defaultMessage: '!!!Your Addresses',
+  },
+  foreignAddresses: {
+    id: 'connector.foreignAddresses',
+    defaultMessage: '!!!Foreign Addresses',
+  },
+  fromWallet: {
+    id: 'connector.fromWallet',
+    defaultMessage: '!!!From wallet',
+  },
+  fromAddresses: {
+    id: 'connector.from',
+    defaultMessage: '!!!From (Inputs): {qty}',
+  },
+  toAddresses: {
+    id: 'connector.to',
+    defaultMessage: '!!!To (Outputs): {qty}',
+  },
+  send: {
+    id: 'wallet.navigation.send',
+    defaultMessage: '!!!Send',
+  },
+  receive: {
+    id: 'wallet.navigation.receive',
+    defaultMessage: '!!!Receive',
+  },
+  assetsSent: {
+    id: 'connector.assetsSent',
+    defaultMessage: '!!!{quantity} assets sent',
+  },
+  assetsReceived: {
+    id: 'connector.assetsReceived',
+    defaultMessage: '!!!{quantity} assets received',
+  },
+  noAssetsSent: {
+    id: 'connector.noAssetsSent',
+    defaultMessage: '!!!No assets sent',
+  },
+  noAssetsReceived: {
+    id: 'connector.noAssetsReceived',
+    defaultMessage: '!!!No assets received',
   },
 });
 

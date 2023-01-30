@@ -256,8 +256,8 @@ class SignTxPage extends Component<Props, State> {
       const defaultNetworkId = txData.amount.defaults.defaultNetworkId;
       const defaultTokenAmount = txData.amount.get(defaultTokenId) ?? new BigNumber('0');
       const txFeeAmount = new BigNumber(txData.fee.amount);
-      const sentAssets = this.getUniqueAssets(txData.inputs);
-      const receivedAssets = this.getUniqueAssets(txData.outputs);
+      const sentAssets = this.getUniqueAssets(txData.outputs.filter(o => !o.isForeign));
+      const receivedAssets = this.getUniqueAssets(txData.inputs);
 
       //only tx fee (no sign) & one asset sent/received
       assetsData.total = this.getDisplayAmount({

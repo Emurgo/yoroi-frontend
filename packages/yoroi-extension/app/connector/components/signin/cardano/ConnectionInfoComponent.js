@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { signTxMessages } from '../SignTxPage';
 import ConnectedWallet from '../../connect/ConnectedWallet';
 import { ReactComponent as NoDappIcon } from '../../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { connectorMessages } from '../../../../i18n/global-messages';
 
 export default function ConnectionInfoComponent({ intl, connectedWebsite, connectedWallet }) {
   const url = connectedWebsite?.url ?? '';
@@ -38,8 +39,7 @@ export default function ConnectionInfoComponent({ intl, connectedWebsite, connec
       </Box>
       <Box mt="32px">
         <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
-          {/* TODO: use intl */}
-          From wallet
+          {intl.formatMessage(connectorMessages.fromWallet)}
         </Typography>
         <ConnectedWallet publicDeriver={connectedWallet} />
       </Box>

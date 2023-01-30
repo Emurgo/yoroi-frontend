@@ -5,6 +5,7 @@ import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import { signTxMessages } from '../SignTxPage';
 import CardanoSignTxSummaryComponent from './SignTxSummaryComponent';
 import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expand.inline.svg';
+import { connectorMessages } from '../../../../i18n/global-messages';
 
 const getAssetDisplayValue = ({ amount, tokenInfo }) => {
   const tokenName = getTokenName(tokenInfo);
@@ -37,18 +38,20 @@ export default function CardanoSignTxComponent({
       {(!isOnlyTxFee || sent.length > 0 || received.length > 0) && (
         <>
           <ExpandableAssetsPanel
+            intl={intl}
             total={total}
             hasNativeToken={isSendingNativeToken}
             assets={sent}
             action="sent"
-            panelTitle="Send" // TODO: use intl
+            panelTitle={intl.formatMessage(connectorMessages.send)}
           />
           <ExpandableAssetsPanel
+            intl={intl}
             total={total}
             hasNativeToken={isReceivingNativeToken}
             assets={received}
             action="received"
-            panelTitle="Receive"
+            panelTitle={intl.formatMessage(connectorMessages.receive)}
           />
         </>
       )}
@@ -57,9 +60,19 @@ export default function CardanoSignTxComponent({
   );
 }
 
-const ExpandableAssetsPanel = ({ assets = [], total, panelTitle, action, hasNativeToken }) => {
+const ExpandableAssetsPanel = ({
+  intl,
+  assets = [],
+  total,
+  panelTitle,
+  action,
+  hasNativeToken,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandable = assets.length > 1;
+  const { assetsSent, assetsReceived, noAssetsSent, noAssetsReceived } = connectorMessages;
+  const assetsMsg = action === 'sent' ? assetsSent : assetsReceived;
+  const noAssetsMsg = action === 'sent' ? noAssetsSent : noAssetsReceived;
 
   return (
     <Panel>
@@ -100,13 +113,12 @@ const ExpandableAssetsPanel = ({ assets = [], total, panelTitle, action, hasNati
 
       {isExpandable && !isExpanded && (
         <AsseetValueDisplay>
-          {assets.length} assets {action}
+          {intl.formatMessage(assetsMsg, { quantity: assets.length })}
         </AsseetValueDisplay>
       )}
 
-      {/* TODO: use intl */}
       {!hasNativeToken && assets.length === 0 && (
-        <AsseetValueDisplay>No assets {action}</AsseetValueDisplay>
+        <AsseetValueDisplay>{intl.formatMessage(noAssetsMsg)}</AsseetValueDisplay>
       )}
     </Panel>
   );
