@@ -32,6 +32,7 @@ import { Ports } from '../../scripts/connections';
 
 import { getCircularReplacer, getLogDate } from '../support/helpers/helpers';
 import { testRunsDataDir } from '../support/helpers/common-constants';
+import SimpleLogger from 'simple-node-logger';
 
 const simpleNodeLogger = require('simple-node-logger');
 const fs = require('fs');
@@ -80,6 +81,11 @@ export function setExpectedTx(signedTx: void | string): void {
 let MockServer: null | any = null;
 
 class MethodLogger {
+
+  localLogger: LocalLogger;
+  method: string;
+  url: string;
+
   constructor(localLogger: LocalLogger, method: string, url: string) {
     this.localLogger = localLogger;
     this.method = method;
@@ -93,9 +99,9 @@ class MethodLogger {
     );
   };
 
-  logResponseSuccess = (message?: string) => {
+  logResponseSuccess = (message: any) => {
     this.localLogger.logInfo(
-      `${this.method}: ${this.url} -> response${message ? `\n    ${message}` : ''}`,
+      `${this.method}: ${this.url} -> response${JSON.stringify(message) ? `\n    ${JSON.stringify(message)}` : ''}`,
       false
     );
   };
@@ -106,6 +112,10 @@ class MethodLogger {
 }
 
 class LocalLogger {
+
+  fileName: string;
+  logger: { info: string => void, error: string => void, ... };
+
   constructor(fileName: string, logPath) {
     this.fileName = fileName;
     this.logger = simpleNodeLogger.createSimpleFileLogger(logPath);
