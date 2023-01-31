@@ -46,7 +46,6 @@ export type SetCustomUserThemeRequest = {|
 export type WalletsNavigation = {|
   ergo: number[],
   cardano: number[],
-  quickAccess: number[],
 |}
 
 /**
@@ -286,7 +285,6 @@ export default class LocalStorageApi {
     if(Array.isArray(result)) return {
       cardano: [],
       ergo: [],
-      quickAccess: [],
     }
 
     return result
