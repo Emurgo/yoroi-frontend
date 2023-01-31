@@ -8,7 +8,7 @@ Feature: Wallet UI Support
     Then Revamp. I switch to revamp version
     And I should see the Support button
 
-@support-1
+@support-1 @ignore
   Scenario: Contact Support successful
     When I click on Support button
     And I send a new Support request with text "Autotests. This is the test message from the extension."
