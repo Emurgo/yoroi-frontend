@@ -32,7 +32,6 @@ import { Ports } from '../../scripts/connections';
 
 import { getCircularReplacer, getLogDate } from '../support/helpers/helpers';
 import { testRunsDataDir } from '../support/helpers/common-constants';
-import SimpleLogger from 'simple-node-logger';
 
 const simpleNodeLogger = require('simple-node-logger');
 const fs = require('fs');
