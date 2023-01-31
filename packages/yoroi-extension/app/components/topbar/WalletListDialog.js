@@ -123,28 +123,9 @@ export default class WalletListDialog extends Component<Props, State> {
         await this.props.updateSortedWalletList({
           ergo: ergoWalletsId,
           cardano: cardanoWalletsId,
-          quickAccess: this.props.walletsNavigation.quickAccess || [],
         });
       }
     );
-  }
-
-  toggleQuickAccess: number => Promise<void> = async (walletId) => {
-    if(!walletId || typeof walletId !== 'number') throw new Error('Invalid wallet id.')
-    const currentQuickAccessList = this.props.walletsNavigation.quickAccess
-    let updatedQuickAccessList = [...currentQuickAccessList];
-    // Remove wallet
-    if(currentQuickAccessList.indexOf(walletId) !== -1) {
-      updatedQuickAccessList =  updatedQuickAccessList.filter(id => id !== walletId)
-    } else {
-      // Add wallet
-      updatedQuickAccessList.push(walletId)
-    }
-
-    await this.props.updateSortedWalletList({
-      ...this.props.walletsNavigation,
-      quickAccess: updatedQuickAccessList
-    });
   }
 
   onDragEnd: (network: 'ergo' | 'cardano' ,result:Object) => any = async (network, result) => {
@@ -169,7 +150,6 @@ export default class WalletListDialog extends Component<Props, State> {
         await this.props.updateSortedWalletList({
           ergo: this.state.ergoWalletsIdx,
           cardano: this.state.cardanoWalletsIdx,
-          quickAccess: this.props.walletsNavigation.quickAccess || [],
         });
       }
     );
@@ -201,7 +181,6 @@ export default class WalletListDialog extends Component<Props, State> {
       getCurrentPrice,
     } = this.props;
 
-    const quickAccessList = new Set(this.props.walletsNavigation.quickAccess)
     const walletsTotal = this.renderWalletsTotal();
 
     return (
@@ -248,8 +227,6 @@ export default class WalletListDialog extends Component<Props, State> {
                         <WalletCard
                           key={walletId}
                           idx={idx}
-                          toggleQuickAccess={this.toggleQuickAccess}
-                          isInQuickAccess={quickAccessList.has(walletId)}
                           onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
                           isCurrentWallet={this.isCurrentWallet(wallet.wallet, 'local')}
                           {...wallet}
@@ -281,8 +258,6 @@ export default class WalletListDialog extends Component<Props, State> {
                       <WalletCard
                         key={walletId}
                         idx={idx}
-                        toggleQuickAccess={this.toggleQuickAccess}
-                        isInQuickAccess={quickAccessList.has(walletId)}
                         onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
                         isCurrentWallet={this.isCurrentWallet(wallet.wallet, 'local')}
                         {...wallet}
