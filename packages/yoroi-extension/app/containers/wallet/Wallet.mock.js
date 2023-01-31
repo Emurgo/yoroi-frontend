@@ -13,7 +13,6 @@ import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Wallet';
 import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
 import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { THEMES } from '../../styles/utils';
 
 export const mockWalletProps: {
   selected: null | PublicDeriver<>,
@@ -37,11 +36,14 @@ export const mockWalletProps: {
         currentRoute: request.location,
       },
       profile: {
-        currentTheme: THEMES.YOROI_CLASSIC,
+        isRevampTheme: false,
+        isClassicTheme: false,
       },
       wallets: {
         selected: request.selected,
+        publicDerivers: request.selected ? [request.selected] : [],
         firstSync: null,
+        getLastSelectedWallet: () => request.selected,
       },
       transactions: {
         getBalanceRequest: {
@@ -62,6 +64,9 @@ export const mockWalletProps: {
         goToRoute: { trigger: action('goToRoute') },
         redirect: { trigger: action('redirect') },
       },
+      wallets: {
+        setActiveWallet: { trigger: action('setActiveWallet') }
+      }
     },
     SidebarContainerProps: {
       generated: {
