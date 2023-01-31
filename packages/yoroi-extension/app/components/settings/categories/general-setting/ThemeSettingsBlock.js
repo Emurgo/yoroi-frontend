@@ -73,9 +73,8 @@ const messages = defineMessages({
 
 type Props = {|
   +currentTheme: Theme,
-  +selectTheme: ({| theme: string |}) => PossiblyAsync<void>,
+  +onSubmit: (theme: string) => PossiblyAsync<void>,
   +onExternalLinkClick: MouseEvent => void,
-  +switchToFirstWallet: void => void,
 |};
 
 const NEW_THEME = THEMES.YOROI_REVAMP
@@ -89,7 +88,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
   render(): Node {
     const {
       currentTheme,
-      selectTheme,
+      onSubmit,
       onExternalLinkClick,
     } = this.props;
     const { intl } = this.context;
@@ -121,7 +120,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
             value={currentTheme === NEW_THEME ? NEW_THEME : OLD_THEME}
             onChange={(e) => {
               const theme = e.target.value === NEW_THEME ? NEW_THEME : THEMES.YOROI_MODERN
-              selectTheme({ theme })
+              onSubmit(theme)
             }}
             sx={{
               display: 'flex',
@@ -177,7 +176,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
                   row
                   value={currentTheme}
                   onChange={(e) => {
-                    selectTheme({ theme: e.target.value })
+                    onSubmit(e.target.value)
                   }}
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginRight: '24px' }}>

@@ -21,7 +21,6 @@ const getUtxos = document.querySelector("#get-utxos");
 const submitTx = document.querySelector("#submit-tx");
 const signTx = document.querySelector("#sign-tx");
 const showUtxos = document.querySelector("#show-utxos");
-const createTx = document.querySelector("#create-tx");
 const getCollateralUtxos = document.querySelector("#get-collateral-utxos");
 const signData = document.querySelector("#sign-data");
 const alertEl = document.querySelector("#alert");
@@ -1055,7 +1054,7 @@ function renderJonsResponse(title, response) {
   );
 }
 
-window.onload = () => {
+const onload = () => {
   if (typeof window.cardano === "undefined") {
     alertError("Cardano API not found");
   } else {
@@ -1082,3 +1081,5 @@ window.onload = () => {
       );
   }
 };
+
+setTimeout(onload, 100);

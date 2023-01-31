@@ -42,6 +42,7 @@ type Props = {|
   |},
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  +openWalletInfoDialog: () => void,
 |};
 
 function constructPlate(
