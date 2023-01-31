@@ -420,8 +420,8 @@ export function getMockServer(settings: {
     server.post('/api/v2/txs/utxoDiffSincePoint', async (req, res) => {
       const methodLogger = localLogger.getMethodLogger('POST', '/api/v2/txs/utxoDiffSincePoint');
       methodLogger.logRequest(req.body);
-      const { addresses, untilBlockHash, afterPoint, diffLimit } = req.body;
-      if (afterPoint.lastPage) {
+      const { addresses, untilBlockHash, afterPoint, afterBestblocks } = req.body;
+      if (afterPoint && afterPoint.lastPage) {
         const afterPointResposne = {
           diffItems: [],
           lastDiffPointSelected: {
@@ -437,7 +437,7 @@ export function getMockServer(settings: {
         {
           addresses,
           untilBlockHash,
-          afterBestBlock: afterPoint.blockHash
+          afterBestBlocks: afterBestblocks || [afterPoint.blockHash],
         },
       );
       if (result !== 'SUCCESS') {
@@ -465,6 +465,7 @@ export function getMockServer(settings: {
             tx_index: item.utxo.txIndex,
           };
         });
+        const { lastFoundBestBlock, lastFoundSafeBlock } = (value: any).reference;
         // no pagination, always return all at once
         // note this isn't exactly what the real server would return but
         // this value is opaque to the client so it shouldn't break anything
@@ -473,6 +474,8 @@ export function getMockServer(settings: {
           lastDiffPointSelected: {
             lastPage: true,
           },
+          lastFoundSafeblock: lastFoundSafeBlock,
+          lastFoundBestblock: lastFoundBestBlock,
         };
         methodLogger.logResponseSuccess(response);
         res.send(response);

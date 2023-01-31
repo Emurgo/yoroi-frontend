@@ -1,8 +1,8 @@
 // @flow
 import type { StoresMap } from '../stores/index';
 import type { ActionsMap } from '../actions/index';
-import type { StoresMap as StoresConnectorMap } from '../ergo-connector/stores/index';
-import type { ActionsMap as ActionsConnectorMap } from '../ergo-connector/actions/index';
+import type { StoresMap as StoresConnectorMap } from '../connector/stores/index';
+import type { ActionsMap as ActionsConnectorMap } from '../connector/actions/index';
 
 type InjectedProps = {|
   +stores: StoresMap,

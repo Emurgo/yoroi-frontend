@@ -91,5 +91,12 @@ export const ROUTES = {
     YOROI_PALETTE: '/experimental/yoroi-palette',
     YOROI_COMPONENTS: '/experimental/components',
     THEMES: '/experimental/themes'
+  },
+  // Revamp specific routes:
+  REVAMP: {
+    // `transfer` the `wallet`
+    TRANSFER: '/wallets/transfer',
+    // `voting` is part of the sidebar
+    CATALYST_VOTING: '/voting',
   }
 };

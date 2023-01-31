@@ -119,7 +119,7 @@ export async function migrateToLatest(
     ['<3.9.6', async () => {
       return await ergoTxHistoryReset(persistentDb);
     }],
-    ['<4.14', async () => {
+    ['<4.18', async () => {
       return await populateNewUtxodata(persistentDb);
     }],
   ];

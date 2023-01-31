@@ -371,7 +371,7 @@ export function genUtxoSumForAddresses(
 export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
-  isLedger?: boolean = false,
+  isLedger: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
@@ -413,7 +413,7 @@ export function getMangledAddressString(
   mnemonic: string,
   path: Array<number>,
   stakingKey: Buffer,
-  isLedger?: boolean = false,
+  isLedger: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
@@ -860,7 +860,7 @@ export class MockUtxoApi implements UtxoApiContract {
   }
 
   async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
-    const { addresses, untilBlockHash, afterBestBlock, } = req;
+    const { addresses, untilBlockHash, afterBestBlocks, } = req;
 
     const hexAddresses = addresses.map(a => {
       const hex = fixAddresses(a, networks.CardanoMainnet);
@@ -872,6 +872,8 @@ export class MockUtxoApi implements UtxoApiContract {
 
     let seenUntilBlock = false;
     const utxoDiffItems = [];
+    let lastFoundBestBlock = null;
+    let lastFoundSafeBlock = null;
     for (let i = this.blockchain.length - 1; i >= 0; i--) {
       const tx = this.blockchain[i];
       if (tx.tx_state !== 'Successful') {
@@ -882,8 +884,16 @@ export class MockUtxoApi implements UtxoApiContract {
         seenUntilBlock = true;
       }
 
+      const txInAfterBestblocks = afterBestBlocks.includes(tx.block_hash);
+      if (txInAfterBestblocks && lastFoundBestBlock == null) {
+        lastFoundBestBlock = tx.block_hash;
+      }
+      if (txInAfterBestblocks && lastFoundSafeBlock == null && i <= this._getLastSafeBlockTxIndex()) {
+        lastFoundSafeBlock = tx.block_hash;
+      }
+
       if (seenUntilBlock) {
-        if (tx.block_hash === afterBestBlock) {
+        if (txInAfterBestblocks) {
           break;
         }
 
@@ -931,14 +941,20 @@ export class MockUtxoApi implements UtxoApiContract {
         });
       }
     }
-    if (!seenUntilBlock) {
+    if (!seenUntilBlock || lastFoundBestBlock == null) {
       return {
         result: UtxoApiResult.BESTBLOCK_ROLLBACK
       };
     }
     return {
       result: UtxoApiResult.SUCCESS,
-      value: { diffItems: utxoDiffItems },
+      value: {
+        diffItems: utxoDiffItems,
+        reference: {
+          lastFoundBestBlock,
+          ...(lastFoundSafeBlock == null ? {} : { lastFoundSafeBlock }),
+        }
+      },
     };
   }
 }

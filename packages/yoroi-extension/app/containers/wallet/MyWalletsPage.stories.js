@@ -98,6 +98,7 @@ const genBaseProps: {|
     stores: {
       profile: {
         shouldHideBalance: false,
+        isRevampTheme: false,
       },
       wallets: {
         publicDerivers: request.publicDerivers,
