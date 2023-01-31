@@ -642,7 +642,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const { amount, total } = await this._calculateAmountAndTotal(
       selectedWallet.publicDeriver,
       inputs,
-      outputs.map(({ address, value }) => ({ address, value })),
+      outputs,
       fee,
       response.utxos,
       ownAddresses,
@@ -853,8 +853,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async _calculateAmountAndTotal(
     publicDeriver: PublicDeriver<>,
-    inputs: Array<{| address: string, value: MultiToken |}>,
-    outputs: Array<{| address: string, value: MultiToken |}>,
+    inputs: $ReadOnlyArray<{| address: string, value: MultiToken |}>,
+    outputs: $ReadOnlyArray<$ReadOnly<{ address: string, value: MultiToken, ... }>>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: IGetAllUtxosResponse,
     ownAddresses: ?Set<string>,
