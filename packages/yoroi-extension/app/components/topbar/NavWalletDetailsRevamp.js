@@ -42,6 +42,7 @@ type Props = {|
   |},
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  +openWalletInfoDialog: () => void,
 |};
 
 function constructPlate(
@@ -87,6 +88,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       plate,
       unitOfAccountSetting,
       getCurrentPrice,
+      openWalletInfoDialog
     } = this.props;
 
     const totalAmount = this.getTotalAmount();
@@ -97,7 +99,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
-          <div className={styles.contentWrapper}>
+          <button type="button" onClick={openWalletInfoDialog} className={styles.contentWrapper}>
             <div className={classnames([styles.currency])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
@@ -123,7 +125,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
           <button disabled={totalAmount === null && !showEyeIconSafe} type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
             {shouldHideBalance ? <img src={IconEyeClosed} alt="Hide balance" /> : <img src={IconEyeOpen} alt="Show balance" />}
           </button>
