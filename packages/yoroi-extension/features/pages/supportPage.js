@@ -2,7 +2,7 @@
 
 import type { LocatorObject } from '../support/webdriver';
 
-export const iframe: LocatorObject = { locator: '#webWidget', method: 'css' };
+export const iframe: LocatorObject = { locator: 'webWidget', method: 'id' };
 
 export const supportButton: LocatorObject = {
   locator: '.MuiButtonBase-root',
