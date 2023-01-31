@@ -964,27 +964,13 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 }
 
+const icons = {
+    send: SendIcon,
+    receive: ReceiveIcon,
+    reward: RewardIcon,
+    error: ErrorIcon
+};
 const TypeIcon = ({ type = 'send' }) => {
-  let Icon = null;
-
-  switch (type) {
-    case 'send': {
-      Icon = SendIcon;
-      break;
-    }
-    case 'receive': {
-      Icon = ReceiveIcon;
-      break;
-    }
-    case 'reward': {
-      Icon = RewardIcon;
-      break;
-    }
-    case 'error': {
-      Icon = ErrorIcon;
-      break;
-    }
-  }
-
+  let Icon = icons[type];
   return <Box sx={{ width: 40, height: 40 }}>{Icon && <Icon />}</Box>;
 };
