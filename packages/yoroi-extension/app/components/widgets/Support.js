@@ -6,26 +6,25 @@ import { IconButton } from '@mui/material';
 import { Box } from '@mui/system';
 import environment from '../../environment';
 
-type Props = {||}
+type Props = {||};
 type State = {|
   open: boolean,
-|}
-export default class Support extends Component <Props, State> {
-
+|};
+export default class Support extends Component<Props, State> {
   state: State = {
     open: false,
-  }
+  };
 
-  messageHandler: any => void = (event) => {
+  messageHandler: any => void = event => {
     if (event.origin === 'null') {
-      return
+      return;
     }
 
     const eventType = event.data;
     if (eventType === 'close') {
-      this.setState({ open: false })
+      this.setState({ open: false });
     }
-  }
+  };
 
   componentDidMount() {
     window.addEventListener('message', this.messageHandler, false);
@@ -37,7 +36,7 @@ export default class Support extends Component <Props, State> {
 
   getUrl(): string | null {
     if (!environment.userAgentInfo.isExtension()) return null;
-    const agent = environment.userAgentInfo.isFirefox() ? 'firefox' : 'chrome'
+    const agent = environment.userAgentInfo.isFirefox() ? 'firefox' : 'chrome';
     return `https://emurgo.github.io/yoroi-support/?source=${agent}&extensionId=${window.location.hostname}`;
   }
 
@@ -56,23 +55,19 @@ export default class Support extends Component <Props, State> {
           zIndex: '9999',
         }}
       >
-        {open === false &&
-        <IconButton
-          sx={{
-            padding: '3px',
-          }}
-          onClick={() => this.setState({ open: true })}
-        >
-          <SupportIcon />
-        </IconButton>}
+        {open === false && (
+          <IconButton sx={{ padding: '3px' }} onClick={() => this.setState({ open: true })}>
+            <SupportIcon />
+          </IconButton>
+        )}
         <iframe
           style={{ marginRight: '-20px', marginBottom: '-30px', display: open ? 'block' : 'none' }}
-          width='375px'
-          height='560px'
+          width="375px"
+          height="560px"
           src={url}
-          title='Zendesk'
+          title="Zendesk"
         />
       </Box>
-    )
+    );
   }
 }
