@@ -8,8 +8,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
-import { ReactComponent as AddMemoSvg }  from '../../../assets/images/add-memo.inline.svg';
-import { ReactComponent as EditSvg }  from '../../../assets/images/edit.inline.svg';
+import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
+import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
+import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
+import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
+import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
@@ -18,7 +22,7 @@ import type { TransactionDirectionType } from '../../../api/ada/transactions/typ
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
-import { ReactComponent as ExpandArrow }  from '../../../assets/images/expand-arrow-grey.inline.svg';
+import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
@@ -85,7 +89,9 @@ type State = {|
 
 @observer
 export default class TransactionRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+  static contextTypes: {|
+    intl: $npm$ReactIntl$IntlFormat,
+  |} = {
     intl: intlShape.isRequired,
   };
 
@@ -96,6 +102,62 @@ export default class TransactionRevamp extends Component<Props, State> {
   toggleDetails: void => void = () => {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
+
+  getTxType(data: WalletTransaction): string | null {
+    const { type } = data;
+    if (type === transactionTypes.EXPEND) {
+      return 'send';
+    }
+    if (type === transactionTypes.INCOME) {
+      return 'receive';
+    }
+    if (type === transactionTypes.SELF) {
+      if (data instanceof CardanoShelleyTransaction) {
+        const features = data.getFeatures();
+        if (
+          (features.includes('Withdrawal') && features.length === 1) ||
+          (features.includes('Withdrawal') &&
+            features.includes('StakeDeregistration') &&
+            features.length === 2)
+        ) {
+          return 'reward';
+        }
+
+        if (
+          (features.includes('StakeDelegation') && features.length === 1) ||
+          (features.includes('StakeDelegation') &&
+            features.includes('StakeRegistration') &&
+            features.length === 2)
+        ) {
+          return 'reward';
+        }
+        if (features.includes('CatalystVotingRegistration') && features.length === 1) {
+          return null;
+        }
+        if (features.includes('StakeRegistration') && features.length === 1) {
+          return null;
+        }
+      }
+
+      // Intra wallet tx
+      return 'send';
+    }
+    if (type === transactionTypes.MULTI) {
+      // can happen for example in Cardano
+      // if you claim a reward from an account doesn't belong to you
+      // you have an input to pay the tx fee
+      // there is an input you don't own (the withdrawal)
+      // you have an output to receive change + withdrawal amount
+      return 'receive';
+    }
+    // unused
+    if (type === transactionTypes.EXCHANGE) {
+      Logger.error('EXCHANGE type transactions not supported');
+      return null;
+    }
+    Logger.error('Unknown transaction type');
+    return null;
+  }
 
   getTxTypeMsg(intl: $npm$ReactIntl$IntlFormat, currency: string, data: WalletTransaction): string {
     const { type } = data;
@@ -154,7 +216,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
     assuranceLevel: AssuranceLevel,
-    isValid: boolean,
+    isValid: boolean
   ): string {
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
@@ -228,11 +290,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (currency == null) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
       }
-      const price = this.props.getHistoricalPrice(
-        ticker,
-        currency,
-        request.timestamp,
-      );
+      const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
       let fiatDisplay;
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
@@ -255,9 +313,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         <>
           {fiatDisplay}&nbsp;{currency}
           <Typography>
-            {this.renderAmountDisplay({ entry: request.entry })}
-            {' '}
-            {this.getTicker(request.entry)}
+            {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
         </>
       );
@@ -265,12 +321,10 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     return (
       <>
-        {this.renderAmountDisplay({ entry: request.entry })}
-        {' '}
-        {this.getTicker(request.entry)}
+        {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </>
     );
-  }
+  };
 
   renderFeeDisplay: ({|
     amount: MultiToken,
@@ -305,11 +359,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (ticker == null) {
         throw new Error('unexpected main token type');
       }
-      const price = this.props.getHistoricalPrice(
-        ticker,
-        currency,
-        request.timestamp,
-      );
+      const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
 
       let fiatDisplay;
       if (price != null) {
@@ -318,11 +368,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         fiatDisplay = (
           <>
             {beforeDecimal}
-            {afterDecimal && (
-              <span className={styles.afterDecimal}>
-                .{afterDecimal}
-              </span>
-            )}
+            {afterDecimal && <span className={styles.afterDecimal}>.{afterDecimal}</span>}
           </>
         );
       } else {
@@ -333,8 +379,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           {fiatDisplay}&nbsp;{currency}
           <Typography>
             {beforeDecimalRewards}
-            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-            {' '}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
           </Typography>
         </>
@@ -374,7 +419,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })}{' '}{this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
         </div>
       );
     }
@@ -401,9 +446,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length}
-        {' '}
-        {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
   };
@@ -411,7 +454,10 @@ export default class TransactionRevamp extends Component<Props, State> {
   renderRow: ({|
     kind: string,
     data: WalletTransaction,
-    address: {| address: string, value: MultiToken |},
+    address: {|
+      address: string,
+      value: MultiToken,
+    |},
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
@@ -491,11 +537,9 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
-    const isFailedTransaction = (state < 0) && !isSubmittedTransaction;
-    const isPendingTransaction = (state === TxStatusCodes.PENDING) || isSubmittedTransaction;
-    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
-      data.isValid :
-      true;
+    const isFailedTransaction = state < 0 && !isSubmittedTransaction;
+    const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
+    const isValidTransaction = data instanceof CardanoShelleyTransaction ? data.isValid : true;
 
     const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
@@ -526,6 +570,9 @@ export default class TransactionRevamp extends Component<Props, State> {
                 alignItems: 'center',
               }}
             >
+              <Box>
+                <TypeIcon type={this.getTxType(data)} />
+              </Box>
               <Box sx={columnTXStyles.transactionType}>
                 <Typography
                   variant="body1"
@@ -916,3 +963,28 @@ export default class TransactionRevamp extends Component<Props, State> {
     return null;
   };
 }
+
+const TypeIcon = ({ type = 'send' }) => {
+  let Icon = null;
+
+  switch (type) {
+    case 'send': {
+      Icon = SendIcon;
+      break;
+    }
+    case 'receive': {
+      Icon = ReceiveIcon;
+      break;
+    }
+    case 'reward': {
+      Icon = RewardIcon;
+      break;
+    }
+    case 'error': {
+      Icon = ErrorIcon;
+      break;
+    }
+  }
+
+  return <Box sx={{ width: 40, height: 40 }}>{Icon && <Icon />}</Box>;
+};
