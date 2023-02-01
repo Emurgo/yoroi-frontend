@@ -6,6 +6,8 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
 import type { ConfigType } from '../../../../config/config-types';
+import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
@@ -25,6 +27,10 @@ type Props = {| ...InjectedOrGenerated<GeneratedData>, stores: any, actions: any
 
 @observer
 class StakingPage extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
   render(): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
     return (

@@ -86,9 +86,10 @@ class Transfer extends Component<AllProps> {
     if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
       return (<UnsupportedWallet />);
     }
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
     return (
       <>
-        <HorizontalLine />
+        {!isRevamp && <HorizontalLine />}
         <BackgroundColoredLayout>
           <Suspense fallback={null}>
             <WalletTransferPage
@@ -120,7 +121,10 @@ class Transfer extends Component<AllProps> {
     |},
     stores: {|
       app: {| currentRoute: string |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      profile: {|
+          isRevampTheme: boolean,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -137,6 +141,9 @@ class Transfer extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        profile: {
+          isRevampTheme: stores.profile.isRevampTheme,
         }
       },
       actions: {
