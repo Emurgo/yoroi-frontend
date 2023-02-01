@@ -32,6 +32,7 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
 import type { ShelleyCip1852CacheValue } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
+import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -50,7 +51,7 @@ const defaultProps: ({|
   VotingRegistrationDialogProps?: *,
   balance: ?MultiToken,
   hasAnyPending: boolean,
-|}) => * = request => ({
+|}) => any  = request => ({
   balance: request.balance,
   hasAnyPending: request.hasAnyPending,
   stores: {
@@ -86,6 +87,55 @@ const defaultProps: ({|
     },
   },
   VotingRegistrationDialogProps: request.VotingRegistrationDialogProps || (null: any),
+  SidebarContainerProps: {
+    generated: {
+      stores: {
+        wallets: {
+          hasAnyWallets: true,
+          selected: null,
+        },
+        app: { currentRoute: ROUTES.MY_WALLETS },
+        profile: {
+          isSidebarExpanded: false,
+        },
+      },
+      actions: {
+        profile: {
+          toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
+        },
+        router: {
+          goToRoute: { trigger: action('goToRoute') },
+        },
+      },
+    },
+  },
+  BannerContainerProps: {
+    generated: {
+      stores: {
+        serverConnectionStore: {
+          checkAdaServerStatus: select(
+            'checkAdaServerStatus',
+            ServerStatusErrors,
+            ServerStatusErrors.Healthy,
+          ),
+          serverTime: undefined,
+        },
+        tokenInfoStore: {
+          tokenInfo: mockFromDefaults(defaultAssets),
+        },
+        wallets: {
+          selected: null,
+        },
+      },
+      actions: Object.freeze({}),
+    },
+  },
+  NavBarContainerRevampProps: {
+    generated: {
+      stores: {},
+      actions: {},
+    }
+  }
 });
 
 const genVotingRegistrationDialogProps: ({|
@@ -421,7 +471,7 @@ export const Register = (): Node => {
               })
             }
           })
-        }
+        },
       }))}
     />
   )

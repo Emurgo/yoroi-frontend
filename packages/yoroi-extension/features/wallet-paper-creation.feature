@@ -9,7 +9,7 @@ Feature: Wallet Paper creation
     When I click the create button
     Then I select the currency cardano
     Then I select Paper Wallet
-    Then I open Number of Adddresses selection dropdown
+    Then I open Number of Addresses selection dropdown
     And I select 2 addresses
     Then I click the create paper wallet button
     Then I enter the paper wallet password "cool password"

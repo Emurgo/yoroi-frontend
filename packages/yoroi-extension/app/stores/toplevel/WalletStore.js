@@ -95,9 +95,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @observable firstSync: ?number;
   @observable publicDerivers: Array<PublicDeriver<>>;
-
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
+
   @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>> = new Request<
     DeferredCall<CreateWalletResponse>
   >(async create => {
@@ -157,6 +157,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       'visibilitychange',
       debounce((_e) => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
     );
+
   }
 
   @action
@@ -374,13 +375,20 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void = ({ wallet }) => {
-    this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
+  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void =
+    ({ wallet }) => {
+      this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
+      this.selected = wallet;
+      // Cache select wallet
+      this.api.localStorage.setSelectedWalletId(wallet.getPublicDeriverId())
+      // do not await on purpose since the UI will handle adding loaders while refresh is happening
+      this.refreshWalletFromRemote(wallet);
+    };
 
-    this.selected = wallet;
-    // do not await on purpose since the UI will handle adding loaders while refresh is happening
-    this.refreshWalletFromRemote(wallet);
-  };
+  getLastSelectedWallet: void => ?PublicDeriver<> = () => {
+    const walletId = this.api.localStorage.getSelectedWalletId();
+    return this.publicDerivers.find(pd => pd.getPublicDeriverId() === walletId);
+  }
 
   @action _unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);
