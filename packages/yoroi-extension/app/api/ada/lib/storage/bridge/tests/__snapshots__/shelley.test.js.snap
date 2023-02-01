@@ -532,6 +532,22 @@ Array [
         "NetworkId": 250,
         "TokenId": 6,
       },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 350,
+        "TokenId": 7,
+      },
     ],
   },
   Object {
