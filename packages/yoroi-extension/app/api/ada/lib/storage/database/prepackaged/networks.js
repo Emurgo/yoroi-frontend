@@ -257,14 +257,14 @@ export const networks = Object.freeze({
       Object.freeze({
         StartAt: 0,
         ChainNetworkId: '0',
-        ByronNetworkId: 1,
-        GenesisDate: '1654041600000',
+        ByronNetworkId: 2,
+        GenesisDate: '1666656000000',
         SlotsPerEpoch: 21600,
         SlotDuration: 20,
       }),
       Object.freeze({
         StartAt: 0,
-        SlotsPerEpoch: 432000,
+        SlotsPerEpoch: 86400,
         SlotDuration: 1,
         PerEpochPercentageReward: 69344,
         LinearFee: {
