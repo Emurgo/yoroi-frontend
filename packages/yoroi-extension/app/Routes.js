@@ -16,6 +16,7 @@ import StakingPage, { StakingPageContentPromise } from './containers/wallet/stak
 import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
+import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import WalletAddPage, { AddAnotherWalletPromise } from './containers/wallet/WalletAddPage'
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
@@ -77,9 +78,6 @@ const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
 const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
 
-const VotingPagePromise = () => import('./containers/wallet/voting/VotingPage');
-const VotingPage = React.lazy(VotingPagePromise);
-
 const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
 
@@ -134,7 +132,7 @@ export const LazyLoadPromises: Array<() => any> = [
   StakingDashboardPagePromise,
   CardanoStakingPagePromise,
   NoticeBoardPagePromise,
-  VotingPagePromise,
+  VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
