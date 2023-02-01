@@ -19,6 +19,7 @@ import type { GeneratedData as SidebarContainerData } from '../../SidebarContain
 import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer'
 import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
 
+// $FlowFixMe[signature-verification-failure]
 export const VotingPageContentPromise = () => import('./VotingPageContent');
 const VotingPageContent = lazy(VotingPageContentPromise);
 
