@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react'
-import { Component } from 'react'
+import { Component, lazy, Suspense } from 'react'
 import { computed } from 'mobx'
 import { observer } from 'mobx-react'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl'
@@ -14,7 +14,6 @@ import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { withLayout } from '../../styles/context/layout'
 import type { LayoutComponentMap } from '../../styles/context/layout'
 import SidebarContainer from '../SidebarContainer'
-import ConnectedWebsitesPage from '../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage'
 import DappConnectorNavbar from '../../components/dapp-connector/Layout/DappConnectorNavbar'
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers'
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
@@ -32,6 +31,9 @@ import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../api/common/lib/MultiToken'
 
+
+export const ConnectedWebsitesPagePromise: void => Promise<any> = () => import('../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage');
+const ConnectedWebsitesPage = lazy(ConnectedWebsitesPagePromise);
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
@@ -103,16 +105,18 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         navbar={<DappConnectorNavbar />}
       >
         <FullscreenLayout bottomPadding={0}>
-          <ConnectedWebsitesPage
-            whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
-            wallets={wallets}
-            onRemoveWallet={this.onRemoveWallet}
-            activeSites={this.generated.stores.connector.activeSites.sites}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-            getConceptualWallet={this.getConceptualWallet.bind(this)}
-            getWalletInfo={this.getWalletInfo.bind(this)}
-          />)
+          <Suspense fallback={null}>
+            <ConnectedWebsitesPage
+              whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+              wallets={wallets}
+              onRemoveWallet={this.onRemoveWallet}
+              activeSites={this.generated.stores.connector.activeSites.sites}
+              getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+              shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+              getConceptualWallet={this.getConceptualWallet.bind(this)}
+              getWalletInfo={this.getWalletInfo.bind(this)}
+            />
+          </Suspense>
         </FullscreenLayout>
       </TopBarLayout>
     );
