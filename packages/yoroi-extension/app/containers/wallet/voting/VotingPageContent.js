@@ -358,7 +358,7 @@ class VotingPageContent extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(VotingPage)} no way to generated props`);
+      throw new Error(`${nameof(VotingPageContent)} no way to generated props`);
     }
 
     const { stores, actions } = this.props;
