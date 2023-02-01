@@ -42,16 +42,16 @@ import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpe
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import type { WalletInfo } from '../../components/buySell/BuySellDialog';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks'
-import NavBarRevamp from '../../components/topbar/NavBarRevamp'
-import { withLayout } from '../../styles/context/layout'
-import type { LayoutComponentMap } from '../../styles/context/layout'
-import { Box } from '@mui/system'
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import NavBarRevamp from '../../components/topbar/NavBarRevamp';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
+import { Box } from '@mui/system';
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
-type Props = InjectedOrGenerated<GeneratedData>
+type Props = InjectedOrGenerated<GeneratedData>;
 
 type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedProps |};
@@ -76,7 +76,14 @@ class MyWalletsPage extends Component<AllProps> {
   }
 
   componentDidMount () {
-    this.generated.actions.wallets.unselectWallet.trigger();
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
+    if (isRevamp) {
+      this.generated.actions.router.goToRoute.trigger({
+        route: ROUTES.WALLETS.ROOT,
+      });
+    } else {
+      this.generated.actions.wallets.unselectWallet.trigger();
+    }
   }
 
   handleWalletNavItemClick: PublicDeriver<> => void = (
@@ -105,13 +112,10 @@ class MyWalletsPage extends Component<AllProps> {
     const { uiDialogs } = stores;
 
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
-
     const wallets = this.generated.stores.wallets.publicDerivers;
-
     const navbarTitle = (
       <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />
     );
-
     const navbarElementClassic = (
       <NavBar
         title={navbarTitle}
@@ -417,11 +421,16 @@ class MyWalletsPage extends Component<AllProps> {
       |},
       wallets: {|
         unselectWallet: {| trigger: (params: void) => void |},
-        setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
+        setActiveWallet: {| trigger: (params: {|
+          wallet: PublicDeriver<>,
+        |}) => void |},
       |},
     |},
     stores: {|
-      profile: {| shouldHideBalance: boolean |},
+      profile: {|
+          shouldHideBalance: boolean,
+          isRevampTheme: boolean,
+      |},
       uiDialogs: {|
         isOpen: any => boolean
       |},
@@ -462,6 +471,7 @@ class MyWalletsPage extends Component<AllProps> {
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          isRevampTheme: stores.profile.isRevampTheme,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

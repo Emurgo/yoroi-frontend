@@ -136,7 +136,10 @@ Then(/^I should see support screen$/, async function () {
 
 Then(/^I should see blockchain screen$/, async function () {
   await this.waitForElement(explorerSettingsDropdown);
-  await this.waitForElement(cardanoPaymentsURLTitle);
+  // The payment URL is not shown on Firefox https://emurgo.atlassian.net/browse/YOEXT-98
+  if (this.getBrowser() !== 'firefox'){
+    await this.waitForElement(cardanoPaymentsURLTitle);
+  }
 });
 
 When(/^I click on remove wallet$/, async function () {

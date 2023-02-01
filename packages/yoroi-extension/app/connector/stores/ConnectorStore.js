@@ -618,7 +618,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       response.changeAddress
     ])
 
-    const outputs = [];
+    const outputs: Array<{| address: string, isForeign: boolean, value: MultiToken |}> = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
@@ -853,8 +853,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async _calculateAmountAndTotal(
     publicDeriver: PublicDeriver<>,
-    inputs: Array<{| address: string, value: MultiToken |}>,
-    outputs: Array<{| address: string, value: MultiToken |}>,
+    inputs: $ReadOnlyArray<{| address: string, value: MultiToken |}>,
+    outputs: $ReadOnlyArray<$ReadOnly<{ address: string, value: MultiToken, ... }>>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: IGetAllUtxosResponse,
     ownAddresses: ?Set<string>,

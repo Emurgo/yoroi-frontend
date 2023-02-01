@@ -24,7 +24,6 @@ const getUtxos = get("#get-utxos");
 const submitTx = get("#submit-tx");
 const signTx = get("#sign-tx");
 const showUtxos = get("#show-utxos");
-const createTx = get("#create-tx");
 const getCollateralUtxos = get("#get-collateral-utxos");
 const signData = get("#sign-data");
 const alertEl = get("#alert");
