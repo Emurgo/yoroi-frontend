@@ -5,30 +5,32 @@ import { getTtl } from "./utils";
 import { Bech32Prefix } from "../../yoroi-extension/app/config/stringConfig";
 import { bytesToHex, hexToBytes } from "./coreUtils";
 
-const cardanoAccessBtnRow = document.querySelector("#request-button-row");
-const cardanoAuthCheck = document.querySelector("#check-identification");
-const cardanoAccessBtn = document.querySelector("#request-access");
-const connectionStatus = document.querySelector("#connection-status");
-const walletPlateSpan = document.querySelector("#wallet-plate");
-const walletIconSpan = document.querySelector("#wallet-icon");
-const getUnUsedAddresses = document.querySelector("#get-unused-addresses");
-const getUsedAddresses = document.querySelector("#get-used-addresses");
-const getChangeAddress = document.querySelector("#get-change-address");
-const getRewardAddresses = document.querySelector("#get-reward-addresses");
-const getAccountBalance = document.querySelector("#get-balance");
-const isEnabledBtn = document.querySelector("#is-enabled");
-const getUtxos = document.querySelector("#get-utxos");
-const submitTx = document.querySelector("#submit-tx");
-const signTx = document.querySelector("#sign-tx");
-const showUtxos = document.querySelector("#show-utxos");
-const createTx = document.querySelector("#create-tx");
-const getCollateralUtxos = document.querySelector("#get-collateral-utxos");
-const signData = document.querySelector("#sign-data");
-const alertEl = document.querySelector("#alert");
-const spinner = document.querySelector("#spinner");
-const utxosContainer = document.querySelector("#utxos");
-const getNFTs = document.getElementById("nfts");
-const getNetworkId = document.getElementById("get-network-id");
+const get = (selector) => document.querySelector(selector);
+const getAll = (selector) => document.querySelectorAll(selector);
+
+const cardanoAccessBtnRow = get("#request-button-row");
+const cardanoAuthCheck = get("#check-identification");
+const cardanoAccessBtn = get("#request-access");
+const connectionStatus = get("#connection-status");
+const walletPlateSpan = get("#wallet-plate");
+const walletIconSpan = get("#wallet-icon");
+const getUnUsedAddresses = get("#get-unused-addresses");
+const getUsedAddresses = get("#get-used-addresses");
+const getChangeAddress = get("#get-change-address");
+const getRewardAddresses = get("#get-reward-addresses");
+const getAccountBalance = get("#get-balance");
+const isEnabledBtn = get("#is-enabled");
+const getUtxos = get("#get-utxos");
+const submitTx = get("#submit-tx");
+const signTx = get("#sign-tx");
+const showUtxos = get("#show-utxos");
+const getCollateralUtxos = get("#get-collateral-utxos");
+const signData = get("#sign-data");
+const alertEl = get("#alert");
+const spinner = get("#spinner");
+const utxosContainer = get("#utxos");
+const getNFTs = get("#nfts");
+const getNetworkId = get("#get-network-id");
 
 let accessGranted = false;
 let cardanoApi;
@@ -588,12 +590,12 @@ showUtxos.addEventListener("click", () => {
 
 function alertError(text) {
   toggleSpinner("hide");
-  alertEl.className = "alert alert-danger overflow-scroll";
+  alertEl.className = "alert alert-danger overflow-auto";
   alertEl.innerHTML = text;
 }
 
 function alertSuccess(text) {
-  alertEl.className = "alert alert-success overflow-scroll";
+  alertEl.className = "alert alert-success overflow-auto";
   alertEl.innerHTML = text;
 }
 
@@ -640,17 +642,24 @@ function renderUtxo() {
   let utxosHTML = "";
   for (let idx in utxos) {
     const utxo = utxos[idx];
+    const amountInADA = Number(utxo.amount) / 1000000;
+    const numOfAssets = utxo.assets.length;
+
     utxosHTML += `
       <li id='${idx}' class="utxo-item list-group-item d-flex justify-content-between align-items-center ${
       selectedUtxoIdx == idx && "bg-primary text-white"
     }" style='cursor: pointer;'>
-          <p id='${idx}' class='mb-0'>${utxo.utxo_id.slice(0, 50)}</p>
-          <span class="badge bg-primary rounded-pill">${utxo.amount}</span>
+          <p id='${idx}' class='mb-0'>${utxo.utxo_id.slice(0, 25)}</p>
+          <div>
+            ${numOfAssets ? `<span class="badge bg-primary rounded-pill">${utxo.assets.length} Assets</span>` : ''}
+            <span class="badge bg-primary rounded-pill">${amountInADA} ADA</span>
+          </div>
       </li>
     `;
   }
 
   utxosHTML += `
+    <input class="w-100 mt-3 p-1" placeholder="Receiver addresss..." type="text" id="create-tx-receiver" />
     <button id="create-tx" class="btn btn-light mt-3 w-100">[Experimental] Create Tx</button>
   `;
   utxosContainer.innerHTML = utxosHTML;
@@ -662,14 +671,12 @@ function renderUtxo() {
     "mb-5"
   );
   // Add select utxo handler for each list item
-  document.querySelectorAll(".utxo-item").forEach((el) => {
+  getAll(".utxo-item").forEach((el) => {
     el.addEventListener("click", selectUtxo);
   });
 
   // Add event handler for create tx button
-  document
-    .querySelector("#create-tx")
-    .addEventListener("click", createTxHandler);
+  get("#create-tx").addEventListener("click", createTxHandler);
 }
 
 function createTxHandler(e) {
@@ -692,7 +699,7 @@ function createTxHandler(e) {
 
   const selectedUtxo = utxos[selectedUtxoIdx];
   if (!selectedUtxo) {
-    alertError("Failed to select a random utxo from the available list!");
+    alertError("No utxo selected");
     return;
   }
 
@@ -742,9 +749,10 @@ function createTxHandler(e) {
     expectedPolicyId,
   });
 
+  let receiver = get('#create-tx-receiver').value || selectedUtxo.receiver;
   const outputHex = bytesToHex(
     CardanoWasm.TransactionOutput.new(
-      CardanoWasm.Address.from_bech32(selectedUtxo.receiver),
+      CardanoWasm.Address.from_bech32(receiver),
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str("1000000"))
     ).to_bytes()
   );
@@ -753,7 +761,7 @@ function createTxHandler(e) {
   const includeOutputs = [];
   const includeTargets = [];
 
-  let targetAddress = selectedUtxo.receiver;
+  let targetAddress = receiver;
   let targetDataHash = null;
 
   /****** FLAGS ******/
@@ -924,7 +932,7 @@ function createTxHandler(e) {
       console.log("[createTx] Including asset:", asset);
       txReq.includeTargets.push({
         // do not specify value, the connector will use minimum value
-        address: selectedUtxo.receiver,
+        address: receiver,
         assets: {
           [asset.assetId]: "1",
         },
@@ -1006,7 +1014,7 @@ signData.addEventListener("click", () => {
     address = addressToCbor(address);
   }
 
-  const payload = document.querySelector("#sign-data-payload").value;
+  const payload = get("#sign-data-payload").value;
   let payloadHex;
   if (payload.startsWith("0x")) {
     payloadHex = Buffer.from(payload.replace("^0x", ""), "hex").toString("hex");
@@ -1055,7 +1063,7 @@ function renderJonsResponse(title, response) {
   );
 }
 
-window.onload = () => {
+const onload = () => {
   if (typeof window.cardano === "undefined") {
     alertError("Cardano API not found");
   } else {
@@ -1082,3 +1090,5 @@ window.onload = () => {
       );
   }
 };
+
+setTimeout(onload, 100);

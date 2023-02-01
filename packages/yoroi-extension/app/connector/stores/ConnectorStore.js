@@ -611,13 +611,21 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
     }
 
-    const outputs = [];
+    const ownAddresses = new Set([
+      ...response.utxos.map(utxo => utxo.address),
+      ...response.usedAddresses,
+      ...response.unusedAddresses,
+      response.changeAddress
+    ])
+
+    const outputs: Array<{| address: string, isForeign: boolean, value: MultiToken |}> = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       outputs.push(
         {
           address,
+          isForeign: !ownAddresses.has(address),
           value: multiTokenFromCardanoValue(
             output.amount(),
             selectedWallet.publicDeriver.getParent().getDefaultToken(),
@@ -630,13 +638,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       networkId: defaultToken.NetworkId,
       amount: txBody.fee().to_str(),
     };
-
-    const ownAddresses = new Set([
-      ...response.utxos.map(utxo => utxo.address),
-      ...response.usedAddresses,
-      ...response.unusedAddresses,
-      response.changeAddress
-    ])
 
     const { amount, total } = await this._calculateAmountAndTotal(
       selectedWallet.publicDeriver,
@@ -852,8 +853,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async _calculateAmountAndTotal(
     publicDeriver: PublicDeriver<>,
-    inputs: Array<{| address: string, value: MultiToken |}>,
-    outputs: Array<{| address: string, value: MultiToken |}>,
+    inputs: $ReadOnlyArray<{| address: string, value: MultiToken |}>,
+    outputs: $ReadOnlyArray<$ReadOnly<{ address: string, value: MultiToken, ... }>>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: IGetAllUtxosResponse,
     ownAddresses: ?Set<string>,

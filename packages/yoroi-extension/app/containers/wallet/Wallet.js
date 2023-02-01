@@ -30,8 +30,6 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
-import { THEMES } from '../../styles/utils';
-import type { Theme } from '../../styles/utils';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -56,6 +54,18 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
+    const { wallets } = this.generated.stores;
+    const publicDeriver = wallets.selected;
+    const publicDerivers = wallets.publicDerivers;
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
+
+    if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
+      const lastSelectedWallet = wallets.getLastSelectedWallet();
+      this.generated.actions.wallets.setActiveWallet.trigger({
+        wallet: lastSelectedWallet ?? publicDerivers[0],
+      });
+    }
+
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
@@ -66,16 +76,13 @@ class Wallet extends Component<AllProps> {
   }
 
   checkRoute(): void | string {
-    let categories;
-    if (this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP) {
-      categories = allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD);
-    } else {
-      categories = allCategories;
-    }
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
+    const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
+
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
+    if (publicDeriver == null) return;
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
@@ -96,7 +103,6 @@ class Wallet extends Component<AllProps> {
       }
       return firstValidCategory.route;
     }
-    return undefined;
   }
 
   navigateToMyWallets: string => void = destination => {
@@ -110,7 +116,7 @@ class Wallet extends Component<AllProps> {
     if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
       return (
         <WalletSyncingOverlay
-          classicTheme={this.generated.stores.profile.currentTheme === THEMES.YOROI_CLASSIC}
+          classicTheme={this.generated.stores.profile.isClassicTheme}
           onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
       )
@@ -255,6 +261,13 @@ class Wallet extends Component<AllProps> {
           |}) => void,
         |},
       |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
@@ -263,7 +276,9 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
+        publicDerivers: Array<PublicDeriver<>>,
         firstSync: ?number,
+        getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       router: {| location: any |},
       transactions: {|
@@ -272,7 +287,8 @@ class Wallet extends Component<AllProps> {
         |},
       |},
       profile: {|
-        currentTheme: Theme,
+        isRevampTheme: boolean,
+        isClassicTheme: boolean,
       |},
     |}
     |} {
@@ -291,7 +307,9 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
-          firstSync: stores.wallets.firstSync
+          publicDerivers: stores.wallets.publicDerivers,
+          firstSync: stores.wallets.firstSync,
+          getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
@@ -312,7 +330,8 @@ class Wallet extends Component<AllProps> {
           })(),
         },
         profile: {
-          currentTheme: stores.profile.currentTheme,
+          isRevampTheme: stores.profile.isRevampTheme,
+          isClassicTheme: stores.profile.isClassicTheme,
         }
       },
       actions: {
@@ -320,6 +339,9 @@ class Wallet extends Component<AllProps> {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
         },
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        }
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),

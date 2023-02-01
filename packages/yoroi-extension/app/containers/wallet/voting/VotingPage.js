@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -29,10 +29,24 @@ import {
   isTrezorTWallet,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { CatalystRoundInfoResponse } from '../../../api/ada/lib/state-fetch/types'
+import TopBarLayout from '../../../components/layout/TopBarLayout';
+import BannerContainer from '../../banners/BannerContainer';
+import SidebarContainer from '../../SidebarContainer';
+import NavBarContainerRevamp from '../../NavBarContainerRevamp';
+import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import globalMessages from '../../../i18n/global-messages';
+import { withLayout } from '../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../styles/context/layout'
+import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer'
+import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer'
+import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
-type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+type Props = InjectedOrGenerated<GeneratedData>
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {|
+  ...Props,
+  ...InjectedProps,
 |};
 
 const messages: * = defineMessages({
@@ -75,7 +89,7 @@ const messages: * = defineMessages({
 });
 
 @observer
-export default class VotingPage extends Component<Props> {
+class VotingPage extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   onClose: void => void = () => {
@@ -117,6 +131,32 @@ export default class VotingPage extends Component<Props> {
   }
 
   render(): Node {
+    const { intl } = this.context;
+    const pageContent = this.getPageContent();
+    const revampLayout = (
+      <TopBarLayout
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        navbar={
+          <NavBarContainerRevamp
+            {...this.generated.NavBarContainerRevampProps}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarVoting)} />}
+          />
+        }
+        showInContainer
+        showAsCard
+      >
+        {pageContent}
+      </TopBarLayout>
+    );
+
+    return this.props.renderLayoutComponent({
+      CLASSIC: pageContent,
+      REVAMP: revampLayout,
+    });
+  }
+
+  getPageContent(): Node {
     const { intl } = this.context
     const {
       uiDialogs,
@@ -292,7 +332,6 @@ export default class VotingPage extends Component<Props> {
     const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
     const fundName = catalystRoundInfo?.currentFund?.name || round.toString();
     return (
-      //
       <div>
         {activeDialog}
         <Voting
@@ -309,6 +348,9 @@ export default class VotingPage extends Component<Props> {
 
   @computed get generated(): {|
     VotingRegistrationDialogProps: InjectedOrGenerated<VotingRegistrationDialogContainerData>,
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
+    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
       dialogs: {|
         closeActiveDialog: {|
@@ -406,6 +448,15 @@ export default class VotingPage extends Component<Props> {
         actions,
         stores,
       }: InjectedOrGenerated<VotingRegistrationDialogContainerData>),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerRevampProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<NavBarContainerRevampData>),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
-  }
-}
+  };
+};
+
+
+export default (withLayout(VotingPage): ComponentType<Props>);
