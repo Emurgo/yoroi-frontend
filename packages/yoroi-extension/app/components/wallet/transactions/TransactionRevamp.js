@@ -103,13 +103,20 @@ export default class TransactionRevamp extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
 
-  getTxType(data: WalletTransaction): string | null {
+  getTxType(
+    intl: $npm$ReactIntl$IntlFormat,
+    currency: string,
+    data: WalletTransaction
+  ): {|
+    icon: string,
+    msg: string,
+  |} {
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
-      return 'send';
+      return { icon: 'send', msg: intl.formatMessage(messages.sent, { currency }) };
     }
     if (type === transactionTypes.INCOME) {
-      return 'receive';
+      return { icon: 'receive', msg: intl.formatMessage(messages.received, { currency }) };
     }
     if (type === transactionTypes.SELF) {
       if (data instanceof CardanoShelleyTransaction) {
@@ -120,66 +127,13 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeDeregistration') &&
             features.length === 2)
         ) {
-          return 'reward';
-        }
-
-        if (
-          (features.includes('StakeDelegation') && features.length === 1) ||
-          (features.includes('StakeDelegation') &&
-            features.includes('StakeRegistration') &&
-            features.length === 2)
-        ) {
-          return 'reward';
+          return {
+            icon: 'reward',
+            msg: intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' }),
+          };
         }
         if (features.includes('CatalystVotingRegistration') && features.length === 1) {
-          return null;
-        }
-        if (features.includes('StakeRegistration') && features.length === 1) {
-          return null;
-        }
-      }
-
-      // Intra wallet tx
-      return 'send';
-    }
-    if (type === transactionTypes.MULTI) {
-      // can happen for example in Cardano
-      // if you claim a reward from an account doesn't belong to you
-      // you have an input to pay the tx fee
-      // there is an input you don't own (the withdrawal)
-      // you have an output to receive change + withdrawal amount
-      return 'receive';
-    }
-    // unused
-    if (type === transactionTypes.EXCHANGE) {
-      Logger.error('EXCHANGE type transactions not supported');
-      return null;
-    }
-    Logger.error('Unknown transaction type');
-    return null;
-  }
-
-  getTxTypeMsg(intl: $npm$ReactIntl$IntlFormat, currency: string, data: WalletTransaction): string {
-    const { type } = data;
-    if (type === transactionTypes.EXPEND) {
-      return intl.formatMessage(messages.sent, { currency });
-    }
-    if (type === transactionTypes.INCOME) {
-      return intl.formatMessage(messages.received, { currency });
-    }
-    if (type === transactionTypes.SELF) {
-      if (data instanceof CardanoShelleyTransaction) {
-        const features = data.getFeatures();
-        if (
-          (features.includes('Withdrawal') && features.length === 1) ||
-          (features.includes('Withdrawal') &&
-            features.includes('StakeDeregistration') &&
-            features.length === 2)
-        ) {
-          return intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' });
-        }
-        if (features.includes('CatalystVotingRegistration') && features.length === 1) {
-          return intl.formatMessage(messages.catalystVotingRegistered);
+          return { icon: 'reward', msg: intl.formatMessage(messages.catalystVotingRegistered) };
         }
         if (
           (features.includes('StakeDelegation') && features.length === 1) ||
@@ -187,13 +141,13 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeRegistration') &&
             features.length === 2)
         ) {
-          return intl.formatMessage(messages.stakeDelegated);
+          return { icon: '', msg: intl.formatMessage(messages.stakeDelegated) };
         }
         if (features.includes('StakeRegistration') && features.length === 1) {
-          return intl.formatMessage(messages.stakeKeyRegistered);
+          return { icon: '', msg: intl.formatMessage(messages.stakeKeyRegistered) };
         }
       }
-      return intl.formatMessage(messages.intrawallet, { currency });
+      return { icon: 'send', msg: intl.formatMessage(messages.intrawallet, { currency }) };
     }
     if (type === transactionTypes.MULTI) {
       // can happen for example in Cardano
@@ -201,15 +155,15 @@ export default class TransactionRevamp extends Component<Props, State> {
       // you have an input to pay the tx fee
       // there is an input you don't own (the withdrawal)
       // you have an output to receive change + withdrawal amount
-      return intl.formatMessage(messages.multiparty, { currency });
+      return { icon: 'receive', msg: intl.formatMessage(messages.multiparty, { currency }) };
     }
     // unused
     if (type === transactionTypes.EXCHANGE) {
       Logger.error('EXCHANGE type transactions not supported');
-      return '???';
+      return { icon: '', msg: '???' };
     }
     Logger.error('Unknown transaction type');
-    return '???';
+    return { icon: '', msg: '???' };
   }
 
   getStatusString(
@@ -517,7 +471,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           </ExplorableHashContainer>
         </CopyableAddress>
         {this.generateAddressButton(request.address.address)}
-        <Typography component='span' variant="body2" color="var(--yoroi-palette-gray-900)">
+        <Typography component="span" variant="body2" color="var(--yoroi-palette-gray-900)">
           {renderAmount(request.address.value.getDefaultEntry())}
         </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (
@@ -551,6 +505,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
+    const txType = this.getTxType(intl, this.getTicker(data.amount.getDefaultEntry()), data);
 
     return (
       <Box className={styles.component}>
@@ -571,7 +526,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               }}
             >
               <Box>
-                <TypeIcon type={this.getTxType(data)} />
+                <TypeIcon type={txType.icon} />
               </Box>
               <Box sx={columnTXStyles.transactionType}>
                 <Typography
@@ -582,7 +537,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       : 'var(--yoroi-palette-gray-900)'
                   }
                 >
-                  {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
+                  {txType.msg}
                 </Typography>
                 <Typography
                   variant="body3"
@@ -965,12 +920,13 @@ export default class TransactionRevamp extends Component<Props, State> {
 }
 
 const icons = {
-    send: SendIcon,
-    receive: ReceiveIcon,
-    reward: RewardIcon,
-    error: ErrorIcon
+  send: SendIcon,
+  receive: ReceiveIcon,
+  reward: RewardIcon,
+  error: ErrorIcon,
 };
-const TypeIcon = ({ type = 'send' }) => {
-  let Icon = icons[type];
+
+const TypeIcon = ({ type }) => {
+  const Icon = icons[type];
   return <Box sx={{ width: 40, height: 40 }}>{Icon && <Icon />}</Box>;
 };
