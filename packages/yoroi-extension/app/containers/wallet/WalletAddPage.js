@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import { Component } from 'react';
+import { Component, lazy } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
@@ -13,7 +13,6 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import WalletAdd from '../../components/wallet/WalletAdd';
-import AddAnotherWallet from '../../components/wallet/add/AddAnotherWallet';
 
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import type { GeneratedData as WalletCreateDialogContainerData } from './dialogs/WalletCreateDialogContainer';
@@ -67,6 +66,9 @@ import {
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { withLayout } from '../../styles/context/layout'
 import type { LayoutComponentMap } from '../../styles/context/layout'
+
+export const AddAnotherWalletPromise: void => Promise<any> = () => import('../../components/wallet/add/AddAnotherWallet');
+const AddAnotherWallet = lazy(AddAnotherWalletPromise);
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
