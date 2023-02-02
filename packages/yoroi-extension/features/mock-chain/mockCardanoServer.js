@@ -25,13 +25,14 @@ import type {
 } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
 import type { ServerStatusResponse } from '../../app/api/common/lib/state-fetch/types';
 import chai from 'chai';
+import axios from 'axios'
 import mockImporter from './mockCardanoImporter';
 import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
 
 import { Ports } from '../../scripts/connections';
 
 import { getCircularReplacer, getLogDate } from '../support/helpers/helpers';
-import { testRunsDataDir } from '../support/helpers/common-constants';
+import { adaToFiatPricesMainUrl, testRunsDataDir } from '../support/helpers/common-constants';
 
 const simpleNodeLogger = require('simple-node-logger');
 const fs = require('fs');
@@ -147,6 +148,11 @@ export function getMockServer(settings: {
   ...
 }): typeof MockServer {
   const dir = `${testRunsDataDir}_cardanoMockServerLogs`;
+  const getCurrencyToFiatCurrentPriceUrl = (from: string) => `${adaToFiatPricesMainUrl}${from}/current`;
+  const getCurrencyToFiatByTimestampPriceUrl = (
+    from: string,
+    timestamp: string
+  ) => `${adaToFiatPricesMainUrl}${from}/${timestamp}`;
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -320,6 +326,34 @@ export function getMockServer(settings: {
       const status = mockImporter.getApiStatus();
       methodLogger.logResponseSuccess(JSON.stringify(status));
       res.send(status);
+    });
+
+    server.get('/api/price/:from/current', async (req, res) => {
+      localLogger.logInfo(`mockCardanoServer: /api/price/${req.params.from}/current -> request`);
+      const cardanoResponsePrice = (
+        await axios(
+          getCurrencyToFiatCurrentPriceUrl(req.params.from),
+          {
+            method: 'get'
+          })
+      ).data;
+      localLogger.logInfo(`mockCardanoServer: GET: /api/price/${req.params.from}/current <- response`);
+      localLogger.logInfo(JSON.stringify(cardanoResponsePrice));
+      res.send(cardanoResponsePrice);
+    });
+
+    server.get('/api/price/:from/:timestamps', async (req, res) => {
+      localLogger.logInfo(`mockCardanoServer: /api/price/${req.params.from}/${req.params.timestamps} -> request`);
+      const cardanoResponsePrice = (
+        await axios(
+          getCurrencyToFiatByTimestampPriceUrl(req.params.from, req.params.timestamps),
+          {
+            method: 'get'
+          })
+      ).data;
+      localLogger.logInfo(`mockCardanoServer: GET: /api/price/${req.params.from}/${req.params.timestamps} <- response`);
+      localLogger.logInfo(JSON.stringify(cardanoResponsePrice));
+      res.send(cardanoResponsePrice);
     });
 
     // To test the dApp connector, we need a no-op mock dApp.

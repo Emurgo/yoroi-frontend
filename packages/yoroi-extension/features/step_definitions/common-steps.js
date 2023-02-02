@@ -9,6 +9,7 @@ import {
   AfterAll,
   setDefinitionFunctionWrapper,
   setDefaultTimeout,
+  When,
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
@@ -84,6 +85,7 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
+import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
 import { walletNameText, walletPlate, walletSyncingOverlayComponent } from '../pages/walletPage';
 import {
   continueButton,
@@ -779,6 +781,12 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
+  await this.waitForElement(walletSummaryBox);
+});
+
+When(/^I go to General Settings$/, async function () {
+  await goToSettings(this);
+  await selectSubmenuSettings(this, 'general');
 });
 
 Then(/^Debug. Take screenshot$/, async function () {

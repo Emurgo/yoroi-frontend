@@ -266,6 +266,14 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
+  this.scrollIntoView = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Scroll into view "${JSON.stringify(locator)}"`);
+    await this.waitForElement(locator);
+    const clickable = await this.getElementBy(locator);
+    await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
+  };
+
+
   this.click = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     await this.waitForElement(locator);
@@ -403,11 +411,6 @@ function CustomWorld(cmdInput: WorldInput) {
     this.webDriverLogger.info(`Webdriver:hoverOnElement: Hovering on element "${JSON.stringify(locator)}"`);
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
-  };
-
-  this.scrollIntoView = async (locator: LocatorObject) => {
-    const element = await this.getElementBy(locator);
-    await this.driver.executeScript('arguments[0].scrollIntoView();', element);
   };
 }
 
