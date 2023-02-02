@@ -84,11 +84,12 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
-import { walletNameText, walletPlate } from '../pages/walletPage';
+import { walletNameText, walletPlate, walletSyncingOverlayComponent } from '../pages/walletPage';
 import {
   continueButton,
   getTosCheckbox,
   languageSelectionForm,
+  loadingSpinnerComponent,
   termsOfUseComponent,
   walletAddComponent,
 } from '../pages/basicSetupPage';
@@ -375,6 +376,8 @@ async function restoreWallet (
   await customWorld.waitForElement(verifyRestoredInfoDialog);
   await checkWalletPlate(customWorld, walletName, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet plate is checked`);
+  await customWorld.waitForElementNotPresent(walletSyncingOverlayComponent);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet is fully synchronized`);
 }
 
 async function checkWalletPlate(
@@ -569,6 +572,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(oneSecond + halfSecond);
+  await this.waitForElementNotPresent(loadingSpinnerComponent);
   await this.waitForElement(yoroiModern);
 });
 

@@ -1321,13 +1321,14 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     let id;
                     if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
-                      const tx = RustModule.WalletV4.Transaction.from_bytes(
-                        Buffer.from(message.params[0], 'hex'),
-                      );
+                      const txBuffer = Buffer.from(message.params[0], 'hex');
                       await connectorSendTxCardano(
                         wallet,
-                        tx.to_bytes(),
+                        txBuffer,
                         localStorageApi,
+                      );
+                      const tx = RustModule.WalletV4.Transaction.from_bytes(
+                        txBuffer
                       );
                       id = Buffer.from(
                         RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
