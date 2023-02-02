@@ -329,7 +329,7 @@ export function getMockServer(settings: {
     });
 
     server.get('/api/price/:from/current', async (req, res) => {
-      logger.info(`mockCardanoServer: /api/price/${req.params.from}/current -> request`);
+      localLogger.logInfo(`mockCardanoServer: /api/price/${req.params.from}/current -> request`);
       const cardanoResponsePrice = (
         await axios(
           getCurrencyToFiatCurrentPriceUrl(req.params.from),
@@ -337,13 +337,13 @@ export function getMockServer(settings: {
             method: 'get'
           })
       ).data;
-      logger.info(`mockCardanoServer: GET: /api/price/${req.params.from}/current <- response`);
-      logger.info(JSON.stringify(cardanoResponsePrice));
+      localLogger.logInfo(`mockCardanoServer: GET: /api/price/${req.params.from}/current <- response`);
+      localLogger.logInfo(JSON.stringify(cardanoResponsePrice));
       res.send(cardanoResponsePrice);
     });
 
     server.get('/api/price/:from/:timestamps', async (req, res) => {
-      logger.info(`mockCardanoServer: /api/price/${req.params.from}/${req.params.timestamps} -> request`);
+      localLogger.logInfo(`mockCardanoServer: /api/price/${req.params.from}/${req.params.timestamps} -> request`);
       const cardanoResponsePrice = (
         await axios(
           getCurrencyToFiatByTimestampPriceUrl(req.params.from, req.params.timestamps),
@@ -351,8 +351,8 @@ export function getMockServer(settings: {
             method: 'get'
           })
       ).data;
-      logger.info(`mockCardanoServer: GET: /api/price/${req.params.from}/${req.params.timestamps} <- response`);
-      logger.info(JSON.stringify(cardanoResponsePrice));
+      localLogger.logInfo(`mockCardanoServer: GET: /api/price/${req.params.from}/${req.params.timestamps} <- response`);
+      localLogger.logInfo(JSON.stringify(cardanoResponsePrice));
       res.send(cardanoResponsePrice);
     });
 
