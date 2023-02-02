@@ -20,7 +20,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isErgo, isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { trackUriPrompt } from '../../api/analytics';
 
 type GeneratedData = typeof UriPromptPage.prototype.generated;
@@ -80,9 +80,12 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletErgo = selected == null
+      ? false
+      : isErgo(selected.getParent().getNetworkInfo());
 
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(globalMessages.uriSchemeLabel)} />

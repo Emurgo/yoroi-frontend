@@ -79,7 +79,6 @@ export default class NFTsWrapper extends Component<Props> {
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
-
     stores: {|
       router: {| location: any |},
       tokenInfoStore: {|

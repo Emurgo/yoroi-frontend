@@ -20,6 +20,7 @@ const Ports = {
 const Servers = {
   // this allows connecting to multiple different backends for different currencies
   Primary: '*.yoroiwallet.com',
+  Testnet: '*.emurgornd.com',
 };
 
 module.exports = {

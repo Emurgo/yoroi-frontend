@@ -37,6 +37,7 @@ type Props = {|
   +onCardano: void => void,
   +onCardanoTestnet: void => void,
   +onCardanoPreprodTestnet: void => void,
+  +onCardanoPreviewTestnet: void => void,
   +onErgo: void | (void => void),
   +onAlonzoTestnet: void => void,
   +onExternalLinkClick: MouseEvent => void,
@@ -95,11 +96,15 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                       </a>
                     </>}
                 />
+              </>
+            }
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+              <>
                 <OptionBlock
                   parentName="PickCurrencyOptionDialog"
                   type="cardanoTestnet"
-                  title="Cardano Legacy Testnet"
-                  onSubmit={this.props.onCardanoTestnet}
+                  title="Cardano Preview Testnet"
+                  onSubmit={this.props.onCardanoPreviewTestnet}
                   learnMoreText={
                     <>
                       {intl.formatMessage(messages.testnetDescription)}<br />
@@ -113,24 +118,25 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 />
               </>
             }
-            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
-              <OptionBlock
-                parentName="PickCurrencyOptionDialog"
-                type="alonzoWhiteTestnet"
-                title="Alonzo White Testnet"
-                onSubmit={this.props.onAlonzoTestnet}
-                learnMoreText={
-                  <>
-                    {intl.formatMessage(messages.testnetDescription)}<br />
-                    <a
-                      href="https://testnets.cardano.org/"
-                      onClick={event => this.props.onExternalLinkClick(event)}
-                    >
-                      {intl.formatMessage(globalMessages.learnMore)}
-                    </a>
-                  </>}
-              />
-            }
+            {/* <TODO:PENDING_REMOVAL> */}
+            {/*{(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&*/}
+            {/*  <OptionBlock*/}
+            {/*    parentName="PickCurrencyOptionDialog"*/}
+            {/*    type="alonzoWhiteTestnet"*/}
+            {/*    title="Alonzo White Testnet"*/}
+            {/*    onSubmit={this.props.onAlonzoTestnet}*/}
+            {/*    learnMoreText={*/}
+            {/*      <>*/}
+            {/*        {intl.formatMessage(messages.testnetDescription)}<br />*/}
+            {/*        <a*/}
+            {/*          href="https://testnets.cardano.org/"*/}
+            {/*          onClick={event => this.props.onExternalLinkClick(event)}*/}
+            {/*        >*/}
+            {/*          {intl.formatMessage(globalMessages.learnMore)}*/}
+            {/*        </a>*/}
+            {/*      </>}*/}
+            {/*  />*/}
+            {/*}*/}
             {this.props.onErgo != null &&
               <OptionBlock
                 parentName="PickCurrencyOptionDialog"

@@ -62,9 +62,9 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
 
   removeWalletRevamp: void => Promise<void> = async () => {
     const settingsActions = this.generated.actions.walletSettings;
-
     const selectedWalletId = this.props.publicDeriver?.getPublicDeriverId();
     const walletsNavigation = this.generated.stores.profile.walletsNavigation;
+
     if (this.props.publicDeriver) {
       const walletType = getWalletType(this.props.publicDeriver)
       const newWalletsNavigation = {
@@ -73,7 +73,6 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         [walletType]: walletsNavigation[walletType].filter(
           walletId => walletId !== selectedWalletId
         ),
-        quickAccess: walletsNavigation.quickAccess.filter(walletId => walletId !== selectedWalletId)
       }
       await this.generated.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
       trackRemoveWallet();

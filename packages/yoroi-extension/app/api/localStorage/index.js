@@ -14,7 +14,7 @@ import {
   TabIdKeys,
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
+import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
 const networkForLocalStorage = String(environment.getNetworkName());
@@ -37,6 +37,7 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
+  SELECTED_WALLET: 'SELECTED_WALLET',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -46,7 +47,6 @@ export type SetCustomUserThemeRequest = {|
 export type WalletsNavigation = {|
   ergo: number[],
   cardano: number[],
-  quickAccess: number[],
 |}
 
 /**
@@ -118,6 +118,19 @@ export default class LocalStorageApi {
   setUserTheme: string => Promise<void> = (theme) => setLocalItem(storageKeys.THEME, theme);
 
   unsetUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.THEME);
+
+  // ========== Select Wallet ========== //
+
+  getSelectedWalletId: void => number | null = () => {
+    const id = localStorage.getItem(storageKeys.SELECTED_WALLET);
+    if (!id) return null
+    if (isNaN(Number(id))) throw new Error(`Invalid wallet Id: ${id}`);
+    return Number(id)
+  }
+
+  setSelectedWalletId: number => void = (id) => {
+    localStorage.setItem(storageKeys.SELECTED_WALLET, id.toString())
+  }
 
   // ========== Custom User Theme ========== //
 
@@ -286,7 +299,6 @@ export default class LocalStorageApi {
     if(Array.isArray(result)) return {
       cardano: [],
       ergo: [],
-      quickAccess: [],
     }
 
     return result

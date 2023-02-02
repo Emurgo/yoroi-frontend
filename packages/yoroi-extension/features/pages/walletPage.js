@@ -66,3 +66,8 @@ export const walletNavBackButton: LocatorObject = {
   locator: '.NavBar_navbar .NavBar_title .NavBarBack_backButton',
   method: 'css',
 };
+
+export const walletSyncingOverlayComponent: LocatorObject = {
+  locator: '.WalletSyncingOverlay_component',
+  method: 'css',
+};

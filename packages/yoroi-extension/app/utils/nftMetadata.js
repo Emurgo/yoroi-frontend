@@ -82,10 +82,10 @@ export function find721metadata(
 
 export function getImageFromTokenMetadata(
   policyId: string,
-  name: string,
+  name: string | void,
   tokenMetadata: TokenMetadata,
 ): string | null {
-  if (tokenMetadata.type !== 'Cardano') {
+  if (tokenMetadata.type !== 'Cardano' || name == null) {
     return null;
   }
   const nftMetadata = find721metadata(
@@ -100,18 +100,21 @@ export function getImageFromTokenMetadata(
   if (typeof nftMetadata.image === 'string') {
     return nftMetadata.image;
   }
-  if (typeof nftMetadata.image?.[0] === 'string') {
-    return nftMetadata.image[0];
+  if (
+    isArray(nftMetadata.image) &&
+      nftMetadata.image.every(s => typeof s === 'string')
+  ) {
+    return nftMetadata.image.join('');
   }
   return null;
 }
 
 export function getAuthorFromTokenMetadata(
   policyId: string,
-  name: string,
+  name: string | void,
   tokenMetadata: TokenMetadata,
 ): string | null {
-  if (tokenMetadata.type !== 'Cardano') {
+  if (tokenMetadata.type !== 'Cardano' || name == null) {
     return null;
   }
   const nftMetadata = find721metadata(
@@ -135,10 +138,10 @@ export function getAuthorFromTokenMetadata(
 
 export function getDescriptionFromTokenMetadata(
   policyId: string,
-  name: string,
+  name: string | void,
   tokenMetadata: TokenMetadata,
 ): string | null {
-  if (tokenMetadata.type !== 'Cardano') {
+  if (tokenMetadata.type !== 'Cardano' || name == null) {
     return null;
   }
   const nftMetadata = find721metadata(

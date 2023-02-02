@@ -59,6 +59,7 @@ import {
 } from '../../api/localStorage';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import moment from 'moment';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -599,7 +600,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             {
               ...batchRequest,
               // only the first call should update from remote
-              isLocalRequest: i > 0,
+              isLocalRequest: request.isLocalRequest || i > 0,
             }
           );
         if (batchResult.transactions.length === 0) {
@@ -645,10 +646,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const continuation = await this.exportTransactionsToFile({
-        publicDeriver: request.publicDeriver,
-        exportRequest: request.exportRequest,
-      });
+      const continuation = await this.exportTransactionsToFile(request);
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
@@ -715,9 +713,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (!withLevels) return;
       const rows = await this.api[apiType].getTransactionRowsToExport({
         publicDeriver: withLevels,
-        ...request.exportRequest,
         getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
       });
+
 
       /**
        * NOTE: The rewards export currently supports only Haskell Shelley
@@ -761,9 +759,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       respTxRows.push(...rows);
     }).promise;
 
-    respTxRows = respTxRows.sort((a, b) => {
-      return b.date - a.date;
-    });
+    const { startDate, endDate } = request.exportRequest;
+    respTxRows = respTxRows.filter(row => {
+      // 4th param `[]` means that the start and end date are included
+      return moment(row.date).isBetween(startDate, endDate, 'day', '[]')
+    }).sort((a, b) => b.date - a.date);
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);

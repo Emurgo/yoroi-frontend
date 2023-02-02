@@ -10,16 +10,17 @@ import {
   getAddressesAmountButton,
   paperWalletDialogSelect,
 } from '../pages/newWalletPages';
-import { fakeAddresses } from '../support/helpers/common-constants';
+import { fakeAddresses, halfSecond } from '../support/helpers/common-constants';
 
 // ========== Paper wallet ==========
 
-Then(/^I open Number of Adddresses selection dropdown$/, async function () {
+Then(/^I open Number of Addresses selection dropdown$/, async function () {
   await this.click(paperWalletDialogSelect);
 });
 
 Then(/^I select 2 addresses$/, async function () {
-  return this.click(getAddressesAmountButton('2'));
+  await this.click(getAddressesAmountButton('2'));
+  await this.driver.sleep(halfSecond);
 });
 
 Then(/^I click the create paper wallet button$/, async function () {

@@ -28,6 +28,7 @@ import { populateWalletDb } from './walletTypes/core/tables';
 import { populateMemoTransactionsDb } from './memos/tables';
 import { populatePricesDb } from './prices/tables';
 import { populateExplorerDb } from './explorers/tables';
+import { populateUtxoDb } from './utxo/tables';
 import { KeyKind } from '../../../../common/lib/crypto/keys/types';
 import { networks, defaultAssets } from './prepackaged/networks';
 import { prepackagedExplorers } from './prepackaged/explorers';
@@ -155,6 +156,17 @@ export const loadLovefieldDB = async (
   return db;
 };
 
+export const loadLovefieldDBFromDump = async (
+  storeType: $Values<typeof schema.DataStoreType>,
+  dump: Object,
+): Promise<lf$Database> => {
+  const db = await populateAndCreate(storeType);
+
+  db.import(dump);
+
+  return db;
+};
+
 /** deletes the old database and returns the new database to use */
 export async function importOldDb(
   oldDb: lf$Database,
@@ -191,7 +203,7 @@ export async function copyDbToMemory(
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaVersion = 16;
+  const schemaVersion = 17;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
@@ -205,6 +217,7 @@ const populateAndCreate = async (
   populateMemoTransactionsDb(schemaBuilder);
   populatePricesDb(schemaBuilder);
   populateExplorerDb(schemaBuilder);
+  populateUtxoDb(schemaBuilder);
 
   const db = await schemaBuilder.connect({
     storeType,

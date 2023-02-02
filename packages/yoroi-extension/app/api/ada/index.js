@@ -21,6 +21,7 @@ import {
   getPendingTransactions,
   removeAllTransactions,
   updateTransactions,
+  updateUtxos,
 } from './lib/storage/bridge/updateTransactions';
 import {
   addrContainsAccountKey,
@@ -163,7 +164,7 @@ import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/u
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
-import type { ForeignUtxoFetcher } from '../../ergo-connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 
 // ADA specific Request / Response params
 
@@ -674,6 +675,11 @@ export default class AdaApi {
     const { skip = 0, limit } = request;
     try {
       if (!request.isLocalRequest) {
+        await updateUtxos(
+          request.publicDeriver.getDb(),
+          request.publicDeriver,
+          request.checkAddressesInUse,
+        );
         await updateTransactions(
           request.publicDeriver.getDb(),
           request.publicDeriver,
@@ -1900,8 +1906,6 @@ export default class AdaApi {
           request.db,
           wallet.bip44WrapperRow,
         );
-        // eslint-disable-next-line no-console
-        console.log({ mode: request.mode, request, wallet, bip44Wallet })
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
             pubDeriver.publicDeriverResult,

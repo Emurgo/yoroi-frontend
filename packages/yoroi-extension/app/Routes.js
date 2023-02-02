@@ -11,10 +11,18 @@ import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
 import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
+import LoadingPage from './containers/LoadingPage';
+import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
+import Wallet from './containers/wallet/Wallet';
+import Settings from './containers/settings/Settings';
+import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
+import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
+import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
+import WalletAddPage, { AddAnotherWalletPromise } from './containers/wallet/WalletAddPage'
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import NFTsWrapper from './containers/wallet/NFTsWrapper';
 
 // PAGES
-const WalletAddPagePromise = () => import('./containers/wallet/WalletAddPage');
-const WalletAddPage = React.lazy(WalletAddPagePromise);
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
 const LanguageSelectionPage = React.lazy(LanguageSelectionPagePromise);
 const TermsOfUsePagePromise = () => import('./containers/profile/TermsOfUsePage');
@@ -23,8 +31,6 @@ const UriPromptPagePromise = () => import('./containers/profile/UriPromptPage');
 const UriPromptPage = React.lazy(UriPromptPagePromise);
 
 // SETTINGS
-const SettingsPromise = () => import('./containers/settings/Settings');
-const Settings = React.lazy(SettingsPromise);
 const GeneralSettingsPagePromise = () => import('./containers/settings/categories/GeneralSettingsPage');
 const GeneralSettingsPage = React.lazy(GeneralSettingsPagePromise);
 const WalletSettingsPagePromise = () => import('./containers/settings/categories/WalletSettingsPage');
@@ -38,15 +44,9 @@ const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
 const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
 const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
 
-// Dynamic container loading - resolver loads file relative to '/app/' directory
-const LoadingPagePromise = () => import('./containers/LoadingPage');
-const LoadingPage = React.lazy(LoadingPagePromise);
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
-
-const WalletPromise = () => import('./containers/wallet/Wallet');
-const Wallet = React.lazy(WalletPromise);
 
 const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
 const MyWalletsPage = React.lazy(MyWalletsPagePromise);
@@ -66,9 +66,6 @@ const WalletReceivePage = React.lazy(WalletReceivePagePromise);
 const URILandingPagePromise = () => import('./containers/uri/URILandingPage');
 const URILandingPage = React.lazy(URILandingPagePromise);
 
-const TransferPromise = () => import('./containers/transfer/Transfer');
-const Transfer = React.lazy(TransferPromise);
-
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
 
@@ -80,9 +77,6 @@ const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
 const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
 const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
-
-const VotingPagePromise = () => import('./containers/wallet/voting/VotingPage');
-const VotingPage = React.lazy(VotingPagePromise);
 
 const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
@@ -96,15 +90,6 @@ const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 const WalletSwitchPromise = () => import('./containers/WalletSwitch');
 const WalletSwitch = React.lazy(WalletSwitchPromise);
 
-const StakingPagePromise = () => import('./containers/wallet/staking/StakingPage');
-const StakingPage = React.lazy(StakingPagePromise);
-
-const AssetsWrapperPromise = () => import('./containers/wallet/AssetsWrapper');
-const AssetsWrapper = React.lazy(AssetsWrapperPromise);
-
-const NFTsWrapperPromise = () => import('./containers/wallet/NFTsWrapper');
-const NFTsWrapper = React.lazy(NFTsWrapperPromise);
-
 const TokensPageRevampPromise = () => import('./containers/wallet/TokensPageRevamp');
 const TokensPageRevamp = React.lazy(TokensPageRevampPromise);
 
@@ -117,9 +102,6 @@ const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
 const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
 const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
 
-const ConnectedWebsitesPagePromise = () => import('./containers/dapp-connector/ConnectedWebsitesContainer');
-const ConnectedWebsitesPage = React.lazy(ConnectedWebsitesPagePromise);
-
 const YoroiPalettePagePromise = () => import('./containers/experimental/YoroiPalette');
 const YoroiPalettePage = React.lazy(YoroiPalettePagePromise);
 
@@ -127,38 +109,34 @@ const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThem
 const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [
-  WalletAddPagePromise,
+  AddAnotherWalletPromise,
+  StakingPageContentPromise,
   LanguageSelectionPagePromise,
   TermsOfUsePagePromise,
   UriPromptPagePromise,
-  SettingsPromise,
   GeneralSettingsPagePromise,
   WalletSettingsPagePromise,
   ExternalStorageSettingsPagePromise,
   OAuthDropboxPagePromise,
   TermsOfUseSettingsPagePromise,
   SupportSettingsPagePromise,
-  LoadingPagePromise,
   NightlyPagePromise,
-  WalletPromise,
   MyWalletsPagePromise,
   WalletSummaryPagePromise,
   WalletSendPagePromise,
   WalletAssetsPagePromise,
   WalletReceivePagePromise,
   URILandingPagePromise,
-  TransferPromise,
+  WalletTransferPagePromise,
   ReceivePromise,
   StakingDashboardPagePromise,
   CardanoStakingPagePromise,
   NoticeBoardPagePromise,
-  VotingPagePromise,
+  VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
   WalletSwitchPromise,
-  StakingPagePromise,
-  AssetsWrapperPromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
   NFTsPageRevampPromise,
@@ -227,7 +205,6 @@ export const Routes = (
           )
         )}
       />
-
       <Route
         path={ROUTES.NFTS.ROOT}
         component={(props) => (
@@ -237,7 +214,6 @@ export const Routes = (
           )
         )}
       />
-
       <Route
         exact
         path={ROUTES.WALLETS.ADD}
@@ -300,6 +276,11 @@ export const Routes = (
         path={ROUTES.SWITCH}
         component={(props) => <WalletSwitch {...props} stores={stores} actions={actions} />}
       />
+      <Route
+        exact
+        path={ROUTES.REVAMP.CATALYST_VOTING}
+        component={(props) => <VotingPage {...props} stores={stores} actions={actions} />}
+      />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </Suspense>
@@ -310,9 +291,7 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.TRANSACTIONS}
-      component={(props) => {
-        return <WalletSummaryPage {...props} stores={stores} actions={actions} />
-      }}
+      component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
@@ -351,6 +330,11 @@ const WalletsSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.CATALYST_VOTING}
       component={(props) => <VotingPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.REVAMP.TRANSFER}
+      component={(props) => <Transfer {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );
@@ -425,7 +409,6 @@ const NFTsSubPages = (stores, actions) => (
     />
   </Switch>
 )
-/* eslint-enable max-len */
 
 export function wrapSettings(
   settingsProps: InjectedOrGenerated<SettingsData>,
@@ -435,7 +418,9 @@ export function wrapSettings(
     <Settings
       {...settingsProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </Settings>
   );
 }
@@ -448,7 +433,9 @@ export function wrapAssets(
     <AssetsWrapper
       {...assetsProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </AssetsWrapper>
   );
 }
@@ -461,7 +448,9 @@ export function wrapNFTs(
     <NFTsWrapper
       {...assetsProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </NFTsWrapper>
   );
 }
@@ -474,7 +463,9 @@ export function wrapWallet(
     <Wallet
       {...walletProps}
     >
-      {children}
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
     </Wallet>
   );
 }
