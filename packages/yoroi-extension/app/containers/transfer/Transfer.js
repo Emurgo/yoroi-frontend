@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import { Component, lazy, Suspense } from 'react';
 import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -15,7 +15,6 @@ import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
-import WalletTransferPage from './WalletTransferPage';
 import type { GeneratedData as WalletTransferPageData } from './WalletTransferPage';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
@@ -26,6 +25,9 @@ import HorizontalLine from '../../components/widgets/HorizontalLine';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+
+export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
+const WalletTransferPage = lazy(WalletTransferPagePromise);
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -84,14 +86,17 @@ class Transfer extends Component<AllProps> {
     if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
       return (<UnsupportedWallet />);
     }
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
     return (
       <>
-        <HorizontalLine />
+        {!isRevamp && <HorizontalLine />}
         <BackgroundColoredLayout>
-          <WalletTransferPage
-            {...this.generated.WalletTransferPageProps}
-            publicDeriver={wallet}
-          />
+          <Suspense fallback={null}>
+            <WalletTransferPage
+              {...this.generated.WalletTransferPageProps}
+              publicDeriver={wallet}
+            />
+          </Suspense>
         </BackgroundColoredLayout>
       </>
     );
@@ -116,7 +121,10 @@ class Transfer extends Component<AllProps> {
     |},
     stores: {|
       app: {| currentRoute: string |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      profile: {|
+          isRevampTheme: boolean,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -133,6 +141,9 @@ class Transfer extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        profile: {
+          isRevampTheme: stores.profile.isRevampTheme,
         }
       },
       actions: {
