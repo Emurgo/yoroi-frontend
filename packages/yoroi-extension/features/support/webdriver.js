@@ -285,6 +285,14 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
+  this.scrollIntoView = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Scroll into view "${JSON.stringify(locator)}"`);
+    await this.waitForElement(locator);
+    const clickable = await this.getElementBy(locator);
+    await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
+  };
+
+
   this.click = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     await this.waitForElement(locator);
@@ -424,11 +432,6 @@ function CustomWorld(cmdInput: WorldInput) {
     await actions.move({ origin: locator }).perform();
   };
 
-  this.scrollIntoView = async (locator: LocatorObject) => {
-    const element = await this.getElementBy(locator);
-    await this.driver.executeScript('arguments[0].scrollIntoView();', element);
-  };
-
   this.getInfoFromIndexedDB = async (tableName: string) => {
     await this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
@@ -445,7 +448,7 @@ function CustomWorld(cmdInput: WorldInput) {
         });
     });
     const {name, version} = allDBs[0];
-    
+
     await this.driver.executeScript((dbName, dbVersion, table) => {
       const request = window.indexedDB.open(dbName, dbVersion);
       request.onsuccess = function (event) {
