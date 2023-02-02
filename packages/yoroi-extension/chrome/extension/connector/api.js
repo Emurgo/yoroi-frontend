@@ -89,6 +89,7 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import cbor from 'cbor';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -744,16 +745,21 @@ export async function connectorSignCardanoTx(
   let txBody: RustModule.WalletV4.TransactionBody;
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
   let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
+  let rawTxBody: Buffer;
   const bytes = Buffer.from(txHex, 'hex');
   try {
     const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
     txBody = fullTx.body();
     witnessSet = fullTx.witness_set();
     auxiliaryData = fullTx.auxiliary_data();
+    rawTxBody = cbor.encodeCanonical(
+      cbor.decodeFirstSync(bytes)[0]
+    );
   } catch (originalErr) {
     try {
       // Try parsing as body for backward compatibility
       txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+      rawTxBody = bytes;
     } catch (_e) {
       throw originalErr;
     }
@@ -776,7 +782,7 @@ export async function connectorSignCardanoTx(
     ...requiredScriptSignKeys,
   ]);
 
-  console.log('totalAdditionalRequiredSignKeys', JSON.stringify(totalAdditionalRequiredSignKeys));
+  console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
   const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
 
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
@@ -789,9 +795,20 @@ export async function connectorSignCardanoTx(
     return Promise.resolve([]);
   }
 
-  const [utxos, allBaseAddresses] = await Promise.all([
+  const queryAllRewardAddresses = (): Promise<Array<FullAddressPayload>> => {
+    if (additionalSignaturesRequired) {
+      return getAllAddressesForDisplay({
+        publicDeriver,
+        type: CoreAddressTypes.CARDANO_REWARD,
+      });
+    }
+    return Promise.resolve([]);
+  }
+
+  const [utxos, allBaseAddresses, allRewardAddresses] = await Promise.all([
     withHasUtxoChains.getAllUtxos(),
     queryAllBaseAddresses(),
+    queryAllRewardAddresses(),
   ]);
 
   const requiredTxSignAddresses = new Set<string>();
@@ -822,7 +839,7 @@ export async function connectorSignCardanoTx(
       console.log('requiredAddress', requiredAddress.to_bech32());
       requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
-    console.log('requiredTxSignAddresses', JSON.stringify(requiredTxSignAddresses));
+    console.log('requiredTxSignAddresses', [...requiredTxSignAddresses]);
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
       if (requiredTxSignAddresses.delete(address)) {
@@ -832,7 +849,13 @@ export async function connectorSignCardanoTx(
         break;
       }
     }
-    console.log('otherRequiredSigners', JSON.stringify(otherRequiredSigners));
+    for (const rewardAddress of allRewardAddresses) {
+      const { address, addressing } = rewardAddress;
+      if (totalAdditionalRequiredSignKeys.has(address.slice(2))) {
+        otherRequiredSigners.push({ address, addressing });
+      }
+    }
+    console.log('otherRequiredSigners', [...otherRequiredSigners]);
   }
 
   const submittedTxs = loadSubmittedTransactions() || [];
@@ -878,7 +901,7 @@ export async function connectorSignCardanoTx(
 
   const signedTx = shelleySignTransaction(
     usedUtxos,
-    txBody,
+    rawTxBody,
     withLevels.getParent().getPublicDeriverLevel(),
     RustModule.WalletV4.Bip32PrivateKey.from_bytes(
       Buffer.from(normalizedKey.prvKeyHex, 'hex')
@@ -1005,10 +1028,10 @@ export async function connectorSendTx(
 
 export async function connectorSendTxCardano(
   wallet: IPublicDeriver</* ConceptualWallet */>,
-  signedTx: Uint8Array,
+  signedTx: Buffer,
   localStorage: LocalStorageApi,
 ): Promise<void> {
-  const signedTx64 = Buffer.from(signedTx).toString('base64');
+  const signedTx64 = signedTx.toString('base64');
   const network = wallet.getParent().getNetworkInfo();
   const backend = network.Backend.BackendService;
   if (backend == null) {
