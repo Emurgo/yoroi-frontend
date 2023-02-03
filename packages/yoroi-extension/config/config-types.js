@@ -2,11 +2,11 @@
 
 export type ConfigType = {|
   network: NetworkConfigType,
-  seiza: SeizaConfigType,
+  poolExplorer: PoolExplorerConfigType,
   app: AppConfigType,
 |};
 
-export type SeizaConfigType = {|
+export type PoolExplorerConfigType = {|
     simpleTemplate: string,
 |}
 

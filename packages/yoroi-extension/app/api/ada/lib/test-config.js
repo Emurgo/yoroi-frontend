@@ -6,7 +6,7 @@ const CONFIG: ConfigType = {
     name: 'mainnet',
     priceBackendUrl: '',
   },
-  seiza: {
+  poolExplorer: {
     simpleTemplate: '',
   },
   app: {
