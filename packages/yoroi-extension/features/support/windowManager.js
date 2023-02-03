@@ -115,9 +115,8 @@ export class WindowManager {
     const handles = this._getTitleByHandle(currentHandle);
     if (handles.length === 1) {
       return handles[0].title;
-    } else {
-      throw new WindowManagerError(`Too many titles for the handle ${currentHandle}`);
     }
+    throw new WindowManagerError(`Too many titles for the handle ${currentHandle}`);
   }
 
   async _openNewWithCheck(

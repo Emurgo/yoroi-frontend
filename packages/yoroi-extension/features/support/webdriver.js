@@ -440,12 +440,8 @@ function CustomWorld(cmdInput: WorldInput) {
     const allDBs = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.allDBsPromise
-        .then(reponse => {
-          callback(reponse);
-        })
-        .catch(error => {
-          callback(error);
-        });
+        .then(reponse => callback(reponse))
+        .catch(err => callback(err));
     });
     const {name, version} = allDBs[0];
 
@@ -454,7 +450,7 @@ function CustomWorld(cmdInput: WorldInput) {
       request.onsuccess = function (event) {
           const db = event.target.result;
           window.tableContent = db
-            .transaction(table, "readonly")
+            .transaction(table, 'readonly')
             .objectStore(table)
             .getAll();
       }

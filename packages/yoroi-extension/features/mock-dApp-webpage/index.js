@@ -506,9 +506,9 @@ export class MockDAppWebpage {
         // eslint-disable-next-line promise/always-return
         .then(utxosResponse => {
           if (utxosResponse == null || utxosResponse.length === 0) {
-            callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
+            return callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
           }
-          callback({ success: true, retValue: utxosResponse });
+          return callback({ success: true, retValue: utxosResponse });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
@@ -539,9 +539,9 @@ export class MockDAppWebpage {
       window.collateralPromise
         .then(utxosResponse => {
           if (utxosResponse == null || utxosResponse.length === 0) {
-            callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
+            return callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
           }
-          callback({ success: true, retValue: utxosResponse });
+          return callback({ success: true, retValue: utxosResponse });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
