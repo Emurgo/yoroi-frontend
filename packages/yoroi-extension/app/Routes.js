@@ -319,7 +319,7 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE}
-      component={(props) => <CardanoStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+      component={(props) => <CardanoStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.poolExplorer.simpleTemplate} />}
     />
     <Route
       exact
