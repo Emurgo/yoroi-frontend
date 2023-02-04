@@ -548,7 +548,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
-              <Box sx={columnTXStyles.status}>
+              <Box sx={columnTXStyles.status} id='txStatus'>
                 {state === TxStatusCodes.IN_BLOCK ? (
                   <Typography
                     sx={{
@@ -579,6 +579,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 variant="body1"
                 color="var(--yoroi-palette-gray-900)"
                 sx={columnTXStyles.fee}
+                id='txFee'
               >
                 {this.renderFeeDisplay({
                   amount: data.fee,
@@ -587,7 +588,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 })}
               </Typography>
               <Box sx={columnTXStyles.amount}>
-                <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
+                <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)" id='transactionAmount'>
                   {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
                     timestamp: data.date.valueOf(),

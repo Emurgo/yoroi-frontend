@@ -33,7 +33,7 @@ import { connectorButton } from '../pages/sidebarPage';
 
 const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
-const mockDAppUrl = `http://localhost:${Ports.DevBackendServe}/mock-dapp`;
+const mockDAppUrl = `http://localhost:${Ports.DevBackendServer}/mock-dapp`;
 
 const connectorPopUpIsDisplayed = async (customWorld: Object) => {
   await customWorld.driver.sleep(2000);
@@ -174,7 +174,7 @@ When(/^I request signing the transaction:$/, async function (table) {
   const fields = table.hashes()[0];
   const normalizedAmount = `${parseFloat(fields.amount) * parseFloat('1000000')}`;
   this.webDriverLogger.info(
-    `Step: I request signing the transaction: ${normalizedAmount} to address: ${fields.address}`
+    `Step: I request signing the transaction: ${normalizedAmount} to address: ${fields.toAddress}`
   );
   await this.mockDAppPage.requestSigningTx(normalizedAmount, fields.toAddress);
 });
@@ -375,16 +375,17 @@ Then(/^The user reject for signing data is received$/, async function () {
   expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });
 
-When(/^I ask to get Collateral for (.+) Utxos$/, async function (utxos) {
-  this.webDriverLogger.info(`Step: I ask to get Collateral for ${utxos} Utxos`);
-  await this.mockDAppPage.addCollateral(utxos);
+When(/^I ask to get Collateral for (.+) ADA$/, async function (amount) {
+  this.webDriverLogger.info(`Step: I ask to get Collateral for ${amount} ADA`);
+  const amountString = (parseFloat(amount) * 1000000).toString();
+  await this.mockDAppPage.addCollateral(amountString);
 });
 
 Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expectedCollateral, utxosAmount) {
     this.webDriverLogger.info(
       `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
     );
-    const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+    const collateral = await this.mockDAppPage.getCollateral(utxosAmount);
     const collateralJson = JSON.parse(collateral)[0];
     const expectedUtxos = JSON.parse(expectedCollateral);
     expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
@@ -393,8 +394,7 @@ Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expected
 
 Then(/^The dApp should receive collateral$/, async function (table) {
   const fields = table.hashes()[0];
-  const utxosAmount = fields.forAmount;
-  const collateral = await this.mockDAppPage.getCollateralUtxos(utxosAmount);
+  const collateral = await this.mockDAppPage.getCollateralResult();
   const collateralJson = JSON.parse(collateral)[0];
   expect(collateralJson.amount, 'Amount is different').to.equal(fields.amount);
   expect(collateralJson.receiver, 'Receiver is different').to.equal(fields.receiver);

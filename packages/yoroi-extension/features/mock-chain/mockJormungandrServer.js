@@ -176,9 +176,9 @@ export function getMockServer(
 
     installCoinPriceRequestHandlers(server);
 
-    MockServer = server.listen(Ports.DevBackendServe, () => {
+    MockServer = server.listen(Ports.DevBackendServer, () => {
       // eslint-disable-next-line no-console
-      console.log(`JSON Server is running at ${Ports.DevBackendServe}`);
+      console.log(`JSON Server is running at ${Ports.DevBackendServer}`);
     });
   }
   return MockServer;
