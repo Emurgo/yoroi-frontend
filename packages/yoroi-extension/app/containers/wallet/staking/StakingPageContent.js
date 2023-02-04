@@ -385,7 +385,7 @@ class StakingPageContent extends Component<AllProps> {
         <CardanoStakingPage
           stores={this.props.stores}
           actions={this.props.actions}
-          urlTemplate={CONFIG.seiza.simpleTemplate}
+          urlTemplate={CONFIG.poolExplorer.simpleTemplate}
         />
         {uiDialogs.isOpen(OverviewModal) ? (
           <OverviewModal

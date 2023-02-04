@@ -36,6 +36,7 @@ function createWallet(payload: {|
 
 export type WalletNames =
   'shelley-simple-24' |
+  'shelley-collateral' |
   'shelley-simple-15' |
   'shelley-delegated' |
   'shelley-ledger-delegated' |
@@ -122,6 +123,11 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('shelley-simple-24': WalletNames),
     mnemonic: 'reunion walnut update express purse defense slice barrel estate olympic february flock give team alert coast luggage exhaust notable bag december split furnace sponsor',
     plate: 'DSKC-9213',
+  }),
+  createWallet({
+    name: ('shelley-collateral': WalletNames),
+    mnemonic: 'deal calm cloth world refuse pledge grant tuna inner body fat afford absorb off barely',
+    plate: 'HLBZ-9462',
   }),
   createWallet({
     name: ('shelley-simple-15': WalletNames),
