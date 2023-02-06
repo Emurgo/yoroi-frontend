@@ -1003,8 +1003,8 @@ function handleInjectorConnect(port) {
                   );
                 } catch {
                   fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
+                  fullTx.set_witness_set(resp.ok.to_bytes());
                 }
-                fullTx.set_witness_set(resp.ok);
                 rpcResponse({ ok: Buffer.from(fullTx.to_bytes()).toString('hex') });
               } else if (resp?.ok) {
                 const witnessSet: RustModule.WalletV4.TransactionWitnessSet = resp.ok;
