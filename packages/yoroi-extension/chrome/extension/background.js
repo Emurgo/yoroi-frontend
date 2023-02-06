@@ -434,7 +434,7 @@ const yoroiMessageHandler = async (
     tx: CardanoTx,
     password: string,
     tabId: number
-  ): Promise<string> {
+  ): Promise<RustModule.WalletV4.TransactionWitnessSet> {
     return await withDb(async (db, localStorageApi) => {
       return await withSelectedWallet(
         tabId,
@@ -990,15 +990,26 @@ function handleInjectorConnect(port) {
                   },
                   connection
                 );
-              if (!returnTx && resp?.ok != null) {
-                const witnessSetResp = Buffer.from(
-                  RustModule.WalletV4.Transaction.from_bytes(
-                    Buffer.from(resp.ok, 'hex'),
-                  ).witness_set().to_bytes()
-                ).toString('hex');
-                rpcResponse({ ok: witnessSetResp });
-              } else {
+              if (resp?.ok == null) {
                 rpcResponse(resp);
+              } else if (returnTx && resp?.ok) {
+                const bodyOrTxBytes = Buffer.from(tx, 'hex');
+                let fullTx;
+                try {
+                  fullTx = RustModule.WalletV4.FixedTransaction.new(
+                    bodyOrTxBytes,
+                    resp.ok.to_bytes(),
+                    true,
+                  );
+                } catch {
+                  fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
+                }
+                fullTx.set_witness_set(resp.ok);
+                rpcResponse({ ok: Buffer.from(fullTx.to_bytes()).toString('hex') });
+              } else if (resp?.ok) {
+                const witnessSet: RustModule.WalletV4.TransactionWitnessSet = resp.ok;
+                
+                rpcResponse({ ok: Buffer.from(witnessSet.to_bytes()).toString('hex') });
               }
             } catch (e) {
               handleError(e);
