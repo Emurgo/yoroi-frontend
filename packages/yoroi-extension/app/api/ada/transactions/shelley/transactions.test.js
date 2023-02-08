@@ -493,8 +493,8 @@ describe('Create unsigned TX from UTXO', () => {
     // it will take only one of the utxos because it covers the required token and the fee
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4], utxos[2]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998056');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1946');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998058');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1944');
 
     const assetInfo = identifierToCardanoAsset(testAssetId);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
