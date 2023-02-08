@@ -733,11 +733,26 @@ function getTxRequiredSigningKeys(
   return set;
 }
 
+/**
+ * Returns HEX of a serialised witness set
+ */
 export async function connectorSignCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: string,
   tx: CardanoTx,
-): Promise<RustModule.WalletV4.TransactionWitnessSet> {
+): Promise<string> {
+  return RustModule.WasmScope(Module =>
+    __connectorSignCardanoTx(publicDeriver, password, tx, Module));
+}
+
+async function __connectorSignCardanoTx(
+  publicDeriver: PublicDeriver<>,
+  password: string,
+  tx: CardanoTx,
+  // eslint-disable-next-line no-shadow
+  RustModule: RustModule,
+): Promise<string> {
+
   // eslint-disable-next-line no-unused-vars
   const { tx: txHex, partialSign } = tx;
 
@@ -909,7 +924,7 @@ export async function connectorSignCardanoTx(
     otherRequiredSigners,
   );
 
-  return signedTx.witness_set();
+  return signedTx.witness_set().to_hex();
 }
 
 export async function connectorCreateCardanoTx(

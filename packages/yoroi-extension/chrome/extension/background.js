@@ -89,6 +89,7 @@ import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/tr
 import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
+import { hexToBytes } from '../../app/coreUtils';
 
 /*::
 declare var chrome;
@@ -430,11 +431,15 @@ const yoroiMessageHandler = async (
       );
     });
   }
+
+  /**
+   * Returns HEX of a serialised witness set
+   */
   async function signCardanoTx(
     tx: CardanoTx,
     password: string,
     tabId: number
-  ): Promise<RustModule.WalletV4.TransactionWitnessSet> {
+  ): Promise<string> {
     return await withDb(async (db, localStorageApi) => {
       return await withSelectedWallet(
         tabId,
@@ -523,12 +528,12 @@ const yoroiMessageHandler = async (
       case 'tx/cardano':
       {
         try {
-          const signedTx = await signCardanoTx(
+          const signedTxWitnessSetHEX = await signCardanoTx(
             (request.tx: any),
             password,
             request.tabId
           );
-          responseData.resolve({ ok: signedTx });
+          responseData.resolve({ ok: signedTxWitnessSetHEX });
         } catch (error) {
           responseData.resolve({ err: 'transaction signing failed' })
         }
@@ -992,24 +997,26 @@ function handleInjectorConnect(port) {
                 );
               if (resp?.ok == null) {
                 rpcResponse(resp);
-              } else if (returnTx && resp?.ok) {
-                const bodyOrTxBytes = Buffer.from(tx, 'hex');
-                let fullTx;
-                try {
-                  fullTx = RustModule.WalletV4.FixedTransaction.new(
-                    bodyOrTxBytes,
-                    resp.ok.to_bytes(),
-                    true,
-                  );
-                } catch {
-                  fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
-                  fullTx.set_witness_set(resp.ok.to_bytes());
-                }
-                rpcResponse({ ok: Buffer.from(fullTx.to_bytes()).toString('hex') });
-              } else if (resp?.ok) {
-                const witnessSet: RustModule.WalletV4.TransactionWitnessSet = resp.ok;
-                
-                rpcResponse({ ok: Buffer.from(witnessSet.to_bytes()).toString('hex') });
+              } else if (returnTx) {
+                const bodyOrTxBytes = hexToBytes(tx);
+                const witnessSetBytes = hexToBytes(resp.ok);
+                // eslint-disable-next-line no-shadow
+                RustModule.WasmScope(RustModule => {
+                  let fullTx;
+                  try {
+                    fullTx = RustModule.WalletV4.FixedTransaction.new(
+                      bodyOrTxBytes,
+                      witnessSetBytes,
+                      true,
+                    );
+                  } catch {
+                    fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
+                    fullTx.set_witness_set(witnessSetBytes);
+                  }
+                  rpcResponse({ ok: fullTx.to_hex() });
+                });
+              } else {
+                rpcResponse({ ok: resp.ok });
               }
             } catch (e) {
               handleError(e);
