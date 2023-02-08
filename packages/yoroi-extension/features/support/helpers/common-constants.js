@@ -7,6 +7,8 @@ export const mailsacAPIKey = process.env.MAILSAC_API_KEY;
 export const mailsacEmail = 'qaemurgo@mailsac.com';
 export const mailsacRequestMainPart = `https://mailsac.com/api/addresses/${mailsacEmail}/`;
 
+export const adaToFiatPricesMainUrl = `https://iohk-mainnet.yoroiwallet.com/api/price/`;
+
 export const commonWalletPassword = 'asdfasdfasdf';
 export const txSuccessfulStatuses = ['high', 'medium', 'low'];
 export const halfSecond = 500;

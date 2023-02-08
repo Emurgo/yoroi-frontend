@@ -2,7 +2,7 @@
   "network": {
     "name": "mainnet"
   },
-  "seiza": {
+  "poolExplorer": {
     "simpleTemplate": "https://adapools.yoroiwallet.com/?source=$$BROWSER$$"
   },
   "app": {

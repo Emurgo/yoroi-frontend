@@ -163,10 +163,27 @@ const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
+const CardanoPreviewTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+  {
+    ExplorerId: 5_50,
+    NetworkId: networks.CardanoPreviewTestnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://preview.cardanoscan.io/address/',
+      transaction: 'https://preview.cardanoscan.io/transaction/',
+      pool: 'https://preview.cardanoscan.io/pool/',
+      stakeAddress: 'https://preview.cardanoscan.io/stakeKey/',
+      token: 'https://preview.cardanoscan.io/token/',
+    },
+    Name: 'CardanoScan',
+  },
+];
+
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
+  [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
   [networks.JormungandrMainnet.NetworkId, JormungandrExplorers],
   [networks.ErgoMainnet.NetworkId, ErgoExplorers],
   [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],
@@ -184,7 +201,10 @@ export const prepackagedDefaultExplorers:
       CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
     [networks.CardanoPreprodTestnet.NetworkId, getOrThrow(
-      CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
+      CardanoPreprodTestnetExplorers.find(explorer => explorer.IsBackup)
+    )],
+    [networks.CardanoPreviewTestnet.NetworkId, getOrThrow(
+      CardanoPreviewTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
     [networks.JormungandrMainnet.NetworkId, getOrThrow(
       JormungandrExplorers.find(explorer => explorer.IsBackup)
