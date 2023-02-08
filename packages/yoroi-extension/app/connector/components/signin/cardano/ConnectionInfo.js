@@ -1,10 +1,11 @@
+// @flow
 import { Box, Typography } from '@mui/material';
 import { signTxMessages } from '../SignTxPage';
 import ConnectedWallet from '../../connect/ConnectedWallet';
 import { ReactComponent as NoDappIcon } from '../../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
 
-export default function ConnectionInfoComponent({ intl, connectedWebsite, connectedWallet }) {
+export default function ConnectionInfo({ intl, connectedWebsite, connectedWallet }) {
   const url = connectedWebsite?.url ?? '';
   const faviconUrl = connectedWebsite?.image ?? '';
 

@@ -1,5 +1,5 @@
-/* eslint-disable no-nested-ternary */
 // @flow
+/* eslint-disable no-nested-ternary */
 import { Component } from 'react';
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -11,7 +11,7 @@ import { intlShape, defineMessages } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
-import WalletCard from './ConnectedWallet';
+import ConnectedWallet from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -324,13 +324,7 @@ class ConnectPage extends Component<Props> {
                         <WalletButton
                           onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
                         >
-                          <WalletCard
-                            shouldHideBalance={shouldHideBalance}
-                            publicDeriver={item}
-                            getTokenInfo={this.props.getTokenInfo}
-                            unitOfAccountSetting={this.props.unitOfAccount}
-                            getCurrentPrice={this.props.getCurrentPrice}
-                          />
+                          <ConnectedWallet publicDeriver={item} />
                         </WalletButton>
                       </li>
                     ))}

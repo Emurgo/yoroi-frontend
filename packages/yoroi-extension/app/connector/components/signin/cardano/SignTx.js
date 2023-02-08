@@ -1,9 +1,10 @@
+// @flow
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useState } from 'react';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import { signTxMessages } from '../SignTxPage';
-import CardanoSignTxSummaryComponent from './SignTxSummaryComponent';
+import CardanoSignTxSummary from './SignTxSummary';
 import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expand.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
 
@@ -12,7 +13,7 @@ const getAssetDisplayValue = ({ amount, tokenInfo }) => {
   return `${tokenInfo.IsNFT && amount == 1 ? '' : amount + ' '}${tokenName}`;
 };
 
-export default function CardanoSignTxComponent({
+export default function CardanoSignTx({
   intl,
   txAssetsData,
   // getAddressUrlHash,
@@ -24,7 +25,7 @@ export default function CardanoSignTxComponent({
 
   return (
     <Box>
-      <CardanoSignTxSummaryComponent txAssetsData={txAssetsData} intl={intl} />
+      <CardanoSignTxSummary txAssetsData={txAssetsData} intl={intl} />
       <Panel>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start">
           <Typography color="#4A5065" fontWeight={500}>

@@ -38,7 +38,6 @@ export default class WalletCard extends Component<Props> {
       ? constructPlate(this.props.publicDeriver.checksum, 0, styles.icon)
       : [];
 
-    const defaultEntry = this.props.publicDeriver.balance.getDefaultEntry();
     const checksum = this.props.publicDeriver.checksum?.TextPart;
 
     return (

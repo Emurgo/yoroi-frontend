@@ -1,5 +1,5 @@
-/* eslint-disable no-nested-ternary */
 // @flow
+/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
@@ -42,9 +42,9 @@ import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
-import CardanoSignTxComponent from './cardano/SignTxComponent';
-import ConnectionInfoComponent from './cardano/ConnectionInfoComponent';
-import CardanoSignTxSummaryComponent from './cardano/SignTxSummaryComponent';
+import CardanoSignTx from './cardano/SignTx';
+import ConnectionInfo from './cardano/ConnectionInfo';
+import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 
 type Props = {|
@@ -223,17 +223,26 @@ class SignTxPage extends Component<Props, State> {
     return null;
   };
 
-  getUniqueAssets: Array<any> = assets => {
+  getUniqueAssets: (
+    Array<
+      $ReadOnly<
+        Inexact<{|
+          value: MultiToken,
+        |}>
+      >
+    >
+  ) => Array<{|
+    tokenInfo: ?$ReadOnly<TokenRow>,
+    amount: BigNumber,
+  |}> = assets => {
     return assets.reduce((acc, curr) => {
       const newAcc = [].concat(acc);
-      const defaultId = curr.value.getDefaultEntry().identifier;
+      const defaultEntry = curr.value.getDefaultEntry();
 
-      if (!newAcc.includes(defaultId) && defaultId) newAcc.push(defaultId);
-
-      curr.value.nonDefaultEntries().forEach(e => {
-        if (!newAcc.some(a => a.Identifier === e.identifier)) {
+      [defaultEntry].concat(curr.value.nonDefaultEntries()).forEach(e => {
+        if (!newAcc.some(a => a.tokenInfo?.Identifier === e.identifier) && e.identifier) {
           const tokenInfo = this.props.getTokenInfo(e);
-          tokenInfo && newAcc.push(Object.assign({ tokenInfo, amount: e.amount }));
+          tokenInfo && newAcc.push({ tokenInfo, amount: e.amount });
         }
       });
 
@@ -305,7 +314,7 @@ class SignTxPage extends Component<Props, State> {
 
       content = (
         <Box>
-          <CardanoSignTxComponent
+          <CardanoSignTx
             intl={intl}
             txAssetsData={summaryAssetsData}
             passwordFormField={
@@ -322,7 +331,7 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = (
         <Box>
           <Box mb="32px">
-            <CardanoSignTxSummaryComponent txAssetsData={summaryAssetsData} intl={intl} />
+            <CardanoSignTxSummary txAssetsData={summaryAssetsData} intl={intl} />
           </Box>
           <CardanoUtxoDetails
             txData={txData}
@@ -363,7 +372,7 @@ class SignTxPage extends Component<Props, State> {
         <SignTxTabs
           detailsContent={<Box overflowWrap="break-word">{content}</Box>}
           connectionContent={
-            <ConnectionInfoComponent
+            <ConnectionInfo
               connectedWallet={this.props.selectedWallet}
               intl={intl}
               connectedWebsite={connectedWebsite}

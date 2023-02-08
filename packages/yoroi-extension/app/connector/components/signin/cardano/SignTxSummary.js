@@ -1,7 +1,8 @@
+// @flow
 import { Box, Typography } from '@mui/material';
 import { signTxMessages } from '../SignTxPage';
 
-export default function CardanoSignTxSummaryComponent({ txAssetsData, intl }) {
+export default function CardanoSignTxSummary({ txAssetsData, intl }) {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const showOnlyTxFee = isOnlyTxFee && sent.length == 0 && received.length == 0;
   return (

@@ -1,5 +1,5 @@
-/* eslint-disable no-nested-ternary */
 // @flow
+/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape } from 'react-intl';
