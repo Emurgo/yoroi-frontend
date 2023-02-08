@@ -857,23 +857,31 @@ export default class AdaApi {
         ...signingKey,
         password,
       });
-      const signedTx = shelleySignTransaction(
-        request.signRequest.senderUtxos,
-        request.signRequest.unsignedTx,
-        request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(normalizedKey.prvKeyHex, 'hex')
-        ),
-        request.signRequest.neededStakingKeyHashes.wits,
-        request.signRequest.metadata,
-      );
+
+      const { txHash, encodedTx } = RustModule.WasmScope(WasmModule => {
+        const signedTx = shelleySignTransaction(
+          request.signRequest.senderUtxos,
+          request.signRequest.unsignedTx,
+          request.publicDeriver.getParent().getPublicDeriverLevel(),
+          WasmModule.WalletV4.Bip32PrivateKey.from_bytes(
+            Buffer.from(normalizedKey.prvKeyHex, 'hex')
+          ),
+          request.signRequest.neededStakingKeyHashes.wits,
+          request.signRequest.metadata,
+        );
+
+        return {
+          txHash: Buffer.from(
+            WasmModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+          ).toString('hex'),
+          encodedTx: signedTx.to_bytes(),
+        }
+      })
 
       const response = await request.sendTx({
         network: request.publicDeriver.getParent().getNetworkInfo(),
-        id: Buffer.from(
-          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-        ).toString('hex'),
-        encodedTx: signedTx.to_bytes(),
+        id: txHash,
+        encodedTx,
       });
 
       Logger.debug(
@@ -1168,8 +1176,10 @@ export default class AdaApi {
       }
       return a == null || a.length === 0;
     }
+
     const noInputs = noneOrEmpty(includeInputs);
     const noOutputs = noneOrEmpty(includeOutputs) && noneOrEmpty(includeTargets);
+
     if (noOutputs) {
       if (noInputs) {
         throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
@@ -1277,29 +1287,34 @@ export default class AdaApi {
       policyId: string, assetId: string,
     |} {
       const { script, assetName } = mintEntry;
-      const policyId = bytesToHex(
-        RustModule.WalletV4.NativeScript
-          .from_bytes(hexToBytes(script))
-          .hash()
-          .to_bytes()
-      );
+      const policyId = RustModule.WasmScope(WasmModule => {
+        return bytesToHex(
+          WasmModule.WalletV4.NativeScript
+            .from_bytes(hexToBytes(script))
+            .hash()
+            .to_bytes()
+        );
+      });
+
       const assetId = `${policyId}.${assetName}`;
       return { policyId, assetId };
     }
 
-    for (const outputHex of (includeOutputs ?? [])) {
-      const output = RustModule.WalletV4.TransactionOutput.from_bytes(hexToBytes(outputHex))
-      const newOutput = {
-        address: bytesToHex(output.address().to_bytes()),
-        amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
-      };
-      const outputDataHash = output.data_hash();
-      if (outputDataHash != null) {
-        // $FlowFixMe[prop-missing]
-        newOutput.dataHash = bytesToHex(outputDataHash.to_bytes());
+    RustModule.WasmScope(WasmModule => {
+      for (const outputHex of (includeOutputs ?? [])) {
+        const output = WasmModule.WalletV4.TransactionOutput.from_bytes(hexToBytes(outputHex))
+        const newOutput = {
+          address: bytesToHex(output.address().to_bytes()),
+          amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
+        };
+        const outputDataHash = output.data_hash();
+        if (outputDataHash != null) {
+          // $FlowFixMe[prop-missing]
+          newOutput.dataHash = bytesToHex(outputDataHash.to_bytes());
+        }
+        outputs.push(newOutput);
       }
-      outputs.push(newOutput);
-    }
+    });
 
     for (const target of (includeTargets ?? [])) {
       const targetAssets = { ...(target.assets || {}) };
@@ -1367,15 +1382,18 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-        // ensureRequiredMinimalValue is true
-        const minAmount = RustModule.WalletV4.min_ada_required(
-          cardanoValueFromMultiToken(amount),
-          dataHash != null,
-          protocolParams.coinsPerUtxoWord,
-        );
-        if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
-          amount = makeMultiToken(minAmount.to_str());
-        }
+        RustModule.WasmScope(WasmModule => {
+          // ensureRequiredMinimalValue is true
+          const minAmount = WasmModule.WalletV4.min_ada_required(
+            cardanoValueFromMultiToken(amount),
+            dataHash != null,
+            protocolParams.coinsPerUtxoWord,
+          );
+
+          if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
+            amount = makeMultiToken(minAmount.to_str());
+          };
+        });
       }
       outputs.push({
         address: target.address,
@@ -1507,6 +1525,7 @@ export default class AdaApi {
         allUtxo,
         false,
       );
+
       const utxoSum = allUtxosForKey.reduce(
       (sum, utxo) => sum.joinAddMutable(new MultiToken(
         utxo.output.tokens.map(token => ({
@@ -1530,6 +1549,14 @@ export default class AdaApi {
         .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
+      const stakeCredentialHex = RustModule.WasmScope(Scope => {
+        return Buffer.from(
+            Scope.WalletV4.StakeCredential
+              .from_keyhash(stakingKey.hash())
+              .to_bytes()
+          ).toString('hex')
+      });
+
       const signTxRequest = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
         unsignedTx: unsignedTx.txBuilder,
@@ -1542,11 +1569,7 @@ export default class AdaApi {
           NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
         },
         neededStakingKeyHashes: {
-          neededHashes: new Set([Buffer.from(
-            RustModule.WalletV4.StakeCredential
-              .from_keyhash(stakingKey.hash())
-              .to_bytes()
-          ).toString('hex')]),
+          neededHashes: new Set([stakeCredentialHex]),
           wits: new Set(),
         },
       });
