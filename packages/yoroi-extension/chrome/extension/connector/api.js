@@ -750,7 +750,7 @@ async function __connectorSignCardanoTx(
   password: string,
   tx: CardanoTx,
   // eslint-disable-next-line no-shadow
-  RustModule: RustModule,
+  RustModule: typeof RustModule,
 ): Promise<string> {
 
   // eslint-disable-next-line no-unused-vars

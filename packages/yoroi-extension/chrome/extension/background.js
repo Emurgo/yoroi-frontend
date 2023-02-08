@@ -999,6 +999,7 @@ function handleInjectorConnect(port) {
                 rpcResponse(resp);
               } else if (returnTx) {
                 const bodyOrTxBytes = hexToBytes(tx);
+                // $FlowFixMe[prop-missing]
                 const witnessSetBytes = hexToBytes(resp.ok);
                 // eslint-disable-next-line no-shadow
                 RustModule.WasmScope(RustModule => {
