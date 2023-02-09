@@ -106,8 +106,8 @@ const ExpandableAssetsPanel = ({
 
       {isExpandable && isExpanded && (
         <>
-          {assets.map(asset => (
-            <AsseetValueDisplay>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
+          {assets.map((asset, k) => (
+            <AsseetValueDisplay key={k}>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
           ))}
         </>
       )}

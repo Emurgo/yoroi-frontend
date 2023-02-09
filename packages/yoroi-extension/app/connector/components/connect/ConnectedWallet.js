@@ -5,7 +5,7 @@ import { Chip, Typography } from '@mui/material';
 import styles from './ConnectedWallet.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
+import type { PublicDeriverCache } from '../../../../chrome/extension/connector/types';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
