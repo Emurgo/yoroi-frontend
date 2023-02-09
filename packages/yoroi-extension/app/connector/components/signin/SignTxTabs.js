@@ -10,8 +10,6 @@ import { observer } from 'mobx-react';
 import { Tab, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import environment from '../../../environment';
-import styles from './SignTxTabs.scss';
-import classNames from 'classnames';
 
 type Props = {|
   connectionContent: Node,
@@ -30,6 +28,7 @@ const messages = defineMessages({
 
 function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
+  const match = useMediaQuery('(min-width:1441px)');
 
   const handleChange = (event, newValue) => setValue(newValue);
 
@@ -55,7 +54,11 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
           }}
         >
           <TabList
-            className={styles.tabList}
+            sx={{
+              width: match ? '640px' : '480px',
+              boxShadow: 'none',
+              '&.MuiTabs-indicator': { height: '2px' },
+            }}
             textColor="primary"
             indicatorColor="primary"
             onChange={handleChange}
@@ -83,7 +86,18 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
           ({ component, id }) =>
             component !== null && (
               <TabPanel
-                className={classNames(styles.tabPanel, isTestEnv && styles.isTestEnv)}
+                sx={{
+                  height: isTestEnv
+                    ? 'calc(84vh - 55px)'
+                    : 'calc(100vh - 48px - 88px - 50px - 120px)',
+                  overflowY: 'scroll',
+                  margin: 'auto',
+                  boxShadow: 'none',
+                  backgroundColor: 'var(--yoroi-palette-common-white)',
+                  p: '32px',
+                  pr: '12px',
+                  width: match ? '640px' : '480px',
+                }}
                 value={id}
                 key={id}
               >
