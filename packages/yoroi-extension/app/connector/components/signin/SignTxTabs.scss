@@ -1,0 +1,31 @@
+.tabPanel {
+  height: calc(100vh - 48px - 88px - 50px - 120px);
+  overflow-y: scroll;
+  margin: auto;
+  box-shadow: none;
+  background-color: var(--yoroi-palette-common-white);
+  padding: 32px;
+  padding-right: 12px;
+  width: 480px;
+
+  @media screen and (min-width: 1441px) {
+    width: 640px;
+  }
+}
+
+.isTestEnv {
+  height: calc(84vh - 55px);
+}
+
+.tabList {
+  width: 480px;
+  box-shadow: none;
+
+  @media screen and (min-width: 1441px) {
+    width: 640px;
+  }
+
+  & .MuiTabs-indicator {
+    height: '2px';
+  }
+}

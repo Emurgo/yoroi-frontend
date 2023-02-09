@@ -380,7 +380,14 @@ class SignTxPage extends Component<Props, State> {
           }
           utxosContent={utxosContent}
         />
-        <Box p="32px" sx={{ borderTop: '1px solid #DCE0E9', maxWidth: '100%' }}>
+        <Box
+          sx={{
+            padding: '32px',
+            borderTop: '1px solid #DCE0E9',
+            maxWidth: '100%',
+            backgroundColor: '#fff',
+          }}
+        >
           <Box sx={{ display: 'flex', gap: '15px' }}>
             <Button
               sx={{ minWidth: 0 }}

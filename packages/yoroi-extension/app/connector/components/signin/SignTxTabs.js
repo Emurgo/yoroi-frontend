@@ -8,8 +8,10 @@ import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { observer } from 'mobx-react';
 import { Tab, Typography } from '@mui/material';
-import environment from '../../../environment';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import environment from '../../../environment';
+import styles from './SignTxTabs.scss';
+import classNames from 'classnames';
 
 type Props = {|
   connectionContent: Node,
@@ -53,11 +55,7 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
           }}
         >
           <TabList
-            sx={{
-              '& .MuiTabs-indicator': { height: '2px' },
-              width: '480px',
-              boxShadow: 'none',
-            }}
+            className={styles.tabList}
             textColor="primary"
             indicatorColor="primary"
             onChange={handleChange}
@@ -85,18 +83,7 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
           ({ component, id }) =>
             component !== null && (
               <TabPanel
-                sx={{
-                  height: isTestEnv
-                    ? 'calc(84vh - 55px)'
-                    : 'calc(100vh - 48px - 88px - 50px - 120px)', // 103 = 52px (topbar) + 51px (tabs bar)
-                  overflowY: 'scroll',
-                  width: '480px',
-                  margin: 'auto',
-                  boxShadow: 'none',
-                  backgroundColor: 'var(--yoroi-palette-common-white)',
-                  p: '32px',
-                  pr: '12px', // since overflow scroll adds 20px of right padding
-                }}
+                className={classNames(styles.tabPanel, isTestEnv && styles.isTestEnv)}
                 value={id}
                 key={id}
               >
