@@ -69,13 +69,18 @@ export const unscramblePaperAdaMnemonic = (
         const entropy = mnemonicToEntropy(
           scrambledMnemonics.join(' ')
         );
-        const newEntropy = RustModule.WalletV2.paper_wallet_unscramble(
-          Buffer.from(entropy, 'hex'),
-          password
-        );
+
+        const mnemonics = RustModule.WasmScope(Scope => {
+          const newEntropy = Scope.WalletV2.paper_wallet_unscramble(
+            Buffer.from(entropy, 'hex'),
+            password
+          );
+
+          return newEntropy.to_english_mnemonics();
+        });
 
         return [
-          newEntropy.to_english_mnemonics(),
+          mnemonics,
           config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
         ];
       } catch (e) {
@@ -91,12 +96,17 @@ export const unscramblePaperAdaMnemonic = (
       }
       try {
         const entropy = mnemonicToEntropy(phrase);
-        const newEntropy = RustModule.WalletV2.paper_wallet_unscramble(
-          Buffer.from(entropy, 'hex'),
-          password
-        );
+        const mnemonics = RustModule.WasmScope(Scope => {
+          const newEntropy = Scope.WalletV2.paper_wallet_unscramble(
+            Buffer.from(entropy, 'hex'),
+            password
+          );
+
+          return newEntropy.to_english_mnemonics();
+        });
+
         return [
-          newEntropy.to_english_mnemonics(),
+          mnemonics,
           config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
         ];
       } catch (e) {
