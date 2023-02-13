@@ -29,24 +29,24 @@ class SidebarContainer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { stores } = this.generated;
+    const { stores, actions } = this.generated;
     const { profile } = stores;
 
     const SidebarComponent = (
       <Sidebar
         onCategoryClicked={category => {
-          this.generated.actions.router.goToRoute.trigger({
+          actions.router.goToRoute.trigger({
             route: category.route,
           });
         }}
         isActiveCategory={category =>
-          this.generated.stores.app.currentRoute.startsWith(category.route)
+          stores.app.currentRoute.startsWith(category.route)
         }
         categories={allCategories.filter(category =>
           category.isVisible({
-            hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
-            selected: this.generated.stores.wallets.selected,
-            currentRoute: this.generated.stores.app.currentRoute,
+            hasAnyWallets: stores.wallets.hasAnyWallets,
+            selected: stores.wallets.selected,
+            currentRoute: stores.app.currentRoute,
           })
         )}
         onToggleSidebar={this.toggleSidebar}
@@ -57,13 +57,11 @@ class SidebarContainer extends Component<AllProps> {
     const SidebarRevampComponent = (
       <SidebarRevamp
         onCategoryClicked={category => {
-          this.generated.actions.router.goToRoute.trigger({
+          actions.router.goToRoute.trigger({
             route: category.route,
           });
         }}
-        isActiveCategory={category =>
-          this.generated.stores.app.currentRoute.startsWith(category.route)
-        }
+        isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
         categories={allCategoriesRevamp.filter(category =>
           category.isVisible({
             hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
@@ -71,7 +69,7 @@ class SidebarContainer extends Component<AllProps> {
             currentRoute: this.generated.stores.app.currentRoute,
             isRewardWallet: (
               publicDeriver: PublicDeriver<>
-              ) => !!this.generated.stores.delegation.getDelegationRequests(publicDeriver),
+              ) => !!stores.delegation.getDelegationRequests(publicDeriver),
           })
         )}
       />

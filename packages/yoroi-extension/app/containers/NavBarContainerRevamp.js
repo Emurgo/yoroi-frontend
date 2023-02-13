@@ -47,10 +47,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   onSelectWallet: (PublicDeriver<>) => void = newWallet => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: this.generated.stores.app.currentRoute,
-      publicDeriver: newWallet,
-    });
+    const { delegation, app } = this.generated.stores;
+    const delegationRequest = delegation.getDelegationRequests(newWallet);
+    const isRewardWallet = delegationRequest == null;
+    const isStakingPage = app.currentRoute === ROUTES.STAKING;
+
+    const route = isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
+    this.generated.actions.router.goToRoute.trigger({ route, publicDeriver: newWallet });
   };
 
   openDialogWrapper: any => void = dialog => {
