@@ -560,8 +560,7 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
-      // $FlowFixMe[prop-missing]
-      const code = responseData.request?.data === 'data'
+      const code = responseData.request?.type === 'data'
         ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
         : TxSignErrorCodes.USER_DECLINED;
       responseData.resolve({ err: { code, info: 'User rejected' } });
@@ -574,8 +573,7 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
-      // $FlowFixMe[prop-missing]
-      const code = responseData.request?.data === 'data'
+      const code = responseData.request?.type === 'data'
         ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
         : TxSignErrorCodes.PROOF_GENERATION;
       responseData.resolve({
