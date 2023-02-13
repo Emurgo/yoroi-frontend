@@ -71,6 +71,9 @@ export const mockTransferProps: {
             selected: request.selected,
           },
           app: { currentRoute: request.currentRoute },
+          delegation: {
+            getDelegationRequests: () => undefined,
+          },
         },
         actions: {
           profile: {
