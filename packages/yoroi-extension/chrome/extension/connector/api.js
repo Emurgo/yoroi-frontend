@@ -89,7 +89,6 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
-import cbor from 'cbor';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -734,11 +733,26 @@ function getTxRequiredSigningKeys(
   return set;
 }
 
+/**
+ * Returns HEX of a serialised witness set
+ */
 export async function connectorSignCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: string,
   tx: CardanoTx,
 ): Promise<string> {
+  return RustModule.WasmScope(Module =>
+    __connectorSignCardanoTx(publicDeriver, password, tx, Module));
+}
+
+async function __connectorSignCardanoTx(
+  publicDeriver: PublicDeriver<>,
+  password: string,
+  tx: CardanoTx,
+  // eslint-disable-next-line no-shadow
+  RustModule: typeof RustModule,
+): Promise<string> {
+
   // eslint-disable-next-line no-unused-vars
   const { tx: txHex, partialSign } = tx;
 
@@ -748,13 +762,11 @@ export async function connectorSignCardanoTx(
   let rawTxBody: Buffer;
   const bytes = Buffer.from(txHex, 'hex');
   try {
-    const fullTx = RustModule.WalletV4.Transaction.from_bytes(bytes);
+    const fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
     txBody = fullTx.body();
     witnessSet = fullTx.witness_set();
     auxiliaryData = fullTx.auxiliary_data();
-    rawTxBody = cbor.encodeCanonical(
-      cbor.decodeFirstSync(bytes)[0]
-    );
+    rawTxBody = Buffer.from(fullTx.raw_body());
   } catch (originalErr) {
     try {
       // Try parsing as body for backward compatibility
@@ -912,7 +924,7 @@ export async function connectorSignCardanoTx(
     otherRequiredSigners,
   );
 
-  return Buffer.from(signedTx.to_bytes()).toString('hex');
+  return signedTx.witness_set().to_hex();
 }
 
 export async function connectorCreateCardanoTx(

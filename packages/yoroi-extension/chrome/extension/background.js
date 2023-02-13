@@ -89,6 +89,7 @@ import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/tr
 import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
+import { hexToBytes } from '../../app/coreUtils';
 
 /*::
 declare var chrome;
@@ -430,6 +431,10 @@ const yoroiMessageHandler = async (
       );
     });
   }
+
+  /**
+   * Returns HEX of a serialised witness set
+   */
   async function signCardanoTx(
     tx: CardanoTx,
     password: string,
@@ -523,12 +528,12 @@ const yoroiMessageHandler = async (
       case 'tx/cardano':
       {
         try {
-          const signedTx = await signCardanoTx(
+          const signedTxWitnessSetHEX = await signCardanoTx(
             (request.tx: any),
             password,
             request.tabId
           );
-          responseData.resolve({ ok: signedTx });
+          responseData.resolve({ ok: signedTxWitnessSetHEX });
         } catch (error) {
           responseData.resolve({ err: 'transaction signing failed' })
         }
@@ -990,15 +995,29 @@ function handleInjectorConnect(port) {
                   },
                   connection
                 );
-              if (!returnTx && resp?.ok != null) {
-                const witnessSetResp = Buffer.from(
-                  RustModule.WalletV4.Transaction.from_bytes(
-                    Buffer.from(resp.ok, 'hex'),
-                  ).witness_set().to_bytes()
-                ).toString('hex');
-                rpcResponse({ ok: witnessSetResp });
-              } else {
+              if (resp?.ok == null) {
                 rpcResponse(resp);
+              } else if (returnTx) {
+                const bodyOrTxBytes = hexToBytes(tx);
+                // $FlowFixMe[prop-missing]
+                const witnessSetBytes = hexToBytes(resp.ok);
+                // eslint-disable-next-line no-shadow
+                RustModule.WasmScope(RustModule => {
+                  let fullTx;
+                  try {
+                    fullTx = RustModule.WalletV4.FixedTransaction.new(
+                      bodyOrTxBytes,
+                      witnessSetBytes,
+                      true,
+                    );
+                  } catch {
+                    fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
+                    fullTx.set_witness_set(witnessSetBytes);
+                  }
+                  rpcResponse({ ok: fullTx.to_hex() });
+                });
+              } else {
+                rpcResponse({ ok: resp.ok });
               }
             } catch (e) {
               handleError(e);
