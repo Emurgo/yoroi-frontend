@@ -33,7 +33,8 @@ import {
   asTx,
   asValue,
   ConnectorError,
-  DataSignErrorCodes, TxSignErrorCodes,
+  DataSignErrorCodes,
+  TxSignErrorCodes,
 } from './connector/types';
 import {
   connectorCreateCardanoTx,
@@ -559,6 +560,7 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
+      // $FlowFixMe[prop-missing]
       const code = responseData.request?.data === 'data'
         ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
         : TxSignErrorCodes.USER_DECLINED;
@@ -572,6 +574,7 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
+      // $FlowFixMe[prop-missing]
       const code = responseData.request?.data === 'data'
         ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
         : TxSignErrorCodes.PROOF_GENERATION;
