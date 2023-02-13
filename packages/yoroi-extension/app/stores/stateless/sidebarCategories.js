@@ -141,8 +141,10 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected }) => (
-      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
+    isVisible: ({ selected, isRewardWallet }) => (
+      !!selected &&
+      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
+      isRewardWallet(selected)
     ),
   },
   {

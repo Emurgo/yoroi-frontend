@@ -69,6 +69,9 @@ class SidebarContainer extends Component<AllProps> {
             hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
             selected: this.generated.stores.wallets.selected,
             currentRoute: this.generated.stores.app.currentRoute,
+            isRewardWallet: (
+              publicDeriver: PublicDeriver<>
+              ) => !!this.generated.stores.delegation.getDelegationRequests(publicDeriver),
           })
         )}
       />
@@ -104,6 +107,9 @@ class SidebarContainer extends Component<AllProps> {
         hasAnyWallets: boolean,
         selected: null | PublicDeriver<>,
       |},
+      delegation: {|
+        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -124,6 +130,9 @@ class SidebarContainer extends Component<AllProps> {
         wallets: {
           selected: stores.wallets.selected,
           hasAnyWallets: stores.wallets.hasAnyWallets,
+        },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests
         },
       },
       actions: {
