@@ -114,7 +114,10 @@ type isVisibleFunc = ({|
     hasAnyWallets: boolean,
     selected: null | PublicDeriver<>,
     currentRoute: string,
+    isRewardWallet: isRewardWalletFunc,
   |}) => boolean;
+
+type isRewardWalletFunc = (PublicDeriver<>) => boolean;
 
 export type SidebarCategoryRevamp = {|
   +className: string,

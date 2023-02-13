@@ -153,6 +153,9 @@ const genBaseProps: {|
           profile: {
             isSidebarExpanded: false,
           },
+          delegation: {
+            getDelegationRequests: () => undefined,
+          },
         },
         actions: {
           profile: {

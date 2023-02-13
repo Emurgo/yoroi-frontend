@@ -10,6 +10,7 @@ import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
 import type { LayoutComponentMap } from '../styles/context/layout';
+import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
@@ -67,9 +68,8 @@ class SidebarContainer extends Component<AllProps> {
             hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
             selected: this.generated.stores.wallets.selected,
             currentRoute: this.generated.stores.app.currentRoute,
-            isRewardWallet: (
-              publicDeriver: PublicDeriver<>
-              ) => !!stores.delegation.getDelegationRequests(publicDeriver),
+            isRewardWallet: (publicDeriver: PublicDeriver<>) =>
+              stores.delegation.getDelegationRequests(publicDeriver) != null,
           })
         )}
       />
