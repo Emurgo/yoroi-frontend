@@ -1,44 +1,46 @@
 /* eslint-disable no-nested-ternary */
 // @flow
-import React, { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import moment from 'moment';
-import classnames from 'classnames';
-import styles from './Transaction.scss';
-import { ReactComponent as AddMemoSvg }  from '../../../assets/images/add-memo.inline.svg';
-import { ReactComponent as EditSvg }  from '../../../assets/images/edit.inline.svg';
-import WalletTransaction from '../../../domain/WalletTransaction';
-import JormungandrTransaction from '../../../domain/JormungandrTransaction';
-import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
-import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
-import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
-import { Logger } from '../../../utils/logging';
-import { ReactComponent as ExpandArrow }  from '../../../assets/images/expand-arrow-grey.inline.svg';
-import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { TxStatusCodes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type {
   CertificateRow,
   TokenRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
+import type { Notification } from '../../../types/notificationType';
+import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
+import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import { intlShape } from 'react-intl';
+import moment from 'moment';
+import classnames from 'classnames';
+import styles from './Transaction.scss';
+import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
+import WalletTransaction from '../../../domain/WalletTransaction';
+import JormungandrTransaction from '../../../domain/JormungandrTransaction';
+import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
+import globalMessages, { memoMessages } from '../../../i18n/global-messages';
+import { transactionTypes } from '../../../api/ada/transactions/types';
+import { Logger } from '../../../utils/logging';
+import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import { TxStatusCodes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
-import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
   parseMetadata,
   parseMetadataDetailed,
@@ -46,7 +48,6 @@ import {
 import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import {
@@ -154,7 +155,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
     assuranceLevel: AssuranceLevel,
-    isValid: boolean,
+    isValid: boolean
   ): string {
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
@@ -228,11 +229,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (currency == null) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
       }
-      const price = this.props.getHistoricalPrice(
-        ticker,
-        currency,
-        request.timestamp,
-      );
+      const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
       let fiatDisplay;
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
@@ -255,9 +252,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         <>
           {fiatDisplay}&nbsp;{currency}
           <Typography>
-            {this.renderAmountDisplay({ entry: request.entry })}
-            {' '}
-            {this.getTicker(request.entry)}
+            {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
         </>
       );
@@ -265,12 +260,10 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     return (
       <>
-        {this.renderAmountDisplay({ entry: request.entry })}
-        {' '}
-        {this.getTicker(request.entry)}
+        {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </>
     );
-  }
+  };
 
   renderFeeDisplay: ({|
     amount: MultiToken,
@@ -305,11 +298,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (ticker == null) {
         throw new Error('unexpected main token type');
       }
-      const price = this.props.getHistoricalPrice(
-        ticker,
-        currency,
-        request.timestamp,
-      );
+      const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
 
       let fiatDisplay;
       if (price != null) {
@@ -318,11 +307,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         fiatDisplay = (
           <>
             {beforeDecimal}
-            {afterDecimal && (
-              <span className={styles.afterDecimal}>
-                .{afterDecimal}
-              </span>
-            )}
+            {afterDecimal && <span className={styles.afterDecimal}>.{afterDecimal}</span>}
           </>
         );
       } else {
@@ -333,8 +318,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           {fiatDisplay}&nbsp;{currency}
           <Typography>
             {beforeDecimalRewards}
-            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-            {' '}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
           </Typography>
         </>
@@ -374,7 +358,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })}{' '}{this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
         </div>
       );
     }
@@ -401,9 +385,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length}
-        {' '}
-        {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
   };
@@ -411,7 +393,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   renderRow: ({|
     kind: string,
     data: WalletTransaction,
-    address: {| address: string, value: MultiToken |},
+    address: TxDataOutput | TxDataInput,
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
@@ -471,7 +453,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           </ExplorableHashContainer>
         </CopyableAddress>
         {this.generateAddressButton(request.address.address)}
-        <Typography component='span' variant="body2" color="var(--yoroi-palette-gray-900)">
+        <Typography component="span" variant="body2" color="var(--yoroi-palette-gray-900)">
           {renderAmount(request.address.value.getDefaultEntry())}
         </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (
@@ -491,11 +473,9 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
-    const isFailedTransaction = (state < 0) && !isSubmittedTransaction;
-    const isPendingTransaction = (state === TxStatusCodes.PENDING) || isSubmittedTransaction;
-    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
-      data.isValid :
-      true;
+    const isFailedTransaction = state < 0 && !isSubmittedTransaction;
+    const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
+    const isValidTransaction = data instanceof CardanoShelleyTransaction ? data.isValid : true;
 
     const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
@@ -548,7 +528,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
-              <Box sx={columnTXStyles.status} id='txStatus'>
+              <Box sx={columnTXStyles.status} id="txStatus">
                 {state === TxStatusCodes.IN_BLOCK ? (
                   <Typography
                     sx={{
@@ -579,7 +559,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 variant="body1"
                 color="var(--yoroi-palette-gray-900)"
                 sx={columnTXStyles.fee}
-                id='txFee'
+                id="txFee"
               >
                 {this.renderFeeDisplay({
                   amount: data.fee,
@@ -588,7 +568,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                 })}
               </Typography>
               <Box sx={columnTXStyles.amount}>
-                <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)" id='transactionAmount'>
+                <Typography
+                  variant="body1"
+                  fontWeight="500"
+                  color="var(--yoroi-palette-gray-900)"
+                  id="transactionAmount"
+                >
                   {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
                     timestamp: data.date.valueOf(),

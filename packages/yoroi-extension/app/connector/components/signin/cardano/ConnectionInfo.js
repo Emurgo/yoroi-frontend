@@ -1,11 +1,23 @@
 // @flow
+import type { Node, ComponentType } from 'react';
+import type {
+  PublicDeriverCache,
+  WhitelistEntry,
+} from '../../../../../chrome/extension/connector/types';
+import type { ConnectorIntl } from '../../../types';
+import { injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { signTxMessages } from '../SignTxPage';
 import ConnectedWallet from '../../connect/ConnectedWallet';
 import { ReactComponent as NoDappIcon } from '../../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
 
-export default function ConnectionInfo({ intl, connectedWebsite, connectedWallet }) {
+type Props = {|
+  connectedWebsite: ?WhitelistEntry,
+  connectedWallet: PublicDeriverCache,
+|};
+
+function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & ConnectorIntl): Node {
   const url = connectedWebsite?.url ?? '';
   const faviconUrl = connectedWebsite?.image ?? '';
 
@@ -47,3 +59,5 @@ export default function ConnectionInfo({ intl, connectedWebsite, connectedWallet
     </Box>
   );
 }
+
+export default (injectIntl(ConnectionInfo): ComponentType<Props>);

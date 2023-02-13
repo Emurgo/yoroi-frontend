@@ -16,11 +16,6 @@ export type TokenEntry = {|
   +amount: BigNumber,
 |};
 
-export type CustomTokenEntry = {|
-  ...TokenEntry,
-  +fee: BigNumber,
-|};
-
 export type DefaultTokenEntry = {|
   +defaultNetworkId: number,
   +defaultIdentifier: string,

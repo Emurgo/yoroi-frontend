@@ -22,7 +22,7 @@ import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
-import type { CardanoConnectorSignRequest } from '../../../types';
+import type { CardanoConnectorSignRequest, TxDataInput, TxDataOutput } from '../../../types';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import { ReactComponent as ExternalLinkIcon } from '../../../assets/images/external-link.inline.svg';
@@ -112,11 +112,7 @@ class CardanoUtxoDetails extends Component<Props> {
 
   renderRow: ({|
     kind: string,
-    address: {|
-      address: string,
-      value: MultiToken,
-      isForeign: ?Boolean,
-    |},
+    address: TxDataInput | TxDataOutput,
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {

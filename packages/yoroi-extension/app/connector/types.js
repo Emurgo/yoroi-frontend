@@ -1,5 +1,8 @@
 // @flow
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { MultiToken } from '../api/common/lib/MultiToken';
+import type { TxDataOutput, TxDataInput } from '../api/common/types';
+export type { TxDataOutput, TxDataInput } from '../api/common/types';
 
 // TODO: delete this and replace it with a Request object
 export const LoadingWalletStates = Object.freeze({
@@ -9,27 +12,21 @@ export const LoadingWalletStates = Object.freeze({
   REJECTED: 3,
 });
 
+export type ConnectorIntl = {|
+  intl: $npm$ReactIntl$IntlShape,
+|};
+
+export type TxDataFee = {|
+  tokenId: string,
+  networkId: number,
+  amount: string,
+|};
+
 export type CardanoConnectorSignRequest = {|
-  inputs: Array<{|
-    address: string,
-    isForeign: ?Boolean,
-    value: MultiToken,
-  |}>,
-  foreignInputs: Array<{|
-    address: string,
-    isForeign: ?Boolean,
-    value: MultiToken,
-  |}>,
-  outputs: Array<{|
-    isForeign: ?Boolean,
-    address: string,
-    value: MultiToken,
-  |}>,
-  fee: {|
-    tokenId: string,
-    networkId: number,
-    amount: string,
-  |},
+  inputs: Array<TxDataInput>,
+  foreignInputs: Array<TxDataInput>,
+  outputs: Array<TxDataOutput>,
+  fee: TxDataFee,
   amount: MultiToken,
   total: MultiToken,
 |};

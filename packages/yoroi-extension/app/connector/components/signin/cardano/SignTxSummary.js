@@ -1,8 +1,16 @@
 // @flow
+import type { Node, ComponentType } from 'react';
+import type { ConnectorIntl } from '../../../types';
+import type { SummaryAssetsData } from '../CardanoSignTxPage';
 import { Box, Typography } from '@mui/material';
+import { injectIntl } from 'react-intl';
 import { signTxMessages } from '../SignTxPage';
 
-export default function CardanoSignTxSummary({ txAssetsData, intl }) {
+type Props = {|
+  txAssetsData: SummaryAssetsData,
+|};
+
+function CardanoSignTxSummary({ txAssetsData, intl }: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const showOnlyTxFee = isOnlyTxFee && sent.length == 0 && received.length == 0;
   return (
@@ -17,7 +25,7 @@ export default function CardanoSignTxSummary({ txAssetsData, intl }) {
           {intl.formatMessage(signTxMessages.summary)}
         </Typography>
         <Typography variant="h3" fontSize="24px" textAlign="right">
-          {showOnlyTxFee ? total.cryptoFee : total.cryptoTotal} {total.ticker}
+          {showOnlyTxFee ? total.fee : total.total} {total.ticker}
         </Typography>
       </Box>
       {(sent.length > 0 || received.length > 0) && (
@@ -32,6 +40,8 @@ export default function CardanoSignTxSummary({ txAssetsData, intl }) {
     </Box>
   );
 }
+
+export default (injectIntl(CardanoSignTxSummary): ComponentType<Props>);
 
 const Separator = () => (
   <Box

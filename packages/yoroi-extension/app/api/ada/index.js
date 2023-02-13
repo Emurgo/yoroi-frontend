@@ -344,6 +344,7 @@ export type CardanoTxRequest = {|
   includeTargets?: Array<{|
     address: string,
     value?: string,
+    isForeign: ?boolean,
     assets?: {| [assetId: string]: string |},
     dataHash?: string,
     mintRequest?: Array<CardanoTxRequestMint>, // this mint is sent directly to the target

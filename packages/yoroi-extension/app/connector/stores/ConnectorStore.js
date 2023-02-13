@@ -1,9 +1,5 @@
 /* eslint-disable promise/always-return */
 // @flow
-import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed, toJS } from 'mobx';
-import Request from '../../stores/lib/LocalizedRequest';
-import Store from '../../stores/base/Store';
 import type {
   ConfirmedSignData,
   ConnectedSites,
@@ -26,7 +22,25 @@ import type { StoresMap } from './index';
 import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
+  TxDataInput,
+  TxDataOutput
 } from '../types';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData } from '../../api/ada/lib/state-fetch/types';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import type {
+  HaskellShelleyTxSignRequest
+} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import BigNumber from 'bignumber.js';
+import { observable, action, runInAction, computed, toJS } from 'mobx';
+import Request from '../../stores/lib/LocalizedRequest';
+import Store from '../../stores/base/Store';
 import { LoadingWalletStates } from '../types';
 import { getWallets } from '../../api/common/index';
 import {
@@ -43,7 +57,6 @@ import {
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
@@ -64,17 +77,6 @@ import { loadSubmittedTransactions } from '../../api/localStorage';
 import {
   signTransaction as shelleySignTransaction
 } from '../../api/ada/transactions/shelley/transactions';
-import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData } from '../../api/ada/lib/state-fetch/types';
-import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import type {
-  HaskellShelleyTxSignRequest
-} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet';
-import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -618,7 +620,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       response.changeAddress
     ])
 
-    const outputs: Array<{| address: string, isForeign: boolean, value: MultiToken |}> = [];
+    const outputs: Array<TxDataOutput> = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
@@ -782,6 +784,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
     runInAction(() => {
       this.adaTransaction = {
+        foreignInputs: [],
         inputs: unsignedTx.inputs(),
         outputs: unsignedTx.outputs(),
         fee,
@@ -853,8 +856,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async _calculateAmountAndTotal(
     publicDeriver: PublicDeriver<>,
-    inputs: $ReadOnlyArray<{| address: string, value: MultiToken |}>,
-    outputs: $ReadOnlyArray<$ReadOnly<{ address: string, value: MultiToken, ... }>>,
+    inputs: $ReadOnlyArray<TxDataInput>,
+    outputs: $ReadOnlyArray<$ReadOnly<TxDataOutput>>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: IGetAllUtxosResponse,
     ownAddresses: ?Set<string>,

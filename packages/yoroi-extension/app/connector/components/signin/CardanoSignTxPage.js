@@ -2,8 +2,26 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Notification } from '../../../types/notificationType';
+import type {
+  DefaultTokenEntry,
+  TokenLookupKey,
+  TokenEntry,
+} from '../../../api/common/lib/MultiToken';
+import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type {
+  PublicDeriverCache,
+  WhitelistEntry,
+} from '../../../../chrome/extension/connector/types';
+import type {
+  CardanoConnectorSignRequest,
+  SignSubmissionErrorType,
+  TxDataOutput,
+  TxDataInput,
+} from '../../types';
+import { intlShape, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -11,30 +29,17 @@ import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import type {
-  DefaultTokenEntry,
-  TokenLookupKey,
-  CustomTokenEntry,
-} from '../../../api/common/lib/MultiToken';
-import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
   getTokenName,
   getTokenIdentifierIfExists,
   assetNameFromIdentifier,
 } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import type {
-  PublicDeriverCache,
-  WhitelistEntry,
-} from '../../../../chrome/extension/connector/types';
-import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
 import WalletCard from '../connect/ConnectedWallet';
@@ -67,6 +72,18 @@ type Props = {|
   +signData: ?{| address: string, payload: string |},
 |};
 
+export type SummaryAssetsData = {|
+  total: DisplayAmount | Object,
+  isOnlyTxFee: boolean,
+  sent: Array<any>,
+  received: Array<any>,
+|};
+
+type TokenEntryWithFee = {|
+  ...TokenEntry,
+  +fee: BigNumber,
+|};
+
 const messages = defineMessages({
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
@@ -80,6 +97,15 @@ const messages = defineMessages({
 
 type State = {|
   isSubmitting: boolean,
+|};
+
+type DisplayAmount = {|
+  fiatAmount: string | null,
+  currency: string | null,
+  amount: string,
+  fee: string,
+  total: string,
+  ticker: Node | string,
 |};
 
 @observer
@@ -172,7 +198,7 @@ class SignTxPage extends Component<Props, State> {
     return undefined;
   };
 
-  getDisplayAmount: CustomTokenEntry => Object = request => {
+  getDisplayAmount: TokenEntryWithFee => DisplayAmount = request => {
     const tokenInfo = this.props.getTokenInfo(request);
     if (!tokenInfo) {
       throw new Error('missing token info');
@@ -212,10 +238,10 @@ class SignTxPage extends Component<Props, State> {
     return {
       fiatAmount: fiatAmountDisplay,
       currency: fiatCurrency,
-      cryptoAmount: beforeDecimalAmount + (afterDecimalAmount || ''),
-      cryptoFee: beforeDecimalFee + (afterDecimalFee || ''),
-      cryptoTotal: beforeDecimalTotal + (afterDecimalTotal || ''),
-      ticker: ticker,
+      amount: beforeDecimalAmount + (afterDecimalAmount || ''),
+      fee: beforeDecimalFee + (afterDecimalFee || ''),
+      total: beforeDecimalTotal + (afterDecimalTotal || ''),
+      ticker,
     };
   };
 
@@ -224,19 +250,17 @@ class SignTxPage extends Component<Props, State> {
   };
 
   getUniqueAssets: (
-    Array<
-      $ReadOnly<
-        Inexact<{|
-          value: MultiToken,
-        |}>
-      >
-    >
+    Array<TxDataOutput>
   ) => Array<{|
     tokenInfo: ?$ReadOnly<TokenRow>,
     amount: BigNumber,
   |}> = assets => {
     return assets.reduce((acc, curr) => {
-      const newAcc = [].concat(acc);
+      const newAcc: Array<{|
+        tokenInfo: ?$ReadOnly<TokenRow>,
+        amount: BigNumber,
+      |}> = [].concat(acc);
+
       const defaultEntry = curr.value.getDefaultEntry();
 
       [defaultEntry].concat(curr.value.nonDefaultEntries()).forEach(e => {
@@ -250,7 +274,7 @@ class SignTxPage extends Component<Props, State> {
     }, []);
   };
 
-  getSummaryAssetsData: Object = () => {
+  getSummaryAssetsData: void => SummaryAssetsData = () => {
     const { txData } = this.props;
 
     const assetsData = {
@@ -266,7 +290,9 @@ class SignTxPage extends Component<Props, State> {
       const defaultTokenAmount = txData.amount.get(defaultTokenId) ?? new BigNumber('0');
       const txFeeAmount = new BigNumber(txData.fee.amount);
       const sentAssets = this.getUniqueAssets(txData.outputs.filter(o => !o.isForeign));
-      const receivedAssets = this.getUniqueAssets(txData.inputs);
+      const receivedAssets = this.getUniqueAssets(
+        txData.inputs.map(i => ({ ...i, isForeign: false }))
+      );
 
       //only tx fee (no sign) & one asset sent/received
       assetsData.total = this.getDisplayAmount({
@@ -315,7 +341,6 @@ class SignTxPage extends Component<Props, State> {
       content = (
         <Box>
           <CardanoSignTx
-            intl={intl}
             txAssetsData={summaryAssetsData}
             passwordFormField={
               <TextField
@@ -331,7 +356,7 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = (
         <Box>
           <Box mb="32px">
-            <CardanoSignTxSummary txAssetsData={summaryAssetsData} intl={intl} />
+            <CardanoSignTxSummary txAssetsData={summaryAssetsData} />
           </Box>
           <CardanoUtxoDetails
             txData={txData}
@@ -374,7 +399,6 @@ class SignTxPage extends Component<Props, State> {
           connectionContent={
             <ConnectionInfo
               connectedWallet={this.props.selectedWallet}
-              intl={intl}
               connectedWebsite={connectedWebsite}
             />
           }

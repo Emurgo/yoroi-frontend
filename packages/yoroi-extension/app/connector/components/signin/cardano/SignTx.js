@@ -1,4 +1,8 @@
 // @flow
+import type { Node, ComponentType } from 'react';
+import type { ConnectorIntl } from '../../../types';
+import type { SummaryAssetsData } from '../CardanoSignTxPage';
+import { injectIntl } from 'react-intl';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useState } from 'react';
@@ -13,26 +17,31 @@ const getAssetDisplayValue = ({ amount, tokenInfo }) => {
   return `${tokenInfo.IsNFT && amount == 1 ? '' : amount + ' '}${tokenName}`;
 };
 
-export default function CardanoSignTx({
+type Props = {|
+  txAssetsData: SummaryAssetsData,
+  passwordFormField: Node,
+|};
+
+function CardanoSignTx({
   intl,
   txAssetsData,
   // getAddressUrlHash,
   passwordFormField,
-}) {
+}: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
-  const isSendingNativeToken = Number(total.cryptoAmount) < 0;
-  const isReceivingNativeToken = Number(total.cryptoAmount) > 0;
+  const isSendingNativeToken = Number(total.amount) < 0;
+  const isReceivingNativeToken = Number(total.amount) > 0;
 
   return (
     <Box>
-      <CardanoSignTxSummary txAssetsData={txAssetsData} intl={intl} />
+      <CardanoSignTxSummary txAssetsData={txAssetsData} />
       <Panel>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start">
           <Typography color="#4A5065" fontWeight={500}>
             {intl.formatMessage(signTxMessages.transactionFee)}
           </Typography>
           <Typography textAlign="right" color="#242838">
-            {total.cryptoFee} {total.ticker}
+            {total.fee} {total.ticker}
           </Typography>
         </Box>
       </Panel>
@@ -61,6 +70,8 @@ export default function CardanoSignTx({
   );
 }
 
+export default (injectIntl(CardanoSignTx): ComponentType<Props>);
+
 const ExpandableAssetsPanel = ({
   intl,
   assets = [],
@@ -68,7 +79,7 @@ const ExpandableAssetsPanel = ({
   panelTitle,
   action,
   hasNativeToken,
-}) => {
+}): Node => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandable = assets.length > 1;
   const { assetsSent, assetsReceived, noAssetsSent, noAssetsReceived } = connectorMessages;
@@ -96,7 +107,7 @@ const ExpandableAssetsPanel = ({
 
       {(hasNativeToken || assets.length !== 0) && (
         <AsseetValueDisplay>
-          {total.cryptoAmount} {total.ticker}
+          {total.amount} {total.ticker}
         </AsseetValueDisplay>
       )}
 
@@ -125,7 +136,7 @@ const ExpandableAssetsPanel = ({
   );
 };
 
-const AsseetValueDisplay = ({ children }) => (
+const AsseetValueDisplay = ({ children }): Node => (
   <Box mt="16px">
     <Typography textAlign="right" color="#242838">
       {children}
@@ -133,7 +144,7 @@ const AsseetValueDisplay = ({ children }) => (
   </Box>
 );
 
-const Panel = ({ children }) => (
+const Panel = ({ children }): Node => (
   <Box
     mt="32px"
     width="100%"
