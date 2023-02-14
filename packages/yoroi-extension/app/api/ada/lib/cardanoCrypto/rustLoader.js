@@ -146,7 +146,7 @@ function createWasmScope(): {|
   }
 }
 
-class Module {
+export class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;
@@ -320,5 +320,5 @@ class Module {
   }
 }
 
-// need this otherwise Wallet's flow type isn't properly exported
+// Need this otherwise Wallet's flow type isn't properly exported
 export const RustModule: Module = new Module();

@@ -13,7 +13,7 @@ import type {
 import type {
   CoreAddressT,
 } from '../../../../ada/lib/storage/database/primitives/enums';
-import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { RustModule, Module } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 import { CoreAddressTypes, } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   addressToKind,
@@ -172,7 +172,16 @@ export type HashToIdsFunc = HashToIdsRequest => Promise<Map<string, number>>;
  * ex: handles adding foreign addresses (that don't belong to your wallet)
  * ex: handles the difference between base/enterprise addresses or group/single
  */
-export function rawGenHashToIdsFunc(
+
+export const rawGenHashToIdsFunc = (
+  ownAddressIds: Set<number>,
+  network: $ReadOnly<NetworkRow>,
+): HashToIdsFunc => RustModule.WasmScope(
+    Scope => _rawGenHashToIdsFunc(Scope, ownAddressIds, network)
+  );
+
+function _rawGenHashToIdsFunc(
+  Scope: Module,
   ownAddressIds: Set<number>,
   network: $ReadOnly<NetworkRow>,
 ): HashToIdsFunc {
@@ -236,12 +245,12 @@ export function rawGenHashToIdsFunc(
       if (address.type === CoreAddressTypes.CARDANO_BASE) {
         // for group addresses we have to look at the payment key
         // to see if there exists a canonical address
-        const wasmAddress = RustModule.WalletV4.Address.from_bytes(
+        const wasmAddress = Scope.WalletV4.Address.from_bytes(
           Buffer.from(address.data, 'hex')
         );
-        const baseAddress = RustModule.WalletV4.BaseAddress.from_address(wasmAddress);
+        const baseAddress = Scope.WalletV4.BaseAddress.from_address(wasmAddress);
         if (baseAddress == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} not base address Should never happen`);
-        const canonical = RustModule.WalletV4.EnterpriseAddress.new(
+        const canonical = Scope.WalletV4.EnterpriseAddress.new(
           wasmAddress.network_id(),
           baseAddress.payment_cred()
         );
@@ -259,12 +268,12 @@ export function rawGenHashToIdsFunc(
       } else if (address.type === CoreAddressTypes.CARDANO_PTR) {
         // for group addresses we have to look at the payment key
         // to see if there exists a canonical address
-        const wasmAddress = RustModule.WalletV4.Address.from_bytes(
+        const wasmAddress = Scope.WalletV4.Address.from_bytes(
           Buffer.from(address.data, 'hex')
         );
-        const ptrAddress = RustModule.WalletV4.PointerAddress.from_address(wasmAddress);
+        const ptrAddress = Scope.WalletV4.PointerAddress.from_address(wasmAddress);
         if (ptrAddress == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} not ptr address Should never happen`);
-        const canonical = RustModule.WalletV4.EnterpriseAddress.new(
+        const canonical = Scope.WalletV4.EnterpriseAddress.new(
           wasmAddress.network_id(),
           ptrAddress.payment_cred()
         );
@@ -282,12 +291,12 @@ export function rawGenHashToIdsFunc(
       } else if (address.type === CoreAddressTypes.JORMUNGANDR_GROUP) {
         // for group addresses we have to look at the payment key
         // to see if there exists a canonical address
-        const wasmAddress = RustModule.WalletV3.Address.from_bytes(
+        const wasmAddress = Scope.WalletV3.Address.from_bytes(
           Buffer.from(address.data, 'hex')
         );
         const groupAddress = wasmAddress.to_group_address();
         if (groupAddress == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} Should never happen`);
-        const canonical = RustModule.WalletV3.Address.single_from_public_key(
+        const canonical = Scope.WalletV3.Address.single_from_public_key(
           groupAddress.get_spending_key(),
           wasmAddress.get_discrimination()
         );
