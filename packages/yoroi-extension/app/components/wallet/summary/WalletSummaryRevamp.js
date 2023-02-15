@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as ExportTxToFileSvg }  from '../../../assets/images/transaction/export.inline.svg';
+import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
@@ -82,7 +82,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
 
   renderPendingAmount(
     timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>,
-    label: string,
+    label: string
   ): Node {
     if (!timestampedAmount.length) {
       return null;
@@ -119,19 +119,13 @@ export default class WalletSummaryRevamp extends Component<Props> {
             throw new Error('unexpected main token type');
           }
 
-          const price = getHistoricalPrice(
-            ticker,
-            currency,
-            timestamp
-          );
+          const price = getHistoricalPrice(ticker, currency, timestamp);
           if (price == null) {
             totalFiatAmount = null;
             break;
           }
           totalFiatAmount = totalFiatAmount.plus(
-            tokenEntry.amount
-              .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-              .multipliedBy(price)
+            tokenEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).multipliedBy(price)
           );
         }
         if (totalFiatAmount) {
@@ -140,11 +134,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
           pendingAmount = (
             <>
               {beforeDecimal}
-              {afterDecimal && (
-                <span className={styles.afterDecimal}>
-                  .{afterDecimal}
-                </span>
-              )}
+              {afterDecimal && <span className={styles.afterDecimal}>.{afterDecimal}</span>}
               &nbsp;
               {currency}
             </>
@@ -156,18 +146,16 @@ export default class WalletSummaryRevamp extends Component<Props> {
     if (!pendingAmount) {
       pendingAmount = this.renderAmountDisplay({
         shouldHideBalance,
-        amount: timestampedAmount.map(({ amount }) => amount).reduce(
-          (accuAmount, curAmount) => accuAmount.joinAddCopy(curAmount)
-        ),
+        amount: timestampedAmount
+          .map(({ amount }) => amount)
+          .reduce((accuAmount, curAmount) => accuAmount.joinAddCopy(curAmount)),
       });
     }
 
     return (
       <div className={styles.pendingConfirmation}>
         {label}:&nbsp;
-        <span className={styles.amount}>
-          {pendingAmount}
-        </span>
+        <span className={styles.amount}>{pendingAmount}</span>
       </div>
     );
   }
@@ -183,7 +171,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
 
     const content = (
       <Box
-        id='walletSummary_box'
+        id="walletSummary_box"
         sx={{
           background: 'var(--yoroi-palette-common-white)',
           boxShadow:
@@ -217,10 +205,10 @@ export default class WalletSummaryRevamp extends Component<Props> {
               <Button
                 variant="ternary"
                 sx={{
-                  textTransform: 'capitalize',
-                  svg: {
-                    marginRight: '16px',
-                  },
+                  textTransform: 'uppercase',
+                  fontWeight: 'bold',
+                  borderWidth: 2,
+                  svg: { marginRight: '16px' },
                 }}
                 onClick={openExportTxToFileDialog}
                 onKeyPress={openExportTxToFileDialog}
