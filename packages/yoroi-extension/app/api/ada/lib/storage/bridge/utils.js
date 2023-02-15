@@ -329,11 +329,14 @@ export function isJormungandrAddress(
   kind: CoreAddressT
 ): boolean {
   // note: excluding legacy byron addresses
-  if (kind === CoreAddressTypes.JORMUNGANDR_SINGLE) return true;
-  if (kind === CoreAddressTypes.JORMUNGANDR_GROUP) return true;
-  if (kind === CoreAddressTypes.JORMUNGANDR_ACCOUNT) return true;
-  if (kind === CoreAddressTypes.JORMUNGANDR_MULTISIG) return true;
-  return false;
+  const types = [
+    CoreAddressTypes.JORMUNGANDR_SINGLE,
+    CoreAddressTypes.JORMUNGANDR_GROUP,
+    CoreAddressTypes.JORMUNGANDR_ACCOUNT,
+    CoreAddressTypes.JORMUNGANDR_MULTISIG,
+  ];
+
+  return kind in types;
 }
 
 export function isErgoAddress(
