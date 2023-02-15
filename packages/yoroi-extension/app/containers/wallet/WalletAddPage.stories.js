@@ -148,6 +148,9 @@ const defaultProps: {|
           selected: null,
         },
         app: { currentRoute: ROUTES.WALLETS.ADD },
+        delegation: {
+          getDelegationRequests: () => undefined,
+        },
       },
       actions: {
         profile: {
