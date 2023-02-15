@@ -73,7 +73,7 @@ export const unscramblePaperAdaMnemonic = (
         const mnemonics = RustModule.WasmScope(Scope => {
           const newEntropy = Scope.WalletV2.paper_wallet_unscramble(
             Buffer.from(entropy, 'hex'),
-            password
+            password || ''
           );
 
           return newEntropy.to_english_mnemonics();
@@ -99,7 +99,7 @@ export const unscramblePaperAdaMnemonic = (
         const mnemonics = RustModule.WasmScope(Scope => {
           const newEntropy = Scope.WalletV2.paper_wallet_unscramble(
             Buffer.from(entropy, 'hex'),
-            password
+            password || ''
           );
 
           return newEntropy.to_english_mnemonics();
