@@ -146,7 +146,7 @@ function createWasmScope(): {|
   }
 }
 
-export class Module {
+class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;

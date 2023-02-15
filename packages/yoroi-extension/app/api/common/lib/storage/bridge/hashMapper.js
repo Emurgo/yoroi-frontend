@@ -13,7 +13,7 @@ import type {
 import type {
   CoreAddressT,
 } from '../../../../ada/lib/storage/database/primitives/enums';
-import { RustModule, Module } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 import { CoreAddressTypes, } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   addressToKind,
@@ -181,7 +181,7 @@ export const rawGenHashToIdsFunc = (
   );
 
 function _rawGenHashToIdsFunc(
-  Scope: Module,
+  Scope: typeof RustModule,
   ownAddressIds: Set<number>,
   network: $ReadOnly<NetworkRow>,
 ): HashToIdsFunc {
