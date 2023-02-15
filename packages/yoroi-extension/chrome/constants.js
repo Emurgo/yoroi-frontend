@@ -34,7 +34,7 @@ export function genCSP(request: {|
     scriptSrc.push(portToPermission(Ports.ReactDevTools));
 
     connectSrc.push(portToPermission(Ports.WebpackDev));
-    connectSrc.push(portToPermission(Ports.DevBackendServe));
+    connectSrc.push(portToPermission(Ports.DevBackendServer));
     connectSrc.push(portToPermission(Ports.ReactDevTools));
     connectSrc.push(portToSocketPermission(Ports.WebpackDev));
 
@@ -48,11 +48,7 @@ export function genCSP(request: {|
 
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
-
-  // Zendesk setup
-  scriptSrc.push('https://*.zdassets.com/')
-  connectSrc.push('https://*.zdassets.com/')
-  connectSrc.push('https://emurgohelpdesk.zendesk.com/')
+  frameSrc.push('https://emurgo.github.io/');
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');

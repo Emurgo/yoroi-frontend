@@ -171,12 +171,12 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(changeAddresses.errMsg);
   }
 
-  async _getUTXOs(): Promise<Array<Utxo>> {
+  async _getUTXOs(amount?: string): Promise<Array<Utxo>> {
     this.logger.info(`MockDApp: Getting UTXOs`);
     const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
-        .getUtxos()
+        .getUtxos(args[0])
         .then(utxosResponse => {
           // eslint-disable-next-line promise/always-return
           if (utxosResponse.length === 0) {
@@ -188,7 +188,7 @@ export class MockDAppWebpage {
         .catch(error => {
           callback({ success: false, errMsg: JSON.stringify(error) });
         });
-    });
+    }, amount);
     this.logger.info(
       `MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`
     );
@@ -353,7 +353,7 @@ export class MockDAppWebpage {
     this.logger.info(
       `MockDApp: Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
     );
-    const UTXOs = await this._getUTXOs();
+    const UTXOs = await this._getUTXOs(amount);
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
     const utxo = UTXOs[0];
@@ -466,13 +466,9 @@ export class MockDAppWebpage {
     }
     this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
 
-    this.driver.executeScript(
-      (addr, plHex) => {
-        window.signDataPromise = window.api.signData(addr, plHex);
-      },
-      address,
-      payloadHex
-    );
+    const scriptString = `window.signDataPromise = window.api.signData(${JSON.stringify(address)}, ${JSON.stringify(payloadHex)});`;
+
+    this.driver.executeScript(scriptString);
   }
 
   async getSigningDataResult(): Promise<string> {
@@ -495,10 +491,10 @@ export class MockDAppWebpage {
     return signingResult;
   }
 
-  async getCollateralUtxos(amount: string): Promise<string> {
+  async getCollateral(amount: string): Promise<string> {
     this.logger.info(`MockDApp: Getting Collateral Utxos`);
 
-    Buffer.from(
+    const convertedAmount = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
 
@@ -506,15 +502,18 @@ export class MockDAppWebpage {
       const callback = args[args.length - 1];
 
       window.api
-        .getCollateralUtxos('1a004ac4a0')
+        .getCollateral(args[0])
         // eslint-disable-next-line promise/always-return
         .then(utxosResponse => {
-          callback({ success: true, retValue: utxosResponse });
+          if (utxosResponse == null || utxosResponse.length === 0) {
+            return callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
+          }
+          return callback({ success: true, retValue: utxosResponse });
         })
         .catch(error => {
           callback({ success: false, errMsg: error.message });
         });
-    });
+    }, convertedAmount);
     if (collateralResponse.success) {
       const utxos = this._mapCborUtxos(collateralResponse.retValue);
       return JSON.stringify(utxos, undefined, 2);
@@ -525,12 +524,34 @@ export class MockDAppWebpage {
 
   async addCollateral(amount: string) {
     this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
-    const utxosHex = Buffer.from(
+    const amountHex = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
+    const scriptString = `window.collateralPromise = window.api.getCollateral(${JSON.stringify(amountHex)});`;
 
-    this.driver.executeScript(utxos => {
-      window.collateralPromise = window.api.getCollateralUtxos(utxos);
-    }, utxosHex);
+    await this.driver.executeScript(scriptString);
+  }
+
+  async getCollateralResult(): Promise<string> {
+    this.logger.info(`MockDApp: Getting collateral data result`);
+    const collateralResult = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.collateralPromise
+        .then(utxosResponse => {
+          if (utxosResponse == null || utxosResponse.length === 0) {
+            return callback({ success: false, errMsg: 'NO COLLATERAL UTXOS' });
+          }
+          return callback({ success: true, retValue: utxosResponse });
+        })
+        .catch(error => {
+          callback({ success: false, errMsg: error.message });
+        });
+    });
+    if (collateralResult.success) {
+      const utxos = this._mapCborUtxos(collateralResult.retValue);
+      return JSON.stringify(utxos, undefined, 2);
+    }
+    this.logger.error(`MockDApp: -> The error is received: ${collateralResult.errMsg}`);
+    throw new MockDAppWebpageError(collateralResult.errMsg);
   }
 }

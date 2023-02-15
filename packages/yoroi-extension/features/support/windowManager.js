@@ -15,6 +15,7 @@ export const popupConnectorName = 'popupConnectorWindow';
 export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
 export const trezorConnectTabName = 'Trezor';
+export const backgroungTabName = 'background';
 
 export class WindowManager {
   windowHandles: Array<CustomWindowHandle>;
@@ -74,6 +75,15 @@ export class WindowManager {
     return handles;
   }
 
+  _getTitleByHandle(handle: string): Array<CustomWindowHandle> {
+    this.logger.info(`WindowManager: Getting a title by the handle "${handle}"`);
+    const handles = this.windowHandles.filter(customHandle => customHandle.handle === handle);
+    this.logger.info(
+      `WindowManager: -> The titles for the handle "${handle}" are ${JSON.stringify(handles)}`
+    );
+    return handles;
+  }
+
   async _getCurrentWindowHandle(): Promise<string> {
     this.logger.info(`WindowManager: Getting the current handle`);
     const currentHandle = await this.driver.getWindowHandle();
@@ -97,6 +107,16 @@ export class WindowManager {
     );
 
     return { title: windowName, handle: currentWindowHandle };
+  }
+
+  async getCurrentWindowName(): Promise<string> {
+    this.logger.info(`WindowManager: Getting the window name from window manager`);
+    const currentHandle = await this._getCurrentWindowHandle();
+    const handles = this._getTitleByHandle(currentHandle);
+    if (handles.length === 1) {
+      return handles[0].title;
+    }
+    throw new WindowManagerError(`Too many titles for the handle ${currentHandle}`);
   }
 
   async _openNewWithCheck(
@@ -162,10 +182,10 @@ export class WindowManager {
     return newWindowHandles.filter(handle => !oldHandles.includes(handle));
   }
 
-  async findNewWindows(): Promise<Array<string>> {
+  async findNewWindows(tries: number = 50): Promise<Array<string>> {
     this.logger.info(`WindowManager: Finding a new window`);
     let newWindowHandles: Array<string> = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < tries; i++) {
       this.logger.info(`WindowManager: -> Try ${i} to find a new window`);
       await new Promise(resolve => setTimeout(resolve, 100));
       newWindowHandles = await this.getAllWindowHandles();

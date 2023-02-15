@@ -24,7 +24,7 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-} from './ergo-connector/types';
+} from './connector/types';
 import {
   APIErrorCodes,
   asPaginate,
@@ -34,7 +34,8 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
-} from './ergo-connector/types';
+  TxSignErrorCodes,
+} from './connector/types';
 import {
   connectorCreateCardanoTx,
   connectorGenerateReorgTx,
@@ -56,7 +57,7 @@ import {
   connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
-} from './ergo-connector/api';
+} from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
   updateTransactions as cardanoUpdateTransactions
@@ -82,13 +83,14 @@ import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { authSignHexPayload } from '../../app/ergo-connector/api';
+import { authSignHexPayload } from '../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
-import type { ForeignUtxoFetcher } from '../../app/ergo-connector/stores/ConnectorStore';
+import ConnectorStore from '../../app/connector/stores/ConnectorStore';
+import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
+import { hexToBytes } from '../../app/coreUtils';
 
 /*::
 declare var chrome;
@@ -430,6 +432,10 @@ const yoroiMessageHandler = async (
       );
     });
   }
+
+  /**
+   * Returns HEX of a serialised witness set
+   */
   async function signCardanoTx(
     tx: CardanoTx,
     password: string,
@@ -523,12 +529,12 @@ const yoroiMessageHandler = async (
       case 'tx/cardano':
       {
         try {
-          const signedTx = await signCardanoTx(
+          const signedTxWitnessSetHEX = await signCardanoTx(
             (request.tx: any),
             password,
             request.tabId
           );
-          responseData.resolve({ ok: signedTx });
+          responseData.resolve({ ok: signedTxWitnessSetHEX });
         } catch (error) {
           responseData.resolve({ err: 'transaction signing failed' })
         }
@@ -554,12 +560,10 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
-      responseData.resolve({
-        err: {
-          code: 2,
-          info: 'User rejected'
-        }
-      });
+      const code = responseData.request?.type === 'data'
+        ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
+        : TxSignErrorCodes.USER_DECLINED;
+      responseData.resolve({ err: { code, info: 'User rejected' } });
       connection.pendingSigns.delete(request.uid);
     } else {
       // eslint-disable-next-line no-console
@@ -569,11 +573,11 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
+      const code = responseData.request?.type === 'data'
+        ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
+        : TxSignErrorCodes.PROOF_GENERATION;
       responseData.resolve({
-        err: {
-          code: 3,
-          info: `utxo error: ${request.errorType} (${request.data})`
-        }
+        err: { code, info: `signing error: ${request.errorType} (${request.data})` }
       });
       connection.pendingSigns.delete(request.uid);
     } else {
@@ -818,33 +822,6 @@ async function confirmConnect(
   });
 }
 
-// generic communication to the entire connector
-chrome.runtime.onMessageExternal.addListener((message, sender) => {
-  if (sender.id === environment.ergoConnectorExtensionId) {
-    if (message.type === 'open_browseraction_menu') {
-      chrome.windows.getLastFocused(currentWindow => {
-        if (currentWindow == null) return; // should not happen
-        const bounds = getBoundsForWindow(currentWindow);
-        chrome.windows.create({
-          ...popupProps,
-          url: chrome.extension.getURL(`/main_window_connector.html#/settings`),
-          left: (bounds.width + bounds.positionX) - popupProps.width,
-          top: bounds.positionY + 80,
-        });
-      });
-    }
-  }
-});
-
-// per-page connection to injected code in the connector
-chrome.runtime.onConnectExternal.addListener(port => {
-  if (port.sender.id === environment.ergoConnectorExtensionId) {
-    handleInjectorConnect(port);
-  } else {
-    // disconnect?
-  }
-});
-
 // per-page connection to injected code by Yoroi with connector
 chrome.runtime.onConnect.addListener(port => {
   handleInjectorConnect(port);
@@ -1017,15 +994,29 @@ function handleInjectorConnect(port) {
                   },
                   connection
                 );
-              if (!returnTx && resp?.ok != null) {
-                const witnessSetResp = Buffer.from(
-                  RustModule.WalletV4.Transaction.from_bytes(
-                    Buffer.from(resp.ok, 'hex'),
-                  ).witness_set().to_bytes()
-                ).toString('hex');
-                rpcResponse({ ok: witnessSetResp });
-              } else {
+              if (resp?.ok == null) {
                 rpcResponse(resp);
+              } else if (returnTx) {
+                const bodyOrTxBytes = hexToBytes(tx);
+                // $FlowFixMe[prop-missing]
+                const witnessSetBytes = hexToBytes(resp.ok);
+                // eslint-disable-next-line no-shadow
+                RustModule.WasmScope(RustModule => {
+                  let fullTx;
+                  try {
+                    fullTx = RustModule.WalletV4.FixedTransaction.new(
+                      bodyOrTxBytes,
+                      witnessSetBytes,
+                      true,
+                    );
+                  } catch {
+                    fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
+                    fullTx.set_witness_set(witnessSetBytes);
+                  }
+                  rpcResponse({ ok: fullTx.to_hex() });
+                });
+              } else {
+                rpcResponse({ ok: resp.ok });
               }
             } catch (e) {
               handleError(e);
@@ -1348,13 +1339,14 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     let id;
                     if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
-                      const tx = RustModule.WalletV4.Transaction.from_bytes(
-                        Buffer.from(message.params[0], 'hex'),
-                      );
+                      const txBuffer = Buffer.from(message.params[0], 'hex');
                       await connectorSendTxCardano(
                         wallet,
-                        tx.to_bytes(),
+                        txBuffer,
                         localStorageApi,
+                      );
+                      const tx = RustModule.WalletV4.Transaction.from_bytes(
+                        txBuffer
                       );
                       id = Buffer.from(
                         RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()

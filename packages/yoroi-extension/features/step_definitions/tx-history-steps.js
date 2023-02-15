@@ -8,7 +8,8 @@ import i18n from '../support/helpers/i18n-helpers';
 import {
   confirmationCountText,
   failedTransactionElement,
-  getTopTx,
+  getLastTx,
+  getTxAmount,
   getTxStatus,
   noTransactionsComponent,
   numberOfTransactions,
@@ -16,11 +17,19 @@ import {
   pendingTransactionElement,
   showMoreButton,
   transactionAddressListElement,
-  transactionComponent, transactionIdText,
+  transactionComponent,
+  transactionIdText,
 } from '../pages/walletTransactionsHistoryPage';
 import { summaryTab } from '../pages/walletPage';
-import { displayInfo , txSuccessfulStatuses } from '../support/helpers/common-constants';
+import {
+  displayInfo,
+  txSuccessfulStatuses,
+  adaToFiatPricesMainUrl,
+  oneSecond,
+} from '../support/helpers/common-constants';
 import { getMethod } from '../support/helpers/helpers';
+
+const axios = require('axios');
 
 function verifyAllTxsFields(
   txType,
@@ -208,7 +217,7 @@ Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async f
   this.webDriverLogger.info(`Step: I wait for ${minutes} minute(s) the last transaction is confirmed`);
   const startTime = Date.now();
   while (startTime + waitTimeMs > Date.now()){
-    const topTx = await getTopTx(this);
+    const topTx = await getLastTx(this);
     const topTxState = await getTxStatus(topTx);
     if(txSuccessfulStatuses.includes(topTxState.toLowerCase())){
       const endTime = Date.now();
@@ -222,3 +231,30 @@ Then(/^I wait for (\d+) minute\(s\) the last transaction is confirmed$/, async f
   this.webDriverLogger.error(`The latest transaction is still in status "Submitted" after ${minutes} minutes (${(endTime - startTime) / 1000})`);
   throw new AssertionError(`The latest transaction is still in status "Submitted" after ${minutes} minutes`);
 });
+Then(
+  /^I validate the transaction amount to (USD|JPY|EUR|CNY|KRW|BTC|ETH|BRL) currency pairing$/,
+  async function (currency) {
+    const TIMESTAMP = '1555773413000'; // the timestamp of the first tx of this wallet
+    const response = await axios(`${adaToFiatPricesMainUrl}ADA/${TIMESTAMP}`);
+
+    const rate = response.data.tickers[0].prices[currency];
+
+    await this.driver.sleep(oneSecond);
+    const allTxsList = await this.findElements(transactionComponent);
+    for (const txListElement of allTxsList) {
+      const txAmount = await getTxAmount(txListElement);
+
+      expect(txAmount).to.contain(currency);
+
+      const amountList = txAmount.split('\n');
+      const fiatAmount = amountList[0].replace(currency, '');
+      const adaAmount = parseFloat(amountList[1].replace('ADA', ''));
+
+      const expectedValueNotFixed = adaAmount * rate;
+      const expectedValue = expectedValueNotFixed < 1
+        ? expectedValueNotFixed.toFixed(6)
+        : expectedValueNotFixed.toFixed(2);
+      expect(fiatAmount).to.contain(`${expectedValue}`);
+    }
+  }
+);

@@ -18,8 +18,8 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
     isDev: isDebug,
     additional: {
       'connect-src': [
-        portToPermission(Ports.DevBackendServe),
-        portToSocketPermission(Ports.DevBackendServe),
+        portToPermission(Ports.DevBackendServer),
+        portToSocketPermission(Ports.DevBackendServer),
         portToPermission(Ports.ErgoMockServer),
         portToSocketPermission(Ports.ErgoMockServer),
       ],

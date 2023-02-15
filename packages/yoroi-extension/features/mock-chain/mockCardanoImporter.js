@@ -42,6 +42,20 @@ import {
 } from '../../app/config/numbersConfig';
 import { testWallets } from './TestWallets';
 import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primitives/enums';
+import { getLogDate } from '../support/helpers/helpers';
+import { testRunsDataDir } from '../support/helpers/common-constants';
+
+const simpleNodeLogger = require('simple-node-logger');
+const fs = require('fs');
+
+// logging
+const dir = `${testRunsDataDir}_cardanoMockServerLogs`;
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+const loggerPath = `${dir}/cardanoMockImporterLog_${getLogDate()}.log`;
+
+const logger = simpleNodeLogger.createSimpleFileLogger(loggerPath);
 
 // based on abandon x 14 + share
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
@@ -84,6 +98,7 @@ export const generateTransaction = (): {|
   cip1852TrezorTx2: RemoteTransaction,
   cip1852TrezorTx3: RemoteTransaction,
   shelleySimple15: RemoteTransaction,
+  shelleyCollateral: RemoteTransaction,
   shelleyDelegatedTx1: RemoteTransaction,
   shelleyDelegatedTx2: RemoteTransaction,
   shelleyLedgerDelegatedTx1: RemoteTransaction,
@@ -92,6 +107,7 @@ export const generateTransaction = (): {|
   shelleyOnlyRegisteredTx2: RemoteTransaction,
   delegateMangledWallet: RemoteTransaction,
 |} => {
+  logger.info(`mockCardanoServer: Generate transactions`);
   /**
    * To simplify, our genesis is a single address which gives all its ada to a "distributor"
    * The distributor gives ADA to a bunch of addresses to setup the tests
@@ -1425,6 +1441,71 @@ export const generateTransaction = (): {|
   };
 
   // =====================
+  //   shelley-collateral
+  // =====================
+
+  const shelleyCollateral = {
+    hash: '021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f607',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '16',
+        index: 16,
+        amount: '7000000',
+        assets: [],
+      },
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(testWallets['dump-wallet'].mnemonic, [
+          WalletTypePurpose.BIP44,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          1,
+        ]),
+        amount: '5000000',
+        assets: [],
+      },
+      {
+        // 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06
+        address:
+          '0166cab16b0952f7856bb2b930d65708dbaf41094d905ed9f0eb986ee8ec488e4dc9a59298dcf4ef39f8b3c826ae34b1bced770507fbf920d7',
+        amount: '1000000',
+        assets: [],
+      },
+      {
+        // 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06
+        address:
+          '0166cab16b0952f7856bb2b930d65708dbaf41094d905ed9f0eb986ee8ec488e4dc9a59298dcf4ef39f8b3c826ae34b1bced770507fbf920d7',
+        amount: '1000000',
+        assets: [],
+      },
+    ],
+    height: 304,
+    block_hash: '304',
+    tx_ordinal: 0,
+    time: '2019-04-20T15:16:53.000Z',
+    epoch: 0,
+    slot: 304,
+    last_update: '2019-05-20T23:18:11.899Z',
+    tx_state: 'Successful',
+  };
+
+  // =====================
   //   shelley-simple-15
   // =====================
 
@@ -1441,8 +1522,8 @@ export const generateTransaction = (): {|
           1,
         ]),
         txHash: distributorTx.hash,
-        id: distributorTx.hash + '16',
-        index: 16,
+        id: distributorTx.hash + '17',
+        index: 17,
         amount: '10000000',
         assets: [],
       },
@@ -1457,7 +1538,7 @@ export const generateTransaction = (): {|
           ChainDerivations.EXTERNAL,
           1,
         ]),
-        amount: '1',
+        amount: '4500000',
         assets: [],
       },
       {
@@ -1470,12 +1551,12 @@ export const generateTransaction = (): {|
         assets: [],
       },
     ],
-    height: 304,
-    block_hash: '304',
+    height: 305,
+    block_hash: '305',
     tx_ordinal: 0,
     time: '2019-04-20T15:16:53.000Z',
     epoch: 0,
-    slot: 304,
+    slot: 305,
     last_update: '2019-05-20T23:18:11.899Z',
     tx_state: 'Successful',
   };
@@ -1922,6 +2003,7 @@ export const generateTransaction = (): {|
     cip1852TrezorTx1,
     cip1852TrezorTx2,
     cip1852TrezorTx3,
+    shelleyCollateral,
     shelleySimple15,
     shelleyDelegatedTx1,
     shelleyDelegatedTx2,
@@ -1941,6 +2023,7 @@ const transactions: Array<MockTx> = [];
 const mockUtxoApi: MockUtxoApi = new MockUtxoApi(transactions, 1);
 
 export function addTransaction(tx: MockTx): void {
+  logger.info(`mockCardanoImporter: Adding the transaction\n${JSON.stringify(tx)}`);
   // need to insert txs in order they appear in the blockchain
   // note: pending transactions always go at the end
   if (tx.epoch == null || tx.slot == null || tx.tx_ordinal == null) {
@@ -1971,6 +2054,7 @@ export function addTransaction(tx: MockTx): void {
     transactions.push(tx);
     return;
   }
+  logger.info(`mockCardanoImporter: Inserting the transaction\n${JSON.stringify(tx)} with slice`);
   transactions.splice(insertionIndex, 0, tx);
 }
 
@@ -2011,6 +2095,8 @@ export function resetChain(chainToUse: $Values<typeof MockChain>): void {
     addTransaction(txs.cip1852TrezorTx1);
     addTransaction(txs.cip1852TrezorTx2);
     addTransaction(txs.cip1852TrezorTx3);
+    // shelley-collateral
+    addTransaction(txs.shelleyCollateral);
     // shelley-simple-15
     addTransaction(txs.shelleySimple15);
     // shelley-delegated
@@ -2044,6 +2130,7 @@ export function resetChain(chainToUse: $Values<typeof MockChain>): void {
 const apiStatuses: Array<ServerStatusResponse> = [];
 
 const setServerStatus = (serverStatus: ServerStatusResponse) => {
+  logger.info(`mockCardanoImporter: Set server status\n${JSON.stringify(serverStatus)}`);
   apiStatuses[0] = serverStatus;
 };
 
@@ -2079,6 +2166,7 @@ export function appMaintenanceFinish() {
 }
 
 function getApiStatus(): ServerStatusResponse {
+  logger.info(`mockCardanoImporter: Get api statuses\n${JSON.stringify(apiStatuses[0])}`);
   return apiStatuses[0];
 }
 
@@ -2095,6 +2183,7 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
+  logger.info(`mockCardanoImporter: Send TX\n${JSON.stringify(request)}`);
   const remoteTx = toRemoteByronTx(transactions, request);
 
   addTransaction(remoteTx);
@@ -2105,6 +2194,7 @@ const getPoolInfo: PoolInfoFunc = genGetPoolInfo();
 const getRewardHistory: RewardHistoryFunc = async (
   _body: RewardHistoryRequest
 ): Promise<RewardHistoryResponse> => {
+  logger.info(`mockCardanoImporter: Get reward history\n${JSON.stringify(_body)}`);
   return {
     e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: [
       {
@@ -2138,6 +2228,7 @@ const getRewardHistory: RewardHistoryFunc = async (
 };
 
 const getAccountState: AccountStateFunc = async request => {
+  logger.info(`mockCardanoImporter: Get account state`);
   const totalRewards = new BigNumber(5000000);
   const totalWithdrawals = new BigNumber(0);
 
@@ -2228,6 +2319,7 @@ const mockScriptOutputs = [
 ];
 
 const getUtxoData = (txHash: string, txIndex: number): UtxoData | null => {
+  logger.info(`mockCardanoImporter: Get UTXO data for \ntxHash: ${JSON.stringify(txHash)}, txIndex: ${JSON.stringify(txIndex)}`);
   const output = mockScriptOutputs.find(
     entry => entry.txHash === txHash && entry.txIndex === txIndex
   );
