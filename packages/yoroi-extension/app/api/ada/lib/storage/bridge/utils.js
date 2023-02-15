@@ -5,7 +5,7 @@ import { CoreAddressTypes } from '../database/primitives/enums';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type { NetworkRow } from '../database/primitives/tables';
-import { isJormungandr, isCardanoHaskell, isErgo, networks } from '../database/prepackaged/networks';
+import { isJormungandr, isCardanoHaskell, isErgo } from '../database/prepackaged/networks';
 import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
 import { bech32 as bech32Module } from 'bech32';
