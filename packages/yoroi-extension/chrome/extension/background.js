@@ -34,6 +34,7 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
+  TxSignErrorCodes,
 } from './connector/types';
 import {
   connectorCreateCardanoTx,
@@ -559,12 +560,10 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
-      responseData.resolve({
-        err: {
-          code: 2,
-          info: 'User rejected'
-        }
-      });
+      const code = responseData.request?.type === 'data'
+        ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
+        : TxSignErrorCodes.USER_DECLINED;
+      responseData.resolve({ err: { code, info: 'User rejected' } });
       connection.pendingSigns.delete(request.uid);
     } else {
       // eslint-disable-next-line no-console
@@ -574,11 +573,11 @@ const yoroiMessageHandler = async (
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
     if (connection && responseData) {
+      const code = responseData.request?.type === 'data'
+        ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
+        : TxSignErrorCodes.PROOF_GENERATION;
       responseData.resolve({
-        err: {
-          code: 3,
-          info: `utxo error: ${request.errorType} (${request.data})`
-        }
+        err: { code, info: `signing error: ${request.errorType} (${request.data})` }
       });
       connection.pendingSigns.delete(request.uid);
     } else {

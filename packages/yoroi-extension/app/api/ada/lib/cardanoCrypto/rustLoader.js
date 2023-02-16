@@ -146,7 +146,7 @@ function createWasmScope(): {|
   }
 }
 
-export class Module {
+class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;
@@ -227,7 +227,11 @@ export class Module {
    * callback promise resolves.
    */
   WasmScope<T>(callback: Module => T): T {
-    return this.__WasmScopeInternal(callback).result;
+    const scopedResult =  this.__WasmScopeInternal(callback);
+    if (scopedResult instanceof Promise) {
+      return scopedResult.then(r => r.result);
+    }
+    return scopedResult.result;
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly

@@ -54,6 +54,9 @@ export const mockSettingsProps: {
             selected: request.selected,
           },
           app: { currentRoute: request.location },
+          delegation: {
+            getDelegationRequests: () => undefined,
+          },
         },
         actions: {
           profile: {

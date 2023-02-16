@@ -79,6 +79,9 @@ export const mockWalletProps: {
           profile: {
             isSidebarExpanded: false,
           },
+          delegation: {
+            getDelegationRequests: () => undefined,
+          },
         },
         actions: {
           profile: {
