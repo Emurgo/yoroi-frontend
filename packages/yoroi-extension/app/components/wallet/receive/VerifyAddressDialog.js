@@ -165,18 +165,17 @@ export default class VerifyAddressDialog extends Component<Props> {
    */
   renderStakingKey: (void) => Node = () => {
     const { intl } = this.context;
+    const { type: addrType, address } = this.props.addressInfo;
 
-    const getStakingKey = () => {
-      if (this.props.addressInfo.type === CoreAddressTypes.JORMUNGANDR_GROUP) {
-        const wasmAddr = RustModule.WalletV3.Address.from_string(
-          this.props.addressInfo.address
-        ).to_group_address();
+    const getStakingKey = (WasmScope: typeof RustModule) => {
+      if (addrType === CoreAddressTypes.JORMUNGANDR_GROUP) {
+        const wasmAddr = WasmScope.WalletV3.Address.from_string(address).to_group_address();
         if (wasmAddr == null) return null; // should never happen
         return Buffer.from(wasmAddr.get_account_key().as_bytes()).toString('hex');
       }
-      if (this.props.addressInfo.type === CoreAddressTypes.CARDANO_BASE) {
-        const wasmAddr = RustModule.WalletV4.BaseAddress.from_address(
-          RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address)
+      if (addrType === CoreAddressTypes.CARDANO_BASE) {
+        const wasmAddr = WasmScope.WalletV4.BaseAddress.from_address(
+          WasmScope.WalletV4.Address.from_bech32(address)
         )?.stake_cred();
         if (wasmAddr == null) return null; // should never happen
         const hash = wasmAddr.to_keyhash() ?? wasmAddr.to_scripthash();
@@ -185,7 +184,7 @@ export default class VerifyAddressDialog extends Component<Props> {
       }
     };
 
-    const stakingKey = getStakingKey();
+    const stakingKey = RustModule.WasmScope(getStakingKey);
     if (stakingKey == null) return null;
     return (
       <>
@@ -213,6 +212,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     if (this.props.complexityLevel !== ComplexityLevels.Advanced) {
       return null;
     }
+
     const getSpendingKey = () => {
       if (isJormungandrAddress(this.props.addressInfo.type)) {
         const wasmAddr = RustModule.WalletV3.Address.from_string(
@@ -260,10 +260,19 @@ export default class VerifyAddressDialog extends Component<Props> {
     if (this.props.addressInfo.type !== CoreAddressTypes.CARDANO_PTR) {
       return null;
     }
-    const wasmAddr = RustModule.WalletV4.PointerAddress.from_address(
-      RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address)
-    )?.stake_pointer();
-    if (wasmAddr == null) return null; // should never happen
+
+    const addrInfo = RustModule.WasmScope(Scope => {
+      const wasmAddr = Scope.WalletV4.PointerAddress.from_address(
+        RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address)
+      )?.stake_pointer();
+      if (wasmAddr == null) return null; // should never happen
+
+      return [wasmAddr.slot(), wasmAddr.tx_index(), wasmAddr.cert_index()]
+    });
+
+    if (addrInfo == null) return null; // should never happen
+
+    const [slot, txIdx, certIdx] = addrInfo;
 
     return (
       <>
@@ -272,7 +281,7 @@ export default class VerifyAddressDialog extends Component<Props> {
         </span>
         <div className="keyPointer">
           <RawHash light={false} className={styles.hash}>
-            ({wasmAddr.slot()}, {wasmAddr.tx_index()}, {wasmAddr.cert_index()})
+            ({slot}, {txIdx}, {certIdx})
           </RawHash>
         </div>
         <br />
