@@ -33,19 +33,25 @@ export class BIP32ED25519PublicKey implements IKey, IKeyDerivation, IPublic {
   toBuffer(): Buffer {
     return Buffer.from(this.key.as_bytes());
   }
+
   getType(): KeyKindType {
     return KeyKind.BIP32ED25519;
   }
+
   verify(data: Buffer, signature: Buffer): boolean {
-    return this.key.to_raw_key().verify(
-      data,
-      RustModule.WalletV4.Ed25519Signature.from_bytes(signature)
-    );
+    return RustModule.WasmScope(Scope => {
+      return this.key.to_raw_key().verify(
+        data,
+        Scope.WalletV4.Ed25519Signature.from_bytes(signature)
+      );
+    });
   }
+
   static fromBuffer(buff: Buffer): BIP32ED25519PublicKey {
     const key = RustModule.WalletV4.Bip32PublicKey.from_bytes(buff);
     return BIP32ED25519PublicKey.fromV3Key(key);
   }
+
   static fromV3Key(key: RustModule.WalletV4.Bip32PublicKey): BIP32ED25519PublicKey {
     const newKey = annotateBIP32ED25519PublicKey(BIP32ED25519PublicKey);
     return new newKey(key);
@@ -68,25 +74,31 @@ export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
   toBuffer(): Buffer {
     return Buffer.from(this.key.as_bytes());
   }
+
   getType(): KeyKindType {
     return KeyKind.BIP32ED25519;
   }
+
   sign(data: Buffer): Buffer {
     return Buffer.from(this.key.to_raw_key().sign(data).to_hex(), 'hex');
   }
+
   toPublic(): BIP32ED25519PublicKey {
     const pubKey = this.key.to_public();
     return BIP32ED25519PublicKey.fromV3Key(pubKey);
   }
+
   static fromBuffer(buff: Buffer): BIP32ED25519PrivateKey {
     const key = RustModule.WalletV4.Bip32PrivateKey.from_bytes(buff);
     return BIP32ED25519PrivateKey.fromV3Key(key);
   }
+
   static fromV3Key(key: RustModule.WalletV4.Bip32PrivateKey): BIP32ED25519PrivateKey {
     const newKey = annotateBIP32ED25519PrivateKey(BIP32ED25519PrivateKey);
     return new newKey(key);
   }
 }
+
 function annotateBIP32ED25519PrivateKey(
   clazz: Class<BIP32ED25519PrivateKey>
 ): Class<BIP32ED25519PrivateKey> {
@@ -108,19 +120,23 @@ export class BIP32PublicKey implements IKey, IKeyDerivation, IPublic {
   toBuffer(): Buffer {
     return decode(this.key.toBase58());
   }
+
   getType(): KeyKindType {
     return KeyKind.BIP32;
   }
+
   verify(data: Buffer, signature: Buffer): boolean {
     return this.key.verify(
       data,
       signature
     );
   }
+
   static fromBuffer(buff: Buffer): BIP32PublicKey {
     const key = fromBase58(encode(buff));
     return BIP32PublicKey.fromBip32(key);
   }
+
   static fromBip32(key: BIP32Interface): BIP32PublicKey {
     const newKey = annotateBIP32PublicKey(BIP32PublicKey);
     return new newKey(key);
@@ -143,25 +159,31 @@ export class BIP32PrivateKey implements IKey, IKeyDerivation, IPrivate {
   toBuffer(): Buffer {
     return decode(this.key.toBase58());
   }
+
   getType(): KeyKindType {
     return KeyKind.BIP32;
   }
+
   sign(data: Buffer): Buffer {
     return this.key.sign(data);
   }
+
   toPublic(): BIP32PublicKey {
     const pubKey = fromPublicKey(this.key.publicKey, this.key.chainCode);
     return BIP32PublicKey.fromBip32(pubKey);
   }
+
   static fromBuffer(buff: Buffer): BIP32PrivateKey {
     const key = fromBase58(encode(buff));
     return BIP32PrivateKey.fromBip32(key);
   }
+
   static fromBip32(key: BIP32Interface): BIP32PrivateKey {
     const newKey = annotateBIP32PrivateKey(BIP32PrivateKey);
     return new newKey(key);
   }
 }
+
 function annotateBIP32PrivateKey(
   clazz: Class<BIP32PrivateKey>
 ): Class<BIP32PrivateKey> {

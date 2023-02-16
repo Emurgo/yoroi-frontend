@@ -1001,16 +1001,16 @@ function handleInjectorConnect(port) {
                 // $FlowFixMe[prop-missing]
                 const witnessSetBytes = hexToBytes(resp.ok);
                 // eslint-disable-next-line no-shadow
-                RustModule.WasmScope(RustModule => {
+                RustModule.WasmScope(Scope => {
                   let fullTx;
                   try {
-                    fullTx = RustModule.WalletV4.FixedTransaction.new(
+                    fullTx = Scope.WalletV4.FixedTransaction.new(
                       bodyOrTxBytes,
                       witnessSetBytes,
                       true,
                     );
                   } catch {
-                    fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
+                    fullTx = Scope.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
                     fullTx.set_witness_set(witnessSetBytes);
                   }
                   rpcResponse({ ok: fullTx.to_hex() });
