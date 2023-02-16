@@ -175,8 +175,7 @@ export class RemoteFetcher implements IFetcher {
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getTransactionsHistoryForAddresses)} missing backend url`);
     return axios(
-      // `${BackendService}/api/v2/txs/history`,
-      `http://localhost:8082/v2/txs/history`,
+      `${BackendService}/api/v2/txs/history`,
       {
         method: 'post',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
@@ -494,7 +493,7 @@ export class RemoteFetcher implements IFetcher {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
     return axios(
-      `http://localhost:8082/v2.1/lastBlockBySlot`, // Todo: Swich back to BackendService
+      `${BackendService}/api/v2.1/lastBlockBySlot`,
       {
         method: 'post',
         data: {
