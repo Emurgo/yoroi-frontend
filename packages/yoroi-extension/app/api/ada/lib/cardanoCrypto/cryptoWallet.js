@@ -113,6 +113,5 @@ export function generatePrivateKeyForCatalyst(): RustModule.WalletV4.Bip32Privat
     Buffer.from(bip39entropy, 'hex'),
     EMPTY_PASSWORD
   );
-
   return rootKey;
 }

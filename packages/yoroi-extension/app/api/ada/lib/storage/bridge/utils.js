@@ -28,62 +28,64 @@ export function addressToKind(
   network: $ReadOnly<NetworkRow>,
 ): CoreAddressT {
   try {
-    if (isJormungandr(network)) {
-      // Need to try parsing as a legacy address first
-      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
-        return CoreAddressTypes.CARDANO_LEGACY;
-      }
-      const wasmAddr = parseAs === 'bytes'
-        ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
-        : RustModule.WalletV3.Address.from_string(address);
+    return RustModule.WasmScope(Scope => {
+      if (isJormungandr(network)) {
+        // Need to try parsing as a legacy address first
+        // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+        if (Scope.WalletV4.ByronAddress.is_valid(address)) {
+          return CoreAddressTypes.CARDANO_LEGACY;
+        }
+        const wasmAddr = parseAs === 'bytes'
+          ? Scope.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
+          : Scope.WalletV3.Address.from_string(address);
 
-      switch (wasmAddr.get_kind()) {
-        case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.JORMUNGANDR_SINGLE;
-        case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.JORMUNGANDR_GROUP;
-        case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.JORMUNGANDR_ACCOUNT;
-        case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.JORMUNGANDR_MULTISIG;
-        default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
+        switch (wasmAddr.get_kind()) {
+          case Scope.WalletV3.AddressKind.Single: return CoreAddressTypes.JORMUNGANDR_SINGLE;
+          case Scope.WalletV3.AddressKind.Group: return CoreAddressTypes.JORMUNGANDR_GROUP;
+          case Scope.WalletV3.AddressKind.Account: return CoreAddressTypes.JORMUNGANDR_ACCOUNT;
+          case Scope.WalletV3.AddressKind.Multisig: return CoreAddressTypes.JORMUNGANDR_MULTISIG;
+          default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
+        }
       }
-    }
-    if (isCardanoHaskell(network)) {
-      // Need to try parsing as a legacy address first
-      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
-        return CoreAddressTypes.CARDANO_LEGACY;
+      if (isCardanoHaskell(network)) {
+        // Need to try parsing as a legacy address first
+        // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+        if (Scope.WalletV4.ByronAddress.is_valid(address)) {
+          return CoreAddressTypes.CARDANO_LEGACY;
+        }
+        const wasmAddr = parseAs === 'bytes'
+          ? Scope.WalletV4.Address.from_bytes(Buffer.from(address, 'hex'))
+          : Scope.WalletV4.Address.from_bech32(address);
+        {
+          const byronAddr = Scope.WalletV4.ByronAddress.from_address(wasmAddr);
+          if (byronAddr) return CoreAddressTypes.CARDANO_LEGACY;
+        }
+        {
+          const baseAddr = Scope.WalletV4.BaseAddress.from_address(wasmAddr);
+          if (baseAddr) return CoreAddressTypes.CARDANO_BASE;
+        }
+        {
+          const ptrAddr = Scope.WalletV4.PointerAddress.from_address(wasmAddr);
+          if (ptrAddr) return CoreAddressTypes.CARDANO_PTR;
+        }
+        {
+          const enterpriseAddr = Scope.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+          if (enterpriseAddr) return CoreAddressTypes.CARDANO_ENTERPRISE;
+        }
+        {
+          const rewardAddr = Scope.WalletV4.RewardAddress.from_address(wasmAddr);
+          if (rewardAddr) return CoreAddressTypes.CARDANO_REWARD;
+        }
+        throw new Error(`${nameof(addressToKind)} unknown address type`);
       }
-      const wasmAddr = parseAs === 'bytes'
-        ? RustModule.WalletV4.Address.from_bytes(Buffer.from(address, 'hex'))
-        : RustModule.WalletV4.Address.from_bech32(address);
-      {
-        const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
-        if (byronAddr) return CoreAddressTypes.CARDANO_LEGACY;
+      if (isErgo(network)) {
+        const ergoAddress = parseAs === 'bytes'
+          ? Scope.SigmaRust.NetworkAddress.from_bytes(Buffer.from(address, 'hex'))
+          : Scope.SigmaRust.NetworkAddress.from_base58(address);
+        return ergoAddressToType(ergoAddress);
       }
-      {
-        const baseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
-        if (baseAddr) return CoreAddressTypes.CARDANO_BASE;
-      }
-      {
-        const ptrAddr = RustModule.WalletV4.PointerAddress.from_address(wasmAddr);
-        if (ptrAddr) return CoreAddressTypes.CARDANO_PTR;
-      }
-      {
-        const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
-        if (enterpriseAddr) return CoreAddressTypes.CARDANO_ENTERPRISE;
-      }
-      {
-        const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(wasmAddr);
-        if (rewardAddr) return CoreAddressTypes.CARDANO_REWARD;
-      }
-      throw new Error(`${nameof(addressToKind)} unknown address type`);
-    }
-    if (isErgo(network)) {
-      const ergoAddress = parseAs === 'bytes'
-        ? RustModule.SigmaRust.NetworkAddress.from_bytes(Buffer.from(address, 'hex'))
-        : RustModule.SigmaRust.NetworkAddress.from_base58(address);
-      return ergoAddressToType(ergoAddress);
-    }
-    throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
+      throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
+    });
   } catch (e1) {
     throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${address}`);
   }
@@ -329,11 +331,14 @@ export function isJormungandrAddress(
   kind: CoreAddressT
 ): boolean {
   // note: excluding legacy byron addresses
-  if (kind === CoreAddressTypes.JORMUNGANDR_SINGLE) return true;
-  if (kind === CoreAddressTypes.JORMUNGANDR_GROUP) return true;
-  if (kind === CoreAddressTypes.JORMUNGANDR_ACCOUNT) return true;
-  if (kind === CoreAddressTypes.JORMUNGANDR_MULTISIG) return true;
-  return false;
+  const types = [
+    CoreAddressTypes.JORMUNGANDR_SINGLE,
+    CoreAddressTypes.JORMUNGANDR_GROUP,
+    CoreAddressTypes.JORMUNGANDR_ACCOUNT,
+    CoreAddressTypes.JORMUNGANDR_MULTISIG,
+  ];
+
+  return kind in types;
 }
 
 export function isErgoAddress(

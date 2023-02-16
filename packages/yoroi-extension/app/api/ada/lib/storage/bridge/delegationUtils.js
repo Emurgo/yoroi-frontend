@@ -52,13 +52,13 @@ export async function getDelegatedBalance(
 
 export function addrContainsAccountKey(
   address: string,
-  targetAccountKey: RustModule.WalletV4.StakeCredential,
+  targetAccountKey: RustModule.WalletV4.StakeCredential | string,
   acceptTypeMismatch: boolean,
 ): boolean {
   const wasmAddr = normalizeToAddress(address);
   if (wasmAddr == null) throw new Error(`${nameof(addrContainsAccountKey)} invalid address ${address}`);
 
-  const accountKeyString = Buffer.from(targetAccountKey.to_bytes()).toString('hex');
+  const accountKeyString = typeof targetAccountKey === 'string' ? targetAccountKey : Buffer.from(targetAccountKey.to_bytes()).toString('hex');
 
   const asBase = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
   if (asBase != null) {
