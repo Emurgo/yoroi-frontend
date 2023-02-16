@@ -213,9 +213,9 @@ export default class VerifyAddressDialog extends Component<Props> {
       return null;
     }
 
-    const getSpendingKey = () => {
+    const getSpendingKey = (WasmScope: typeof RustModule) => {
       if (isJormungandrAddress(this.props.addressInfo.type)) {
-        const wasmAddr = RustModule.WalletV3.Address.from_string(
+        const wasmAddr = WasmScope.WalletV3.Address.from_string(
           this.props.addressInfo.address
         );
         const spendingKey = getJormungandrSpendingKey(wasmAddr);
@@ -232,7 +232,7 @@ export default class VerifyAddressDialog extends Component<Props> {
       }
     };
 
-    const spendingKey = getSpendingKey();
+    const spendingKey = RustModule.WasmScope(getSpendingKey);
     if (spendingKey == null) return null;
     return (
       <>
