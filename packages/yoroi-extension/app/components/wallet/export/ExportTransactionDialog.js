@@ -76,7 +76,6 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       shouldIncludeTxIds
     } = this.props;
     const { startDate, endDate } = this.state;
-    console.log({startDate})
     const infoBlock = (
       <Box
         sx={{
