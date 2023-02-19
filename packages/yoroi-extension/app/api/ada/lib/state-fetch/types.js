@@ -46,7 +46,7 @@ export type HistoryRequest = {|
   addresses: Array<string>,
   after?: {|
     block: string,
-    tx: string,
+    tx?: string,
   |},
   untilBlock: string,
 |};

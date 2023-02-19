@@ -62,6 +62,7 @@ import { transactionTypes } from '../../api/ada/transactions/types';
 import moment from 'moment';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
+import type { TransactionExportRow } from '../../api/export';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -711,14 +712,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     await txStore.getTransactionRowsToExportRequest.execute(async () => {
       const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
-      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-      if (!withLevels) return;
-      const rows = await this.api[apiType].getTransactionRowsToExport({
-        publicDeriver: withLevels,
-        getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
-      });
-
-
       /**
        * NOTE: The rewards export currently supports only Haskell Shelley
        */
@@ -757,8 +750,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           respTxRows.push(...rewardRows);
         }
       }
-
-      respTxRows.push(...rows);
     }).promise;
 
     const { startDate, endDate } = request.exportRequest;
@@ -771,13 +762,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     const dateFormat = 'YYYY-MM-DD';
     const dateToSlot = (date: string) => {
-       const relativeSlot = toRelativeSlotNumber(
+      const relativeSlot = toRelativeSlotNumber(
         timeToSlot({
           time: new Date(`${date}T23:59:59`), // Get the slot at the last second in the day
         }).slot
       );
 
-      return [relativeSlot.epoch, relativeSlot.slot]
+      return [
+        Math.max(relativeSlot.epoch, 1),
+        Math.max(relativeSlot.slot, 0)
+      ];
     }
 
     const startSlot = dateToSlot(startDate.subtract(1, 'day').format(dateFormat));
@@ -791,12 +785,20 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
     const startBlockHash = blockHashes[startSlot];
     const endBlockHash = blockHashes[endSlot];
+    if (!startBlockHash) {
+      throw new Error('missing start block hash');
+    }
+    if (!endBlockHash) {
+      throw new Error('missing end block hash');
+    }
     const txs = await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash);
+
+    respTxRows.push(...txs);
 
     respTxRows = respTxRows.filter(row => {
       // 4th param `[]` means that the start and end date are included
       return moment(row.date).isBetween(startDate, endDate, 'day', '[]')
-    }).sort((a, b) => b.date - a.date);
+    }).sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
@@ -827,20 +829,74 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _getTxsFromRemote: (
     publicDeriver: PublicDeriver<>,
-    startBlock: string,
-    endBlock: string,
-  ) => void = async (publicDeriver, startBlock, endBlock) => {
-    // todo: add return types
-    const addresses = await getAllAddressesForWallet(publicDeriver)
+    startBlockHash: string,
+    endBlockHash: string,
+  ) => Promise<Array<TransactionExportRow>> = async (
+    publicDeriver,
+    startBlockHash,
+    endBlockHash
+  ) => {
+    const addresses =  (
+      await getAllAddressesForWallet(publicDeriver)
+    );
     const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const network = publicDeriver.getParent().getNetworkInfo()
     const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses({
-      after: { block: startBlock },
-      untilBlock: endBlock,
+      after: { block: startBlockHash },
+      untilBlock: endBlockHash,
       network,
       addresses: toRequestAddresses(addresses),
     });
-    console.log({txsFromNetwork})
+
+    const ownAddresses = new Set([
+      ...addresses.utxoAddresses.map(a => a.Hash),
+      ...addresses.accountingAddresses.map(a => a.Hash),
+    ]);
+
+    const result = [];
+    txsFromNetwork.forEach(remoteTx => {
+      let ownAmountChange = new BigNumber('0');
+      let txFee = new BigNumber('0');
+      for (const input of remoteTx.inputs) {
+        txFee = txFee.plus(input.amount);
+        if (ownAddresses.has(input.address)) {
+          ownAmountChange = ownAmountChange.minus(input.amount);
+        }
+      }
+      for (const output of remoteTx.outputs) {
+        txFee = txFee.minus(output.amount);
+        if (ownAddresses.has(output.address)) {
+          ownAmountChange = ownAmountChange.plus(output.amount);
+        }
+      }
+
+      // invariant: reported amount + fee = own amount change
+      let type;
+      let fee;
+      let amount;
+      if (ownAmountChange.isPositive()) {
+        type = 'in';
+        fee = new BigNumber('0');
+        amount = ownAmountChange;
+      } else {
+        type = 'out';
+        fee = txFee;
+        amount = ownAmountChange.absoluteValue().minus(txFee);
+      }
+
+      if (remoteTx.time != null) {
+        const time: string = remoteTx.time;
+        result.push({
+          type,
+          amount: amount.shiftedBy(-6).toString(),
+          fee: fee.shiftedBy(-6).toString(),
+          date: new Date(time),
+          comment: '',
+          id: remoteTx.hash,
+        });
+      }
+    });
+    return result;
   }
 
   @action

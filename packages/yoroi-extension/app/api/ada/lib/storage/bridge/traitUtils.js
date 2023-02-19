@@ -169,7 +169,10 @@ export async function getAllAddressesForDisplay(
 
 export async function getAllAddressesForWallet(
   publicDeriver: PublicDeriver<>,
-): Promise<> {
+): Promise<{|
+  utxoAddresses: Array<$ReadOnly<AddressRow>>,
+  accountingAddresses: Array<$ReadOnly<AddressRow>>,
+|}> {
   const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
       throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
