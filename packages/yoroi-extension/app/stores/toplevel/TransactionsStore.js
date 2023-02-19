@@ -706,7 +706,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const txStore = this.stores.transactions;
     let respTxRows = [];
 
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
     const delegationStore = this.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(request.publicDeriver);
 
