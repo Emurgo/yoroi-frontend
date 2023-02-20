@@ -3,18 +3,28 @@
 
 import { Component } from 'react';
 import type { Node } from 'react';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography, Box } from '@mui/material'
-import globalMessages from '../../../i18n/global-messages';
+import ConnectHardwareWalletLogo from '../../../assets/images/add-wallet/connect-hw-revamp.inline.svg';
+import CreateWalletLogo from '../../../assets/images/add-wallet/create-wallet-revamp.inline.svg';
+import RestoreWalletLogo from '../../../assets/images/add-wallet/restore-wallet-revamp.inline.svg';
+import AddWalletCard from './AddWalletCard';
 
 
 export const messages: * = defineMessages({
-    subtitle: {
-        id: 'wallet.add.page.revamp.subtitle',
-        defaultMessage: 'Light wallet for Cardano assets',
+    createWallet: {
+        id: 'wallet.add.page.revamp.createWallet',
+        defaultMessage: 'Create new wallet',
+    },
+    restoreWallet: {
+        id: 'wallet.add.page.revamp.restoreWallet',
+        defaultMessage: 'Restore existing wallet',
+    },
+    connectHardwareWallet: {
+        id: 'wallet.add.page.revamp.connectHardwareWallet',
+        defaultMessage: 'Connect hardware wallet',
     }
 });
 
@@ -27,16 +37,35 @@ export default class AddWalletPageContent extends Component<{||}> {
   render(): Node {
     const { intl } = this.context;
 
+    const addWalletOption = [
+        {
+            imageSrc: CreateWalletLogo,
+            label: intl.formatMessage(messages.createWallet),
+        },
+        {
+            imageSrc: RestoreWalletLogo,
+            label: intl.formatMessage(messages.restoreWallet),
+        },
+        {
+            imageSrc: ConnectHardwareWalletLogo,
+            label: intl.formatMessage(messages.connectHardwareWallet),
+        }
+    ]
+
     return (
       <Box
         sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flexDirection: 'column',
+            flexDirection: 'row',
+            gap: '24px',
+            mt: '24px',
         }}
       >
-        <h1>Content</h1>
+        {addWalletOption.map(({ imageSrc, label }) => (
+          <AddWalletCard key={label} imageSrc={imageSrc} label={label} />
+        ))}
       </Box>
     )
   }
