@@ -6,7 +6,7 @@ import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Typography, Box } from '@mui/material'
+import { Box } from '@mui/material'
 import ConnectHardwareWalletLogo from '../../../assets/images/add-wallet/connect-hw-revamp.inline.svg';
 import CreateWalletLogo from '../../../assets/images/add-wallet/create-wallet-revamp.inline.svg';
 import RestoreWalletLogo from '../../../assets/images/add-wallet/restore-wallet-revamp.inline.svg';
