@@ -66,6 +66,7 @@ import {
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { withLayout } from '../../styles/context/layout'
 import type { LayoutComponentMap } from '../../styles/context/layout'
+import WalletAddPageRevamp from './WalletAddPageRevamp'
 
 export const AddAnotherWalletPromise: void => Promise<any> = () => import('../../components/wallet/add/AddAnotherWallet');
 const AddAnotherWallet = lazy(AddAnotherWalletPromise);
@@ -336,33 +337,17 @@ class WalletAddPage extends Component<AllProps> {
       );
     }
 
-
-    const navbarElementClassic = (
-      <NavBar
-        title={
-          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.addWalletLabel)} />
-        }
-      />
-    );
-
-    const navbarElementRevamp = (
-      <NavBarRevamp
-        title={
-          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.addWalletLabel)} />
-        }
-      />
-    );
-
-    const navbarElement = this.props.renderLayoutComponent({
-      CLASSIC: navbarElementClassic,
-      REVAMP: navbarElementRevamp,
-    });
-
-    return (
+    const addWalletPageClassic = (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
-        navbar={navbarElement}
+        navbar={
+          <NavBar
+            title={
+              <NavBarTitle title={this.context.intl.formatMessage(globalMessages.addWalletLabel)} />
+            }
+          />
+        }
         showInContainer
       >
         <AddAnotherWallet
@@ -375,6 +360,20 @@ class WalletAddPage extends Component<AllProps> {
         {activeDialog}
       </TopBarLayout>
     );
+
+    const addWalletPageRevamp = (
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+      >
+        <WalletAddPageRevamp />
+      </TopBarLayout>
+    )
+
+    return this.props.renderLayoutComponent({
+      CLASSIC: addWalletPageClassic,
+      REVAMP: addWalletPageRevamp,
+    });
   }
 
   _goToSettingsRoot: (() => void) = () => {
