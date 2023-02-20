@@ -10,7 +10,7 @@ import { Typography, Box } from '@mui/material'
 import globalMessages from '../../../i18n/global-messages';
 
 
-export const messages: * = defineMessages({
+const messages: * = defineMessages({
     subtitle: {
         id: 'wallet.add.page.revamp.subtitle',
         defaultMessage: 'Light wallet for Cardano assets',

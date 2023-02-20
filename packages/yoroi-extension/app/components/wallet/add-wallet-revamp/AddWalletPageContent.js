@@ -13,7 +13,7 @@ import RestoreWalletLogo from '../../../assets/images/add-wallet/restore-wallet-
 import AddWalletCard from './AddWalletCard';
 
 
-export const messages: * = defineMessages({
+const messages: * = defineMessages({
     createWallet: {
         id: 'wallet.add.page.revamp.createWallet',
         defaultMessage: 'Create new wallet',
@@ -25,7 +25,7 @@ export const messages: * = defineMessages({
     connectHardwareWallet: {
         id: 'wallet.add.page.revamp.connectHardwareWallet',
         defaultMessage: 'Connect hardware wallet',
-    }
+    },
 });
 
 @observer
