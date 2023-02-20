@@ -8,7 +8,7 @@ import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { TransferStatus } from '../../types/TransferTypes';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import WalletAddPage from './WalletAddPage';
+import WalletAddPage from './AddWalletPage';
 import {
   globalKnobs,
   getWalletNameCases,

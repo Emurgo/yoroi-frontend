@@ -63,22 +63,21 @@ import type {
 import {
   networks, isJormungandr, isCardanoHaskell, isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { withLayout } from '../../styles/context/layout'
 import type { LayoutComponentMap } from '../../styles/context/layout'
-import WalletAddPageRevamp from './WalletAddPageRevamp'
+import AddWalletPageRevamp from './AddWalletPageRevamp';
 
 export const AddAnotherWalletPromise: void => Promise<any> = () => import('../../components/wallet/add/AddAnotherWallet');
 const AddAnotherWallet = lazy(AddAnotherWalletPromise);
 
-export type GeneratedData = typeof WalletAddPage.prototype.generated;
+export type GeneratedData = typeof AddWalletPage.prototype.generated;
 
 type Props = InjectedOrGenerated<GeneratedData>;
 type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-class WalletAddPage extends Component<AllProps> {
+class AddWalletPage extends Component<AllProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -111,7 +110,7 @@ class WalletAddPage extends Component<AllProps> {
 
     const openTrezorConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+        throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
@@ -119,13 +118,13 @@ class WalletAddPage extends Component<AllProps> {
         params: { restoreType: { type, extra: 'trezor' } },
       });
       if (api !== ApiOptions.ada) {
-        throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
+        throw new Error(`${nameof(AddWalletPage)} not ADA API type`);
       }
       this.generated.actions[ApiOptions.ada].trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+        throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
@@ -133,7 +132,7 @@ class WalletAddPage extends Component<AllProps> {
         params: { restoreType: { type, extra: 'ledger' } },
       });
       if (api !== ApiOptions.ada) {
-        throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
+        throw new Error(`${nameof(AddWalletPage)} not ADA API type`);
       }
       this.generated.actions[ApiOptions.ada].ledgerConnect.init.trigger();
     };
@@ -155,7 +154,7 @@ class WalletAddPage extends Component<AllProps> {
       />);
     } else if (uiDialogs.isOpen(WalletCreateOptionDialog)) {
       if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+        throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       activeDialog = (
         <WalletCreateOptionDialogContainer
@@ -197,7 +196,7 @@ class WalletAddPage extends Component<AllProps> {
       );
     } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
       if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+        throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       activeDialog = (
         <WalletRestoreOptionDialogContainer
@@ -242,7 +241,7 @@ class WalletAddPage extends Component<AllProps> {
       );
     } else if (uiDialogs.isOpen(WalletEraOptionDialogContainer)) {
       if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+        throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       const hardware = uiDialogs.getParam<'trezor' | 'ledger'>('hardware');
       const onEra = (era: 'bip44' | 'cip1852') => {
@@ -269,7 +268,7 @@ class WalletAddPage extends Component<AllProps> {
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
       const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
-      if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
+      if (mode == null) throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
           {...this.generated.WalletRestoreDialogContainerProps}
@@ -294,7 +293,7 @@ class WalletAddPage extends Component<AllProps> {
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
       const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
-      if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
+      if (mode == null) throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletTrezorConnectDialogContainer
           {...this.generated.WalletTrezorConnectDialogContainerProps}
@@ -305,7 +304,7 @@ class WalletAddPage extends Component<AllProps> {
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
       const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
-      if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
+      if (mode == null) throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletLedgerConnectDialogContainer
           {...this.generated.WalletLedgerConnectDialogContainerProps}
@@ -366,7 +365,7 @@ class WalletAddPage extends Component<AllProps> {
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
-        <WalletAddPageRevamp />
+        <AddWalletPageRevamp />
       </TopBarLayout>
     )
 

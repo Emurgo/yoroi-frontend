@@ -18,7 +18,7 @@ import Settings from './containers/settings/Settings';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
-import WalletAddPage, { AddAnotherWalletPromise } from './containers/wallet/WalletAddPage'
+import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage'
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 
@@ -217,7 +217,7 @@ export const Routes = (
       <Route
         exact
         path={ROUTES.WALLETS.ADD}
-        component={(props) => <WalletAddPage {...props} stores={stores} actions={actions} />}
+        component={(props) => <AddWalletPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact

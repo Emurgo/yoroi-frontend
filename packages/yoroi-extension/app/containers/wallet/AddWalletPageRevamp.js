@@ -5,15 +5,13 @@ import AddWalletPageHeader from '../../components/wallet/add-wallet-revamp/AddWa
 import { Box } from '@mui/material';
 import AddWalletPageContent from '../../components/wallet/add-wallet-revamp/AddWalletPageContent';
 
-
-// Todo: Fix all names from `WalletAddPage` into `AddWalletPage`
-export default class AddWalletPage extends Component {
-    render(): Node {
-        return (
-          <Box>
-            <AddWalletPageHeader />
-            <AddWalletPageContent />
-          </Box>
-        )
-    }
+export default class AddWalletPageRevamp extends Component {
+  render(): Node {
+    return (
+      <Box>
+        <AddWalletPageHeader />
+        <AddWalletPageContent />
+      </Box>
+    )
+  }
 }
