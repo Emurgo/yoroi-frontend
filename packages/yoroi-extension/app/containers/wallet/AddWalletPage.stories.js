@@ -8,7 +8,7 @@ import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { TransferStatus } from '../../types/TransferTypes';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import WalletAddPage from './AddWalletPage';
+import AddWalletPage from './AddWalletPage';
 import {
   globalKnobs,
   getWalletNameCases,
@@ -64,7 +64,7 @@ import { walletLookup } from '../../../stories/helpers/WalletCache'
 
 export default {
   title: `${__filename.split('.')[0]}`,
-  component: WalletAddPage,
+  component: AddWalletPage,
   decorators: [withScreenshot],
 };
 
@@ -196,7 +196,7 @@ const defaultProps: {|
 });
 
 export const MainPage = (): Node => (
-  <WalletAddPage
+  <AddWalletPage
     generated={defaultProps(Object.freeze({
       selectedNetwork: networks.CardanoMainnet,
     }))}
@@ -204,7 +204,7 @@ export const MainPage = (): Node => (
 );
 
 export const CurrencySelect = (): Node => (
-  <WalletAddPage
+  <AddWalletPage
     generated={defaultProps(Object.freeze({
       openDialog: WalletCreateDialog,
       selectedNetwork: undefined,
@@ -232,7 +232,7 @@ export const CurrencySelect = (): Node => (
 
 export const CreateWalletOptions = (): Node => {
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletCreateOptionDialog,
@@ -242,7 +242,7 @@ export const CreateWalletOptions = (): Node => {
 };
 
 export const CreateWalletStart = (): Node => (
-  <WalletAddPage
+  <AddWalletPage
     generated={defaultProps(Object.freeze({
       selectedNetwork: networks.CardanoMainnet,
       openDialog: WalletCreateDialog,
@@ -318,7 +318,7 @@ export const CreateWalletPrivacyDialog = (): Node => {
     countdownCases.CountingDown
   );
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
@@ -352,7 +352,7 @@ export const CreateWalletRecoveryPhraseDisplay = (): Node => {
     countdownCases.CountingDown
   );
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
@@ -417,7 +417,7 @@ export const CreateWalletRecoveryPhraseEnter = (): Node => {
     throw new Error('missing case enteredPhrase');
   })();
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
@@ -444,7 +444,7 @@ export const CreateWalletFinalConfirm = (): Node => {
   const isTermDeviceAccepted = boolean('isTermDeviceAccepted', false);
   const isTermRecoveryAccepted = boolean('isTermRecoveryAccepted', false);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
@@ -524,7 +524,7 @@ const restoreWalletProps: {|
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, mode } = isValidRequest;
         if (!mode.length) {
-          throw new Error(`${nameof(WalletAddPage)}::story no length in mode`);
+          throw new Error(`${nameof(AddWalletPage)}::story no length in mode`);
         }
         if (isValidRequest.mode.extra === 'paper') {
           return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length  });
@@ -621,7 +621,7 @@ const restoreWalletProps: {|
 
 export const CardanoRestoreOptions = (): Node => {
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletRestoreOptionDialog,
@@ -632,7 +632,7 @@ export const CardanoRestoreOptions = (): Node => {
 
 export const ErgoRestoreOptions = (): Node => {
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.ErgoMainnet,
         openDialog: WalletRestoreOptionDialog,
@@ -643,7 +643,7 @@ export const ErgoRestoreOptions = (): Node => {
 
 export const CardanoEraSelect = (): Node => {
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletEraOptionDialogContainer,
@@ -669,7 +669,7 @@ export const RestoreWalletStart = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         selectedNetwork,
         openDialog: WalletRestoreDialog,
@@ -728,7 +728,7 @@ export const RestoreVerify = (): Node => {
   const lookup = walletLookup([]);
 
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -758,7 +758,7 @@ export const RestoreLegacyExplanation = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -785,7 +785,7 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -808,7 +808,7 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -831,7 +831,7 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -854,7 +854,7 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -878,7 +878,7 @@ export const RestoreUpgradeError = (): Node => {
   const lookup = walletLookup([]);
 
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -902,7 +902,7 @@ export const RestoreUpgradeNoNeed = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
@@ -924,7 +924,7 @@ export const RestoreUpgradeNoNeed = (): Node => {
 
 export const HardwareOptions = (): Node => {
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletConnectHWOptionDialog,
         selectedNetwork: networks.CardanoMainnet,
@@ -977,7 +977,7 @@ const trezorPops: {|
 export const TrezorCheck = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
         selectedNetwork,
@@ -1021,7 +1021,7 @@ export const TrezorConnect = (): Node => {
   });
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
         selectedNetwork,
@@ -1071,7 +1071,7 @@ export const TrezorSave = (): Node => {
   const nameCases = getWalletNameCases();
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
         selectedNetwork,
@@ -1147,7 +1147,7 @@ const ledgerProps: {|
 export const LedgerCheck = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
@@ -1191,7 +1191,7 @@ export const LedgerConnect = (): Node => {
   });
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
@@ -1241,7 +1241,7 @@ export const LedgerSave = (): Node => {
   const nameCases = getWalletNameCases();
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
@@ -1295,7 +1295,7 @@ export const LedgerUpgrade = (): Node => {
   }
   const signRequest = tentativeTx;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
@@ -1381,7 +1381,7 @@ export const LedgerUpgrade = (): Node => {
 
 
 export const PaperWalletCreate = (): Node => (
-  <WalletAddPage
+  <AddWalletPage
     generated={defaultProps(Object.freeze({
       selectedNetwork: networks.CardanoMainnet,
       openDialog: WalletPaperDialog,
@@ -1452,7 +1452,7 @@ export const PaperWalletUserPasswordDialog = (): Node => {
   };
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: UserPasswordDialog,
         selectedNetwork,
@@ -1518,7 +1518,7 @@ export const PaperWalletCreateDialog = (): Node => {
   };
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: UserPasswordDialog,
         selectedNetwork,
@@ -1596,7 +1596,7 @@ export const PaperWalletVerifyDialog = (): Node => {
   );
   const selectedNetwork = networks.CardanoMainnet;
   return (
-    <WalletAddPage
+    <AddWalletPage
       generated={defaultProps(Object.freeze({
         openDialog: UserPasswordDialog,
         selectedNetwork,
@@ -1650,7 +1650,7 @@ export const PaperWalletVerifyDialog = (): Node => {
 
 export const PaperWalletFinalizeDialog = (): Node => {
   const selectedNetwork = networks.CardanoMainnet;
-  return (<WalletAddPage
+  return (<AddWalletPage
     generated={defaultProps(Object.freeze({
       openDialog: UserPasswordDialog,
       selectedNetwork,

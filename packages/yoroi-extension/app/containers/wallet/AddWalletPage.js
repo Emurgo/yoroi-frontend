@@ -461,7 +461,7 @@ class AddWalletPage extends Component<AllProps> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(WalletAddPage)} no way to generated props`);
+      throw new Error(`${nameof(AddWalletPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({
@@ -549,4 +549,4 @@ class AddWalletPage extends Component<AllProps> {
     });
   }
 }
-export default (withLayout(WalletAddPage): ComponentType<Props>)
+export default (withLayout(AddWalletPage): ComponentType<Props>)

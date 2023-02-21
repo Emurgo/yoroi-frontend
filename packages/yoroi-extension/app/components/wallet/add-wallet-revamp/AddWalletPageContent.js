@@ -1,11 +1,9 @@
 
 // @flow
-
-import { Component } from 'react';
-import type { Node } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import type { Node, ComponentType } from 'react';
+import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Box } from '@mui/material'
 import ConnectHardwareWalletLogo from '../../../assets/images/add-wallet/connect-hw-revamp.inline.svg';
 import CreateWalletLogo from '../../../assets/images/add-wallet/create-wallet-revamp.inline.svg';
@@ -28,45 +26,44 @@ const messages: * = defineMessages({
     },
 });
 
-@observer
-export default class AddWalletPageContent extends Component<{||}> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
+type Intl = {|
+  intl: $npm$ReactIntl$IntlShape,
+|};
 
-  render(): Node {
-    const { intl } = this.context;
+type Props = {||}
 
-    const addWalletOption = [
-        {
-            imageSrc: CreateWalletLogo,
-            label: intl.formatMessage(messages.createWallet),
-        },
-        {
-            imageSrc: RestoreWalletLogo,
-            label: intl.formatMessage(messages.restoreWallet),
-        },
-        {
-            imageSrc: ConnectHardwareWalletLogo,
-            label: intl.formatMessage(messages.connectHardwareWallet),
-        }
-    ]
+function AddWalletPageContent(props: Props & Intl): Node {
+  const { intl } =  props;
+  const addWalletOption = [
+    {
+      imageSrc: CreateWalletLogo,
+      label: intl.formatMessage(messages.createWallet),
+    },
+    {
+      imageSrc: RestoreWalletLogo,
+      label: intl.formatMessage(messages.restoreWallet),
+    },
+    {
+      imageSrc: ConnectHardwareWalletLogo,
+      label: intl.formatMessage(messages.connectHardwareWallet),
+    }
+  ]
 
-    return (
-      <Box
-        sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            gap: '24px',
-            mt: '24px',
-        }}
-      >
-        {addWalletOption.map(({ imageSrc, label }) => (
-          <AddWalletCard key={label} imageSrc={imageSrc} label={label} />
-        ))}
-      </Box>
-    )
-  }
+  return (
+    <Box
+      sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+          gap: '24px',
+          mt: '24px',
+      }}
+    >
+      {addWalletOption.map(({ imageSrc, label }) => (
+        <AddWalletCard key={label} imageSrc={imageSrc} label={label} />
+      ))}
+    </Box>
+  )
 }
+export default (injectIntl(observer(AddWalletPageContent)): ComponentType<Props>);
