@@ -4,11 +4,21 @@ import AddWalletPageHeader from '../../components/wallet/add-wallet-revamp/AddWa
 import { Box } from '@mui/material';
 import AddWalletPageContent from '../../components/wallet/add-wallet-revamp/AddWalletPageContent';
 
-export default function AddWalletPageRevamp(): Node {
+type Props = {|
+  +onCreate: void => void,
+  +onRestore: void => void,
+  +onHardwareConnect: void => void,
+|};
+
+export default function AddWalletPageRevamp(props: Props): Node {
   return (
     <Box>
       <AddWalletPageHeader />
-      <AddWalletPageContent />
+      <AddWalletPageContent
+        onCreate={props.onCreate}
+        onRestore={props.onRestore}
+        onHardwareConnect={props.onHardwareConnect}
+      />
     </Box>
   )
 }

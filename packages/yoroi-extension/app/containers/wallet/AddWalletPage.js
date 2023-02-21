@@ -90,6 +90,7 @@ class AddWalletPage extends Component<AllProps> {
   };
 
   openDialogWrapper: any => void = (dialog) => {
+    console.log({ dialog })
     // we reset the API when we open a dialog instead of when we close a dialog
     // this is because on close, asynchronous unmount actions get triggered
     // so there is no safe time at which we can un-select the API
@@ -365,7 +366,14 @@ class AddWalletPage extends Component<AllProps> {
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
-        <AddWalletPageRevamp />
+        <AddWalletPageRevamp
+          onHardwareConnect={
+            () => this.openDialogWrapper(WalletConnectHWOptionDialog)
+          }
+          onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
+          onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
+        />
+        {activeDialog}
       </TopBarLayout>
     )
 

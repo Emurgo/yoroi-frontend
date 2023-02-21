@@ -30,22 +30,29 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type Props = {||}
+type Props = {|
+  +onCreate: void => void,
+  +onRestore: void => void,
+  +onHardwareConnect: void => void,
+|};
 
 function AddWalletPageContent(props: Props & Intl): Node {
-  const { intl } =  props;
+  const { intl, onCreate, onRestore, onHardwareConnect } =  props;
   const addWalletOption = [
     {
       imageSrc: CreateWalletLogo,
       label: intl.formatMessage(messages.createWallet),
+      onClick: onCreate,
     },
     {
       imageSrc: RestoreWalletLogo,
       label: intl.formatMessage(messages.restoreWallet),
+      onClick: onRestore,
     },
     {
       imageSrc: ConnectHardwareWalletLogo,
       label: intl.formatMessage(messages.connectHardwareWallet),
+      onClick: onHardwareConnect,
     }
   ]
 
@@ -60,8 +67,8 @@ function AddWalletPageContent(props: Props & Intl): Node {
           mt: '24px',
       }}
     >
-      {addWalletOption.map(({ imageSrc, label }) => (
-        <AddWalletCard key={label} imageSrc={imageSrc} label={label} />
+      {addWalletOption.map((option) => (
+        <AddWalletCard key={option.label} {...option} />
       ))}
     </Box>
   )
