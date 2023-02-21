@@ -360,6 +360,7 @@ class AddWalletPage extends Component<AllProps> {
       </TopBarLayout>
     );
 
+    const goToRoute = this.generated.actions.router.goToRoute;
     const addWalletPageRevamp = (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -369,7 +370,7 @@ class AddWalletPage extends Component<AllProps> {
           onHardwareConnect={
             () => this.openDialogWrapper(WalletConnectHWOptionDialog)
           }
-          onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
+          onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
           onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
         />
         {activeDialog}

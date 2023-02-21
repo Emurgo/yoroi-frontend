@@ -22,7 +22,7 @@ import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddW
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 // Todo: Add lazy loading
-import CreateWalletPage from './containers/wallet/CreateWalletPage';
+import CreateWalletPage from './containers/wallet/CreateWalletPageContainer';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
