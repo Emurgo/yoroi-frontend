@@ -21,6 +21,8 @@ import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './container
 import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage'
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
+// Todo: Add lazy loading
+import CreateWalletPage from './containers/wallet/CreateWalletPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -218,6 +220,11 @@ export const Routes = (
         exact
         path={ROUTES.WALLETS.ADD}
         component={(props) => <AddWalletPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.WALLETS.CREATE_NEW_WALLET}
+        component={(props) => <CreateWalletPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
