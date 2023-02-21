@@ -1,30 +1,9 @@
 // @flow
-import { useEffect, useState } from 'react';
-import type { Node, ComponentType } from 'react';
+import { Component } from 'react';
+import type { Node } from 'react';
 
-import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
-import { Box } from '@mui/material';
-import { observer } from 'mobx-react';
-
-
-function CreateWalletPage(): Node {
-  const [open, setOpen] = useState(false);
-
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
-
-  return (
-    <Box>
-      <h1>Create new wallet!!</h1>
-      <SaveRecoveryPhraseTipsDialog
-        open={open}
-        onClose={() => setOpen(false)}
-      />
-    </Box>
-  );
+export default class CreateWalletPage extends Component<{||}> {
+  render(): Node {
+    return <h1>Create new wallet!!</h1>;
+  }
 }
-
-
-export default (observer(CreateWalletPage) : ComponentType<Props> )
