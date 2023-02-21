@@ -438,6 +438,7 @@
   "uri.verify.dialog.address.label": "Receiver address",
   "uri.verify.dialog.text": "Before continuing, make sure the transaction details are correct.",
   "uri.verify.dialog.title": "Transaction details",
+  "wallet.infoDialog.title": "Tips",
   "wallet.add.page.revamp.subtitle": "Light wallet for Cardano assets",
   "wallet.add.page.revamp.createWallet": "Create new wallet",
   "wallet.add.page.revamp.restoreWallet": "Restore existing wallet",
