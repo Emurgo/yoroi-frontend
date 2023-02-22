@@ -16,6 +16,7 @@ const messages: Object = defineMessages({
 type Props = {|
     open: bolean,
     children: Node,
+    onClose(): void,
 |}
 
 type Intl = {|
@@ -23,11 +24,12 @@ type Intl = {|
 |};
 
 function InfoDialog(props: Props & Intl): Node {
-   const { open, children, intl } = props;
+   const { open, onClose, children, intl } = props;
 
    return (
      <Modal
        open={open}
+       onClose={onClose}
        sx={{
         background: 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
