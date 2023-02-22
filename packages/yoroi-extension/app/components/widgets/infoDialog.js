@@ -81,6 +81,7 @@ function InfoDialog(props: Props & Intl): Node {
            <Button
              variant='rv-primary'
              disableRipple={false}
+             onClick={onClose}
              sx={{
                width: '176px',
                height: '40px',
