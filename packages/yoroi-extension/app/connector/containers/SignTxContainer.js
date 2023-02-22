@@ -1,32 +1,32 @@
 // @flow
 import type { Node } from 'react';
-import { Component } from 'react';
-import { observer } from 'mobx-react';
-import { computed, observable, runInAction } from 'mobx';
-import config from '../../config';
-import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
-import SignTxPage from '../components/signin/SignTxPage';
-import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type {
   SigningMessage,
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../chrome/extension/connector/types';
-import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../types';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { computed, observable, runInAction } from 'mobx';
+import config from '../../config';
+import globalMessages from '../../i18n/global-messages';
+import SignTxPage from '../components/signin/SignTxPage';
+import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
+import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../types';
 import { Box } from '@mui/material';
 import AddCollateralPage from '../components/signin/AddCollateralPage';
 

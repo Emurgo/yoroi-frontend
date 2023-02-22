@@ -5,12 +5,73 @@ import type { SummaryAssetsData } from '../CardanoSignTxPage';
 import { Box, Typography } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { signTxMessages } from '../SignTxPage';
+import { connectorMessages } from '../../../../i18n/global-messages';
 
 type Props = {|
   txAssetsData: SummaryAssetsData,
+  renderExplorerHashLink: Function,
 |};
 
-function CardanoSignTxSummary({ txAssetsData, intl }: Props & ConnectorIntl): Node {
+type AssetsSummaryDisplayProps = {| ...Props, ...ConnectorIntl |};
+
+const getAssetsSummaryDisplay = ({
+  txAssetsData,
+  renderExplorerHashLink,
+  intl,
+}: AssetsSummaryDisplayProps): Node => {
+  const { sent, received } = txAssetsData;
+  const [sentAsset = null] = sent;
+  const [receivedAsset = null] = received;
+  const { assetsSent, assetSent, assetsReceived, assetReceived } = connectorMessages;
+
+  return (
+    <>
+      {/* SENT ASSETS */}
+      {sent.length > 1 && (
+        <Box lineHeight="24px">{intl.formatMessage(assetsSent, { quantity: sent.length })}</Box>
+      )}
+      {sent.length === 1 && (
+        <Box
+          lineHeight="24px"
+          sx={{
+            '& .ExplorableHash_url': { color: '#fff' },
+            '& .ExplorableHash_url svg': { marginRight: '3px' },
+            '& .ExplorableHash_url svg path': { fill: '#fff' },
+          }}
+        >
+          {renderExplorerHashLink(sentAsset?.tokenInfo)}
+          {intl.formatMessage(assetSent, { assetName: '' })}
+        </Box>
+      )}
+
+      {/* RECEIVED ASSETS */}
+      {received.length > 1 && (
+        <Box lineHeight="24px">
+          {intl.formatMessage(assetsReceived, { quantity: received.length })}
+        </Box>
+      )}
+      {received.length === 1 && (
+        <Box
+          lineHeight="24px"
+          sx={{
+            '& .ExplorableHash_url': { color: '#fff' },
+            '& .ExplorableHash_url svg': { marginRight: '3px' },
+            '& .ExplorableHash_url svg path': { fill: '#fff' },
+          }}
+        >
+          {renderExplorerHashLink(receivedAsset?.tokenInfo)}{' '}
+          {intl.formatMessage(assetReceived, { assetName: '' })}
+        </Box>
+      )}
+    </>
+  );
+};
+
+function CardanoSignTxSummary({
+  txAssetsData,
+  renderExplorerHashLink,
+  intl,
+}: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const showOnlyTxFee = isOnlyTxFee && sent.length == 0 && received.length == 0;
   return (
@@ -32,8 +93,7 @@ function CardanoSignTxSummary({ txAssetsData, intl }: Props & ConnectorIntl): No
         <>
           <Separator />
           <Box textAlign="right">
-            {sent.length > 1 && <Box lineHeight="24px">{sent.length} assets sent</Box>}
-            {received.length > 1 && <Box lineHeight="24px">{received.length} assets received</Box>}
+            {getAssetsSummaryDisplay({ txAssetsData, renderExplorerHashLink, intl })}
           </Box>
         </>
       )}

@@ -47,6 +47,7 @@ import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
 import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
@@ -188,6 +189,22 @@ class SignTxPage extends Component<Props, State> {
       </ExplorableHashContainer>
     ) : (
       truncateToken(getTokenName(tokenInfo))
+    );
+  };
+
+  renderAddressExplorerUrl: ($ReadOnly<TokenRow>, color: string) => Node = (tokenInfo, color) => {
+    const fingerprint = this.getFingerprint(tokenInfo);
+    return fingerprint !== undefined ? (
+      <ExplorableHashContainer
+        selectedExplorer={this.props.selectedExplorer}
+        hash={fingerprint}
+        light
+        linkType="address"
+      >
+        <span>{truncateAddressShort(getTokenName(tokenInfo), 10)}</span> <ExternalLinkIcon />
+      </ExplorableHashContainer>
+    ) : (
+      truncateAddressShort(getTokenName(tokenInfo), 10)
     );
   };
 
@@ -342,6 +359,7 @@ class SignTxPage extends Component<Props, State> {
         <Box>
           <CardanoSignTx
             txAssetsData={summaryAssetsData}
+            renderExplorerHashLink={this.renderAddressExplorerUrl}
             passwordFormField={
               <TextField
                 type="password"
@@ -356,7 +374,10 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = (
         <Box>
           <Box mb="32px">
-            <CardanoSignTxSummary txAssetsData={summaryAssetsData} />
+            <CardanoSignTxSummary
+              txAssetsData={summaryAssetsData}
+              renderExplorerHashLink={this.renderAddressExplorerUrl}
+            />
           </Box>
           <CardanoUtxoDetails
             txData={txData}

@@ -120,6 +120,8 @@
   "connector.to": "To (Outputs): {qty}",
   "connector.assetsSent": "{quantity} assets sent",
   "connector.assetsReceived": "{quantity} assets received",
+  "connector.assetSent": "{assetName} sent",
+  "connector.assetReceived": "{assetName} received",
   "connector.noAssetsSent": "No assets sent",
   "connector.noAssetsReceived": "No assets received",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",

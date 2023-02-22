@@ -1056,6 +1056,14 @@ export const connectorMessages: * = defineMessages({
     id: 'connector.assetsReceived',
     defaultMessage: '!!!{quantity} assets received',
   },
+  assetSent: {
+    id: 'connector.assetSent',
+    defaultMessage: '!!!{assetName} sent',
+  },
+  assetReceived: {
+    id: 'connector.assetReceived',
+    defaultMessage: '!!!{assetName} received',
+  },
   noAssetsSent: {
     id: 'connector.noAssetsSent',
     defaultMessage: '!!!No assets sent',

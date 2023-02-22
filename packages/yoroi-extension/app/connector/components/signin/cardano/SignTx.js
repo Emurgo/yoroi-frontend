@@ -2,6 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import type { ConnectorIntl } from '../../../types';
 import type { SummaryAssetsData } from '../CardanoSignTxPage';
+import BigNumber from 'bignumber.js';
 import { injectIntl } from 'react-intl';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -12,20 +13,33 @@ import CardanoSignTxSummary from './SignTxSummary';
 import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expand.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
 
-const getAssetDisplayValue = ({ amount, tokenInfo }) => {
-  const tokenName = getTokenName(tokenInfo);
-  return `${tokenInfo.IsNFT && amount == 1 ? '' : amount + ' '}${tokenName}`;
-};
+type AssetDisplayValueProps = {|
+  amount: BigNumber,
+  tokenInfo: any,
+  renderExplorerHashLink: Function,
+|};
+
+export const getAssetDisplayValue = ({
+  amount,
+  tokenInfo,
+  renderExplorerHashLink,
+}: AssetDisplayValueProps): Node => (
+  <>
+    {amount.toNumber() === 1 && tokenInfo.IsNFT ? null : <span>{amount.toNumber() + ' '}</span>}
+    {renderExplorerHashLink(tokenInfo)}
+  </>
+);
 
 type Props = {|
   txAssetsData: SummaryAssetsData,
+  renderExplorerHashLink: Function,
   passwordFormField: Node,
 |};
 
 function CardanoSignTx({
   intl,
   txAssetsData,
-  // getAddressUrlHash,
+  renderExplorerHashLink,
   passwordFormField,
 }: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
@@ -34,7 +48,10 @@ function CardanoSignTx({
 
   return (
     <Box>
-      <CardanoSignTxSummary txAssetsData={txAssetsData} />
+      <CardanoSignTxSummary
+        renderExplorerHashLink={renderExplorerHashLink}
+        txAssetsData={txAssetsData}
+      />
       <Panel>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start">
           <Typography color="#4A5065" fontWeight={500}>
@@ -54,6 +71,7 @@ function CardanoSignTx({
             assets={sent}
             action="sent"
             panelTitle={intl.formatMessage(connectorMessages.send)}
+            renderExplorerHashLink={renderExplorerHashLink}
           />
           <ExpandableAssetsPanel
             intl={intl}
@@ -62,6 +80,7 @@ function CardanoSignTx({
             assets={received}
             action="received"
             panelTitle={intl.formatMessage(connectorMessages.receive)}
+            renderExplorerHashLink={renderExplorerHashLink}
           />
         </>
       )}
@@ -79,6 +98,7 @@ const ExpandableAssetsPanel = ({
   panelTitle,
   action,
   hasNativeToken,
+  renderExplorerHashLink,
 }): Node => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandable = assets.length > 1;
@@ -112,13 +132,17 @@ const ExpandableAssetsPanel = ({
       )}
 
       {!isExpandable && assets.length === 1 && (
-        <AsseetValueDisplay>{getAssetDisplayValue(assets[0])}</AsseetValueDisplay>
+        <AsseetValueDisplay>
+          {getAssetDisplayValue({ ...assets[0], renderExplorerHashLink })}
+        </AsseetValueDisplay>
       )}
 
       {isExpandable && isExpanded && (
         <>
           {assets.map((asset, k) => (
-            <AsseetValueDisplay key={k}>{getAssetDisplayValue(asset)}</AsseetValueDisplay>
+            <AsseetValueDisplay key={k}>
+              {getAssetDisplayValue({ ...asset, renderExplorerHashLink })}
+            </AsseetValueDisplay>
           ))}
         </>
       )}

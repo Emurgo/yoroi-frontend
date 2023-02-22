@@ -84,14 +84,6 @@ class CardanoUtxoDetails extends Component<Props> {
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
     const ticker = tokenInfo ? this.getTicker(tokenInfo) : nameFromIdentifier;
 
-    if (Boolean(tokenInfo?.IsNFT)) {
-      return (
-        <div>
-          <span>{ticker}</span>
-        </div>
-      );
-    }
-
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
       numberOfDecimals
