@@ -2,7 +2,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
