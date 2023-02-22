@@ -2,14 +2,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import classnames from 'classnames';
-import styles from './Transaction.scss';
-import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
-import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
-import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
-import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
-import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
-import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -28,16 +20,23 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
-import styles from './Transaction.scss';
+import BigNumber from 'bignumber.js';
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
+import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
+import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
+import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
+import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
+import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
+import styles from './Transaction.scss';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
 import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import { Logger } from '../../../utils/logging';
-import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
@@ -54,10 +53,7 @@ import {
   parseMetadataDetailed,
 } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
-import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import {
   assuranceLevelTranslations,
   jormungandrCertificateKinds,
