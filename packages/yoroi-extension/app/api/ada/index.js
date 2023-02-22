@@ -859,12 +859,12 @@ export default class AdaApi {
         password,
       });
 
-      const { txHash, encodedTx } = RustModule.WasmScope(WasmModule => {
+      const { txHash, encodedTx } = RustModule.WasmScope(Scope => {
         const signedTx = shelleySignTransaction(
           request.signRequest.senderUtxos,
           request.signRequest.unsignedTx,
           request.publicDeriver.getParent().getPublicDeriverLevel(),
-          WasmModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Scope.WalletV4.Bip32PrivateKey.from_bytes(
             Buffer.from(normalizedKey.prvKeyHex, 'hex')
           ),
           request.signRequest.neededStakingKeyHashes.wits,
@@ -873,7 +873,7 @@ export default class AdaApi {
 
         return {
           txHash: Buffer.from(
-            WasmModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+            Scope.WalletV4.hash_transaction(signedTx.body()).to_bytes()
           ).toString('hex'),
           encodedTx: signedTx.to_bytes(),
         }
@@ -1288,9 +1288,9 @@ export default class AdaApi {
       policyId: string, assetId: string,
     |} {
       const { script, assetName } = mintEntry;
-      const policyId = RustModule.WasmScope(WasmModule => {
+      const policyId = RustModule.WasmScope(Scope => {
         return bytesToHex(
-          WasmModule.WalletV4.NativeScript
+          Scope.WalletV4.NativeScript
             .from_bytes(hexToBytes(script))
             .hash()
             .to_bytes()
@@ -1301,9 +1301,9 @@ export default class AdaApi {
       return { policyId, assetId };
     }
 
-    RustModule.WasmScope(WasmModule => {
+    RustModule.WasmScope(Scope => {
       for (const outputHex of (includeOutputs ?? [])) {
-        const output = WasmModule.WalletV4.TransactionOutput.from_bytes(hexToBytes(outputHex))
+        const output = Scope.WalletV4.TransactionOutput.from_bytes(hexToBytes(outputHex))
         const newOutput = {
           address: bytesToHex(output.address().to_bytes()),
           amount: multiTokenFromCardanoValue(output.amount(), defaultToken),
@@ -1383,9 +1383,9 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-        RustModule.WasmScope(WasmModule => {
+        RustModule.WasmScope(Scope => {
           // ensureRequiredMinimalValue is true
-          const minAmount = WasmModule.WalletV4.min_ada_required(
+          const minAmount = Scope.WalletV4.min_ada_required(
             cardanoValueFromMultiToken(amount),
             dataHash != null,
             protocolParams.coinsPerUtxoWord,
@@ -2545,7 +2545,11 @@ function getDifferenceAfterTx(
   stakingKey: RustModule.WalletV4.PublicKey,
   defaultToken: DefaultTokenEntry,
 ): MultiToken {
-  const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+
+  const accountKeyString = RustModule.WasmScope(Scope => {
+    const stakeCredential = Scope.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+    return Buffer.from(stakeCredential.to_bytes()).toString('hex')
+  })
 
   const sumInForKey = new MultiToken([], defaultToken);
   {
@@ -2561,7 +2565,7 @@ function getDifferenceAfterTx(
         throw new Error(`${nameof(getDifferenceAfterTx)} utxo not found. Should not happen`);
       }
       const address = match.address;
-      if (addrContainsAccountKey(address, stakeCredential, true)) {
+      if (addrContainsAccountKey(address, accountKeyString, true)) {
         sumInForKey.joinAddMutable(new MultiToken(
           match.output.tokens.map(token => ({
             identifier: token.Token.Identifier,
@@ -2581,7 +2585,7 @@ function getDifferenceAfterTx(
     for (let i = 0; i < outputs.len(); i++) {
       const output = outputs.get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
-      if (addrContainsAccountKey(address, stakeCredential, true)) {
+      if (addrContainsAccountKey(address, accountKeyString, true)) {
         sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));
       }
     }

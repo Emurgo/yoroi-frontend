@@ -2,6 +2,15 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import moment from 'moment';
+import classnames from 'classnames';
+import styles from './Transaction.scss';
+import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
+import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
+import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
+import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
+import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -86,7 +95,9 @@ type State = {|
 
 @observer
 export default class TransactionRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+  static contextTypes: {|
+    intl: $npm$ReactIntl$IntlFormat,
+  |} = {
     intl: intlShape.isRequired,
   };
 
@@ -98,13 +109,20 @@ export default class TransactionRevamp extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
 
-  getTxTypeMsg(intl: $npm$ReactIntl$IntlFormat, currency: string, data: WalletTransaction): string {
+  getTxType(
+    intl: $npm$ReactIntl$IntlFormat,
+    currency: string,
+    data: WalletTransaction
+  ): {|
+    icon: string,
+    msg: string,
+  |} {
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
-      return intl.formatMessage(messages.sent, { currency });
+      return { icon: 'send', msg: intl.formatMessage(messages.sent, { currency }) };
     }
     if (type === transactionTypes.INCOME) {
-      return intl.formatMessage(messages.received, { currency });
+      return { icon: 'receive', msg: intl.formatMessage(messages.received, { currency }) };
     }
     if (type === transactionTypes.SELF) {
       if (data instanceof CardanoShelleyTransaction) {
@@ -115,10 +133,13 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeDeregistration') &&
             features.length === 2)
         ) {
-          return intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' });
+          return {
+            icon: 'reward',
+            msg: intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' }),
+          };
         }
         if (features.includes('CatalystVotingRegistration') && features.length === 1) {
-          return intl.formatMessage(messages.catalystVotingRegistered);
+          return { icon: 'reward', msg: intl.formatMessage(messages.catalystVotingRegistered) };
         }
         if (
           (features.includes('StakeDelegation') && features.length === 1) ||
@@ -126,13 +147,13 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeRegistration') &&
             features.length === 2)
         ) {
-          return intl.formatMessage(messages.stakeDelegated);
+          return { icon: '', msg: intl.formatMessage(messages.stakeDelegated) };
         }
         if (features.includes('StakeRegistration') && features.length === 1) {
-          return intl.formatMessage(messages.stakeKeyRegistered);
+          return { icon: '', msg: intl.formatMessage(messages.stakeKeyRegistered) };
         }
       }
-      return intl.formatMessage(messages.intrawallet, { currency });
+      return { icon: 'send', msg: intl.formatMessage(messages.intrawallet, { currency }) };
     }
     if (type === transactionTypes.MULTI) {
       // can happen for example in Cardano
@@ -140,15 +161,15 @@ export default class TransactionRevamp extends Component<Props, State> {
       // you have an input to pay the tx fee
       // there is an input you don't own (the withdrawal)
       // you have an output to receive change + withdrawal amount
-      return intl.formatMessage(messages.multiparty, { currency });
+      return { icon: 'receive', msg: intl.formatMessage(messages.multiparty, { currency }) };
     }
     // unused
     if (type === transactionTypes.EXCHANGE) {
       Logger.error('EXCHANGE type transactions not supported');
-      return '???';
+      return { icon: '', msg: '???' };
     }
     Logger.error('Unknown transaction type');
-    return '???';
+    return { icon: '', msg: '???' };
   }
 
   getStatusString(
@@ -487,6 +508,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
+    const txType = this.getTxType(intl, this.getTicker(data.amount.getDefaultEntry()), data);
 
     return (
       <Box className={styles.component}>
@@ -506,6 +528,9 @@ export default class TransactionRevamp extends Component<Props, State> {
                 alignItems: 'center',
               }}
             >
+              <Box>
+                <TypeIcon type={txType.icon} />
+              </Box>
               <Box sx={columnTXStyles.transactionType}>
                 <Typography
                   variant="body1"
@@ -515,7 +540,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       : 'var(--yoroi-palette-gray-900)'
                   }
                 >
-                  {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
+                  {txType.msg}
                 </Typography>
                 <Typography
                   variant="body3"
@@ -902,3 +927,15 @@ export default class TransactionRevamp extends Component<Props, State> {
     return null;
   };
 }
+
+const icons = {
+  send: SendIcon,
+  receive: ReceiveIcon,
+  reward: RewardIcon,
+  error: ErrorIcon,
+};
+
+const TypeIcon = ({ type }) => {
+  const Icon = icons[type];
+  return <Box sx={{ width: 40, height: 40 }}>{Icon && <Icon />}</Box>;
+};
