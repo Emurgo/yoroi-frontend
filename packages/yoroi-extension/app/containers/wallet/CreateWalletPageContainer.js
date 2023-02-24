@@ -17,23 +17,13 @@ type Props = InjectedOrGenerated<GeneratedData>;
 
 @observer
 export default class CreateWalletPageContainer extends Component<Props> {
-
-  openDialog: Node => void = dialog => {
-    this.generated.actions.dialogs.open.trigger({ dialog });
-  }
-
   render(): Node {
-    const { stores, actions } = this.generated;
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
-        <CreateWalletPage
-          openDialog={this.openDialog}
-          closeDialog={actions.dialogs.closeActiveDialog.trigger}
-          isDialogOpen={stores.uiDialogs.isOpen}
-        />
+        <CreateWalletPage />
       </TopBarLayout>
     );
   }
@@ -41,24 +31,8 @@ export default class CreateWalletPageContainer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    actions: {|
-      dialogs: {|
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-        closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
-      |},
-    |},
-    stores: {|
-      uiDialogs: {|
-        isOpen: any => boolean
-      |},
-    |},
+    actions: {||},
+    stores: {||},
   |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -68,17 +42,8 @@ export default class CreateWalletPageContainer extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
-      stores: {
-        uiDialogs: {
-          isOpen: stores.uiDialogs.isOpen,
-        }
-      },
-      actions: {
-        dialogs: {
-          open: { trigger: actions.dialogs.open.trigger },
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
-        },
-      },
+      stores: {},
+      actions: {},
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
       SidebarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<SidebarContainerData>
