@@ -12,18 +12,18 @@ import AddWalletCard from './AddWalletCard';
 
 
 const messages: * = defineMessages({
-    createWallet: {
-        id: 'wallet.add.page.revamp.createWallet',
-        defaultMessage: 'Create new wallet',
-    },
-    restoreWallet: {
-        id: 'wallet.add.page.revamp.restoreWallet',
-        defaultMessage: 'Restore existing wallet',
-    },
-    connectHardwareWallet: {
-        id: 'wallet.add.page.revamp.connectHardwareWallet',
-        defaultMessage: 'Connect hardware wallet',
-    },
+  createWallet: {
+    id: 'wallet.add.page.revamp.createWallet',
+    defaultMessage: '!!!Create new wallet',
+  },
+  restoreWallet: {
+    id: 'wallet.add.page.revamp.restoreWallet',
+    defaultMessage: '!!!Restore existing wallet',
+  },
+  connectHardwareWallet: {
+    id: 'wallet.add.page.revamp.connectHardwareWallet',
+    defaultMessage: '!!!Connect hardware wallet',
+  },
 });
 
 type Intl = {|

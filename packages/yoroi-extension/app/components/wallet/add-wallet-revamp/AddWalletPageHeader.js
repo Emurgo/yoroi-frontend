@@ -13,7 +13,7 @@ import globalMessages from '../../../i18n/global-messages';
 const messages: * = defineMessages({
     subtitle: {
         id: 'wallet.add.page.revamp.subtitle',
-        defaultMessage: 'Light wallet for Cardano assets',
+        defaultMessage: '!!!Light wallet for Cardano assets',
     }
 });
 
