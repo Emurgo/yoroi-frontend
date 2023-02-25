@@ -4,6 +4,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography } from '@mui/material'
+import StepController from './StepController';
 
 const messages: * = defineMessages({
   description: {
@@ -31,6 +32,11 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           </Typography>
 
           <iframe width="100%" height="365px" src="https://www.youtube.com/embed/_ltQayKP5ek" title="Introducing EMURGO" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ borderRadius: '8px' }} />
+
+          <StepController
+            goNext={() => {}}
+            goBack={() => {}}
+          />
         </Stack>
       </Stack>
     )
