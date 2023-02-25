@@ -44,7 +44,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
 
     return (
       <Box>
-        <Stack direction='row' alignItems='center' justifyContent='center' gap='24px' mt='24px'>
+        <Stack direction='row' alignItems='center' justifyContent='center' gap='24px' mt='24px' mb='48px'>
           {steps.map(([stepId, label]) => {
             const stepColor = currentStep === stepId ? 'primary.200' : 'grey.400';
             return (
@@ -61,6 +61,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
                     borderStyle: 'solid',
                     borderColor: stepColor,
                     borderRadius: '50%',
+                    transition: 'color 300ms ease',
                   }}
                 >
                   <Typography variant='body2' fontWeight={500} color={stepColor}>

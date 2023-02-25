@@ -8,6 +8,7 @@ import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
 import CreateWalletSteps from './CreateWalletSteps';
+import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 
 const messages: * = defineMessages({
   title: {
@@ -48,9 +49,10 @@ function CreateWalletPage(props: Props & Intl): Node {
       </Box>
 
       <CreateWalletSteps currentStep={1} />
+      <LearnAboutRecoveryPhrase />
 
       <SaveRecoveryPhraseTipsDialog
-        open={false} // Todo: revert this
+        open={!open} // Todo: revert this
         onClose={() => setOpen(false)}
       />
     </Box>
