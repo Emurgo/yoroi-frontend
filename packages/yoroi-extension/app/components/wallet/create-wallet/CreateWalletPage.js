@@ -7,6 +7,7 @@ import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
+import CreateWalletSteps from './CreateWalletSteps';
 
 const messages: * = defineMessages({
   title: {
@@ -46,8 +47,10 @@ function CreateWalletPage(props: Props & Intl): Node {
         <Typography variant='h3'>{intl.formatMessage(messages.title)}</Typography>
       </Box>
 
+      <CreateWalletSteps currentStep={1} />
+
       <SaveRecoveryPhraseTipsDialog
-        open={open}
+        open={false} // Todo: revert this
         onClose={() => setOpen(false)}
       />
     </Box>
