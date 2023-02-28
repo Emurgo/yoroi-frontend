@@ -353,7 +353,7 @@ export default class SendTxHintBlock extends React.Component<Props> {
 
     if (
       signTxInfo.tx.auxiliaryData &&
-        signTxInfo.tx.auxiliaryData.type === TxAuxiliaryDataType.CATALYST_REGISTRATION
+        signTxInfo.tx.auxiliaryData.type === TxAuxiliaryDataType.CIP36_REGISTRATION
     ) {
       const imgStep1 = require(`../../../../assets/img/nano-${deviceCode}/hint-catalyst-1.svg`).default;
       const imgStep2 = require(`../../../../assets/img/nano-${deviceCode}/hint-send-1.png`);
