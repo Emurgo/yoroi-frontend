@@ -8,6 +8,7 @@ import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS } from './steps';
+import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 
 const messages: * = defineMessages({
   title: {
@@ -32,7 +33,11 @@ function CreateWalletPage(props: Props & Intl): Node {
         nextStep={setCurrentStep}
       />
     ),
-    [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: <h1>Hello, World</h1>,
+    [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
+      <SaveRecoveryPhraseStep
+        nextStep={setCurrentStep}
+      />
+    ),
   }
 
   const CurrentStep = steps[currentStep];

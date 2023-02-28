@@ -1,11 +1,10 @@
 // @flow
-import { useEffect, useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Box, Typography } from '@mui/material'
-import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
+import { CREATE_WALLET_SETPS } from './steps';
 
 const messages: * = defineMessages({
   firstStep: {
@@ -31,32 +30,38 @@ type Intl = {|
 |};
 
 type Props = {|
-    currentStep: number,
+    currentStep: string,
 |};
+
+const steps = [
+  {
+    id: CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE,
+    message: messages.firstStep,
+  },
+  {
+    id: CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE,
+    message: messages.secondStep,
+  },
+  {
+    id: CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE,
+    message: messages.thirdStep,
+  },
+  {
+    id: CREATE_WALLET_SETPS.ADD_WALLET_DETAILS,
+    message: messages.forthStep,
+  },
+];
 
 function CreateWalletSteps(props: Props & Intl): Node {
   const { intl, currentStep } = props;
-  // steps: [id, label]
-  const steps = [
-    [1, messages.firstStep],
-    [2, messages.secondStep],
-    [3, messages.thirdStep],
-    [4, messages.forthStep],
-  ];
-
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
 
   return (
     <Box>
       <Stack direction='row' alignItems='center' justifyContent='center' gap='24px' mt='24px' mb='48px'>
-        {steps.map(([stepId, label]) => {
-          const stepColor = currentStep === stepId ? 'primary.200' : 'grey.400';
+        {steps.map(({ id, message }, idx) => {
+          const stepColor = currentStep === id ? 'primary.200' : 'grey.400';
           return (
-            <Stack direction='row' alignItems='center' justifyContent='center' key={stepId}>
+            <Stack direction='row' alignItems='center' justifyContent='center' key={id}>
               <Box
                 sx={{
                   width: '24px',
@@ -73,20 +78,16 @@ function CreateWalletSteps(props: Props & Intl): Node {
                 }}
               >
                 <Typography variant='body2' fontWeight={500} color={stepColor}>
-                  {stepId}
+                  {idx + 1}
                 </Typography>
               </Box>
               <Typography variant='body1' color={stepColor} fontWeight={500}>
-                {intl.formatMessage(label)}
+                {intl.formatMessage(message)}
               </Typography>
             </Stack>
-          )
+          );
         })}
       </Stack>
-      <SaveRecoveryPhraseTipsDialog
-        open={open}
-        onClose={() => setOpen(false)}
-      />
     </Box>
   );
 }
