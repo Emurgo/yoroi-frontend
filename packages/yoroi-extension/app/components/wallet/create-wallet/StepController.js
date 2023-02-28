@@ -11,8 +11,8 @@ type Intl = {|
 |};
 
 type Props = {|
-    goNext(): void,
-    goBack(): void,
+    goNext?: void => void,
+    goBack?: void => void,
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
@@ -23,7 +23,8 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         <Button
           variant='outlined'
           disableRipple={false}
-          onClick={goBack}
+          disabled={!goBack}
+          onClick={() => goBack && goBack()}
           sx={{
             width: '144px',
             height: '40px',
@@ -38,7 +39,8 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         <Button
           variant='rv-primary'
           disableRipple={false}
-          onClick={goNext}
+          disabled={!goNext}
+          onClick={() => goNext && goNext()}
           sx={{
             width: '144px',
             height: '40px',
@@ -50,6 +52,11 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         </Button>
       </Stack>
     )
+}
+
+LearnAboutRecoveryPhrase.defaultProps = {
+  goNext: undefined,
+  goBack: undefined,
 }
 
 export default (injectIntl(observer(LearnAboutRecoveryPhrase)) : ComponentType<Props>);
