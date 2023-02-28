@@ -1,3 +1,4 @@
+
 // @flow
 import type { Node, ComponentType } from 'react';
 import InfoDialog from '../../widgets/infoDialog';
@@ -7,28 +8,28 @@ import { Typography, Box } from '@mui/material';
 
 const messages: Object = defineMessages({
   title: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.title',
-    defaultMessage: '!!!Read this before saving your recovery phrase',
+    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.title',
+    defaultMessage: '!!!How to save your recovery phrase?',
   },
   firstTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.firstTip',
-    defaultMessage: '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
+    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.firstTip',
+    defaultMessage: '!!!Make sure no one is looking at your screen.',
   },
   secondTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.secondTip',
-    defaultMessage: '!!!The recovery phrase is the only way to access your wallet.',
+    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.secondTip',
+    defaultMessage: '!!!DO NOT take a screenshot.',
   },
   thirdTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.thirdTip',
-    defaultMessage: '!!!Yoroi will NEVER ask for the recovery phrase. Watch out for scammers and impersonators.',
+    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.thirdTip',
+    defaultMessage: '!!!Write the recovery phrase on a piece of paper and store in a secure location like a safety deposit box. ',
   },
   forthTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.forthTip',
-    defaultMessage: '!!!If you lose your recovery phrase, it will not be possible to recover your wallet.',
+    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.forthTip',
+    defaultMessage: '!!!It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.',
   },
   fifthTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.fifthTip',
-    defaultMessage: '!!!Remember: you are the only person who should know this recovery phrase.',
+    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.fifthTip',
+    defaultMessage: '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
   },
 });
 

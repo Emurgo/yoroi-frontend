@@ -22,17 +22,17 @@ type Intl = {|
 
 type Props = {|
     currentStep: number,
-    nextStep(step: string): void,
+    setCurrentStep(step: string): void,
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { intl, nextStep } = props;
+  const { intl, setCurrentStep } = props;
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setOpen(true)
   }, [])
-  
+
   return (
     <Stack alignItems='center' justifyContent='center'>
       <Stack direction='column' alignItems='center' justifyContent='center' maxWidth='648px'>
@@ -43,7 +43,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         <iframe width="100%" height="365px" src="https://www.youtube.com/embed/_ltQayKP5ek" title="Introducing EMURGO" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ borderRadius: '8px' }} />
 
         <StepController
-          goNext={() => nextStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
+          goNext={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
         />
       </Stack>
       <SaveRecoveryPhraseTipsDialog

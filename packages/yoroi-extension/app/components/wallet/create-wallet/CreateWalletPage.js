@@ -30,12 +30,12 @@ function CreateWalletPage(props: Props & Intl): Node {
   const steps = {
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
-        nextStep={setCurrentStep}
+        setCurrentStep={setCurrentStep}
       />
     ),
     [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
       <SaveRecoveryPhraseStep
-        nextStep={setCurrentStep}
+        setCurrentStep={setCurrentStep}
       />
     ),
   }
