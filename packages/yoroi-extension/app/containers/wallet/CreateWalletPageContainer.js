@@ -18,12 +18,16 @@ type Props = InjectedOrGenerated<GeneratedData>;
 @observer
 export default class CreateWalletPageContainer extends Component<Props> {
   render(): Node {
+    const { stores } = this.generated;
+    
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
-        <CreateWalletPage />
+        <CreateWalletPage
+          genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
+        />
       </TopBarLayout>
     );
   }
@@ -32,7 +36,11 @@ export default class CreateWalletPageContainer extends Component<Props> {
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {||},
-    stores: {||},
+    stores: {|
+      wallets: {|
+        genWalletRecoveryPhrase: void => Promise<Array<string>>,
+      |},
+    |},
   |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -42,7 +50,15 @@ export default class CreateWalletPageContainer extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
-      stores: {},
+      stores: {
+        substores: {
+          ada: {
+            wallets: {
+              genWalletRecoveryPhrase: stores.substores.ada.wallets.genWalletRecoveryPhrase,
+            },
+          },
+        },
+      },
       actions: {},
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
       SidebarContainerProps: (

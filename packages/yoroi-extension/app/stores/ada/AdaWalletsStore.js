@@ -110,6 +110,18 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
+  genWalletRecoveryPhrase: void => Promise<string> = async () => {
+    const recoveryPhrase = await (
+      this.generateWalletRecoveryPhraseRequest.execute({}).promise
+    );
+
+    if (recoveryPhrase == null) {
+      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+    };
+
+    return recoveryPhrase;
+  }
+
   /** Create the wallet and go to wallet summary screen */
   _createInDb: void => Promise<void> = async () => {
     const persistentDb = this.stores.loading.getDatabase();
