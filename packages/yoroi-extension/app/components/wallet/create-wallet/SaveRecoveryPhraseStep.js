@@ -1,7 +1,7 @@
 // @flow
 import { useEffect, useState } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography } from '@mui/material'
@@ -11,8 +11,8 @@ import HowToSaveRecoverPhraseTipsDialog from './HowToSaveRecoverPhraseTipsDialog
 
 const messages: * = defineMessages({
   description: {
-    id: 'wallet.create.firstStep.description',
-    defaultMessage: '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to use a recovery phrase.',
+    id: 'wallet.create.secondStep.description',
+    defaultMessage: '!!!Click <strong>“Show recovery phrase”</strong> below to reveal and keep it.',
   },
 });
 
@@ -35,7 +35,10 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
 
   return (
     <Stack alignItems='center' justifyContent='center'>
-      <Stack direction='column' alignItems='center' justifyContent='center' maxWidth='648px'>
+      <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='648px'>
+        <Typography>
+          <FormattedHTMLMessage {...messages.description} />
+        </Typography>
 
         <StepController
           goNext={() => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE)}
@@ -44,7 +47,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
       </Stack>
 
       <HowToSaveRecoverPhraseTipsDialog
-        open={open}
+        open={!open} // Todo: undo this
         onClose={() => setOpen(false)}
       />
     </Stack>
