@@ -1,5 +1,5 @@
 // @flow
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -29,11 +29,7 @@ type Props = {|
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
   const { setCurrentStep, recoveryPhrase } = props;
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
+  const [open, setOpen] = useState(true);
 
   return (
     <Stack alignItems='center' justifyContent='center'>
@@ -56,7 +52,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
       </Stack>
 
       <HowToSaveRecoverPhraseTipsDialog
-        open={!open} // Todo: undo this
+        open={open}
         onClose={() => setOpen(false)}
       />
     </Stack>

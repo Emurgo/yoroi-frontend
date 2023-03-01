@@ -25,7 +25,7 @@ type Props = {||};
 
 function CreateWalletPage(props: Props & Intl): Node {
   const { intl, genWalletRecoveryPhrase } = props;
-  const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
+  const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
 
   const steps = {

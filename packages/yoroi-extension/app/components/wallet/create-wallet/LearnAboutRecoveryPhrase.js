@@ -1,5 +1,5 @@
 // @flow
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -25,11 +25,7 @@ type Props = {|
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   const { intl, onNext } = props;
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
+  const [open, setOpen] = useState(true);
 
   return (
     <Stack alignItems='center' justifyContent='center'>
