@@ -19,7 +19,7 @@ type Props = InjectedOrGenerated<GeneratedData>;
 export default class CreateWalletPageContainer extends Component<Props> {
   render(): Node {
     const { stores } = this.generated;
-    
+
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}

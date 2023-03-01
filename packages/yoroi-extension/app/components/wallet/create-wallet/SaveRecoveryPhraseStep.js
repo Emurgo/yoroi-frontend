@@ -4,10 +4,12 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography } from '@mui/material'
+import { Stack, Typography, Box } from '@mui/material'
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS } from './steps';
 import HowToSaveRecoverPhraseTipsDialog from './HowToSaveRecoverPhraseTipsDialog';
+import RecoveryPhrase from './RecoveryPhrase';
+import { ReactComponent as InfoIcon }  from '../../../assets/images/info-icon-primary.inline.svg';
 
 const messages: * = defineMessages({
   description: {
@@ -21,12 +23,12 @@ type Intl = {|
 |};
 
 type Props = {|
-    currentStep: number,
     setCurrentStep(step: string): void,
+    recoveryPhrase: Array<string> | null,
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
-  const { intl, setCurrentStep } = props;
+  const { intl, setCurrentStep, recoveryPhrase } = props;
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -35,10 +37,17 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
 
   return (
     <Stack alignItems='center' justifyContent='center'>
-      <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='648px'>
-        <Typography>
-          <FormattedHTMLMessage {...messages.description} />
-        </Typography>
+      <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='700px'>
+        <Stack mb='8px' flexDirection='row' alignItems='center' gap='6px'>
+          <Typography>
+            <FormattedHTMLMessage {...messages.description} />
+          </Typography>
+          <Box sx={{ cursor: 'pointer' }} onClick={() => setOpen(true)}>
+            <InfoIcon />
+          </Box>
+        </Stack>
+
+        {recoveryPhrase && <RecoveryPhrase recoveryPhrase={recoveryPhrase} />}
 
         <StepController
           goNext={() => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE)}

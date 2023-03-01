@@ -24,18 +24,24 @@ type Intl = {|
 type Props = {||};
 
 function CreateWalletPage(props: Props & Intl): Node {
-  const { intl } = props;
+  const { intl, genWalletRecoveryPhrase } = props;
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
+  const [recoveryPhrase, setRecoveryPhrase] = useState(null);
 
   const steps = {
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
-        setCurrentStep={setCurrentStep}
+        onNext={async () => {
+          setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
+          const walletRecoveryPhrase = await genWalletRecoveryPhrase();
+          setRecoveryPhrase(walletRecoveryPhrase);
+        }}
       />
     ),
     [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
       <SaveRecoveryPhraseStep
         setCurrentStep={setCurrentStep}
+        recoveryPhrase={recoveryPhrase}
       />
     ),
   };
