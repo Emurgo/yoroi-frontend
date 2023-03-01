@@ -28,7 +28,7 @@ type Props = {|
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
-  const { intl, setCurrentStep, recoveryPhrase } = props;
+  const { setCurrentStep, recoveryPhrase } = props;
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

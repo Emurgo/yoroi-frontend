@@ -33,6 +33,7 @@ function CreateWalletPage(props: Props & Intl): Node {
       <LearnAboutRecoveryPhrase
         onNext={async () => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
+          if (recoveryPhrase !== null) return;
           const walletRecoveryPhrase = await genWalletRecoveryPhrase();
           setRecoveryPhrase(walletRecoveryPhrase);
         }}

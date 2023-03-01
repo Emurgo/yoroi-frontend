@@ -4,7 +4,8 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box, Typography, Grid, Stack, Button } from '@mui/material'
+import { Box, Typography, Grid, Button } from '@mui/material'
+import { ReactComponent as EyeIcon }  from '../../../assets/images/open-eye-primary.inline.svg';
 
 type Props = {|
     recoveryPhrase: Array<string> | null,
@@ -24,7 +25,6 @@ const messages: * = defineMessages({
 
 function RecoveryPhrase(props: Props & Intl): Node {
   const { recoveryPhrase, intl } = props;
-  const [open, setOpen] = useState(false);
   const [isRecoverPhraseShown, showRecoveryPhrase] = useState(false);
 
   return (
@@ -63,8 +63,25 @@ function RecoveryPhrase(props: Props & Intl): Node {
           </Grid>
         ))}
       </Grid>
-      <Button size='medium' sx={{ display: 'inline-block', mt: '22px' }} onClick={() => showRecoveryPhrase(!isRecoverPhraseShown)}>
-        {intl.formatMessage(messages.showRecoveryPhraseBtn)}
+      <Button
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          mt: '22px',
+          ml: '-10px',
+          height: 'unset',
+          minHeight: 'unset',
+          lineHeight: 1,
+          padding: '6px',
+        }}
+        onClick={() => showRecoveryPhrase(!isRecoverPhraseShown)}
+      >
+        <EyeIcon />
+        <Typography variant='body2' fontWeight='500'>
+          {intl.formatMessage(messages.showRecoveryPhraseBtn)}
+        </Typography>
       </Button>
     </Box>
   )
