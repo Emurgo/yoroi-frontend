@@ -2,16 +2,30 @@
 import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
+import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box, Typography, Grid, Stack } from '@mui/material'
+import { Box, Typography, Grid, Stack, Button } from '@mui/material'
 
 type Props = {|
     recoveryPhrase: Array<string> | null,
 |};
 
-function SaveRecoveryPhraseStep(props: Props & Intl): Node {
-  const { recoveryPhrase } = props;
+type Intl = {|
+  intl: $npm$ReactIntl$IntlShape,
+|};
+
+
+const messages: * = defineMessages({
+  showRecoveryPhraseBtn: {
+    id: 'wallet.create.secondStep.showRecoveryPhraseBtn',
+    defaultMessage: '!!!Show recovery phrase',
+  },
+});
+
+function RecoveryPhrase(props: Props & Intl): Node {
+  const { recoveryPhrase, intl } = props;
   const [open, setOpen] = useState(false);
+  const [isRecoverPhraseShown, showRecoveryPhrase] = useState(false);
 
   return (
     <Box width="100%" mt='8px'>
@@ -29,6 +43,8 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
               alignItems: 'center',
               justifyContent: 'center',
               height: '40px',
+              filter: isRecoverPhraseShown ? 'unset' : 'blur(4px)',
+              cursor: isRecoverPhraseShown ? 'auto' : 'not-allowed'
             }}
           >
             <Typography
@@ -47,8 +63,11 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
           </Grid>
         ))}
       </Grid>
+      <Button size='medium' sx={{ display: 'inline-block', mt: '22px' }} onClick={() => showRecoveryPhrase(!isRecoverPhraseShown)}>
+        {intl.formatMessage(messages.showRecoveryPhraseBtn)}
+      </Button>
     </Box>
   )
 }
 
-export default (observer(SaveRecoveryPhraseStep) : ComponentType<Props>);
+export default (injectIntl(observer(RecoveryPhrase)) : ComponentType<Props>);
