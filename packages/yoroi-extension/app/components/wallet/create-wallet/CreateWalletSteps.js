@@ -35,34 +35,55 @@ type Props = {|
 
 const steps = [
   {
-    id: CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE,
+    stepId: CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE,
     message: messages.firstStep,
   },
   {
-    id: CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE,
+    stepId: CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE,
     message: messages.secondStep,
   },
   {
-    id: CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE,
+    stepId: CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE,
     message: messages.thirdStep,
   },
   {
-    id: CREATE_WALLET_SETPS.ADD_WALLET_DETAILS,
+    stepId: CREATE_WALLET_SETPS.ADD_WALLET_DETAILS,
     message: messages.forthStep,
   },
 ];
 
 function CreateWalletSteps(props: Props & Intl): Node {
-  const { intl, currentStep } = props;
+  const { intl, currentStep, setCurrentStep } = props;
+  const currentStepIdx = steps.findIndex(step => step.stepId === currentStep);
+  if (currentStepIdx === -1) throw new Error(`Step to found. Should never happen`)
 
   return (
     <Box>
       <Stack direction='row' alignItems='center' justifyContent='center' gap='24px' mt='24px' mb='48px'>
-        {steps.map(({ id, message }, idx) => {
-          const stepColor = currentStep === id ? 'primary.200' : 'grey.400';
+        {steps.map(({ stepId, message }, idx) => {
+          const isCurrentStep = currentStepIdx === idx ;
+          const isPrevStep = idx < currentStepIdx;
+          const isFutureStep = idx > currentStepIdx;
+          let stepColor = 'grey.400';
+          let cursor = 'pointer';
+
+          if (isCurrentStep) stepColor = 'primary.200'
+          else if (isPrevStep) stepColor = '#A0B3F2'; // Todo: add the color to the design system
+
+          if (isFutureStep) cursor = 'not-allowed'
+
           return (
-            <Stack direction='row' alignItems='center' justifyContent='center' key={id}>
+            <Stack
+              direction='row'
+              alignItems='center'
+              justifyContent='center'
+              key={stepId}
+              onClick={() => {
+                if (isPrevStep) setCurrentStep(stepId);
+              }}
+            >
               <Box
+                component='button'
                 sx={{
                   width: '24px',
                   height: '24px',
@@ -75,13 +96,14 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   borderColor: stepColor,
                   borderRadius: '50%',
                   transition: 'color 300ms ease',
+                  cursor,
                 }}
               >
                 <Typography variant='body2' fontWeight={500} color={stepColor}>
                   {idx + 1}
                 </Typography>
               </Box>
-              <Typography variant='body1' color={stepColor} fontWeight={500}>
+              <Typography sx={{ cursor }} variant='body1' color={stepColor} fontWeight={500}>
                 {intl.formatMessage(message)}
               </Typography>
             </Stack>

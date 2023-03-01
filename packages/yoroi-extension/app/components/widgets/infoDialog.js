@@ -1,5 +1,5 @@
 // @flow
-import Zoom from '@mui/material/Zoom';
+import Fade from '@mui/material/Fade';
 import { Dialog, Typography, Button, Stack, Link } from '@mui/material';
 import React from 'react';
 import type { Node, ComponentType } from 'react';
@@ -26,7 +26,7 @@ type Intl = {|
 |};
 
 const Transition = React.forwardRef((props, ref) => {
-  return <Zoom timeout={500} ref={ref} {...props} />;
+  return <Fade timeout={500} ref={ref} {...props} />;
 });
 
 function InfoDialog(props: Props & Intl): Node {

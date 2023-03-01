@@ -64,7 +64,7 @@ function CreateWalletPage(props: Props & Intl): Node {
         </Box>
         <Typography variant='h3'>{intl.formatMessage(messages.title)}</Typography>
       </Box>
-      <CreateWalletSteps currentStep={currentStep} />
+      <CreateWalletSteps currentStep={currentStep} setCurrentStep={setCurrentStep} />
       {CurrentStep}
     </Box>
   );
