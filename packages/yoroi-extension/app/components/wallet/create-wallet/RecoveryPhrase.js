@@ -1,5 +1,4 @@
 // @flow
-import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -24,8 +23,7 @@ const messages: * = defineMessages({
 });
 
 function RecoveryPhrase(props: Props & Intl): Node {
-  const { recoveryPhrase, intl } = props;
-  const [isRecoverPhraseShown, showRecoveryPhrase] = useState(false);
+  const { recoveryPhrase, intl, shouldShowRecoveryPhrase, toggleRecoveryPhrase } = props;
 
   return (
     <Box width="100%" mt='8px'>
@@ -43,8 +41,8 @@ function RecoveryPhrase(props: Props & Intl): Node {
               alignItems: 'center',
               justifyContent: 'center',
               height: '40px',
-              filter: isRecoverPhraseShown ? 'unset' : 'blur(4px)',
-              cursor: isRecoverPhraseShown ? 'auto' : 'not-allowed'
+              filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
+              cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed'
             }}
           >
             <Typography
@@ -76,7 +74,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
           lineHeight: 1,
           padding: '6px',
         }}
-        onClick={() => showRecoveryPhrase(!isRecoverPhraseShown)}
+        onClick={toggleRecoveryPhrase}
       >
         <EyeIcon />
         <Typography variant='body2' fontWeight='500'>

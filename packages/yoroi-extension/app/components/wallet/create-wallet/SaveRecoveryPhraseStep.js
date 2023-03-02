@@ -1,5 +1,5 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import { Node, ComponentType, useState } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -28,6 +28,12 @@ type Props = {|
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
   const { setCurrentStep, recoveryPhrase, shouldShowDialog, showDialog, hideDialog } = props;
+  const [shouldShowRecoveryPhrase, showRecoveryPhrase] = useState(false);
+
+  function goNextStepCallback() {
+    if (!shouldShowRecoveryPhrase) return;
+    return () => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE);
+  };
 
   return (
     <Stack alignItems='center' justifyContent='center'>
@@ -41,10 +47,15 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
           </Box>
         </Stack>
 
-        {recoveryPhrase && <RecoveryPhrase recoveryPhrase={recoveryPhrase} />}
+        {recoveryPhrase && (
+          <RecoveryPhrase
+            recoveryPhrase={recoveryPhrase}
+            shouldShowRecoveryPhrase={shouldShowRecoveryPhrase}
+            toggleRecoveryPhrase={() => showRecoveryPhrase(!shouldShowRecoveryPhrase)}
+          />)}
 
         <StepController
-          goNext={() => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE)}
+          goNext={goNextStepCallback()}
           goBack={() => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE)}
         />
       </Stack>
