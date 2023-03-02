@@ -1,17 +1,17 @@
 // @flow
-import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography } from '@mui/material'
+import { Stack, Typography, Box } from '@mui/material'
 import StepController from './StepController';
 import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
+import { ReactComponent as InfoIcon }  from '../../../assets/images/info-icon-primary.inline.svg';
 
 const messages: * = defineMessages({
   description: {
     id: 'wallet.create.firstStep.description',
-    defaultMessage: '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to use a recovery phrase.',
+    defaultMessage: '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to <strong>use a recovery phrase</strong>.',
   },
 });
 
@@ -24,14 +24,26 @@ type Props = {|
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { intl, onNext } = props;
-  const [open, setOpen] = useState(true);
+  const { onNext, shouldShowDialog, showDialog, hideDialog } = props;
 
   return (
     <Stack alignItems='center' justifyContent='center'>
       <Stack direction='column' alignItems='center' justifyContent='center' maxWidth='648px'>
-        <Typography variant='body1' mb='16px'>
-          {intl.formatMessage(messages.description)}
+        <Typography mb='16px' variant='body1'>
+          <FormattedHTMLMessage {...messages.description} />
+          <Box
+            component='span'
+            sx={{
+              cursor: 'pointer',
+              ml: '4px',
+              '& svg': {
+                mb: '-5px'
+              }
+          }}
+            onClick={showDialog}
+          >
+            <InfoIcon />
+          </Box>
         </Typography>
 
         <iframe
@@ -50,8 +62,8 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         />
       </Stack>
       <SaveRecoveryPhraseTipsDialog
-        open={open}
-        onClose={() => setOpen(false)}
+        open={shouldShowDialog}
+        onClose={hideDialog}
       />
     </Stack>
   );

@@ -1,5 +1,4 @@
 // @flow
-import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -28,8 +27,7 @@ type Props = {|
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
-  const { setCurrentStep, recoveryPhrase } = props;
-  const [open, setOpen] = useState(true);
+  const { setCurrentStep, recoveryPhrase, shouldShowDialog, showDialog, hideDialog } = props;
 
   return (
     <Stack alignItems='center' justifyContent='center'>
@@ -38,7 +36,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
           <Typography>
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
-          <Box sx={{ cursor: 'pointer' }} onClick={() => setOpen(true)}>
+          <Box sx={{ cursor: 'pointer' }} onClick={showDialog}>
             <InfoIcon />
           </Box>
         </Stack>
@@ -52,8 +50,8 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
       </Stack>
 
       <HowToSaveRecoverPhraseTipsDialog
-        open={open}
-        onClose={() => setOpen(false)}
+        open={shouldShowDialog}
+        onClose={hideDialog}
       />
     </Stack>
   )
