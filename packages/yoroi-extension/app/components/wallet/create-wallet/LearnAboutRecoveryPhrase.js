@@ -46,16 +46,18 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           </Box>
         </Typography>
 
-        <iframe
-          width="100%"
-          height="365px"
-          src="https://www.youtube.com/embed/_ltQayKP5ek"
-          title="Introducing EMURGO"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          style={{ borderRadius: '8px' }}
-        />
+        <Box sx={{ height: '365px', width: '100%' }}>
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/_ltQayKP5ek"
+            title="Introducing EMURGO"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ borderRadius: '8px' }}
+          />
+        </Box>
 
         <StepController
           goNext={onNext}
