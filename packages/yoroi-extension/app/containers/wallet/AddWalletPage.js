@@ -315,28 +315,7 @@ class AddWalletPage extends Component<AllProps> {
       );
     }
 
-    const { hasAnyWallets } = this.generated.stores.wallets;
-    if (!hasAnyWallets) {
-      return (
-        <TopBarLayout
-          banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
-          asModern
-        >
-          <WalletAdd
-            onHardwareConnect={
-              () => this.openDialogWrapper(WalletConnectHWOptionDialog)
-            }
-            onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
-            onRestore={() =>  this.openDialogWrapper(WalletRestoreOptionDialog)}
-            onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
-          />
-          {activeDialog}
-        </TopBarLayout>
-      );
-    }
-
-    const addWalletPageClassic = (
+    let addWalletPageClassic = (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
@@ -359,6 +338,27 @@ class AddWalletPage extends Component<AllProps> {
         {activeDialog}
       </TopBarLayout>
     );
+
+    const { hasAnyWallets } = this.generated.stores.wallets;
+    if (!hasAnyWallets) {
+      addWalletPageClassic = (
+        <TopBarLayout
+          banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+          asModern
+        >
+          <WalletAdd
+            onHardwareConnect={
+              () => this.openDialogWrapper(WalletConnectHWOptionDialog)
+            }
+            onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
+            onRestore={() =>  this.openDialogWrapper(WalletRestoreOptionDialog)}
+            onSettings={this._goToSettingsRoot}
+            onDaedalusTransfer={this._goToDaedalusTransferRoot}
+          />
+          {activeDialog}
+        </TopBarLayout>
+      );
+    }
 
     const addWalletPageRevamp = (
       <TopBarLayout
