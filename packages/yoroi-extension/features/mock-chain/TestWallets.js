@@ -7,6 +7,7 @@ export type RestorationInput = {|
   password: string,
   mnemonic: string,
   plate: string,
+  plateByron?: string,
   deviceId?: ?string,
 |};
 
@@ -18,7 +19,7 @@ function createWallet(payload: {|
   name: string,
   mnemonic: string,
   plate: string,
-  plateShelley?: ?string,
+  plateByron?: ?string,
   deviceId?: ?string,
 |}) {
   const { name, mnemonic, plate } = payload;
@@ -81,7 +82,8 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('empty-wallet': WalletNames),
     mnemonic: 'burst hood dance captain city crane over olive notice sugar what bubble butter wealth grace',
-    plate: 'ZPOX-6942',
+    plate: 'PZEB-5741',
+    plateByron: 'ZPOX-6942',
   }),
   createWallet({
     name: ('simple-pending-wallet': WalletNames),
@@ -108,15 +110,15 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('ledger-wallet': WalletNames),
     mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art',
-    plate: 'JSKA-2258',
-    plateShelley: 'KHDC-5476',
+    plate: 'KHDC-5476',
+    plateByron: 'JSKA-2258',
     deviceId: '707fa118bf6b83',
   }),
   createWallet({
     name: ('trezor-wallet': WalletNames),
     mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
-    plate: 'CZSA-2051',
-    plateShelley: 'PXCA-2349',
+    plate: 'PXCA-2349',
+    plateByron: 'CZSA-2051',
     deviceId: '6495958994A4025BB5EE1DB0',
   }),
   createWallet({

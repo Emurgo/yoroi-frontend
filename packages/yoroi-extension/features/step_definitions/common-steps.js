@@ -376,7 +376,7 @@ async function restoreWallet (
   await inputMnemonicForWallet(customWorld, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Mnemonic phrase is entered`);
   await customWorld.waitForElement(verifyRestoredInfoDialog);
-  await checkWalletPlate(customWorld, walletName, restoreInfo);
+  await checkWalletPlate(customWorld, walletName, restoreInfo, walletEra);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet plate is checked`);
   await customWorld.waitForElementNotPresent(walletSyncingOverlayComponent);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet is fully synchronized`);
@@ -385,11 +385,16 @@ async function restoreWallet (
 async function checkWalletPlate(
   customWorld: any,
   walletName: string,
-  restoreInfo: RestorationInput
+  restoreInfo: RestorationInput,
+  walletEra?: string
 ): Promise<void> {
   const plateElements = await getPlates(customWorld);
   const plateText = await plateElements[0].getText();
-  expect(plateText).to.be.equal(restoreInfo.plate);
+  if (walletEra === 'shelley'){
+    expect(plateText).to.be.equal(restoreInfo.plate);
+  } else if (walletEra === 'byron') {
+    expect(plateText).to.be.equal(restoreInfo.plateByron);
+  }
 
   await customWorld.click(confirmButton);
   await customWorld.waitUntilText(walletNameText, truncateLongName(walletName));
