@@ -9,7 +9,7 @@ class MockDAppWebpageError extends Error {}
 
 type AccessCallBack = {|
   success: boolean,
-  errMsg?: string,
+  error?: any,
 |};
 
 type ReducedAsset = {|
@@ -511,7 +511,7 @@ export class MockDAppWebpage {
           return callback({ success: true, retValue: utxosResponse });
         })
         .catch(error => {
-          callback({ success: false, errMsg: error.message });
+          callback({ success: false, error });
         });
     }, convertedAmount);
     if (collateralResponse.success) {
@@ -544,7 +544,7 @@ export class MockDAppWebpage {
           return callback({ success: true, retValue: utxosResponse });
         })
         .catch(error => {
-          callback({ success: false, errMsg: error.message });
+          callback({ success: false, error });
         });
     });
     if (collateralResult.success) {
