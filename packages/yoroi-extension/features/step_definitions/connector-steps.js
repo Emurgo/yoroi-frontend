@@ -30,6 +30,12 @@ import { getSigningData, signMessageTitle } from '../pages/connector-signingData
 import { addCollateralTitle } from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 import { connectorButton } from '../pages/sidebarPage';
+import {
+  ApiErrorCode,
+  DataSignErrorCode,
+  TxSendErrorCode,
+  TxSignErrorCode
+} from '../support/helpers/connectorErrors';
 
 const userRejectMsg = 'user reject';
 const userRejectSigningMsg = 'User rejected';
@@ -312,8 +318,12 @@ Then(/^The user reject for signing is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject for signing is received`);
   await this.windowManager.switchTo(mockDAppName);
   const signingResult = await this.mockDAppPage.getSigningTxResult();
-  expect(signingResult.code, `The reject signing code is different`).to.equal(2);
-  expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
+  expect(signingResult.code, `The reject signing code is different`)
+    .to
+    .equal(TxSignErrorCode.UserDeclined);
+  expect(signingResult.info)
+    .to
+    .equal(userRejectSigningMsg, 'Wrong error message');
 });
 
 Then(/^I should see "No Cardano wallets is found" message$/, async function () {
@@ -371,8 +381,12 @@ Then(/^The user reject for signing data is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject for signing data is received`);
   await this.windowManager.switchTo(mockDAppName);
   const signingResult = await this.mockDAppPage.getSigningDataResult();
-  expect(signingResult.code, `The reject signing code is different`).to.equal(2);
-  expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
+  expect(signingResult.code, `The reject signing code is different`)
+    .to
+    .equal(DataSignErrorCode.UserDeclined);
+  expect(signingResult.info)
+    .to
+    .equal(userRejectSigningMsg, 'Wrong error message');
 });
 
 When(/^I ask to get Collateral for (.+) ADA$/, async function (amount) {
@@ -470,4 +484,16 @@ When(/^I request unused addresses$/, async function () {
 When(/^I request used addresses$/, async function () {
   this.webDriverLogger.info(`Step: I request used addresses`);
   await this.mockDAppPage.requestUsedAddresses();
+});
+
+When(/^The collateral received the error:$/, async function (table) {
+  this.webDriverLogger.info(`Step: I should see the collateral to addresses info`);
+  const tableHashes = table.hashes();
+  const fields = tableHashes[0];
+
+  const collateralResult = await this.mockDAppPage.getCollateralResult();
+  expect(collateralResult.success, `Request is successful but the error should be`).to.be.false;
+  const errorObject = collateralResult.error;
+  expect(errorObject.code).to.equal(fields.code, 'Wrong error code');
+  expect(errorObject.info).to.equal(fields.info, 'Wrong error info');
 });
