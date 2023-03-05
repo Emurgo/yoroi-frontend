@@ -33,6 +33,7 @@ import {
   getErgoBaseConfig,
   isCardanoHaskell,
   isErgo,
+  getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   asGetBalance,
@@ -75,6 +76,23 @@ import type {
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { LedgerConnect } from '../../utils/hwConnectHandler';
+import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils.js'
+import {
+  toLedgerSignRequest,
+  buildSignedTransaction as buildSignedLedgerTransaction,
+} from '../../api/ada/transactions/shelley/ledgerTx.js';
+import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
+import blake2b from 'blake2b';
+import type LocalizableError from '../../i18n/LocalizableError';
+import {
+  convertToLocalizableError as convertToLocalizableLedgerError,
+} from '../../domain/LedgerLocalizedError';
+import {
+  transactionHashMismatchError,
+  unsupportedTransactionError,
+  ledgerSignDataUnsupportedError,
+} from '../../domain/HardwareWalletLocalizedError';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -226,16 +244,25 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @observable adaTransaction: ?CardanoConnectorSignRequest = null;
 
+  // store the transaction body for hw wallet signing
+  rawTxBody: ?Buffer = null;
+  addressedUtxos: ?Array<CardanoAddressedUtxo> = null;
+
   reorgTxSignRequest: ?HaskellShelleyTxSignRequest = null;
   collateralOutputAddressSet: ?Set<string> = null;
   @observable submissionError: ?SignSubmissionErrorType = null;
+  @observable hwWalletError: ?LocalizableError = null;
+  // Whether the above error is recoverable.
+  // Recoverable errors are like the HW is plugged in. Unrecoverable errors are like
+  // the tx is not supported.
+  @observable isHwWalletErrorRecoverable: ?boolean = null;
 
   setup(): void {
     super.setup();
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen((password) => {
-      this._confirmSignInTx(password);
+    this.actions.connector.confirmSignInTx.listen(async (password) => {
+      await this._confirmSignInTx(password);
     });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
@@ -293,6 +320,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           if (response.sign.type === 'tx-reorg/cardano') {
             this.generateReorgTransaction();
           }
+          if (response.sign.type === 'data') {
+            this.checkHwWalletSignData();
+          }
         }
       })
       // eslint-disable-next-line no-console
@@ -305,13 +335,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       this.submissionError = null;
     });
 
-    if (this.signingMessage == null) {
+    const { signingMessage, connectedWallet: wallet } = this;
+
+    if (signingMessage == null) {
       throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
     }
-    const { signingMessage } = this;
-    const wallet = this.wallets.find(w =>
-      w.publicDeriver.getPublicDeriverId() === this.signingMessage?.publicDeriverId
-    );
+
     if (!wallet) {
       throw new Error('unexpected nullish wallet');
     }
@@ -372,13 +401,121 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         signingMessage.sign.type === 'tx_input' ||
         signingMessage.sign.type === 'tx/cardano'
     ) {
-      sendData = {
-        type: 'sign_confirmed',
-        tx: toJS(signingMessage.sign.tx),
-        uid: signingMessage.sign.uid,
-        tabId: signingMessage.tabId,
-        pw: password,
-      };
+      const tx = toJS(signingMessage.sign.tx);
+      if (wallet.publicDeriver.getParent().getWalletType() !== WalletTypeOption.WEB_WALLET) {
+        const config = getCardanoHaskellBaseConfig(
+          wallet.publicDeriver.getParent().getNetworkInfo()
+        ).reduce((acc, next) => Object.assign(acc, next), {});
+
+        const addresses = await getAllAddressesWithPaths(wallet.publicDeriver);
+        const ownUtxoAddressMap = {};
+        const ownStakeAddressMap = {};
+        for (const { address, path } of addresses.utxoAddresses) {
+          ownUtxoAddressMap[address] = path;
+        }
+        for (const { address, path } of addresses.accountingAddresses) {
+          ownStakeAddressMap[address] = path;
+        }
+
+        const { rawTxBody, addressedUtxos } = this;
+        if (!rawTxBody) {
+          throw new Error('unexpected nullish transaction');
+        }
+        if (!addressedUtxos) {
+          throw new Error('unexpected nullish addressed UTXOs');
+        }
+        const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
+
+        let ledgerSignTxPayload;
+        try {
+          ledgerSignTxPayload = toLedgerSignRequest(
+            txBody,
+            Number(config.ChainNetworkId),
+            config.ByronNetworkId,
+            ownUtxoAddressMap,
+            ownStakeAddressMap,
+            addressedUtxos,
+          );
+        } catch {
+          runInAction(() => {
+            this.hwWalletError = unsupportedTransactionError;
+            this.isHwWalletErrorRecoverable = false;
+          });
+          return;
+        }
+
+        const expectedSerial = wallet.publicDeriver.getParent().hardwareInfo?.DeviceId || '';
+
+        const ledgerConnect = new LedgerConnect({
+          locale: this.stores.profile.currentLocale,
+        });
+
+        let ledgerSignResult;
+        try {
+          ledgerSignResult = await ledgerConnect.signTransaction({
+            serial: expectedSerial,
+            params: ledgerSignTxPayload,
+          });
+        } catch (error) {
+          runInAction(() => {
+            this.hwWalletError = new convertToLocalizableLedgerError(error);
+            this.isHwWalletErrorRecoverable = true;
+          });
+          return;
+        }
+
+        if (ledgerSignResult.txHashHex !== blake2b(256 / 8).update(rawTxBody).digest('hex')) {
+          runInAction(() => {
+            this.hwWalletError = transactionHashMismatchError;
+            this.isHwWalletErrorRecoverable = false;
+          });
+          return;
+        }
+
+        const withLevels = asHasLevels<ConceptualWallet>(wallet.publicDeriver);
+        if (withLevels == null) {
+          throw new Error('No public deriver level for this public deriver');
+        }
+
+        const withPublicKey = asGetPublicKey(withLevels);
+        if (withPublicKey == null) throw new Error('No public key for this public deriver');
+        const publicKey = await withPublicKey.getPublicKey();
+
+        const publicKeyInfo = {
+          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+            Buffer.from(publicKey.Hash, 'hex')
+          ),
+          addressing: {
+            startLevel: 1,
+            path: withLevels.getPathToPublic(),
+          },
+        };
+
+        const witnessSetHex = buildSignedLedgerTransaction(
+          txBody,
+          addressedUtxos,
+          ledgerSignResult.witnesses,
+          publicKeyInfo,
+          undefined
+        ).witness_set().to_hex();
+
+        sendData = {
+          type: 'sign_confirmed',
+          tx,
+          uid: signingMessage.sign.uid,
+          tabId: signingMessage.tabId,
+          witnessSetHex,
+          pw: '',
+        };
+      } else {
+        sendData = {
+          type: 'sign_confirmed',
+          tx,
+          uid: signingMessage.sign.uid,
+          tabId: signingMessage.tabId,
+          pw: password,
+        };
+      }
     } else if (signingMessage.sign.type === 'data') {
       sendData = {
         type: 'sign_confirmed',
@@ -392,6 +529,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     window.chrome.runtime.sendMessage(sendData);
+    this.actions.connector.cancelSignInTx.remove(this._cancelSignInTx);
     this._closeWindow();
   };
   @action
@@ -422,8 +560,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
     }
     try {
-      const wallets = (await getWallets({ db: persistentDb }))
-        .filter(w => w.getParent().getWalletType() === WalletTypeOption.WEB_WALLET);
+      const wallets = await getWallets({ db: persistentDb });
 
       const protocol = this.protocol;
       const isProtocolErgo = protocol === 'ergo';
@@ -461,6 +598,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       if (this.signingMessage?.sign.type === 'tx-reorg/cardano') {
         this.generateReorgTransaction();
       }
+      if (this.signingMessage?.sign.type === 'data') {
+        this.checkHwWalletSignData();
+      }
     } catch (err) {
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.REJECTED;
@@ -469,6 +609,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
+  // for Ergo wallets only
   _getTxAssets: Array<PublicDeriver<>> => Promise<void> = async (publicDerivers) => {
     const persistentDb = this.stores.loading.getDatabase();
     if (persistentDb == null) {
@@ -477,9 +618,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (this.signingMessage == null) return;
     const { signingMessage } = this;
 
-    const selectedWallet = publicDerivers.find(
-      wallet => wallet.getPublicDeriverId() === signingMessage.publicDeriverId
-    );
+    const selectedWallet = this.connectedWallet?.publicDeriver;
     if (selectedWallet == null) return;
 
     if (!signingMessage.sign.tx) return;
@@ -523,18 +662,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // De-serialize the tx so that the signing dialog could show the tx info (
   // inputs, outputs, fee, ...) to the user.
   createAdaTransaction: void => Promise<void> = async () => {
-    if (this.signingMessage == null) return;
-    const { signingMessage } = this;
-    const selectedWallet = this.wallets.find(
-      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
-    );
-    if (selectedWallet == null) return undefined;
+    const { signingMessage, connectedWallet } = this;
+    if (connectedWallet == null || signingMessage == null) return undefined;
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
     const { tx/* , partialSign */, tabId } = signingMessage.sign.tx;
 
-    const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
+    const network = connectedWallet.publicDeriver.getParent().getNetworkInfo();
 
     if (!isCardanoHaskell(network)) {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
@@ -548,9 +683,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const submittedTxs = loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(response.utxos),
-      selectedWallet.publicDeriver,
+      connectedWallet.publicDeriver,
       submittedTxs,
     );
+    this.addressedUtxos = addressedUtxos;
 
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
       network.NetworkId
@@ -561,11 +697,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const bytes = Buffer.from(tx, 'hex');
     try {
       // <TODO:USE_METADATA_AND_WITNESSES>
-      txBody = RustModule.WalletV4.Transaction.from_bytes(bytes).body();
+      const transaction = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
+      this.rawTxBody = Buffer.from(transaction.raw_body());
+      txBody = transaction.body();
     } catch (originalErr) {
       try {
         // Try parsing as body for backward compatibility
         txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
+        this.rawTxBody = bytes;
       } catch (_e) {
         throw originalErr;
       }
@@ -628,7 +767,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           isForeign: !ownAddresses.has(address),
           value: multiTokenFromCardanoValue(
             output.amount(),
-            selectedWallet.publicDeriver.getParent().getDefaultToken(),
+            connectedWallet.publicDeriver.getParent().getDefaultToken(),
           ),
         }
       );
@@ -640,7 +779,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     };
 
     const { amount, total } = await this._calculateAmountAndTotal(
-      selectedWallet.publicDeriver,
+      connectedWallet.publicDeriver,
       inputs,
       outputs,
       fee,
@@ -651,7 +790,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (foreignInputs.length) {
       const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData(
         {
-          network: selectedWallet.publicDeriver.getParent().networkInfo,
+          network: connectedWallet.publicDeriver.getParent().networkInfo,
           utxos: foreignInputs,
         }
       )
@@ -741,13 +880,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
   generateReorgTransaction: void => Promise<void> = async () => {
-    if (this.signingMessage == null) return;
-    const { signingMessage } = this;
-    const selectedWallet = this.wallets.find(
-      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
-    );
-
-    if (selectedWallet == null) return undefined;
+    const { signingMessage, connectedWallet } = this;
+    if (connectedWallet == null || signingMessage == null) return undefined;
     if (signingMessage.sign.type !== 'tx-reorg/cardano') {
       throw new Error('unexpected signing data type');
     }
@@ -755,7 +889,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const submittedTxs = loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
-      selectedWallet.publicDeriver,
+      connectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
       asAddressedUtxo(utxos),
@@ -774,7 +908,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       amount: unsignedTx.fee().getDefaultEntry().amount.toString(),
     };
     const { amount, total } = await this._calculateAmountAndTotal(
-      selectedWallet.publicDeriver,
+      connectedWallet.publicDeriver,
       unsignedTx.inputs(),
       unsignedTx.outputs(),
       fee,
@@ -910,9 +1044,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @computed get signingRequest(): ?ISignRequest<any> {
     if (this.signingMessage == null) return;
     const { signingMessage } = this;
-    const selectedWallet = this.wallets.find(
-      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
-    );
+    const selectedWallet = this.connectedWallet;
     if (selectedWallet == null) return undefined;
     if (!signingMessage.sign.tx) return undefined;
 
@@ -988,5 +1120,31 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       result = this.getConnectedSites.execute().result;
     }
     return result ?? { sites: [] };
+  }
+
+  @computed get connectedWallet(): ?PublicDeriverCache {
+    const { signingMessage } = this;
+    if (signingMessage == null) {
+      return null;
+    }
+    return this.wallets.find(wallet =>
+      wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+  }
+
+  checkHwWalletSignData(): void {
+    const { connectedWallet } = this;
+    if (connectedWallet == null) {
+      return;
+    }
+    if (
+      connectedWallet.publicDeriver.getParent().getWalletType()
+        !== WalletTypeOption.WEB_WALLET
+    ) {
+      runInAction(() => {
+        this.hwWalletError = ledgerSignDataUnsupportedError;
+        this.isHwWalletErrorRecoverable = false;
+      });
+    }
   }
 }

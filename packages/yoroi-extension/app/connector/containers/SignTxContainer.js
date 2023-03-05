@@ -29,6 +29,9 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../types';
 import { Box } from '@mui/material';
 import AddCollateralPage from '../components/signin/AddCollateralPage';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type LocalizableError from '../../i18n/LocalizableError';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -49,18 +52,35 @@ export default class SignTxContainer extends Component<
   }
 
   onConfirm: (PublicDeriver<>) => string => Promise<void> = deriver => async password => {
-    const withSigningKey = asGetSigningKey(deriver);
-    if (!withSigningKey) {
-      throw new Error(`[sign tx] no signing key`);
+    const { signingMessage } = this.generated.stores.connector;
+    if (signingMessage == null) {
+      throw new Error('missing the signing message');
     }
-    const signingKeyFromStorage = await withSigningKey.getSigningKey();
-    // will throw a WrongPasswordError
-    await withSigningKey.normalizeKey({
-      ...signingKeyFromStorage,
-      password,
-    });
-    window.removeEventListener('unload', this.onUnload);
-    this.generated.actions.connector.confirmSignInTx.trigger(password);
+    const connectedWallet = this.generated.stores.connector.filteredWallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+    if (connectedWallet == null) {
+      throw new Error('missing connected wallet');
+    }
+
+    if (
+      connectedWallet.publicDeriver.getParent().getWalletType() ===
+        WalletTypeOption.WEB_WALLET
+    ) {
+      // check the password
+      const withSigningKey = asGetSigningKey(deriver);
+      if (!withSigningKey) {
+        throw new Error(`[sign tx] no signing key`);
+      }
+      const signingKeyFromStorage = await withSigningKey.getSigningKey();
+      // will throw a WrongPasswordError
+      await withSigningKey.normalizeKey({
+        ...signingKeyFromStorage,
+        password,
+      });
+      window.removeEventListener('unload', this.onUnload);
+    }
+    await this.generated.actions.connector.confirmSignInTx.trigger(password);
   };
   onCancel: () => void = () => {
     this.generated.actions.connector.cancelSignInTx.trigger();
@@ -133,6 +153,15 @@ export default class SignTxContainer extends Component<
         throw new Error('No explorer for wallet network');
       })();
 
+    let walletType;
+    if (isLedgerNanoWallet(selectedWallet.publicDeriver.getParent())) {
+      walletType = 'ledger';
+    } else if (isTrezorTWallet(selectedWallet.publicDeriver.getParent())) {
+      walletType = 'trezor';
+    } else {
+      walletType = 'web';
+    }
+
     let component = null;
 
     // TODO: handle other sign types
@@ -200,6 +229,12 @@ export default class SignTxContainer extends Component<
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             submissionError={this.generated.stores.connector.submissionError}
             signData={signData}
+            walletType={walletType}
+            hwWalletError={this.generated.stores.connector.hwWalletError}
+            isHwWalletErrorRecoverable={
+              this.generated.stores.connector.isHwWalletErrorRecoverable
+            }
+            tx={signingMessage.sign.tx?.tx}
           />
         );
         break;
@@ -232,7 +267,7 @@ export default class SignTxContainer extends Component<
         cancelSignInTx: {|
           trigger: (params: void) => void,
         |},
-        confirmSignInTx: {| trigger: (params: string) => void |},
+        confirmSignInTx: {| trigger: (params: string) => Promise<void> |},
         refreshWallets: {|
           trigger: (params: void) => Promise<void>,
         |},
@@ -249,6 +284,8 @@ export default class SignTxContainer extends Component<
         adaTransaction: ?CardanoConnectorSignRequest,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         submissionError: ?SignSubmissionErrorType,
+        hwWalletError: ?LocalizableError,
+        isHwWalletErrorRecoverable: ?boolean,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -286,6 +323,8 @@ export default class SignTxContainer extends Component<
           adaTransaction: stores.connector.adaTransaction,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
           submissionError: stores.connector.submissionError,
+          hwWalletError: stores.connector.hwWalletError,
+          isHwWalletErrorRecoverable: stores.connector.isHwWalletErrorRecoverable,
         },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
