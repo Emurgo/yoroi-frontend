@@ -248,9 +248,27 @@ After(async function (scenario) {
     }
   }
   await this.windowManager.switchTo(extensionTabName);
+  await getIndexedDBTablesInfo(this, scenario.pickle.name);
   await this.driver.quit();
   await helpers.sleep(halfSecond);
 });
+
+export async function getIndexedDBTablesInfo(customWorld: any, scenarioName: string) {
+  const cleanName = scenarioName.replace(/ /gi, '_');
+  const dir = await createDirInTestRunsData(customWorld.driver, 'IndexedDBTables');
+  const tables = [
+    'UtxoAtSafePointTable',
+    'UtxoDiffToBestBlock',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput'
+  ];
+
+  for (const table of tables) {
+    const filePath = `${dir}/${table}.json`;
+    const dbResponse = await customWorld.getInfoFromIndexedDB(table);
+    await writeFile(filePath, JSON.stringify(dbResponse));
+  }
+};
 
 export async function getPlates(customWorld: any): Promise<any> {
   // check plate in confirmation dialog

@@ -449,7 +449,7 @@ function CustomWorld(cmdInput: WorldInput) {
       const request = window.indexedDB.open(dbName, dbVersion);
       request.onsuccess = function (event) {
           const db = event.target.result;
-          window.tableContent = db
+          window.tableContentRequest = db
             .transaction(table, 'readonly')
             .objectStore(table)
             .getAll();
@@ -459,7 +459,22 @@ function CustomWorld(cmdInput: WorldInput) {
       version,
       tableName
     );
-    const tableContent = await this.driver.executeScript(() => window.tableContent.result);
+    let tableContent;
+    try {
+      tableContent = await this.driver.executeScript(() => window.tableContentRequest.result);
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      try {
+        await this.driver.executeScript(() => {
+          window.tableContentRequest.onsuccess = (event) => {
+            window.tableContent = event.target.result;
+          }
+        });
+        tableContent = await this.driver.executeScript('return window.tableContent');
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
 
     return tableContent;
   };

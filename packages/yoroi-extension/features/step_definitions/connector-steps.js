@@ -371,7 +371,7 @@ Then(/^The user reject for signing data is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject for signing data is received`);
   await this.windowManager.switchTo(mockDAppName);
   const signingResult = await this.mockDAppPage.getSigningDataResult();
-  expect(signingResult.code, `The reject signing code is different`).to.equal(2);
+  expect(signingResult.code, `The reject signing code is different`).to.equal(3);
   expect(signingResult.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });
 
