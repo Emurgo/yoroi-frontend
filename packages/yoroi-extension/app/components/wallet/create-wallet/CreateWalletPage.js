@@ -9,6 +9,7 @@ import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS, TIPS_DIALOGS } from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
+import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
 
 const messages: * = defineMessages({
   title: {
@@ -63,6 +64,12 @@ function CreateWalletPage(props: Props & Intl): Node {
         recoveryPhrase={recoveryPhrase}
       />
     ),
+    [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
+      <VerifyRecoveryPhraseStep
+        recoveryPhrase={recoveryPhrase}
+        setCurrentStep={setCurrentStep}
+      />
+    )
   };
 
   const CurrentStep = steps[currentStep];
