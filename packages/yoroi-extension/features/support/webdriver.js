@@ -440,7 +440,7 @@ function CustomWorld(cmdInput: WorldInput) {
     const allDBs = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.allDBsPromise
-        .then(reponse => callback(reponse))
+        .then(response => callback(response))
         .catch(err => callback(err));
     });
     const {name, version} = allDBs[0];
