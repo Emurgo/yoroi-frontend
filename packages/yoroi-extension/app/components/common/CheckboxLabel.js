@@ -2,8 +2,8 @@
 import type { Node } from 'react';
 import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 
-import { ReactComponent as OutlineIcon }  from '../../assets/images/forms/checkbox-outline.inline.svg';
-import { ReactComponent as CheckedIcon }  from '../../assets/images/forms/checkbox-checked.inline.svg';
+import { ReactComponent as OutlineIcon } from '../../assets/images/forms/checkbox-outline.inline.svg';
+import { ReactComponent as CheckedIcon } from '../../assets/images/forms/checkbox-checked.inline.svg';
 import { Box } from '@mui/system';
 import ReactMarkdown from 'react-markdown';
 
@@ -16,6 +16,8 @@ type Props = {|
   description?: ?string,
   checked: boolean,
   disabled?: boolean,
+  icon?: Node,
+  checkedIcon?: Node,
   onChange: () => void,
 |};
 function CheckboxLabel({
@@ -26,6 +28,8 @@ function CheckboxLabel({
   sx,
   labelSx,
   descriptionSx,
+  icon,
+  checkedIcon,
   ...checkboxProps
 }: Props): Node {
   return (
@@ -33,8 +37,8 @@ function CheckboxLabel({
       control={
         <Checkbox
           disabled={disabled}
-          icon={<OutlineIcon />}
-          checkedIcon={<CheckedIcon />}
+          icon={icon ?? <OutlineIcon />}
+          checkedIcon={checkedIcon ?? <CheckedIcon />}
           {...checkboxProps}
         />
       }

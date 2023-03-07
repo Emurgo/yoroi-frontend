@@ -109,6 +109,8 @@
   "connector.label.connectWalletNoHardwareSupported": "Note, hardware wallets are not supported for the dapp connecting yet.",
   "connector.label.selectAllWallets": "Select all wallets",
   "connector.label.yourWallets": "Your Wallets",
+  "form.languageSelector.title": "Select language",
+  "form.languageSelector.label": "Language",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",
   "global.labels.minAda": "Min-ADA",
   "global.connector.connectedWebsites": "Connected Websites",
