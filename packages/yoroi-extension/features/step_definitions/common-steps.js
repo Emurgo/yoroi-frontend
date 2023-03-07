@@ -248,13 +248,12 @@ After(async function (scenario) {
     }
   }
   await this.windowManager.switchTo(extensionTabName);
-  await getIndexedDBTablesInfo(this, scenario.pickle.name);
+  await getIndexedDBTablesInfo(this, 'second_test_done');
   await this.driver.quit();
   await helpers.sleep(halfSecond);
 });
 
-export async function getIndexedDBTablesInfo(customWorld: any, scenarioName: string) {
-  const cleanName = scenarioName.replace(/ /gi, '_');
+export async function getIndexedDBTablesInfo(customWorld: any, postfix: string = '') {
   const dir = await createDirInTestRunsData(customWorld.driver, 'IndexedDBTables');
   const tables = [
     'UtxoAtSafePointTable',
@@ -264,7 +263,7 @@ export async function getIndexedDBTablesInfo(customWorld: any, scenarioName: str
   ];
 
   for (const table of tables) {
-    const filePath = `${dir}/${table}.json`;
+    const filePath = `${dir}/${table}_${postfix}.json`;
     const dbResponse = await customWorld.getInfoFromIndexedDB(table);
     await writeFile(filePath, JSON.stringify(dbResponse));
   }

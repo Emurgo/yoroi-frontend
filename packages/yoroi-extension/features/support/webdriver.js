@@ -433,6 +433,41 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.getInfoFromIndexedDB = async (tableName: string) => {
+    if (this.getBrowser() === 'firefox') {
+      return await this.getInfoFromIndexedDBFF(tableName);
+    }
+    return await this.getInfoFromIndexedDBChrome(tableName);
+  };
+
+  this.getInfoFromIndexedDBFF = async (tableName: string) => {
+    await this.driver.executeScript((dbName, table) => {
+      const dbRequest = window.indexedDB.open(dbName);
+      dbRequest.onsuccess = function (event) {
+          const db = event.target.result;
+          const tableContentRequest = db
+            .transaction(table, 'readonly')
+            .objectStore(table)
+            .getAll();
+            tableContentRequest.onsuccess = function (event) {
+              window.tableData = event.target.result;
+            }
+      }
+    },
+      'yoroi-schema',
+      tableName
+    );
+    let tableContent;
+    try {
+      tableContent = await this.driver.executeScript(() => window.tableData);
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      tableContent = {};
+    }
+
+    return tableContent;
+  };
+
+  this.getInfoFromIndexedDBChrome = async (tableName: string) => {
     await this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
     });
@@ -449,10 +484,13 @@ function CustomWorld(cmdInput: WorldInput) {
       const request = window.indexedDB.open(dbName, dbVersion);
       request.onsuccess = function (event) {
           const db = event.target.result;
-          window.tableContentRequest = db
+          const tableContentRequest = db
             .transaction(table, 'readonly')
             .objectStore(table)
             .getAll();
+            tableContentRequest.onsuccess = function (event) {
+              window.tableData = event.target.result;
+            }
       }
     },
       name,
@@ -461,19 +499,10 @@ function CustomWorld(cmdInput: WorldInput) {
     );
     let tableContent;
     try {
-      tableContent = await this.driver.executeScript(() => window.tableContentRequest.result);
+      tableContent = await this.driver.executeScript(() => window.tableData);
     } catch (error) {
       this.webDriverLogger.warn(error);
-      try {
-        await this.driver.executeScript(() => {
-          window.tableContentRequest.onsuccess = (event) => {
-            window.tableContent = event.target.result;
-          }
-        });
-        tableContent = await this.driver.executeScript('return window.tableContent');
-      } catch (error) {
-        throw new Error(error);
-      }
+      tableContent = {};
     }
 
     return tableContent;
