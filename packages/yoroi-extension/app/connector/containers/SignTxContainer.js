@@ -202,6 +202,8 @@ export default class SignTxContainer extends Component<
             onCancel={this.onCancel}
             selectedExplorer={selectedExplorer}
             submissionError={this.generated.stores.connector.submissionError}
+            walletType={walletType}
+            hwWalletError={this.generated.stores.connector.hwWalletError}
           />
         );
         break;
@@ -234,7 +236,7 @@ export default class SignTxContainer extends Component<
             isHwWalletErrorRecoverable={
               this.generated.stores.connector.isHwWalletErrorRecoverable
             }
-            tx={signingMessage.sign.tx?.tx}
+            tx={signingMessage.sign?.tx?.tx}
           />
         );
         break;

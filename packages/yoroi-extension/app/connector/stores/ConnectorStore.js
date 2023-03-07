@@ -79,6 +79,7 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils.js'
 import {
+  createLedgerSignTxPayload,
   toLedgerSignRequest,
   buildSignedTransaction as buildSignedLedgerTransaction,
 } from '../../api/ada/transactions/shelley/ledgerTx.js';
@@ -93,6 +94,9 @@ import {
   unsupportedTransactionError,
   ledgerSignDataUnsupportedError,
 } from '../../domain/HardwareWalletLocalizedError';
+import type {
+  SignTransactionRequest as LedgerSignTransactionRequest,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -444,60 +448,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           return;
         }
 
-        const expectedSerial = wallet.publicDeriver.getParent().hardwareInfo?.DeviceId || '';
-
-        const ledgerConnect = new LedgerConnect({
-          locale: this.stores.profile.currentLocale,
-        });
-
-        let ledgerSignResult;
-        try {
-          ledgerSignResult = await ledgerConnect.signTransaction({
-            serial: expectedSerial,
-            params: ledgerSignTxPayload,
-          });
-        } catch (error) {
-          runInAction(() => {
-            this.hwWalletError = new convertToLocalizableLedgerError(error);
-            this.isHwWalletErrorRecoverable = true;
-          });
-          return;
-        }
-
-        if (ledgerSignResult.txHashHex !== blake2b(256 / 8).update(rawTxBody).digest('hex')) {
-          runInAction(() => {
-            this.hwWalletError = transactionHashMismatchError;
-            this.isHwWalletErrorRecoverable = false;
-          });
-          return;
-        }
-
-        const withLevels = asHasLevels<ConceptualWallet>(wallet.publicDeriver);
-        if (withLevels == null) {
-          throw new Error('No public deriver level for this public deriver');
-        }
-
-        const withPublicKey = asGetPublicKey(withLevels);
-        if (withPublicKey == null) throw new Error('No public key for this public deriver');
-        const publicKey = await withPublicKey.getPublicKey();
-
-        const publicKeyInfo = {
-          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-            Buffer.from(publicKey.Hash, 'hex')
-          ),
-          addressing: {
-            startLevel: 1,
-            path: withLevels.getPathToPublic(),
-          },
-        };
-
-        const witnessSetHex = buildSignedLedgerTransaction(
+        const witnessSetHex = (await this.ledgerSignTx(
+          wallet.publicDeriver,
+          ledgerSignTxPayload,
           txBody,
+          rawTxBody,
           addressedUtxos,
-          ledgerSignResult.witnesses,
-          publicKeyInfo,
-          undefined
-        ).witness_set().to_hex();
+        )).witness_set().to_hex();
 
         sendData = {
           type: 'sign_confirmed',
@@ -886,13 +843,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected signing data type');
     }
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
+    const addressedUtxos = asAddressedUtxo(utxos);
+    this.addressedUtxos = addressedUtxos;
     const submittedTxs = loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       connectedWallet.publicDeriver,
       usedUtxoIds,
       reorgTargetAmount,
-      asAddressedUtxo(utxos),
+      addressedUtxos,
       submittedTxs,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
@@ -934,31 +893,73 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected nullish sign request');
     }
 
-    const withSigningKey = asGetSigningKey(publicDeriver);
-    if (!withSigningKey) {
-      throw new Error('expect to be able to get signing key');
-    }
-    const signingKey = await withSigningKey.getSigningKey();
-    const normalizedKey = await withSigningKey.normalizeKey({
-      ...signingKey,
-      password,
-    });
+    if (publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET) {
+      const withSigningKey = asGetSigningKey(publicDeriver);
+      if (!withSigningKey) {
+        throw new Error('expect to be able to get signing key');
+      }
+      const signingKey = await withSigningKey.getSigningKey();
+      const normalizedKey = await withSigningKey.normalizeKey({
+        ...signingKey,
+        password,
+      });
 
-    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-    if (!withLevels) {
-      throw new Error(`can't get level`);
-    }
+      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+      if (!withLevels) {
+        throw new Error(`can't get level`);
+      }
 
-    return shelleySignTransaction(
-      signRequest.senderUtxos,
-      signRequest.unsignedTx,
-      withLevels.getParent().getPublicDeriverLevel(),
-      RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      ),
-      signRequest.neededStakingKeyHashes.wits,
-      signRequest.metadata,
-    );
+      return shelleySignTransaction(
+        signRequest.senderUtxos,
+        signRequest.unsignedTx,
+        withLevels.getParent().getPublicDeriverLevel(),
+        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Buffer.from(normalizedKey.prvKeyHex, 'hex')
+        ),
+        signRequest.neededStakingKeyHashes.wits,
+        signRequest.metadata,
+      );
+    } else {
+      const config = getCardanoHaskellBaseConfig(
+        publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const addresses = await getAllAddressesWithPaths(publicDeriver);
+      const ownUtxoAddressMap = {};
+      const ownStakeAddressMap = {};
+      for (const { address, path } of addresses.utxoAddresses) {
+        ownUtxoAddressMap[address] = path;
+      }
+      for (const { address, path } of addresses.accountingAddresses) {
+        ownStakeAddressMap[address] = path;
+      }
+      function addressingMap(addr: string) {
+        const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
+        if (path) {
+          return { path };
+        }
+        return undefined;
+      }
+
+      const ledgerSignTxPayload = await createLedgerSignTxPayload({
+        signRequest,
+        byronNetworkMagic: config.ByronNetworkId,
+        networkId: Number(config.ChainNetworkId),
+        addressingMap,
+      });
+      const { addressedUtxos } = this;
+      if (addressedUtxos == null) {
+        throw new Error('missing addressed UTXOs');
+      }
+      const txBody = signRequest.unsignedTx.build();
+      return this.ledgerSignTx(
+        publicDeriver,
+        ledgerSignTxPayload,
+        txBody,
+        Buffer.from(txBody.to_bytes()),
+        addressedUtxos,
+      );
+    }
   }
   getUtxosAfterReorg: (string) => Array<RemoteUnspentOutput> = (txId) => {
     const allOutputs = this.adaTransaction?.outputs;
@@ -1129,6 +1130,69 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return this.wallets.find(wallet =>
       wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+  }
+
+  async ledgerSignTx(
+    publicDeriver: PublicDeriver<>,
+    ledgerSignTxPayload: LedgerSignTransactionRequest,
+    txBody: RustModule.WalletV4.TransactionBody,
+    rawTxBody: Buffer,
+    addressedUtxos: Array<CardanoAddressedUtxo>,
+  ): Promise<RustModule.WalletV4.Transaction> {
+    const expectedSerial = publicDeriver.getParent().hardwareInfo?.DeviceId || '';
+
+    const ledgerConnect = new LedgerConnect({
+      locale: this.stores.profile.currentLocale,
+    });
+
+    let ledgerSignResult;
+    try {
+      ledgerSignResult = await ledgerConnect.signTransaction({
+        serial: expectedSerial,
+        params: ledgerSignTxPayload,
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.hwWalletError = new convertToLocalizableLedgerError(error);
+        this.isHwWalletErrorRecoverable = true;
+      });
+      throw error;
+    }
+
+    if (ledgerSignResult.txHashHex !== blake2b(256 / 8).update(rawTxBody).digest('hex')) {
+      runInAction(() => {
+        this.hwWalletError = transactionHashMismatchError;
+        this.isHwWalletErrorRecoverable = false;
+      });
+      throw new Error('hash mismatch');
+    }
+
+    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (withLevels == null) {
+      throw new Error('No public deriver level for this public deriver');
+    }
+
+    const withPublicKey = asGetPublicKey(withLevels);
+    if (withPublicKey == null) throw new Error('No public key for this public deriver');
+    const publicKey = await withPublicKey.getPublicKey();
+
+    const publicKeyInfo = {
+      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+        Buffer.from(publicKey.Hash, 'hex')
+      ),
+      addressing: {
+        startLevel: 1,
+        path: withLevels.getPathToPublic(),
+      },
+    };
+
+    return buildSignedLedgerTransaction(
+      txBody,
+      addressedUtxos,
+      ledgerSignResult.witnesses,
+      publicKeyInfo,
+      undefined
     );
   }
 

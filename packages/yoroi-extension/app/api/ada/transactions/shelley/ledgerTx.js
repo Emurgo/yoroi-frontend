@@ -43,7 +43,7 @@ export async function createLedgerSignTxPayload(request: {|
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
-  addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  addressingMap: string => (void | { +path: Array<number>, ... }),
 |}): Promise<SignTransactionRequest> {
   const txBody = request.signRequest.unsignedTx.build();
 
