@@ -136,7 +136,7 @@ class AddCollateralPage extends Component<Props, State> {
       this.setState({ isSubmitting: true });
       this.props.onConfirm('').finally(() => {
         this.setState({ isSubmitting: false });
-      });
+      }).catch(error => { throw error; });
     }
   }
 

@@ -134,6 +134,8 @@ const genBaseProps: {|
         adaTransaction: null,
         currentConnectorWhitelist: [],
         submissionError: null,
+        hwWalletError: null,
+        isHwWalletErrorRecoverable: null,
       },
       coinPriceStore: {
         getCurrentPrice: (_from, _to) => '5',
@@ -172,7 +174,7 @@ const genBaseProps: {|
           trigger: action('cancelSignInTx'),
         },
         confirmSignInTx: {
-          trigger: action('confirmSignInTx'),
+          trigger: async () => action('confirmSignInTx')(),
         },
       },
     },

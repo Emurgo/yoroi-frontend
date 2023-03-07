@@ -212,6 +212,12 @@ export default class SignTxContainer extends Component<
       case 'tx/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
         if (txData == null && signData == null) return this.renderLoading();
+        let tx;
+        if (signingMessage.sign.type === 'tx/cardano') {
+          tx = signingMessage.sign.tx.tx;
+        } else {
+          tx = '';
+        }
         component = (
           <CardanoSignTxPage
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
@@ -236,7 +242,7 @@ export default class SignTxContainer extends Component<
             isHwWalletErrorRecoverable={
               this.generated.stores.connector.isHwWalletErrorRecoverable
             }
-            tx={signingMessage.sign?.tx?.tx}
+            tx={tx}
           />
         );
         break;

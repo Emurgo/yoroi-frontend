@@ -43,7 +43,7 @@ export async function createLedgerSignTxPayload(request: {|
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
-  addressingMap: string => (void | { +path: Array<number>, ... }),
+  addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
 |}): Promise<SignTransactionRequest> {
   const txBody = request.signRequest.unsignedTx.build();
 
@@ -228,6 +228,7 @@ function _transformToLedgerOutputs(request: {|
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
 |}): Array<TxOutput> {
   const result = [];
+
   for (let i = 0; i < request.txOutputs.len(); i++) {
     const output = request.txOutputs.get(i);
     const address = output.address();
@@ -601,21 +602,21 @@ export function toLedgerSignRequest(
   protocolMagic: number,
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
-  senderUtxos: Array<CardanoAddressedUtxo>,
+  addressedUtxos: Array<CardanoAddressedUtxo>,
 ): SignTransactionRequest {
-  function formatInputs(inputs: RustModule.WalletV4.TransactionInputs) {
+  function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     const formatted = [];
     for (let i = 0; i < inputs.len(); i++) {
       const input = inputs.get(i);
       const hash = input.transaction_id().to_hex();
       const index = input.index();
-      const senderUtxo = senderUtxos.find(utxo =>
+      const ownUtxo = addressedUtxos.find(utxo =>
         utxo.tx_hash === hash && utxo.tx_index === index
       );
       formatted.push({
         txHashHex: hash,
         outputIndex: index,
-        path: senderUtxo ? senderUtxo.addressing.path : null,
+        path: ownUtxo ? ownUtxo.addressing.path : null,
       });
     }
     return formatted.sort(compareInputs);
@@ -736,7 +737,7 @@ export function toLedgerSignRequest(
     }
 
     return {
-      amount: output.amount().coin().to_str(), 
+      amount: output.amount().coin().to_str(),
       destination,
       tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
     };
@@ -771,7 +772,7 @@ export function toLedgerSignRequest(
     }
   }
 
-  function addressingMap(addr: string) {
+  function addressingMap(addr: string): void | {| +path: Array<number> |} {
     const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
     if (path) {
       return { path };

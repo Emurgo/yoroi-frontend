@@ -77,12 +77,11 @@ import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/Publ
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
-import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils.js'
+import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils'
 import {
-  createLedgerSignTxPayload,
   toLedgerSignRequest,
   buildSignedTransaction as buildSignedLedgerTransaction,
-} from '../../api/ada/transactions/shelley/ledgerTx.js';
+} from '../../api/ada/transactions/shelley/ledgerTx';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
 import type LocalizableError from '../../i18n/LocalizableError';
@@ -94,9 +93,6 @@ import {
   unsupportedTransactionError,
   ledgerSignDataUnsupportedError,
 } from '../../domain/HardwareWalletLocalizedError';
-import type {
-  SignTransactionRequest as LedgerSignTransactionRequest,
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -407,53 +403,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ) {
       const tx = toJS(signingMessage.sign.tx);
       if (wallet.publicDeriver.getParent().getWalletType() !== WalletTypeOption.WEB_WALLET) {
-        const config = getCardanoHaskellBaseConfig(
-          wallet.publicDeriver.getParent().getNetworkInfo()
-        ).reduce((acc, next) => Object.assign(acc, next), {});
-
-        const addresses = await getAllAddressesWithPaths(wallet.publicDeriver);
-        const ownUtxoAddressMap = {};
-        const ownStakeAddressMap = {};
-        for (const { address, path } of addresses.utxoAddresses) {
-          ownUtxoAddressMap[address] = path;
-        }
-        for (const { address, path } of addresses.accountingAddresses) {
-          ownStakeAddressMap[address] = path;
-        }
-
-        const { rawTxBody, addressedUtxos } = this;
+        const { rawTxBody } = this;
         if (!rawTxBody) {
           throw new Error('unexpected nullish transaction');
-        }
-        if (!addressedUtxos) {
-          throw new Error('unexpected nullish addressed UTXOs');
-        }
-        const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
-
-        let ledgerSignTxPayload;
-        try {
-          ledgerSignTxPayload = toLedgerSignRequest(
-            txBody,
-            Number(config.ChainNetworkId),
-            config.ByronNetworkId,
-            ownUtxoAddressMap,
-            ownStakeAddressMap,
-            addressedUtxos,
-          );
-        } catch {
-          runInAction(() => {
-            this.hwWalletError = unsupportedTransactionError;
-            this.isHwWalletErrorRecoverable = false;
-          });
-          return;
         }
 
         const witnessSetHex = (await this.ledgerSignTx(
           wallet.publicDeriver,
-          ledgerSignTxPayload,
-          txBody,
           rawTxBody,
-          addressedUtxos,
         )).witness_set().to_hex();
 
         sendData = {
@@ -575,7 +532,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (this.signingMessage == null) return;
     const { signingMessage } = this;
 
-    const selectedWallet = this.connectedWallet?.publicDeriver;
+    const selectedWallet = publicDerivers.find(
+      wallet => wallet.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
     if (selectedWallet == null) return;
 
     if (!signingMessage.sign.tx) return;
@@ -919,47 +878,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         signRequest.neededStakingKeyHashes.wits,
         signRequest.metadata,
       );
-    } else {
-      const config = getCardanoHaskellBaseConfig(
-        publicDeriver.getParent().getNetworkInfo()
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
-      const addresses = await getAllAddressesWithPaths(publicDeriver);
-      const ownUtxoAddressMap = {};
-      const ownStakeAddressMap = {};
-      for (const { address, path } of addresses.utxoAddresses) {
-        ownUtxoAddressMap[address] = path;
-      }
-      for (const { address, path } of addresses.accountingAddresses) {
-        ownStakeAddressMap[address] = path;
-      }
-      function addressingMap(addr: string) {
-        const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
-        if (path) {
-          return { path };
-        }
-        return undefined;
-      }
-
-      const ledgerSignTxPayload = await createLedgerSignTxPayload({
-        signRequest,
-        byronNetworkMagic: config.ByronNetworkId,
-        networkId: Number(config.ChainNetworkId),
-        addressingMap,
-      });
-      const { addressedUtxos } = this;
-      if (addressedUtxos == null) {
-        throw new Error('missing addressed UTXOs');
-      }
-      const txBody = signRequest.unsignedTx.build();
-      return this.ledgerSignTx(
-        publicDeriver,
-        ledgerSignTxPayload,
-        txBody,
-        Buffer.from(txBody.to_bytes()),
-        addressedUtxos,
-      );
     }
+    return this.ledgerSignTx(
+      publicDeriver,
+      Buffer.from(signRequest.unsignedTx.build().to_bytes()),
+    );
   }
   getUtxosAfterReorg: (string) => Array<RemoteUnspentOutput> = (txId) => {
     const allOutputs = this.adaTransaction?.outputs;
@@ -1135,11 +1058,46 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async ledgerSignTx(
     publicDeriver: PublicDeriver<>,
-    ledgerSignTxPayload: LedgerSignTransactionRequest,
-    txBody: RustModule.WalletV4.TransactionBody,
     rawTxBody: Buffer,
-    addressedUtxos: Array<CardanoAddressedUtxo>,
   ): Promise<RustModule.WalletV4.Transaction> {
+    const config = getCardanoHaskellBaseConfig(
+      publicDeriver.getParent().getNetworkInfo()
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
+    const addresses = await getAllAddressesWithPaths(publicDeriver);
+    const ownUtxoAddressMap = {};
+    const ownStakeAddressMap = {};
+    for (const { address, path } of addresses.utxoAddresses) {
+      ownUtxoAddressMap[address] = path;
+    }
+    for (const { address, path } of addresses.accountingAddresses) {
+      ownStakeAddressMap[address] = path;
+    }
+
+    const { addressedUtxos } = this;
+    if (!addressedUtxos) {
+      throw new Error('unexpected nullish addressed UTXOs');
+    }
+    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
+
+    let ledgerSignTxPayload;
+    try {
+      ledgerSignTxPayload = toLedgerSignRequest(
+        txBody,
+        Number(config.ChainNetworkId),
+        config.ByronNetworkId,
+        ownUtxoAddressMap,
+        ownStakeAddressMap,
+        addressedUtxos,
+      );
+    } catch {
+      runInAction(() => {
+        this.hwWalletError = unsupportedTransactionError;
+        this.isHwWalletErrorRecoverable = false;
+      });
+      throw new Error('unsupported transaction');
+    }
+
     const expectedSerial = publicDeriver.getParent().hardwareInfo?.DeviceId || '';
 
     const ledgerConnect = new LedgerConnect({
@@ -1187,9 +1145,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       },
     };
 
+    // `addressedUtxos` is all UTXOs of this wallet
+    // `ownUtxos` is own UTXOs used by this tx as inputs
+    const txInputs = new Set();
+    for (let i = 0; i < txBody.inputs().len(); i++) {
+      const input = txBody.inputs().get(i);
+      txInputs.add(`${input.transaction_id().to_hex()}${input.index()}`);
+    }
+    const ownUtxos = addressedUtxos.filter(utxo =>
+      txInputs.has(`${utxo.tx_hash}${utxo.tx_index}`)
+    );
+
     return buildSignedLedgerTransaction(
       txBody,
-      addressedUtxos,
+      ownUtxos,
       ledgerSignResult.witnesses,
       publicKeyInfo,
       undefined

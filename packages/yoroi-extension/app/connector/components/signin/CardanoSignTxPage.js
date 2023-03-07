@@ -156,7 +156,7 @@ class SignTxPage extends Component<Props, State> {
       this.setState({ isSubmitting: true });
       this.props.onConfirm('').finally(() => {
         this.setState({ isSubmitting: false });
-      });
+      }).catch(error => { throw error; });
     }
   }
 
@@ -359,7 +359,7 @@ class SignTxPage extends Component<Props, State> {
               <Typography>Transaction:</Typography>
               <textarea
                 rows="10"
-                style={{width:'100%'}}
+                style={{ width: '100%' }}
                 disabled
                 value={this.props.tx}
               />
