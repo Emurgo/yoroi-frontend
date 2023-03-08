@@ -172,7 +172,7 @@
     "copy-webpack-plugin": "6.0.0"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "5.1.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "6.0.0",
     "@download/blockies": "1.0.3",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
