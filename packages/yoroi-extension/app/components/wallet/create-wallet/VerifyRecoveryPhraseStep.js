@@ -8,6 +8,7 @@ import StepController from './StepController';
 import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
 import classnames from 'classnames';
+import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg'
 
 const messages: * = defineMessages({
   description: {
@@ -17,6 +18,10 @@ const messages: * = defineMessages({
   incorrectOrder: {
     id: 'wallet.create.thirdStep.incorrectOrder',
     defineMessages: '!!!Incorrect order. Try again',
+  },
+  verified: {
+    id: 'walllet.create.thirdStep.verifiedRecoveryPhrase',
+    defaultMessage: '!!!The recovery phrase is verified',
   }
 });
 
@@ -148,6 +153,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           gap='8px'
         >
           {recoveryPhrase.map((word, idx) => {
+            // Todo: sort words alphabetically.
             return (
               <Stack
                 key={word}
@@ -179,10 +185,22 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           {wrongWord !== null && intl.formatMessage(messages.incorrectOrder)}
         </Typography>
 
-        <StepController
-          goNext={goNextStepCallback()}
-          goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
-        />
+
+        {isValidPhrase && (
+          <Stack gap='10px' direction='row' mt='-24px'>
+            <VerifiedIcon />
+            <Typography variant='body1' fontWeight={500}>
+              {intl.formatMessage(messages.verified)}
+            </Typography>
+          </Stack>
+        )}
+
+        <Box mt='10px'>
+          <StepController
+            goNext={goNextStepCallback()}
+            goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
+          />
+        </Box>
       </Stack>
     </Stack>
   );
