@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
-import { CREATE_WALLET_SETPS, TIPS_DIALOGS } from './steps';
+import { CREATE_WALLET_SETPS, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
 
@@ -29,16 +29,18 @@ function CreateWalletPage(props: Props & Intl): Node {
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [dialogs, setDialogs] = useState({
-    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: true,
-    [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: true,
+    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]:
+      !isDialogShownBefore(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE),
+    [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE),
   });
 
   function showDialog(dialogId: string): void {
-   setDialogs(prev => ({ ...prev, [dialogId]: true }));
+    setDialogs(prev => ({ ...prev, [dialogId]: true }));
   };
 
   function hideDialog(dialogId: string): void {
-   setDialogs(prev => ({ ...prev, [dialogId]: false }));
+    markDialogAsShown(dialogId);
+    setDialogs(prev => ({ ...prev, [dialogId]: false }));
   };
 
   const steps = {
