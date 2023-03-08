@@ -1,5 +1,5 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import { Node, ComponentType, useState } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -7,6 +7,7 @@ import { Stack, Box, Typography, Grid } from '@mui/material'
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
+import classnames from 'classnames';
 
 const messages: * = defineMessages({
   description: {
@@ -25,8 +26,23 @@ type Props = {|
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { recoveryPhrase, setCurrentStep } = props;
-
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
+
+  const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
+    new Array(recoveryPhrase.length).fill(null),
+  );
+
+  function onAddWord(word: string, idx: number): void {
+    setRecoveryPhrase(prev => {
+      const copy = [...prev];
+      copy[idx] = word;
+      return copy;
+    });
+  };
+
+  function isWordAdded(word) {
+    return enteredRecoveryPhrase.some(w => w === word);
+  }
 
   return (
     <Stack alignItems='center' justifyContent='center' className={styles.component}>
@@ -44,11 +60,11 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             alignItems='center'
             justifyContent='center'
           >
-            {recoveryPhrase.map((word, idx) => (
+            {enteredRecoveryPhrase.map((word, idx) => (
               <Stack
                 item
-                key={word}
-                columns={7}
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
               >
                 <Box
                   sx={{
@@ -58,7 +74,9 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
+                    width: '120px',
+                    height: '40px',
                   }}
                   variant='body1'
                   color='primary.200'
@@ -76,21 +94,23 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                   >
                     {idx + 1}.
                   </Typography>
-                  <Typography
-                    sx={{
-                      background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
-                      width: '100px',
-                      height: '40px',
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: '8px',
-                      ml: '4px'
+                  {word && (
+                    <Typography
+                      sx={{
+                        background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
+                        width: '100px',
+                        height: '40px',
+                        textAlign: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '8px',
+                        ml: '4px'
                     }}
-                  >
-                    {word}
-                  </Typography>
+                    >
+                      {word}
+                    </Typography>
+                  )}
                 </Box>
               </Stack>
            ))}
@@ -104,36 +124,31 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           justifyContent='center'
           gap='8px'
         >
-          {recoveryPhrase.map((word) => (
-            <Stack
-              key={word}
-              columns={7}
-              sx={{
-                background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
-                textAlign: 'center',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '40px',
-                cursor: 'pointer',
-              }}
-            >
-              <Typography
-                sx={{
-                  width: '131px',
+          {recoveryPhrase.map((word, idx) => {
+            return (
+              <Stack
+                key={word}
+                className={classnames(styles.wordChip, {
+                  [styles.wordAdded]: isWordAdded(word),
+                })}
+                onClick={() => onAddWord(word, idx)}
+              >
+                <Typography
+                  sx={{
+                  width: '129px',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   px: '10px',
                 }}
-                variant='body1'
-                color='primary.200'
-              >
-                {word}
-              </Typography>
-            </Stack>
-            ))}
+                  variant='body1'
+                  color='primary.200'
+                >
+                  {word}
+                </Typography>
+              </Stack>
+            );
+          })}
         </Stack>
 
         <StepController
