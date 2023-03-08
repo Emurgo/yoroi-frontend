@@ -3,7 +3,7 @@ import { Node, ComponentType, useState } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography, Grid } from '@mui/material'
+import { Stack, Box, Typography } from '@mui/material'
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
@@ -14,6 +14,10 @@ const messages: * = defineMessages({
     id: 'wallet.create.thirdStep.description',
     defaultMessage: '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
   },
+  incorrectOrder: {
+    id: 'wallet.create.thirdStep.incorrectOrder',
+    defineMessages: '!!!Incorrect order. Try again',
+  }
 });
 
 type Intl = {|
@@ -25,24 +29,43 @@ type Props = {|
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
-  const { recoveryPhrase, setCurrentStep } = props;
+  const { intl, recoveryPhrase, setCurrentStep } = props;
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
     new Array(recoveryPhrase.length).fill(null),
   );
+  const [wrongWord, setWrongWord] = useState<string | null>(null)
 
   function onAddWord(word: string, idx: number): void {
+    if (isWordAdded(word)) return;
+
+    const nextWordIdx = enteredRecoveryPhrase.findIndex(w => w === null);
+    if (nextWordIdx === -1) throw new Error('Entered recovery phrase words list is full');
+
+    const isInCorrectOrder = recoveryPhrase[nextWordIdx] === word;
+    if (!isInCorrectOrder) {
+      return setWrongWord(word);
+    };
+
     setRecoveryPhrase(prev => {
       const copy = [...prev];
       copy[idx] = word;
       return copy;
     });
+    setWrongWord(null);
   };
 
   function isWordAdded(word) {
     return enteredRecoveryPhrase.some(w => w === word);
   }
+
+  const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);
+
+  function goNextStepCallback() {
+    if (!isValidPhrase) return;
+    return () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS)
+  };
 
   return (
     <Stack alignItems='center' justifyContent='center' className={styles.component}>
@@ -130,12 +153,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 key={word}
                 className={classnames(styles.wordChip, {
                   [styles.wordAdded]: isWordAdded(word),
+                  [styles.wrongWord]: wrongWord === word,
                 })}
                 onClick={() => onAddWord(word, idx)}
               >
                 <Typography
                   sx={{
-                  width: '129px',
+                  width: '127px',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -151,8 +175,12 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           })}
         </Stack>
 
+        <Typography variant='body2' color='error.100' height='20px' mt='16px'>
+          {wrongWord !== null && intl.formatMessage(messages.incorrectOrder)}
+        </Typography>
+
         <StepController
-          goNext={() => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS)}
+          goNext={goNextStepCallback()}
           goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
         />
       </Stack>
@@ -160,4 +188,4 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   );
 }
 
-export default (observer(VerifyRecoveryPhraseStep) : ComponentType<Props>);
+export default (injectIntl(observer(VerifyRecoveryPhraseStep)) : ComponentType<Props>);
