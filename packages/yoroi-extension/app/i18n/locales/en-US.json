@@ -446,6 +446,7 @@
   "wallet.create.secondStep.showRecoveryPhraseBtn": "Show recovery phrase",
   "wallet.create.thirdStep": "Verify recovery phrase",
   "wallet.create.thirdStep.description": "<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.",
+  "wallet.create.thirdStep.incorrectOrder": "Incorrect order. Try again",
   "wallet.create.forthStep": "Add wallet details",
   "wallet.create.page.title": "Create a Wallet",
   "wallet.create.dialog.saveRecoveryPhrase.title": "Read this before saving your recovery phrase",
