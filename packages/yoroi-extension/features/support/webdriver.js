@@ -433,6 +433,41 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   this.getInfoFromIndexedDB = async (tableName: string) => {
+    if (this.getBrowser() === 'firefox') {
+      return await this.getInfoFromIndexedDBFF(tableName);
+    }
+    return await this.getInfoFromIndexedDBChrome(tableName);
+  };
+
+  this.getInfoFromIndexedDBFF = async (tableName: string) => {
+    await this.driver.executeScript((dbName, table) => {
+      const dbRequest = window.indexedDB.open(dbName);
+      dbRequest.onsuccess = function (event) {
+          const db = event.target.result;
+          const tableContentRequest = db
+            .transaction(table, 'readonly')
+            .objectStore(table)
+            .getAll();
+            tableContentRequest.onsuccess = function (event) {
+              window.tableData = event.target.result;
+            }
+      }
+    },
+      'yoroi-schema',
+      tableName
+    );
+    let tableContent;
+    try {
+      tableContent = await this.driver.executeScript(() => window.tableData);
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      tableContent = {};
+    }
+
+    return tableContent;
+  };
+
+  this.getInfoFromIndexedDBChrome = async (tableName: string) => {
     await this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
     });
@@ -440,7 +475,7 @@ function CustomWorld(cmdInput: WorldInput) {
     const allDBs = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.allDBsPromise
-        .then(reponse => callback(reponse))
+        .then(response => callback(response))
         .catch(err => callback(err));
     });
     const {name, version} = allDBs[0];
@@ -449,17 +484,26 @@ function CustomWorld(cmdInput: WorldInput) {
       const request = window.indexedDB.open(dbName, dbVersion);
       request.onsuccess = function (event) {
           const db = event.target.result;
-          window.tableContent = db
+          const tableContentRequest = db
             .transaction(table, 'readonly')
             .objectStore(table)
             .getAll();
+            tableContentRequest.onsuccess = function (event) {
+              window.tableData = event.target.result;
+            }
       }
     },
       name,
       version,
       tableName
     );
-    const tableContent = await this.driver.executeScript(() => window.tableContent.result);
+    let tableContent;
+    try {
+      tableContent = await this.driver.executeScript(() => window.tableData);
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      tableContent = {};
+    }
 
     return tableContent;
   };
