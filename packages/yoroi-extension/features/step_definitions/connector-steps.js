@@ -37,7 +37,7 @@ import {
   TxSignErrorCode
 } from '../support/helpers/connectorErrors';
 
-const userRejectMsg = 'user reject';
+const userRejectMsg = 'User rejected';
 const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServer}/mock-dapp`;
 
@@ -164,7 +164,9 @@ Then(/^The user reject is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject is received`);
   const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
   expect(requestAccessResult.success, `Request access is granted`).to.be.false;
-  expect(requestAccessResult.errMsg).to.equal(userRejectMsg, 'Wrong error message');
+  const errorObject = JSON.parse(requestAccessResult.error);
+  expect(errorObject.code).to.equal(ApiErrorCode.Refused, 'Wrong error message');
+  expect(errorObject.info).to.equal(userRejectMsg, 'Wrong error message');
 });
 
 Then(/^The dApp should see balance (\d+)$/, async function (expectedBalance) {

@@ -228,16 +228,16 @@ export class MockDAppWebpage {
       window.accessRequestPromise
         .then(
           // eslint-disable-next-line promise/always-return
-          api => {
+          (api) => {
             window.api = api;
             callback({ success: true });
           },
-          error => {
-            callback({ success: false, errMsg: error.message });
+          (error) => {
+            callback({ success: false, error: error.message });
           }
         )
-        .catch(error => {
-          callback({ success: false, errMsg: error.message });
+        .catch((error) => {
+          callback({ success: false, error: error.message });
         });
     });
     this.logger.info(`MockDApp: -> The access response: ${JSON.stringify(accessResponse)}`);
