@@ -76,3 +76,38 @@ Feature: dApp connector get collateral
     Then The dApp should receive collateral
       | amount  | receiver |
       | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
+
+  @dApp-1027 @ignore
+  Scenario: dApp, anonymous wallet, get collateral from empty wallet (DAPP-1027)
+    Given There is a Shelley wallet stored named empty-wallet
+    Then Revamp. I switch to revamp version
+    Then I open the mock dApp tab
+    And I request anonymous access to Yoroi
+    Then I should see the connector popup for connection
+    And I select the only wallet named empty-wallet with 0 balance
+    Then The popup window should be closed
+    And The access request should succeed
+    And The wallet empty-wallet is connected to the website localhost
+    Then I ask to get Collateral for 1 ADA
+    # TODO replace info when we have it
+    And The collateral received the error:
+      | code | info |
+      | -1   | ???  |
+
+  @dApp-1028 @ignore
+  Scenario: dApp, authorized wallet, get collateral from empty wallet (DAPP-1028)
+    Given There is a Shelley wallet stored named empty-wallet
+    Then Revamp. I switch to revamp version
+    Then I open the mock dApp tab
+    And I request access to Yoroi
+    Then I should see the connector popup for connection
+    And I select the only wallet named empty-wallet with 0 balance
+    Then I enter the spending password asdfasdfasdf and click confirm
+    Then The popup window should be closed
+    And The access request should succeed
+    And The wallet empty-wallet is connected to the website localhost
+    Then I ask to get Collateral for 1 ADA
+    # TODO replace info when we have it
+    And The collateral received the error:
+      | code | info |
+      | -1   | ???  |
