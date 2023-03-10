@@ -155,7 +155,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           {recoveryPhrase.map((word, idx) => {
             // Todo: sort words alphabetically.
             return (
-              <Stack
+              <button
+                type='button'
                 key={word}
                 className={classnames(styles.wordChip, {
                   [styles.wordAdded]: isWordAdded(word),
@@ -176,7 +177,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 >
                   {word}
                 </Typography>
-              </Stack>
+              </button>
             );
           })}
         </Stack>
