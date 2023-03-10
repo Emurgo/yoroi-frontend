@@ -41,7 +41,9 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
-    new Array(recoveryPhrase.length).fill(null),
+    // Todo: undo the change below
+    // new Array(recoveryPhrase.length).fill(null),
+    recoveryPhrase,
   );
   const [wrongWord, setWrongWord] = useState<string | null>(null)
 

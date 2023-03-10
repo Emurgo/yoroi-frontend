@@ -10,6 +10,7 @@ import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
+import AddWalletDetailsStep from './AddWalletDetailsStep';
 
 const messages: * = defineMessages({
   title: {
@@ -32,6 +33,8 @@ function CreateWalletPage(props: Props & Intl): Node {
     [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]:
       !isDialogShownBefore(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE),
     [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE),
+    [TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD]:
+      !isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD),
   });
 
   function showDialog(dialogId: string): void {
@@ -69,6 +72,14 @@ function CreateWalletPage(props: Props & Intl): Node {
     [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
       <VerifyRecoveryPhraseStep
         recoveryPhrase={recoveryPhrase}
+        setCurrentStep={setCurrentStep}
+      />
+    ),
+    [CREATE_WALLET_SETPS.ADD_WALLET_DETAILS]: (
+      <AddWalletDetailsStep
+        shouldShowDialog={dialogs.WALLET_NAME_AND_PASSWORD}
+        hideDialog={() => hideDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
+        showDialog={() => showDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
         setCurrentStep={setCurrentStep}
       />
     )
