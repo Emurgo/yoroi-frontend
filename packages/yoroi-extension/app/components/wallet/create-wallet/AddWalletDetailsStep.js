@@ -22,29 +22,21 @@ const messages: * = defineMessages({
     id: 'wallet.create.forthStep.description',
     defaultMessage: '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet creation.',
   },
-  dialogTitle: {
-    id: 'wallet.create.dialog.title',
-    defaultMessage: '!!!Create wallet',
+  enterWalletName: {
+    id: 'wallet.create.forthStep.enterWalletNameInputLabel',
+    defaultMessage: '!!!Enter wallet name',
   },
-  walletName: {
-    id: 'wallet.create.dialog.name.label',
-    defaultMessage: '!!!Wallet name',
+  enterPassword: {
+    id: 'wallet.create.forthStep.enterPasswordInputLabel',
+    defaultMessage: '!!!Enter password',
   },
-  walletNameHint: {
-    id: 'wallet.create.dialog.walletNameHint',
-    defaultMessage: '!!!e.g: Shopping Wallet',
-  },
-  createPersonalWallet: {
-    id: 'wallet.create.dialog.create.personal.wallet.button.label',
-    defaultMessage: '!!!Create personal wallet',
+  passwordHint: {
+    id: 'wallet.create.forthStep.passwordHint',
+    defaultMessage: '!!!Use a combination of letters, numbers and symbols to make your password stronger',
   },
   repeatPasswordLabel: {
-    id: 'wallet.create.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat spending password',
-  },
-  repeatPasswordFieldPlaceholder: {
-    id: 'wallet.create.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Repeat spending password',
+    id: 'wallet.create.forthStep.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat password',
   },
 });
 
@@ -67,19 +59,10 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
     isSubmitting: false,
   };
 
-  componentDidMount(): void {
-    setTimeout(() => { this.walletNameInput.focus(); });
-  }
-
-  // $FlowFixMe[value-as-type]
-  walletNameInput: TextField;
-
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletName: {
-        label: this.context.intl.formatMessage(messages.walletName),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.walletNameHint) : '',
+        label: this.context.intl.formatMessage(messages.enterWalletName),
         value: '',
         validators: [({ field }) => (
           [
@@ -90,9 +73,7 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
       },
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.walletPasswordLabel) : '',
+        label: this.context.intl.formatMessage(messages.enterPassword),
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -108,8 +89,6 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -130,12 +109,6 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
     },
   });
 
-  checkForEnterKey(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      this.submit();
-    }
-  }
-
   render(): Node {
     const { setCurrentStep, shouldShowDialog, showDialog, hideDialog } = this.props;
     const { form } = this;
@@ -147,37 +120,40 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
-
     return (
       <Stack alignItems='center' justifyContent='center'>
-        <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='700px'>
-          <Stack mb='8px' flexDirection='row' alignItems='center' gap='6px'>
-            <Typography>
+        <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='555px'>
+          <Stack mb='20px' flexDirection='row' alignItems='center' gap='6px'>
+            <Typography variant='body1'>
               <FormattedHTMLMessage {...messages.description} />
             </Typography>
-            <Box sx={{ cursor: 'pointer' }} onClick={showDialog}>
+            <Box
+              component='button'
+              sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={showDialog}
+            >
               <InfoIcon />
             </Box>
           </Stack>
-          <Box>
+          <Box onSubmit={(e) => e.preventDefault()} component='form' autoComplete='off'>
             <TextField
               className="walletName"
-              onKeyPress={this.checkForEnterKey.bind(this)}
-              inputRef={input => {
-                  this.walletNameInput = input;
-                }}
               {...walletNameField.bind()}
               done={walletNameField.isValid}
               error={walletNameField.error}
+              autocomplete="off"
             />
 
-            <div>
-              <div>
+            <Box>
+              <Box>
                 <TextField
                   className="walletPassword"
                   {...walletPasswordField.bind()}
                   done={walletPasswordField.isValid}
                   error={walletPasswordField.error}
+                  helperText={
+                    walletPasswordField.error || intl.formatMessage(messages.passwordHint)
+                  }
                 />
                 <TextField
                   className="repeatedPassword"
@@ -185,8 +161,8 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
                   done={repeatPassword && repeatedPasswordField.isValid}
                   error={repeatedPasswordField.error}
                 />
-              </div>
-            </div>
+              </Box>
+            </Box>
           </Box>
 
           <StepController
