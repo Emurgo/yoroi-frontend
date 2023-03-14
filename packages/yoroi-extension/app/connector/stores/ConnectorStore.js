@@ -60,7 +60,13 @@ import {
   connectorRecordSubmittedCardanoTransaction,
 } from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  WalletTypeOption,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { loadSubmittedTransactions } from '../../api/localStorage';
 import {
   signTransaction as shelleySignTransaction
@@ -82,6 +88,10 @@ import {
   toLedgerSignRequest,
   buildSignedTransaction as buildSignedLedgerTransaction,
 } from '../../api/ada/transactions/shelley/ledgerTx';
+import {
+  toTrezorSignRequest,
+  buildSignedTransaction as buildSignedTrezorTransaction,
+} from '../../api/ada/transactions/shelley/trezorTx';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
 import type LocalizableError from '../../i18n/LocalizableError';
@@ -89,10 +99,14 @@ import {
   convertToLocalizableError as convertToLocalizableLedgerError,
 } from '../../domain/LedgerLocalizedError';
 import {
+  convertToLocalizableError as convertToLocalizableTrezorError,
+} from '../../domain/TrezorLocalizedError';
+import {
   transactionHashMismatchError,
   unsupportedTransactionError,
   ledgerSignDataUnsupportedError,
 } from '../../domain/HardwareWalletLocalizedError';
+import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -408,7 +422,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           throw new Error('unexpected nullish transaction');
         }
 
-        const witnessSetHex = (await this.ledgerSignTx(
+        const witnessSetHex = (await this.hwSignTx(
           wallet.publicDeriver,
           rawTxBody,
         )).witness_set().to_hex();
@@ -879,7 +893,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         signRequest.metadata,
       );
     }
-    return this.ledgerSignTx(
+    return this.hwSignTx(
       publicDeriver,
       Buffer.from(signRequest.unsignedTx.build().to_bytes()),
     );
@@ -1053,6 +1067,128 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return this.wallets.find(wallet =>
       wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+  }
+
+  async hwSignTx(
+    publicDeriver: PublicDeriver<>,
+    rawTxBody: Buffer,
+  ): Promise<RustModule.WalletV4.Transaction> {
+    if (isLedgerNanoWallet(publicDeriver.getParent())) {
+      return this.ledgerSignTx(publicDeriver, rawTxBody);
+    } else if (isTrezorTWallet(publicDeriver.getParent())) {
+      return this.trezorSignTx(publicDeriver, rawTxBody);
+    } else {
+      throw new Error('unexpected wallet type');
+    }
+  }
+
+  async trezorSignTx(
+    publicDeriver: PublicDeriver<>,
+    rawTxBody: Buffer,
+  ): Promise<RustModule.WalletV4.Transaction> {
+    const config = getCardanoHaskellBaseConfig(
+      publicDeriver.getParent().getNetworkInfo()
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
+    const addresses = await getAllAddressesWithPaths(publicDeriver);
+    const ownUtxoAddressMap = {};
+    const ownStakeAddressMap = {};
+    for (const { address, path } of addresses.utxoAddresses) {
+      ownUtxoAddressMap[address] = path;
+    }
+    for (const { address, path } of addresses.accountingAddresses) {
+      ownStakeAddressMap[address] = path;
+    }
+
+    const { addressedUtxos } = this;
+    if (!addressedUtxos) {
+      throw new Error('unexpected nullish addressed UTXOs');
+    }
+    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
+
+    let trezorSignTxPayload;
+    try {
+      trezorSignTxPayload = toTrezorSignRequest(
+        txBody,
+        Number(config.ChainNetworkId),
+        config.ByronNetworkId,
+        ownUtxoAddressMap,
+        ownStakeAddressMap,
+        addressedUtxos,
+      );
+    } catch {
+      runInAction(() => {
+        this.hwWalletError = unsupportedTransactionError;
+        this.isHwWalletErrorRecoverable = false;
+      });
+      throw new Error('unsupported transaction');
+    }
+
+    let trezorSignTxResp;
+    try {
+      const signResult = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
+        {
+          ...trezorSignTxPayload,
+          allowSeedlessDevice: true,
+        }
+      ));
+      if (!signResult.success) {
+        throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+      }
+      trezorSignTxResp = signResult.payload;
+    } catch (error) {
+      runInAction(() => {
+        this.hwWalletError = new convertToLocalizableTrezorError(error);
+        this.isHwWalletErrorRecoverable = true;
+      });
+      throw error;
+    }
+
+    if (trezorSignTxResp.hash !== blake2b(256 / 8).update(rawTxBody).digest('hex')) {
+      runInAction(() => {
+        this.hwWalletError = transactionHashMismatchError;
+        this.isHwWalletErrorRecoverable = false;
+      });
+      throw new Error('hash mismatch');
+    }
+
+    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (withLevels == null) {
+      throw new Error('No public deriver level for this public deriver');
+    }
+
+    const withPublicKey = asGetPublicKey(withLevels);
+    if (withPublicKey == null) throw new Error('No public key for this public deriver');
+    const publicKey = await withPublicKey.getPublicKey();
+
+    const publicKeyInfo = {
+      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+        Buffer.from(publicKey.Hash, 'hex')
+      ),
+      addressing: {
+        startLevel: 1,
+        path: withLevels.getPathToPublic(),
+      },
+    };
+
+    // `addressedUtxos` is all UTXOs of this wallet
+    // `ownUtxos` is own UTXOs used by this tx as inputs
+    const txInputs = new Set();
+    for (let i = 0; i < txBody.inputs().len(); i++) {
+      const input = txBody.inputs().get(i);
+      txInputs.add(`${input.transaction_id().to_hex()}${input.index()}`);
+    }
+    const ownUtxos = addressedUtxos.filter(utxo =>
+      txInputs.has(`${utxo.tx_hash}${utxo.tx_index}`)
+    );
+
+    return buildSignedTrezorTransaction(
+      txBody,
+      ownUtxos,
+      trezorSignTxResp.witnesses,
+      publicKeyInfo,
+      undefined
     );
   }
 

@@ -484,3 +484,338 @@ export function buildSignedTransaction(
     metadata
   );
 }
+
+type AddressMap = { [addressHex: string]: Array<number> };
+
+// Convert connector sign tx input into request to Trezor.
+// Note this function has some overlaps in functionality with above functions but
+// this function is more generic because above functions deal only with Yoroi
+// extension "send" transactions.
+export function toTrezorSignRequest(
+  txBody: RustModule.WalletV4.TransactionBody,
+  networkId: number,
+  protocolMagic: number,
+  ownUtxoAddressMap: AddressMap,
+  ownStakeAddressMap: AddressMap,
+  addressedUtxos: Array<CardanoAddressedUtxo>,
+): $Exact<CardanoSignTransaction> {
+  function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
+    const formatted = [];
+    for (let i = 0; i < inputs.len(); i++) {
+      const input = inputs.get(i);
+      const hash = input.transaction_id().to_hex();
+      const index = input.index();
+      const ownUtxo = addressedUtxos.find(utxo =>
+        utxo.tx_hash === hash && utxo.tx_index === index
+      );
+      formatted.push({
+        prev_hash: hash,
+        prev_index: index,
+        ...(ownUtxo ? { path: ownUtxo.addressing.path } : {})
+      });
+    }
+    return formatted.sort(compareInputs);
+  }
+
+  function formatOutput(output: RustModule.WalletV4.TransactionOutput): CardanoOutput {
+    const amount =  output.amount().coin().to_str();
+    const tokenBundle = toTrezorTokenBundle(output.amount().multiasset());
+    const outputDataHash = output.data_hash();
+    const datumHash = outputDataHash ? { datumHash: outputDataHash.to_hex() } : {};
+
+    const addr = output.address();
+    let result;
+    // Yoroi doesn't have Byron addresses or pointer addresses.
+    // If the address is one of these, it's not a wallet address.
+    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(addr);
+    const pointerAddr = RustModule.WalletV4.PointerAddress.from_address(addr);
+    if (byronAddr || pointerAddr) {
+      result = {
+        address: addr.to_bech32(),
+        amount,
+        ...tokenBundle,
+        ...datumHash,
+      };
+    }
+
+    const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
+    if (enterpriseAddr) {
+      const ownAddressPath = ownUtxoAddressMap[addr.to_bech32()];
+      if (ownAddressPath) {
+        result = {
+          addressParameters: {
+            addressType: ADDRESS_TYPE.Enterprise,
+            path: ownAddressPath,
+          },
+          amount,
+          ...tokenBundle,
+          ...datumHash,
+        };
+      } else {
+        result = {
+          address: addr.to_bech32(),
+          amount,
+          ...tokenBundle,
+          ...datumHash,
+        };
+      }
+    }
+
+    const baseAddr = RustModule.WalletV4.BaseAddress.from_address(addr);
+    if (baseAddr) {
+      const paymentAddress = RustModule.WalletV4.EnterpriseAddress.new(
+        networkId,
+        baseAddr.payment_cred()
+      ).to_address().to_hex();
+      const ownPaymentPath = ownUtxoAddressMap[paymentAddress];
+      if (ownPaymentPath) {
+        const stake = baseAddr.stake_cred();
+        const stakeAddr = RustModule.WalletV4.RewardAddress.new(
+          networkId,
+          stake,
+        ).to_address().to_hex();
+        const ownStakePath = ownStakeAddressMap[stakeAddr];
+        if (ownStakePath) {
+          // stake address is ours
+          result = {
+            addressParameters: {
+              addressType: ADDRESS_TYPE.Base,
+              path: ownPaymentPath,
+              stakingPath: ownStakePath,
+            },
+            amount,
+            ...tokenBundle,
+            ...datumHash,
+          };
+        } else {
+          const keyHash = stake.to_keyhash();
+          const scriptHash = stake.to_scripthash();
+          if (keyHash) {
+            // stake address is foreign key hash
+            result = {
+              addressParameters: {
+                addressType: ADDRESS_TYPE.Base,
+                path: ownPaymentPath,
+                stakingKeyHas: keyHash.to_hex(),
+              },
+              amount,
+              ...tokenBundle,
+              ...datumHash,
+            };
+          } else if (scriptHash) {
+            // stake address is script hash
+            result = {
+              addressParameters: {
+                addressType: ADDRESS_TYPE.Base,
+                path: ownPaymentPath,
+                stakingScriptHash: scriptHash.to_hex(),
+              },
+              amount,
+              ...tokenBundle,
+              ...datumHash,
+            };
+          } else {
+            throw new Error('unexpected stake credential type in base address');
+          }
+        }
+        // not having BASE_PAYMENT_SCRIPT_ because payment script is
+        // treated as third party address
+      } else { // payment address is not ours
+        result = {
+          address: addr.to_bech32(),
+          amount,
+          ...tokenBundle,
+          ...datumHash,
+        };
+      }
+    }
+
+    // we do not allow payment to RewardAddresses
+    if (!result) {
+      throw new Error('not expecting to pay to reward address');
+    }
+
+    return result;
+  }
+
+  const outputs = [];
+  for (let i = 0; i < txBody.outputs().len(); i++) {
+    outputs.push(formatOutput(txBody.outputs().get(i)));
+  }
+
+  const formattedRequiredSigners = [];
+  const requiredSigners = txBody.required_signers();
+  if (requiredSigners) {
+    for (let i = 0; i < requiredSigners.len(); i++) {
+      const hash = requiredSigners.get(i);
+      const address = RustModule.WalletV4.EnterpriseAddress.new(
+        networkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+      ).to_address().to_hex();
+      const ownAddressPath = ownUtxoAddressMap[address];
+      if (ownAddressPath) {
+        formattedRequiredSigners.push({
+          keyPath: ownAddressPath,
+        });
+      } else {
+        formattedRequiredSigners.push({
+          keyHash: hash.to_hex(),
+        });
+      }
+    }
+  }
+
+  let formattedCertificates = null;
+  const certificates = txBody.certs();
+  if (certificates) {
+    const getPath = (
+      stakeCredential: RustModule.WalletV4.StakeCredential
+    ): Array<number> => {
+      const rewardAddr = RustModule.WalletV4.RewardAddress.new(
+        networkId,
+        stakeCredential
+      );
+      const addressPayload = Buffer.from(rewardAddr.to_address().to_bytes()).toString('hex');
+      const addressing = ownStakeAddressMap[addressPayload];
+      if (addressing == null) {
+        throw new Error('not own address in certificate');
+      }
+      return addressing;
+    };
+
+    const result = [];
+    for (let i = 0; i < certificates.len(); i++) {
+      const cert = certificates.get(i);
+
+      const registrationCert = cert.as_stake_registration();
+      if (registrationCert != null) {
+        result.push({
+          type: CERTIFICATE_TYPE.StakeRegistration,
+          path: getPath(registrationCert.stake_credential()),
+        });
+        continue;
+      }
+      const deregistrationCert = cert.as_stake_deregistration();
+      if (deregistrationCert != null) {
+        result.push({
+          type: CERTIFICATE_TYPE.StakeDeregistration,
+          path: getPath(deregistrationCert.stake_credential()),
+        });
+        continue;
+      }
+      const delegationCert = cert.as_stake_delegation();
+      if (delegationCert != null) {
+        result.push({
+          type: CERTIFICATE_TYPE.StakeDelegation,
+          path: getPath(delegationCert.stake_credential()),
+          pool:delegationCert.pool_keyhash().to_hex(),
+        });
+        continue;
+      }
+      throw new Error(`unsupported certificate type`);
+    }
+    formattedCertificates = result;
+  }
+
+  let formattedWithdrawals = null;
+  const withdrawals = txBody.withdrawals();
+  if (withdrawals) {
+    const result = [];
+
+    const withdrawalKeys = withdrawals.keys();
+    for (let i = 0; i < withdrawalKeys.len(); i++) {
+      const rewardAddress = withdrawalKeys.get(i);
+      const withdrawalAmount = withdrawals.get(rewardAddress);
+      if (withdrawalAmount == null) {
+        throw new Error('missing withdraw amount should never happen');
+      }
+
+      const rewardAddressPayload = rewardAddress.to_address().to_hex();
+      const path = ownStakeAddressMap[rewardAddressPayload];
+      if (path == null) {
+        throw new Error('foreign withdrawal reward address');
+      }
+      result.push({
+        amount: withdrawalAmount.to_str(),
+        path,
+      });
+    }
+    formattedWithdrawals = result;
+  }
+
+  // TODO: support CIP36 aux data
+  let formattedAuxiliaryData = null;
+  const auxiliaryDataHash = txBody.auxiliary_data_hash();
+  if (auxiliaryDataHash) {
+    formattedAuxiliaryData = {
+      hash: auxiliaryDataHash.to_hex(),
+    };
+  }
+
+  let formattedCollateral = null;
+  const collateral = txBody.collateral();
+  if (collateral) {
+    formattedCollateral = formatInputs(collateral);
+  }
+
+  let formattedCollateralReturn = null;
+  const collateralReturn = txBody.collateral_return();
+  if (collateralReturn) {
+    formattedCollateralReturn = formatOutput(collateralReturn);
+  }
+
+  let formattedReferenceInputs = null;
+  const referenceInputs = txBody.reference_inputs();
+  if (referenceInputs) {
+    formattedReferenceInputs = formatInputs(referenceInputs);
+  }
+
+  const validityIntervalStart = txBody.validity_start_interval_bignum()?.to_str() ?? null;
+
+  const formattedMint = txBody.mint()?.to_js_value().map(([policyId, assets]) => ({
+    policyId,
+    tokenAmounts: Object.keys(assets).map(assetNameBytes => (
+      { assetNameBytes, mintAmount: assets[assetNameBytes] }
+    )),
+  }));
+
+  const scriptDataHash = txBody.script_data_hash()?.to_hex();
+  
+  const result: $Exact<CardanoSignTransaction> = {
+    signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
+    inputs: formatInputs(txBody.inputs()),
+    outputs,
+    fee: txBody.fee().to_str(),
+    protocolMagic,
+    networkId,
+    ttl: String(txBody.ttl()),
+    //includeNetworkId: txBody.network_id() != null,
+  };
+
+  if (validityIntervalStart) {
+    result.validityIntervalStart = validityIntervalStart;
+  }
+  if (formattedCertificates) {
+    result.certificates = formattedCertificates;
+  }
+  if (formattedWithdrawals) {
+    result.withdrawals = formattedWithdrawals;
+  }
+  if (formattedAuxiliaryData) {
+    result.auxiliaryData = formattedAuxiliaryData;
+  }
+  if (formattedMint) {
+    result.mint = formattedMint;
+  }
+  if (scriptDataHash) {
+    //result.scriptDataHash = scriptDataHash;
+  }
+  if (formattedCollateralReturn) {
+    //result.collateralInputs = formattedCollateral;
+  }
+  if (requiredSigners) {
+    //result.requiredSigners = formattedRequiredSigners;
+  }
+  // connector API doesn't support additionalWitnessRequests
+  return result;
+}
