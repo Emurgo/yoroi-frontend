@@ -4,5 +4,10 @@ import { AsyncAction, } from '../lib/Action';
 // ======= WALLET ACTIONS =======
 
 export default class AdaWalletsActions {
-  createWallet: AsyncAction<{| name: string, password: string |}> = new AsyncAction();
+  startWalletCreation: AsyncAction<{| name: string, password: string |}> = new AsyncAction();
+  createWallet: AsyncAction<{|
+    name: string,
+    password: string,
+    recoveryPhrase: Array<string>,
+  |}> = new AsyncAction();
 }

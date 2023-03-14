@@ -13,6 +13,7 @@ import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { trackWalletCreation } from '../../api/analytics';
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
@@ -32,7 +33,8 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       }
     );
     walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
-    ada.wallets.createWallet.listen(this._startWalletCreation);
+    ada.wallets.startWalletCreation.listen(this._startWalletCreation);
+    ada.wallets.createWallet.listen(asyncCheck(this._createWallet))
   }
 
   // =================== SEND MONEY ==================== //
@@ -139,6 +141,33 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
         recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
         network: selectedNetwork,
         accountIndex: this.stores.walletBackup.selectedAccount,
+      });
+      return wallet;
+    }).promise;
+
+    trackWalletCreation('created');
+  };
+
+  _createWallet: {|
+    recoveryPhrase: Array<string>,
+    walletPassword: string,
+    walletName: string,
+  |} => Promise<void> = async (request) => {
+    const persistentDb = this.stores.loading.getDatabase();
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
+    }
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
+    await this.stores.wallets.createWalletRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet({
+        mode: 'cip1852',
+        db: persistentDb,
+        walletName: request.walletName,
+        walletPassword: request.walletPassword,
+        recoveryPhrase: request.recoveryPhrase.join(' '),
+        network: selectedNetwork,
+        accountIndex: 0 + HARD_DERIVATION_START,
       });
       return wallet;
     }).promise;

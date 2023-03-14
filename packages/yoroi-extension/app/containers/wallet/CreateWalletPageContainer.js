@@ -18,7 +18,7 @@ type Props = InjectedOrGenerated<GeneratedData>;
 @observer
 export default class CreateWalletPageContainer extends Component<Props> {
   render(): Node {
-    const { stores } = this.generated;
+    const { stores, actions } = this.generated;
 
     return (
       <TopBarLayout
@@ -27,6 +27,8 @@ export default class CreateWalletPageContainer extends Component<Props> {
       >
         <CreateWalletPage
           genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
+          createWallet={actions.ada.wallets.createWallet.trigger}
+          setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
         />
       </TopBarLayout>
     );
@@ -59,7 +61,20 @@ export default class CreateWalletPageContainer extends Component<Props> {
           },
         },
       },
-      actions: {},
+      actions: {
+        ada: {
+          wallets: {
+            createWallet: {
+              trigger: actions.ada.wallets.createWallet.trigger,
+            },
+          },
+        },
+        profile: {
+          setSelectedNetwork: {
+            trigger: actions.profile.setSelectedNetwork.trigger,
+          },
+        },
+      },
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
       SidebarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<SidebarContainerData>

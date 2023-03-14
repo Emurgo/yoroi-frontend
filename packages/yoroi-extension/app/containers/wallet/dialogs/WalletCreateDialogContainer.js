@@ -20,7 +20,7 @@ export default class WalletCreateDialogContainer extends Component<Props> {
     return (
       <WalletCreateDialog
         classicTheme={this.generated.stores.profile.isClassicTheme}
-        onSubmit={this.generated.actions.ada.wallets.createWallet.trigger}
+        onSubmit={this.generated.actions.ada.wallets.startWalletCreation.trigger}
         onCancel={this.props.onClose}
       />
     );
@@ -54,8 +54,8 @@ export default class WalletCreateDialogContainer extends Component<Props> {
       actions: {
         ada: {
           wallets: {
-            createWallet: {
-              trigger: actions.ada.wallets.createWallet.trigger,
+            startWalletCreation: {
+              trigger: actions.ada.wallets.startWalletCreation.trigger,
             },
           },
         },

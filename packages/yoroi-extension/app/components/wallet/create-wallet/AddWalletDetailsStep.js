@@ -109,6 +109,20 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
     },
   });
 
+  submit: (() => void) = () => {
+    console.log('submitting...')
+    this.form.submit({
+      onSuccess: async (form) => {
+        this.setState({ isSubmitting: true });
+        const { walletName, walletPassword } = form.values();
+        await this.props.onSubmit(walletName, walletPassword);
+      },
+      onError: () => {
+        this.setState({ isSubmitting: false });
+      },
+    });
+  };
+
   render(): Node {
     const { setCurrentStep, shouldShowDialog, showDialog, hideDialog } = this.props;
     const { form } = this;
@@ -119,6 +133,19 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
+
+    const goNextCallback = () => {
+      const fields = [
+        walletNameField,
+        walletPasswordField,
+        repeatedPasswordField,
+      ];
+
+      if (fields.some(field => !field.isValid)) return undefined
+      return () => {
+        this.props.onSubmit(walletName, walletPassword);
+      }
+    }
 
     return (
       <Stack alignItems='center' justifyContent='center'>
@@ -166,6 +193,7 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
           </Box>
 
           <StepController
+            goNext={goNextCallback()}
             goBack={() => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE)}
           />
         </Stack>
@@ -177,4 +205,4 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
       </Stack>
     );
   }
-}
+};

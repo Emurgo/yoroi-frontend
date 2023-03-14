@@ -31,7 +31,7 @@ export default class ErgoWalletsStore extends Store<StoresMap, ActionsMap> {
       }
     );
     walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
-    ergo.wallets.createWallet.listen(this._startWalletCreation);
+    ergo.wallets.startWalletCreation.listen(this._startWalletCreation);
   }
 
   // =================== SEND MONEY ==================== //
