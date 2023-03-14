@@ -16,6 +16,12 @@ import { ReactComponent as InfoIcon }  from '../../../assets/images/info-icon-pr
 import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from '../../common/TextField';
+import { generateShelleyPlate } from '../../../api/ada/lib/cardanoCrypto/plate';
+import { generateWalletRootKey } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { HARD_DERIVATION_START } from '../../../config/numbersConfig';
+import { NUMBER_OF_VERIFIED_ADDRESSES } from '../../../stores/toplevel/WalletRestoreStore';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 
 const messages: * = defineMessages({
   description: {
@@ -45,18 +51,10 @@ type Props = {|
   recoveryPhrase: Array<string> | null,
 |};
 
-type State = {|
-  isSubmitting: boolean,
-|};
-
 @observer
-export default class AddWalletDetailsStep extends Component<Props, State> {
+export default class AddWalletDetailsStep extends Component<Props > {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
-  };
-
-  state: State = {
-    isSubmitting: false,
   };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
@@ -109,26 +107,11 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
     },
   });
 
-  submit: (() => void) = () => {
-    console.log('submitting...')
-    this.form.submit({
-      onSuccess: async (form) => {
-        this.setState({ isSubmitting: true });
-        const { walletName, walletPassword } = form.values();
-        await this.props.onSubmit(walletName, walletPassword);
-      },
-      onError: () => {
-        this.setState({ isSubmitting: false });
-      },
-    });
-  };
-
   render(): Node {
-    const { setCurrentStep, shouldShowDialog, showDialog, hideDialog } = this.props;
+    const { setCurrentStep, shouldShowDialog, showDialog, hideDialog, recoveryPhrase } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
-    const { isSubmitting } = this.state;
 
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');
@@ -146,6 +129,15 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
         this.props.onSubmit(walletName, walletPassword);
       }
     }
+
+    // Todo: network should be dynamic.
+    const network = networks.CardanoPreprodTestnet;
+    const { plate } = generateShelleyPlate(
+      generateWalletRootKey(recoveryPhrase.join(' ')),
+      0 + HARD_DERIVATION_START, // Account Index
+      NUMBER_OF_VERIFIED_ADDRESSES,
+      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
+    );
 
     return (
       <Stack alignItems='center' justifyContent='center'>
@@ -191,6 +183,24 @@ export default class AddWalletDetailsStep extends Component<Props, State> {
               </Box>
             </Box>
           </Box>
+
+          <Stack
+            direction='row'
+            gap='8px'
+            alignItems="center"
+            justifyContent='center'
+            mt='-3px'
+          >
+            <WalletAccountIcon
+              iconSeed={plate.ImagePart}
+              saturationFactor={0}
+              size={6}
+              scalePx={4}
+            />
+            <Typography variant='body1'>
+              {plate.TextPart}
+            </Typography>
+          </Stack>
 
           <StepController
             goNext={goNextCallback()}

@@ -82,6 +82,7 @@ function CreateWalletPage(props: Props & Intl): Node {
         hideDialog={() => hideDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
         showDialog={() => showDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
         setCurrentStep={setCurrentStep}
+        recoveryPhrase={recoveryPhrase}
         onSubmit={(walletName: string, walletPassword: string) => {
           if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
           setSelectedNetwork(networks.CardanoPreprodTestnet);
