@@ -736,10 +736,14 @@ export function toLedgerSignRequest(
       throw new Error('not expecting to pay to reward address');
     }
 
+    const outputDataHash = output.data_hash();
+
+    // TODO: Babbage-era output support
     return {
       amount: output.amount().coin().to_str(),
       destination,
       tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
+      datumHashHex: outputDataHash ? outputDataHash.to_hex() : null,
     };
   }
 
