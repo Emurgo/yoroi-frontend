@@ -482,6 +482,17 @@ signTx.addEventListener("click", () => {
     // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
     const utxo = utxos[0];
 
+    const assets = CardanoWasm.MultiAsset.new();
+    for (const asset of utxo.assets) {
+      const policyId = CardanoWasm.ScriptHash.from_hex(asset.policyId);
+      const policyContent = assets.get(policyId) || CardanoWasm.Assets.new();
+      policyContent.insert(
+        CardanoWasm.AssetName.new(Buffer.from(asset.name, 'hex')),
+        CardanoWasm.BigNum.from_str(asset.amount)
+      );
+      assets.insert(policyId, policyContent);
+    }
+
     const addr = CardanoWasm.Address.from_bech32(utxo.receiver);
 
     const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
@@ -492,7 +503,10 @@ signTx.addEventListener("click", () => {
         CardanoWasm.TransactionHash.from_bytes(hexToBytes(utxo.tx_hash)), // tx hash
         utxo.tx_index // index
       ),
-      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
+      CardanoWasm.Value.new_with_assets(
+        CardanoWasm.BigNum.from_str(utxo.amount),
+        assets
+      )
     );
 
     const shelleyOutputAddress =
