@@ -8,9 +8,10 @@ import { observer } from 'mobx-react';
 import { RESTORE_WALLET_STEPS } from './steps';
 import { isDialogShownBefore, markDialogAsShown } from '../dialogs/utils';
 import { TIPS_DIALOGS } from '../dialogs/constants';
-import RestoreWalletSteps from './RestoreWalletSteps';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
-import SelectWalletTypeStep from './steps/SelectWalletTypeStep';
+import SelectWalletTypeStep from './steps/type/SelectWalletTypeStep';
+import Stepper from '../../common/stepper/Stepper';
+import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 // import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 // import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 // import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
@@ -19,6 +20,18 @@ const messages: * = defineMessages({
   title: {
     id: 'wallet.restore.page.title',
     defaultMessage: '!!!Restore existing wallet',
+  },
+  firstStep: {
+    id: 'wallet.restore.firstStep',
+    defaultMessage: '!!!Select wallet type',
+  },
+  secondStep: {
+    id: 'wallet.restore.secondStep',
+    defaultMessage: '!!!Enter recovery phrase',
+  },
+  thirdStep: {
+    id: 'wallet.restore.thirdStep',
+    defaultMessage: '!!!Add wallet details',
   },
 });
 
@@ -31,7 +44,7 @@ type Props = {||};
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl } = props;
   const [currentStep, setCurrentStep] = useState(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
-  const [recoveryPhrase, setRecoveryPhrase] = useState(null);
+  const [numWords, setNumWords] = useState<number>(15);
   const [dialogs, setDialogs] = useState({
     [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: !isDialogShownBefore(
       TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE
@@ -49,33 +62,38 @@ function RestoreWalletPage(props: Props & Intl): Node {
   }
 
   const steps = {
-    [RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE]: (
-      <SelectWalletTypeStep
-        onNext={() => setCurrentStep(RESTORE_WALLET_STEPS.SAVE_RECOVERY_PHRASE)}
-      />
-    ),
-    // <LearnAboutRecoveryPhrase
-    //   shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
-    //   hideDialog={() => hideDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-    //   showDialog={() => showDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-    //   onNext={async () => {
-    //     setCurrentStep(RESTORE_WALLET_STEPS.SAVE_RECOVERY_PHRASE);
-    //     if (recoveryPhrase !== null) return;
-    //     const walletRecoveryPhrase = await genWalletRecoveryPhrase();
-    //     setRecoveryPhrase(walletRecoveryPhrase);
-    //   }}
-    // />
-    [RESTORE_WALLET_STEPS.SAVE_RECOVERY_PHRASE]: null,
-    // <SaveRecoveryPhraseStep
-    //   shouldShowDialog={dialogs.SAVE_RECOVERY_PHRASE}
-    //   hideDialog={() => hideDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
-    //   showDialog={() => showDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
-    //   setCurrentStep={setCurrentStep}
-    //   recoveryPhrase={recoveryPhrase}
-    // />
+    [RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE]: {
+      stepId: RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE,
+      message: messages.firstStep,
+      component: (
+        <SelectWalletTypeStep
+          onNext={numWords => {
+            setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
+            setNumWords(numWords);
+          }}
+        />
+      ),
+    },
+    [RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE]: {
+      stepId: RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE,
+      message: messages.secondStep,
+      component: (
+        <EnterRecoveryPhraseStep
+          setCurrentStep={setCurrentStep}
+          currentStep={currentStep}
+          numWords={numWords}
+          checkValidPhrase={phrase => console.log(phrase) ?? true}
+        />
+      ),
+    },
+    [RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS]: {
+      stepId: RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS,
+      message: messages.thirdStep,
+      component: null,
+    },
   };
 
-  const CurrentStep = steps[currentStep];
+  const CurrentStep = steps[currentStep].component;
 
   return (
     <Box>
@@ -92,7 +110,11 @@ function RestoreWalletPage(props: Props & Intl): Node {
         </Box>
         <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
       </Box>
-      <RestoreWalletSteps currentStep={currentStep} setCurrentStep={setCurrentStep} />
+      <Stepper
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        steps={Object.values(steps)}
+      />
       {CurrentStep}
     </Box>
   );

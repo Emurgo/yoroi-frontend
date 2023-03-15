@@ -1,22 +1,26 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Box, Typography } from '@mui/material';
-import { RESTORE_WALLET_STEPS } from './steps';
+import styles from './Stepper.scss';
 
 const messages: * = defineMessages({
   firstStep: {
-    id: 'wallet.restore.firstStep',
-    defaultMessage: '!!!Select wallet type',
+    id: 'wallet.create.firstStep',
+    defaultMessage: '!!!Learn about recovery phrase',
   },
   secondStep: {
     id: 'wallet.create.secondStep',
     defaultMessage: '!!!Save recovery phrase',
   },
   thirdStep: {
-    id: 'wallet.restore.thirdStep',
+    id: 'wallet.create.thirdStep',
+    defaultMessage: '!!!Verify recovery phrase',
+  },
+  forthStep: {
+    id: 'wallet.create.forthStep',
     defaultMessage: '!!!Add wallet details',
   },
 });
@@ -25,41 +29,26 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type Props = {|
-  currentStep: string,
-  setCurrentStep: function,
+type StepProps = {|
+  stepId: string,
+  message: any,
+  component?: Node | null,
 |};
 
-const steps = [
-  {
-    stepId: RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE,
-    message: messages.firstStep,
-  },
-  {
-    stepId: RESTORE_WALLET_STEPS.SAVE_RECOVERY_PHRASE,
-    message: messages.secondStep,
-  },
-  {
-    stepId: RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS,
-    message: messages.thirdStep,
-  },
-];
+type Props = {|
+  steps: Array<StepProps>,
+  currentStep: string,
+  setCurrentStep(stepId: string): void,
+|};
 
-function RestoreWalletSteps(props: Props & Intl): Node {
-  const { intl, currentStep, setCurrentStep } = props;
+function Stepper(props: Props & Intl): Node {
+  const { intl, steps, currentStep, setCurrentStep } = props;
   const currentStepIdx = steps.findIndex(step => step.stepId === currentStep);
   if (currentStepIdx === -1) throw new Error(`Step to found. Should never happen`);
 
   return (
     <Box>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        gap="24px"
-        mt="24px"
-        mb="48px"
-      >
+      <Stack sx={{ flexDirection: 'row' }} className={styles.stackContainer}>
         {steps.map(({ stepId, message }, idx) => {
           const isCurrentStep = currentStepIdx === idx;
           const isPrevStep = idx < currentStepIdx;
@@ -74,9 +63,8 @@ function RestoreWalletSteps(props: Props & Intl): Node {
 
           return (
             <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="center"
+              sx={{ flexDirection: 'row' }}
+              className={styles.stackSteps}
               key={stepId}
               onClick={() => {
                 if (isPrevStep) setCurrentStep(stepId);
@@ -84,20 +72,8 @@ function RestoreWalletSteps(props: Props & Intl): Node {
             >
               <Box
                 component="button"
-                sx={{
-                  width: '24px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: '8px',
-                  borderWidth: '2.5px',
-                  borderStyle: 'solid',
-                  borderColor: stepColor,
-                  borderRadius: '50%',
-                  transition: 'color 300ms ease',
-                  cursor,
-                }}
+                className={styles.stackStep}
+                sx={{ borderColor: stepColor, cursor }}
               >
                 <Typography variant="body2" fontWeight={500} color={stepColor}>
                   {idx + 1}
@@ -114,4 +90,4 @@ function RestoreWalletSteps(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(RestoreWalletSteps)): ComponentType<Props>);
+export default (injectIntl(observer(Stepper)): ComponentType<Props>);

@@ -4,10 +4,11 @@ import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box } from '@mui/material';
-import StepController from '../StepController';
-import fifteenImg from '../../../../assets/images/add-wallet/restore/15-word.inline.svg';
-import twentyfourImg from '../../../../assets/images/add-wallet/restore/24-word.inline.svg';
-import AddWalletCard from '../../add-wallet-revamp/AddWalletCard';
+import StepController from '../../StepController';
+import fifteenImg from '../../../../../assets/images/add-wallet/restore/15-word.inline.svg';
+import twentyfourImg from '../../../../../assets/images/add-wallet/restore/24-word.inline.svg';
+import AddWalletCard from '../../../add-wallet-revamp/AddWalletCard';
+import styles from './SelectWalletTypeStep.scss';
 
 const messages: * = defineMessages({
   fifteenWords: {
@@ -25,7 +26,7 @@ type Intl = {|
 |};
 
 type Props = {|
-  onNext(step: string): void,
+  onNext(numWords: number): void,
 |};
 
 function SelectWalletTypeStep(props: Props & Intl): Node {
@@ -34,23 +35,16 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
   return (
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            gap: '24px',
-            mt: '24px',
-          }}
-        >
+        <Box className={styles.container}>
           <AddWalletCard
-            onClick={() => console.log('15 selected')}
+            onClick={() => onNext(15)}
+            imageSx={{ pt: '10px' }}
             imageSrc={fifteenImg}
             label={intl.formatMessage(messages.fifteenWords)}
           />
           <AddWalletCard
-            onClick={() => console.log('24 selected')}
+            onClick={() => onNext(24)}
+            imageSx={{ pt: '10px' }}
             imageSrc={twentyfourImg}
             label={intl.formatMessage(messages.twentyfourWords)}
           />

@@ -5,18 +5,21 @@ import styles from './AddWalletCard.scss';
 
 type Props = {|
   label: string,
+  imageSx?: Object,
   imageSrc: string,
   onClick(): void,
 |};
 
 export default function AddWalletCard(props: Props): Node {
-  const { label, imageSrc, onClick } = props;
+  const { label, imageSx = {}, imageSrc, onClick } = props;
   return (
-    <button onClick={onClick} className={styles.component} type='button'>
-      <Box>
+    <button onClick={onClick} className={styles.component} type="button">
+      <Box sx={{ ...imageSx }}>
         <img src={imageSrc} alt={label} />
       </Box>
-      <Typography variant='h3' textAlign='center' padding='0px 40px' mt='16px'>{label}</Typography>
+      <Typography variant="h3" textAlign="center" padding="0px 40px" mt="16px">
+        {label}
+      </Typography>
     </button>
   );
-};
+}
