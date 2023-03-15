@@ -771,8 +771,8 @@ export function toTrezorSignRequest(
   }
 
   const validityIntervalStart = txBody.validity_start_interval_bignum()?.to_str() ?? null;
-
-  const formattedMint = txBody.mint()?.to_js_value().map(([policyId, assets]) => ({
+  // temp workaround for buggy Mint.to_js_value()
+  const formattedMint = JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(([policyId, assets]) => ({
     policyId,
     tokenAmounts: Object.keys(assets).map(assetNameBytes => (
       { assetNameBytes, mintAmount: assets[assetNameBytes] }
