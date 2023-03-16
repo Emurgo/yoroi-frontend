@@ -708,7 +708,7 @@ export function toTrezorSignRequest(
         result.push({
           type: CERTIFICATE_TYPE.StakeDelegation,
           path: getPath(delegationCert.stake_credential()),
-          pool:delegationCert.pool_keyhash().to_hex(),
+          pool: delegationCert.pool_keyhash().to_hex(),
         });
         continue;
       }
@@ -776,7 +776,7 @@ export function toTrezorSignRequest(
   }));
 
   const scriptDataHash = txBody.script_data_hash()?.to_hex();
-  
+
   const result: $Exact<CardanoSignTransaction> = {
     signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
     inputs: formatInputs(txBody.inputs()),
@@ -785,7 +785,7 @@ export function toTrezorSignRequest(
     protocolMagic,
     networkId,
     ttl: String(txBody.ttl()),
-    //includeNetworkId: txBody.network_id() != null,
+    includeNetworkId: txBody.network_id() != null,
   };
 
   if (validityIntervalStart) {
