@@ -3,12 +3,13 @@ import { Node, ComponentType, useState } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography } from '@mui/material'
+import { Stack, Box, Typography, Button } from '@mui/material'
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
 import classnames from 'classnames';
 import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg'
+import environment from '../../../environment';
 
 const messages: * = defineMessages({
   description: {
@@ -32,6 +33,7 @@ type Intl = {|
 type Props = {|
     currentStep: string,
 |};
+
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, recoveryPhrase, setCurrentStep } = props;
@@ -196,12 +198,24 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           </Stack>
         )}
 
+
         <Box mt='10px'>
           <StepController
             goNext={goNextStepCallback()}
             goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
           />
         </Box>
+
+        {environment.isDev() && (
+          <Button
+            onClick={() => setRecoveryPhrase(recoveryPhrase)}
+            onDoubleClick={() => setRecoveryPhrase(
+              new Array(recoveryPhrase.length).fill(null),
+            )}
+          >
+            Auto Enter
+          </Button>
+        )}
       </Stack>
     </Stack>
   );
