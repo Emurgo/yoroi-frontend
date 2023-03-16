@@ -759,12 +759,6 @@ export function toTrezorSignRequest(
     formattedCollateral = formatInputs(collateral);
   }
 
-  let formattedCollateralReturn = null;
-  const collateralReturn = txBody.collateral_return();
-  if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(collateralReturn);
-  }
-
   let formattedReferenceInputs = null;
   const referenceInputs = txBody.reference_inputs();
   if (referenceInputs) {
@@ -810,14 +804,14 @@ export function toTrezorSignRequest(
     result.mint = formattedMint;
   }
   if (scriptDataHash) {
-    //result.scriptDataHash = scriptDataHash;
+    result.scriptDataHash = scriptDataHash;
   }
-  if (formattedCollateralReturn) {
-    //result.collateralInputs = formattedCollateral;
+  if (formattedCollateral) {
+    result.collateralInputs = formattedCollateral;
   }
   if (requiredSigners) {
-    //result.requiredSigners = formattedRequiredSigners;
+    result.requiredSigners = formattedRequiredSigners;
   }
-  // connector API doesn't support additionalWitnessRequests
+
   return result;
 }
