@@ -77,8 +77,6 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
   const sortedRecoveryPhrase = useMemo(() => makeSortedPhrase(recoveryPhrase), [recoveryPhrase]);
 
-  console.log(sortedRecoveryPhrase, recoveryPhrase);
-
   return (
     <Stack alignItems='center' justifyContent='center' className={styles.component}>
       <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='690px'>
@@ -159,17 +157,16 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           justifyContent='center'
           gap='8px'
         >
-          {recoveryPhrase.map((word, idx) => {
-            // Todo: sort words alphabetically.
+          {sortedRecoveryPhrase.map(({ word, id, originalIdx }) => {
             return (
               <button
                 type='button'
-                key={word}
+                key={id}
                 className={classnames(styles.wordChip, {
                   [styles.wordAdded]: isWordAdded(word),
                   [styles.wrongWord]: wrongWord === word,
                 })}
-                onClick={() => onAddWord(word, idx)}
+                onClick={() => onAddWord(word, originalIdx)}
               >
                 <Typography
                   sx={{
@@ -213,7 +210,10 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         {environment.isDev() && (
           <Button
-            onClick={() => setRecoveryPhrase(recoveryPhrase)}
+            onClick={() => {
+              setRecoveryPhrase(recoveryPhrase)
+              setWrongWord(null);
+            }}
             onDoubleClick={() => setRecoveryPhrase(
               new Array(recoveryPhrase.length).fill(null),
             )}
