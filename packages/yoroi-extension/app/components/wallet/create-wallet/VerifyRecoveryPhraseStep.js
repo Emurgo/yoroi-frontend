@@ -1,5 +1,5 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import { Node, ComponentType, useState, useMemo } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -73,6 +73,31 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     if (!isValidPhrase) return;
     return () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS)
   };
+
+  const shortedRecoveryPhrase = useMemo(() => {
+    const sorted = recoveryPhrase.slice().sort();
+
+    const wordIndexes = new Set();
+
+    return sorted.map((sortedWord, sortedWordIdx) => {
+      const originalIdx = recoveryPhrase.findIndex((originalWord, idx) => {
+        return sortedWord === originalWord && !wordIndexes.has(idx)
+      });
+
+      if (originalIdx === -1) throw new Error('Word not found in the original recovery phrase. Should never happen');
+
+      // Mark word index as watched to handle recovery phrase with duplicates
+      wordIndexes.add(originalIdx);
+
+      return {
+        word: sortedWord,
+        originalIdx,
+        id: sortedWordIdx,
+      };
+    });
+  }, [recoveryPhrase]);
+
+  console.log(shortedRecoveryPhrase);
 
   return (
     <Stack alignItems='center' justifyContent='center' className={styles.component}>
