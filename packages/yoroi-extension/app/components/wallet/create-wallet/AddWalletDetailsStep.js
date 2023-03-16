@@ -11,7 +11,7 @@ import { Stack, Typography, Box } from '@mui/material'
 import StepController from './StepController';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
-import { CREATE_WALLET_SETPS } from './steps';
+import { CREATE_WALLET_SETPS, TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon }  from '../../../assets/images/info-icon-primary.inline.svg';
 import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -57,6 +57,12 @@ export default class AddWalletDetailsStep extends Component<Props > {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  componentDidMount(): void {
+    if (!isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)) {
+      this.props.openDialog(WalletNameAndPasswordTipsDialog);
+    };
+  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -109,7 +115,13 @@ export default class AddWalletDetailsStep extends Component<Props > {
   });
 
   render(): Node {
-    const { setCurrentStep, shouldShowDialog, showDialog, hideDialog, recoveryPhrase } = this.props;
+    const {
+      setCurrentStep,
+      recoveryPhrase,
+      isDialogOpen,
+      openDialog,
+      closeDialog
+    } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
@@ -159,7 +171,7 @@ export default class AddWalletDetailsStep extends Component<Props > {
             <Box
               component='button'
               sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              onClick={showDialog}
+              onClick={() => openDialog(WalletNameAndPasswordTipsDialog)}
             >
               <InfoIcon />
             </Box>
@@ -208,8 +220,13 @@ export default class AddWalletDetailsStep extends Component<Props > {
             </Typography>
             <Box
               component='button'
-              sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              onClick={showDialog}
+              sx={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              onClick={() => openDialog(WalletChecksumTipsDialog)}
             >
               <InfoIcon />
             </Box>
@@ -222,11 +239,12 @@ export default class AddWalletDetailsStep extends Component<Props > {
         </Stack>
 
         <WalletNameAndPasswordTipsDialog
-          open={shouldShowDialog}
-          onClose={hideDialog}
+          open={isDialogOpen(WalletNameAndPasswordTipsDialog)}
+          onClose={closeDialog}
         />
         <WalletChecksumTipsDialog
-          open
+          open={isDialogOpen(WalletChecksumTipsDialog)}
+          onClose={closeDialog}
           plateImagePart={plateImagePart}
           plateTextPart={plate.TextPart}
         />

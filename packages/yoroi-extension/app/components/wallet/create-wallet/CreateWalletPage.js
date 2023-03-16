@@ -27,7 +27,15 @@ type Intl = {|
 type Props = {||};
 
 function CreateWalletPage(props: Props & Intl): Node {
-  const { intl, genWalletRecoveryPhrase, createWallet, setSelectedNetwork } = props;
+  const {
+    intl,
+    genWalletRecoveryPhrase,
+    createWallet,
+    setSelectedNetwork,
+    isDialogOpen,
+    openDialog,
+    closeDialog
+  } = props;
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [dialogs, setDialogs] = useState({
@@ -45,6 +53,12 @@ function CreateWalletPage(props: Props & Intl): Node {
   function hideDialog(dialogId: string): void {
     markDialogAsShown(dialogId);
     setDialogs(prev => ({ ...prev, [dialogId]: false }));
+  };
+
+  const manageDialogsProps = {
+    isDialogOpen,
+    openDialog,
+    closeDialog,
   };
 
   const steps = {
@@ -92,6 +106,7 @@ function CreateWalletPage(props: Props & Intl): Node {
             recoveryPhrase,
           })
         }}
+        {...manageDialogsProps}
       />
     )
   };

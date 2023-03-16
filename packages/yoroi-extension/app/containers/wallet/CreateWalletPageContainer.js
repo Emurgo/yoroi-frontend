@@ -11,6 +11,7 @@ import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import CreateWalletPage from '../../components/wallet/create-wallet/CreateWalletPage';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import { Box } from '@mui/system';
 
 export type GeneratedData = typeof CreateWalletPageContainer.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -29,6 +30,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
           genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
           createWallet={actions.ada.wallets.createWallet.trigger}
           setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+          openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
+          closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+          isDialogOpen={stores.uiDialogs.isOpen}
         />
       </TopBarLayout>
     );
@@ -37,10 +41,25 @@ export default class CreateWalletPageContainer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    actions: {||},
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |},
+      |},
+    |},
     stores: {|
       wallets: {|
         genWalletRecoveryPhrase: void => Promise<Array<string>>,
+      |},
+      uiDialogs: {|
+        isOpen: any => boolean
       |},
     |},
   |} {
@@ -60,6 +79,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
             },
           },
         },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+        },
       },
       actions: {
         ada: {
@@ -72,6 +94,14 @@ export default class CreateWalletPageContainer extends Component<Props> {
         profile: {
           setSelectedNetwork: {
             trigger: actions.profile.setSelectedNetwork.trigger,
+          },
+        },
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
+          open: {
+            trigger: actions.dialogs.open.trigger,
           },
         },
       },
