@@ -10,13 +10,12 @@ import StepController from '../../StepController';
 import { RESTORE_WALLET_STEPS } from '../../steps';
 import styles from './EnterRecoveryPhraseStep.scss';
 import classnames from 'classnames';
-import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
 import Autocomplete from '../../../../common/Autocomplete';
 import globalMessages from '../../../../../i18n/global-messages';
 import RestoreRecoveryPhraseForm from './RestoreRecoveryPhraseForm';
 
-const messages: * = defineMessages({
-  description: {
+const messages = defineMessages({
+  stepDescription: {
     id: 'wallet.create.thirdStep.description',
     defaultMessage:
       '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
@@ -45,26 +44,7 @@ type Props = {|
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, numWords, checkValidPhrase, setCurrentStep } = props;
 
-  const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
-    new Array(numWords).fill('')
-  );
-
-  function onAddWord(word: string, idx: number): void {
-    const nextWordIdx = enteredRecoveryPhrase.findIndex(w => w === null);
-    if (nextWordIdx === -1) throw new Error('Entered recovery phrase words list is full');
-
-    setRecoveryPhrase(prev => {
-      const copy = [...prev];
-      copy[idx] = word;
-      return copy;
-    });
-  }
-
-  const isValidPhrase =
-    enteredRecoveryPhrase.length === numWords && checkValidPhrase(enteredRecoveryPhrase);
-
   function goNextStepCallback() {
-    if (!isValidPhrase) return;
     return () => setCurrentStep(RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS);
   }
 
@@ -77,25 +57,16 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         maxWidth={numWords === 15 ? '690px' : '816px'}
       >
         <Typography mb="16px">
-          <FormattedHTMLMessage {...messages.description} />
+          <FormattedHTMLMessage {...messages.stepDescription} />
         </Typography>
 
         <RestoreRecoveryPhraseForm
           numberOfMnemonics={numWords}
           mnemonicValidator={() => console.log('validate') ?? true}
-          onSubmit={({ recoveryPhrase }) => setRecoveryPhrase(recoveryPhrase)}
-          initValues={{ recoveryPhrase: enteredRecoveryPhrase }}
-          onAddWord={onAddWord}
+          onSubmit={async ({ recoveryPhrase }) => {
+            checkValidPhrase(recoveryPhrase);
+          }}
         />
-
-        {isValidPhrase && (
-          <Stack gap="10px" direction="row" mt="-24px">
-            <VerifiedIcon />
-            <Typography variant="body1" fontWeight={500}>
-              {intl.formatMessage(messages.verified)}
-            </Typography>
-          </Stack>
-        )}
 
         <Box mt="10px">
           <StepController

@@ -20,12 +20,18 @@ type Props = {|
   +placeholder: string,
   +label: string,
   +onChange: string => void,
-  +value: Array<string>,
+  +value: string,
   +autoFocus?: boolean,
   +type: string,
   +name: string,
   +chipProps?: Object,
-  +inputRef?: typeof undefined | (<T>(initialValue: T) => {| current: T |}),
+  +inputRef?:
+    | typeof undefined
+    | (<T>(
+        initialValue: T
+      ) => {|
+        current: T,
+      |}),
 |};
 
 function Autocomplete({
@@ -46,7 +52,7 @@ function Autocomplete({
   chipProps,
   inputRef = null,
 }: Props): Node {
-  const [inputValue, setInputValue] = useState<?string>('');
+  const [inputValue, setInputValue] = useState<?string>(value);
   const isInputPresent = (inputValue?.length ?? 0) > 0;
   const filteredList = isInputPresent
     ? options.filter(w => w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? ''))
@@ -68,10 +74,6 @@ function Autocomplete({
     defaultHighlightedIndex: 0,
     selectedItem: '',
     items: filteredList,
-    onSelectedItemChange({ inputValue }) {
-      onChange(inputValue);
-      setInputValue('');
-    },
     stateReducer: (state, actionAndChanges) => {
       const { changes, type: actionType } = actionAndChanges;
       switch (actionType) {
@@ -89,21 +91,17 @@ function Autocomplete({
     // eslint-disable-next-line no-shadow
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
-        case useCombobox.stateChangeTypes.InputKeyDownBackspace:
-          console.log('backspace');
-          break;
         case useCombobox.stateChangeTypes.InputChange:
           if (inputValue.length === 0) closeMenu();
           setInputValue(inputValue);
+          onChange(inputValue);
           break;
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
-        case useCombobox.stateChangeTypes.InputKeyDownSpace:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          // $FlowFixMe[invalid-compare]
           if (selectedItem && Boolean(inputValue)) {
             onChange(inputValue);
-            setInputValue('');
+            setInputValue(inputValue);
             closeMenu();
           }
           break;
@@ -113,33 +111,20 @@ function Autocomplete({
     },
   });
 
-  return value ? (
-    <Chip
-      variant="autocomplete"
-      label={value}
-      onDelete={() => onChange('')}
-      deleteIcon={<CloseIcon />}
-      {...chipProps}
-    />
-  ) : (
-    <SFormControl
-      error={Boolean(error)}
-      // $FlowFixMe[invalid-compare]
-      disabled={Boolean(value)}
-    >
+  return (
+    <SFormControl error={Boolean(error)}>
       <InputWrapper onClick={() => !isOpen} error={error} isOpen={isOpen}>
         <Box {...getComboboxProps()}>
           <Input
-            // $FlowFixMe[invalid-compare]
             placeholder={placeholder}
-            // $FlowFixMe[invalid-compare]
-            disabled={Boolean(value)}
             disableUnderline
             fullWidth
             autoFocus={autoFocus}
             error={Boolean(error)}
             id={id ?? 'autocomplete-combobox'}
             ref={inputRef}
+            value={value}
+            onChange={onChange}
             {...getInputProps({ type, name, autoFocus })}
           />
         </Box>
@@ -215,14 +200,6 @@ const ULList = styled(Box)({
 const InputWrapper = styled(Box)(
   ({ theme, error, isOpen }) => `
   width: 100%;
-  border: 2px solid ${
-    error
-      ? 'var(--yoroi-comp-input-error)'
-      : isOpen
-      ? 'var(--yoroi-comp-input-text-focus)'
-      : 'var(--yoroi-comp-input-border)'
-  };
-  border-radius: 8px;
   background-color: var(--yoroi-palette-common-white);
   height: 40px;
   align-content: baseline;
@@ -231,13 +208,31 @@ const InputWrapper = styled(Box)(
   position: relative;
   cursor: text;
   margin-bottom: 0;
+  border-radius: 8px;
+
   & input {
     background-color: transparent;
-    color: #000000d9;
+    color: var(--yoroi-palette-primary-200);
     font-size: 1rem;
     padding: 8px;
     letter-spacing: 0;
     text-align: center;
+    border: 2px solid ${error ? 'var(--yoroi-comp-input-error)' : '#7892E8'};
+    border-radius: 8px;
+    height: 40px;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: var(--yoroi-palette-primary-200);
+    }
+
+    &:not([value=""]):not(:focus) {
+      border-color: transparent;
+      background: linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%);
+      background-origin: border-box;
+      background-clip: content-box, border-box;
+      background: linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%);
+    }
   }
 `
 );

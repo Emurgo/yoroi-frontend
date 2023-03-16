@@ -13,7 +13,8 @@ import ReactToolboxMobxForm from '../../../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../../../i18n/global-messages';
 import config from '../../../../../config';
 import Autocomplete from '../../../../common/autocomplete/Autocomplete';
-import { Box, Stack, Typography } from '@mui/material';
+import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import styles from './EnterRecoveryPhraseStep.scss';
 
 const messages = defineMessages({
@@ -33,6 +34,14 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.wallet.button.label',
     defaultMessage: '!!!Verify wallet',
   },
+  clearAll: {
+    id: 'wallet.restore.clearAll',
+    defaultMessage: '!!!Clear all',
+  },
+  verified: {
+    id: 'walllet.create.thirdStep.verifiedRecoveryPhrase',
+    defaultMessage: '!!!The recovery phrase is verified',
+  },
 });
 
 export type WalletRestoreDialogValues = {|
@@ -45,7 +54,6 @@ type Props = {|
   +numberOfMnemonics: number,
   +error?: ?LocalizableError,
   +initValues?: ?WalletRestoreDialogValues,
-  onAddWord(word: string, idx: number): void,
 |};
 
 @observer
@@ -102,11 +110,13 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { error, mnemonicValidator } = this.props;
+    const { error, mnemonicValidator, numberOfMnemonics } = this.props;
     const { form } = this;
     const { recoveryPhrase } = form.values();
 
     const recoveryPhraseField = form.$('recoveryPhrase');
+    const isValidPhrase =
+      recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
 
     return (
       <Box className={styles.verifyRecoveryPhraseArea}>
@@ -119,8 +129,6 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
           justifyContent="center"
         >
           {recoveryPhrase?.map((word, idx) => {
-            const prevWordField =
-              idx !== 0 ? form.$(`recoveryPhrase[${idx - 1}].value`).bind().value : '';
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
 
             return (
@@ -148,11 +156,10 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
                   </Typography>
 
                   <Autocomplete
-                    inputRef={el => (this.myRefs[idx] = el)}
+                    // inputRef={el => (this.myRefs[idx] = el)}
                     options={validWords}
                     maxSelections={1}
                     maxVisibleOptions={5}
-                    autoFocus={idx === 0 && !wordField.bind().value}
                     noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
                     {...wordField.bind()}
                   />
@@ -161,6 +168,37 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
             );
           })}
         </Stack>
+
+        {!isValidPhrase && (
+          <>
+            <Box>{error && intl.formatMessage(error)}</Box>
+            <Box sx={{ width: '100px' }}>
+              <Button
+                variant="outlined"
+                disableRipple={false}
+                onClick={() => form.reset()}
+                sx={{
+                  border: 0,
+                  width: '140px',
+                  fontSize: '14px',
+                  lineHeight: '15px',
+                  minWidth: 0,
+                }}
+              >
+                {intl.formatMessage(messages.clearAll)}
+              </Button>
+            </Box>
+          </>
+        )}
+
+        {isValidPhrase && (
+          <Stack gap="10px" direction="row" mt="12px" alignItems="center">
+            <VerifiedIcon />
+            <Typography variant="body1" fontWeight={500}>
+              {intl.formatMessage(messages.verified)}
+            </Typography>
+          </Stack>
+        )}
       </Box>
     );
   }
