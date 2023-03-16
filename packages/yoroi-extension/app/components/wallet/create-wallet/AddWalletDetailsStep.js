@@ -22,6 +22,7 @@ import { HARD_DERIVATION_START } from '../../../config/numbersConfig';
 import { NUMBER_OF_VERIFIED_ADDRESSES } from '../../../stores/toplevel/WalletRestoreStore';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WalletAccountIcon from '../../topbar/WalletAccountIcon';
+import WalletChecksumTipsDialog from './WalletChecksumTipsDialog';
 
 const messages: * = defineMessages({
   description: {
@@ -139,6 +140,15 @@ export default class AddWalletDetailsStep extends Component<Props > {
       Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
     );
 
+    const plateImagePart = (
+      <WalletAccountIcon
+        iconSeed={plate.ImagePart}
+        saturationFactor={0}
+        size={6}
+        scalePx={4}
+      />
+    );
+
     return (
       <Stack alignItems='center' justifyContent='center'>
         <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='555px'>
@@ -192,12 +202,7 @@ export default class AddWalletDetailsStep extends Component<Props > {
             mt='-3px'
             mb='90px'
           >
-            <WalletAccountIcon
-              iconSeed={plate.ImagePart}
-              saturationFactor={0}
-              size={6}
-              scalePx={4}
-            />
+            {plateImagePart}
             <Typography variant='body1'>
               {plate.TextPart}
             </Typography>
@@ -220,7 +225,11 @@ export default class AddWalletDetailsStep extends Component<Props > {
           open={shouldShowDialog}
           onClose={hideDialog}
         />
-
+        <WalletChecksumTipsDialog
+          open
+          plateImagePart={plateImagePart}
+          plateTextPart={plate.TextPart}
+        />
       </Stack>
     );
   }

@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import { Typography, Box } from '@mui/material';
 
 const messages: Object = defineMessages({
@@ -11,12 +11,12 @@ const messages: Object = defineMessages({
     defaultMessage: '!!!What is wallet checksum and plate number?',
   },
   firstTip: {
-    id: 'wallet.create.dialog.walletChecksum.firstTip',
-    defaultMessage: '!!!Wallet checksum is a generic Blockie image that is generated to visually distinguish your wallet from others.',
+    id: 'wallet.create.dialog.walletChecksum.firstTip', // todo: update it
+    defaultMessage: '!!!{plateImg} Wallet checksum is a generic Blockie image that is generated to visually distinguish your wallet from others.',
   },
   secondTip: {
     id: 'wallet.create.dialog.walletChecksum.secondTip',
-    defaultMessage: '!!!Plate number {plateNumber} is a auto-generated sign of four letters and four digits.',
+    defaultMessage: '!!!Plate number <strong>{plateText}</strong> is a auto-generated sign of four letters and four digits.',
   },
   thirdTip: {
     id: 'wallet.create.dialog.walletChecksum.thirdTip',
@@ -34,20 +34,40 @@ type Props = {|
 |}
 
 function walletChecksumTipsDialog(props: Props & Intl): Node {
-    const { open, onClose, intl } = props;
+    const { open, onClose, intl, plateImagePart, plateTextPart } = props;
 
     return (
       <InfoDialog open={open} onClose={onClose}>
         <Typography textAlign='center' variant='body1' fontWeight='500' mb='16px'>{intl.formatMessage(messages.title)}</Typography>
         <Box component='ul' sx={{ listStyle: 'outside', px: '24px' }}>
           <Box component='li'>
-            <Typography variant='body1' color='grey.800'>{intl.formatMessage(messages.firstTip)}</Typography>
+            <Typography variant='body1' color='grey.800'>
+              <FormattedMessage
+                {...messages.firstTip}
+                values={{
+                    plateImg: (
+                      <Box component='span' display='inline-block' width='24px' position='relative'>
+                        <Box sx={{ position: 'absolute', top: '-18px', left: '0px' }}>
+                          {plateImagePart}
+                        </Box>
+                      </Box>
+                    )
+                }}
+              />
+            </Typography>
           </Box>
           <Box component='li'>
-            <Typography variant='body1' color='grey.800'>{intl.formatMessage(messages.secondTip)}</Typography>
+            <Typography variant='body1' color='grey.800'>
+              <FormattedHTMLMessage
+                {...messages.secondTip}
+                values={{ plateText: plateTextPart }}
+              />
+            </Typography>
           </Box>
           <Box component='li'>
-            <Typography variant='body1' color='grey.800'>{intl.formatMessage(messages.thirdTip)}</Typography>
+            <Typography variant='body1' color='grey.800'>
+              {intl.formatMessage(messages.thirdTip)}
+            </Typography>
           </Box>
         </Box>
       </InfoDialog>
