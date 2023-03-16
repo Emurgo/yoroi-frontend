@@ -328,7 +328,7 @@ export function normalizeToAddress(
 }
 
 export function isJormungandrAddress(
-  kind: CoreAddressT
+  type: CoreAddressT
 ): boolean {
   // note: excluding legacy byron addresses
   const types = [
@@ -338,7 +338,7 @@ export function isJormungandrAddress(
     CoreAddressTypes.JORMUNGANDR_MULTISIG,
   ];
 
-  return kind in types;
+  return types.some(t => t === type);
 }
 
 export function isErgoAddress(

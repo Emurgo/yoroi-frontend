@@ -213,6 +213,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     if (this.props.complexityLevel !== ComplexityLevels.Advanced) {
       return null;
     }
+
     const getSpendingKey = () => {
       if (isJormungandrAddress(this.props.addressInfo.type)) {
         const wasmAddr = RustModule.WalletV3.Address.from_string(
