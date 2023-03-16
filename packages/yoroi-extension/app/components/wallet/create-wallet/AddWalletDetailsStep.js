@@ -190,6 +190,7 @@ export default class AddWalletDetailsStep extends Component<Props > {
             alignItems="center"
             justifyContent='center'
             mt='-3px'
+            mb='90px'
           >
             <WalletAccountIcon
               iconSeed={plate.ImagePart}
@@ -200,6 +201,13 @@ export default class AddWalletDetailsStep extends Component<Props > {
             <Typography variant='body1'>
               {plate.TextPart}
             </Typography>
+            <Box
+              component='button'
+              sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={showDialog}
+            >
+              <InfoIcon />
+            </Box>
           </Stack>
 
           <StepController
@@ -212,6 +220,7 @@ export default class AddWalletDetailsStep extends Component<Props > {
           open={shouldShowDialog}
           onClose={hideDialog}
         />
+
       </Stack>
     );
   }

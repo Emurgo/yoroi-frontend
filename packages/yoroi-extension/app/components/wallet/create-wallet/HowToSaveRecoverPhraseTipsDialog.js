@@ -1,4 +1,3 @@
-
 // @flow
 import type { Node, ComponentType } from 'react';
 import InfoDialog from '../../widgets/infoDialog';
@@ -42,7 +41,7 @@ type Props = {|
     onClose(): void,
 |}
 
-function CreateWalletPage(props: Props & Intl): Node {
+function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
     const { open, onClose, intl } = props;
 
     // [tipId, tipTxt]
@@ -68,4 +67,4 @@ function CreateWalletPage(props: Props & Intl): Node {
     )
 }
 
-export default (injectIntl(CreateWalletPage): ComponentType<Props>);
+export default (injectIntl(HowToSaveRecoveryPhraseTipsDialog): ComponentType<Props>);

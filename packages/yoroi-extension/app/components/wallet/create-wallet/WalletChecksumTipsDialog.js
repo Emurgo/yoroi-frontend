@@ -1,0 +1,57 @@
+// @flow
+import type { Node, ComponentType } from 'react';
+import InfoDialog from '../../widgets/infoDialog';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
+import { Typography, Box } from '@mui/material';
+
+const messages: Object = defineMessages({
+  title: {
+    id: 'wallet.create.dialog.walletChecksum.title',
+    defaultMessage: '!!!What is wallet checksum and plate number?',
+  },
+  firstTip: {
+    id: 'wallet.create.dialog.walletChecksum.firstTip',
+    defaultMessage: '!!!Wallet checksum is a generic Blockie image that is generated to visually distinguish your wallet from others.',
+  },
+  secondTip: {
+    id: 'wallet.create.dialog.walletChecksum.secondTip',
+    defaultMessage: '!!!Plate number {plateNumber} is a auto-generated sign of four letters and four digits.',
+  },
+  thirdTip: {
+    id: 'wallet.create.dialog.walletChecksum.thirdTip',
+    defaultMessage: '!!!Checksum and plate number are unique to your wallet and represent your public key.',
+  },
+});
+
+type Intl = {|
+  intl: $npm$ReactIntl$IntlShape,
+|};
+
+type Props = {|
+    open: boolean,
+    onClose(): void,
+|}
+
+function walletChecksumTipsDialog(props: Props & Intl): Node {
+    const { open, onClose, intl } = props;
+
+    return (
+      <InfoDialog open={open} onClose={onClose}>
+        <Typography textAlign='center' variant='body1' fontWeight='500' mb='16px'>{intl.formatMessage(messages.title)}</Typography>
+        <Box component='ul' sx={{ listStyle: 'outside', px: '24px' }}>
+          <Box component='li'>
+            <Typography variant='body1' color='grey.800'>{intl.formatMessage(messages.firstTip)}</Typography>
+          </Box>
+          <Box component='li'>
+            <Typography variant='body1' color='grey.800'>{intl.formatMessage(messages.secondTip)}</Typography>
+          </Box>
+          <Box component='li'>
+            <Typography variant='body1' color='grey.800'>{intl.formatMessage(messages.thirdTip)}</Typography>
+          </Box>
+        </Box>
+      </InfoDialog>
+    )
+}
+
+export default (injectIntl(walletChecksumTipsDialog): ComponentType<Props>);
