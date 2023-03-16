@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Box, Typography } from '@mui/material'
 import { CREATE_WALLET_SETPS } from './steps';
+import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg'
 
 const messages: * = defineMessages({
   firstStep: {
@@ -69,8 +70,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
 
           if (isCurrentStep) stepColor = 'primary.200'
           else if (isPrevStep) stepColor = '#A0B3F2'; // Todo: add the color to the design system
-
-          if (isFutureStep) cursor = 'not-allowed'
+          if (isFutureStep) cursor = 'not-allowed';
 
           return (
             <Stack
@@ -91,7 +91,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   alignItems: 'center',
                   justifyContent: 'center',
                   mr: '8px',
-                  borderWidth: '2.5px',
+                  borderWidth: isPrevStep ? '0px' : '2px',
                   borderStyle: 'solid',
                   borderColor: stepColor,
                   borderRadius: '50%',
@@ -99,9 +99,13 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   cursor,
                 }}
               >
-                <Typography variant='body2' fontWeight={500} color={stepColor}>
-                  {idx + 1}
-                </Typography>
+                {
+                  isPrevStep ? <StepMarkIcon /> : (
+                    <Typography variant='body2' fontWeight={500} color={stepColor}>
+                      {idx + 1}
+                    </Typography>
+                  )
+                }
               </Box>
               <Typography sx={{ cursor }} variant='body1' color={stepColor} fontWeight={500}>
                 {intl.formatMessage(message)}
