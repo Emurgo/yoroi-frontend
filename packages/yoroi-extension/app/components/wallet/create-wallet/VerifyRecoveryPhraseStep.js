@@ -186,19 +186,23 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           })}
         </Stack>
 
-        <Typography variant='body2' color='error.100' height='20px' mt='16px'>
-          {wrongWord !== null && intl.formatMessage(messages.incorrectOrder)}
-        </Typography>
-
-
-        {isValidPhrase && (
-          <Stack gap='10px' direction='row' mt='-24px'>
-            <VerifiedIcon />
-            <Typography variant='body1' fontWeight={500}>
-              {intl.formatMessage(messages.verified)}
+        <Box height='28px' mt='16px'>
+          { wrongWord !== null && (
+            <Typography variant='body2' color='error.100'>
+              {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
-          </Stack>
-        )}
+          )}
+
+
+          {isValidPhrase && (
+            <Stack gap='10px' direction='row'>
+              <VerifiedIcon />
+              <Typography variant='body1' fontWeight={500}>
+                {intl.formatMessage(messages.verified)}
+              </Typography>
+            </Stack>
+          )}
+        </Box>
 
 
         <Box mt='10px'>
