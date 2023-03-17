@@ -19,7 +19,7 @@ import {
   CERTIFICATE_TYPE,
   ADDRESS_TYPE,
 } from 'trezor-connect/lib/constants/cardano';
-import { CardanoTxSigningMode } from 'trezor-connect';
+import { CardanoTxSigningMode, CardanoTxWitnessType, } from 'trezor-connect';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -644,6 +644,7 @@ export function toTrezorSignRequest(
   }
 
   const formattedRequiredSigners = [];
+  const additionalWitnessRequests = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
     for (let i = 0; i < requiredSigners.len(); i++) {
@@ -657,6 +658,7 @@ export function toTrezorSignRequest(
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
         });
+        additionalWitnessRequests.push(ownAddressPath);
       } else {
         formattedRequiredSigners.push({
           keyHash: hash.to_hex(),
@@ -813,5 +815,39 @@ export function toTrezorSignRequest(
     result.requiredSigners = formattedRequiredSigners;
   }
 
+  if (additionalWitnessRequests) {
+    result.additionalWitnessRequests = additionalWitnessRequests;
+  }
+
   return result;
+}
+
+export function buildConnectorSignedTransaction(
+  txBody: RustModule.WalletV4.TransactionBody,
+  witnesses: Array<CardanoSignedTxWitness>,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
+): RustModule.WalletV4.Transaction {
+  const vkeyWitnesses = RustModule.WalletV4.Vkeywitnesses.new();
+  for (const witness of witnesses) {
+    if (witness.type === CardanoTxWitnessType.BYRON_WITNESS) {
+      throw new Error('Byron wallet does not support connector API');
+    } else if (witness.type === CardanoTxWitnessType.SHELLEY_WITNESS) {
+      const vkeyWitness = RustModule.WalletV4.Vkeywitness.new(
+        RustModule.WalletV4.Vkey.new(
+          RustModule.WalletV4.PublicKey.from_hex(witness.pubKey)
+        ),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
+      );
+      vkeyWitnesses.add(vkeyWitness);
+    } else {
+      throw new Error('unexpected witness type');
+    }
+  }
+  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witnessSet.set_vkeys(vkeyWitnesses);
+  return RustModule.WalletV4.Transaction.new(
+    txBody,
+    witnessSet,
+    metadata
+  );
 }

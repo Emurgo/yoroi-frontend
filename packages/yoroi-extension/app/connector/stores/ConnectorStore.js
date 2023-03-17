@@ -86,11 +86,11 @@ import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils'
 import {
   toLedgerSignRequest,
-  buildSignedTransaction as buildSignedLedgerTransaction,
+  buildConnectorSignedTransaction as buildSignedLedgerTransaction,
 } from '../../api/ada/transactions/shelley/ledgerTx';
 import {
   toTrezorSignRequest,
-  buildSignedTransaction as buildSignedTrezorTransaction,
+  buildConnectorSignedTransaction as buildSignedTrezorTransaction,
 } from '../../api/ada/transactions/shelley/trezorTx';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
@@ -1153,41 +1153,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('hash mismatch');
     }
 
-    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-    if (withLevels == null) {
-      throw new Error('No public deriver level for this public deriver');
-    }
-
-    const withPublicKey = asGetPublicKey(withLevels);
-    if (withPublicKey == null) throw new Error('No public key for this public deriver');
-    const publicKey = await withPublicKey.getPublicKey();
-
-    const publicKeyInfo = {
-      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicKey.Hash, 'hex')
-      ),
-      addressing: {
-        startLevel: 1,
-        path: withLevels.getPathToPublic(),
-      },
-    };
-
-    // `addressedUtxos` is all UTXOs of this wallet
-    // `ownUtxos` is own UTXOs used by this tx as inputs
-    const txInputs = new Set();
-    for (let i = 0; i < txBody.inputs().len(); i++) {
-      const input = txBody.inputs().get(i);
-      txInputs.add(`${input.transaction_id().to_hex()}${input.index()}`);
-    }
-    const ownUtxos = addressedUtxos.filter(utxo =>
-      txInputs.has(`${utxo.tx_hash}${utxo.tx_index}`)
-    );
-
     return buildSignedTrezorTransaction(
       txBody,
-      ownUtxos,
       trezorSignTxResp.witnesses,
-      publicKeyInfo,
       undefined
     );
   }
@@ -1281,20 +1249,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       },
     };
 
-    // `addressedUtxos` is all UTXOs of this wallet
-    // `ownUtxos` is own UTXOs used by this tx as inputs
-    const txInputs = new Set();
-    for (let i = 0; i < txBody.inputs().len(); i++) {
-      const input = txBody.inputs().get(i);
-      txInputs.add(`${input.transaction_id().to_hex()}${input.index()}`);
-    }
-    const ownUtxos = addressedUtxos.filter(utxo =>
-      txInputs.has(`${utxo.tx_hash}${utxo.tx_index}`)
-    );
-
     return buildSignedLedgerTransaction(
       txBody,
-      ownUtxos,
       ledgerSignResult.witnesses,
       publicKeyInfo,
       undefined
