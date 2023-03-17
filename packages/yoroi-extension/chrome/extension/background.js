@@ -529,12 +529,19 @@ const yoroiMessageHandler = async (
       case 'tx/cardano':
       {
         try {
-          const signedTxWitnessSetHEX = await signCardanoTx(
-            (request.tx: any),
-            password,
-            request.tabId
-          );
-          responseData.resolve({ ok: signedTxWitnessSetHEX });
+          let signedTxWitnessSetHex;
+          if (password) {
+            signedTxWitnessSetHex = await signCardanoTx(
+              (request.tx: any),
+              password,
+              request.tabId
+            );
+          } else if (request.witnessSetHex) {
+            signedTxWitnessSetHex = request.witnessSetHex;
+          } else {
+            throw new Error('missing password or witness from connector dialog');
+          }
+          responseData.resolve({ ok: signedTxWitnessSetHex });
         } catch (error) {
           responseData.resolve({ err: 'transaction signing failed' })
         }

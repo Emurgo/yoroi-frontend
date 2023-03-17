@@ -961,6 +961,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.loading',
     defaultMessage: '!!!Loading...',
   },
+  confirmOnLedger: {
+    id: 'label.confirm.ledger',
+    defaultMessage: '!!!Confirm on Ledger',
+  },
+  confirmOnTrezor: {
+    id: 'label.confirm.trezor',
+    defaultMessage: '!!!Confirm on Trezor',
+  },
 });
 export default globalMessages;
 

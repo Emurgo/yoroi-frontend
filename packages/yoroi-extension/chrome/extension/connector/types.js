@@ -478,6 +478,8 @@ export type ConfirmedSignData = {|
   uid: RpcUid,
   tabId: number,
   pw: string,
+  // hardware wallet:
+  witnessSetHex?: ?string,
 |};
 
 export type FailedSignData = {|
