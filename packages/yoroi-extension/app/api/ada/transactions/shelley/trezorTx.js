@@ -755,6 +755,7 @@ export function toTrezorSignRequest(
   let formattedCollateral = null;
   const collateral = txBody.collateral();
   if (collateral) {
+    // eslint-disable-next-line no-unused-vars
     formattedCollateral = formatInputs(collateral);
   }
 
@@ -767,6 +768,7 @@ export function toTrezorSignRequest(
   let formattedReferenceInputs = null;
   const referenceInputs = txBody.reference_inputs();
   if (referenceInputs) {
+    // eslint-disable-next-line no-unused-vars
     formattedReferenceInputs = formatInputs(referenceInputs);
   }
 
