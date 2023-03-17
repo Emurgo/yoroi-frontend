@@ -321,13 +321,14 @@ export async function connectorGetCollateralUtxos(
     throw new Error('requested collateral amount is beyond the allowed limits')
   }
   const adaApi = new AdaApi();
-  const utxosToConsider = (await adaApi.utxosWithSubmittedTxs(
+  const maxViableUtxoAmount = required.plus(MAX_PER_UTXO_SURPLUS);
+  const utxosToConsider = adaApi.utxosWithSubmittedTxs(
     utxos,
     wallet.publicDeriverId,
     submittedTxs,
-  )).filter(
+  ).filter(
     utxo => utxo.assets.length === 0 &&
-      new BigNumber(utxo.amount).lt(required.plus(MAX_PER_UTXO_SURPLUS))
+      new BigNumber(utxo.amount).lt(maxViableUtxoAmount)
   )
   utxosToConsider.sort(
     (utxo1, utxo2) => (new BigNumber(utxo1.amount)).comparedTo(utxo2.amount)
