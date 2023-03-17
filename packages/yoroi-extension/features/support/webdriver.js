@@ -448,6 +448,7 @@ function CustomWorld(cmdInput: WorldInput) {
             .transaction(table, 'readonly')
             .objectStore(table)
             .getAll();
+            // eslint-disable-next-line no-shadow
             tableContentRequest.onsuccess = function (event) {
               window.tableData = event.target.result;
             }
@@ -459,6 +460,7 @@ function CustomWorld(cmdInput: WorldInput) {
     let tableContent;
     try {
       tableContent = await this.driver.executeScript(() => window.tableData);
+    // eslint-disable-next-line no-shadow
     } catch (error) {
       this.webDriverLogger.warn(error);
       tableContent = {};
@@ -488,6 +490,7 @@ function CustomWorld(cmdInput: WorldInput) {
             .transaction(table, 'readonly')
             .objectStore(table)
             .getAll();
+            // eslint-disable-next-line no-shadow
             tableContentRequest.onsuccess = function (event) {
               window.tableData = event.target.result;
             }
@@ -500,6 +503,7 @@ function CustomWorld(cmdInput: WorldInput) {
     let tableContent;
     try {
       tableContent = await this.driver.executeScript(() => window.tableData);
+    // eslint-disable-next-line no-shadow
     } catch (error) {
       this.webDriverLogger.warn(error);
       tableContent = {};
