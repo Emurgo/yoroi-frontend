@@ -1076,11 +1076,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   ): Promise<RustModule.WalletV4.Transaction> {
     if (isLedgerNanoWallet(publicDeriver.getParent())) {
       return this.ledgerSignTx(publicDeriver, rawTxBody);
-    } else if (isTrezorTWallet(publicDeriver.getParent())) {
-      return this.trezorSignTx(publicDeriver, rawTxBody);
-    } else {
-      throw new Error('unexpected wallet type');
     }
+    if (isTrezorTWallet(publicDeriver.getParent())) {
+      return this.trezorSignTx(publicDeriver, rawTxBody);
+    }
+    throw new Error('unexpected wallet type');
   }
 
   async trezorSignTx(
