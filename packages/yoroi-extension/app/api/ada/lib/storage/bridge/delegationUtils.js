@@ -61,15 +61,23 @@ export function addrContainsAccountKey(
   const accountKeyString = typeof targetAccountKey === 'string' ? targetAccountKey : Buffer.from(targetAccountKey.to_bytes()).toString('hex');
 
   const asBase = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
+  // clean: de-allocate the pointer
+  wasmAddr.free();
+
   if (asBase != null) {
-    if (Buffer.from(asBase.stake_cred().to_bytes()).toString('hex') === accountKeyString) {
-      return true;
-    }
+    const isAccountKey = Buffer.from(asBase.stake_cred().to_bytes()).toString('hex') === accountKeyString;
+    // clean: de-allocate the pointer
+    asBase.free();
+    if (isAccountKey) return true;
+
   }
+
   const asPointer = RustModule.WalletV4.PointerAddress.from_address(wasmAddr);
   if (asPointer != null) {
-    // TODO
+    // clean: de-allocate the pointer
+    asPointer.free()
   }
+
   return acceptTypeMismatch;
 }
 
@@ -263,20 +271,17 @@ export function certificateToPoolList(
   certificateHex: string,
   kind: $PropertyType<CertificateInsert, 'Kind'>,
 ): Array<PoolTuples> {
-  switch (kind) {
-    case RustModule.WalletV4.CertificateKind.StakeDeregistration: {
-      return [];
-    }
-    case RustModule.WalletV4.CertificateKind.StakeDelegation: {
-      const cert = RustModule.WalletV4.StakeDelegation.from_bytes(Buffer.from(certificateHex, 'hex'));
+  return RustModule.WasmScope(Scope => {
+    if (kind === Scope.WalletV4.CertificateKind.StakeDeregistration) return []
+    if (kind === Scope.WalletV4.CertificateKind.StakeDelegation) {
+      const cert = Scope.WalletV4.StakeDelegation.from_bytes(Buffer.from(certificateHex, 'hex'));
       return [
         [Buffer.from(cert.pool_keyhash().to_bytes()).toString('hex'), 1]
       ];
     }
-    default: {
-      throw new Error(`${nameof(certificateToPoolList)} unexpected certificate kind ${kind}`);
-    }
-  }
+
+    throw new Error(`${nameof(certificateToPoolList)} unexpected certificate kind ${kind}`);
+  });
 }
 
 export function createCertificate(
@@ -287,6 +292,7 @@ export function createCertificate(
   const credential = RustModule.WalletV4.StakeCredential.from_keyhash(
     stakingKey.hash()
   );
+
   if (poolRequest == null) {
     if (isRegistered) {
       return [RustModule.WalletV4.Certificate.new_stake_deregistration(
@@ -295,6 +301,7 @@ export function createCertificate(
     }
     return []; // no need to undelegate if no staking key registered
   }
+
   const result = [];
   if (!isRegistered) {
     // if unregistered, need to register first
