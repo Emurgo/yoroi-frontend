@@ -790,7 +790,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
-    RustModule.WasmScope(Scope => {
+    return RustModule.WasmScope(Scope => {
       switch (kind) {
         case Scope.WalletV4.CertificateKind.StakeRegistration:
           return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
