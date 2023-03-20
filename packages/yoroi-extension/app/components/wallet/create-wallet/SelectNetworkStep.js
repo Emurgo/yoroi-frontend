@@ -27,10 +27,11 @@ type Intl = {|
 
 type Props = {|
   onSelect(network: $ReadOnly<NetworkRow>): void,
+  goBack(): void,
 |};
 
 function SelectNetworkStep(props: Props & Intl): Node {
-  const { intl, onSelect } = props;
+  const { intl, onSelect, goBack } = props;
 
   const networksList = [
     {
@@ -84,6 +85,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
         <Button
           variant="outlined"
           disableRipple={false}
+          onClick={goBack}
           sx={{
             width: '144px',
             height: '40px',

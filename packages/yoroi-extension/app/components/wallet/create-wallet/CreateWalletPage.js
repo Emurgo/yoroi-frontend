@@ -18,6 +18,7 @@ import { networks } from '../../../api/ada/lib/storage/database/prepackaged/netw
 import CreateWalletPageHeader from './CreateWalletPageHeader';
 import SelectNetworkStep from './SelectNetworkStep';
 import environment from '../../../environment';
+import { ROUTES } from '../../../routes-config';
 
 type Props = {||};
 
@@ -30,6 +31,7 @@ function CreateWalletPage(props: Props): Node {
     isDialogOpen,
     openDialog,
     closeDialog,
+    goToRoute,
   } = props;
   const [currentStep, setCurrentStep] = useState(getFirstStep());
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
@@ -65,6 +67,7 @@ function CreateWalletPage(props: Props): Node {
           setSelectedNetwork(network);
           setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
         }}
+        goBack={() => goToRoute(ROUTES.WALLETS.ROOT)}
       />
     ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (

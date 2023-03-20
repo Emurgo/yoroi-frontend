@@ -33,6 +33,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
           openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
           closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
           isDialogOpen={stores.uiDialogs.isOpen}
+          goToRoute={route => actions.router.goToRoute.trigger({ route })}
         />
       </TopBarLayout>
     );
@@ -50,6 +51,15 @@ export default class CreateWalletPageContainer extends Component<Props> {
           trigger: (params: {|
             dialog: any,
             params?: any,
+          |}) => void,
+        |},
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
           |}) => void,
         |},
       |},
@@ -107,6 +117,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
           open: {
             trigger: actions.dialogs.open.trigger,
           },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
