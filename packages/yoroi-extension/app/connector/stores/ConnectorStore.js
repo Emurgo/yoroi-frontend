@@ -105,6 +105,7 @@ import {
   transactionHashMismatchError,
   unsupportedTransactionError,
   ledgerSignDataUnsupportedError,
+  trezorSignDataUnsupportedError
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 
@@ -1266,8 +1267,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       connectedWallet.publicDeriver.getParent().getWalletType()
         !== WalletTypeOption.WEB_WALLET
     ) {
+      const hwWalletError = isLedgerNanoWallet(connectedWallet.publicDeriver.getParent()) ?
+            ledgerSignDataUnsupportedError :
+            trezorSignDataUnsupportedError;
       runInAction(() => {
-        this.hwWalletError = ledgerSignDataUnsupportedError;
+        this.hwWalletError = hwWalletError;
         this.isHwWalletErrorRecoverable = false;
       });
     }

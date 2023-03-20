@@ -631,6 +631,7 @@
   "wallet.hw.ledger.common.error.104": "Ledger device timeout, please retry.",
   "wallet.hw.ledger.common.error.105": "Network error. Please check your internet connection.",
   "wallet.hw.ledger.data.sign.unsupported.error": "The Ledger Cardano app does not support data signing at this memoment",
+  "wallet.hw.trezor.data.sign.unsupported.error": "Trezor does not support data signing at this memoment",
   "wallet.hw.tx.hash.error": "The transaction hash computed by Yoroi extension and that by the device mismatch.",
   "wallet.hw.tx.unsupported.error": "Signing this transaction with hardware wallet is not supported.",
   "wallet.includeKey.explanationLine1": "Do you want to include your wallet's <strong>public</strong> key in the error logs?",
