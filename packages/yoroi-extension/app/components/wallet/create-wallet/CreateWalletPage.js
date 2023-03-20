@@ -4,7 +4,13 @@ import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
-import { CREATE_WALLET_SETPS, getFirstStep, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
+import {
+  CREATE_WALLET_SETPS,
+  getFirstStep,
+  isDialogShownBefore,
+  markDialogAsShown,
+  TIPS_DIALOGS,
+} from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
 import AddWalletDetailsStep from './AddWalletDetailsStep';
@@ -27,21 +33,23 @@ function CreateWalletPage(props: Props): Node {
   const [currentStep, setCurrentStep] = useState(getFirstStep());
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [dialogs, setDialogs] = useState({
-    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]:
-      !isDialogShownBefore(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE),
+    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: !isDialogShownBefore(
+      TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE
+    ),
     [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE),
-    [TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD]:
-      !isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD),
+    [TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD]: !isDialogShownBefore(
+      TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD
+    ),
   });
 
   function showDialog(dialogId: string): void {
     setDialogs(prev => ({ ...prev, [dialogId]: true }));
-  };
+  }
 
   function hideDialog(dialogId: string): void {
     markDialogAsShown(dialogId);
     setDialogs(prev => ({ ...prev, [dialogId]: false }));
-  };
+  }
 
   const manageDialogsProps = {
     isDialogOpen,
@@ -80,10 +88,7 @@ function CreateWalletPage(props: Props): Node {
       />
     ),
     [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
-      <VerifyRecoveryPhraseStep
-        recoveryPhrase={recoveryPhrase}
-        setCurrentStep={setCurrentStep}
-      />
+      <VerifyRecoveryPhraseStep recoveryPhrase={recoveryPhrase} setCurrentStep={setCurrentStep} />
     ),
     [CREATE_WALLET_SETPS.ADD_WALLET_DETAILS]: (
       <AddWalletDetailsStep
@@ -99,11 +104,11 @@ function CreateWalletPage(props: Props): Node {
             walletName,
             walletPassword,
             recoveryPhrase,
-          })
+          });
         }}
         {...manageDialogsProps}
       />
-    )
+    ),
   };
 
   const CurrentStep = steps[currentStep];
@@ -119,5 +124,4 @@ function CreateWalletPage(props: Props): Node {
   );
 }
 
-
-export default (observer(CreateWalletPage) : ComponentType<Props> )
+export default (observer(CreateWalletPage): ComponentType<Props>);

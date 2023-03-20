@@ -3,17 +3,16 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box, Typography, Grid, Button } from '@mui/material'
-import { ReactComponent as EyeIcon }  from '../../../assets/images/open-eye-primary.inline.svg';
+import { Box, Typography, Grid, Button } from '@mui/material';
+import { ReactComponent as EyeIcon } from '../../../assets/images/open-eye-primary.inline.svg';
 
 type Props = {|
-    recoveryPhrase: Array<string> | null,
+  recoveryPhrase: Array<string> | null,
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
-
 
 const messages: * = defineMessages({
   showRecoveryPhraseBtn: {
@@ -26,8 +25,8 @@ function RecoveryPhrase(props: Props & Intl): Node {
   const { recoveryPhrase, intl, shouldShowRecoveryPhrase, toggleRecoveryPhrase } = props;
 
   return (
-    <Box width="100%" mt='8px'>
-      <Grid container gap='8px'>
+    <Box width="100%" mt="8px">
+      <Grid container gap="8px">
         {recoveryPhrase.map((word, idx) => (
           <Grid
             item
@@ -42,7 +41,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
               justifyContent: 'center',
               height: '40px',
               filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
-              cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed'
+              cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed',
             }}
           >
             <Typography
@@ -51,10 +50,10 @@ function RecoveryPhrase(props: Props & Intl): Node {
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                px: '10px'
+                px: '10px',
               }}
-              variant='body1'
-              color='primary.200'
+              variant="body1"
+              color="primary.200"
             >
               {idx + 1}. {word}
             </Typography>
@@ -77,12 +76,12 @@ function RecoveryPhrase(props: Props & Intl): Node {
         onClick={toggleRecoveryPhrase}
       >
         <EyeIcon />
-        <Typography variant='body2' fontWeight='500'>
+        <Typography variant="body2" fontWeight="500">
           {intl.formatMessage(messages.showRecoveryPhraseBtn)}
         </Typography>
       </Button>
     </Box>
-  )
+  );
 }
 
-export default (injectIntl(observer(RecoveryPhrase)) : ComponentType<Props>);
+export default (injectIntl(observer(RecoveryPhrase)): ComponentType<Props>);

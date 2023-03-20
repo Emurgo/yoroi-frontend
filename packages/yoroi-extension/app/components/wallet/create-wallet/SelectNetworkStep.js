@@ -79,7 +79,6 @@ function SelectNetworkStep(props: Props & Intl): Node {
             </Box>
           ))}
         </Stack>
-        <StepController />
       </Stack>
     </Stack>
   );
