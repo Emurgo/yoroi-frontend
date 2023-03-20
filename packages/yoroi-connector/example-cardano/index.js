@@ -480,6 +480,18 @@ signTx.addEventListener("click", () => {
     );
 
     // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
+    // pick the UTXO with the most ADAs
+    utxos.sort((utxo1, utxo2) => {
+      const amount1 = BigInt(utxo1.amount);
+      const amount2 = BigInt(utxo2.amount);
+      if (amount1 > amount2) {
+        return -1;
+      }
+      if (amount1 < amount2) {
+        return 1;
+      }
+      return 0;
+    });
     const utxo = utxos[0];
 
     const assets = CardanoWasm.MultiAsset.new();
@@ -958,9 +970,23 @@ function createTxHandler(e) {
   cardanoApi.experimental
     .createTx(txReq, true)
     .then((txHex) => {
+      const createdTx = CardanoWasm.Transaction.from_bytes(Buffer.from(txHex, 'hex'));
+      // add `keyHash`, which is one of the conditions of the witness script, to
+      // required signers list of the created tx, so that later the sign tx API will
+      // sign with this key
+      const createdBody = createdTx.body();
+      const requiredSigners = CardanoWasm.Ed25519KeyHashes.new();
+      requiredSigners.add(keyHash);
+      createdBody.set_required_signers(requiredSigners);
+      const newTx = CardanoWasm.Transaction.new(
+        createdBody,
+        createdTx.witness_set(),
+        createdTx.auxiliary_data(),
+      );
+
       toggleSpinner("hide");
       alertSuccess(`<p> Creating tx succeeds: ${txHex} <p/>`);
-      unsignedTransactionHex = txHex;
+      unsignedTransactionHex = newTx.to_hex();
     })
     .catch((error) => {
       console.error(error);
