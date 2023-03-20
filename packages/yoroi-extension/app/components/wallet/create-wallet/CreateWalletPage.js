@@ -1,10 +1,7 @@
 // @flow
 import { Node, ComponentType, useState } from 'react';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
@@ -12,23 +9,12 @@ import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
 import AddWalletDetailsStep from './AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-
-const messages: * = defineMessages({
-  title: {
-    id: 'wallet.create.page.title',
-    defaultMessage: '!!!Create a Wallet',
-  },
-});
-
-type Intl = {|
-  intl: $npm$ReactIntl$IntlShape,
-|};
+import CreateWalletPageHeader from './CreateWalletPageHeader';
 
 type Props = {||};
 
-function CreateWalletPage(props: Props & Intl): Node {
+function CreateWalletPage(props: Props): Node {
   const {
-    intl,
     genWalletRecoveryPhrase,
     createWallet,
     setSelectedNetwork,
@@ -115,19 +101,7 @@ function CreateWalletPage(props: Props & Intl): Node {
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}
-      >
-        <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
-          <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
-        </Box>
-        <Typography variant='h3'>{intl.formatMessage(messages.title)}</Typography>
-      </Box>
+      <CreateWalletPageHeader />
       <CreateWalletSteps currentStep={currentStep} setCurrentStep={setCurrentStep} />
       {CurrentStep}
     </Box>
@@ -135,4 +109,4 @@ function CreateWalletPage(props: Props & Intl): Node {
 }
 
 
-export default (injectIntl(observer(CreateWalletPage)) : ComponentType<Props> )
+export default (observer(CreateWalletPage) : ComponentType<Props> )
