@@ -1,15 +1,14 @@
 // @flow
-import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography, Box } from '@mui/material';
-import StepController from './StepController';
+import { Stack, Typography, Box, Button } from '@mui/material';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import styles from './SelectNetworkStep.scss';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages: * = defineMessages({
   title: {
@@ -27,13 +26,11 @@ type Intl = {|
 |};
 
 type Props = {|
-  selectedNetwork: void | $ReadOnly<NetworkRow>,
-  setSelectedNetwork(network: $ReadOnly<NetworkRow>): void,
-  setCurrentStep(stepId: string): void,
+  onSelect(network: $ReadOnly<NetworkRow>): void,
 |};
 
 function SelectNetworkStep(props: Props & Intl): Node {
-  const { selectedNetwork, setSelectedNetwork, setCurrentStep, intl } = props;
+  const { intl, onSelect } = props;
 
   const networksList = [
     {
@@ -65,20 +62,40 @@ function SelectNetworkStep(props: Props & Intl): Node {
         </Box>
         <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
       </Box>
-      <Stack direction="column" alignItems="left" justifyContent="center">
-        <Stack mb="8px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
+      <Stack direction="column" alignItems="center" justifyContent="center">
+        <Stack mb="48px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
           <Typography>
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
         </Stack>
 
         <Stack alignItems="center" justifyContent="center" gap="16px">
-          {networksList.map(network => (
-            <Box component="button" className={styles.card} key={network.name}>
-              <Typography variant="h3">{network.name}</Typography>
+          {networksList.map(({ name, networkInfo }) => (
+            <Box
+              component="button"
+              className={styles.networkCard}
+              key={name}
+              onClick={() => onSelect(networkInfo)}
+            >
+              <Typography variant="h3">{name}</Typography>
             </Box>
           ))}
         </Stack>
+        <Button
+          variant="outlined"
+          disableRipple={false}
+          sx={{
+            width: '144px',
+            height: '40px',
+            minWidth: 'unset',
+            minHeight: 'unset',
+            fontSize: '14px',
+            lineHeight: '15px',
+            mt: '96px',
+          }}
+        >
+          {intl.formatMessage(globalMessages.backButtonLabel)}
+        </Button>
       </Stack>
     </Stack>
   );

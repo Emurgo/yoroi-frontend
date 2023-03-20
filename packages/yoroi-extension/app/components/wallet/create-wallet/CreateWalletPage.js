@@ -17,6 +17,7 @@ import AddWalletDetailsStep from './AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import CreateWalletPageHeader from './CreateWalletPageHeader';
 import SelectNetworkStep from './SelectNetworkStep';
+import environment from '../../../environment';
 
 type Props = {||};
 
@@ -60,9 +61,10 @@ function CreateWalletPage(props: Props): Node {
   const steps = {
     [CREATE_WALLET_SETPS.SELECT_NETWORK]: (
       <SelectNetworkStep
-        setCurrentStep={setCurrentStep}
-        setSelectedNetwork={setSelectedNetwork}
-        selectedNetwork={selectedNetwork}
+        onSelect={network => {
+          setSelectedNetwork(network);
+          setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
+        }}
       />
     ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
@@ -99,7 +101,13 @@ function CreateWalletPage(props: Props): Node {
         recoveryPhrase={recoveryPhrase}
         onSubmit={(walletName: string, walletPassword: string) => {
           if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
-          setSelectedNetwork(networks.CardanoPreprodTestnet);
+          if (environment.isProduction()) {
+            setSelectedNetwork(networks.CardanoMainnet);
+          }
+
+          if (!selectedNetwork)
+            throw new Error('Network must be selected to create a wallet. Should never happen');
+
           createWallet({
             walletName,
             walletPassword,
@@ -112,7 +120,6 @@ function CreateWalletPage(props: Props): Node {
   };
 
   const CurrentStep = steps[currentStep];
-
   if (currentStep === CREATE_WALLET_SETPS.SELECT_NETWORK) return CurrentStep;
 
   return (
