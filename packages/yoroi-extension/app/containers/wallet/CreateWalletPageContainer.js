@@ -1,4 +1,3 @@
-
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
@@ -11,9 +10,7 @@ import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import CreateWalletPage from '../../components/wallet/create-wallet/CreateWalletPage';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import type {
-  NetworkRow,
-} from '../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export type GeneratedData = typeof CreateWalletPageContainer.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -25,7 +22,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
 
     return (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
         <CreateWalletPage
@@ -47,13 +44,13 @@ export default class CreateWalletPageContainer extends Component<Props> {
     actions: {|
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
+          trigger: (params: void) => void,
         |},
         open: {|
           trigger: (params: {|
             dialog: any,
-            params?: any
-          |}) => void
+            params?: any,
+          |}) => void,
         |},
       |},
     |},
@@ -63,7 +60,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
         genWalletRecoveryPhrase: void => Promise<Array<string>>,
       |},
       uiDialogs: {|
-        isOpen: any => boolean
+        isOpen: any => boolean,
       |},
     |},
   |} {
@@ -113,9 +110,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
         },
       },
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
-      SidebarContainerProps: (
-        { actions, stores, }: InjectedOrGenerated<SidebarContainerData>
-      ),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
     });
   }
 }

@@ -52,6 +52,7 @@ function CreateWalletPage(props: Props): Node {
   const steps = {
     [CREATE_WALLET_SETPS.SELECT_NETWORK]: (
       <SelectNetworkStep
+        setCurrentStep={setCurrentStep}
         setSelectedNetwork={setSelectedNetwork}
         selectedNetwork={selectedNetwork}
       />
