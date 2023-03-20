@@ -4,12 +4,13 @@ import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
-import { CREATE_WALLET_SETPS, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
+import { CREATE_WALLET_SETPS, getFirstStep, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
 import AddWalletDetailsStep from './AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import CreateWalletPageHeader from './CreateWalletPageHeader';
+import SelectNetworkStep from './SelectNetworkStep';
 
 type Props = {||};
 
@@ -18,11 +19,12 @@ function CreateWalletPage(props: Props): Node {
     genWalletRecoveryPhrase,
     createWallet,
     setSelectedNetwork,
+    selectedNetwork,
     isDialogOpen,
     openDialog,
-    closeDialog
+    closeDialog,
   } = props;
-  const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
+  const [currentStep, setCurrentStep] = useState(getFirstStep());
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [dialogs, setDialogs] = useState({
     [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]:
@@ -48,6 +50,12 @@ function CreateWalletPage(props: Props): Node {
   };
 
   const steps = {
+    [CREATE_WALLET_SETPS.SELECT_NETWORK]: (
+      <SelectNetworkStep
+        setSelectedNetwork={setSelectedNetwork}
+        selectedNetwork={selectedNetwork}
+      />
+    ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
         shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
@@ -98,6 +106,8 @@ function CreateWalletPage(props: Props): Node {
   };
 
   const CurrentStep = steps[currentStep];
+
+  if (currentStep === CREATE_WALLET_SETPS.SELECT_NETWORK) return CurrentStep;
 
   return (
     <Box>

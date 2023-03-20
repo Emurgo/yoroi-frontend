@@ -11,7 +11,9 @@ import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import CreateWalletPage from '../../components/wallet/create-wallet/CreateWalletPage';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import { Box } from '@mui/system';
+import type {
+  NetworkRow,
+} from '../../api/ada/lib/storage/database/primitives/tables';
 
 export type GeneratedData = typeof CreateWalletPageContainer.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -30,6 +32,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
           genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
           createWallet={actions.ada.wallets.createWallet.trigger}
           setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+          selectedNetwork={stores.profile.selectedNetwork}
           openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
           closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
           isDialogOpen={stores.uiDialogs.isOpen}
@@ -55,6 +58,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
       |},
     |},
     stores: {|
+      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
       wallets: {|
         genWalletRecoveryPhrase: void => Promise<Array<string>>,
       |},
@@ -81,6 +85,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
+        },
+        profile: {
+          selectedNetwork: stores.profile.selectedNetwork,
         },
       },
       actions: {
