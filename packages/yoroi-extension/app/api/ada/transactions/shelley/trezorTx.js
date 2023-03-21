@@ -817,7 +817,7 @@ export function toTrezorSignRequest(
     result.requiredSigners = formattedRequiredSigners;
   }
 
-  if (additionalWitnessRequests) {
+  if (additionalWitnessRequests.length > 0) {
     result.additionalWitnessRequests = additionalWitnessRequests;
   }
 
