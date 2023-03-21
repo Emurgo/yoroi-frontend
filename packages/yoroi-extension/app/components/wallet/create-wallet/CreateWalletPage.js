@@ -60,6 +60,9 @@ function CreateWalletPage(props: Props): Node {
     closeDialog,
   };
 
+  // Todos:
+  // 1. Open/close dialogs using `stores` not local state
+  // 2.
   const steps = {
     [CREATE_WALLET_SETPS.SELECT_NETWORK]: (
       <SelectNetworkStep
@@ -75,11 +78,18 @@ function CreateWalletPage(props: Props): Node {
         shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
         hideDialog={() => hideDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
         showDialog={() => showDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-        onNext={async () => {
+        nextStep={async () => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase !== null) return;
           const walletRecoveryPhrase = await genWalletRecoveryPhrase();
           setRecoveryPhrase(walletRecoveryPhrase);
+        }}
+        prevStep={() => {
+          if (environment.isProduction()) {
+            return goToRoute(ROUTES.WALLETS.ROOT);
+          }
+
+          setCurrentStep(CREATE_WALLET_SETPS.SELECT_NETWORK);
         }}
       />
     ),

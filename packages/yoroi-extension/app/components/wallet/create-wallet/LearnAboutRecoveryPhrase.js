@@ -21,11 +21,12 @@ type Intl = {|
 |};
 
 type Props = {|
-  onNext(step: string): void,
+  nextStep(): void,
+  prevStep(): void,
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { onNext, shouldShowDialog, showDialog, hideDialog } = props;
+  const { nextStep, prevStep, shouldShowDialog, showDialog, hideDialog } = props;
 
   return (
     <Stack alignItems="center" justifyContent="center">
@@ -60,7 +61,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           />
         </Box>
 
-        <StepController goNext={onNext} />
+        <StepController goNext={nextStep} goBack={prevStep} />
       </Stack>
       <SaveRecoveryPhraseTipsDialog open={shouldShowDialog} onClose={hideDialog} />
     </Stack>
