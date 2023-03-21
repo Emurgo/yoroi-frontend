@@ -47,10 +47,6 @@ const messages = defineMessages({
     id: 'connector.label.connectWalletAuthRequest',
     defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
   },
-  connectWalletNoHardwareSupported: {
-    id: 'connector.label.connectWalletNoHardwareSupported',
-    defaultMessage: '!!!Note, hardware wallets are not supported for the dapp connecting yet.',
-  },
   yourWallets: {
     id: 'connector.label.yourWallets',
     defaultMessage: '!!!Your Wallets',
@@ -341,10 +337,6 @@ class ConnectPage extends Component<Props> {
         </Box>
         {hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
-            <p className={styles.infoText}>
-              {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
-            </p>
-
             <p className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</p>
             <p className={styles.infoText}>
               {intl.formatMessage(connectorMessages.messageReadOnly)}

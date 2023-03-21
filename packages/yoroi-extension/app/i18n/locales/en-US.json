@@ -106,7 +106,6 @@
   "connector.label.connect": "Connect to",
   "connector.label.connectWallet": "Connect Wallet",
   "connector.label.connectWalletAuthRequest": "Enter your spending password to allow the dApp to identify you via your wallet",
-  "connector.label.connectWalletNoHardwareSupported": "Note, hardware wallets are not supported for the dapp connecting yet.",
   "connector.label.selectAllWallets": "Select all wallets",
   "connector.label.yourWallets": "Your Wallets",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",
