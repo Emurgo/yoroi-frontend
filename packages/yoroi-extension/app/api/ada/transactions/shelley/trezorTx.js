@@ -786,10 +786,12 @@ export function toTrezorSignRequest(
     fee: txBody.fee().to_str(),
     protocolMagic,
     networkId,
-    ttl: String(txBody.ttl()),
     includeNetworkId: txBody.network_id() != null,
   };
 
+  if (txBody.ttl()) {
+    result.ttl = String(txBody.ttl());
+  }
   if (validityIntervalStart) {
     result.validityIntervalStart = validityIntervalStart;
   }
