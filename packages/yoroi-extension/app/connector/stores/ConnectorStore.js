@@ -817,7 +817,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected signing data type');
     }
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
-    const addressedUtxos = asAddressedUtxo(utxos);
+    const addressedUtxos = asAddressedUtxo(toJS(utxos));
     this.addressedUtxos = addressedUtxos;
     const submittedTxs = loadSubmittedTransactions() || [];
 
