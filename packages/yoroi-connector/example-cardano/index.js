@@ -480,19 +480,9 @@ signTx.addEventListener("click", () => {
     );
 
     // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
-    // pick the UTXO with the most ADAs
-    utxos.sort((utxo1, utxo2) => {
-      const amount1 = BigInt(utxo1.amount);
-      const amount2 = BigInt(utxo2.amount);
-      if (amount1 > amount2) {
-        return -1;
-      }
-      if (amount1 < amount2) {
-        return 1;
-      }
-      return 0;
-    });
-    const utxo = utxos[0];
+    const utxo = utxos.reduce(
+      (prev, curr) => BigInt(prev.amount) > BigInt(curr.amount) ? prev : curr
+    );
 
     const assets = CardanoWasm.MultiAsset.new();
     for (const asset of utxo.assets) {
