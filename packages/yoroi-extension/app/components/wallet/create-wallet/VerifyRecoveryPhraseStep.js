@@ -41,9 +41,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
-    // Todo: undo the change below
-    // new Array(recoveryPhrase.length).fill(null),
-    recoveryPhrase
+    new Array(recoveryPhrase.length).fill(null)
   );
   const [wrongWord, setWrongWord] = useState<string | null>(null);
 
@@ -205,14 +203,12 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           )}
         </Box>
 
-        <Box mt="10px">
-          <StepController
-            goNext={goNextStepCallback()}
-            goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
-          />
-        </Box>
+        <StepController
+          goNext={goNextStepCallback()}
+          goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
+        />
 
-        {environment.isDev() && (
+        {!environment.isDev() && (
           <Button
             onClick={() => {
               setRecoveryPhrase(recoveryPhrase);

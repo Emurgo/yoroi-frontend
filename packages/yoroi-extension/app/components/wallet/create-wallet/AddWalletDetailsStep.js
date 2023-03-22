@@ -214,7 +214,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
             alignItems="center"
             justifyContent="center"
             mt="-3px"
-            mb="90px"
+            mb="30px"
           >
             {plateImagePart}
             <Typography variant="body1">{plate.TextPart}</Typography>
