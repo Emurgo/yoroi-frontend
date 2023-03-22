@@ -439,6 +439,7 @@
   "uri.verify.dialog.text": "Before continuing, make sure the transaction details are correct.",
   "uri.verify.dialog.title": "Transaction details",
   "wallet.infoDialog.title": "Tips",
+  "wallet.create.walletLoading": "Preparing your wallet...",
   "wallet.create.firstStep": "Learn about recovery phrase",
   "wallet.create.firstStep.description": "A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to <strong>use a recovery phrase</strong>.",
   "wallet.create.secondStep": "Save recovery phrase",

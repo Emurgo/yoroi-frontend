@@ -30,7 +30,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
-import { PrepareWallet } from '../../components/wallet/PrepareWallet';
+import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -111,12 +111,10 @@ class Wallet extends Component<AllProps> {
 
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
     const { stores } = this.generated;
-    const publicDeriver = this.generated.stores.wallets.selected;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
 
     if (stores.wallets.firstSync !== publicDeriver.getPublicDeriverId()) return;
-
-    if (stores.profile.isRevampTheme) return <PrepareWallet />;
 
     return (
       <WalletSyncingOverlay
@@ -132,10 +130,10 @@ class Wallet extends Component<AllProps> {
       return null;
     }
     const { intl } = this.context;
-    const { wallets } = this.generated.stores;
-    const { actions } = this.generated;
+    const { actions, stores } = this.generated;
+    const selectedWallet = stores.wallets.selected;
 
-    if (!wallets.selected) {
+    if (!selectedWallet) {
       return (
         <TopBarLayout
           banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -149,9 +147,10 @@ class Wallet extends Component<AllProps> {
         </TopBarLayout>
       );
     }
-    const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
+    if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
+    const isFirstSync = stores.wallets.firstSync === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
@@ -206,28 +205,42 @@ class Wallet extends Component<AllProps> {
             }))}
         >
           {this.props.children}
-          {this.renderOverlay()}
+          {isFirstSync && (
+            <WalletSyncingOverlay
+              classicTheme={this.generated.stores.profile.isClassicTheme}
+              onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
+            />
+          )}
         </WalletWithNavigation>
       </TopBarLayout>
     );
 
     const walletRevamp = (
       <TopBarLayout
-        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+        banner={
+          isFirstSync ? <BannerContainer {...this.generated.BannerContainerProps} /> : undefined
+        }
         sidebar={sidebarContainer}
         navbar={
-          <NavBarContainerRevamp
-            {...this.generated.NavBarContainerRevampProps}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
-            menu={menu}
-          />
+          isFirstSync ? (
+            <NavBarContainerRevamp
+              {...this.generated.NavBarContainerRevampProps}
+              title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+              menu={menu}
+            />
+          ) : undefined
         }
         showInContainer
         showAsCard
       >
-        {warning}
-        {this.renderOverlay()}
-        {this.props.children}
+        {!isFirstSync ? (
+          <WalletLoadingAnimation />
+        ) : (
+          <>
+            {warning}
+            {this.props.children}
+          </>
+        )}
       </TopBarLayout>
     );
 
