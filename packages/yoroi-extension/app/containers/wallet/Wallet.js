@@ -109,21 +109,6 @@ class Wallet extends Component<AllProps> {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
 
-  renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
-    const { stores } = this.generated;
-    const publicDeriver = stores.wallets.selected;
-    if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
-
-    if (stores.wallets.firstSync !== publicDeriver.getPublicDeriverId()) return;
-
-    return (
-      <WalletSyncingOverlay
-        classicTheme={this.generated.stores.profile.isClassicTheme}
-        onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
-      />
-    );
-  }
-
   render(): Node {
     // abort rendering if the page isn't valid for this wallet
     if (this.checkRoute() != null) {
@@ -215,32 +200,26 @@ class Wallet extends Component<AllProps> {
       </TopBarLayout>
     );
 
-    const walletRevamp = (
+    const walletRevamp = !isFirstSync ? (
       <TopBarLayout
-        banner={
-          isFirstSync ? <BannerContainer {...this.generated.BannerContainerProps} /> : undefined
-        }
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
         navbar={
-          isFirstSync ? (
-            <NavBarContainerRevamp
-              {...this.generated.NavBarContainerRevampProps}
-              title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
-              menu={menu}
-            />
-          ) : undefined
+          <NavBarContainerRevamp
+            {...this.generated.NavBarContainerRevampProps}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+            menu={menu}
+          />
         }
         showInContainer
         showAsCard
       >
-        {!isFirstSync ? (
-          <WalletLoadingAnimation />
-        ) : (
-          <>
-            {warning}
-            {this.props.children}
-          </>
-        )}
+        {warning}
+        {this.props.children}
+      </TopBarLayout>
+    ) : (
+      <TopBarLayout sidebar={sidebarContainer}>
+        <WalletLoadingAnimation />
       </TopBarLayout>
     );
 
