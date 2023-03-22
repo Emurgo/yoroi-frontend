@@ -105,6 +105,7 @@
   "connector.connect.createWallet": "create wallet",
   "connector.label.connect": "Connect to",
   "connector.label.connectWallet": "Connect Wallet",
+  "connector.connect.hardwareWalletsConnectWithAuthNotSupported": "Connecting to hardware wallet with authentication is not supported",
   "connector.label.connectWalletAuthRequest": "Enter your spending password to allow the dApp to identify you via your wallet",
   "connector.label.selectAllWallets": "Select all wallets",
   "connector.label.yourWallets": "Your Wallets",
