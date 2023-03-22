@@ -30,6 +30,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
+import { PrepareWallet } from '../../components/wallet/PrepareWallet';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -109,18 +110,20 @@ class Wallet extends Component<AllProps> {
   };
 
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
+    const { stores } = this.generated;
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
 
-    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
-      return (
-        <WalletSyncingOverlay
-          classicTheme={this.generated.stores.profile.isClassicTheme}
-          onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
-        />
-      );
-    }
-    return null;
+    if (stores.wallets.firstSync !== publicDeriver.getPublicDeriverId()) return;
+
+    if (stores.profile.isRevampTheme) return <PrepareWallet />;
+
+    return (
+      <WalletSyncingOverlay
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
+      />
+    );
   }
 
   render(): Node {
