@@ -208,7 +208,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
         />
 
-        {!environment.isDev() && (
+        {environment.isDev() && (
           <Button
             onClick={() => {
               setRecoveryPhrase(recoveryPhrase);
