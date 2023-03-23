@@ -19,9 +19,7 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type Props = {|
-  currentStep: number,
-|};
+type Props = {||};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   const { intl } = props;

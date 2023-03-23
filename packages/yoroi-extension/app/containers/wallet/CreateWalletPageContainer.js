@@ -35,8 +35,8 @@ export default class CreateWalletPageContainer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    actions: {||},
-    stores: {||},
+    actions: {||} | Object,
+    stores: {||} | Object,
   |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;

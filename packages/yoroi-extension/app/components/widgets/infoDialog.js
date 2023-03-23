@@ -5,19 +5,20 @@ import { Box } from '@mui/system';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
+import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
-    dialogTitle: {
-        id: 'wallet.infoDialog.title',
-        defaultMessage: '!!!Tips',
-    },
-})
+  dialogTitle: {
+    id: 'wallet.infoDialog.title',
+    defaultMessage: '!!!Tips',
+  },
+});
 
 type Props = {|
-    open: bolean,
-    children: Node,
-    onClose(): void,
-|}
+  +open: boolean,
+  +children: Node,
+  +onClose: void => void,
+|};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -79,7 +80,7 @@ function InfoDialog(props: Props & Intl): Node {
         </Box>
         <Link
           href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi-"
-          target='_blank'
+          target="_blank"
           rel="noreferrer noopener"
           sx={{
             textDecoration: 'none',
@@ -90,9 +91,9 @@ function InfoDialog(props: Props & Intl): Node {
         >
           Learn more on Yoroi Zendesk
         </Link>
-        <Stack alignItems='center' justifyContent='center'>
+        <Stack alignItems="center" justifyContent="center">
           <Button
-            variant='rv-primary'
+            variant="rv-primary"
             disableRipple={false}
             onClick={onClose}
             sx={{
@@ -110,4 +111,4 @@ function InfoDialog(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(InfoDialog): ComponentType<Props>)
+export default (injectIntl(observer(InfoDialog)): ComponentType<Props>);
