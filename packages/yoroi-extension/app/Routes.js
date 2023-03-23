@@ -23,8 +23,9 @@ import ConnectedWebsitesPage, {
 import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
-// Todo: Add lazy loading
-import CreateWalletPage from './containers/wallet/CreateWalletPageContainer';
+import CreateWalletPage, {
+  CreateWalletPagePromise,
+} from './containers/wallet/CreateWalletPageContainer';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -122,6 +123,7 @@ const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
+  CreateWalletPagePromise,
   LanguageSelectionPagePromise,
   TermsOfUsePagePromise,
   UriPromptPagePromise,
