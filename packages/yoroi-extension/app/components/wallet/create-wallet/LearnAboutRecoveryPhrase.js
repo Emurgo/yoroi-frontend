@@ -1,5 +1,5 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import { Node, ComponentType, useEffect } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -7,6 +7,7 @@ import { Stack, Typography, Box } from '@mui/material';
 import StepController from './StepController';
 import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
+import { isDialogShownBefore, TIPS_DIALOGS } from './steps';
 
 const messages: * = defineMessages({
   description: {
@@ -26,7 +27,14 @@ type Props = {|
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { nextStep, prevStep, shouldShowDialog, showDialog, hideDialog } = props;
+  const { nextStep, prevStep, isDialogOpen, openDialog, closeDialog } = props;
+
+  const isActiveDialog = isDialogOpen(SaveRecoveryPhraseTipsDialog);
+
+  useEffect(() => {
+    if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE))
+      openDialog(SaveRecoveryPhraseTipsDialog);
+  }, []);
 
   return (
     <Stack alignItems="center" justifyContent="center">
@@ -42,7 +50,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
                 mb: '-5px',
               },
             }}
-            onClick={showDialog}
+            onClick={() => openDialog(SaveRecoveryPhraseTipsDialog)}
           >
             <InfoIcon />
           </Box>
@@ -63,7 +71,10 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
 
         <StepController goNext={nextStep} goBack={prevStep} />
       </Stack>
-      <SaveRecoveryPhraseTipsDialog open={shouldShowDialog} onClose={hideDialog} />
+      <SaveRecoveryPhraseTipsDialog
+        open={isActiveDialog}
+        onClose={() => closeDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
+      />
     </Stack>
   );
 }

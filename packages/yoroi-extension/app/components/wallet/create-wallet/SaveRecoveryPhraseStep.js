@@ -1,11 +1,11 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import { Node, ComponentType, useState, useEffect } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box } from '@mui/material';
 import StepController from './StepController';
-import { CREATE_WALLET_SETPS } from './steps';
+import { CREATE_WALLET_SETPS, isDialogShownBefore, TIPS_DIALOGS } from './steps';
 import HowToSaveRecoverPhraseTipsDialog from './HowToSaveRecoverPhraseTipsDialog';
 import RecoveryPhrase from './RecoveryPhrase';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
@@ -27,8 +27,14 @@ type Props = {|
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
-  const { setCurrentStep, recoveryPhrase, shouldShowDialog, showDialog, hideDialog } = props;
+  const { setCurrentStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog } = props;
   const [shouldShowRecoveryPhrase, showRecoveryPhrase] = useState(false);
+
+  const isActiveDialog = isDialogOpen(HowToSaveRecoverPhraseTipsDialog);
+  useEffect(() => {
+    if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE))
+      openDialog(HowToSaveRecoverPhraseTipsDialog);
+  }, []);
 
   function goNextStepCallback() {
     if (!shouldShowRecoveryPhrase) return;
@@ -42,7 +48,10 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
           <Typography>
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
-          <Box sx={{ cursor: 'pointer' }} onClick={showDialog}>
+          <Box
+            sx={{ cursor: 'pointer' }}
+            onClick={() => openDialog(HowToSaveRecoverPhraseTipsDialog)}
+          >
             <InfoIcon />
           </Box>
         </Stack>
@@ -61,7 +70,10 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
         />
       </Stack>
 
-      <HowToSaveRecoverPhraseTipsDialog open={shouldShowDialog} onClose={hideDialog} />
+      <HowToSaveRecoverPhraseTipsDialog
+        open={isActiveDialog}
+        onClose={() => closeDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
+      />
     </Stack>
   );
 }
