@@ -31,7 +31,5 @@ export function markDialogAsShown(dialogId: string) {
 }
 
 export function isDialogShownBefore(dialogId: string) {
-  // Todo: undo the change below
-  return false;
-  // return localStorage.getItem(asDialogId(dialogId)) === 'true';
+  return localStorage.getItem(asDialogId(dialogId)) === 'true';
 }

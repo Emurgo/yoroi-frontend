@@ -80,6 +80,7 @@ function CreateWalletPage(props: Props): Node {
       <AddWalletDetailsStep
         setCurrentStep={setCurrentStep}
         recoveryPhrase={recoveryPhrase}
+        selectedNetwork={selectedNetwork}
         onSubmit={(walletName: string, walletPassword: string) => {
           if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
           if (environment.isProduction()) {
