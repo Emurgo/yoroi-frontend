@@ -489,7 +489,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
     }
     try {
-      const wallets = await getWallets({ db: persistentDb });
+      const wallets = (await getWallets({ db: persistentDb })).filter(w =>
+        w.getParent().getWalletType() === WalletTypeOption.WEB_WALLET
+          || isLedgerNanoWallet(w.getParent())
+      );
 
       const protocol = this.protocol;
       const isProtocolErgo = protocol === 'ergo';
