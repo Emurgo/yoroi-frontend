@@ -26,7 +26,11 @@ export default class CreateWalletPageContainer extends Component<Props> {
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
         <Suspense fallback={null}>
-          <CreateWalletPage />
+          <CreateWalletPage
+            genWalletRecoveryPhrase={
+              this.generated.stores.substores.ada.wallets.genWalletRecoveryPhrase
+            }
+          />
         </Suspense>
       </TopBarLayout>
     );
@@ -61,9 +65,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
       },
       actions: {},
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
-      SidebarContainerProps: (
-        { actions, stores, }: InjectedOrGenerated<SidebarContainerData>
-      ),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
     });
   }
 }

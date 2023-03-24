@@ -5,7 +5,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
+import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS, TIPS_DIALOGS } from './steps';
@@ -34,12 +34,12 @@ function CreateWalletPage(props: Props & Intl): Node {
   });
 
   function showDialog(dialogId: string): void {
-   setDialogs(prev => ({ ...prev, [dialogId]: true }));
-  };
+    setDialogs(prev => ({ ...prev, [dialogId]: true }));
+  }
 
   function hideDialog(dialogId: string): void {
-   setDialogs(prev => ({ ...prev, [dialogId]: false }));
-  };
+    setDialogs(prev => ({ ...prev, [dialogId]: false }));
+  }
 
   const steps = {
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
@@ -47,7 +47,7 @@ function CreateWalletPage(props: Props & Intl): Node {
         shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
         hideDialog={() => hideDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
         showDialog={() => showDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-        onNext={async () => {
+        nextStep={async () => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase !== null) return;
           const walletRecoveryPhrase = await genWalletRecoveryPhrase();
@@ -81,7 +81,7 @@ function CreateWalletPage(props: Props & Intl): Node {
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
           <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
         </Box>
-        <Typography variant='h3'>{intl.formatMessage(messages.title)}</Typography>
+        <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
       </Box>
       <CreateWalletSteps currentStep={currentStep} setCurrentStep={setCurrentStep} />
       {CurrentStep}
@@ -89,4 +89,4 @@ function CreateWalletPage(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(CreateWalletPage)) : ComponentType<Props> )
+export default (injectIntl(observer(CreateWalletPage)): ComponentType<Props>);
