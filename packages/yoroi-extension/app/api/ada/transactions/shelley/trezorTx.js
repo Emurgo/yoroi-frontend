@@ -821,6 +821,7 @@ export function toTrezorSignRequest(
     result.additionalWitnessRequests = additionalWitnessRequests;
   }
 
+  console.log('Trezor sign request:', JSON.stringify(result, null, 2));
   return result;
 }
 
