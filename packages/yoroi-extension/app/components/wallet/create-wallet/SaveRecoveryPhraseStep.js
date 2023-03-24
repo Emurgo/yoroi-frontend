@@ -1,5 +1,6 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import { useState } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -25,6 +26,9 @@ type Intl = {|
 type Props = {|
   setCurrentStep(step: string): void,
   recoveryPhrase: Array<string> | null,
+  shouldShowDialog: boolean,
+  showDialog(): void,
+  hideDialog(): void,
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {

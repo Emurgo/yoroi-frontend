@@ -22,7 +22,9 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type Props = {||};
+type Props = {|
+  genWalletRecoveryPhrase: void => Promise<Array<string>>,
+|};
 
 function CreateWalletPage(props: Props & Intl): Node {
   const { intl, genWalletRecoveryPhrase } = props;
@@ -47,11 +49,17 @@ function CreateWalletPage(props: Props & Intl): Node {
         shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
         hideDialog={() => hideDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
         showDialog={() => showDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-        nextStep={async () => {
+        nextStep={() => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
-          if (recoveryPhrase !== null) return;
-          const walletRecoveryPhrase = await genWalletRecoveryPhrase();
-          setRecoveryPhrase(walletRecoveryPhrase);
+          if (recoveryPhrase === null) {
+            genWalletRecoveryPhrase()
+              .then(setRecoveryPhrase)
+              .catch(err => {
+                // Todo: add proper error handling
+                // eslint-disable-next-line no-console
+                console.error(`genWalletRecoveryPhrase:: ${err}`);
+              });
+          }
         }}
       />
     ),

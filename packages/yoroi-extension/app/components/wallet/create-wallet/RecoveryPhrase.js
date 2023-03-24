@@ -3,17 +3,18 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box, Typography, Grid, Button } from '@mui/material'
-import { ReactComponent as EyeIcon }  from '../../../assets/images/open-eye-primary.inline.svg';
+import { Box, Typography, Grid, Button } from '@mui/material';
+import { ReactComponent as EyeIcon } from '../../../assets/images/open-eye-primary.inline.svg';
 
 type Props = {|
-    recoveryPhrase: Array<string> | null,
+  recoveryPhrase: Array<string> | null,
+  shouldShowRecoveryPhrase: boolean,
+  toggleRecoveryPhrase(): void,
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
-
 
 const messages: * = defineMessages({
   showRecoveryPhraseBtn: {
@@ -26,40 +27,41 @@ function RecoveryPhrase(props: Props & Intl): Node {
   const { recoveryPhrase, intl, shouldShowRecoveryPhrase, toggleRecoveryPhrase } = props;
 
   return (
-    <Box width="100%" mt='8px'>
-      <Grid container gap='8px'>
-        {recoveryPhrase.map((word, idx) => (
-          <Grid
-            item
-            key={word}
-            columns={7}
-            sx={{
-              background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
-              textAlign: 'center',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '40px',
-              filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
-              cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed'
-            }}
-          >
-            <Typography
+    <Box width="100%" mt="8px">
+      <Grid container gap="8px">
+        {recoveryPhrase &&
+          recoveryPhrase.map((word, idx) => (
+            <Grid
+              item
+              key={word}
+              columns={7}
               sx={{
-                width: '124px',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                px: '10px'
+                background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
+                textAlign: 'center',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '40px',
+                filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
+                cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed',
               }}
-              variant='body1'
-              color='primary.200'
             >
-              {idx + 1}. {word}
-            </Typography>
-          </Grid>
-        ))}
+              <Typography
+                sx={{
+                  width: '124px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  px: '10px',
+                }}
+                variant="body1"
+                color="primary.200"
+              >
+                {idx + 1}. {word}
+              </Typography>
+            </Grid>
+          ))}
       </Grid>
       <Button
         sx={{
@@ -77,12 +79,12 @@ function RecoveryPhrase(props: Props & Intl): Node {
         onClick={toggleRecoveryPhrase}
       >
         <EyeIcon />
-        <Typography variant='body2' fontWeight='500'>
+        <Typography variant="body2" fontWeight="500">
           {intl.formatMessage(messages.showRecoveryPhraseBtn)}
         </Typography>
       </Button>
     </Box>
-  )
+  );
 }
 
-export default (injectIntl(observer(RecoveryPhrase)) : ComponentType<Props>);
+export default (injectIntl(observer(RecoveryPhrase)): ComponentType<Props>);

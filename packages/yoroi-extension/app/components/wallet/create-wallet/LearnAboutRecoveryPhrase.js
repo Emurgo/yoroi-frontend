@@ -22,7 +22,10 @@ type Intl = {|
 |};
 
 type Props = {|
-  onNext(step: string): void,
+  nextStep(): void,
+  shouldShowDialog: boolean,
+  showDialog(): void,
+  hideDialog(): void,
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {

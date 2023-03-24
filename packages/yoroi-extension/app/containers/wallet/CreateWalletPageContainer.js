@@ -39,10 +39,14 @@ export default class CreateWalletPageContainer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    actions: {||},
+    actions: {||} | Object,
     stores: {|
-      wallets: {|
-        genWalletRecoveryPhrase: void => Promise<Array<string>>,
+      substores: {|
+        ada: {|
+          wallets: {|
+            genWalletRecoveryPhrase: void => Promise<Array<string>>,
+          |},
+        |},
       |},
     |},
   |} {
