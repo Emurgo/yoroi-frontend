@@ -1,6 +1,5 @@
-
 // @flow
-import { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -9,8 +8,11 @@ import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
-import CreateWalletPage from '../../components/wallet/create-wallet/CreateWalletPage';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+
+export const CreateWalletPagePromise: void => Promise<any> = () =>
+  import('../../components/wallet/create-wallet/CreateWalletPage');
+const CreateWalletPage = React.lazy(CreateWalletPagePromise);
 
 export type GeneratedData = typeof CreateWalletPageContainer.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -18,16 +20,18 @@ type Props = InjectedOrGenerated<GeneratedData>;
 @observer
 export default class CreateWalletPageContainer extends Component<Props> {
   render(): Node {
-    const { stores } = this.generated;
-
     return (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
-        <CreateWalletPage
-          genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
-        />
+        <Suspense fallback={null}>
+          <CreateWalletPage
+            genWalletRecoveryPhrase={
+              this.generated.stores.substores.ada.wallets.genWalletRecoveryPhrase
+            }
+          />
+        </Suspense>
       </TopBarLayout>
     );
   }
@@ -35,10 +39,14 @@ export default class CreateWalletPageContainer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    actions: {||},
+    actions: {||} | Object,
     stores: {|
-      wallets: {|
-        genWalletRecoveryPhrase: void => Promise<Array<string>>,
+      substores: {|
+        ada: {|
+          wallets: {|
+            genWalletRecoveryPhrase: void => Promise<Array<string>>,
+          |},
+        |},
       |},
     |},
   |} {
@@ -61,9 +69,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
       },
       actions: {},
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
-      SidebarContainerProps: (
-        { actions, stores, }: InjectedOrGenerated<SidebarContainerData>
-      ),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
     });
   }
 }

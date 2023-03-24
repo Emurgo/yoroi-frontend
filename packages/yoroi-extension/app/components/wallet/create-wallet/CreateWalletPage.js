@@ -1,10 +1,11 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import { useState } from 'react';
+import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg'
+import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
@@ -22,7 +23,9 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type Props = {||};
+type Props = {|
+  genWalletRecoveryPhrase: void => Promise<Array<string>>,
+|};
 
 function CreateWalletPage(props: Props & Intl): Node {
   const { intl, genWalletRecoveryPhrase } = props;
@@ -49,11 +52,17 @@ function CreateWalletPage(props: Props & Intl): Node {
         shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
         hideDialog={() => hideDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
         showDialog={() => showDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-        onNext={async () => {
+        nextStep={() => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
-          if (recoveryPhrase !== null) return;
-          const walletRecoveryPhrase = await genWalletRecoveryPhrase();
-          setRecoveryPhrase(walletRecoveryPhrase);
+          if (recoveryPhrase === null) {
+            genWalletRecoveryPhrase()
+              .then(setRecoveryPhrase)
+              .catch(err => {
+                // Todo: add proper error handling
+                // eslint-disable-next-line no-console
+                console.error(`genWalletRecoveryPhrase:: ${err}`);
+              });
+          }
         }}
       />
     ),
@@ -89,7 +98,7 @@ function CreateWalletPage(props: Props & Intl): Node {
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
           <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
         </Box>
-        <Typography variant='h3'>{intl.formatMessage(messages.title)}</Typography>
+        <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
       </Box>
       <CreateWalletSteps currentStep={currentStep} setCurrentStep={setCurrentStep} />
       {CurrentStep}
@@ -97,5 +106,4 @@ function CreateWalletPage(props: Props & Intl): Node {
   );
 }
 
-
-export default (injectIntl(observer(CreateWalletPage)) : ComponentType<Props> )
+export default (injectIntl(observer(CreateWalletPage)): ComponentType<Props>);
