@@ -7,7 +7,7 @@ import { Box } from '@mui/system';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { observable } from 'mobx';
+import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
   dialogTitle: {
@@ -119,4 +119,4 @@ function InfoDialog(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observable(InfoDialog)): ComponentType<Props>);
+export default (injectIntl(observer(InfoDialog)): ComponentType<Props>);
