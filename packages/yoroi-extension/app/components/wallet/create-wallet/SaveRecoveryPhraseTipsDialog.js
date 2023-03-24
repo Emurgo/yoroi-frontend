@@ -7,27 +7,30 @@ import { Typography, Box } from '@mui/material';
 
 const messages: Object = defineMessages({
   title: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.title',
+    id: 'wallet.create.dialog.tips.title',
     defaultMessage: '!!!Read this before saving your recovery phrase',
   },
   firstTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.firstTip',
-    defaultMessage: '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
+    id: 'wallet.create.dialog.tips.first',
+    defaultMessage:
+      '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
   },
   secondTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.secondTip',
+    id: 'wallet.create.dialog.tips.second',
     defaultMessage: '!!!The recovery phrase is the only way to access your wallet.',
   },
   thirdTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.thirdTip',
-    defaultMessage: '!!!Yoroi will NEVER ask for the recovery phrase. Watch out for scammers and impersonators.',
+    id: 'wallet.create.dialog.tips.third',
+    defaultMessage:
+      '!!!Yoroi will NEVER ask for the recovery phrase. Watch out for scammers and impersonators.',
   },
   forthTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.forthTip',
-    defaultMessage: '!!!If you lose your recovery phrase, it will not be possible to recover your wallet.',
+    id: 'wallet.create.dialog.tips.forth',
+    defaultMessage:
+      '!!!If you lose your recovery phrase, it will not be possible to recover your wallet.',
   },
   fifthTip: {
-    id: 'wallet.create.dialog.saveRecoveryPhrase.fifthTip',
+    id: 'wallet.create.dialog.tips.fifth',
     defaultMessage: '!!!Remember: you are the only person who should know this recovery phrase.',
   },
 });

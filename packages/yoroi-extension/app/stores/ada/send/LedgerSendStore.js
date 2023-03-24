@@ -240,11 +240,11 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         if (
           !ledgerSignTxResp.auxiliaryDataSupplement ||
             (ledgerSignTxResp.auxiliaryDataSupplement.type !==
-              TxAuxiliaryDataSupplementType.CATALYST_REGISTRATION)
+              TxAuxiliaryDataSupplementType.CIP36_REGISTRATION)
         ) {
           throw new Error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} unexpected Ledger sign transaction response`);
         }
-        const { catalystRegistrationSignatureHex } =
+        const { cip36VoteRegistrationSignatureHex } =
           ledgerSignTxResp.auxiliaryDataSupplement;
 
         metadata = generateRegistrationMetadata(
@@ -253,7 +253,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
           rewardAddress,
           nonce,
           (_hashedMetadata) => {
-            return catalystRegistrationSignatureHex;
+            return cip36VoteRegistrationSignatureHex;
           },
         );
         // We can verify that

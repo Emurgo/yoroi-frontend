@@ -1,5 +1,6 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import { useState } from 'react';
+import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -87,6 +88,5 @@ function CreateWalletPage(props: Props & Intl): Node {
     </Box>
   );
 }
-
 
 export default (injectIntl(observer(CreateWalletPage)) : ComponentType<Props> )
