@@ -1568,8 +1568,14 @@ function handleInjectorConnect(port) {
                   requiredAmount = RustModule.WalletV4.Value.from_bytes(
                     Buffer.from(requiredAmount, 'hex')
                   ).coin().to_str();
-                } catch (e) {
-                  throw new Error(`Failed to parse the required collateral amount: "${requiredAmount}"`);
+                } catch {
+                  rpcResponse({
+                    err: {
+                      code: APIErrorCodes.API_INVALID_REQUEST,
+                      info: 'failed to parse the required collateral amount',
+                    },
+                  });
+                  return;
                 }
               }
               await withDb(async (db, localStorageApi) => {
@@ -1625,18 +1631,22 @@ function handleInjectorConnect(port) {
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {
-                        rpcResponse({ error: 'not enough UTXOs' });
+                        rpcResponse({
+                          err: {
+                            code: -5,
+                            info: 'not enough UTXOs'
+                          }
+                        });
                         return;
                       }
-                      throw error;
                     }
                     // we can get enough collaterals after re-organization
                     // pop-up the UI
                     const connection = connectedSites.get(tabId);
                     if (connection == null) {
-                      Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
-                      rpcResponse(undefined); // shouldn't happen
-                      return;
+                      throw new Error(
+                        `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
+                      );
                     }
 
                     const resp = await confirmSign(
@@ -1653,7 +1663,12 @@ function handleInjectorConnect(port) {
                       connection,
                     );
                     if (!resp.ok) {
-                      rpcResponse({ error: 'sign failed' });
+                      rpcResponse({
+                        err: {
+                          code: APIErrorCodes.API_REFUSED,
+                          info: 'sign failed'
+                        }
+                      });
                       return;
                     }
                     const utxos = await transformCardanoUtxos(
