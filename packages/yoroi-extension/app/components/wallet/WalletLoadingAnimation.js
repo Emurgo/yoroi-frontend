@@ -7,11 +7,12 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography } from '@mui/material';
+import dotFlashingStyles from '../widgets/DotFlashing.scss';
 
 const messages: * = defineMessages({
   walletLoading: {
     id: 'wallet.create.walletLoading',
-    defaultMessage: '!!!Preparing your wallet...',
+    defaultMessage: '!!!Preparing your wallet',
   },
 });
 
@@ -22,12 +23,11 @@ type Intl = {|
 
 function WalletLoadingAnimation(props: Props & Intl): Node {
   const { intl } = props;
-  const options = {
+  const { View } = useLottie({
     animationData: prepareWalletAnimation,
     loop: true,
     width: 10,
-  };
-  const { View } = useLottie(options);
+  });
 
   return (
     <Stack alignItems="center" justifyContent="center" height="100%">
@@ -39,8 +39,24 @@ function WalletLoadingAnimation(props: Props & Intl): Node {
       >
         {View}
       </Box>
-      <Typography variant="h1" mt="25px">
+      <Typography
+        variant="h1"
+        mt="25px"
+        color="primary.200"
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+        }}
+      >
         {intl.formatMessage(messages.walletLoading)}
+        <Box
+          sx={{
+            mb: '8px',
+            ml: '15px',
+          }}
+          className={dotFlashingStyles.component}
+        />
       </Typography>
     </Stack>
   );
