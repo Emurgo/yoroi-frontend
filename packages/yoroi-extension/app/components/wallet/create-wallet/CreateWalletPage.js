@@ -1,4 +1,5 @@
 // @flow
+import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
@@ -22,15 +23,17 @@ type Props = {|
     walletPassword: string,
     recoveryPhrase: Array<string>,
   |}) => void,
+  selectedNetwork: $ReadOnly<NetworkRow>,
   setSelectedNetwork: (params: void | $ReadOnly<NetworkRow>) => void,
   openDialog(dialog: any): void,
   closeDialog(): void,
   isDialogOpen(dialog: any): boolean,
+  goToRoute(route: string): void,
 |};
 
 export type ManageDialogsProps = {|
   openDialog(dialog: any): void,
-  closeDialog(): void,
+  closeDialog(dialogId: string): void,
   isDialogOpen(dialog: any): boolean,
 |};
 
@@ -69,7 +72,7 @@ function CreateWalletPage(props: Props): Node {
     ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
-        nextStep={async () => {
+        nextStep={() => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase === null) {
             genWalletRecoveryPhrase()

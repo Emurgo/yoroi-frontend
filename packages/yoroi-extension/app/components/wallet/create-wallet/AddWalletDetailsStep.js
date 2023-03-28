@@ -21,6 +21,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from '../../common/TextField';
 import WalletPlate from './WalletPlate';
 import type { ManageDialogsProps } from './CreateWalletPage';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages: * = defineMessages({
   description: {
@@ -50,9 +51,7 @@ const messages: * = defineMessages({
 type Props = {|
   setCurrentStep(step: string): void,
   recoveryPhrase: Array<string> | null,
-  shouldShowDialog: boolean,
-  hideDialog(): void,
-  showDialog(): void,
+  selectedNetwork: $ReadOnly<NetworkRow>,
   onSubmit: (walletName: string, walletPassword: string) => void,
   ...ManageDialogsProps,
 |};
@@ -208,14 +207,14 @@ export default class AddWalletDetailsStep extends Component<Props> {
             actions={[
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
-                disabled: true,
+                disabled: false,
                 onClick: () => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE),
                 type: 'secondary',
               },
               {
-                label: intl.formatMessage(globalMessages.nextButtonLabel),
+                label: intl.formatMessage(globalMessages.create),
                 disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
-                  field => field.isValid
+                  field => !field.isValid
                 ),
                 onClick: () => {
                   this.props.onSubmit(walletName, walletPassword);

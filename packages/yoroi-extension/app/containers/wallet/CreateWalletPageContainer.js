@@ -10,6 +10,7 @@ import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
@@ -75,6 +76,15 @@ export default class CreateWalletPageContainer extends Component<Props> {
           trigger: (params: void | $ReadOnly<NetworkRow>) => void,
         |},
       |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       substores: {|
@@ -86,6 +96,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
       |},
       uiDialogs: {|
         isOpen: any => boolean,
+      |},
+      profile: {|
+        selectedNetwork: void | $ReadOnly<NetworkRow>,
       |},
     |},
   |} {

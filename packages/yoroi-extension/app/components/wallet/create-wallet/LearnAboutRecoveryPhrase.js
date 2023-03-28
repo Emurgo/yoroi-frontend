@@ -1,5 +1,6 @@
 // @flow
-import { Node, ComponentType, useEffect } from 'react';
+import { useEffect } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -9,6 +10,7 @@ import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import { isDialogShownBefore, TIPS_DIALOGS } from './steps';
 import globalMessages from '../../../i18n/global-messages';
+import type { ManageDialogsProps } from './CreateWalletPage';
 
 const messages: * = defineMessages({
   description: {
@@ -25,6 +27,7 @@ type Intl = {|
 type Props = {|
   nextStep(): void,
   prevStep(): void,
+  ...ManageDialogsProps,
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
@@ -74,7 +77,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           actions={[
             {
               label: intl.formatMessage(globalMessages.backButtonLabel),
-              disabled: true,
+              disabled: false,
               onClick: prevStep,
               type: 'secondary',
             },

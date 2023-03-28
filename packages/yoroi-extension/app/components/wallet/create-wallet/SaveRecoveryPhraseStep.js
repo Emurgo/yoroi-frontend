@@ -11,6 +11,7 @@ import HowToSaveRecoverPhraseTipsDialog from './HowToSaveRecoverPhraseTipsDialog
 import RecoveryPhrase from './RecoveryPhrase';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
+import type { ManageDialogsProps } from './CreateWalletPage';
 
 const messages: * = defineMessages({
   description: {
@@ -26,6 +27,7 @@ type Intl = {|
 type Props = {|
   setCurrentStep(step: string): void,
   recoveryPhrase: Array<string> | null,
+  ...ManageDialogsProps,
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
