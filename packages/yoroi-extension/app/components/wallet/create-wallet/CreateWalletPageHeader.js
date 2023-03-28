@@ -1,6 +1,5 @@
 // @flow
-import { ComponentType } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Box, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';

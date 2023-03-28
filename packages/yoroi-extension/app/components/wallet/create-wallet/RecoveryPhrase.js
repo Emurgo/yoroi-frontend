@@ -8,6 +8,8 @@ import { ReactComponent as EyeIcon } from '../../../assets/images/open-eye-prima
 
 type Props = {|
   recoveryPhrase: Array<string> | null,
+  shouldShowRecoveryPhrase: boolean,
+  toggleRecoveryPhrase(): void,
 |};
 
 type Intl = {|
@@ -27,38 +29,39 @@ function RecoveryPhrase(props: Props & Intl): Node {
   return (
     <Box width="100%" mt="8px">
       <Grid container gap="8px">
-        {recoveryPhrase.map((word, idx) => (
-          <Grid
-            item
-            key={word}
-            columns={7}
-            sx={{
-              background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
-              textAlign: 'center',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '40px',
-              filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
-              cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed',
-            }}
-          >
-            <Typography
+        {recoveryPhrase &&
+          recoveryPhrase.map((word, idx) => (
+            <Grid
+              item
+              key={word}
+              columns={7}
               sx={{
-                width: '124px',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                px: '10px',
+                background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
+                textAlign: 'center',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '40px',
+                filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
+                cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed',
               }}
-              variant="body1"
-              color="primary.200"
             >
-              {idx + 1}. {word}
-            </Typography>
-          </Grid>
-        ))}
+              <Typography
+                sx={{
+                  width: '124px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  px: '10px',
+                }}
+                variant="body1"
+                color="primary.200"
+              >
+                {idx + 1}. {word}
+              </Typography>
+            </Grid>
+          ))}
       </Grid>
       <Button
         sx={{

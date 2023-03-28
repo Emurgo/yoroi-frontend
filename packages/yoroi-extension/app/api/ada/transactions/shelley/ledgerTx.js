@@ -25,6 +25,7 @@ import {
   TxOutputDestinationType,
   TxAuxiliaryDataType,
   StakeCredentialParamsType,
+  CIP36VoteRegistrationFormat,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -89,14 +90,18 @@ export async function createLedgerSignTxPayload(request: {|
       request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
 
     auxiliaryData = {
-      type: TxAuxiliaryDataType.CATALYST_REGISTRATION,
+      type: TxAuxiliaryDataType.CIP36_REGISTRATION,
       params: {
-        votingPublicKeyHex: votingPublicKey.replace(/^0x/, ''),
+        format: CIP36VoteRegistrationFormat.CIP_15,
+        voteKeyHex: votingPublicKey.replace(/^0x/, ''),
         stakingPath: stakingKeyPath,
-        rewardsDestination: {
-          type: AddressType.REWARD_KEY,
+        paymentDestination: {
+          type: TxOutputDestinationType.DEVICE_OWNED,
           params: {
-            stakingPath: stakingKeyPath,
+            type: AddressType.REWARD_KEY,
+            params: {
+              stakingPath: stakingKeyPath,
+            },
           },
         },
         nonce,

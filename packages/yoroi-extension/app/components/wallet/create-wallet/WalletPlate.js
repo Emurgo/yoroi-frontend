@@ -1,5 +1,5 @@
 // @flow
-
+import type { Node } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { usePlate } from './plate';
@@ -8,13 +8,15 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-pri
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import WalletChecksumTipsDialog from './WalletChecksumTipsDialog';
 import { TIPS_DIALOGS } from './steps';
+import type { ManageDialogsProps } from './CreateWalletPage';
 
 type Props = {|
-  recoveryPhrase: string[],
-  network: $ReadOnly<NetworkRow>,
+  recoveryPhrase: Array<string>,
+  selectedNetwork: $ReadOnly<NetworkRow>,
+  ...ManageDialogsProps,
 |};
 
-function WalletPlate(props: Props) {
+function WalletPlate(props: Props): Node {
   const { recoveryPhrase, selectedNetwork, openDialog, closeDialog, isDialogOpen } = props;
   const plate = usePlate(recoveryPhrase, selectedNetwork);
 

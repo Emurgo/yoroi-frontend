@@ -4,6 +4,7 @@ import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import { Typography, Box } from '@mui/material';
+import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
   title: {
@@ -34,9 +35,11 @@ type Intl = {|
 type Props = {|
   open: boolean,
   onClose(): void,
+  plateTextPart: string,
+  plateImagePart: Node,
 |};
 
-function walletChecksumTipsDialog(props: Props & Intl): Node {
+function WalletChecksumTipsDialog(props: Props & Intl): Node {
   const { open, onClose, intl, plateImagePart, plateTextPart } = props;
 
   return (
@@ -76,4 +79,4 @@ function walletChecksumTipsDialog(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(walletChecksumTipsDialog): ComponentType<Props>);
+export default (injectIntl(observer(WalletChecksumTipsDialog)): ComponentType<Props>);

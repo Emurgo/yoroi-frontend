@@ -1,22 +1,19 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Button, Stack } from '@mui/material';
-import globalMessages from '../../../i18n/global-messages';
-
-type Intl = {|
-  intl: $npm$ReactIntl$IntlShape,
-|};
 
 type Props = {|
-  goNext?: void => void,
-  goBack?: void => void,
+  actions: Array<{|
+    type: 'primary' | 'secondary',
+    label: string,
+    disabled: boolean,
+    onClick(): void,
+  |}>,
 |};
 
-function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { intl, goBack, goNext } = props;
+function StepController(props: Props): Node {
+  const { actions } = props;
 
   return (
     <Stack
@@ -27,43 +24,26 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
       py="24px"
       gap="24px"
     >
-      <Button
-        variant="outlined"
-        disableRipple={false}
-        disabled={!goBack}
-        onClick={() => goBack && goBack()}
-        sx={{
-          width: '144px',
-          height: '40px',
-          minWidth: 'unset',
-          minHeight: 'unset',
-          fontSize: '14px',
-          lineHeight: '15px',
-        }}
-      >
-        {intl.formatMessage(globalMessages.backButtonLabel)}
-      </Button>
-      <Button
-        variant="rv-primary"
-        disableRipple={false}
-        disabled={!goNext}
-        onClick={() => goNext && goNext()}
-        sx={{
-          width: '144px',
-          height: '40px',
-          fontSize: '14px',
-          lineHeight: '15px',
-        }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>
+      {actions.map(({ type, label, disabled, onClick }) => (
+        <Button
+          variant={type === 'primary' ? 'rv-primary' : 'outlined'}
+          disableRipple={false}
+          onClick={onClick}
+          disabled={disabled}
+          sx={{
+            width: '144px',
+            height: '40px',
+            minWidth: 'unset',
+            minHeight: 'unset',
+            fontSize: '14px',
+            lineHeight: '15px',
+          }}
+        >
+          {label}
+        </Button>
+      ))}
     </Stack>
   );
 }
 
-LearnAboutRecoveryPhrase.defaultProps = {
-  goNext: undefined,
-  goBack: undefined,
-};
-
-export default (injectIntl(observer(LearnAboutRecoveryPhrase)): ComponentType<Props>);
+export default (observer(StepController): ComponentType<Props>);
