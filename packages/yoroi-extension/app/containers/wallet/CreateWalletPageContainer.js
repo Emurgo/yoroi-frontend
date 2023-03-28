@@ -9,6 +9,7 @@ import type { GeneratedData as BannerContainerData } from '../banners/BannerCont
 import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
@@ -54,6 +55,22 @@ export default class CreateWalletPageContainer extends Component<Props> {
             dialog: any,
             params?: any,
           |}) => void,
+        |},
+      |},
+      ada: {|
+        wallets: {|
+          createWallet: {|
+            trigger: ({|
+              walletName: string,
+              walletPassword: string,
+              recoveryPhrase: Array<string>,
+            |}) => Promise<void>,
+          |},
+        |},
+      |},
+      profile: {|
+        setSelectedNetwork: {|
+          trigger: (params: void | $ReadOnly<NetworkRow>) => void,
         |},
       |},
     |},

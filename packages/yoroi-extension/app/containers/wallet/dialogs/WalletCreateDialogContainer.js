@@ -15,7 +15,6 @@ type Props = {|
 
 @observer
 export default class WalletCreateDialogContainer extends Component<Props> {
-
   render(): Node {
     return (
       <WalletCreateDialog
@@ -30,14 +29,14 @@ export default class WalletCreateDialogContainer extends Component<Props> {
     actions: {|
       ada: {|
         wallets: {|
-          createWallet: {|
-            trigger: (params: {|name: string, password: string|}) => Promise<void>,
+          startWalletCreation: {|
+            trigger: (params: {| name: string, password: string |}) => Promise<void>,
           |},
         |},
       |},
     |},
-    stores: {|profile: {|isClassicTheme: boolean|}|},
-    |} {
+    stores: {| profile: {| isClassicTheme: boolean |} |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
