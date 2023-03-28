@@ -4,6 +4,7 @@ import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Typography, Box } from '@mui/material';
+import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
   whatIsWalletName: {
@@ -89,4 +90,4 @@ function CreateWalletPage(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(CreateWalletPage): ComponentType<Props>);
+export default (injectIntl(observer(CreateWalletPage)): ComponentType<Props>);

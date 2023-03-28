@@ -32,6 +32,7 @@ type Intl = {|
 
 type Props = {|
   currentStep: string,
+  setCurrentStep(stepId: string): void,
 |};
 
 const steps = [

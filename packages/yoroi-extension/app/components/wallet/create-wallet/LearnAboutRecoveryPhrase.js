@@ -8,6 +8,7 @@ import StepController from './StepController';
 import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import { isDialogShownBefore, TIPS_DIALOGS } from './steps';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages: * = defineMessages({
   description: {
@@ -27,7 +28,7 @@ type Props = {|
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { nextStep, prevStep, isDialogOpen, openDialog, closeDialog } = props;
+  const { nextStep, prevStep, isDialogOpen, openDialog, closeDialog, intl } = props;
 
   const isActiveDialog = isDialogOpen(SaveRecoveryPhraseTipsDialog);
 
@@ -69,7 +70,22 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           />
         </Box>
 
-        <StepController goNext={nextStep} goBack={prevStep} />
+        <StepController
+          actions={[
+            {
+              label: intl.formatMessage(globalMessages.backButtonLabel),
+              disabled: true,
+              onClick: prevStep,
+              type: 'secondary',
+            },
+            {
+              label: intl.formatMessage(globalMessages.nextButtonLabel),
+              disabled: false,
+              onClick: nextStep,
+              type: 'primary',
+            },
+          ]}
+        />
       </Stack>
       <SaveRecoveryPhraseTipsDialog
         open={isActiveDialog}

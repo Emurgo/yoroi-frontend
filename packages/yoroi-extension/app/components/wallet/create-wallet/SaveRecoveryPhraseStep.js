@@ -1,5 +1,6 @@
 // @flow
-import { Node, ComponentType, useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -9,6 +10,7 @@ import { CREATE_WALLET_SETPS, isDialogShownBefore, TIPS_DIALOGS } from './steps'
 import HowToSaveRecoverPhraseTipsDialog from './HowToSaveRecoverPhraseTipsDialog';
 import RecoveryPhrase from './RecoveryPhrase';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages: * = defineMessages({
   description: {
@@ -27,7 +29,7 @@ type Props = {|
 |};
 
 function SaveRecoveryPhraseStep(props: Props & Intl): Node {
-  const { setCurrentStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog } = props;
+  const { setCurrentStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog, intl } = props;
   const [shouldShowRecoveryPhrase, showRecoveryPhrase] = useState(false);
 
   const isActiveDialog = isDialogOpen(HowToSaveRecoverPhraseTipsDialog);
@@ -35,11 +37,6 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
     if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE))
       openDialog(HowToSaveRecoverPhraseTipsDialog);
   }, []);
-
-  function goNextStepCallback() {
-    if (!shouldShowRecoveryPhrase) return;
-    return () => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE);
-  }
 
   return (
     <Stack alignItems="center" justifyContent="center">
@@ -65,8 +62,20 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
         )}
 
         <StepController
-          goNext={goNextStepCallback()}
-          goBack={() => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE)}
+          actions={[
+            {
+              label: intl.formatMessage(globalMessages.backButtonLabel),
+              disabled: false,
+              onClick: () => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE),
+              type: 'secondary',
+            },
+            {
+              label: intl.formatMessage(globalMessages.nextButtonLabel),
+              disabled: !shouldShowRecoveryPhrase,
+              onClick: () => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE),
+              type: 'primary',
+            },
+          ]}
         />
       </Stack>
 

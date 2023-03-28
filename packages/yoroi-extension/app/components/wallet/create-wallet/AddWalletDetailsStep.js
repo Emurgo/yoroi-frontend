@@ -20,6 +20,7 @@ import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from '../../common/TextField';
 import WalletPlate from './WalletPlate';
+import type { ManageDialogsProps } from './CreateWalletPage';
 
 const messages: * = defineMessages({
   description: {
@@ -49,6 +50,11 @@ const messages: * = defineMessages({
 type Props = {|
   setCurrentStep(step: string): void,
   recoveryPhrase: Array<string> | null,
+  shouldShowDialog: boolean,
+  hideDialog(): void,
+  showDialog(): void,
+  onSubmit: (walletName: string, walletPassword: string) => void,
+  ...ManageDialogsProps,
 |};
 
 @observer
@@ -137,14 +143,8 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
-    const goNextCallback = () => {
-      const fields = [walletNameField, walletPasswordField, repeatedPasswordField];
-
-      if (fields.some(field => !field.isValid)) return undefined;
-      return () => {
-        this.props.onSubmit(walletName, walletPassword);
-      };
-    };
+    if (!recoveryPhrase)
+      throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
 
     return (
       <Stack alignItems="center" justifyContent="center">
@@ -205,8 +205,24 @@ export default class AddWalletDetailsStep extends Component<Props> {
           />
 
           <StepController
-            goNext={goNextCallback()}
-            goBack={() => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE)}
+            actions={[
+              {
+                label: intl.formatMessage(globalMessages.backButtonLabel),
+                disabled: true,
+                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE),
+                type: 'secondary',
+              },
+              {
+                label: intl.formatMessage(globalMessages.nextButtonLabel),
+                disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
+                  field => field.isValid
+                ),
+                onClick: () => {
+                  this.props.onSubmit(walletName, walletPassword);
+                },
+                type: 'primary',
+              },
+            ]}
           />
         </Stack>
 

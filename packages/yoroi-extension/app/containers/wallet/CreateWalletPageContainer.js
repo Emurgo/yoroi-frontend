@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -8,9 +8,12 @@ import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
-import CreateWalletPage from '../../components/wallet/create-wallet/CreateWalletPage';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+
+export const CreateWalletPagePromise: void => Promise<any> = () =>
+  import('../../components/wallet/create-wallet/CreateWalletPage');
+const CreateWalletPage = React.lazy(CreateWalletPagePromise);
 
 export type GeneratedData = typeof CreateWalletPageContainer.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -25,16 +28,18 @@ export default class CreateWalletPageContainer extends Component<Props> {
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
-        <CreateWalletPage
-          genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
-          createWallet={actions.ada.wallets.createWallet.trigger}
-          setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
-          selectedNetwork={stores.profile.selectedNetwork}
-          openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
-          closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
-          isDialogOpen={stores.uiDialogs.isOpen}
-          goToRoute={route => actions.router.goToRoute.trigger({ route })}
-        />
+        <Suspense fallback={null}>
+          <CreateWalletPage
+            genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
+            createWallet={actions.ada.wallets.createWallet.trigger}
+            setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+            selectedNetwork={stores.profile.selectedNetwork}
+            openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
+            closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+            isDialogOpen={stores.uiDialogs.isOpen}
+            goToRoute={route => actions.router.goToRoute.trigger({ route })}
+          />
+        </Suspense>
       </TopBarLayout>
     );
   }
@@ -54,20 +59,30 @@ export default class CreateWalletPageContainer extends Component<Props> {
           |}) => void,
         |},
       |},
-      router: {|
-        goToRoute: {|
-          trigger: (params: {|
-            publicDeriver?: null | PublicDeriver<>,
-            params?: ?any,
-            route: string,
-          |}) => void,
+      ada: {|
+        wallets: {|
+          createWallet: {|
+            trigger: ({|
+              walletName: string,
+              walletPassword: string,
+              recoveryPhrase: Array<string>,
+            |}) => Promise<void>,
+          |},
+        |},
+      |},
+      profile: {|
+        setSelectedNetwork: {|
+          trigger: (params: void | $ReadOnly<NetworkRow>) => void,
         |},
       |},
     |},
     stores: {|
-      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
-      wallets: {|
-        genWalletRecoveryPhrase: void => Promise<Array<string>>,
+      substores: {|
+        ada: {|
+          wallets: {|
+            genWalletRecoveryPhrase: void => Promise<Array<string>>,
+          |},
+        |},
       |},
       uiDialogs: {|
         isOpen: any => boolean,

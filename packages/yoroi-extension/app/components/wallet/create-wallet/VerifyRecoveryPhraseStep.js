@@ -1,5 +1,6 @@
 // @flow
-import { Node, ComponentType, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -11,8 +12,9 @@ import classnames from 'classnames';
 import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg';
 import environment from '../../../environment';
 import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
+import globalMessages from '../../../i18n/global-messages';
 
-const messages: * = defineMessages({
+const messages = defineMessages({
   description: {
     id: 'wallet.create.thirdStep.description',
     defaultMessage:
@@ -20,7 +22,7 @@ const messages: * = defineMessages({
   },
   incorrectOrder: {
     id: 'wallet.create.thirdStep.incorrectOrder',
-    defineMessages: '!!!Incorrect order. Try again',
+    defaultMessage: '!!!Incorrect order. Try again',
   },
   verified: {
     id: 'walllet.create.thirdStep.verifiedRecoveryPhrase',
@@ -33,14 +35,15 @@ type Intl = {|
 |};
 
 type Props = {|
-  currentStep: string,
+  setCurrentStep(stepId: string): void,
+  recoveryPhrase: Array<string> | null,
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, recoveryPhrase, setCurrentStep } = props;
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
-  const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
+  const [enteredRecoveryPhrase, setRecoveryPhrase] = useState(
     new Array(recoveryPhrase.length).fill(null)
   );
   const [wrongWord, setWrongWord] = useState<string | null>(null);
@@ -69,12 +72,6 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   }
 
   const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);
-
-  function goNextStepCallback() {
-    if (!isValidPhrase) return;
-    return () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
-  }
-
   const sortedRecoveryPhrase = useMemo(() => makeSortedPhrase(recoveryPhrase), [recoveryPhrase]);
 
   return (
@@ -203,14 +200,29 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           )}
         </Box>
 
-        <StepController
-          goNext={goNextStepCallback()}
-          goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
-        />
+        <Box mt="10px">
+          <StepController
+            actions={[
+              {
+                label: intl.formatMessage(globalMessages.backButtonLabel),
+                disabled: false,
+                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE),
+                type: 'secondary',
+              },
+              {
+                label: intl.formatMessage(globalMessages.nextButtonLabel),
+                disabled: !isValidPhrase,
+                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS),
+                type: 'primary',
+              },
+            ]}
+          />
+        </Box>
 
         {environment.isDev() && (
           <Button
             onClick={() => {
+              if (!recoveryPhrase) return;
               setRecoveryPhrase(recoveryPhrase);
               setWrongWord(null);
             }}

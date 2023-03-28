@@ -1,5 +1,5 @@
 // @flow
-import { Node, ComponentType, useState } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
 import CreateWalletSteps from './CreateWalletSteps';
@@ -13,8 +13,26 @@ import CreateWalletPageHeader from './CreateWalletPageHeader';
 import SelectNetworkStep from './SelectNetworkStep';
 import environment from '../../../environment';
 import { ROUTES } from '../../../routes-config';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
-type Props = {||};
+type Props = {|
+  genWalletRecoveryPhrase: void => Promise<Array<string>>,
+  createWallet: ({|
+    walletName: string,
+    walletPassword: string,
+    recoveryPhrase: Array<string>,
+  |}) => void,
+  setSelectedNetwork: (params: void | $ReadOnly<NetworkRow>) => void,
+  openDialog(dialog: any): void,
+  closeDialog(): void,
+  isDialogOpen(dialog: any): boolean,
+|};
+
+export type ManageDialogsProps = {|
+  openDialog(dialog: any): void,
+  closeDialog(): void,
+  isDialogOpen(dialog: any): boolean,
+|};
 
 function CreateWalletPage(props: Props): Node {
   const {
@@ -53,9 +71,15 @@ function CreateWalletPage(props: Props): Node {
       <LearnAboutRecoveryPhrase
         nextStep={async () => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
-          if (recoveryPhrase !== null) return;
-          const walletRecoveryPhrase = await genWalletRecoveryPhrase();
-          setRecoveryPhrase(walletRecoveryPhrase);
+          if (recoveryPhrase === null) {
+            genWalletRecoveryPhrase()
+              .then(setRecoveryPhrase)
+              .catch(err => {
+                // Todo: add proper error handling
+                // eslint-disable-next-line no-console
+                console.error(`genWalletRecoveryPhrase:: ${err}`);
+              });
+          }
         }}
         prevStep={() => {
           if (environment.isProduction()) {

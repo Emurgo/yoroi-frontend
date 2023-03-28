@@ -4,6 +4,7 @@ import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Typography, Box } from '@mui/material';
+import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
   title: {
@@ -40,8 +41,8 @@ type Intl = {|
 |};
 
 type Props = {|
-  open: boolean,
-  onClose(): void,
+  +open: boolean,
+  +onClose: void => void,
 |};
 
 function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
@@ -74,4 +75,4 @@ function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(HowToSaveRecoveryPhraseTipsDialog): ComponentType<Props>);
+export default (injectIntl(observer(HowToSaveRecoveryPhraseTipsDialog)): ComponentType<Props>);
