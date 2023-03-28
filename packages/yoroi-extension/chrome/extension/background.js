@@ -1633,7 +1633,7 @@ function handleInjectorConnect(port) {
                       if (error instanceof NotEnoughMoneyToSendError) {
                         rpcResponse({
                           err: {
-                            code: -5,
+                            code: APIErrorCodes.API_INTERNAL_ERROR,
                             info: 'not enough UTXOs'
                           }
                         });
