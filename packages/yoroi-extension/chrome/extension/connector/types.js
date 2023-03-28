@@ -434,6 +434,7 @@ export type SigningMessage = {|
   publicDeriverId: number,
   sign: PendingSignData,
   tabId: number,
+  requesterUrl: string,
 |};
 export type ConnectedSites = {|
   sites: Array<string>,
