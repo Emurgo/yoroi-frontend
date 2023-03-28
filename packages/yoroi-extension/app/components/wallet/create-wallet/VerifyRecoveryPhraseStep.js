@@ -1,30 +1,33 @@
 // @flow
-import { Node, ComponentType, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography, Button } from '@mui/material'
+import { Stack, Box, Typography, Button } from '@mui/material';
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
 import classnames from 'classnames';
-import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg'
+import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg';
 import environment from '../../../environment';
 import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
+import globalMessages from '../../../i18n/global-messages';
 
-const messages: * = defineMessages({
+const messages = defineMessages({
   description: {
     id: 'wallet.create.thirdStep.description',
-    defaultMessage: '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
+    defaultMessage:
+      '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
   },
   incorrectOrder: {
     id: 'wallet.create.thirdStep.incorrectOrder',
-    defineMessages: '!!!Incorrect order. Try again',
+    defaultMessage: '!!!Incorrect order. Try again',
   },
   verified: {
     id: 'walllet.create.thirdStep.verifiedRecoveryPhrase',
     defaultMessage: '!!!The recovery phrase is verified',
-  }
+  },
 });
 
 type Intl = {|
@@ -32,9 +35,9 @@ type Intl = {|
 |};
 
 type Props = {|
-    currentStep: string,
+  setCurrentStep(stepId: string): void,
+  recoveryPhrase: Array<string> | null,
 |};
-
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, recoveryPhrase, setCurrentStep } = props;
@@ -43,9 +46,9 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState<Array<string>>(
     // Todo: undo the change below
     // new Array(recoveryPhrase.length).fill(null),
-    recoveryPhrase,
+    recoveryPhrase
   );
-  const [wrongWord, setWrongWord] = useState<string | null>(null)
+  const [wrongWord, setWrongWord] = useState<string | null>(null);
 
   function onAddWord(word: string, idx: number): void {
     if (isWordAdded(word)) return;
@@ -56,7 +59,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     const isInCorrectOrder = recoveryPhrase[nextWordIdx] === word;
     if (!isInCorrectOrder) {
       return setWrongWord(word);
-    };
+    }
 
     setRecoveryPhrase(prev => {
       const copy = [...prev];
@@ -64,36 +67,30 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
       return copy;
     });
     setWrongWord(null);
-  };
+  }
 
   function isWordAdded(word) {
     return enteredRecoveryPhrase.some(w => w === word);
   }
 
   const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);
-
-  function goNextStepCallback() {
-    if (!isValidPhrase) return;
-    return () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS)
-  };
-
   const sortedRecoveryPhrase = useMemo(() => makeSortedPhrase(recoveryPhrase), [recoveryPhrase]);
 
   return (
-    <Stack alignItems='center' justifyContent='center' className={styles.component}>
-      <Stack direction='column' alignItems='left' justifyContent='center' maxWidth='690px'>
-        <Typography mb='16px'>
+    <Stack alignItems="center" justifyContent="center" className={styles.component}>
+      <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="690px">
+        <Typography mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
         <Box className={styles.verifyRecoveryPhraseArea}>
           <Stack
-            gap='8px'
-            p='16px 14px'
-            flexDirection='row'
-            flexWrap='wrap'
-            alignItems='center'
-            justifyContent='center'
+            gap="8px"
+            p="16px 14px"
+            flexDirection="row"
+            flexWrap="wrap"
+            alignItems="center"
+            justifyContent="center"
           >
             {enteredRecoveryPhrase.map((word, idx) => (
               <Stack
@@ -113,13 +110,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     width: '120px',
                     height: '40px',
                   }}
-                  variant='body1'
-                  color='primary.200'
+                  variant="body1"
+                  color="primary.200"
                 >
                   <Typography
-                    variant='body1'
-                    color='primary.200'
-                    width='20px'
+                    variant="body1"
+                    color="primary.200"
+                    width="20px"
                     sx={{
                       display: 'flex',
                       flexDirection: 'row',
@@ -140,29 +137,29 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: '8px',
-                        ml: '4px'
-                    }}
+                        ml: '4px',
+                      }}
                     >
                       {word}
                     </Typography>
                   )}
                 </Box>
               </Stack>
-           ))}
+            ))}
           </Stack>
         </Box>
 
         <Stack
-          flexDirection='row'
-          flexWrap='wrap'
-          alignItems='center'
-          justifyContent='center'
-          gap='8px'
+          flexDirection="row"
+          flexWrap="wrap"
+          alignItems="center"
+          justifyContent="center"
+          gap="8px"
         >
           {sortedRecoveryPhrase.map(({ word, id, originalIdx }) => {
             return (
               <button
-                type='button'
+                type="button"
                 key={id}
                 className={classnames(styles.wordChip, {
                   [styles.wordAdded]: isWordAdded(word),
@@ -172,14 +169,14 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               >
                 <Typography
                   sx={{
-                  width: '127px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  px: '10px',
-                }}
-                  variant='body1'
-                  color='primary.200'
+                    width: '127px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    px: '10px',
+                  }}
+                  variant="body1"
+                  color="primary.200"
                 >
                   {word}
                 </Typography>
@@ -188,41 +185,50 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           })}
         </Stack>
 
-        <Box height='28px' mt='16px'>
-          { wrongWord !== null && (
-            <Typography variant='body2' color='error.100'>
+        <Box height="28px" mt="16px">
+          {wrongWord !== null && (
+            <Typography variant="body2" color="error.100">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
           )}
 
-
           {isValidPhrase && (
-            <Stack gap='10px' direction='row'>
+            <Stack gap="10px" direction="row">
               <VerifiedIcon />
-              <Typography variant='body1' fontWeight={500}>
+              <Typography variant="body1" fontWeight={500}>
                 {intl.formatMessage(messages.verified)}
               </Typography>
             </Stack>
           )}
         </Box>
 
-
-        <Box mt='10px'>
+        <Box mt="10px">
           <StepController
-            goNext={goNextStepCallback()}
-            goBack={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
+            actions={[
+              {
+                label: intl.formatMessage(globalMessages.backButtonLabel),
+                disabled: false,
+                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE),
+                type: 'secondary',
+              },
+              {
+                label: intl.formatMessage(globalMessages.nextButtonLabel),
+                disabled: !isValidPhrase,
+                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS),
+                type: 'primary',
+              },
+            ]}
           />
         </Box>
 
         {environment.isDev() && (
           <Button
             onClick={() => {
-              setRecoveryPhrase(recoveryPhrase)
+              if (!recoveryPhrase) return;
+              setRecoveryPhrase(recoveryPhrase);
               setWrongWord(null);
             }}
-            onDoubleClick={() => setRecoveryPhrase(
-              new Array(recoveryPhrase.length).fill(null),
-            )}
+            onDoubleClick={() => setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null))}
           >
             Auto Enter
           </Button>
@@ -232,4 +238,4 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(VerifyRecoveryPhraseStep)) : ComponentType<Props>);
+export default (injectIntl(observer(VerifyRecoveryPhraseStep)): ComponentType<Props>);

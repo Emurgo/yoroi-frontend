@@ -4,6 +4,7 @@ import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Typography, Box } from '@mui/material';
+import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
   title: {
@@ -20,15 +21,18 @@ const messages: Object = defineMessages({
   },
   thirdTip: {
     id: 'wallet.create.dialog.howToSaveRecoveryPhrase.thirdTip',
-    defaultMessage: '!!!Write the recovery phrase on a piece of paper and store in a secure location like a safety deposit box. ',
+    defaultMessage:
+      '!!!Write the recovery phrase on a piece of paper and store in a secure location like a safety deposit box. ',
   },
   forthTip: {
     id: 'wallet.create.dialog.howToSaveRecoveryPhrase.forthTip',
-    defaultMessage: '!!!It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.',
+    defaultMessage:
+      '!!!It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.',
   },
   fifthTip: {
     id: 'wallet.create.dialog.howToSaveRecoveryPhrase.fifthTip',
-    defaultMessage: '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
+    defaultMessage:
+      '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
   },
 });
 
@@ -37,34 +41,38 @@ type Intl = {|
 |};
 
 type Props = {|
-    open: boolean,
-    onClose(): void,
-|}
+  +open: boolean,
+  +onClose: void => void,
+|};
 
 function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
-    const { open, onClose, intl } = props;
+  const { open, onClose, intl } = props;
 
-    // [tipId, tipTxt]
-    const tips = [
-        [1, messages.firstTip],
-        [2, messages.secondTip],
-        [3, messages.thirdTip],
-        [4, messages.forthTip],
-        [5, messages.fifthTip],
-    ];
+  // [tipId, tipTxt]
+  const tips = [
+    [1, messages.firstTip],
+    [2, messages.secondTip],
+    [3, messages.thirdTip],
+    [4, messages.forthTip],
+    [5, messages.fifthTip],
+  ];
 
-    return (
-      <InfoDialog open={open} onClose={onClose}>
-        <Typography textAlign='center' variant='body1' fontWeight='500' mb='16px'>{intl.formatMessage(messages.title)}</Typography>
-        <Box component='ul' sx={{ listStyle: 'outside', px: '24px' }}>
-          {tips.map(([tipId, tipTxt]) => (
-            <Box key={tipId} component='li'>
-              <Typography variant='body1' color='grey.800'>{intl.formatMessage(tipTxt)}</Typography>
-            </Box>
-          ))}
-        </Box>
-      </InfoDialog>
-    )
+  return (
+    <InfoDialog open={open} onClose={onClose}>
+      <Typography textAlign="center" variant="body1" fontWeight="500" mb="16px">
+        {intl.formatMessage(messages.title)}
+      </Typography>
+      <Box component="ul" sx={{ listStyle: 'outside', px: '24px' }}>
+        {tips.map(([tipId, tipTxt]) => (
+          <Box key={tipId} component="li">
+            <Typography variant="body1" color="grey.800">
+              {intl.formatMessage(tipTxt)}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </InfoDialog>
+  );
 }
 
-export default (injectIntl(HowToSaveRecoveryPhraseTipsDialog): ComponentType<Props>);
+export default (injectIntl(observer(HowToSaveRecoveryPhraseTipsDialog)): ComponentType<Props>);
