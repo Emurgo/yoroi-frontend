@@ -44,26 +44,17 @@ const messages = defineMessages({
   },
 });
 
-export type WalletRestoreDialogValues = {|
-  recoveryPhrase: Array<string>,
-|};
-
 type Props = {|
-  +onSubmit: WalletRestoreDialogValues => PossiblyAsync<void>,
-  +mnemonicValidator: string => boolean,
-  +numberOfMnemonics: number,
+  +onSubmit: string => PossiblyAsync<void>,
+  +isValidMnemonic: (Array<{| value: string, label: string |}>) => boolean,
+  +numberOfMnemonics: any | 12 | 15 | 21 | 24 | 27,
   +error?: ?LocalizableError,
-  +initValues?: ?WalletRestoreDialogValues,
 |};
 
 @observer
 export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
-  static defaultProps: {|
-    error: void,
-    initValues: Object,
-  |} = {
+  static defaultProps: {| error: void |} = {
     error: undefined,
-    initValues: {},
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -71,9 +62,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
   };
 
   getInitRecoveryPhrase: void => Array<string> = () => {
-    return (
-      this.props.initValues?.recoveryPhrase ?? new Array(this.props.numberOfMnemonics).fill('')
-    );
+    return new Array(this.props.numberOfMnemonics).fill('');
   };
 
   myRefs: Array<any> = [];
@@ -88,6 +77,14 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
       },
     },
     {
+      hooks: {
+        onReset: form => {
+          // we update the name of the form so the fields get re-rendered on reset
+          form.name = 'restore-' + Date.now();
+          form.reset();
+        },
+      },
+      name: 'restore-' + Date.now(),
       options: {
         showErrorsOnInit: false,
         validateOnChange: true,
@@ -101,8 +98,8 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
     this.form.submit({
       onSuccess: async form => {
         const { recoveryPhrase } = form.values();
-        const walletData: WalletRestoreDialogValues = { recoveryPhrase: join(recoveryPhrase, ' ') };
-        await this.props.onSubmit(walletData);
+        const phrase = recoveryPhrase.map(w => w.value);
+        await this.props.onSubmit(join(phrase, ' '));
       },
       onError: () => {},
     });
@@ -110,32 +107,37 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { error, mnemonicValidator, numberOfMnemonics } = this.props;
+    const { error, isValidMnemonic, numberOfMnemonics } = this.props;
     const { form } = this;
     const { recoveryPhrase } = form.values();
 
     const recoveryPhraseField = form.$('recoveryPhrase');
-    const isValidPhrase =
+    const allWordsEntered =
       recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
+    const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
+    const mnemonicError = intl.formatMessage(globalMessages.invalidRecoveryPhrase);
+
+    if (isValidPhrase && !form.submitted) this.submit();
 
     return (
       <Box className={styles.verifyRecoveryPhraseArea}>
         <Stack
           gap="8px"
-          p="16px 14px"
+          p="16px 0px"
           flexDirection="row"
           flexWrap="wrap"
           alignItems="center"
-          justifyContent="center"
+          justifyContent="flex-start"
         >
           {recoveryPhrase?.map((word, idx) => {
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
+            const fieldBind = wordField.bind();
 
             return (
               <Stack
                 item
-                // eslint-disable-next-line react/no-array-index-key
-                key={idx}
+                // use the form name key to know when we reset
+                key={form.name + '-word-' + idx}
               >
                 <Box
                   sx={{
@@ -144,14 +146,15 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     width: '120px',
                     height: '40px',
+                    gap: '4px',
                   }}
                   variant="body1"
                   color="primary.200"
                 >
-                  <Typography variant="body1" color="primary.200" width="20px">
+                  <Typography variant="body1" color="primary.200" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -161,7 +164,8 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
                     maxSelections={1}
                     maxVisibleOptions={5}
                     noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
-                    {...wordField.bind()}
+                    {...fieldBind}
+                    onFocus={e => e.target.setSelectionRange(0, e.target.value?.length)}
                   />
                 </Box>
               </Stack>
@@ -171,18 +175,27 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
 
         {!isValidPhrase && (
           <>
-            <Box>{error && intl.formatMessage(error)}</Box>
+            {allWordsEntered && (
+              <Box>
+                <Typography variant="body2" color="#FF1351">
+                  {mnemonicError}
+                </Typography>
+              </Box>
+            )}
             <Box sx={{ width: '100px' }}>
               <Button
                 variant="outlined"
-                disableRipple={false}
-                onClick={() => form.reset()}
+                onClick={form.onReset}
                 sx={{
                   border: 0,
-                  width: '140px',
+                  height: '1.5rem',
                   fontSize: '14px',
                   lineHeight: '15px',
+                  padding: 0,
+                  mt: '16px',
                   minWidth: 0,
+                  minHeight: 0,
+                  '&:hover': { border: 0 },
                 }}
               >
                 {intl.formatMessage(messages.clearAll)}

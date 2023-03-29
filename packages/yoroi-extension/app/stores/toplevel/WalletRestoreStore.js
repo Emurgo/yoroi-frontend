@@ -238,6 +238,10 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const api = getApiForNetwork(selectedNetwork);
     return this.stores.substores[api].walletRestore.isValidMnemonic(request);
   }
+
+  getMode: void => void | RestoreModeType = () => {
+    return this.mode;
+  }
 }
 
 export function generatePlates(

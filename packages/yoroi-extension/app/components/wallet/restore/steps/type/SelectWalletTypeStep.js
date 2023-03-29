@@ -1,8 +1,9 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box } from '@mui/material';
 import StepController from '../../StepController';
 import fifteenImg from '../../../../../assets/images/add-wallet/restore/15-word.inline.svg';
@@ -26,7 +27,7 @@ type Intl = {|
 |};
 
 type Props = {|
-  onNext(numWords: number): void,
+  onNext(mode: RestoreModeType): void,
 |};
 
 function SelectWalletTypeStep(props: Props & Intl): Node {
@@ -37,13 +38,13 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
         <Box className={styles.container}>
           <AddWalletCard
-            onClick={() => onNext(15)}
+            onClick={() => onNext({ type: 'bip44', extra: undefined, length: 15 })}
             imageSx={{ pt: '10px' }}
             imageSrc={fifteenImg}
             label={intl.formatMessage(messages.fifteenWords)}
           />
           <AddWalletCard
-            onClick={() => onNext(24)}
+            onClick={() => onNext({ type: 'cip1852', extra: undefined, length: 24 })}
             imageSx={{ pt: '10px' }}
             imageSrc={twentyfourImg}
             label={intl.formatMessage(messages.twentyfourWords)}

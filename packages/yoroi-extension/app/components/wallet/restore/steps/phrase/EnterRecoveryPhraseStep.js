@@ -1,13 +1,16 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import validWords from 'bip39/src/wordlists/english.json';
+import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
 import { useState } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Stack, Box, Typography } from '@mui/material';
-import StepController from '../../StepController';
 import { RESTORE_WALLET_STEPS } from '../../steps';
+import { PublicDeriver } from '../../../../../api/ada/lib/storage/models/PublicDeriver';
+import { asGetPublicKey } from '../../../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import validWords from 'bip39/src/wordlists/english.json';
+import StepController from '../../StepController';
 import styles from './EnterRecoveryPhraseStep.scss';
 import classnames from 'classnames';
 import Autocomplete from '../../../../common/Autocomplete';
@@ -30,22 +33,54 @@ const messages = defineMessages({
   },
 });
 
-type Intl = {|
-  intl: $npm$ReactIntl$IntlShape,
-|};
+type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
 type Props = {|
-  numWords: number,
-  currentStep: string,
+  walletRestore: any,
+  walletData: any,
   setCurrentStep(stepId: string): void,
-  checkValidPhrase(enteredPhrase: Array<string>): boolean,
+  checkValidPhrase(enteredPhrase: string): boolean,
+  onSubmit(phrase: string): PossiblyAsync<PublicDeriver<> | typeof undefined>,
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
-  const { intl, numWords, checkValidPhrase, setCurrentStep } = props;
+  const [enableNext, setEnableNext] = useState(false);
+  const [duplicatedWallet, setDuplicatedWallet] = useState(null);
+  const { intl, setCurrentStep, walletRestore, walletData, checkValidPhrase, onSubmit } = props;
+  const mode = walletData.getMode();
 
   function goNextStepCallback() {
     return () => setCurrentStep(RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS);
+  }
+
+  function checkMnemonic(recoveryPhrase) {
+    const phrase = recoveryPhrase.map(word => word.value).join(' ');
+    const isValid = checkValidPhrase(phrase);
+    return isValid;
+  }
+
+  async function handleSubmit(recoveryPhrase) {
+    const duplicatedWallet = await onSubmit(recoveryPhrase);
+    if (!Boolean(duplicatedWallet)) setEnableNext(true);
+    else setDuplicatedWallet(duplicatedWallet);
+  }
+
+  function getDuplicatedWalletData() {
+    const publicDeriver = duplicatedWallet;
+    if (!Boolean(publicDeriver)) {
+      throw new Error(`${nameof(VerifyRecoveryPhraseStep)} no duplicated wallet`);
+    }
+    const parent = publicDeriver?.getParent();
+    const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+      parent
+    );
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate =
+      withPubKey == null ? null : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+
+    return balance;
   }
 
   return (
@@ -54,23 +89,23 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         direction="column"
         alignItems="left"
         justifyContent="center"
-        maxWidth={numWords === 15 ? '690px' : '816px'}
+        maxWidth={mode.length === 15 ? '690px' : '816px'}
       >
         <Typography mb="16px">
           <FormattedHTMLMessage {...messages.stepDescription} />
         </Typography>
 
         <RestoreRecoveryPhraseForm
-          numberOfMnemonics={numWords}
-          mnemonicValidator={() => console.log('validate') ?? true}
-          onSubmit={async ({ recoveryPhrase }) => {
-            checkValidPhrase(recoveryPhrase);
-          }}
+          numberOfMnemonics={mode.length}
+          isValidMnemonic={checkMnemonic}
+          onSubmit={handleSubmit}
         />
+
+        {Boolean(duplicatedWallet) && <>TODO: Wallet duped - {getDuplicatedWalletData()}</>}
 
         <Box mt="10px">
           <StepController
-            goNext={goNextStepCallback()}
+            goNext={enableNext ? goNextStepCallback() : undefined}
             goBack={() => setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE)}
           />
         </Box>

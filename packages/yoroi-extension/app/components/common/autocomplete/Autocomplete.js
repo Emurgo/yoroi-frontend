@@ -20,18 +20,12 @@ type Props = {|
   +placeholder: string,
   +label: string,
   +onChange: string => void,
+  +onFocus: any => void,
   +value: string,
   +autoFocus?: boolean,
   +type: string,
   +name: string,
   +chipProps?: Object,
-  +inputRef?:
-    | typeof undefined
-    | (<T>(
-        initialValue: T
-      ) => {|
-        current: T,
-      |}),
 |};
 
 function Autocomplete({
@@ -44,15 +38,15 @@ function Autocomplete({
   disabled,
   id,
   onChange,
+  onFocus,
   value,
   autoFocus,
   type,
   name,
   placeholder,
   chipProps,
-  inputRef = null,
 }: Props): Node {
-  const [inputValue, setInputValue] = useState<?string>(value);
+  const [inputValue, setInputValue] = useState<?string>(value || '');
   const isInputPresent = (inputValue?.length ?? 0) > 0;
   const filteredList = isInputPresent
     ? options.filter(w => w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? ''))
@@ -92,16 +86,18 @@ function Autocomplete({
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
-          if (inputValue.length === 0) closeMenu();
+          if (inputValue.length === 0) {
+            closeMenu();
+            onChange(inputValue);
+          }
           setInputValue(inputValue);
-          onChange(inputValue);
           break;
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          if (selectedItem && Boolean(inputValue)) {
-            onChange(inputValue);
-            setInputValue(inputValue);
+          if (selectedItem || Boolean(inputValue)) {
+            onChange(selectedItem || inputValue);
+            setInputValue(selectedItem || inputValue);
             closeMenu();
           }
           break;
@@ -122,9 +118,9 @@ function Autocomplete({
             autoFocus={autoFocus}
             error={Boolean(error)}
             id={id ?? 'autocomplete-combobox'}
-            ref={inputRef}
             value={value}
-            onChange={onChange}
+            onBlur={onChange}
+            onFocus={onFocus}
             {...getInputProps({ type, name, autoFocus })}
           />
         </Box>
