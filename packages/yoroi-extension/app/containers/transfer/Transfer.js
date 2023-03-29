@@ -74,17 +74,17 @@ class Transfer extends Component<AllProps> {
     return this.props.renderLayoutComponent({
       CLASSIC: transferClassic,
       REVAMP: content,
-    })
+    });
   }
 
   getContent: void => Node = () => {
     const wallet = this.generated.stores.wallets.selected;
     if (wallet == null) {
-      return (<NoWalletMessage />);
+      return <NoWalletMessage />;
     }
     // temporary solution: will need to handle more cases later for different currencies
     if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
-      return (<UnsupportedWallet />);
+      return <UnsupportedWallet />;
     }
     const isRevamp = this.generated.stores.profile.isRevampTheme;
     return (
@@ -100,7 +100,7 @@ class Transfer extends Component<AllProps> {
         </BackgroundColoredLayout>
       </>
     );
-  }
+  };
 
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
@@ -114,19 +114,19 @@ class Transfer extends Component<AllProps> {
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
-          |}) => void
-        |}
-      |}
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
-          isRevampTheme: boolean,
+        isRevampTheme: boolean,
       |},
-    |}
-    |} {
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -144,27 +144,22 @@ class Transfer extends Component<AllProps> {
         },
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
-        }
+        },
       },
       actions: {
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
-      SidebarContainerProps: (
-        { actions, stores, }: InjectedOrGenerated<SidebarContainerData>
-      ),
-      NavBarContainerProps: (
-        { actions, stores, }: InjectedOrGenerated<NavBarContainerData>
-      ),
-      NavBarContainerRevampProps: (
-        { actions, stores, }: InjectedOrGenerated<NavBarContainerRevampData>
-      ),
-      WalletTransferPageProps: (
-        { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
-      ),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
+      NavBarContainerRevampProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<NavBarContainerRevampData>),
+      WalletTransferPageProps: ({ actions, stores }: InjectedOrGenerated<WalletTransferPageData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }
-export default (withLayout(Transfer): ComponentType<Props>)
+export default (withLayout(Transfer): ComponentType<Props>);
