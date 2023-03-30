@@ -110,7 +110,17 @@ function CreateWalletSteps(props: Props & Intl): Node {
                 {isPrevStep ? (
                   <StepMarkIcon />
                 ) : (
-                  <Typography variant="body2" fontWeight={500} color={stepColor}>
+                  <Typography
+                    sx={{
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    variant="body2"
+                    fontWeight={500}
+                    color={stepColor}
+                  >
                     {idx + 1}
                   </Typography>
                 )}

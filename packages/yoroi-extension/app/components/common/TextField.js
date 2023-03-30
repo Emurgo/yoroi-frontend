@@ -3,10 +3,10 @@
 import React from 'react';
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
-import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
-import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inline.svg';
-import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
-import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
+import { ReactComponent as ErrorIcon } from '../../assets/images/forms/error.inline.svg';
+import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inline.svg';
+import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
+import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
 
 type Props = {|
@@ -91,7 +91,7 @@ function TextField({
                 onMouseDown={handleMouseDownPassword}
                 edge="end"
               >
-                {showPassword ? <EyeIcon /> : <CloseEyeIcon />}
+                {showPassword ? <CloseEyeIcon /> : <EyeIcon />}
               </IconButton>
             </InputAdornment>
           ) : QRHandler ? (
@@ -100,11 +100,7 @@ function TextField({
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
-              <IconButton
-                aria-label="QR Code Scanner"
-                onClick={QRHandler}
-                edge="end"
-              >
+              <IconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
                 <QRLogo />
               </IconButton>
             </InputAdornment>
@@ -113,7 +109,7 @@ function TextField({
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
             </InputAdornment>
           ),
-          placeholder: placeholder != null ? placeholder : '',
+        placeholder: placeholder != null ? placeholder : '',
       }}
       {...props}
     />

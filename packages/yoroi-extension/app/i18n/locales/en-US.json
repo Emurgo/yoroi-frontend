@@ -467,7 +467,6 @@
   "wallet.create.dialog.howToSaveRecoveryPhrase.secondTip": "DO NOT take a screenshot.",
   "wallet.create.dialog.howToSaveRecoveryPhrase.thirdTip": "Write the recovery phrase on a piece of paper and store in a secure location like a safety deposit box. ",
   "wallet.create.dialog.howToSaveRecoveryPhrase.forthTip": "It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.",
-  "wallet.create.dialog.howToSaveRecoveryPhrase.fifthTip": "DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.",
   "wallet.create.dialog.walletNameAndPassword.whatIsWalletName": "What is wallet name?",
   "wallet.create.dialog.walletNameAndPassword.whatIsWalletName.firstTip": "It is a wallet identifier that helps you to easier find the exact wallet in your app",
   "wallet.create.dialog.walletNameAndPassword.whatIsWalletName.secondTip": "You can have different wallet names for the same wallet account connected to different devices",

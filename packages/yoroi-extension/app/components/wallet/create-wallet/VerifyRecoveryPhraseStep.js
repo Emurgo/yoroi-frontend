@@ -78,7 +78,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
   return (
     <Stack alignItems="center" justifyContent="center" className={styles.component}>
-      <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="690px">
+      <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
@@ -100,48 +100,44 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               >
                 <Box
                   sx={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    width: '120px',
+                    width: '113px',
                     height: '40px',
                   }}
                   variant="body1"
                   color="primary.200"
                 >
-                  <Typography
-                    variant="body1"
-                    color="primary.200"
-                    width="20px"
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <Typography variant="body1" color="primary.200" width="20px">
                     {idx + 1}.
                   </Typography>
                   {word && (
-                    <Typography
+                    <Box
                       sx={{
                         background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
-                        width: '100px',
+                        borderRadius: '8px',
+                        width: '93px',
                         height: '40px',
-                        textAlign: 'center',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderRadius: '8px',
                         ml: '4px',
                       }}
                     >
-                      {word}
-                    </Typography>
+                      <Typography
+                        sx={{
+                          display: 'block',
+                          cursor: 'default',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {word}
+                      </Typography>
+                    </Box>
                   )}
                 </Box>
               </Stack>
@@ -169,7 +165,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               >
                 <Typography
                   sx={{
-                    width: '127px',
+                    width: '100%',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

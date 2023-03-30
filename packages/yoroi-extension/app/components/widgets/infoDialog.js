@@ -52,7 +52,6 @@ function InfoDialog(props: Props & Intl): Node {
       <Box
         sx={{
           width: '648px',
-          minHeight: '415px',
           background: 'var(--yoroi-palette-common-white)',
           borderRadius: '8px',
           boxShadow: '0px 13px 20px -1px rgba(0, 0, 0, 0.15)',
