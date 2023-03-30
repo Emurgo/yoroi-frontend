@@ -6,7 +6,6 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Box, Typography, Button } from '@mui/material';
 import StepController from './StepController';
-import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
 import classnames from 'classnames';
 import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg';
@@ -35,16 +34,19 @@ type Intl = {|
 |};
 
 type Props = {|
-  setCurrentStep(stepId: string): void,
   recoveryPhrase: Array<string> | null,
+  nextStep(): void,
+  prevStep(): void,
+  markRecoveryPhraseAsEntered(): void,
+  isRecoveryPhraseEntered: boolean,
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
-  const { intl, recoveryPhrase, setCurrentStep } = props;
+  const { intl, recoveryPhrase, isRecoveryPhraseEntered, nextStep, prevStep } = props;
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState(
-    new Array(recoveryPhrase.length).fill(null)
+    isRecoveryPhraseEntered ? recoveryPhrase : new Array(recoveryPhrase.length).fill(null)
   );
   const [wrongWord, setWrongWord] = useState<string | null>(null);
 
@@ -206,13 +208,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,
-                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE),
+                onClick: prevStep,
                 type: 'secondary',
               },
               {
                 label: intl.formatMessage(globalMessages.nextButtonLabel),
                 disabled: !isValidPhrase,
-                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS),
+                onClick: nextStep,
                 type: 'primary',
               },
             ]}
