@@ -19,7 +19,7 @@ import {
   CERTIFICATE_TYPE,
   ADDRESS_TYPE,
 } from 'trezor-connect/lib/constants/cardano';
-import { CardanoTxSigningMode } from 'trezor-connect';
+import { CardanoTxSigningMode, CardanoTxWitnessType, } from 'trezor-connect';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -644,6 +644,7 @@ export function toTrezorSignRequest(
   }
 
   const formattedRequiredSigners = [];
+  const additionalWitnessRequests = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
     for (let i = 0; i < requiredSigners.len(); i++) {
@@ -657,6 +658,7 @@ export function toTrezorSignRequest(
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
         });
+        additionalWitnessRequests.push(ownAddressPath);
       } else {
         formattedRequiredSigners.push({
           keyHash: hash.to_hex(),
@@ -708,7 +710,7 @@ export function toTrezorSignRequest(
         result.push({
           type: CERTIFICATE_TYPE.StakeDelegation,
           path: getPath(delegationCert.stake_credential()),
-          pool:delegationCert.pool_keyhash().to_hex(),
+          pool: delegationCert.pool_keyhash().to_hex(),
         });
         continue;
       }
@@ -759,12 +761,6 @@ export function toTrezorSignRequest(
     formattedCollateral = formatInputs(collateral);
   }
 
-  let formattedCollateralReturn = null;
-  const collateralReturn = txBody.collateral_return();
-  if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(collateralReturn);
-  }
-
   let formattedReferenceInputs = null;
   const referenceInputs = txBody.reference_inputs();
   if (referenceInputs) {
@@ -782,7 +778,7 @@ export function toTrezorSignRequest(
   }));
 
   const scriptDataHash = txBody.script_data_hash()?.to_hex();
-  
+
   const result: $Exact<CardanoSignTransaction> = {
     signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
     inputs: formatInputs(txBody.inputs()),
@@ -790,10 +786,12 @@ export function toTrezorSignRequest(
     fee: txBody.fee().to_str(),
     protocolMagic,
     networkId,
-    ttl: String(txBody.ttl()),
-    //includeNetworkId: txBody.network_id() != null,
+    includeNetworkId: txBody.network_id() != null,
   };
 
+  if (txBody.ttl()) {
+    result.ttl = String(txBody.ttl());
+  }
   if (validityIntervalStart) {
     result.validityIntervalStart = validityIntervalStart;
   }
@@ -810,14 +808,48 @@ export function toTrezorSignRequest(
     result.mint = formattedMint;
   }
   if (scriptDataHash) {
-    //result.scriptDataHash = scriptDataHash;
+    result.scriptDataHash = scriptDataHash;
   }
-  if (formattedCollateralReturn) {
-    //result.collateralInputs = formattedCollateral;
+  if (formattedCollateral) {
+    result.collateralInputs = formattedCollateral;
   }
   if (requiredSigners) {
-    //result.requiredSigners = formattedRequiredSigners;
+    result.requiredSigners = formattedRequiredSigners;
   }
-  // connector API doesn't support additionalWitnessRequests
+
+  if (additionalWitnessRequests.length > 0) {
+    result.additionalWitnessRequests = additionalWitnessRequests;
+  }
+
   return result;
+}
+
+export function buildConnectorSignedTransaction(
+  txBody: RustModule.WalletV4.TransactionBody,
+  witnesses: Array<CardanoSignedTxWitness>,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
+): RustModule.WalletV4.Transaction {
+  const vkeyWitnesses = RustModule.WalletV4.Vkeywitnesses.new();
+  for (const witness of witnesses) {
+    if (witness.type === CardanoTxWitnessType.BYRON_WITNESS) {
+      throw new Error('Byron wallet does not support connector API');
+    } else if (witness.type === CardanoTxWitnessType.SHELLEY_WITNESS) {
+      const vkeyWitness = RustModule.WalletV4.Vkeywitness.new(
+        RustModule.WalletV4.Vkey.new(
+          RustModule.WalletV4.PublicKey.from_hex(witness.pubKey)
+        ),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
+      );
+      vkeyWitnesses.add(vkeyWitness);
+    } else {
+      throw new Error('unexpected witness type');
+    }
+  }
+  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witnessSet.set_vkeys(vkeyWitnesses);
+  return RustModule.WalletV4.Transaction.new(
+    txBody,
+    witnessSet,
+    metadata
+  );
 }
