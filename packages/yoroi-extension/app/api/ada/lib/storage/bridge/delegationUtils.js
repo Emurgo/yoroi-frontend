@@ -61,8 +61,6 @@ export function addrContainsAccountKey(
   const accountKeyString = typeof targetAccountKey === 'string' ? targetAccountKey : Buffer.from(targetAccountKey.to_bytes()).toString('hex');
 
   const asBase = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
-  // clean: de-allocate the pointer
-  wasmAddr.free();
 
   if (asBase != null) {
     const isAccountKey = Buffer.from(asBase.stake_cred().to_bytes()).toString('hex') === accountKeyString;
@@ -77,6 +75,9 @@ export function addrContainsAccountKey(
     // clean: de-allocate the pointer
     asPointer.free()
   }
+
+  // clean: de-allocate the pointer
+  wasmAddr.free();
 
   return acceptTypeMismatch;
 }
