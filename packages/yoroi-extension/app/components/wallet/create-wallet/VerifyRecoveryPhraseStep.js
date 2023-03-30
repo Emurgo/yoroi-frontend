@@ -86,11 +86,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         <Box className={styles.verifyRecoveryPhraseArea}>
           <Stack
             gap="8px"
-            p="16px 14px"
             flexDirection="row"
             flexWrap="wrap"
             alignItems="center"
             justifyContent="center"
+            sx={{
+              paddingY: '16px',
+            }}
           >
             {enteredRecoveryPhrase.map((word, idx) => (
               <Stack
@@ -104,7 +106,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    width: '113px',
+                    width: '117px',
                     height: '40px',
                   }}
                   variant="body1"
