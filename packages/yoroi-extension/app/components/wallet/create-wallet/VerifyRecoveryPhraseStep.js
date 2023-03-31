@@ -12,6 +12,7 @@ import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-ic
 import environment from '../../../environment';
 import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
 import globalMessages from '../../../i18n/global-messages';
+import Fade from '@mui/material/Fade';
 
 const messages = defineMessages({
   description: {
@@ -49,6 +50,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     isRecoveryPhraseEntered ? recoveryPhrase : new Array(recoveryPhrase.length).fill(null)
   );
   const [wrongWord, setWrongWord] = useState<string | null>(null);
+  const [fadeOutWordIdx, setFadeOutWordIdx] = useState<number>(-1); // Recovery phrase word index
 
   function onAddWord(word: string, idx: number): void {
     if (isWordAdded(word)) return;
@@ -67,9 +69,11 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
       return copy;
     });
     setWrongWord(null);
+    setFadeOutWordIdx(idx);
   }
 
-  function isWordAdded(word) {
+  // Todo: handle the case if the recovery phrase has 2+ similar words.
+  function isWordAdded(word: string): boolean {
     return enteredRecoveryPhrase.some(w => w === word);
   }
 
@@ -94,56 +98,71 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               paddingY: '16px',
             }}
           >
-            {enteredRecoveryPhrase.map((word, idx) => (
-              <Stack
-                item
-                // eslint-disable-next-line react/no-array-index-key
-                key={idx}
-              >
+            {enteredRecoveryPhrase.map((word, idx) => {
+              const isLastEnteredWord =
+                !isRecoveryPhraseEntered &&
+                (idx === enteredRecoveryPhrase.length - 1 ||
+                  enteredRecoveryPhrase[idx + 1] === null);
+
+              const Word = (
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    width: '117px',
+                    background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
+                    borderRadius: '8px',
+                    width: '93px',
                     height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    ml: '4px',
                   }}
-                  variant="body1"
-                  color="primary.200"
                 >
-                  <Typography variant="body1" color="primary.200" width="20px">
-                    {idx + 1}.
+                  <Typography
+                    sx={{
+                      display: 'block',
+                      cursor: 'default',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {word}
                   </Typography>
-                  {word && (
-                    <Box
-                      sx={{
-                        background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
-                        borderRadius: '8px',
-                        width: '93px',
-                        height: '40px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        ml: '4px',
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          display: 'block',
-                          cursor: 'default',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {word}
-                      </Typography>
-                    </Box>
-                  )}
                 </Box>
-              </Stack>
-            ))}
+              );
+              return (
+                <Stack
+                  item
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={idx}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      width: '117px',
+                      height: '40px',
+                    }}
+                    variant="body1"
+                    color="primary.200"
+                  >
+                    <Typography variant="body1" color="primary.200" width="20px">
+                      {idx + 1}.
+                    </Typography>
+                    {word &&
+                      (isLastEnteredWord ? (
+                        <Fade in timeout={500}>
+                          {Word}
+                        </Fade>
+                      ) : (
+                        Word
+                      ))}
+                  </Box>
+                </Stack>
+              );
+            })}
           </Stack>
         </Box>
 
@@ -155,7 +174,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           gap="8px"
         >
           {sortedRecoveryPhrase.map(({ word, id, originalIdx }) => {
-            return (
+            const button = (
               <button
                 type="button"
                 key={id}
@@ -172,6 +191,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     px: '10px',
+                    zIndex: 10,
                   }}
                   variant="body1"
                   color="primary.200"
@@ -179,6 +199,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                   {word}
                 </Typography>
               </button>
+            );
+            return fadeOutWordIdx === originalIdx ? (
+              <Fade in timeout={500}>
+                {button}
+              </Fade>
+            ) : (
+              button
             );
           })}
         </Stack>
