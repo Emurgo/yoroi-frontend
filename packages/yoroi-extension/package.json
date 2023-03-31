@@ -91,7 +91,7 @@
     "@babel/runtime": "7.12.18",
     "@babel/runtime-corejs3": "7.12.18",
     "@emurgo/cardano-message-signing-nodejs": "1.0.1",
-    "@emurgo/cardano-serialization-lib-nodejs": "11.3.0",
+    "@emurgo/cardano-serialization-lib-nodejs": "11.3.1",
     "@emurgo/js-chain-libs-node": "0.7.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@storybook/addon-actions": "6.2.7",
