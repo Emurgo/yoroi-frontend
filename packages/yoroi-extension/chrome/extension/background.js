@@ -602,7 +602,8 @@ const yoroiMessageHandler = async (
           sendResponse(({
             publicDeriverId: connection.status.publicDeriverId,
             sign: responseData.request,
-            tabId
+            tabId,
+            requesterUrl: connection.url,
           }: SigningMessage));
           return;
         }

@@ -82,6 +82,7 @@ const message = (id: number) => ({
     },
   },
   tabId: 0,
+  requesterUrl: 'https://dapp/',
 });
 
 const genBaseProps: {|
