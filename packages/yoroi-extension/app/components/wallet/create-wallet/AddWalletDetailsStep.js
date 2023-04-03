@@ -14,7 +14,7 @@ import { Stack, Typography, Box } from '@mui/material';
 import StepController from './StepController';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
-import { CREATE_WALLET_SETPS, TIPS_DIALOGS, isDialogShownBefore } from './steps';
+import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -49,9 +49,11 @@ const messages: * = defineMessages({
 });
 
 type Props = {|
-  setCurrentStep(step: string): void,
+  prevStep(): void,
   recoveryPhrase: Array<string> | null,
   selectedNetwork: $ReadOnly<NetworkRow>,
+  isRecoveryPhraseEntered: boolean,
+  markRecoveryPhraseAsEntered(): void,
   onSubmit: (walletName: string, walletPassword: string) => void,
   ...ManageDialogsProps,
 |};
@@ -127,7 +129,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
 
   render(): Node {
     const {
-      setCurrentStep,
+      prevStep,
       recoveryPhrase,
       isDialogOpen,
       openDialog,
@@ -208,7 +210,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,
-                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE),
+                onClick: prevStep,
                 type: 'secondary',
               },
               {
