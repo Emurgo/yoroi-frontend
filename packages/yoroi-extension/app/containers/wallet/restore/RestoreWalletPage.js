@@ -84,6 +84,15 @@ export default class RestoreWalletPage extends Component<Props> {
         closeActiveDialog: {| trigger: (params: void) => void |},
         open: {| trigger: (params: {| dialog: any, params?: any |}) => void |},
       |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       explorers: {| selectedExplorer: Map<number, SelectedExplorer> |},
@@ -170,6 +179,9 @@ export default class RestoreWalletPage extends Component<Props> {
               trigger: actions.ada.wallets.createWallet.trigger,
             },
           },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
     });

@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-array-index-key */
 // @flow
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { Node } from 'react';
 import { useCombobox } from 'downshift';
 import { Input, Box, InputLabel, FormControl, FormHelperText, Chip, useTheme } from '@mui/material';
@@ -25,8 +25,24 @@ type Props = {|
   +autoFocus?: boolean,
   +type: string,
   +name: string,
-  +chipProps?: Object,
+  +isVerified: boolean,
 |};
+
+function useCachedOptions(options) {
+  const cachedOptions = {};
+
+  const getCachedOptions = inputValue => {
+    if (!cachedOptions[inputValue]) {
+      cachedOptions[inputValue] = options.filter(w =>
+        w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? '')
+      );
+    }
+
+    return cachedOptions[inputValue];
+  };
+
+  return { getCachedOptions };
+}
 
 function Autocomplete({
   options,
@@ -44,14 +60,12 @@ function Autocomplete({
   type,
   name,
   placeholder,
-  chipProps,
+  isVerified,
 }: Props): Node {
   const [inputValue, setInputValue] = useState<?string>(value || '');
   const isInputPresent = (inputValue?.length ?? 0) > 0;
-  const filteredList = isInputPresent
-    ? options.filter(w => w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? ''))
-    : options;
-  const sliceArrayItems = slice(filteredList, 0, maxVisibleOptions);
+  const { getCachedOptions } = useCachedOptions(options);
+  const filteredList = isInputPresent ? getCachedOptions(inputValue) : [];
 
   const {
     isOpen,
@@ -109,7 +123,12 @@ function Autocomplete({
 
   return (
     <SFormControl error={Boolean(error)}>
-      <InputWrapper onClick={() => !isOpen} error={error} isOpen={isOpen}>
+      <InputWrapper
+        isVerified={isVerified}
+        onClick={() => !isOpen}
+        error={isInputPresent && filteredList.length === 0}
+        isOpen={isOpen}
+      >
         <Box {...getComboboxProps()}>
           <Input
             placeholder={placeholder}
@@ -129,21 +148,29 @@ function Autocomplete({
       <ULList
         component="ul"
         {...getMenuProps()}
-        sx={{ boxShadow: isOpen ? '0 3px 7px 0 rgba(74,74,74,0.16)' : 'unset' }}
+        sx={{
+          boxShadow: isOpen ? '0px 3px 10px rgba(24, 26, 30, 0.08)' : 'unset',
+          maxHeight: 44 * maxVisibleOptions + 'px',
+          color: 'black',
+          borderRadius: '8px',
+          width: '120px',
+          '&::-webkit-scrollbar': { display: 'none' },
+        }}
       >
         {isOpen && (
           <>
-            {sliceArrayItems.length === 0 ? (
-              <Box sx={{ padding: '14px 20px', bgcolor: 'var(--yoroi-palette-common-white)' }}>
+            {filteredList.length === 0 ? (
+              <Box sx={{ padding: '16px', bgcolor: 'var(--yoroi-palette-common-white)' }}>
                 {noResultsMessage}
               </Box>
             ) : (
-              sliceArrayItems.map((item, index) => {
+              filteredList.map((item, index) => {
+                const regularPart = Boolean(inputValue) ? item.replace(inputValue || '', '') : item;
                 return (
                   <Box
                     key={`${item}${index}`}
                     sx={{
-                      padding: '14px 20px',
+                      padding: '16px',
                       backgroundColor:
                         highlightedIndex === index
                           ? 'var(--yoroi-palette-gray-50)'
@@ -152,7 +179,8 @@ function Autocomplete({
                     }}
                     {...getItemProps({ item, index })}
                   >
-                    {item}
+                    <span style={{ fontWeight: 'bold' }}>{inputValue?.toLowerCase()}</span>
+                    <span>{regularPart}</span>
                   </Box>
                 );
               })
@@ -173,7 +201,6 @@ Autocomplete.defaultProps = {
   autoFocus: false,
   maxVisibleOptions: 5,
   noResultsMessage: '',
-  chipProps: null,
 };
 
 const ULList = styled(Box)({
@@ -194,7 +221,7 @@ const ULList = styled(Box)({
 });
 
 const InputWrapper = styled(Box)(
-  ({ theme, error, isOpen }) => `
+  ({ theme, error, isVerified, isOpen }) => `
   width: 100%;
   background-color: var(--yoroi-palette-common-white);
   height: 40px;
@@ -205,7 +232,7 @@ const InputWrapper = styled(Box)(
   cursor: text;
   margin-bottom: 0;
   border-radius: 8px;
-
+  
   & input {
     background-color: transparent;
     color: var(--yoroi-palette-primary-200);
@@ -213,21 +240,27 @@ const InputWrapper = styled(Box)(
     padding: 8px;
     letter-spacing: 0;
     text-align: center;
-    border: 2px solid ${error ? 'var(--yoroi-comp-input-error)' : '#7892E8'};
+    border: 2px solid ${error ? '#ff1351' : '#7892E8'};
     border-radius: 8px;
     height: 40px;
     box-sizing: border-box;
 
     &:focus {
-      border-color: var(--yoroi-palette-primary-200);
+      border-color: ${error ? '#ff1351' : 'var(--yoroi-palette-primary-200)'};
     }
 
-    &:not([value=""]):not(:focus) {
-      border-color: transparent;
-      background: linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%);
-      background-origin: border-box;
-      background-clip: content-box, border-box;
-      background: linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%);
+    ${
+      !error
+        ? `&:not([value=""]):not(:focus) {
+        border-color: transparent;
+        background-origin: border-box;
+        background: ${
+          isVerified
+            ? 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%);'
+            : 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%'
+        });
+      }`
+        : ''
     }
   }
 `

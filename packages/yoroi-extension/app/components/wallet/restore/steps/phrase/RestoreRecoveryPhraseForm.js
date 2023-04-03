@@ -127,7 +127,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
           flexDirection="row"
           flexWrap="wrap"
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="center"
         >
           {recoveryPhrase?.map((word, idx) => {
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
@@ -154,13 +154,14 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
                   variant="body1"
                   color="primary.200"
                 >
-                  <Typography variant="body1" color="primary.200" width="24px">
+                  <Typography variant="body1" color="#7892E8" width="24px">
                     {idx + 1}.
                   </Typography>
 
                   <Autocomplete
                     // inputRef={el => (this.myRefs[idx] = el)}
                     options={validWords}
+                    isVerified={isValidPhrase}
                     maxSelections={1}
                     maxVisibleOptions={5}
                     noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
@@ -175,13 +176,6 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
 
         {!isValidPhrase && (
           <>
-            {allWordsEntered && (
-              <Box>
-                <Typography variant="body2" color="#FF1351">
-                  {mnemonicError}
-                </Typography>
-              </Box>
-            )}
             <Box sx={{ width: '100px' }}>
               <Button
                 variant="outlined"
@@ -192,7 +186,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
                   fontSize: '14px',
                   lineHeight: '15px',
                   padding: 0,
-                  mt: '16px',
+                  mb: '16px',
                   minWidth: 0,
                   minHeight: 0,
                   '&:hover': { border: 0 },
@@ -200,6 +194,12 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
               >
                 {intl.formatMessage(messages.clearAll)}
               </Button>
+            </Box>
+
+            <Box>
+              <Typography variant="body2" color={allWordsEntered ? '#FF1351' : 'transparent'}>
+                {mnemonicError}
+              </Typography>
             </Box>
           </>
         )}

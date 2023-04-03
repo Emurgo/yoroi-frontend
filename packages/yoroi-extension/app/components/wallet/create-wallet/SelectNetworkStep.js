@@ -32,7 +32,7 @@ type Props = {|
 |};
 
 function SelectNetworkStep(props: Props & Intl): Node {
-  const { intl, onSelect, prevStep } = props;
+  const { intl, onSelect, goBack } = props;
 
   const networksList = [
     {
@@ -89,7 +89,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
           {
             label: intl.formatMessage(globalMessages.backButtonLabel),
             disabled: false,
-            onClick: prevStep,
+            onClick: goBack,
             type: 'secondary',
           },
         ]}

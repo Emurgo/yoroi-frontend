@@ -71,13 +71,10 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
       throw new Error(`${nameof(VerifyRecoveryPhraseStep)} no duplicated wallet`);
     }
     const parent = publicDeriver?.getParent();
-    const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
-      parent
-    );
+    const settingsCache = stores.walletSettings.getConceptualWalletSettingsCache(parent);
     const withPubKey = asGetPublicKey(publicDeriver);
-    const plate =
-      withPubKey == null ? null : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const plate = withPubKey == null ? null : stores.wallets.getPublicKeyCache(withPubKey).plate;
+    const txRequests = stores.transactions.getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result ?? null;
 
     return balance;
@@ -89,7 +86,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         direction="column"
         alignItems="left"
         justifyContent="center"
-        maxWidth={mode.length === 15 ? '690px' : '816px'}
+        maxWidth={mode.length === 15 ? '636px' : '760px'}
       >
         <Typography mb="16px">
           <FormattedHTMLMessage {...messages.stepDescription} />

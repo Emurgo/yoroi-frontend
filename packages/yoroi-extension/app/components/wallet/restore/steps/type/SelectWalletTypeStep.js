@@ -28,10 +28,11 @@ type Intl = {|
 
 type Props = {|
   onNext(mode: RestoreModeType): void,
+  goBack(): void,
 |};
 
 function SelectWalletTypeStep(props: Props & Intl): Node {
-  const { onNext, intl } = props;
+  const { onNext, goBack, intl } = props;
 
   return (
     <Stack alignItems="center" justifyContent="center">
@@ -51,7 +52,7 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
           />
         </Box>
 
-        <StepController goBack={() => console.log('go back')} showNextButton={false} />
+        <StepController goBack={goBack} showNextButton={false} />
       </Stack>
     </Stack>
   );

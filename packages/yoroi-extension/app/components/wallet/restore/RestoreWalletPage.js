@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import { RESTORE_WALLET_STEPS } from './steps';
+import { RESTORE_WALLET_STEPS, getFirstRestorationStep } from './steps';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import SelectWalletTypeStep from './steps/type/SelectWalletTypeStep';
 import Stepper from '../../common/stepper/Stepper';
@@ -16,6 +16,9 @@ import { networks } from '../../../api/ada/lib/storage/database/prepackaged/netw
 import { useRestoreWallet } from './hooks';
 import { isWalletExist } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { markDialogAsShown } from '../dialogs/utils';
+import { ROUTES } from '../../../routes-config';
+import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
+import environment from '../../../environment';
 
 const messages: * = defineMessages({
   title: {
@@ -55,10 +58,10 @@ type Props = {|
 
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, createWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { walletRestore, profile } = actions;
+  const { walletRestore, profile, router } = actions;
   const { walletRestore: walletData, profile: profileData, wallets } = stores;
 
-  const [currentStep, setCurrentStep] = useState(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
+  const [currentStep, setCurrentStep] = useState(getFirstRestorationStep());
 
   const { recoveryPhrase, setRestoreWalletData } = useRestoreWallet();
 
@@ -71,7 +74,24 @@ function RestoreWalletPage(props: Props & Intl): Node {
     },
   };
 
+  function goToAddWalletScreen() {
+    router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+  }
+
   const steps = {
+    [RESTORE_WALLET_STEPS.SELECT_NETWORK]: {
+      stepId: RESTORE_WALLET_STEPS.SELECT_NETWORK,
+      message: messages.firstStep,
+      component: (
+        <SelectNetworkStep
+          onSelect={network => {
+            profile.setSelectedNetwork.trigger(network);
+            setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
+          }}
+          goBack={goToAddWalletScreen}
+        />
+      ),
+    },
     [RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE]: {
       stepId: RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE,
       message: messages.firstStep,
@@ -81,6 +101,10 @@ function RestoreWalletPage(props: Props & Intl): Node {
             profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
             walletRestore.setMode.trigger(mode);
             setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
+          }}
+          goBack={() => {
+            if (environment.isProduction()) goToAddWalletScreen();
+            else setCurrentStep(RESTORE_WALLET_STEPS.SELECT_NETWORK);
           }}
         />
       ),
@@ -120,7 +144,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
       message: messages.thirdStep,
       component: (
         <AddWalletDetailsStep
-          setCurrentStep={setCurrentStep}
+          prevStep={() => setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE)}
           recoveryPhrase={recoveryPhrase.split(' ')}
           selectedNetwork={profileData.selectedNetwork}
           onSubmit={(walletName: string, walletPassword: string) => {
@@ -137,6 +161,8 @@ function RestoreWalletPage(props: Props & Intl): Node {
   };
 
   const CurrentStep = steps[currentStep].component;
+
+  if (currentStep === RESTORE_WALLET_STEPS.SELECT_NETWORK) return CurrentStep;
 
   return (
     <Box>
@@ -156,7 +182,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
       <Stepper
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
-        steps={Object.values(steps)}
+        steps={Object.values(steps).slice(1)}
       />
       {CurrentStep}
     </Box>
