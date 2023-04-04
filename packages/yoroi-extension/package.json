@@ -244,7 +244,7 @@
     "semver": "7.3.4",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
-    "trezor-connect-flow": "file:../../../trezor-connect-flow",
+    "trezor-connect-flow": "Emurgo/trezor-connect-flow#ca300a34ae68b47a38e9335dd2f39127a5e6b4a4",
     "ua-parser-js": "0.7.24",
     "unorm": "1.6.0",
     "validator": "13.5.2"
