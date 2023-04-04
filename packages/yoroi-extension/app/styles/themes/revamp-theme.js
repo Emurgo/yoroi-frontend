@@ -50,18 +50,28 @@ const theme = {
     /* `main` is added since MUI required it but we don't use it at all */
     primary: {
       main: '#3154CB',
-      '50': '#F0F2FB',
-      '100': '#164FD6',
-      '200': '#3154CB',
-      '300': '#1A44B7',
+      '100': '#E4E8F7',
+      '200': '#C4CFF5',
+      '300': '#A0B3F2',
+      '400': '#7892E8',
+      '500': '#4B6DDE',
+      '600': '#3154CB',
+      '700': '#1737A3',
+      '800': '#122770',
+      '900': '#121F4D',
       contrastText: '#FFF',
     },
     secondary: {
       main: '#16E3BA',
-      '50': '#F4FDFA', // ?
-      '100': '#C9ECE5', // light
-      '200': '#16E3BA', // main - hover btn color -
-      '300': '#17D1AA', // dark
+      '100': '#E4F7F3',
+      '200': '#C6F7ED',
+      '300': '#93F5E1',
+      '400': '#66F2D6',
+      '500': '#16E3BA',
+      '600': '#08C29D',
+      '700': '#0B997D',
+      '800': '#12705D',
+      '900': '#17453C',
       contrastText: '#FFF',
     },
     background: {
