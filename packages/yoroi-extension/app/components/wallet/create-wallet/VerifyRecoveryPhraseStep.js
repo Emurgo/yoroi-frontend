@@ -217,14 +217,14 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             </Typography>
           )}
 
-          {isValidPhrase && (
+          <Fade in={isValidPhrase}>
             <Stack gap="10px" direction="row">
               <VerifiedIcon />
               <Typography variant="body1" fontWeight={500}>
                 {intl.formatMessage(messages.verified)}
               </Typography>
             </Stack>
-          )}
+          </Fade>
         </Box>
 
         <Box mt="10px">
