@@ -2,10 +2,12 @@
 
 import Config from '../../config';
 import environment from '../../environment';
-import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
-import type { Manifest } from 'trezor-connect';
-import type { DeviceEvent } from 'trezor-connect/lib/types/trezor/device';
-import type { UiEvent } from 'trezor-connect/lib/types/events';
+import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect-flow';
+import type {
+  Manifest,
+  DeviceEvent,
+  UiEvent,
+} from 'trezor-connect-flow';
 
 /* eslint-disable no-restricted-properties */
 

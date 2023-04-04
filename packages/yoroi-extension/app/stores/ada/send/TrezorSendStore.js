@@ -191,12 +191,12 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         if (
           !auxDataSupplement
           || auxDataSupplement.type !== 1
-          || auxDataSupplement.catalystSignature == null
+          || auxDataSupplement.cVoteRegistrationSignature == null
         ) {
           // noinspection ExceptionCaughtLocallyJS
           throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} unexpected Trezor sign transaction response`);
         }
-        const { catalystSignature } = auxDataSupplement;
+        const catalystSignature = auxDataSupplement.cVoteRegistrationSignature;
 
         metadata = generateRegistrationMetadata(
           votingPublicKey,
