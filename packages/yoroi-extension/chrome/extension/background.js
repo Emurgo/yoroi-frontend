@@ -602,7 +602,8 @@ const yoroiMessageHandler = async (
           sendResponse(({
             publicDeriverId: connection.status.publicDeriverId,
             sign: responseData.request,
-            tabId
+            tabId,
+            requesterUrl: connection.url,
           }: SigningMessage));
           return;
         }
@@ -1017,8 +1018,91 @@ function handleInjectorConnect(port) {
                       true,
                     );
                   } catch {
+                    // merge new witness set into the input witness set
                     fullTx = Scope.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
-                    fullTx.set_witness_set(witnessSetBytes);
+                    const originalWitnessSet = fullTx.witness_set();
+                    const newWitnessSet = Scope.WalletV4.TransactionWitnessSet.from_bytes(
+                      witnessSetBytes
+                    );
+                    const mergedWitnessSet = Scope.WalletV4.TransactionWitnessSet.new();
+                    let vkeys = originalWitnessSet.vkeys();
+                    const newVkeys = newWitnessSet.vkeys();
+                    if (vkeys && newVkeys) {
+                      for (let i = 0; i < newVkeys.len(); i++) {
+                        vkeys.add(newVkeys.get(i));
+                      }
+                    } else if (newVkeys) {
+                      vkeys = newVkeys;
+                    }
+                    if (vkeys) {
+                      mergedWitnessSet.set_vkeys(vkeys);
+                    }
+
+                    let nativeScripts = originalWitnessSet.native_scripts();
+                    const newNativeScripts = newWitnessSet.native_scripts();
+                    if (nativeScripts && newNativeScripts) {
+                      for (let i = 0; i < newNativeScripts.len(); i++) {
+                        nativeScripts.add(newNativeScripts.get(i));
+                      }
+                    } else if (newNativeScripts) {
+                      nativeScripts = newNativeScripts;
+                    }
+                    if (nativeScripts) {
+                      mergedWitnessSet.set_native_scripts(nativeScripts);
+                    }
+
+                    let bootstraps = originalWitnessSet.bootstraps();
+                    const newBootstraps = newWitnessSet.bootstraps();
+                    if (bootstraps && newBootstraps) {
+                      for (let i =0; i < newBootstraps.len(); i++) {
+                        bootstraps.add(newBootstraps.get(i));
+                      }
+                    } else if (newBootstraps) {
+                      bootstraps = newBootstraps;
+                    }
+                    if (bootstraps) {
+                      mergedWitnessSet.set_bootstraps(bootstraps);
+                    }
+
+                    let plutusScripts = originalWitnessSet.plutus_scripts();
+                    const newPlutusScripts = newWitnessSet.plutus_scripts();
+                    if (plutusScripts && newPlutusScripts) {
+                      for (let i = 0; i < newPlutusScripts.len(); i++) {
+                        plutusScripts.add(newPlutusScripts.get(i));
+                      }
+                    } else if (newPlutusScripts) {
+                      plutusScripts = newPlutusScripts;
+                    }
+                    if (plutusScripts) {
+                      mergedWitnessSet.set_plutus_scripts(plutusScripts);
+                    }
+
+                    let plutusData = originalWitnessSet.plutus_data();
+                    const newPlutusData = newWitnessSet.plutus_data();
+                    if (plutusData && newPlutusData) {
+                      for (let i = 0; i < newPlutusData.len(); i++) {
+                        plutusData.add(newPlutusData.get(i));
+                      }
+                    } else if (newPlutusData) {
+                      plutusData = newPlutusData;
+                    }
+                    if (plutusData) {
+                      mergedWitnessSet.set_plutus_data(plutusData);
+                    }
+
+                    let redeemers = originalWitnessSet.redeemers();
+                    const newRedeemers = newWitnessSet.redeemers();
+                    if (redeemers && newRedeemers) {
+                      for (let i = 0; i < newRedeemers.len(); i++) {
+                        redeemers.add(newRedeemers.get(i));
+                      }
+                    } else if (newRedeemers) {
+                      redeemers = newRedeemers;
+                    }
+                    if (redeemers) {
+                      mergedWitnessSet.set_redeemers(redeemers);
+                    }
+                    fullTx.set_witness_set(mergedWitnessSet.to_bytes());
                   }
                   rpcResponse({ ok: fullTx.to_hex() });
                 });
@@ -1568,8 +1652,14 @@ function handleInjectorConnect(port) {
                   requiredAmount = RustModule.WalletV4.Value.from_bytes(
                     Buffer.from(requiredAmount, 'hex')
                   ).coin().to_str();
-                } catch (e) {
-                  throw new Error(`Failed to parse the required collateral amount: "${requiredAmount}"`);
+                } catch {
+                  rpcResponse({
+                    err: {
+                      code: APIErrorCodes.API_INVALID_REQUEST,
+                      info: 'failed to parse the required collateral amount',
+                    },
+                  });
+                  return;
                 }
               }
               await withDb(async (db, localStorageApi) => {
@@ -1625,18 +1715,22 @@ function handleInjectorConnect(port) {
                       );
                     } catch (error) {
                       if (error instanceof NotEnoughMoneyToSendError) {
-                        rpcResponse({ error: 'not enough UTXOs' });
+                        rpcResponse({
+                          err: {
+                            code: APIErrorCodes.API_INTERNAL_ERROR,
+                            info: 'not enough UTXOs'
+                          }
+                        });
                         return;
                       }
-                      throw error;
                     }
                     // we can get enough collaterals after re-organization
                     // pop-up the UI
                     const connection = connectedSites.get(tabId);
                     if (connection == null) {
-                      Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
-                      rpcResponse(undefined); // shouldn't happen
-                      return;
+                      throw new Error(
+                        `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
+                      );
                     }
 
                     const resp = await confirmSign(
@@ -1653,7 +1747,12 @@ function handleInjectorConnect(port) {
                       connection,
                     );
                     if (!resp.ok) {
-                      rpcResponse({ error: 'sign failed' });
+                      rpcResponse({
+                        err: {
+                          code: APIErrorCodes.API_REFUSED,
+                          info: 'sign failed'
+                        }
+                      });
                       return;
                     }
                     const utxos = await transformCardanoUtxos(
