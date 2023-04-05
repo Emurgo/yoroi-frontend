@@ -29,13 +29,13 @@ const fontFamily = ['Rubik', 'sans-serif'].join(',');
  * @param {*} mediumWeight typography font weight on medium size
  * @returns
  */
-function withMedium(token, variant, mediumWeight: number = 500) {
+function makeVariants<T>(token: string, variant: T) {
+  const styles = { ...variant, fontFamily, fontWeight: 400 };
   return {
-    [token]: variant,
-    [`${token}-regular`]: variant,
+    [`${token}-regular`]: styles,
     [`${token}-medium`]: {
-      ...variant,
-      fontWeight: mediumWeight,
+      ...styles,
+      fontWeight: 500,
     },
   };
 }
@@ -67,7 +67,7 @@ const theme = {
   palette: {
     /* `main` is added since MUI required it but we don't use it at all */
     primary: {
-      main: '#3154CB',
+      main: '#4B6DDE',
       '100': '#E4E8F7',
       '200': '#C4CFF5',
       '300': '#A0B3F2',
@@ -116,65 +116,74 @@ const theme = {
   },
   typography: {
     fontFamily,
-    // token: heading-1-regular
-    ...withMedium('h1', {
-      fontWeight: 400,
+    // token: h1-regular & h1-medium
+    ...makeVariants('h1', {
       fontSize: '1.875rem', // 30px
       lineHeight: '38px',
-      fontFamily,
     }),
-    ...withMedium('h2', {
-      fontWeight: 400,
+    // token: h2-regular & h2-medium
+    ...makeVariants('h2', {
       fontSize: '1.75rem', // 28px
       lineHeight: '32px',
-      fontFamily,
     }),
-    ...withMedium('h3', {
-      fontWeight: 400,
+    // token: h3-regular & h3-medium
+    ...makeVariants('h3', {
       fontSize: '1.5rem', // 24px
       lineHeight: '32px',
-      fontFamily,
     }),
-    ...withMedium('h4', {
-      fontWeight: 400,
+    // token: h4-regular & h4-medium
+    ...makeVariants('h4', {
       fontSize: '1.25rem', // 20px
       lineHeight: '28px',
-      fontFamily,
     }),
-    ...withMedium('h5', {
-      fontWeight: 400,
+    // token: h5-regular & h5-medium
+    ...makeVariants('h5', {
       fontSize: '1.125rem', // 18px
       lineHeight: '26px',
-      fontFamily,
     }),
-    ...withMedium('h6', {
-      fontWeight: 400,
+    button1: {
       fontSize: '1rem', // 16px
-      lineHeight: '26px',
+      fontWeight: 500,
+      lineHeight: '22px',
+      letterSpacing: '0.5px',
       textTransform: 'uppercase',
       fontFamily,
-    }),
-    ...withMedium('h7', {
+    },
+    button2: {
+      fontSize: '0.875rem', // 14px
       fontWeight: 400,
-      fontSize: '0.875rem',
-      fontFamily,
+      lineHeight: '22px',
+      letterSpacing: '0.5px',
       textTransform: 'uppercase',
+      fontFamily,
+    },
+    // token:  body-1-regular & body-1-medium
+    ...makeVariants('body-1', {
+      fontSize: '1rem', // 16px
+      lineHeight: '24px',
     }),
-    body1: {
+    // token: body-2-regular & body-2-medium
+    ...makeVariants('body-2', {
+      fontSize: '0.875rem', // 14px
+      lineHeight: '24px',
+    }),
+    overline: {
       fontWeight: 400,
-      fontSize: '1rem',
+      fontSize: '0.875rem', // 14px
+      lineHeight: '22px',
+      textTransform: 'uppercase',
       fontFamily,
     },
-    body2: {
-      fontWeight: 400,
-      fontSize: '0.875rem',
-      fontFamily,
-    },
-    body3: {
-      fontWeight: 400,
-      fontSize: '0.75rem',
-      fontFamily,
-    },
+    // token: caption-1-regular & caption-2-medium
+    ...makeVariants('caption-1', {
+      fontSize: '0.75rem', // 12px
+      lineHeight: '16px',
+    }),
+    // token: caption-2-regular & caption-2-medium
+    ...makeVariants('caption-1', {
+      fontSize: '0.625rem', // 10px
+      lineHeight: '14px',
+    }),
   },
 };
 export const revampTheme: Object = createTheme(deepmerge(commonTheme, theme));
