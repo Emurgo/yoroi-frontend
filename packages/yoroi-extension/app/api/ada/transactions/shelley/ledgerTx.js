@@ -757,6 +757,7 @@ export function toLedgerSignRequest(
     outputs.push(formatOutput(txBody.outputs().get(i)));
   }
 
+  const additionalWitnessPaths = [];
   const formattedRequiredSigners = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
@@ -772,6 +773,7 @@ export function toLedgerSignRequest(
           type: TxRequiredSignerType.PATH,
           path: ownAddressPath,
         });
+        additionalWitnessPaths.push(ownAddressPath);
       } else {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.HASH,
@@ -867,6 +869,49 @@ export function toLedgerSignRequest(
       totalCollateral: txBody.total_collateral()?.to_str() ?? null,
       referenceInputs: formattedReferenceInputs,
     },
-    additionalWitnessPaths: [],
+    additionalWitnessPaths,
   };
+}
+
+export function buildConnectorSignedTransaction(
+  txBody: RustModule.WalletV4.TransactionBody,
+  witnesses: Array<Witness>,
+  publicKey: {|
+    ...Addressing,
+    key: RustModule.WalletV4.Bip32PublicKey,
+  |},
+  metadata: RustModule.WalletV4.AuxiliaryData | void
+): RustModule.WalletV4.Transaction {
+  const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
+
+  const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
+
+  for (const witness of witnesses) {
+    const addressing = {
+      path: witness.path,
+      startLevel: 1,
+    };
+    verifyFromBip44Root(addressing);
+
+    const witnessKey = derivePublicByAddressing({
+      addressing,
+      startingFrom: {
+        level: keyLevel,
+        key: publicKey.key,
+      }
+    });
+    const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+      RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
+      RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.witnessSignatureHex, 'hex')),
+    );
+    vkeyWitWasm.add(vkeyWit);
+  }
+  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witSet.set_vkeys(vkeyWitWasm);
+
+  return RustModule.WalletV4.Transaction.new(
+    txBody,
+    witSet,
+    metadata
+  );
 }
