@@ -26,6 +26,9 @@ type Props = {|
   +type: string,
   +name: string,
   +isVerified: boolean,
+  +inputRef: any,
+  +prevFieldRef: any,
+  +nextFieldRef: any,
 |};
 
 function useCachedOptions(options) {
@@ -61,11 +64,15 @@ function Autocomplete({
   name,
   placeholder,
   isVerified,
+  inputRef,
+  prevFieldRef,
+  nextFieldRef,
 }: Props): Node {
   const [inputValue, setInputValue] = useState<?string>(value || '');
   const isInputPresent = (inputValue?.length ?? 0) > 0;
   const { getCachedOptions } = useCachedOptions(options);
   const filteredList = isInputPresent ? getCachedOptions(inputValue) : [];
+  const hasError = isInputPresent && filteredList.length === 0;
 
   const {
     isOpen,
@@ -121,16 +128,47 @@ function Autocomplete({
     },
   });
 
+  const handleKeyDownEvent = e => {
+    const { target, key, code, shiftKey } = e;
+    const noInputValue = inputValue?.length === 0;
+
+    // Prevent tab if word not correct
+    if (code === 'Tab' && (hasError || noInputValue) && !shiftKey) {
+      e.preventDefault();
+    }
+
+    // prevent space to occur if no input value
+    if (code === 'Space' && noInputValue) {
+      e.preventDefault();
+    }
+
+    // when enter or space (tab works by default), go to the next field
+    if ((code === 'Enter' || code === 'Space') && isOpen && !hasError) {
+      // Select word if correct when pressing enter or space
+      target.blur();
+
+      if (nextFieldRef) nextFieldRef.focus();
+    }
+
+    // Focus on the previous field if backspace and no value
+    if ((code === 'Backspace' || code === 'ArrowLeft') && noInputValue && prevFieldRef) {
+      e.preventDefault();
+      prevFieldRef.focus();
+      prevFieldRef.setSelectionRange(0, prevFieldRef.value?.length);
+    }
+  };
+
   return (
-    <SFormControl error={Boolean(error)}>
+    <SFormControl error={Boolean(error)} onKeyDownCapture={handleKeyDownEvent}>
       <InputWrapper
         isVerified={isVerified}
         onClick={() => !isOpen}
-        error={isInputPresent && filteredList.length === 0}
+        error={hasError}
         isOpen={isOpen}
       >
         <Box {...getComboboxProps()}>
           <Input
+            inputRef={inputRef}
             placeholder={placeholder}
             disableUnderline
             fullWidth

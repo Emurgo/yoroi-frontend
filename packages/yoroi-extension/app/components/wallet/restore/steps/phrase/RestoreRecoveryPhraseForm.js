@@ -50,13 +50,22 @@ const messages = defineMessages({
 
 type Props = {|
   +onSubmit: string => PossiblyAsync<void>,
-  +isValidMnemonic: (Array<{| value: string, label: string |}>) => boolean,
+  +isValidMnemonic: (
+    Array<{|
+      value: string,
+      label: string,
+    |}>
+  ) => boolean,
   +numberOfMnemonics: any | 12 | 15 | 21 | 24 | 27,
   +error?: ?LocalizableError,
 |};
 
+type State = {|
+  mounted: boolean,
+|};
+
 @observer
-export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
+export default class RestoreRecoveryPhraseFormClass extends Component<Props, State> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -65,11 +74,15 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  state: State = {
+    mounted: false,
+  };
+
   getInitRecoveryPhrase: void => Array<string> = () => {
     return new Array(this.props.numberOfMnemonics).fill('');
   };
 
-  myRefs: Array<any> = [];
+  inputRefs: Array<any> = [];
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -109,6 +122,12 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
     });
   };
 
+  // hack to get the refs
+  componentDidMount() {
+    // console.log(this.inputRefs);
+    this.setState({ mounted: true });
+  }
+
   render(): Node {
     const { intl } = this.context;
     const { error, isValidMnemonic, numberOfMnemonics } = this.props;
@@ -137,6 +156,9 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
             const fieldBind = wordField.bind();
 
+            const isFirstField = idx === 0;
+            const isLastField = idx === recoveryPhrase.length - 1;
+
             return (
               <Stack
                 item
@@ -163,7 +185,9 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
                   </Typography>
 
                   <Autocomplete
-                    // inputRef={el => (this.myRefs[idx] = el)}
+                    inputRef={ref => (this.inputRefs[idx] = ref)}
+                    prevFieldRef={!isFirstField ? this.inputRefs[idx - 1] : null}
+                    nextFieldRef={!isLastField ? this.inputRefs[idx + 1] : null}
                     options={validWords}
                     isVerified={isValidPhrase}
                     maxSelections={1}
