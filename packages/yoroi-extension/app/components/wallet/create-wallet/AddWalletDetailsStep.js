@@ -1,9 +1,18 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ManageDialogsProps } from './CreateWalletPage';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
+import StepController from './StepController';
+import globalMessages from '../../../i18n/global-messages';
+import config from '../../../config';
+import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
+import TextField from '../../common/TextField';
+import WalletPlate from './WalletPlate';
 import {
   isValidWalletName,
   isValidWalletPassword,
@@ -11,23 +20,19 @@ import {
 } from '../../../utils/validations';
 import { observer } from 'mobx-react';
 import { Stack, Typography, Box } from '@mui/material';
-import StepController from './StepController';
-import globalMessages from '../../../i18n/global-messages';
-import config from '../../../config';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
-import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import TextField from '../../common/TextField';
-import WalletPlate from './WalletPlate';
-import type { ManageDialogsProps } from './CreateWalletPage';
-import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages: * = defineMessages({
-  description: {
+  createDesc: {
     id: 'wallet.create.forthStep.description',
     defaultMessage:
       '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet creation.',
+  },
+  restoreDesc: {
+    id: 'wallet.restore.fourthStep.description',
+    defaultMessage:
+      '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet restoration process.',
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
@@ -134,6 +139,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
       openDialog,
       closeDialog,
       selectedNetwork,
+      isRecovery,
     } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
@@ -146,12 +152,14 @@ export default class AddWalletDetailsStep extends Component<Props> {
     if (!recoveryPhrase)
       throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
 
+    const descriptionMessage = Boolean(isRecovery) ? messages.restoreDesc : messages.createDesc;
+
     return (
       <Stack alignItems="center" justifyContent="center">
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography variant="body1">
-              <FormattedHTMLMessage {...messages.description} />
+              <FormattedHTMLMessage {...descriptionMessage} />
             </Typography>
             <Box
               component="button"
@@ -213,7 +221,9 @@ export default class AddWalletDetailsStep extends Component<Props> {
                 type: 'secondary',
               },
               {
-                label: intl.formatMessage(globalMessages.create),
+                label: intl.formatMessage(
+                  Boolean(isRecovery) ? globalMessages.restore : globalMessages.create
+                ),
                 disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
                   field => !field.isValid
                 ),

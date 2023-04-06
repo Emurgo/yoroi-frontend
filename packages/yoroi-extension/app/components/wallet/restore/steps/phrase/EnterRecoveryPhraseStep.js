@@ -18,18 +18,10 @@ import globalMessages from '../../../../../i18n/global-messages';
 import RestoreRecoveryPhraseForm from './RestoreRecoveryPhraseForm';
 
 const messages = defineMessages({
-  stepDescription: {
-    id: 'wallet.create.thirdStep.description',
+  description: {
+    id: 'wallet.restore.thirdStep.description',
     defaultMessage:
-      '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
-  },
-  incorrectOrder: {
-    id: 'wallet.create.thirdStep.incorrectOrder',
-    defineMessages: '!!!Incorrect order. Try again',
-  },
-  verified: {
-    id: 'walllet.create.thirdStep.verifiedRecoveryPhrase',
-    defaultMessage: '!!!The recovery phrase is verified',
+      '!!!Add the <strong>recovery phrase</strong> you received upon your wallet creation process to <strong>restore</strong> your <strong>wallet</strong> in Yoroi.',
   },
 });
 
@@ -89,7 +81,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         maxWidth={mode.length === 15 ? '636px' : '760px'}
       >
         <Typography mb="16px">
-          <FormattedHTMLMessage {...messages.stepDescription} />
+          <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
         <RestoreRecoveryPhraseForm

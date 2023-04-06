@@ -39,8 +39,12 @@ const messages = defineMessages({
     defaultMessage: '!!!Clear all',
   },
   verified: {
-    id: 'walllet.create.thirdStep.verifiedRecoveryPhrase',
+    id: 'wallet.restore.thirdStep.verifiedRecoveryPhrase',
     defaultMessage: '!!!The recovery phrase is verified',
+  },
+  incorrectRecoveryPhrase: {
+    id: 'wallet.restore.thirdStep.incorrectRecoveryPhrase',
+    defaultMessage: '!!!Incorrect recovery phrase. Please make sure you have written it correctly',
   },
 });
 
@@ -115,7 +119,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props> {
     const allWordsEntered =
       recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
     const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
-    const mnemonicError = intl.formatMessage(globalMessages.invalidRecoveryPhrase);
+    const mnemonicError = intl.formatMessage(messages.incorrectRecoveryPhrase);
 
     if (isValidPhrase && !form.submitted) this.submit();
 

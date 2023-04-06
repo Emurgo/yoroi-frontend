@@ -22,7 +22,7 @@ import environment from '../../../environment';
 
 const messages: * = defineMessages({
   title: {
-    id: 'wallet.restore.page.title',
+    id: 'wallet.restore.title',
     defaultMessage: '!!!Restore existing wallet',
   },
   firstStep: {
@@ -147,6 +147,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           prevStep={() => setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE)}
           recoveryPhrase={recoveryPhrase.split(' ')}
           selectedNetwork={profileData.selectedNetwork}
+          isRecovery={true}
           onSubmit={(walletName: string, walletPassword: string) => {
             if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
             if (!profileData.selectedNetwork)

@@ -140,6 +140,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.create',
     defaultMessage: '!!!Create',
   },
+  restore: {
+    id: 'global.labels.restore',
+    defaultMessage: '!!!Restore',
+  },
   remove: {
     id: 'global.labels.remove',
     defaultMessage: '!!!Remove',
@@ -455,7 +459,8 @@ const globalMessages: * = defineMessages({
   },
   forMoreHelp: {
     id: 'loading.screen.error',
-    defaultMessage: '!!!Unexpected error occurred. We apologize for the inconvenience. If this error persists, please reach out to our support team {supportRequestLink}',
+    defaultMessage:
+      '!!!Unexpected error occurred. We apologize for the inconvenience. If this error persists, please reach out to our support team {supportRequestLink}',
   },
   logsContent: {
     id: 'settings.support.logs.content',
@@ -1021,9 +1026,8 @@ export const connectorMessages: * = defineMessages({
   },
   connector: {
     id: 'connector.appNameShort',
-    defaultMessage: '!!!Connector'
-  }
-
+    defaultMessage: '!!!Connector',
+  },
 });
 
 export function listOfTranslators(contributorsList: string, contributorsAck: string): string {
