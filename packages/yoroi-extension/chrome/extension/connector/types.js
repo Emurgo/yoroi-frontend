@@ -7,6 +7,7 @@ import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type CardanoTxRequest from '../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { CardanoSignTransaction } from 'trezor-connect-flow';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -529,6 +530,11 @@ export type GetConnectedSitesData = {|
 
 export type GetConnectionProtocolData = {|
   type: 'get_protocol',
+|}
+
+export type TrezorSign = {|
+  type: 'trezor-sign',
+  data: CardanoSignTransaction,
 |}
 
 // when a tx is submitted we mark those as potentially spent and filter

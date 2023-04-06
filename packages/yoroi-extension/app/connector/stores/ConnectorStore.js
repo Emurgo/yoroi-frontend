@@ -107,7 +107,6 @@ import {
   ledgerSignDataUnsupportedError,
   trezorSignDataUnsupportedError
 } from '../../domain/HardwareWalletLocalizedError';
-import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -1128,12 +1127,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     let trezorSignTxResp;
     try {
-      const signResult = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
+      const { signResult, errorMessage } = await connectorCall(
         {
-          ...trezorSignTxPayload,
-          allowSeedlessDevice: true,
+          type: 'trezor-sign',
+          data: trezorSignTxPayload,
         }
-      ));
+      );
+      if (errorMessage) {
+        throw new Error(errorMessage);
+      }
       if (!signResult.success) {
         throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
       }
