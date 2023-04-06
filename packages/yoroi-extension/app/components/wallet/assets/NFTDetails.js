@@ -295,7 +295,7 @@ function NFTDetails({
                   sx={{ ml: '-8px', mb: '24px' }}
                   startIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >
-                  <Typography variant='h7' sx={{ textTransform: 'none' }}>
+                  <Typography variant='button2'>
                     {intl.formatMessage(messages.copyMetadata)}
                   </Typography>
                 </Button>}

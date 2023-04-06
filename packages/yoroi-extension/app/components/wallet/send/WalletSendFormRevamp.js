@@ -491,13 +491,13 @@ export default class WalletSendForm extends Component<Props, State> {
                 <Typography
                   sx={{
                     position: 'absolute',
-                    top: '-10px',
+                    top: '-8px',
                     left: '6px',
                     backgroundColor: 'var(--yoroi-palette-common-white)',
                     paddingX: '4px',
                     color: shouldSendAll && 'var(--yoroi-comp-input-text-disabled)'
                   }}
-                  fontSize='12px'
+                  variant='caption2'
                 >
                   {intl.formatMessage(globalMessages.amountLabel)}
                 </Typography>
