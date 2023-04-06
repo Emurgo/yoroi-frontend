@@ -98,7 +98,9 @@ function RestoreWalletPage(props: Props & Intl): Node {
       component: (
         <SelectWalletTypeStep
           onNext={mode => {
-            profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
+            if (environment.isProduction())
+              profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
+
             walletRestore.setMode.trigger(mode);
             setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
           }}
@@ -122,7 +124,8 @@ function RestoreWalletPage(props: Props & Intl): Node {
           }
           onSubmit={async recoveryPhrase => {
             const importedWallets = wallets.publicDerivers;
-            const accountIndex = walletRestore.selectedAccount ?? 0;
+            const accountIndex = walletData.selectedAccount;
+            console.log('🚀 > recoveryPhrase:', recoveryPhrase);
 
             const duplicatedWallet = await isWalletExist(
               importedWallets,
@@ -131,6 +134,8 @@ function RestoreWalletPage(props: Props & Intl): Node {
               accountIndex,
               profileData.selectedNetwork
             );
+
+            console.log('🚀 > duplicatedWallet:', duplicatedWallet);
 
             setRestoreWalletData({ isDuplicated: Boolean(duplicatedWallet), recoveryPhrase });
 

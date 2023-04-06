@@ -109,6 +109,7 @@ export default class RestoreWalletPage extends Component<Props> {
         duplicatedWallet: null | void | PublicDeriver<>,
         walletRestoreMeta: void | WalletRestoreMeta,
         isValidMnemonic: ({| mnemonic: string, mode: RestoreModeType |}) => boolean,
+        selectedAccount: number,
         getMode: () => void | RestoreModeType,
       |},
       wallets: {|
@@ -150,6 +151,7 @@ export default class RestoreWalletPage extends Component<Props> {
           recoveryResult: stores.walletRestore.recoveryResult,
           walletRestoreMeta: stores.walletRestore.walletRestoreMeta,
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
+          selectedAccount: stores.walletRestore.selectedAccount,
           getMode: stores.walletRestore.getMode,
         },
       },
