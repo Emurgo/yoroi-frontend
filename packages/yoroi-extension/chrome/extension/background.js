@@ -24,7 +24,6 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-  TrezorSign,
 } from './connector/types';
 import {
   APIErrorCodes,
@@ -92,7 +91,6 @@ import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
-import { wrapWithFrame } from '../../app/stores/lib/TrezorWrapper';
 
 /*::
 declare var chrome;
@@ -403,7 +401,6 @@ const yoroiMessageHandler = async (
     | GetConnectedSitesData
     | GetConnectionProtocolData
     | GetUtxosRequest
-    | TrezorSign
   ),
   sender,
   sendResponse
@@ -693,20 +690,6 @@ const yoroiMessageHandler = async (
     } catch (error) {
       Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
     }
-  } else if (request.type === 'trezor-sign') {
-    let signResult = null;
-    let errorMessage = null;
-    try {
-      signResult = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
-        {
-          ...request.data,
-          allowSeedlessDevice: true,
-        }
-      ));
-    } catch (error) {
-      errorMessage = error.message;
-    }
-    sendResponse({ signResult, errorMessage });
   }
 };
 
