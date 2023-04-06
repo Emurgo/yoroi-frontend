@@ -19,6 +19,8 @@ import {
   CardanoCertificateType,
   CardanoAddressType,
   CardanoTxSigningMode,
+  CardanoTxOutputSerializationFormat,
+  CardanoTxWitnessType,
 } from 'trezor-connect-flow';
 import type {
   Address, Value, Addressing,
@@ -631,7 +633,17 @@ export function toTrezorSignRequest(
     if (outputDataHash) {
       result.datumHash = outputDataHash.to_hex();
     }
+    const inlineDatum = output.plutus_data();
+    if (inlineDatum) {
+      result.inlineDatum = inlineDatum.to_hex();
+      result.format = CardanoTxOutputSerializationFormat.MAP_BABBAGE;
+    }
 
+    const refScript = output.script_ref();
+    if (refScript) {
+      result.referenceScript = refScript.to_hex();
+      result.format = CardanoTxOutputSerializationFormat.MAP_BABBAGE;
+    }
 
     return result;
   }
@@ -759,13 +771,6 @@ export function toTrezorSignRequest(
     formattedCollateral = formatInputs(collateral);
   }
 
-  let formattedReferenceInputs = null;
-  const referenceInputs = txBody.reference_inputs();
-  if (referenceInputs) {
-    // eslint-disable-next-line no-unused-vars
-    formattedReferenceInputs = formatInputs(referenceInputs);
-  }
-
   const validityIntervalStart = txBody.validity_start_interval_bignum()?.to_str() ?? null;
   // temp workaround for buggy Mint.to_js_value()
   const formattedMint = JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(([policyId, assets]) => ({
@@ -814,7 +819,26 @@ export function toTrezorSignRequest(
   if (requiredSigners) {
     result.requiredSigners = formattedRequiredSigners;
   }
-
+  const collateralReturn = txBody.collateral_return();
+  if (collateralReturn) {
+    result.collateralReturn = formatOutput(collateralReturn);
+  }
+  const totalCollateral = txBody.total_collateral();
+  if (totalCollateral) {
+    result.totalCollateral = totalCollateral.to_str();
+  }
+  const referenceInputs = txBody.reference_inputs();
+  if (referenceInputs) {
+    const formattedReferenceInputs = [];
+    for (let i = 0; i < referenceInputs.len(); i++) {
+      const input = referenceInputs.get(i);
+      formattedReferenceInputs.push({
+        prev_hash: input.transaction_id().to_hex(),
+        prev_index: input.index(),
+      });
+    }
+    result.referenceInputs = formattedReferenceInputs;
+  }
   if (additionalWitnessRequests.length > 0) {
     result.additionalWitnessRequests = additionalWitnessRequests;
   }
