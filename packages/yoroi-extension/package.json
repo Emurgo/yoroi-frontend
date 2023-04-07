@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.19.0",
+  "version": "4.19.100",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -185,7 +185,7 @@
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "5.51.1",
     "@ledgerhq/hw-transport-webusb": "5.49.0",
-    "@emurgo/yoroi-lib": "0.2.0",
+    "@emurgo/yoroi-lib": "0.3.3",
     "@mui/lab": "^5.0.0-alpha.51",
     "@mui/material": "^5.0.4",
     "@mui/x-date-pickers": "^5.0.8",
@@ -244,7 +244,7 @@
     "semver": "7.3.4",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
-    "trezor-connect": "8.2.4",
+    "trezor-connect": "8.2.12",
     "ua-parser-js": "0.7.24",
     "unorm": "1.6.0",
     "validator": "13.5.2"
