@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
+  yoroi: {
+    id: 'global.yoroi',
+    defaultMessage: 'Yoroi',
+  },
   here: {
     id: 'global.util.here',
     defaultMessage: '!!!here',
