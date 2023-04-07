@@ -16,10 +16,12 @@ function verify(
   signatureHex: string,
   publicKey: RustModule.WalletV4.PublicKey
 ): boolean {
-  return publicKey.verify(
-    serializer(obj),
-    RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex)
-  );
+  return RustModule.WasmScope(Scope => {
+    return publicKey.verify(
+      serializer(obj),
+      Scope.WalletV4.Ed25519Signature.from_hex(signatureHex)
+    );
+  })
 }
 
 export function verifyTicker(
@@ -37,10 +39,12 @@ export function verifyPubKeyDataReplacement(
   pubKeyDataSignature: string,
   pubKeyMaster: string
 ): boolean {
-  return verify(
-    pubKeyData,
-    s => Buffer.from(s),
-    pubKeyDataSignature,
-    RustModule.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyMaster, 'hex'))
-  );
+  return RustModule.WasmScope(Scope => {
+    return verify(
+      pubKeyData,
+      s => Buffer.from(s),
+      pubKeyDataSignature,
+      Scope.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyMaster, 'hex'))
+    );
+  });
 }

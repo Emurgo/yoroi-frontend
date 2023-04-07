@@ -461,10 +461,16 @@ class MockTrezorConnect {
       body.set_withdrawals(withdrawals);
     }
 
-    const txBodyHash = RustModule.WalletV4.hash_transaction(body);
-    for (const witGen of witGens) {
-      witGen(txBodyHash);
-    }
+    const txHash: string = RustModule.WasmScope(Scope => {
+      const txBodyHash = Scope.WalletV4.hash_transaction(body);
+
+      for (const witGen of witGens) {
+        witGen(txBodyHash);
+      }
+
+      return Buffer.from(txBodyHash.to_bytes()).toString('hex');
+    });
+
 
     // TODO: handle scripts
 
@@ -472,7 +478,7 @@ class MockTrezorConnect {
       success: true,
       id: 0,
       payload: {
-        hash: Buffer.from(txBodyHash.to_bytes()).toString('hex'),
+        hash: txHash,
         witnesses: witnessesToReturn,
       },
     }: Success<CardanoSignedTxData>) ;

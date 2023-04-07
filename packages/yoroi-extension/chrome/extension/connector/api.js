@@ -321,13 +321,14 @@ export async function connectorGetCollateralUtxos(
     throw new Error('requested collateral amount is beyond the allowed limits')
   }
   const adaApi = new AdaApi();
-  const utxosToConsider = (await adaApi.utxosWithSubmittedTxs(
+  const maxViableUtxoAmount = required.plus(MAX_PER_UTXO_SURPLUS);
+  const utxosToConsider = adaApi.utxosWithSubmittedTxs(
     utxos,
     wallet.publicDeriverId,
     submittedTxs,
-  )).filter(
+  ).filter(
     utxo => utxo.assets.length === 0 &&
-      new BigNumber(utxo.amount).lt(required.plus(MAX_PER_UTXO_SURPLUS))
+      new BigNumber(utxo.amount).lt(maxViableUtxoAmount)
   )
   utxosToConsider.sort(
     (utxo1, utxo2) => (new BigNumber(utxo1.amount)).comparedTo(utxo2.amount)
@@ -382,17 +383,17 @@ async function getAllFullAddresses(
   const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
   const addressTypes = isCardano ? [
     CoreAddressTypes.CARDANO_BASE,
-    CoreAddressTypes.CARDANO_ENTERPRISE,
-    CoreAddressTypes.CARDANO_LEGACY,
-    CoreAddressTypes.CARDANO_PTR,
-    // CoreAddressTypes.CARDANO_REWARD
   ] : [
     CoreAddressTypes.ERGO_P2PK,
     CoreAddressTypes.ERGO_P2SH,
     CoreAddressTypes.ERGO_P2S
   ]
   const promises = addressTypes
-    .map(type => getAllAddressesForDisplay({ publicDeriver: wallet, type }));
+    .map(type => getAllAddressesForDisplay({
+      publicDeriver: wallet,
+      type,
+      ignoreCutoff: true,
+    }));
   await RustModule.load();
   const addresses: FullAddressPayload[] =
     (await Promise.all(promises)).flat();

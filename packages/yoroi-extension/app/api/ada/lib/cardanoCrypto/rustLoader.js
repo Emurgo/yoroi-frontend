@@ -324,5 +324,5 @@ class Module {
   }
 }
 
-// need this otherwise Wallet's flow type isn't properly exported
+// Need this otherwise Wallet's flow type isn't properly exported
 export const RustModule: Module = new Module();

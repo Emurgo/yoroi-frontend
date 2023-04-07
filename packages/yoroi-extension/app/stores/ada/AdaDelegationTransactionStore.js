@@ -193,6 +193,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         }],
       });
     }).promise;
+
     if (unsignedTx == null) throw new Error(`Should never happen`);
   }
 
