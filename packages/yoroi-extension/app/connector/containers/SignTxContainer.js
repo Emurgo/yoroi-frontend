@@ -109,7 +109,9 @@ export default class SignTxContainer extends Component<
     if (selectedWallet == null) return this.renderLoading();
     const whitelistEntries = this.generated.stores.connector.currentConnectorWhitelist;
     const connectedWebsite = whitelistEntries.find(
-      cacheEntry => selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId
+      cacheEntry =>
+      selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId &&
+        cacheEntry.url === signingMessage.requesterUrl,
     );
 
     const tooltipNotification = {

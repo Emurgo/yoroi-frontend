@@ -56,6 +56,7 @@ export async function rawGetAllAddressesForDisplay(
   request: {|
     publicDeriver: IPublicDeriver<>,
     type: CoreAddressT,
+    ignoreCutoff: boolean,
    |},
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
@@ -90,7 +91,7 @@ export async function rawGetAllAddressesForDisplay(
 
   // when public deriver level = chain we still have a display cutoff
   const hasCutoff = asDisplayCutoff(request.publicDeriver);
-  if (hasCutoff != null) {
+  if (hasCutoff != null && !request.ignoreCutoff) {
     const cutoff = await hasCutoff.rawGetCutoff(
       tx,
       {
@@ -127,8 +128,9 @@ export type FullAddressPayload =
 
 export async function getAllAddressesForDisplay(
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-    type: CoreAddressT,
+    +publicDeriver: IPublicDeriver<ConceptualWallet>,
+    +type: CoreAddressT,
+    +ignoreCutoff?: ?boolean,
   |},
 ): Promise<Array<FullAddressPayload>> {
   const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
@@ -160,6 +162,7 @@ export async function getAllAddressesForDisplay(
       {
         publicDeriver: request.publicDeriver,
         type: request.type,
+        ignoreCutoff: request.ignoreCutoff === true,
       },
       derivationTables,
     )
