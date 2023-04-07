@@ -14,9 +14,9 @@ const messages: Object = defineMessages({
 })
 
 type Props = {|
-    open: bolean,
+    open: boolean,
     children: Node,
-    onClose(): void,
+    onClose: () => void,
 |}
 
 type Intl = {|

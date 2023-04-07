@@ -6,6 +6,8 @@ import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
 
+type Props = {||}
+
 
 function CreateWalletPage(): Node {
   const [open, setOpen] = useState(false);

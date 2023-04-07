@@ -38,7 +38,7 @@ type Intl = {|
 
 type Props = {|
     open: boolean,
-    onClose(): void,
+    onClose: () => void,
 |}
 
 function CreateWalletPage(props: Props & Intl): Node {
