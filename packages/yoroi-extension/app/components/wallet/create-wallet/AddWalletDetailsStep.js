@@ -144,6 +144,11 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
+    const isValidFields =
+      isValidWalletName(walletName) &&
+      isValidWalletPassword(walletPassword) &&
+      isValidRepeatPassword(walletPassword, repeatPassword);
+
     if (!recoveryPhrase)
       throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
 
@@ -215,9 +220,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
               },
               {
                 label: intl.formatMessage(globalMessages.create),
-                disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
-                  field => !field.isValid
-                ),
+                disabled: !isValidFields,
                 onClick: () => {
                   this.props.onSubmit(walletName, walletPassword);
                 },
