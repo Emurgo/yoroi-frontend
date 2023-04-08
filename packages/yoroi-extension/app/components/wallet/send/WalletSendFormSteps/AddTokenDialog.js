@@ -1,6 +1,6 @@
 // @flow
 
-/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
+/* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
 import { Component } from 'react';
@@ -10,23 +10,22 @@ import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import styles from './AddTokenDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import {
-  MultiToken,
-} from '../../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../../assets/images/assets-page/info.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
-import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg'
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
 import SingleTokenRow from './SingleTokenRow';
 import { Button } from '@mui/material';
+import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import type {
-  TokenLookupKey,
-} from '../../../../api/common/lib/MultiToken';
-import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+  TokenRow,
+  NetworkRow,
+} from '../../../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
-import type { FormattedTokenDisplay } from '../../../../utils/wallet'
+import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
@@ -40,7 +39,7 @@ import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 type Props = {|
   +onClose: void => void,
   +spendableBalance: ?MultiToken,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +onAddToken: ({|
@@ -53,8 +52,8 @@ type Props = {|
     amount?: string,
     shouldSendAll?: boolean,
   |}>,
-  +shouldAddMoreTokens: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => boolean,
-  +calculateMinAda: Array<{| token: $ReadOnly<TokenRow>, included: boolean |}> => string,
+  +shouldAddMoreTokens: (Array<{| token: $ReadOnly<TokenRow>, included: boolean |}>) => boolean,
+  +calculateMinAda: (Array<{| token: $ReadOnly<TokenRow>, included: boolean |}>) => string,
 |};
 
 type State = {|
@@ -66,20 +65,18 @@ type State = {|
     token: $ReadOnly<TokenRow>,
     amount: BigNumber | null,
     included: boolean,
-  |}>
-|}
-
+  |}>,
+|};
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
-  DOWN: 'DOWN'
-}
+  DOWN: 'DOWN',
+};
 
 const SORTING_COLUMNS = {
   LABEL: 'label',
-  AMOUNT: 'amount'
-}
-
+  AMOUNT: 'amount',
+};
 
 export const messages: Object = defineMessages({
   nTokens: {
@@ -108,22 +105,21 @@ export const messages: Object = defineMessages({
   },
   noTokensYet: {
     id: 'wallet.send.form.dialog.noTokensYet',
-    defaultMessage: '!!!There are no tokens in your wallet yet'
+    defaultMessage: '!!!There are no tokens in your wallet yet',
   },
   add: {
-    id: 'wallet.send.form.dialog.add',
-    defaultMessage: '!!!add'
+    id: 'wallet.send.form.dialog.confirm',
+    defaultMessage: '!!!Confirm',
   },
   minAda: {
     id: 'wallet.send.form.dialog.minAda',
-    defaultMessage: '!!!Min-ADA: {minAda}'
-},
+    defaultMessage: '!!!Min-ADA: {minAda}',
+  },
 });
 
 @observer
 export default class AddTokenDialog extends Component<Props, State> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -137,40 +133,38 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   componentDidMount(): void {
     const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
-    const tokensList = getTokens(spendableBalance, getTokenInfo)
-    const selectedTokens = plannedTxInfoMap.filter(
-      ({ token }) => token.IsNFT === false && token.IsDefault === false
-    )
+    const tokensList = getTokens(spendableBalance, getTokenInfo);
+    const selectedTokens = plannedTxInfoMap
+      .filter(({ token }) => token.IsNFT === false && token.IsDefault === false)
       .map(({ token, amount }) => ({ token, amount: new BigNumber(amount ?? 0), included: true }));
 
-    this.setState({ currentTokensList: tokensList, fullTokensList: tokensList, selectedTokens })
+    this.setState({ currentTokensList: tokensList, fullTokensList: tokensList, selectedTokens });
   }
 
-
-  onSelect: $ReadOnly<TokenRow> => void = (token) => {
+  onSelect: ($ReadOnly<TokenRow>) => void = token => {
     // Remove if it already in the list
     const selectedTokens = this.state.selectedTokens.filter(
       ({ token: t }) => t.Identifier !== token.Identifier
     );
     this.setState({ selectedTokens: [...selectedTokens, { token, included: true, amount: null }] });
-  }
+  };
 
-  onRemoveToken: $ReadOnly<TokenRow> => void = (token) => {
+  onRemoveToken: ($ReadOnly<TokenRow>) => void = token => {
     const tokenEntry = this.getSelectedToken(token);
     if (!tokenEntry) return;
     const selectedTokens = [...this.state.selectedTokens].filter(
-      ({ token: t }) => t.Identifier !== token.Identifier);
+      ({ token: t }) => t.Identifier !== token.Identifier
+    );
 
     this.setState({
-      selectedTokens: [...selectedTokens, { token, included: false, amount: null }]
+      selectedTokens: [...selectedTokens, { token, included: false, amount: null }],
     });
-  }
+  };
 
-  isTokenIncluded: $ReadOnly<TokenRow> => boolean = (token) => {
-    return !!this.state.selectedTokens.find(
-      ({ token: t }) => t.Identifier === token.Identifier
-    )?.included;
-  }
+  isTokenIncluded: ($ReadOnly<TokenRow>) => boolean = token => {
+    return !!this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier)
+      ?.included;
+  };
 
   updateAmount: ($ReadOnly<TokenRow>, BigNumber | null) => void = (token, amount) => {
     const filteredTokens = this.state.selectedTokens.filter(
@@ -178,71 +172,72 @@ export default class AddTokenDialog extends Component<Props, State> {
     );
 
     this.setState({ selectedTokens: [...filteredTokens, { token, amount, included: true }] });
-  }
+  };
 
-  getCurrentAmount: $ReadOnly<TokenRow> => ?BigNumber = (token) => {
+  getCurrentAmount: ($ReadOnly<TokenRow>) => ?BigNumber = token => {
     const tokenEntry = this.getSelectedToken(token);
     return tokenEntry?.amount;
-  }
+  };
 
-  getSelectedToken: $ReadOnly<TokenRow> => {|
+  getSelectedToken: (
+    $ReadOnly<TokenRow>
+  ) => {|
     token: $ReadOnly<TokenRow>,
     amount: BigNumber | null,
     included: boolean,
-  |} | null = (token) => {
-    return this.state.selectedTokens.find(
-      ({ token: t }) => t.Identifier === token.Identifier
-    ) ?? null;
-  }
-
+  |} | null = token => {
+    return (
+      this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier) ?? null
+    );
+  };
 
   onAddAll: void => void = () => {
     const toRemove = [];
     for (const { token, amount, included } of this.state.selectedTokens) {
       if (!included) {
         toRemove.push(token);
-        continue
+        continue;
       }
       if (!amount) continue;
       // Todo: combine add token + amount into one step
       this.props.onAddToken({
-            token, shouldReset: false
+        token,
+        shouldReset: false,
       });
 
       this.props.updateAmount(amount);
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
-  }
+  };
 
-  getMaxAmount: $ReadOnly<TokenRow> => BigNumber = (tokenInfo) => {
+  getMaxAmount: ($ReadOnly<TokenRow>) => BigNumber = tokenInfo => {
     const token = this.state.fullTokensList.find(
       entry => entry.info.Identifier === tokenInfo.Identifier
     );
 
     if (!token) throw new Error('Token not found.');
-    const amount = new BigNumber(formattedAmountToNaturalUnits(
-      token.amount ?? '0',
-      token.info.Metadata.numberOfDecimals,
-    ));
-    return amount
-  }
+    const amount = new BigNumber(
+      formattedAmountToNaturalUnits(token.amount ?? '0', token.info.Metadata.numberOfDecimals)
+    );
+    return amount;
+  };
 
-  isValidAmount: $ReadOnly<TokenRow> => boolean = (token) => {
+  isValidAmount: ($ReadOnly<TokenRow>) => boolean = token => {
     const tokenEntry = this.state.selectedTokens.find(
       ({ token: t }) => t.Identifier === token.Identifier
     );
     if (tokenEntry && tokenEntry.included) {
       // Should not show any error if no amount entered
       // Will disable the `ADD` button only
-      if (tokenEntry.amount === null) return true
+      if (tokenEntry.amount === null) return true;
       const maxAmount = this.getMaxAmount(token);
       if (tokenEntry.amount && maxAmount.lt(tokenEntry.amount)) {
-        return false
+        return false;
       }
-    };
-    return true
-  }
+    }
+    return true;
+  };
 
   isValidAmounts: void => boolean = () => {
     for (const tokenEntry of this.state.selectedTokens) {
@@ -251,72 +246,67 @@ export default class AddTokenDialog extends Component<Props, State> {
         !this.isValidAmount(tokenEntry.token) ||
         !tokenEntry.amount ||
         Number(tokenEntry.amount) === 0
-      ) return false;
-    }
-    return true
-  }
-
-  search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
-    (event: SyntheticEvent<HTMLInputElement>) => {
-      const keyword = event.currentTarget.value
-      this.setState((prev) => ({ currentTokensList: prev.fullTokensList }))
-      if(!keyword) return
-      const regExp = new RegExp(keyword, 'gi')
-      const tokensListCopy = [...this.state.fullTokensList]
-
-      const filteredTokensList = tokensListCopy.filter(
-        a => a.label.match(regExp) || a.id.match(regExp)
       )
-      this.setState({ currentTokensList: filteredTokensList })
-    };
+        return false;
+    }
+    return true;
+  };
 
-    compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
-      let newSortDirection = SORTING_DIRECTIONS.UP
-      if (!this.state.sortingDirection) {
-        newSortDirection = SORTING_DIRECTIONS.UP
-      } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
-        newSortDirection = SORTING_DIRECTIONS.DOWN
-      }
+  search: (e: SyntheticEvent<HTMLInputElement>) => void = (
+    event: SyntheticEvent<HTMLInputElement>
+  ) => {
+    const keyword = event.currentTarget.value;
+    this.setState(prev => ({ currentTokensList: prev.fullTokensList }));
+    if (!keyword) return;
+    const regExp = new RegExp(keyword, 'gi');
+    const tokensListCopy = [...this.state.fullTokensList];
 
-      this.setState({ sortingDirection: newSortDirection })
+    const filteredTokensList = tokensListCopy.filter(
+      a => a.label.match(regExp) || a.id.match(regExp)
+    );
+    this.setState({ currentTokensList: filteredTokensList });
+  };
 
-      if (field === SORTING_COLUMNS.AMOUNT) {
-        return compareNumbers(a[field], b[field], newSortDirection)
-      }
-      // Other fields
-      return compareStrings(a[field], b[field], newSortDirection)
+  compare: (a: any, b: any, field: string) => number = (a, b, field) => {
+    let newSortDirection = SORTING_DIRECTIONS.UP;
+    if (!this.state.sortingDirection) {
+      newSortDirection = SORTING_DIRECTIONS.UP;
+    } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
+      newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
-  sortTokens: ((field: string) => void) = (field: string) => {
-    const tokensListCopy = [...this.state.fullTokensList]
-    const sortedTokens = tokensListCopy.sort((a,b) => this.compare(a,b, field))
+    this.setState({ sortingDirection: newSortDirection });
+
+    if (field === SORTING_COLUMNS.AMOUNT) {
+      return compareNumbers(a[field], b[field], newSortDirection);
+    }
+    // Other fields
+    return compareStrings(a[field], b[field], newSortDirection);
+  };
+
+  sortTokens: (field: string) => void = (field: string) => {
+    const tokensListCopy = [...this.state.fullTokensList];
+    const sortedTokens = tokensListCopy.sort((a, b) => this.compare(a, b, field));
     this.setState({ currentTokensList: sortedTokens, sortingColumn: field });
   };
 
-  displayColumnLogo: ((column: string) => Node) = (column: string) => {
-    const {
-        sortingColumn,
-        sortingDirection
-    } = this.state;
+  displayColumnLogo: (column: string) => Node = (column: string) => {
+    const { sortingColumn, sortingDirection } = this.state;
     if (!sortingDirection || sortingColumn !== column) {
-      return <ArrowsList />
+      return <ArrowsList />;
     }
     if (sortingDirection === SORTING_DIRECTIONS.UP && sortingColumn === column) {
-      return <ArrowsListFromTop />
+      return <ArrowsListFromTop />;
     }
     if (sortingDirection === SORTING_DIRECTIONS.DOWN && sortingColumn === column) {
-      return <ArrowsListFromBottom />
+      return <ArrowsListFromBottom />;
     }
     return <ArrowsList />;
-  }
+  };
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      onClose,
-      calculateMinAda,
-      shouldAddMoreTokens
-    } = this.props;
+    const { onClose, calculateMinAda, shouldAddMoreTokens } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
     const shouldAddMore = shouldAddMoreTokens(
       selectedTokens.map(({ token, included }) => ({ token, included }))
@@ -324,8 +314,9 @@ export default class AddTokenDialog extends Component<Props, State> {
     return (
       <Dialog
         title={
-          fullTokensList.length === 0 ? intl.formatMessage(globalMessages.tokens) :
-            intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
+          fullTokensList.length === 0
+            ? intl.formatMessage(globalMessages.tokens)
+            : intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
         }
         closeOnOverlayClick={false}
         className={styles.dialog}
@@ -334,93 +325,104 @@ export default class AddTokenDialog extends Component<Props, State> {
       >
         <div className={styles.component}>
           <Box sx={{ position: 'relative', width: '100%' }}>
-            <Box sx={{ position: 'absolute', top: '55%', left: '10px', transform: 'translateY(-50%)' }}> <SearchIcon /> </Box>
+            <Box
+              sx={{ position: 'absolute', top: '55%', left: '10px', transform: 'translateY(-50%)' }}
+            >
+              {' '}
+              <SearchIcon />{' '}
+            </Box>
             <OutlinedInput
               onChange={this.search}
-              sx={{ padding: '0px 0px 0px 30px', height: '40px', width: '100%', fontSize: '14px', lineHeight: '22px', }}
+              sx={{
+                padding: '0px 0px 0px 30px',
+                height: '40px',
+                width: '100%',
+                fontSize: '14px',
+                lineHeight: '22px',
+              }}
               placeholder={intl.formatMessage(messages.search)}
             />
           </Box>
           {isCardanoHaskell(this.props.selectedNetwork) && (
-          <div className={styles.minAda}>
-            <MinAda
-              minAda={calculateMinAda(
-                selectedTokens.map(({ token, included }) => ({ token, included }))
-              )}
-            />
-          </div>
+            <div className={styles.minAda}>
+              <MinAda
+                minAda={calculateMinAda(
+                  selectedTokens.map(({ token, included }) => ({ token, included }))
+                )}
+              />
+            </div>
           )}
           {!shouldAddMore && (
             <Box sx={{ marginTop: '10px' }}>
               <MaxAssetsError maxAssetsAllowed={10} />
-            </Box>)}
-          {
-            currentTokensList.length === 0 ? (
-              <div className={styles.noAssetFound}>
-                <NoItemsFoundImg />
-                <h1 className={styles.text}>
-                  {intl.formatMessage(
-                    fullTokensList.length === 0 ? messages.noTokensYet : messages.noTokensFound
-                  )}
-                </h1>
-              </div>
-            ): (
-              <div className={styles.columnsContainer}>
-                <ul className={styles.columns}>
-                  <li className={styles.name}>
-                    <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
-                      <p className={styles.headerText}>
-                        {intl.formatMessage(messages.nameAndTicker)}
-                      </p>
-                      {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
-                    </button>
-                  </li>
-                  <li className={styles.identifier}>
+            </Box>
+          )}
+          {currentTokensList.length === 0 ? (
+            <div className={styles.noAssetFound}>
+              <NoItemsFoundImg />
+              <h1 className={styles.text}>
+                {intl.formatMessage(
+                  fullTokensList.length === 0 ? messages.noTokensYet : messages.noTokensFound
+                )}
+              </h1>
+            </div>
+          ) : (
+            <div className={styles.columnsContainer}>
+              <ul className={styles.columns}>
+                <li className={styles.name}>
+                  <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
                     <p className={styles.headerText}>
-                      {intl.formatMessage(messages.identifier)}
+                      {intl.formatMessage(messages.nameAndTicker)}
                     </p>
-                    <InfoIcon />
-                  </li>
-                  <li className={styles.quantity}>
-                    <button type='button' onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                      <p className={styles.headerText}>
-                        {intl.formatMessage(messages.quantity)}
-                      </p>
-                      {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                    </button>
-                  </li>
-                </ul>
+                    {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
+                  </button>
+                </li>
+                <li className={styles.identifier}>
+                  <p className={styles.headerText}>{intl.formatMessage(messages.identifier)}</p>
+                  <InfoIcon />
+                </li>
+                <li className={styles.quantity}>
+                  <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
+                    <p className={styles.headerText}>{intl.formatMessage(messages.quantity)}</p>
+                    {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                  </button>
+                </li>
+              </ul>
 
-                {
-                  currentTokensList.map(token => (
-                    <SingleTokenRow
-                      key={token.id}
-                      token={token}
-                      updateAmount={this.updateAmount}
-                      getTokenAmount={this.getCurrentAmount}
-                      onAddToken={this.onSelect}
-                      onRemoveToken={this.onRemoveToken}
-                      isTokenIncluded={this.isTokenIncluded}
-                      isValidAmount={this.isValidAmount}
-                    />
-                  ))
-                }
-              </div>
-            )
-          }
-
+              {currentTokensList.map(token => (
+                <SingleTokenRow
+                  key={token.id}
+                  token={token}
+                  updateAmount={this.updateAmount}
+                  getTokenAmount={this.getCurrentAmount}
+                  onAddToken={this.onSelect}
+                  onRemoveToken={this.onRemoveToken}
+                  isTokenIncluded={this.isTokenIncluded}
+                  isValidAmount={this.isValidAmount}
+                />
+              ))}
+            </div>
+          )}
         </div>
         {fullTokensList.length !== 0 && (
           <Button
             sx={{
               width: '100%',
-              height: '61px',
-              borderRadius: '0px',
-              color: 'var(--yoroi-palette-secondary-300)',
+              color: 'secondary.300',
+              borderTopLeftRadius: '0px',
+              borderTopRightRadius: '0px',
+              borderColor: 'gray.200',
+              ':hover': {
+                bgcolor: 'transparent',
+                borderColor: 'gray.300',
+              },
+              '&.MuiButton-sizeMedium': {
+                height: '81px',
+              },
             }}
             disabled={selectedTokens.length === 0 || !this.isValidAmounts() || !shouldAddMore}
             onClick={this.onAddAll}
-            variant='ternary'
+            variant="ternary"
           >
             {intl.formatMessage(messages.add)}
           </Button>

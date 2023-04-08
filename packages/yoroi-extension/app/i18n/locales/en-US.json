@@ -164,7 +164,7 @@
   "global.util.here": "here",
   "wallet.send.form.memoWarning": "Memos are stored localy only",
   "wallet.send.form.max": "MAX",
-  "wallet.send.form.dialog.add": "add",
+  "wallet.send.form.dialog.confirm": "Confirm",
   "wallet.send.form.dialog.minAda": "Min-ADA: {minAda}",
   "wallet.send.form.amount.minAdaLabel": "Min ADA",
   "wallet.send.form.amount.minimumRequiredADA": "The minimum required is {number} ADA",

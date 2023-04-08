@@ -701,29 +701,6 @@ export default class WalletSendForm extends Component<Props, State> {
     this.setState({ invalidMemo: !isValid });
   }
 
-  _nextStepButton(disabledCondition: boolean, nextStep: () => void): Node {
-    const { intl } = this.context;
-
-    return (
-      <Button
-        variant="contained"
-        color="secondary"
-        size="large"
-        onClick={nextStep}
-        /** Next Action can't be performed in case transaction fees are not calculated
-         * or there's a transaction waiting to be confirmed (pending) */
-        disabled={disabledCondition}
-        sx={{
-          margin: '125px 0px 0px 0px',
-          display: 'block',
-          width: '173px',
-        }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>
-    );
-  }
-
   renderUnitOfAccountAmount(value: string): Node {
     let convertedAmount;
 
