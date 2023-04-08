@@ -8,6 +8,7 @@
   border: 1px solid var(--yoroi-palette-gray-300);
   border-radius: 8px;
   min-width: 360px;
+  height: 56px;
 }
 
 .outerWrapper {
@@ -43,12 +44,12 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   text-align: start;
   margin-right: auto;
 
-  .name { 
+  .name {
     font-size: 14px;
     line-height: 22px;
     color: #242838;
@@ -60,7 +61,7 @@
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0.2px;
-    color: #6B7384;
+    color: #6b7384;
   }
 }
 
@@ -72,6 +73,7 @@
   line-height: 22px;
   width: 100%;
 }
+
 .balance {
   display: flex;
   flex-direction: column;
@@ -94,7 +96,6 @@
   width: 100%;
 }
 
-
 .amount {
   font-weight: 500;
 
@@ -108,28 +109,10 @@
       margin-top: -2px;
     }
   }
-
-
 }
 
 .highlightAmount {
   color: var(--yoroi-palette-secondary-300);
-}
-
-.toggleButton {
-  margin-left: auto;
-  background-color: var(--yoroi-palette-primary-200);
-  width: 56px;
-  height: 56px;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  &:hover {
-    cursor: pointer;
-  }
-
-  g {
-    stroke: #ffffff;
-  }
 }
 
 .fixedAmount {
