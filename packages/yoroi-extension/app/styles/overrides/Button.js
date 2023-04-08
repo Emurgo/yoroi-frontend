@@ -254,7 +254,7 @@ const RevampButton = {
       borderRadius: 8,
       fontWeight: 500,
       fontFamily: 'Rubik',
-      lineHeight: '18px',
+      lineHeight: '19px',
       textTransform: 'uppercase',
       padding: '16px',
       '&.MuiButton-sizeLarge': {
@@ -295,28 +295,28 @@ const RevampButton = {
     {
       props: { variant: 'ternary' },
       style: {
-        minWidth: '160px',
-        minHeight: '44px',
-        height: '44px',
+        width: '160px',
+        height: '40px',
+        padding: '8px',
         fontSize: '0.875rem',
         backgroundColor: 'transparent',
-        color: 'var(--yoroi-palette-gray-600)',
+        color: revampBaseTheme.palette.gray[600],
         border: '1px solid',
-        borderColor: 'var(--yoroi-palette-gray-400)',
+        borderColor: revampBaseTheme.palette.gray[400],
         ':hover': {
-          borderColor: 'var(--yoroi-palette-gray-500)',
+          borderColor: revampBaseTheme.palette.gray[500],
         },
         '&.Mui-active': {
-          backgroundColor: 'var(--yoroi-palette-gray-50)',
+          backgroundColor: revampBaseTheme.palette.gray[50],
         },
         '&.Mui-disabled': {
           border: '1px solid',
           opacity: 0.4,
-          borderColor: 'var(--yoroi-palette-gray-400)',
-          color: 'var(--yoroi-palette-gray-600)',
+          borderColor: revampBaseTheme.palette.gray[400],
+          color: revampBaseTheme.palette.gray[600],
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: 'var(--yoroi-palette-gray-600)',
+          color: revampBaseTheme.palette.gray[600],
         },
       },
     },
