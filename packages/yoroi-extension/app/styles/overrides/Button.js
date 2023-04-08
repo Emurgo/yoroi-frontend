@@ -196,6 +196,56 @@ const ModernButton = {
   ],
 };
 
+function makeContainedBtnStyles(color: 'primary' | 'secondary'): Object {
+  return {
+    backgroundColor: revampBaseTheme.palette[color].main,
+    color: revampBaseTheme.palette.common.white,
+    ':hover': {
+      backgroundColor: revampBaseTheme.palette[color][600],
+    },
+    ':active': {
+      backgroundColor: revampBaseTheme.palette[color][700],
+    },
+    ':focus': {
+      backgroundColor: revampBaseTheme.palette[color][500],
+    },
+    '&.Mui-disabled': {
+      color: revampBaseTheme.palette.common.white,
+      backgroundColor: revampBaseTheme.palette[color][200],
+    },
+    '& .MuiLoadingButton-loadingIndicator': {
+      color: revampBaseTheme.palette.common.white,
+    },
+  };
+}
+
+function makeOutlinedBtnStyles(color: 'primary' | 'secondary'): Object {
+  return {
+    backgroundColor: revampBaseTheme.palette.common.white,
+    color: revampBaseTheme.palette[color][600],
+    border: '2px solid',
+    borderColor: revampBaseTheme.palette[color][600],
+    ':hover': {
+      border: '2px solid',
+      color: revampBaseTheme.palette[color][600],
+      borderColor: revampBaseTheme.palette[color][600],
+    },
+    ':active': {
+      borderColor: revampBaseTheme.palette[color][700],
+    },
+    ':focus': {
+      borderColor: revampBaseTheme.palette[color][500],
+    },
+    '&.Mui-disabled': {
+      border: '2px solid',
+      borderColor: revampBaseTheme.palette[color][200],
+      color: revampBaseTheme.palette[color][200],
+    },
+    '& .MuiLoadingButton-loadingIndicator': {
+      color: revampBaseTheme.palette[color][600],
+    },
+  };
+}
 // Button in Figam: https://bit.ly/3Ky4uvo
 const RevampButton = {
   styleOverrides: {
@@ -204,61 +254,43 @@ const RevampButton = {
       borderRadius: 8,
       fontWeight: 500,
       fontFamily: 'Rubik',
-      minHeight: 52,
-      minWidth: 230,
       lineHeight: '18px',
       textTransform: 'uppercase',
       padding: '16px',
-      height: 52,
+      '&.MuiButton-sizeLarge': {
+        height: '56px',
+      },
+      '&.MuiButton-sizeMedium': {
+        padding: '10px',
+        height: '40px',
+      },
+      '&.MuiButton-sizeSmall': {
+        padding: '7px',
+        height: '32px',
+      },
+      boxShadow: 'none',
+      ':hover': {
+        boxShadow: 'none',
+      },
     },
   },
-  defaultProps: { disableRipple: true },
+  defaultProps: { disableRipple: false },
   variants: [
     {
-      props: { variant: 'primary' },
-      style: {
-        backgroundColor: revampBaseTheme.palette.primary.main,
-        color: revampBaseTheme.palette.common.white,
-        ':hover': {
-          backgroundColor: revampBaseTheme.palette.primary[600],
-        },
-        '&.Mui-active': {
-          backgroundColor: revampBaseTheme.palette.primary[700],
-        },
-        '&.Mui-disabled': {
-          opacity: 0.4,
-          color: revampBaseTheme.palette.common.white,
-        },
-        '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.common.white,
-        },
-      },
+      props: { variant: 'contained', color: 'primary' },
+      style: makeContainedBtnStyles('primary'),
     },
     {
-      props: { variant: 'secondary' },
-      style: {
-        backgroundColor: revampBaseTheme.palette.common.white,
-        color: revampBaseTheme.palette.primary[600],
-        border: '2px solid',
-        borderColor: revampBaseTheme.palette.primary[600],
-        ':hover': {
-          color: revampBaseTheme.palette.primary[600],
-          borderColor: 'var(--yoroi-comp-button-secondary-border-hover)',
-          backgroundColor: 'var(--yoroi-comp-button-secondary-background-hover)',
-        },
-        '&.Mui-active': {
-          backgroundColor: 'var(--yoroi-comp-button-secondary-background-active)',
-        },
-        '&.Mui-disabled': {
-          border: '2px solid',
-          opacity: 0.4,
-          borderColor: 'var(--yoroi-comp-button-secondary-border)',
-          color: 'var(--yoroi-comp-button-secondary-text)',
-        },
-        '& .MuiLoadingButton-loadingIndicator': {
-          color: 'var(--yoroi-comp-button-secondary-text)',
-        },
-      },
+      props: { variant: 'contained', color: 'secondary' },
+      style: makeContainedBtnStyles('secondary'),
+    },
+    {
+      props: { variant: 'outlined', color: 'primary' },
+      style: makeOutlinedBtnStyles('primary'),
+    },
+    {
+      props: { variant: 'outlined', color: 'secondary' },
+      style: makeOutlinedBtnStyles('secondary'),
     },
     {
       props: { variant: 'ternary' },
