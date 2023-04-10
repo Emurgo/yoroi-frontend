@@ -21,8 +21,6 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type Props = {||};
-
 function CreateWalletPage(props: Props & Intl): Node {
   const { intl } = props;
   return (
