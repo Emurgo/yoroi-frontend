@@ -67,7 +67,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
           },
         },
       },
-      actions: {},
+      actions: Object.freeze({}),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
     });

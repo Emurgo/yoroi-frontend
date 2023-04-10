@@ -82,6 +82,7 @@ const message = (id: number) => ({
     },
   },
   tabId: 0,
+  requesterUrl: 'https://dapp/',
 });
 
 const genBaseProps: {|
@@ -134,6 +135,8 @@ const genBaseProps: {|
         adaTransaction: null,
         currentConnectorWhitelist: [],
         submissionError: null,
+        hwWalletError: null,
+        isHwWalletErrorRecoverable: null,
       },
       coinPriceStore: {
         getCurrentPrice: (_from, _to) => '5',
@@ -172,7 +175,7 @@ const genBaseProps: {|
           trigger: action('cancelSignInTx'),
         },
         confirmSignInTx: {
-          trigger: action('confirmSignInTx'),
+          trigger: async () => action('confirmSignInTx')(),
         },
       },
     },

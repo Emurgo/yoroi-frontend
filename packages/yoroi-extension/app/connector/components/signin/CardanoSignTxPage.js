@@ -44,6 +44,8 @@ import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import type LocalizableError from '../../../i18n/LocalizableError';
+import ErrorBlock from '../../../components/widgets/ErrorBlock';
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,
@@ -63,6 +65,10 @@ type Props = {|
   +connectedWebsite: ?WhitelistEntry,
   +submissionError: ?SignSubmissionErrorType,
   +signData: ?{| address: string, payload: string |},
+  +walletType: 'ledger' | 'trezor' | 'web',
+  +hwWalletError: ?LocalizableError,
+  +isHwWalletErrorRecoverable: ?boolean,
+  +tx: ?string,
 |};
 
 const messages = defineMessages({
@@ -124,27 +130,34 @@ class SignTxPage extends Component<Props, State> {
   );
 
   submit(): void {
-    this.form.submit({
-      onSuccess: form => {
-        const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true });
-        this.props
-          .onConfirm(walletPassword)
-          .finally(() => {
-            this.setState({ isSubmitting: false });
-          })
-          .catch(error => {
-            if (error instanceof WrongPassphraseError) {
-              this.form
-                .$('walletPassword')
-                .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
-            } else {
-              throw error;
-            }
-          });
-      },
-      onError: () => {},
-    });
+    if (this.props.walletType === 'web') {
+      this.form.submit({
+        onSuccess: form => {
+          const { walletPassword } = form.values();
+          this.setState({ isSubmitting: true });
+          this.props
+            .onConfirm(walletPassword)
+            .finally(() => {
+              this.setState({ isSubmitting: false });
+            })
+            .catch(error => {
+              if (error instanceof WrongPassphraseError) {
+                this.form
+                  .$('walletPassword')
+                  .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+              } else {
+                throw error;
+              }
+            });
+        },
+        onError: () => {},
+      });
+    } else {
+      this.setState({ isSubmitting: true });
+      this.props.onConfirm('').finally(() => {
+        this.setState({ isSubmitting: false });
+      }).catch(error => { throw error; });
+    }
   }
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
@@ -335,6 +348,27 @@ class SignTxPage extends Component<Props, State> {
     const url = connectedWebsite?.url ?? '';
     const faviconUrl = connectedWebsite?.image ?? '';
 
+    const { walletType, hwWalletError, isHwWalletErrorRecoverable } = this.props;
+
+    if (hwWalletError && isHwWalletErrorRecoverable === false) {
+      return (
+        <>
+          <ErrorBlock error={hwWalletError} />
+          {this.props.tx && (
+            <Box>
+              <Typography>Transaction:</Typography>
+              <textarea
+                rows="10"
+                style={{ width: '100%' }}
+                disabled
+                value={this.props.tx}
+              />
+            </Box>
+          )}
+        </>
+      );
+    }
+
     let content;
     let utxosContent;
     if (txData) {
@@ -438,6 +472,15 @@ class SignTxPage extends Component<Props, State> {
       return null;
     }
 
+    let confirmButtonLabel;
+    if (walletType === 'ledger') {
+      confirmButtonLabel = globalMessages.confirmOnLedger;
+    } else if (walletType === 'trezor') {
+      confirmButtonLabel = globalMessages.confirmOnTrezor;
+    } else {
+      confirmButtonLabel = globalMessages.confirm;
+    }
+
     return (
       <SignTxTabs
         overviewContent={
@@ -505,11 +548,14 @@ class SignTxPage extends Component<Props, State> {
             </Box>
             {content}
             <Box mt="46px">
-              <TextField
-                type="password"
-                {...walletPasswordField.bind()}
-                error={walletPasswordField.error}
-              />
+              {walletType === 'web' && (
+                <TextField
+                  type="password"
+                  {...walletPasswordField.bind()}
+                  error={walletPasswordField.error}
+                />
+              )}
+              <ErrorBlock error={hwWalletError} />
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '15px' }}>
                 <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
                   {intl.formatMessage(globalMessages.cancel)}
@@ -517,11 +563,11 @@ class SignTxPage extends Component<Props, State> {
                 <LoadingButton
                   variant="primary"
                   fullWidth
-                  disabled={!walletPasswordField.isValid}
+                  disabled={walletType === 'web' && !walletPasswordField.isValid}
                   onClick={this.submit.bind(this)}
                   loading={isSubmitting}
                 >
-                  {intl.formatMessage(globalMessages.confirm)}
+                  {intl.formatMessage(confirmButtonLabel)}
                 </LoadingButton>
               </Box>
             </Box>

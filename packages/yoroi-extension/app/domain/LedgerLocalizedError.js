@@ -35,6 +35,10 @@ export const ledgerErrors: * = defineMessages({
     id: 'wallet.hw.ledger.catalyst.unsupported.106',
     defaultMessage: '!!!Please upgrade your Ledger firmware version to at least 2.0.0 and Caradano app version to 2.3.2 or above.',
   },
+  cardanoAppNotRunning: {
+    id: 'wallet.hw.ledger.app.not.running',
+    defaultMessage: '!!!The Cardano App is not running on your Ledger',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -69,6 +73,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
+      case 'TransportOpenUserCancelled: Access denied to use Ledger device':
         // Showing - Failed to connect. Please check your ledger device and retry.
         localizableError = new LocalizableError(globalMessages.ledgerError101);
         break;
@@ -97,6 +102,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'catalyst registration not supported':
         localizableError = new LocalizableError(
           ledgerErrors.cip15NotSupportedError106
+        );
+        break;
+      case 'DeviceStatusError: General error 0x6e01. Please consult https://github.com/cardano-foundation/ledger-app-cardano/blob/master/src/errors.h':
+        localizableError = new LocalizableError(
+          ledgerErrors.cardanoAppNotRunning
         );
         break;
       default:
