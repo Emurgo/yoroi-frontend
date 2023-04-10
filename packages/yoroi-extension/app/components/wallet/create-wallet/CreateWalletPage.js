@@ -8,6 +8,8 @@ import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 
+type Props = {||}
+
 const messages: * = defineMessages({
   title: {
     id: 'wallet.create.page.title',

@@ -46,8 +46,8 @@ export default class CreateWalletPageContainer extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
-      stores: {},
-      actions: {},
+      stores: Object.freeze({}),
+      actions: Object.freeze({}),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
     });
