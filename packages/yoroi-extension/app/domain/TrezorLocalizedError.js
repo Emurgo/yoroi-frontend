@@ -40,14 +40,14 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'Iframe timeout':
         localizableError = new LocalizableError(globalMessages.trezorError101);
         break;
-      case 'Permissions not granted':
+      case 'Trezor signing error: Permissions not granted':
         localizableError = new LocalizableError(globalMessages.hwError101);
         break;
-      case 'Cancelled':
-      case 'Popup closed':
+      case 'Trezor signing error: Popup closed (code=Method_Interrupted)':
         localizableError = new LocalizableError(globalMessages.trezorError103);
         break;
-      case 'Signing cancelled':
+      case 'Trezor signing error: Cancelled (code=Failure_ActionCancelled)':
+      case 'Trezor signing error: Failed to execute \'transferIn\' on \'USBDevice\': A transfer error has occurred. (code=19)':
         localizableError = new LocalizableError(messages.signTxError101);
         break;
       case 'Feature AuxiliaryData not supported by device firmware':
