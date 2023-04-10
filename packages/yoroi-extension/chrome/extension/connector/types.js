@@ -434,6 +434,7 @@ export type SigningMessage = {|
   publicDeriverId: number,
   sign: PendingSignData,
   tabId: number,
+  requesterUrl: string,
 |};
 export type ConnectedSites = {|
   sites: Array<string>,
@@ -478,6 +479,8 @@ export type ConfirmedSignData = {|
   uid: RpcUid,
   tabId: number,
   pw: string,
+  // hardware wallet:
+  witnessSetHex?: ?string,
 |};
 
 export type FailedSignData = {|
