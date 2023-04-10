@@ -228,6 +228,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
       />
       <Route
         exact
+        path={ROUTES.WALLETS.CREATE_NEW_WALLET}
+        component={(props) => <CreateWalletPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
         path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
         component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
       />

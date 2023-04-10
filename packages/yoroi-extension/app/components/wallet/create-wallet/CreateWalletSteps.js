@@ -1,11 +1,11 @@
 // @flow
-import { useEffect, useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography } from '@mui/material'
-import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
+import { Stack, Box, Typography } from '@mui/material';
+import { CREATE_WALLET_SETPS } from './steps';
+import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg';
 
 const messages: * = defineMessages({
   firstStep: {
@@ -31,33 +31,67 @@ type Intl = {|
 |};
 
 type Props = {|
-    currentStep: number,
+  currentStep: string,
+  setCurrentStep(stepId: string): void,
 |};
 
+const steps = [
+  {
+    stepId: CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE,
+    message: messages.firstStep,
+  },
+  {
+    stepId: CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE,
+    message: messages.secondStep,
+  },
+  {
+    stepId: CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE,
+    message: messages.thirdStep,
+  },
+  {
+    stepId: CREATE_WALLET_SETPS.ADD_WALLET_DETAILS,
+    message: messages.forthStep,
+  },
+];
+
 function CreateWalletSteps(props: Props & Intl): Node {
-  const { intl, currentStep } = props;
-  // steps: [id, label]
-  const steps = [
-    [1, messages.firstStep],
-    [2, messages.secondStep],
-    [3, messages.thirdStep],
-    [4, messages.forthStep],
-  ];
-
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(true)
-  }, [])
+  const { intl, currentStep, setCurrentStep } = props;
+  const currentStepIdx = steps.findIndex(step => step.stepId === currentStep);
+  if (currentStepIdx === -1) throw new Error(`Step to found. Should never happen`);
 
   return (
     <Box>
-      <Stack direction='row' alignItems='center' justifyContent='center' gap='24px' mt='24px' mb='48px'>
-        {steps.map(([stepId, label]) => {
-          const stepColor = currentStep === stepId ? 'primary.200' : 'grey.400';
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        gap="24px"
+        mt="24px"
+        mb="48px"
+      >
+        {steps.map(({ stepId, message }, idx) => {
+          const isCurrentStep = currentStepIdx === idx;
+          const isPrevStep = idx < currentStepIdx;
+          const isFutureStep = idx > currentStepIdx;
+          let stepColor = 'grey.400';
+          let cursor = 'pointer';
+
+          if (isCurrentStep) stepColor = 'primary.200';
+          else if (isPrevStep) stepColor = '#A0B3F2'; // Todo: add the color to the design system
+          if (isFutureStep) cursor = 'not-allowed';
+
           return (
-            <Stack direction='row' alignItems='center' justifyContent='center' key={stepId}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              key={stepId}
+              onClick={() => {
+                if (isPrevStep) setCurrentStep(stepId);
+              }}
+            >
               <Box
+                component="button"
                 sx={{
                   width: '24px',
                   height: '24px',
@@ -65,30 +99,31 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   alignItems: 'center',
                   justifyContent: 'center',
                   mr: '8px',
-                  borderWidth: '2.5px',
+                  borderWidth: isPrevStep ? '0px' : '2px',
                   borderStyle: 'solid',
                   borderColor: stepColor,
                   borderRadius: '50%',
                   transition: 'color 300ms ease',
+                  cursor,
                 }}
               >
-                <Typography variant='body2' fontWeight={500} color={stepColor}>
-                  {stepId}
-                </Typography>
+                {isPrevStep ? (
+                  <StepMarkIcon />
+                ) : (
+                  <Typography variant="body2" fontWeight={500} color={stepColor}>
+                    {idx + 1}
+                  </Typography>
+                )}
               </Box>
-              <Typography variant='body1' color={stepColor} fontWeight={500}>
-                {intl.formatMessage(label)}
+              <Typography sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
+                {intl.formatMessage(message)}
               </Typography>
             </Stack>
-          )
+          );
         })}
       </Stack>
-      <SaveRecoveryPhraseTipsDialog
-        open={open}
-        onClose={() => setOpen(false)}
-      />
     </Box>
   );
 }
 
-export default (injectIntl(observer(CreateWalletSteps)) : ComponentType<Props>);
+export default (injectIntl(observer(CreateWalletSteps)): ComponentType<Props>);

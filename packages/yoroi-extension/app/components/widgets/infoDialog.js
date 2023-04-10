@@ -1,5 +1,7 @@
 // @flow
-import { Modal, Typography, Button, Stack, Link } from '@mui/material';
+import Fade from '@mui/material/Fade';
+import { Dialog, Typography, Button, Stack, Link } from '@mui/material';
+import React from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -15,29 +17,35 @@ const messages: Object = defineMessages({
 });
 
 type Props = {|
-  +open: boolean,
-  +children: Node,
-  +onClose: void => void,
+  open: boolean,
+  children: Node,
+  onClose(): void,
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
+const Transition = React.forwardRef((props, ref) => {
+  return <Fade timeout={500} ref={ref} {...props} />;
+});
+
 function InfoDialog(props: Props & Intl): Node {
   const { open, onClose, children, intl } = props;
 
   return (
-    <Modal
+    <Dialog
       open={open}
       onClose={onClose}
+      TransitionComponent={Transition}
       sx={{
         background: 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        '& .MuiBackdrop-root': {
+        '& .MuiPaper-root': {
           background: 'none',
+          maxWidth: 'unset',
         },
       }}
     >
@@ -107,7 +115,7 @@ function InfoDialog(props: Props & Intl): Node {
           </Button>
         </Stack>
       </Box>
-    </Modal>
+    </Dialog>
   );
 }
 
