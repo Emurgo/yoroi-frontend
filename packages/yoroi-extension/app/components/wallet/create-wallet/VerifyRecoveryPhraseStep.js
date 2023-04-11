@@ -40,24 +40,23 @@ type Props = {|
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
-  const { intl, recoveryPhrase, setCurrentStep } = props;
+  const { intl, _recoveryPhrase, setCurrentStep } = props;
+  const recoveryPhrase = 'day day day day day day day day day day day day day day day'.split(' ');
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState(
     new Array(recoveryPhrase.length).fill(null)
   );
-  const [wrongWord, setWrongWord] = useState<string | null>(null);
+  const [wrongWord, setWrongWord] = useState<{| word: string, idx: number |} | null>(null);
 
   function onAddWord(word: string, idx: number): void {
-    if (isWordAdded(word)) return;
+    if (isWordAdded(word, idx)) return;
 
     const nextWordIdx = enteredRecoveryPhrase.findIndex(w => w === null);
     if (nextWordIdx === -1) throw new Error('Entered recovery phrase words list is full');
 
-    const isInCorrectOrder = recoveryPhrase[nextWordIdx] === word;
-    if (!isInCorrectOrder) {
-      return setWrongWord(word);
-    }
+    const isInCorrectOrder = recoveryPhrase[nextWordIdx] === word && nextWordIdx === idx;
+    if (!isInCorrectOrder) return setWrongWord({ word, idx });
 
     setRecoveryPhrase(prev => {
       const copy = [...prev];
@@ -67,8 +66,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     setWrongWord(null);
   }
 
-  function isWordAdded(word) {
-    return enteredRecoveryPhrase.some(w => w === word);
+  function isWordAdded(word: string, idx: number): boolean {
+    return enteredRecoveryPhrase.some((w, i) => w === word && i === idx);
   }
 
   const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);
@@ -154,14 +153,15 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           justifyContent="center"
           gap="8px"
         >
-          {sortedRecoveryPhrase.map(({ word, id, originalIdx }) => {
+          {sortedRecoveryPhrase.map(({ word, originalIdx }) => {
             return (
               <button
                 type="button"
-                key={id}
+                key={`${word}-${originalIdx}`}
                 className={classnames(styles.wordChip, {
-                  [styles.wordAdded]: isWordAdded(word),
-                  [styles.wrongWord]: wrongWord === word,
+                  [styles.wordAdded]: isWordAdded(word, originalIdx),
+                  [styles.wrongWord]:
+                    wrongWord && wrongWord.word === word && wrongWord.idx === originalIdx,
                 })}
                 onClick={() => onAddWord(word, originalIdx)}
               >
