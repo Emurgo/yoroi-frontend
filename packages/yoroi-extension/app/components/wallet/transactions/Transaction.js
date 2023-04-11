@@ -1017,29 +1017,38 @@ export default class Transaction extends Component<Props, State> {
     const { intl } = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
-      let jsonData = null;
+      let metadata;
+      if (typeof data.metadata === 'string') {
+        let jsonData = null;
 
-      try {
-        jsonData = parseMetadata(data.metadata);
-      } catch (error) {
-        // try to parse schema using detailed conversion if advanced user
-        if (this.props.complexityLevel === ComplexityLevels.Advanced) {
-          try {
-            jsonData = parseMetadataDetailed(data.metadata);
-          } catch (errDetailed) {
-            // discard error
-            // can not parse metadata as json
-            // show the metadata hex as is
+        try {
+          jsonData = parseMetadata(data.metadata);
+        } catch (error) {
+          // try to parse schema using detailed conversion if advanced user
+          if (this.props.complexityLevel === ComplexityLevels.Advanced) {
+            try {
+              jsonData = parseMetadataDetailed(data.metadata);
+            } catch (errDetailed) {
+              // discard error
+              // can not parse metadata as json
+              // show the metadata hex as is
+            }
           }
+          // do nothing for simple user
         }
-        // do nothing for simple user
+        if (jsonData !== null) {
+          metadata = (<CodeBlock code={jsonData} />);
+        } else {
+          metadata = (<span>0x{data.metadata}</span>);
+        }
+      } else {
+        metadata = (<CodeBlock code={JSON.stringify(data.metadata)} />);
       }
-
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
           <span className={styles.rowData}>
-            {jsonData !== null ? <CodeBlock code={jsonData} /> : <span>0x{data.metadata}</span>}
+            {metadata}
           </span>
         </div>
       );
