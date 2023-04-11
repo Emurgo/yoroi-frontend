@@ -869,8 +869,13 @@ export function toLedgerSignRequest(
     formattedReferenceInputs = formatInputs(referenceInputs);
   }
 
+  let signingMode = TransactionSigningMode.ORDINARY_TRANSACTION;
+  if (formattedCollateral) {
+    signingMode = TransactionSigningMode.PLUTUS_TRANSACTION;
+  }
+
   return {
-    signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
+    signingMode,
     tx: {
       network: {
         networkId,
@@ -884,12 +889,13 @@ export function toLedgerSignRequest(
       withdrawals: formattedWithdrawals,
       auxiliaryData: formattedAuxiliaryData,
       validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
-      mint: txBody.mint()?.to_js_value().map(([policyIdHex, assets]) => ({
-        policyIdHex,
-        tokens: Object.keys(assets).map(assetNameHex => (
-          { assetNameHex, amount: assets[assetNameHex] }
-        )),
-      })) ?? null,
+      mint: JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(
+        ([policyIdHex, assets]) => ({
+          policyIdHex,
+          tokens: Object.keys(assets).map(assetNameHex => (
+            { assetNameHex, amount: assets[assetNameHex] }
+          )),
+        })) ?? null,
       scriptDataHashHex: txBody.script_data_hash()?.to_hex() ??  null,
       collateralInputs: formattedCollateral,
       requiredSigners: requiredSigners ? formattedRequiredSigners : null,
