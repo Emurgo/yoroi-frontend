@@ -27,6 +27,8 @@ import {
   StakeCredentialParamsType,
   CIP36VoteRegistrationFormat,
   TxRequiredSignerType,
+  DatumType,
+  TxOutputFormat,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -741,13 +743,40 @@ export function toLedgerSignRequest(
       throw new Error('not expecting to pay to reward address');
     }
 
+    const amount = output.amount().coin().to_str();
+    const tokenBundle = toLedgerTokenBundle(output.amount().multiasset());
     const outputDataHash = output.data_hash();
+    const plutusData = output.plutus_data();
+    const scriptRef = output.script_ref();
 
-    // TODO: Babbage-era output support
+    if (scriptRef || plutusData) {
+      let datum = null;
+      if (plutusData) {
+        datum = {
+          type: DatumType.INLINE,
+          datumHex: plutusData.to_hex(),
+        };
+      } else if (outputDataHash) {
+        datum = {
+          type: DatumType.HASH,
+          datumHashHex: outputDataHash.to_hex(),
+        };
+      }
+      return {
+        format: TxOutputFormat.MAP_BABBAGE,
+        amount,
+        destination,
+        tokenBundle,
+        datum,
+        referenceScriptHex: scriptRef ? scriptRef.to_hex() : null,
+      };
+    }
+
     return {
-      amount: output.amount().coin().to_str(),
+      format: TxOutputFormat.ARRAY_LEGACY,
+      amount,
       destination,
-      tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
+      tokenBundle,
       datumHashHex: outputDataHash ? outputDataHash.to_hex() : null,
     };
   }
