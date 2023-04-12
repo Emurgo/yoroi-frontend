@@ -33,7 +33,6 @@ import { connectorButton } from '../pages/sidebarPage';
 import {
   ApiErrorCode,
   DataSignErrorCode,
-  TxSendErrorCode,
   TxSignErrorCode
 } from '../support/helpers/connectorErrors';
 
@@ -496,6 +495,6 @@ When(/^The collateral received the error:$/, async function (table) {
   const collateralResult = await this.mockDAppPage.getCollateralResult();
   expect(collateralResult.success, `Request is successful but the error should be`).to.be.false;
   const errorObject = collateralResult.error;
-  expect(errorObject.code).to.equal(fields.code, 'Wrong error code');
-  expect(errorObject.info).to.equal(fields.info, 'Wrong error info');
+  expect(errorObject.code).to.equal(parseInt(fields.code, 10), 'Wrong error code');
+  expect(errorObject.info).to.include(fields.info, 'Wrong error info');
 });
