@@ -4,14 +4,9 @@ import { WebDriver } from 'selenium-webdriver';
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { bytesToHex, getTtl, hexToBytes } from '../support/helpers/dapp-helpers';
 import { MultiAsset, TransactionBuilder } from '@emurgo/cardano-serialization-lib-nodejs';
+import type { DAppConnectorResponse } from '../support/helpers/dapp-helpers';
 
 class MockDAppWebpageError extends Error {}
-
-type DAppConnectorResponse = {|
-  success: boolean,
-  retValue: any,
-  error: any,
-|};
 
 type ReducedAsset = {|
   policyId: any | string,
@@ -174,30 +169,30 @@ export class MockDAppWebpage {
 
   async _getUTXOs(amount?: string): Promise<Array<Utxo>> {
     this.logger.info(`MockDApp: Getting UTXOs`);
-    const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
+    const walletUTXOsResponse = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
         .getUtxos(args[0])
         .then(utxosResponse => {
           // eslint-disable-next-line promise/always-return
           if (utxosResponse.length === 0) {
-            callback({ success: false, errMsg: 'NO UTXOS' });
+            callback({ success: false, error: 'NO UTXOS', retValue: null });
           } else {
-            callback({ success: true, retValue: utxosResponse });
+            callback({ success: true, retValue: utxosResponse, error: null });
           }
         })
-        .catch(error => {
-          callback({ success: false, errMsg: JSON.stringify(error) });
+        .catch(err => {
+          callback({ success: false, error: JSON.stringify(err), retValue: null });
         });
-    }, amount);
+    }, amount): DAppConnectorResponse);
     this.logger.info(
       `MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`
     );
     if (walletUTXOsResponse.success) {
       return this._mapCborUtxos(walletUTXOsResponse.retValue);
     }
-    this.logger.error(`MockDApp: -> The error is received: ${walletUTXOsResponse.errMsg}`);
-    throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
+    this.logger.error(`MockDApp: -> The error is received: ${walletUTXOsResponse.error}`);
+    throw new MockDAppWebpageError(walletUTXOsResponse.error);
   }
 
   async requestUsedAddresses() {
