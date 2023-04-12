@@ -39,6 +39,7 @@ import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
+import cbor from 'cbor';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -610,7 +611,10 @@ export function toLedgerSignRequest(
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
+  rawTxBody: Buffer,
 ): SignTransactionRequest {
+  const parsedCbor = cbor.decode(rawTxBody);
+
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     const formatted = [];
     for (let i = 0; i < inputs.len(); i++) {
@@ -629,7 +633,10 @@ export function toLedgerSignRequest(
     return formatted.sort(compareInputs);
   }
 
-  function formatOutput(output: RustModule.WalletV4.TransactionOutput): TxOutput {
+  function formatOutput(
+    output: RustModule.WalletV4.TransactionOutput,
+    isPostAlonzoTransactionOutput: boolean,
+  ): TxOutput {
     const addr = output.address();
     let destination;
 
@@ -749,7 +756,7 @@ export function toLedgerSignRequest(
     const plutusData = output.plutus_data();
     const scriptRef = output.script_ref();
 
-    if (scriptRef || plutusData) {
+    if (isPostAlonzoTransactionOutput || scriptRef || plutusData) {
       let datum = null;
       if (plutusData) {
         datum = {
@@ -783,7 +790,12 @@ export function toLedgerSignRequest(
 
   const outputs = [];
   for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(formatOutput(txBody.outputs().get(i)));
+    outputs.push(
+      formatOutput(
+        txBody.outputs().get(i),
+        parsedCbor.get(1)[i].constructor.name === 'Map',
+      )
+    );
   }
 
   const additionalWitnessPaths = [];
@@ -865,7 +877,10 @@ export function toLedgerSignRequest(
   let formattedCollateralReturn = null;
   const collateralReturn = txBody.collateral_return();
   if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(collateralReturn);
+    formattedCollateralReturn = formatOutput(
+      collateralReturn,
+      parsedCbor.get(16).constructor.name === 'Map',
+    );
   }
 
   let formattedReferenceInputs = null;
