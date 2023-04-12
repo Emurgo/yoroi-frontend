@@ -111,3 +111,36 @@ Feature: dApp connector get collateral
     And The collateral received the error:
       | code | info |
       | -1   | ???  |
+
+  @dApp-1029
+  Scenario: dApp, anonymous wallet, get collateral, more than 5 ADA (DAPP-1029)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    Then Revamp. I switch to revamp version
+    Then I open the mock dApp tab
+    And I request anonymous access to Yoroi
+    Then I should see the connector popup for connection
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
+    Then The popup window should be closed
+    And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    Then I ask to get Collateral for 5.5 ADA
+    And The collateral received the error:
+      | code | info |
+      | -2   | requested collateral amount is beyond the allowed limits |
+
+  @dApp-1030
+  Scenario: dApp, authorized wallet, get collateral, more than 5 ADA (DAPP-1030)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    Then Revamp. I switch to revamp version
+    Then I open the mock dApp tab
+    And I request access to Yoroi
+    Then I should see the connector popup for connection
+    And I select the only wallet named shelley-simple-15 with 5.5 balance
+    Then I enter the spending password asdfasdfasdf and click confirm
+    Then The popup window should be closed
+    And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    Then I ask to get Collateral for 5.5 ADA
+    And The collateral received the error:
+      | code | info |
+      | -2   | requested collateral amount is beyond the allowed limits |
