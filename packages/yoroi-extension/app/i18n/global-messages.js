@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
+  yoroi: {
+    id: 'global.yoroi',
+    defaultMessage: 'Yoroi',
+  },
   here: {
     id: 'global.util.here',
     defaultMessage: '!!!here',
@@ -960,6 +964,14 @@ const globalMessages: * = defineMessages({
   loading: {
     id: 'wallet.loading',
     defaultMessage: '!!!Loading...',
+  },
+  confirmOnLedger: {
+    id: 'label.confirm.ledger',
+    defaultMessage: '!!!Confirm on Ledger',
+  },
+  confirmOnTrezor: {
+    id: 'label.confirm.trezor',
+    defaultMessage: '!!!Confirm on Trezor',
   },
 });
 export default globalMessages;
