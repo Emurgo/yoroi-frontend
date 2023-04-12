@@ -27,12 +27,15 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
-import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/connector/types';
+import type {
+  PublicDeriverCache,
+  Tx,
+  WhitelistEntry,
+} from '../../../../chrome/extension/connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
-import WalletCard from '../connect/ConnectedWallet';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
@@ -269,8 +272,6 @@ class SignTxPage extends Component<Props, State> {
     const totalInput = txData.totalInput();
     const fee = txData.fee();
     const amount = totalInput.joinSubtractCopy(fee);
-    const url = connectedWebsite?.url ?? '';
-    const faviconUrl = connectedWebsite?.image ?? '';
 
     return (
       <SignTxTabs
