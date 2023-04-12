@@ -52,6 +52,8 @@ import CardanoSignTx from './cardano/SignTx';
 import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
+import type LocalizableError from '../../../i18n/LocalizableError';
+import ErrorBlock from '../../../components/widgets/ErrorBlock';
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,
@@ -71,6 +73,10 @@ type Props = {|
   +connectedWebsite: ?WhitelistEntry,
   +submissionError: ?SignSubmissionErrorType,
   +signData: ?{| address: string, payload: string |},
+  +walletType: 'ledger' | 'trezor' | 'web',
+  +hwWalletError: ?LocalizableError,
+  +isHwWalletErrorRecoverable: ?boolean,
+  +tx: ?string,
 |};
 
 export type SummaryAssetsData = {|
@@ -153,27 +159,41 @@ class SignTxPage extends Component<Props, State> {
   );
 
   submit(): void {
-    this.form.submit({
-      onSuccess: form => {
-        const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true });
-        this.props
-          .onConfirm(walletPassword)
-          .finally(() => {
-            this.setState({ isSubmitting: false });
-          })
-          .catch(error => {
-            if (error instanceof WrongPassphraseError) {
-              this.form
-                .$('walletPassword')
-                .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
-            } else {
-              throw error;
-            }
-          });
-      },
-      onError: () => {},
-    });
+    if (this.props.walletType === 'web') {
+      this.form.submit({
+        onSuccess: form => {
+          const { walletPassword } = form.values();
+          this.setState({ isSubmitting: true });
+          this.props
+            .onConfirm(walletPassword)
+            .finally(() => {
+              this.setState({ isSubmitting: false });
+            })
+            .catch(error => {
+              if (error instanceof WrongPassphraseError) {
+                this.form
+                  .$('walletPassword')
+                  .invalidate(
+                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                  );
+              } else {
+                throw error;
+              }
+            });
+        },
+        onError: () => {},
+      });
+    } else {
+      this.setState({ isSubmitting: true });
+      this.props
+        .onConfirm('')
+        .finally(() => {
+          this.setState({ isSubmitting: false });
+        })
+        .catch(error => {
+          throw error;
+        });
+    }
   }
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
@@ -350,6 +370,22 @@ class SignTxPage extends Component<Props, State> {
     const url = connectedWebsite?.url ?? '';
     const faviconUrl = connectedWebsite?.image ?? '';
 
+    const { walletType, hwWalletError, isHwWalletErrorRecoverable } = this.props;
+
+    if (hwWalletError && isHwWalletErrorRecoverable === false) {
+      return (
+        <>
+          <ErrorBlock error={hwWalletError} />
+          {this.props.tx && (
+            <Box>
+              <Typography>Transaction:</Typography>
+              <textarea rows="10" style={{ width: '100%' }} disabled value={this.props.tx} />
+            </Box>
+          )}
+        </>
+      );
+    }
+
     let content;
     let utxosContent;
     if (txData) {
@@ -360,6 +396,8 @@ class SignTxPage extends Component<Props, State> {
           <CardanoSignTx
             txAssetsData={summaryAssetsData}
             renderExplorerHashLink={this.renderAddressExplorerUrl}
+            walletType={walletType}
+            hwWalletError={hwWalletError}
             passwordFormField={
               <TextField
                 type="password"
@@ -411,6 +449,15 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = null;
     } else {
       return null;
+    }
+
+    let confirmButtonLabel;
+    if (walletType === 'ledger') {
+      confirmButtonLabel = globalMessages.confirmOnLedger;
+    } else if (walletType === 'trezor') {
+      confirmButtonLabel = globalMessages.confirmOnTrezor;
+    } else {
+      confirmButtonLabel = globalMessages.confirm;
     }
 
     return (

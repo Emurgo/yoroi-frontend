@@ -217,6 +217,33 @@ const ModernButton = {
         },
       },
     },
+    // Todo: this button `varient` should be part of the new revam design system
+    {
+      props: { variant: 'rv-primary' },
+      style: {
+        minWidth: 'unset',
+        minHeight: 'unset',
+        width: 'unset',
+        height: 'unset',
+        // Todo: get the colors from the design system
+        backgroundColor: '#4B6DDE',
+        color: 'var(--yoroi-palette-common-white)',
+        border: 1,
+        ':hover': {
+          backgroundColor: '#3154CB',
+        },
+        '&.Mui-active': {
+          backgroundColor: '#1737A3',
+        },
+        '&.Mui-disabled': {
+          color: '#C4CFF5',
+          opacity: 0.4,
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: '#C4CFF5',
+        },
+      },
+    },
   ],
 };
 

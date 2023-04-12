@@ -864,45 +864,49 @@ export default class Transaction extends Component<Props, State> {
   jormungandrCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
-    switch (kind) {
-      case RustModule.WalletV3.CertificateKind.PoolRegistration:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
-      case RustModule.WalletV3.CertificateKind.PoolUpdate:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
-      case RustModule.WalletV3.CertificateKind.PoolRetirement:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
-      case RustModule.WalletV3.CertificateKind.StakeDelegation:
-        return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
-      case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
-        return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
-      default: {
-        throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
+    return RustModule.WasmScope(Scope => {
+      switch (kind) {
+        case Scope.WalletV3.CertificateKind.PoolRegistration:
+          return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
+        case Scope.WalletV3.CertificateKind.PoolUpdate:
+          return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
+        case Scope.WalletV3.CertificateKind.PoolRetirement:
+          return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
+        case Scope.WalletV3.CertificateKind.StakeDelegation:
+          return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
+        case Scope.WalletV3.CertificateKind.OwnerStakeDelegation:
+          return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
+        default: {
+          throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
+        }
       }
-    }
+    });
   };
 
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
-    switch (kind) {
-      case RustModule.WalletV4.CertificateKind.StakeRegistration:
-        return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
-      case RustModule.WalletV4.CertificateKind.StakeDeregistration:
-        return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
-      case RustModule.WalletV4.CertificateKind.StakeDelegation:
-        return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
-      case RustModule.WalletV4.CertificateKind.PoolRegistration:
-        return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
-      case RustModule.WalletV4.CertificateKind.PoolRetirement:
-        return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
-      case RustModule.WalletV4.CertificateKind.GenesisKeyDelegation:
-        return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
-      case RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
-        return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
-      default: {
-        throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
+    return RustModule.WasmScope(Scope => {
+      switch (kind) {
+        case Scope.WalletV4.CertificateKind.StakeRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
+        case Scope.WalletV4.CertificateKind.StakeDeregistration:
+          return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
+        case Scope.WalletV4.CertificateKind.StakeDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
+        case Scope.WalletV4.CertificateKind.PoolRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
+        case Scope.WalletV4.CertificateKind.PoolRetirement:
+          return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
+        case Scope.WalletV4.CertificateKind.GenesisKeyDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
+        case Scope.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
+          return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
+        default: {
+          throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
+        }
       }
-    }
+    });
   };
 
   getWithdrawals: WalletTransaction => ?Node = data => {

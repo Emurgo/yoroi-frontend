@@ -48,10 +48,6 @@ const messages = defineMessages({
     defaultMessage:
       '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
   },
-  connectWalletNoHardwareSupported: {
-    id: 'connector.label.connectWalletNoHardwareSupported',
-    defaultMessage: '!!!Note, hardware wallets are not supported for the dapp connecting yet.',
-  },
   yourWallets: {
     id: 'connector.label.yourWallets',
     defaultMessage: '!!!Your Wallets',
@@ -75,6 +71,10 @@ const messages = defineMessages({
   createWallet: {
     id: 'connector.connect.createWallet',
     defaultMessage: '!!!create wallet',
+  },
+  harwareWalletConnectWithAuthNotSupported: {
+    id: 'connector.connect.hardwareWalletsConnectWithAuthNotSupported',
+    defaultMessage: '!!!Connecting to hardware wallet with authentication is not supported',
   },
 });
 
@@ -103,6 +103,7 @@ type Props = {|
   +unitOfAccount: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +onUpdateHideBalance: void => Promise<void>,
+  +isSelectWalletHardware: boolean,
 |};
 
 @observer
@@ -194,6 +195,7 @@ class ConnectPage extends Component<Props> {
       shouldHideBalance,
       isAppAuth,
       onUpdateHideBalance,
+      isSelectWalletHardware,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -231,11 +233,15 @@ class ConnectPage extends Component<Props> {
     const passwordForm = (
       <Box p="26px">
         <div>
-          <TextField
-            type="password"
-            {...walletPasswordField.bind()}
-            error={walletPasswordField.error}
-          />
+          {isSelectWalletHardware ? (
+            intl.formatMessage(messages.harwareWalletConnectWithAuthNotSupported)
+          ) : (
+            <TextField
+              type="password"
+              {...walletPasswordField.bind()}
+              error={walletPasswordField.error}
+            />
+          )}
         </div>
         <Stack direction="row" spacing={4} mt="15px">
           <Button
@@ -246,15 +252,17 @@ class ConnectPage extends Component<Props> {
           >
             {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
-          <Button
-            variant="primary"
-            sx={{ minWidth: 'auto' }}
-            fullWidth
-            disabled={!walletPasswordField.isValid}
-            onClick={this.submit}
-          >
-            {intl.formatMessage(globalMessages.confirm)}
-          </Button>
+          {!isSelectWalletHardware && (
+            <Button
+              variant="primary"
+              sx={{ minWidth: 'auto' }}
+              fullWidth
+              disabled={!walletPasswordField.isValid}
+              onClick={this.submit}
+            >
+              {intl.formatMessage(globalMessages.confirm)}
+            </Button>
+          )}
         </Stack>
       </Box>
     );
@@ -336,10 +344,6 @@ class ConnectPage extends Component<Props> {
         </Box>
         {hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
-            <p className={styles.infoText}>
-              {intl.formatMessage(messages.connectWalletNoHardwareSupported)}
-            </p>
-
             <p className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</p>
             <p className={styles.infoText}>
               {intl.formatMessage(connectorMessages.messageReadOnly)}
