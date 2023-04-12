@@ -85,10 +85,10 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) return;
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-    const activeCategory = categories.find(
-      category => this.generated.stores.app.currentRoute.startsWith(category.route)
+    const activeCategory = categories.find(category =>
+      this.generated.stores.app.currentRoute.startsWith(category.route)
     );
 
     // if we're on a page that isn't applicable for the currently selected wallet
@@ -96,8 +96,7 @@ class Wallet extends Component<AllProps> {
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
     if (!activeCategory?.isVisible(visibilityContext)) {
-      const firstValidCategory = categories
-        .find(c => c.isVisible(visibilityContext));
+      const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
@@ -119,9 +118,9 @@ class Wallet extends Component<AllProps> {
           classicTheme={this.generated.stores.profile.isClassicTheme}
           onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
         />
-      )
+      );
     }
-    return null
+    return null;
   }
 
   render(): Node {
@@ -147,11 +146,12 @@ class Wallet extends Component<AllProps> {
         </TopBarLayout>
       );
     }
+
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (
@@ -190,15 +190,15 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         <WalletWithNavigation
-          categories={
-            allCategories
-              .filter(c => c.isVisible(visibilityContext))
-              .map(category => ({
-                className: category.className,
-                icon: category.icon,
-                label: category.label,
-                isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
-                onClick: () => this.generated.actions.router.goToRoute.trigger({
+          categories={allCategories
+            .filter(c => c.isVisible(visibilityContext))
+            .map(category => ({
+              className: category.className,
+              icon: category.icon,
+              label: category.label,
+              isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
+              onClick: () =>
+                this.generated.actions.router.goToRoute.trigger({
                   route: category.route,
                 }),
             }))}
@@ -290,8 +290,8 @@ class Wallet extends Component<AllProps> {
         isRevampTheme: boolean,
         isClassicTheme: boolean,
       |},
-    |}
-    |} {
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -319,9 +319,10 @@ class Wallet extends Component<AllProps> {
         },
         transactions: {
           getBalanceRequest: (() => {
-            if (stores.wallets.selected == null) return {
-              result: undefined,
-            };
+            if (stores.wallets.selected == null)
+              return {
+                result: undefined,
+              };
             const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
 
             return {
@@ -332,7 +333,7 @@ class Wallet extends Component<AllProps> {
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
           isClassicTheme: stores.profile.isClassicTheme,
-        }
+        },
       },
       actions: {
         router: {
@@ -341,7 +342,7 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
-        }
+        },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),

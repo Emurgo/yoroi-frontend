@@ -9,7 +9,7 @@ import {
   ModernFormControl,
   ModernMenu,
   ModernMenuItem,
-  ModernTabs,
+  RevampTabs,
   ModernTabPanel,
   ModernChip,
   ModernTooltip,
@@ -39,11 +39,10 @@ const theme = {
     MuiInputLabel: ModernInputLabel,
     MuiMenu: ModernMenu,
     MuiMenuItem: ModernMenuItem,
-    MuiTabs: ModernTabs,
+    MuiTabs: RevampTabs,
     MuiTabPanel: ModernTabPanel,
     MuiChip: ModernChip,
     MuiTooltip: ModernTooltip,
   },
 };
 export const revampTheme: Object = createTheme(deepmerge(revampBaseTheme, theme));
-
