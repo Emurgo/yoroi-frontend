@@ -144,7 +144,9 @@ class SignTxPage extends Component<Props, State> {
               if (error instanceof WrongPassphraseError) {
                 this.form
                   .$('walletPassword')
-                  .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+                  .invalidate(
+                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                  );
               } else {
                 throw error;
               }
@@ -154,9 +156,14 @@ class SignTxPage extends Component<Props, State> {
       });
     } else {
       this.setState({ isSubmitting: true });
-      this.props.onConfirm('').finally(() => {
-        this.setState({ isSubmitting: false });
-      }).catch(error => { throw error; });
+      this.props
+        .onConfirm('')
+        .finally(() => {
+          this.setState({ isSubmitting: false });
+        })
+        .catch(error => {
+          throw error;
+        });
     }
   }
 
@@ -357,12 +364,7 @@ class SignTxPage extends Component<Props, State> {
           {this.props.tx && (
             <Box>
               <Typography>Transaction:</Typography>
-              <textarea
-                rows="10"
-                style={{ width: '100%' }}
-                disabled
-                value={this.props.tx}
-              />
+              <textarea rows="10" style={{ width: '100%' }} disabled value={this.props.tx} />
             </Box>
           )}
         </>
@@ -399,7 +401,7 @@ class SignTxPage extends Component<Props, State> {
               px="10px"
             >
               <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-              <Typography textAlign='right'>
+              <Typography textAlign="right">
                 {this.renderAmountDisplay({
                   entry: {
                     identifier: txData.fee.tokenId,
@@ -417,11 +419,11 @@ class SignTxPage extends Component<Props, State> {
               justifyContent="space-between"
               alignItems="flex-start"
               borderRadius="6px"
-              backgroundColor="var(--yoroi-palette-primary-300)"
+              backgroundColor="primary.600"
               color="var(--yoroi-palette-common-white)"
             >
               <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
-              <Typography variant="h3" textAlign='right'>
+              <Typography variant="h3" textAlign="right">
                 {this.renderAmountDisplay({
                   entry: {
                     identifier: txAmountDefaultToken,
@@ -539,10 +541,10 @@ class SignTxPage extends Component<Props, State> {
                   publicDeriver={this.props.selectedWallet}
                   getTokenInfo={this.props.getTokenInfo}
                   getCurrentPrice={(_from, _to) => null}
-                  unitOfAccountSetting={({
+                  unitOfAccountSetting={{
                     enabled: false,
                     currency: null,
-                  })}
+                  }}
                 />
               </Box>
             </Box>

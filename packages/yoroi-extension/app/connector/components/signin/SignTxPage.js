@@ -27,7 +27,11 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
-import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/connector/types';
+import type {
+  PublicDeriverCache,
+  Tx,
+  WhitelistEntry,
+} from '../../../../chrome/extension/connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
@@ -35,7 +39,7 @@ import { Box } from '@mui/system';
 import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
-import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 
 type Props = {|
   +tx: Tx,
@@ -87,7 +91,7 @@ export const signTxMessages: Object = defineMessages({
   },
   more: {
     id: 'connector.signin.more',
-    defaultMessage: '!!!more'
+    defaultMessage: '!!!more',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
@@ -101,7 +105,7 @@ export const signTxMessages: Object = defineMessages({
 
 type State = {|
   isSubmitting: boolean,
-|}
+|};
 
 @observer
 class SignTxPage extends Component<Props, State> {
@@ -111,8 +115,7 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     isSubmitting: false,
-  }
-
+  };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -151,16 +154,18 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true })
+        this.setState({ isSubmitting: true });
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
-            this.form.$('walletPassword').invalidate(
-              this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
-            )
+            this.form
+              .$('walletPassword')
+              .invalidate(
+                this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
+              );
           } else {
             throw error;
           }
-          this.setState({ isSubmitting: false })
+          this.setState({ isSubmitting: false });
         });
       },
       onError: () => {},
@@ -300,7 +305,11 @@ class SignTxPage extends Component<Props, State> {
                   },
                 }}
               >
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
+                {faviconUrl != null && faviconUrl !== '' ? (
+                  <img src={faviconUrl} alt={`${url} favicon`} />
+                ) : (
+                  <NoDappIcon />
+                )}
               </Box>
               <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
                 {url}
@@ -320,10 +329,10 @@ class SignTxPage extends Component<Props, State> {
                 publicDeriver={this.props.selectedWallet}
                 getTokenInfo={this.props.getTokenInfo}
                 getCurrentPrice={(_from, _to) => null}
-                unitOfAccountSetting={({
+                unitOfAccountSetting={{
                   enabled: false,
                   currency: null,
-                })}
+                }}
               />
             </Box>
             <Box pt="32px">
@@ -364,7 +373,7 @@ class SignTxPage extends Component<Props, State> {
                   justifyContent="space-between"
                   alignItems="center"
                   borderRadius="6px"
-                  backgroundColor="var(--yoroi-palette-primary-300)"
+                  backgroundColor="primary.600"
                   color="var(--yoroi-palette-common-white)"
                 >
                   <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>

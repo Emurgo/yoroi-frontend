@@ -218,18 +218,22 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
               </Button>
             </Box>
-            {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && (
-              <Box sx={{ padding: '16px 30px' }}>
+            {/* {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && ( */}
+            <Box sx={{ padding: '16px 30px' }}>
+              <Typography variant="body1">
                 {this.renderPendingAmount(
                   pendingAmount.incoming,
                   intl.formatMessage(messages.pendingIncomingConfirmationLabel)
                 )}
+              </Typography>
+              <Typography variant="body1">
                 {this.renderPendingAmount(
                   pendingAmount.outgoing,
                   intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
                 )}
-              </Box>
-            )}
+              </Typography>
+            </Box>
+            {/* )} */}
           </>
         )}
         <Box

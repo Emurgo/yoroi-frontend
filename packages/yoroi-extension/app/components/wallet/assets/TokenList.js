@@ -4,12 +4,12 @@ import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { ReactComponent as NoAssetLogo }  from '../../../assets/images/assets-page/asset-no.inline.svg';
-import { ReactComponent as ArrowsListFromBottom }  from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
-import { ReactComponent as ArrowsListFromTop }  from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
-import { ReactComponent as ArrowsList }  from '../../../assets/images/assets-page/arrows-list.inline.svg';
-import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as Info }  from '../../../assets/images/assets-page/info.inline.svg';
+import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as ArrowsListFromBottom } from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
+import { ReactComponent as ArrowsListFromTop } from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import { ReactComponent as ArrowsList } from '../../../assets/images/assets-page/arrows-list.inline.svg';
+import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as Info } from '../../../assets/images/assets-page/info.inline.svg';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
@@ -64,11 +64,7 @@ type State = {|
   sortingColumn: string,
 |};
 
-function TokenList({
-  assetsList: list,
-  shouldHideBalance,
-  intl,
-}: Props & Intl): Node {
+function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl): Node {
   const [state, setState] = useState<State>({
     assetsList: list,
     sortingDirection: null,
@@ -81,7 +77,7 @@ function TokenList({
     const assetsListCopy = [...list];
     const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp));
     setState(prev => ({ ...prev, assetsList: filteredAssetsList }));
-  }, [keyword, list])
+  }, [keyword, list]);
 
   const compare: (a: any, b: any, field: string) => number = (a, b, field) => {
     let newSortDirection = SORTING_DIRECTIONS.UP;
@@ -91,13 +87,13 @@ function TokenList({
       newSortDirection = SORTING_DIRECTIONS.DOWN;
     }
 
-    setState({ ...state, sortingDirection: newSortDirection })
+    setState({ ...state, sortingDirection: newSortDirection });
 
     if (field === SORTING_COLUMNS.AMOUNT) {
-      return compareNumbers(a[field], b[field], newSortDirection)
+      return compareNumbers(a[field], b[field], newSortDirection);
     }
     // Other fields
-    return compareStrings(a[field], b[field], newSortDirection)
+    return compareStrings(a[field], b[field], newSortDirection);
   };
 
   const sortAssets: (field: string) => void = (field: string) => {
@@ -136,7 +132,7 @@ function TokenList({
         </Typography>
         <SearchInput
           disableUnderline
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={e => setKeyword(e.target.value)}
           placeholder={intl.formatMessage(assetsMessage.search)}
           startAdornment={
             <InputAdornment position="start">
@@ -147,7 +143,7 @@ function TokenList({
       </Box>
 
       {!assetsList.length ? (
-        <Stack alignItems='center' justifyContent='center' sx={{ height: '100%', flex: 1 }}>
+        <Stack alignItems="center" justifyContent="center" sx={{ height: '100%', flex: 1 }}>
           <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
         </Stack>
       ) : (
@@ -163,7 +159,7 @@ function TokenList({
                 </ButtonBase>
               }
               secondColumn={
-                <Stack direction='row' alignItems='center' spacing='4px'>
+                <Stack direction="row" alignItems="center" spacing="4px">
                   <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
                     {intl.formatMessage(globalMessages.fingerprint)}
                   </Typography>
@@ -186,7 +182,7 @@ function TokenList({
                 avatar={<NoAssetLogo />}
                 name={token.name}
                 id={token.id}
-                amount={shouldHideBalance ? hiddenAmount :  token.amount}
+                amount={shouldHideBalance ? hiddenAmount : token.amount}
               />
             ))}
           </List>
@@ -257,9 +253,15 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
-            sx={{ textDecoration: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '70%' }}
-            color="var(--yoroi-palette-primary-300)"
-            to={id !== '-' &&  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
+            sx={{
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '70%',
+            }}
+            color="primary.600"
+            to={id !== '-' && ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
