@@ -116,6 +116,7 @@ const simpleNodeLogger = require('simple-node-logger');
 
 const { promisify } = require('util');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -126,6 +127,12 @@ const testProgress = {
 
 BeforeAll(() => {
   setDefaultTimeout(halfMinute);
+  const chromeDataDir = `${testRunsDataDir}_chrome`;
+  const firefoxDataDir = `${testRunsDataDir}_chrome`;
+  const chromeMockServerDataDir = `${testRunsDataDir}_cardanoMockServerLogs`;
+  rimraf.sync(chromeDataDir);
+  rimraf.sync(firefoxDataDir);
+  rimraf.sync(chromeMockServerDataDir);
 
   CardanoServer.getMockServer({});
   ErgoServer.getMockServer({});
