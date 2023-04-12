@@ -3,10 +3,12 @@
 import React from 'react';
 import { map } from 'lodash';
 import classnames from 'classnames';
-import type { Node, Element } from 'react';
+import type { Node, Element, ComponentType } from 'react';
 import { Modal, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
+import { withLayout } from '../../styles/context/layout';
+import { observer } from 'mobx-react';
 
 type ActionType = {|
   +label: string,
@@ -30,7 +32,9 @@ type Props = {|
   +closeOnOverlayClick?: boolean,
 |};
 
-export default function DialogFn(props: Props): Node {
+type InjectedProps = {| isRevampLayout: boolean |};
+
+function DialogFn(props: Props & InjectedProps): Node {
   const {
     title,
     children,
@@ -40,6 +44,7 @@ export default function DialogFn(props: Props): Node {
     className,
     closeButton,
     backButton,
+    isRevampLayout,
   } = props;
 
   const hasSubmitting =
@@ -91,13 +96,14 @@ export default function DialogFn(props: Props): Node {
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
                   key={i}
-                  variant={
-                    action.danger === true
-                      ? 'danger'
-                      : action.primary === true
-                      ? 'primary'
-                      : 'secondary'
-                  }
+                  // variant={
+                  //   action.danger === true
+                  //     ? 'danger'
+                  //     : action.primary === true
+                  //     ? 'primary'
+                  //     : 'secondary'
+                  // }
+                  {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
                   loading={action.isSubmitting}
                   onClick={action.onClick}
@@ -171,3 +177,19 @@ const ModalFooter = styled(Box)(({ theme }) => ({
     },
   },
 }));
+
+function getBtnVariant(danger?: boolean, primary?: boolean, isRevampLayout: boolean): {||} {
+  if (isRevampLayout && primary) {
+    return { variant: 'contained', color: 'secondary' };
+  }
+
+  if (isRevampLayout && !primary) {
+    return { variant: 'outlined', color: 'secondary' };
+  }
+
+  if (danger === true) return { variant: 'danger' };
+  if (primary === true) return { variant: 'primary' };
+  return { variant: 'secondary' };
+}
+
+export default (withLayout(observer(DialogFn)): ComponentType<Props>);

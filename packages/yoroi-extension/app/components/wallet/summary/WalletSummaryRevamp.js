@@ -208,12 +208,13 @@ export default class WalletSummaryRevamp extends Component<Props> {
                   textTransform: 'uppercase',
                   fontWeight: 'bold',
                   borderWidth: 2,
-                  svg: { marginRight: '16px' },
+                  width: 'unset',
                 }}
                 onClick={openExportTxToFileDialog}
                 onKeyPress={openExportTxToFileDialog}
+                disabled={isLoadingTransactions}
+                startIcon={<ExportTxToFileSvg />}
               >
-                <ExportTxToFileSvg />
                 {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
               </Button>
             </Box>
