@@ -178,7 +178,14 @@ const ModalFooter = styled(Box)(({ theme }) => ({
   },
 }));
 
-function getBtnVariant(danger?: boolean, primary?: boolean, isRevampLayout: boolean): {||} {
+function getBtnVariant(
+  danger?: boolean,
+  primary?: boolean,
+  isRevampLayout: boolean
+): {|
+  variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
+  color?: 'primary' | 'secondary',
+|} {
   if (isRevampLayout && primary) {
     return { variant: 'contained', color: 'secondary' };
   }
