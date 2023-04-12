@@ -12,6 +12,8 @@ import { signTxMessages } from '../SignTxPage';
 import CardanoSignTxSummary from './SignTxSummary';
 import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expand.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
+import ErrorBlock from '../../../../components/widgets/ErrorBlock';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
 type AssetDisplayValueProps = {|
   amount: BigNumber,
@@ -34,6 +36,8 @@ type Props = {|
   txAssetsData: SummaryAssetsData,
   renderExplorerHashLink: Function,
   passwordFormField: Node,
+  hwWalletError: ?LocalizableError,
+  walletType: string,
 |};
 
 function CardanoSignTx({
@@ -41,6 +45,8 @@ function CardanoSignTx({
   txAssetsData,
   renderExplorerHashLink,
   passwordFormField,
+  hwWalletError,
+  walletType,
 }: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const isSendingNativeToken = Number(total.amount) < 0;
@@ -84,7 +90,9 @@ function CardanoSignTx({
           />
         </>
       )}
-      <Box mt="32px">{passwordFormField}</Box>
+      {walletType === 'web' && <Box mt="32px">{passwordFormField}</Box>}
+
+      <ErrorBlock error={hwWalletError} />
     </Box>
   );
 }
