@@ -2,8 +2,7 @@
 
 export type SortedRecoveryPhraseEntry = {|
   id: number,
-  word: string,
-  originalIdx: number,
+  internalWordId: string,
 |};
 
 export function makeSortedPhrase(recoveryPhrase: Array<string>): SortedRecoveryPhraseEntry[] {
