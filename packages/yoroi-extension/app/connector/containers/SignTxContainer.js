@@ -29,7 +29,10 @@ import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { Box } from '@mui/material';
 import AddCollateralPage from '../components/signin/AddCollateralPage';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type LocalizableError from '../../i18n/LocalizableError';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
@@ -63,10 +66,7 @@ export default class SignTxContainer extends Component<
       throw new Error('missing connected wallet');
     }
 
-    if (
-      connectedWallet.publicDeriver.getParent().getWalletType() ===
-        WalletTypeOption.WEB_WALLET
-    ) {
+    if (connectedWallet.publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET) {
       // check the password
       const withSigningKey = asGetSigningKey(deriver);
       if (!withSigningKey) {
@@ -110,8 +110,8 @@ export default class SignTxContainer extends Component<
     const whitelistEntries = this.generated.stores.connector.currentConnectorWhitelist;
     const connectedWebsite = whitelistEntries.find(
       cacheEntry =>
-      selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId &&
-        cacheEntry.url === signingMessage.requesterUrl,
+        selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId &&
+        cacheEntry.url === signingMessage.requesterUrl
     );
 
     const tooltipNotification = {
@@ -174,7 +174,6 @@ export default class SignTxContainer extends Component<
         component = (
           <SignTxPage
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-            connectedWebsite={connectedWebsite}
             selectedWallet={selectedWallet}
             onCopyAddressTooltip={handleCopyAddressTooltip}
             notification={notification}
@@ -241,9 +240,7 @@ export default class SignTxContainer extends Component<
             signData={signData}
             walletType={walletType}
             hwWalletError={this.generated.stores.connector.hwWalletError}
-            isHwWalletErrorRecoverable={
-              this.generated.stores.connector.isHwWalletErrorRecoverable
-            }
+            isHwWalletErrorRecoverable={this.generated.stores.connector.isHwWalletErrorRecoverable}
             tx={tx}
           />
         );
