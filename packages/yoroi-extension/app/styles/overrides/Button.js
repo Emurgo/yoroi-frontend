@@ -246,6 +246,7 @@ function makeOutlinedBtnStyles(color: 'primary' | 'secondary'): Object {
     },
   };
 }
+
 // Button in Figam: https://bit.ly/3Ky4uvo
 const RevampButton = {
   styleOverrides: {
@@ -321,23 +322,51 @@ const RevampButton = {
       },
     },
     {
-      props: { variant: 'danger' },
+      props: { variant: 'contained', color: 'error' },
       style: {
-        backgroundColor: 'var(--yoroi-comp-button-danger-background)',
-        color: 'var(--yoroi-comp-button-danger-text)',
+        backgroundColor: revampBaseTheme.palette.error[200],
+        color: revampBaseTheme.palette.common.white,
         border: 0,
         ':hover': {
-          backgroundColor: 'var(--yoroi-comp-button-danger-background-hover)',
+          backgroundColor: revampBaseTheme.palette.error[100],
         },
         '&.Mui-active': {
-          backgroundColor: 'var(--yoroi-comp-button-danger-background-active)',
+          backgroundColor: revampBaseTheme.palette.error[200],
         },
         '&.Mui-disabled': {
-          color: 'var(--yoroi-comp-button-danger-text)',
+          backgroundColor: revampBaseTheme.palette.error[200],
+          color: revampBaseTheme.palette.common.white,
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: 'var(--yoroi-comp-button-danger-background)',
+          color: revampBaseTheme.palette.error[200],
+        },
+      },
+    },
+    {
+      props: { variant: 'outlined', color: 'error' },
+      style: {
+        backgroundColor: revampBaseTheme.palette.common.white,
+        color: revampBaseTheme.palette.error[500],
+        border: '2px solid',
+        borderColor: revampBaseTheme.palette.error[500],
+        ':hover': {
+          border: '2px solid',
+          color: revampBaseTheme.palette.error[400],
+          borderColor: revampBaseTheme.palette.error[400],
+        },
+        ':active': {
+          borderColor: revampBaseTheme.palette.error[400],
+        },
+        ':focus': {
+          borderColor: revampBaseTheme.palette.error[400],
+        },
+        '&.Mui-disabled': {
+          border: '2px solid',
+          opacity: 0.4,
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: revampBaseTheme.palette.error[500],
         },
       },
     },

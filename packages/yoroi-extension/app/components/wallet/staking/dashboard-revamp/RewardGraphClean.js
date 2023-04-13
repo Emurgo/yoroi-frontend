@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Box } from '@mui/system';
 import type { GraphItems } from '../dashboard/GraphWrapper';
+import { Stack, Typography } from '@mui/material';
 
 const graphVars = {
   barWidth: 10,
@@ -45,31 +46,40 @@ export default class RewardGraphClean extends Component<Props> {
     |}) => {
       if (active && payload != null) {
         const { poolName } = payload[0].payload;
+        const values = [
+          [epochTitle, label],
+          [primaryBarLabel, payload[0].value],
+          poolName ? [stakepoolNameTitle, poolName] : null,
+        ];
         return (
           <Box
             sx={{
               padding: '8px 12px 8px 8px',
-              backgroundColor: '#242838',
-              color: 'var(--yoroi-dashboard-graph-tooltip-text-color)',
-              fontSize: '0.75rem',
+              backgroundColor: 'gray.900',
+              color: 'common.white',
               lineHeight: '14px',
               borderRadius: '4px',
             }}
           >
-            <p>
-              <span>{epochTitle}:</span>&nbsp;
-              <span>{label}</span>
-            </p>
-            <p>
-              <span>{primaryBarLabel}:</span>&nbsp;
-              <span>{payload[0].value}</span>
-            </p>
-            {poolName && (
-              <p>
-                <span>{stakepoolNameTitle}:</span>&nbsp;
-                <span>{payload[0].payload.poolName}</span>
-              </p>
-            )}
+            {values
+              .filter(value => value !== null)
+              .map(([key, value], idx) => (
+                <Stack direction="row" mb="2px">
+                  <Typography width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
+                    {key}:
+                  </Typography>
+                  <Typography
+                    sx={{
+                      wordWrap: 'break-word',
+                      maxWidth: '300px',
+                    }}
+                    variant="caption1"
+                    fontWeight="bold"
+                  >
+                    {value}
+                  </Typography>
+                </Stack>
+              ))}
           </Box>
         );
       }

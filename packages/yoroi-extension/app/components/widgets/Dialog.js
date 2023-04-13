@@ -186,12 +186,14 @@ function getBtnVariant(
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary',
 |} {
+  if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
+
   if (isRevampLayout && primary) {
-    return { variant: 'contained', color: 'secondary' };
+    return { variant: 'contained', color: 'primary' };
   }
 
   if (isRevampLayout && !primary) {
-    return { variant: 'outlined', color: 'secondary' };
+    return { variant: 'outlined', color: 'primary' };
   }
 
   if (danger === true) return { variant: 'danger' };
