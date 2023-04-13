@@ -1,6 +1,5 @@
 // @flow
 /* eslint-disable no-nested-ternary */
-import React, { Component } from 'react';
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
@@ -19,13 +18,13 @@ import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
   TxDataOutput,
-  TxDataInput,
 } from '../../types';
+import type LocalizableError from '../../../i18n/LocalizableError';
+import { Component } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -36,24 +35,43 @@ import {
   assetNameFromIdentifier,
 } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
-import WalletCard from '../connect/ConnectedWallet';
 import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
 import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
-import type LocalizableError from '../../../i18n/LocalizableError';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
+
+const messages = defineMessages({
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
+  sendError: {
+    id: 'connector.signin.error.sendError',
+    defaultMessage: '!!!An error occured when sending the transaction.',
+  },
+});
+
+export type SummaryAssetsData = {|
+  total: DisplayAmount | Object,
+  isOnlyTxFee: boolean,
+  sent: Array<any>,
+  received: Array<any>,
+|};
+
+type TokenEntryWithFee = {|
+  ...TokenEntry,
+  +fee: BigNumber,
+|};
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,
@@ -78,29 +96,6 @@ type Props = {|
   +isHwWalletErrorRecoverable: ?boolean,
   +tx: ?string,
 |};
-
-export type SummaryAssetsData = {|
-  total: DisplayAmount | Object,
-  isOnlyTxFee: boolean,
-  sent: Array<any>,
-  received: Array<any>,
-|};
-
-type TokenEntryWithFee = {|
-  ...TokenEntry,
-  +fee: BigNumber,
-|};
-
-const messages = defineMessages({
-  incorrectWalletPasswordError: {
-    id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
-  },
-  sendError: {
-    id: 'connector.signin.error.sendError',
-    defaultMessage: '!!!An error occured when sending the transaction.',
-  },
-});
 
 type State = {|
   isSubmitting: boolean,
@@ -212,7 +207,7 @@ class SignTxPage extends Component<Props, State> {
     );
   };
 
-  renderAddressExplorerUrl: ($ReadOnly<TokenRow>, color: string) => Node = (tokenInfo, color) => {
+  renderAddressExplorerUrl: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
     return fingerprint !== undefined ? (
       <ExplorableHashContainer
@@ -323,7 +318,6 @@ class SignTxPage extends Component<Props, State> {
 
     if (txData) {
       const defaultTokenId = txData.amount.defaults.defaultIdentifier;
-      const defaultNetworkId = txData.amount.defaults.defaultNetworkId;
       const defaultTokenAmount = txData.amount.get(defaultTokenId) ?? new BigNumber('0');
       const txFeeAmount = new BigNumber(txData.fee.amount);
       const sentAssets = this.getUniqueAssets(txData.outputs.filter(o => !o.isForeign));
@@ -331,7 +325,7 @@ class SignTxPage extends Component<Props, State> {
         txData.inputs.map(i => ({ ...i, isForeign: false }))
       );
 
-      //only tx fee (no sign) & one asset sent/received
+      // only tx fee (no sign) & one asset sent/received
       assetsData.total = this.getDisplayAmount({
         identifier: txData.fee.tokenId,
         networkId: txData.fee.networkId,
@@ -367,16 +361,13 @@ class SignTxPage extends Component<Props, State> {
 
     const { isSubmitting } = this.state;
 
-    const url = connectedWebsite?.url ?? '';
-    const faviconUrl = connectedWebsite?.image ?? '';
-
     const { walletType, hwWalletError, isHwWalletErrorRecoverable } = this.props;
 
     if (hwWalletError && isHwWalletErrorRecoverable === false) {
       return (
         <>
           <ErrorBlock error={hwWalletError} />
-          {this.props.tx && (
+          {Boolean(this.props.tx) && (
             <Box>
               <Typography>Transaction:</Typography>
               <textarea rows="10" style={{ width: '100%' }} disabled value={this.props.tx} />
@@ -487,6 +478,7 @@ class SignTxPage extends Component<Props, State> {
               variant="outlined"
               color="primary"
               onClick={onCancel}
+              disabled={isSubmitting}
             >
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
@@ -494,11 +486,11 @@ class SignTxPage extends Component<Props, State> {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={!walletPasswordField.isValid}
+              disabled={!walletPasswordField.isValid || isSubmitting}
               onClick={this.submit.bind(this)}
               sx={{ minWidth: 0 }}
             >
-              {intl.formatMessage(globalMessages.confirm)}
+              {intl.formatMessage(confirmButtonLabel)}
             </Button>
           </Box>
         </Box>

@@ -666,11 +666,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         this._closeWindow();
         return;
       }
-      // eslint-disable-next-line camelcase
+
       const utxo = addressedUtxos.find(
-        ({ tx_hash, tx_index }) =>
-          // eslint-disable-next-line camelcase
-          tx_hash === txHash && tx_index === txIndex
+        (
+          { tx_hash, tx_index } // eslint-disable-line camelcase
+        ) => tx_hash === txHash && tx_index === txIndex // eslint-disable-line camelcase
       );
       if (utxo) {
         inputs.push({

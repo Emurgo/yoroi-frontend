@@ -2,6 +2,7 @@
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import type { TxDataOutput, TxDataInput } from '../api/common/types';
+
 export type { TxDataOutput, TxDataInput } from '../api/common/types';
 
 // TODO: delete this and replace it with a Request object

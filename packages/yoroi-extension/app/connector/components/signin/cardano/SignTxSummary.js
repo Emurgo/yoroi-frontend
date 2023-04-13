@@ -73,7 +73,7 @@ function CardanoSignTxSummary({
   intl,
 }: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
-  const showOnlyTxFee = isOnlyTxFee && sent.length == 0 && received.length == 0;
+  const showOnlyTxFee = isOnlyTxFee && sent.length === 0 && received.length === 0;
   return (
     <Box
       p="16px"

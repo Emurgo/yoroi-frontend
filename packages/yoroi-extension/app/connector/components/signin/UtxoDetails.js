@@ -17,7 +17,6 @@ import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
