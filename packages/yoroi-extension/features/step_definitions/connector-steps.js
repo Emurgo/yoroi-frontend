@@ -37,7 +37,7 @@ import {
 } from '../support/helpers/connectorErrors';
 import type { DAppConnectorResponse } from '../support/helpers/dapp-helpers';
 
-const userRejectMsg = 'User rejected';
+const userRejectMsg = 'User Rejected';
 const userRejectSigningMsg = 'User rejected';
 const mockDAppUrl = `http://localhost:${Ports.DevBackendServer}/mock-dapp`;
 
