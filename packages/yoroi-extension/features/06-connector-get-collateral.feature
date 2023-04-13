@@ -18,7 +18,8 @@ Feature: dApp connector get collateral
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-collateral is connected to the website localhost
-    Then The dApp should see collateral: {"utxo_id":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f6071","tx_hash":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f607","tx_index":1,"receiver":"addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06","amount":"1000000","assets":[]} for 1000000
+    Then The dApp should see balance 2000000
+    And The dApp should see collateral: {"utxo_id":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f6071","tx_hash":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f607","tx_index":1,"receiver":"addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06","amount":"1000000","assets":[]} for 1000000
 
   @dApp-1024
   Scenario: dApp, authorized wallet, get collateral (DAPP-1024)
@@ -32,7 +33,8 @@ Feature: dApp connector get collateral
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-collateral is connected to the website localhost
-    Then The dApp should see collateral: {"utxo_id":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f6071","tx_hash":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f607","tx_index":1,"receiver":"addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06","amount":"1000000","assets":[]} for 1000000
+    Then The dApp should see balance 2000000
+    And The dApp should see collateral: {"utxo_id":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f6071","tx_hash":"021657dfc7f9e33d0ca9cb33b0487138d2f74286e9e00f19946f27e9a8c6f607","tx_index":1,"receiver":"addr1q9nv4vttp9f00pttk2unp4jhprd67sgffkg9ak0sawvxa68vfz8ymjd9j2vdea8088ut8jpx4c6tr08dwuzs07leyrtsuc6l06","amount":"1000000","assets":[]} for 1000000
 
   @dApp-1025
   Scenario: dApp, anonymous wallet, get collateral, connector popup (DAPP-1025)
@@ -45,6 +47,7 @@ Feature: dApp connector get collateral
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-simple-15 is connected to the website localhost
+    Then The dApp should see balance 5500000
     Then I ask to get Collateral for 1 ADA
     Then I should see the connector popup to Add Collateral with fee info
       | fee   |
@@ -67,6 +70,7 @@ Feature: dApp connector get collateral
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-simple-15 is connected to the website localhost
+    Then The dApp should see balance 5500000
     Then I ask to get Collateral for 1 ADA
     Then I should see the connector popup to Add Collateral with fee info
       | fee   |
@@ -77,7 +81,7 @@ Feature: dApp connector get collateral
       | amount  | receiver |
       | 1000000 | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
 
-  @dApp-1027 @ignore
+  @dApp-1027
   Scenario: dApp, anonymous wallet, get collateral from empty wallet (DAPP-1027)
     Given There is a Shelley wallet stored named empty-wallet
     Then Revamp. I switch to revamp version
@@ -89,12 +93,11 @@ Feature: dApp connector get collateral
     And The access request should succeed
     And The wallet empty-wallet is connected to the website localhost
     Then I ask to get Collateral for 1 ADA
-    # TODO replace info when we have it
     And The collateral received the error:
       | code | info |
-      | -1   | ???  |
+      | -2   | not enough UTXOs |
 
-  @dApp-1028 @ignore
+  @dApp-1028
   Scenario: dApp, authorized wallet, get collateral from empty wallet (DAPP-1028)
     Given There is a Shelley wallet stored named empty-wallet
     Then Revamp. I switch to revamp version
@@ -107,10 +110,9 @@ Feature: dApp connector get collateral
     And The access request should succeed
     And The wallet empty-wallet is connected to the website localhost
     Then I ask to get Collateral for 1 ADA
-    # TODO replace info when we have it
     And The collateral received the error:
       | code | info |
-      | -1   | ???  |
+      | -2   | not enough UTXOs |
 
   @dApp-1029
   Scenario: dApp, anonymous wallet, get collateral, more than 5 ADA (DAPP-1029)

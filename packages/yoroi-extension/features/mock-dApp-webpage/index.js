@@ -517,9 +517,9 @@ export class MockDAppWebpage {
       collateralResponse.retValue.length !== 0
     ) {
       const utxos = this._mapCborUtxos(collateralResponse.retValue);
-      return { success: true, retValue: JSON.stringify(utxos, undefined, 2), error: null };
+      return { success: true, retValue: utxos, error: null };
     }
-    this.logger.error(`MockDApp: -> Something went wrong: ${collateralResponse.error}`);
+    this.logger.error(`MockDApp: -> Something went wrong: ${JSON.stringify(collateralResponse.error)}`);
     return collateralResponse;
   }
 
@@ -547,7 +547,7 @@ export class MockDAppWebpage {
       collateralResult.retValue.length !== 0
     ) {
       const utxos = this._mapCborUtxos(collateralResult.retValue);
-      return { success: true, retValue: JSON.stringify(utxos, undefined, 2), error: null };
+      return { success: true, retValue: utxos, error: null };
     }
     this.logger.error(`MockDApp: -> Something went wrong: ${JSON.stringify(collateralResult)}`);
     return collateralResult;

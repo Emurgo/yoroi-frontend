@@ -35,6 +35,7 @@ import {
   DataSignErrorCode,
   TxSignErrorCode
 } from '../support/helpers/connectorErrors';
+import type { DAppConnectorResponse } from '../support/helpers/dapp-helpers';
 
 const userRejectMsg = 'User rejected';
 const userRejectSigningMsg = 'User rejected';
@@ -161,9 +162,9 @@ Then(/^The access request should succeed$/, async function () {
 
 Then(/^The user reject is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject is received`);
-  const requestAccessResult = await this.mockDAppPage.checkAccessRequest();
+  const requestAccessResult = (await this.mockDAppPage.checkAccessRequest(): DAppConnectorResponse);
   expect(requestAccessResult.success, `Request access is granted`).to.be.false;
-  const errorObject = JSON.parse(requestAccessResult.error);
+  const errorObject = requestAccessResult.error;
   expect(errorObject.code).to.equal(ApiErrorCode.Refused, 'Wrong error message');
   expect(errorObject.info).to.equal(userRejectMsg, 'Wrong error message');
 });
@@ -246,8 +247,9 @@ Then(/^I should see the transaction addresses info:$/, async function (table) {
 
 Then(/^The signing transaction API should return (.+)$/, async function (txHex) {
   this.webDriverLogger.info(`Step: The signing transaction API should return ${txHex} `);
-  const result = await this.mockDAppPage.getSigningTxResult();
-  expect(result).to.equal(txHex);
+  const result = (await this.mockDAppPage.getSigningTxResult(): DAppConnectorResponse);
+  expect(result.success).to.equal(true);
+  expect(result.retValue).to.equal(txHex);
 });
 
 Then(/^I see the error Incorrect wallet password$/, async function () {
@@ -318,11 +320,13 @@ Then(/^I receive the wallet disconnection message$/, async function () {
 Then(/^The user reject for signing is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject for signing is received`);
   await this.windowManager.switchTo(mockDAppName);
-  const signingResult = await this.mockDAppPage.getSigningTxResult();
-  expect(signingResult.code, `The reject signing code is different`)
+  const signingResult = (await this.mockDAppPage.getSigningTxResult(): DAppConnectorResponse);
+  expect(signingResult.success).to.equal(false);
+  const errorObject = signingResult.error;
+  expect(errorObject.code, `The reject signing code is different`)
     .to
     .equal(TxSignErrorCode.UserDeclined);
-  expect(signingResult.info)
+  expect(errorObject.info)
     .to
     .equal(userRejectSigningMsg, 'Wrong error message');
 });
@@ -381,11 +385,13 @@ Then(/^The signing data API should return (.+)$/, async function (dataHex) {
 Then(/^The user reject for signing data is received$/, async function () {
   this.webDriverLogger.info(`Step: The user reject for signing data is received`);
   await this.windowManager.switchTo(mockDAppName);
-  const signingResult = await this.mockDAppPage.getSigningDataResult();
-  expect(signingResult.code, `The reject signing code is different`)
+  const signingResult = (await this.mockDAppPage.getSigningDataResult(): DAppConnectorResponse);
+  expect(signingResult.success).to.equal(false);
+  const errorObject = signingResult.error;
+  expect(errorObject.code, `The reject signing code is different`)
     .to
     .equal(DataSignErrorCode.UserDeclined);
-  expect(signingResult.info)
+  expect(errorObject.info)
     .to
     .equal(userRejectSigningMsg, 'Wrong error message');
 });
@@ -397,22 +403,25 @@ When(/^I ask to get Collateral for (.+) ADA$/, async function (amount) {
 });
 
 Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expectedCollateral, utxosAmount) {
-    this.webDriverLogger.info(
-      `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
-    );
-    const collateral = await this.mockDAppPage.getCollateral(utxosAmount);
-    const collateralJson = JSON.parse(collateral)[0];
-    const expectedUtxos = JSON.parse(expectedCollateral);
-    expect(collateralJson, 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
+  const expectedUtxos = JSON.parse(expectedCollateral);
+  this.webDriverLogger.info(
+    `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
+  );
+  const collateralResponse = (
+    await this.mockDAppPage.getCollateral(utxosAmount): DAppConnectorResponse
+  );
+  expect(collateralResponse.success).to.equal(true);
+  expect(collateralResponse.retValue[0], 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
   }
 );
 
 Then(/^The dApp should receive collateral$/, async function (table) {
   const fields = table.hashes()[0];
-  const collateral = await this.mockDAppPage.getCollateralResult();
-  const collateralJson = JSON.parse(collateral)[0];
-  expect(collateralJson.amount, 'Amount is different').to.equal(fields.amount);
-  expect(collateralJson.receiver, 'Receiver is different').to.equal(fields.receiver);
+  const collateralResponse = (await this.mockDAppPage.getCollateralResult(): DAppConnectorResponse);
+  expect(collateralResponse.success).to.equal(true);
+  const collateralUtxuJson = collateralResponse.retValue[0];
+  expect(collateralUtxuJson.amount, 'Amount is different').to.equal(fields.amount);
+  expect(collateralUtxuJson.receiver, 'Receiver is different').to.equal(fields.receiver);
 });
 
 Then(/^I should see the connector popup to Add Collateral with fee info$/, async function (table) {
