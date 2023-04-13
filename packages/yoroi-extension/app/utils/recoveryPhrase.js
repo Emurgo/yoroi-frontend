@@ -1,7 +1,7 @@
 // @flow
 
 export type SortedRecoveryPhraseEntry = {|
-  id: number,
+  word: string,
   internalWordId: string,
 |};
 
