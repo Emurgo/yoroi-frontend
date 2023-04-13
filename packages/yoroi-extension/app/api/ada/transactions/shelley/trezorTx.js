@@ -514,7 +514,7 @@ export function toTrezorSignRequest(
         ...(ownUtxo ? { path: ownUtxo.addressing.path } : {})
       });
     }
-    return formatted.sort(compareInputs);
+    return formatted;
   }
 
   function formatOutput(output: RustModule.WalletV4.TransactionOutput): CardanoOutput {
