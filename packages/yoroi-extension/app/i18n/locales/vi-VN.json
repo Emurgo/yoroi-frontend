@@ -580,6 +580,8 @@
   "wallet.create.dialog.repeatPasswordFieldPlaceholder": "Nhập lại mật khẩu chi tiêu của bạn",
   "wallet.create.dialog.repeatPasswordLabel": "Nhập lại mật khẩu chi tiêu của bạn",
   "wallet.create.dialog.title": "Tạo Ví",
+  "wallet.create.selectNetwork.title": "Select network",
+  "wallet.create.selectNetwork.description": "Pick a <strong>network</strong> you want to create a wallet on.",
   "wallet.create.dialog.walletNameHint": "ví dụ: Ví mua sắm",
   "wallet.currency.pick.cardano": "Cardano là giao thức bằng chứng cổ phần an toàn đầu tiên được chứng minh",
   "wallet.currency.pick.ergo": "Ergo xây dựng các tính năng mã hóa tiên tiến và chức năng DeFi hoàn toàn mới trên nền tảng vững chắc được tạo dựng bởi một thập kỷ lý thuyết và phát triển chuỗi khối",
