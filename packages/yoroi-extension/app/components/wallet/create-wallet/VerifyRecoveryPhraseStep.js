@@ -41,34 +41,36 @@ type Props = {|
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, recoveryPhrase, setCurrentStep } = props;
+  // const recoveryPhrase = ['b', 'a', 'b'];
+
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState(
     new Array(recoveryPhrase.length).fill(null)
   );
-  const [wrongWord, setWrongWord] = useState<string | null>(null);
+  const [wrongWordIdx, setWrongWordIdx] = useState<number | null>(null);
+  const [addedWordsIndxes, setAddedWordsIndexes] = useState(new Set());
 
   function onAddWord(word: string, idx: number): void {
-    if (isWordAdded(word)) return;
+    if (addedWordsIndxes.has(idx)) return;
 
     const nextWordIdx = enteredRecoveryPhrase.findIndex(w => w === null);
     if (nextWordIdx === -1) throw new Error('Entered recovery phrase words list is full');
 
     const isInCorrectOrder = recoveryPhrase[nextWordIdx] === word;
-    if (!isInCorrectOrder) {
-      return setWrongWord(word);
-    }
+    if (!isInCorrectOrder) return setWrongWordIdx(idx);
 
     setRecoveryPhrase(prev => {
       const copy = [...prev];
-      copy[idx] = word;
+      copy[nextWordIdx] = word;
       return copy;
     });
-    setWrongWord(null);
-  }
+    setWrongWordIdx(null);
 
-  function isWordAdded(word) {
-    return enteredRecoveryPhrase.some(w => w === word);
+    // Mark word as added
+    const addedWords = new Set(addedWordsIndxes);
+    addedWords.add(idx);
+    setAddedWordsIndexes(addedWords);
   }
 
   const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);
@@ -91,11 +93,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             justifyContent="center"
           >
             {enteredRecoveryPhrase.map((word, idx) => (
-              <Stack
-                item
-                // eslint-disable-next-line react/no-array-index-key
-                key={idx}
-              >
+              // eslint-disable-next-line react/no-array-index-key
+              <Stack item key={idx}>
                 <Box
                   sx={{
                     whiteSpace: 'nowrap',
@@ -154,16 +153,16 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           justifyContent="center"
           gap="8px"
         >
-          {sortedRecoveryPhrase.map(({ word, id, originalIdx }) => {
+          {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
             return (
               <button
                 type="button"
-                key={id}
+                key={internalWordId}
                 className={classnames(styles.wordChip, {
-                  [styles.wordAdded]: isWordAdded(word),
-                  [styles.wrongWord]: wrongWord === word,
+                  [styles.wordAdded]: addedWordsIndxes.has(idx),
+                  [styles.wrongWord]: wrongWordIdx === idx,
                 })}
-                onClick={() => onAddWord(word, originalIdx)}
+                onClick={() => onAddWord(word, idx)}
               >
                 <Typography
                   sx={{
@@ -184,7 +183,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         </Stack>
 
         <Box height="28px" mt="16px">
-          {wrongWord !== null && (
+          {wrongWordIdx !== null && (
             <Typography variant="body2" color="error.100">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
@@ -224,9 +223,14 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             onClick={() => {
               if (!recoveryPhrase) return;
               setRecoveryPhrase(recoveryPhrase);
-              setWrongWord(null);
+              setWrongWordIdx(null);
+              setAddedWordsIndexes(new Set(recoveryPhrase.map((_, idx) => idx)));
             }}
-            onDoubleClick={() => setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null))}
+            onDoubleClick={() => {
+              setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null));
+              setWrongWordIdx(null);
+              setAddedWordsIndexes(new Set());
+            }}
           >
             Auto Enter
           </Button>
