@@ -17,11 +17,11 @@ export const TIPS_DIALOGS = Object.freeze({
 });
 
 export function getFirstStep(): string {
-  if (environment.isProduction()) {
-    return CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE;
+  if (environment.isDev() || environment.isNightly()) {
+    return CREATE_WALLET_SETPS.SELECT_NETWORK;
   }
 
-  return CREATE_WALLET_SETPS.SELECT_NETWORK;
+  return CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE;
 }
 
 const asDialogId: string => string = (dialogId: string) => `dialog__${dialogId}`;

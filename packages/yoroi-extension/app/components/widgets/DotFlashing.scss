@@ -1,0 +1,52 @@
+.component {
+  $animation-duration: 0.5s;
+
+  position: relative;
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dot-flashing $animation-duration infinite linear alternate;
+  animation-delay: 0.25s;
+
+  &::before,
+  &::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+  }
+
+  &::before {
+    left: -10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 2px;
+    background-color: #3154cb;
+    color: #3154cb;
+    animation: dot-flashing $animation-duration infinite alternate;
+    animation-delay: 0s;
+  }
+
+  &::after {
+    left: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 2px;
+    background-color: #3154cb;
+    color: #3154cb;
+    animation: dot-flashing $animation-duration infinite alternate;
+    animation-delay: 0.5s;
+  }
+
+  @keyframes dot-flashing {
+    0% {
+      background-color: #3154cb;
+    }
+    50%,
+    100% {
+      background-color: rgba(49, 84, 203, 0.4);
+    }
+  }
+}

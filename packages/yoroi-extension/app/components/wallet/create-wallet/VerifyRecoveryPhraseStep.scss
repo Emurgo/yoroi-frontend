@@ -1,6 +1,5 @@
 .component {
   .verifyRecoveryPhraseArea {
-    width: 100%;
     border: double 2px transparent;
     border-radius: 8px;
     background-image: linear-gradient(
@@ -15,19 +14,38 @@
   }
 
   .wordChip {
+    position: relative;
     text-align: center;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 123px;
     height: 40px;
     cursor: pointer;
 
-    border: double 2px var(--yoroi-palette-gray-50);
-    background-image: linear-gradient(269deg, #e4e8f7 0%, #c6f7ed 99%),
+    background-image: linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%),
       linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%);
     background-origin: border-box;
     background-clip: content-box, border-box;
+
+    &::before {
+      position: absolute;
+      content: '';
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      background: linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%);
+      border-radius: 8px;
+      z-index: 1;
+      transition: opacity 200ms linear;
+      opacity: 0;
+    }
+
+    &:not(.wordAdded):not(.wrongWord):hover::before {
+      opacity: 1;
+    }
 
     &.wordAdded {
       border: double 2px transparent;

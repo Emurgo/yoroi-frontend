@@ -4,7 +4,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Box, Typography, Grid, Button } from '@mui/material';
-import { ReactComponent as EyeIcon } from '../../../assets/images/open-eye-primary.inline.svg';
+import { ReactComponent as OpenedEyeIcon } from '../../../assets/images/open-eye-primary.inline.svg';
+import { ReactComponent as ClosedEyeIcon } from '../../../assets/images/close-eye-primary.inline.svg';
 
 type Props = {|
   recoveryPhrase: Array<string> | null,
@@ -20,6 +21,10 @@ const messages: * = defineMessages({
   showRecoveryPhraseBtn: {
     id: 'wallet.create.secondStep.showRecoveryPhraseBtn',
     defaultMessage: '!!!Show recovery phrase',
+  },
+  hideRecoveryPhraseBtn: {
+    id: 'wallet.create.secondStep.hideRecoveryPhraseBtn',
+    defaultMessage: '!!!Hide recovery phrase',
   },
 });
 
@@ -78,9 +83,13 @@ function RecoveryPhrase(props: Props & Intl): Node {
         }}
         onClick={toggleRecoveryPhrase}
       >
-        <EyeIcon />
+        {shouldShowRecoveryPhrase ? <ClosedEyeIcon /> : <OpenedEyeIcon />}
         <Typography variant="body2" fontWeight="500">
-          {intl.formatMessage(messages.showRecoveryPhraseBtn)}
+          {intl.formatMessage(
+            shouldShowRecoveryPhrase
+              ? messages.hideRecoveryPhraseBtn
+              : messages.showRecoveryPhraseBtn
+          )}
         </Typography>
       </Button>
     </Box>

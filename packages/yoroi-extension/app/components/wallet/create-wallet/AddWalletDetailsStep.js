@@ -14,7 +14,7 @@ import { Stack, Typography, Box } from '@mui/material';
 import StepController from './StepController';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
-import { CREATE_WALLET_SETPS, TIPS_DIALOGS, isDialogShownBefore } from './steps';
+import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -31,11 +31,11 @@ const messages: * = defineMessages({
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
-    defaultMessage: '!!!Enter wallet name',
+    defaultMessage: '!!!Wallet name',
   },
   enterPassword: {
     id: 'wallet.create.forthStep.enterPasswordInputLabel',
-    defaultMessage: '!!!Enter password',
+    defaultMessage: '!!!Password',
   },
   passwordHint: {
     id: 'wallet.create.forthStep.passwordHint',
@@ -49,9 +49,10 @@ const messages: * = defineMessages({
 });
 
 type Props = {|
-  setCurrentStep(step: string): void,
+  prevStep: () => void,
   recoveryPhrase: Array<string> | null,
   selectedNetwork: $ReadOnly<NetworkRow>,
+  isRecoveryPhraseEntered: boolean,
   onSubmit: (walletName: string, walletPassword: string) => void,
   ...ManageDialogsProps,
 |};
@@ -127,7 +128,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
 
   render(): Node {
     const {
-      setCurrentStep,
+      prevStep,
       recoveryPhrase,
       isDialogOpen,
       openDialog,
@@ -141,6 +142,11 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
+
+    const isValidFields =
+      isValidWalletName(walletName) &&
+      isValidWalletPassword(walletPassword) &&
+      isValidRepeatPassword(walletPassword, repeatPassword);
 
     if (!recoveryPhrase)
       throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
@@ -208,14 +214,12 @@ export default class AddWalletDetailsStep extends Component<Props> {
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,
-                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE),
+                onClick: prevStep,
                 type: 'secondary',
               },
               {
                 label: intl.formatMessage(globalMessages.create),
-                disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
-                  field => !field.isValid
-                ),
+                disabled: !isValidFields,
                 onClick: () => {
                   this.props.onSubmit(walletName, walletPassword);
                 },

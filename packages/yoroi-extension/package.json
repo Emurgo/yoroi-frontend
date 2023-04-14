@@ -216,6 +216,7 @@
     "json-bigint": "1.0.0",
     "jspdf": "1.5.3",
     "lodash": "4.17.20",
+    "lottie-react": "^2.4.0",
     "lovefield": "2.1.12",
     "mixwith": "0.1.1",
     "mobx": "5.15.7",
