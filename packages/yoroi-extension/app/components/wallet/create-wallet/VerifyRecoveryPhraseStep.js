@@ -201,7 +201,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 </Typography>
               </button>
             );
-            return fadeOutWordIdx === internalWordId ? (
+            return fadeOutWordIdx === idx ? (
               <Fade in timeout={500}>
                 {button}
               </Fade>
@@ -253,13 +253,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               if (!recoveryPhrase) return;
               setRecoveryPhrase(recoveryPhrase);
               setWrongWordIdx(null);
-              setAddedWordsIndexes(new Set(recoveryPhrase.map((_, idx) => idx)));
             }}
-            onDoubleClick={() => {
-              setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null));
-              setWrongWordIdx(null);
-              setAddedWordsIndexes(new Set());
-            }}
+            onDoubleClick={() => setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null))}
           >
             Auto Enter
           </Button>
