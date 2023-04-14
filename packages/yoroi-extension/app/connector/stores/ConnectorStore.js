@@ -1186,7 +1186,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         config.ByronNetworkId,
         ownUtxoAddressMap,
         ownStakeAddressMap,
-        addressedUtxos
+        addressedUtxos,
+        rawTxBody,
       );
     } catch {
       runInAction(() => {
