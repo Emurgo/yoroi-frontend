@@ -255,8 +255,12 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               if (!recoveryPhrase) return;
               setRecoveryPhrase(recoveryPhrase);
               setWrongWordIdx(null);
+              setAddedWordsIndexes(new Set(recoveryPhrase.map((_, idx) => idx)));
             }}
-            onDoubleClick={() => setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null))}
+            onDoubleClick={() => {
+              setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null));
+              setAddedWordsIndexes(new Set());
+            }}
           >
             Auto Enter
           </Button>
