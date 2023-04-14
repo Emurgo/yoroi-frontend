@@ -1,35 +1,38 @@
 // @flow
 import type { Node } from 'react';
-import { Component } from 'react';
-import { observer } from 'mobx-react';
-import { computed, observable, runInAction } from 'mobx';
-import config from '../../config';
-import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
-import SignTxPage from '../components/signin/SignTxPage';
-import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type {
   SigningMessage,
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../chrome/extension/connector/types';
-import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../types';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { computed, observable, runInAction } from 'mobx';
+import config from '../../config';
+import globalMessages from '../../i18n/global-messages';
+import SignTxPage from '../components/signin/SignTxPage';
+import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
+import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../types';
 import { Box } from '@mui/material';
 import AddCollateralPage from '../components/signin/AddCollateralPage';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type LocalizableError from '../../i18n/LocalizableError';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
@@ -63,10 +66,7 @@ export default class SignTxContainer extends Component<
       throw new Error('missing connected wallet');
     }
 
-    if (
-      connectedWallet.publicDeriver.getParent().getWalletType() ===
-        WalletTypeOption.WEB_WALLET
-    ) {
+    if (connectedWallet.publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET) {
       // check the password
       const withSigningKey = asGetSigningKey(deriver);
       if (!withSigningKey) {
@@ -110,8 +110,8 @@ export default class SignTxContainer extends Component<
     const whitelistEntries = this.generated.stores.connector.currentConnectorWhitelist;
     const connectedWebsite = whitelistEntries.find(
       cacheEntry =>
-      selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId &&
-        cacheEntry.url === signingMessage.requesterUrl,
+        selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId &&
+        cacheEntry.url === signingMessage.requesterUrl
     );
 
     const tooltipNotification = {
@@ -174,7 +174,6 @@ export default class SignTxContainer extends Component<
         component = (
           <SignTxPage
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-            connectedWebsite={connectedWebsite}
             selectedWallet={selectedWallet}
             onCopyAddressTooltip={handleCopyAddressTooltip}
             notification={notification}
@@ -241,9 +240,7 @@ export default class SignTxContainer extends Component<
             signData={signData}
             walletType={walletType}
             hwWalletError={this.generated.stores.connector.hwWalletError}
-            isHwWalletErrorRecoverable={
-              this.generated.stores.connector.isHwWalletErrorRecoverable
-            }
+            isHwWalletErrorRecoverable={this.generated.stores.connector.isHwWalletErrorRecoverable}
             tx={tx}
           />
         );
@@ -253,16 +250,7 @@ export default class SignTxContainer extends Component<
         component = null;
     }
 
-    return (
-      <Box
-        sx={{
-          height: 'calc(100vh - 52px)',
-          backgroundColor: 'var(--yoroi-palette-common-white)',
-        }}
-      >
-        {component}
-      </Box>
-    );
+    return <Box sx={{ height: 'calc(100vh - 52px)' }}>{component}</Box>;
   }
 
   @computed get generated(): {|

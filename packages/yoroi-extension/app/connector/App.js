@@ -110,7 +110,7 @@ class App extends Component<Props, State> {
     changeToplevelTheme(currentTheme);
 
     return (
-      <div style={{ height: '100%' }}>
+      <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
           {globalStyles(muiTheme)}

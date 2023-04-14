@@ -1,25 +1,17 @@
 .card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
-  letter-spacing: 0;
-  line-height: 22px;
-  padding: 18px;
-  border: 2px solid #fff;
-  border-radius: 10px;
-
-  &:hover {
-    border-color: var(--yoroi-palette-gray-50);
-  }
+  margin-top: 16px;
 
   & .avatar {
-    margin-right: 13px;
-    border-radius: 50%;
+    margin-right: 8px;
+    border-radius: 4px;
     overflow: hidden;
     object-fit: cover;
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
   }
 
   & .wrapper {
@@ -31,6 +23,8 @@
     display: flex;
     flex-flow: column;
     align-items: flex-start;
+    justify-content: space-between;
+    height: 100%;
   }
 
   & .name {
@@ -40,5 +34,11 @@
 
   & .balance {
     font-weight: 400;
+  }
+
+  & .checksum {
+    color: #6b7384;
+    margin-top: 8px;
+    font-size: 14px;
   }
 }
