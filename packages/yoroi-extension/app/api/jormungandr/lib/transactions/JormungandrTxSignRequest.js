@@ -1,16 +1,17 @@
 // @flow
 
+import type { JormungandrAddressedUtxo } from './types';
+import type { TxDataOutput, TxDataInput } from '../../../common/types';
+import type {
+  Address, Value, Addressing,
+} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
-import type { JormungandrAddressedUtxo } from './types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
-import type {
-  Address, Value, Addressing,
-} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 
 type NetworkSettingSnapshot = {|
   // there is no way given just an unsigned transaction body to know which network it belongs to
@@ -40,10 +41,7 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     this.networkSettingSnapshot = data.networkSettingSnapshot;
   }
 
-  inputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  inputs(): Array<TxDataInput> {
     return getTxInputs(
       this.unsignedTx,
       this.senderUtxos,
@@ -55,10 +53,7 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     return getTxInputTotal(this.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
-  outputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  outputs(): Array<TxDataOutput> {
     return getTxOutputs(
       this.unsignedTx,
       this.networkSettingSnapshot.NetworkId
@@ -189,10 +184,7 @@ export function getTxInputTotal(
 export function getTxOutputs(
   IOs: RustModule.WalletV3.InputOutput,
   networkId: number,
-): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+): Array<TxDataOutput> {
   const values = [];
 
   const outputs = IOs.outputs();
@@ -212,6 +204,7 @@ export function getTxOutputs(
     );
     values.push({
       value,
+      isForeign: false,
       address: Buffer.from(output.address().as_bytes()).toString('hex')
     });
   }

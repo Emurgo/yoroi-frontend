@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.19.0",
+  "version": "4.19.200",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -202,6 +202,7 @@
     "bs58check": "2.1.2",
     "buffer": "6.0.3",
     "cardano-wallet-browser": "1.2.2",
+    "cbor": "^8.1.0",
     "chacha": "2.1.0",
     "classnames": "2.2.6",
     "crypto-browserify": "3.12.0",
@@ -215,6 +216,7 @@
     "json-bigint": "1.0.0",
     "jspdf": "1.5.3",
     "lodash": "4.17.20",
+    "lottie-react": "^2.4.0",
     "lovefield": "2.1.12",
     "mixwith": "0.1.1",
     "mobx": "5.15.7",
