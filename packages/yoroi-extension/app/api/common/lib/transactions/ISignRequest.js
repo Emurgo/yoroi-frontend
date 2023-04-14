@@ -1,19 +1,12 @@
 // @flow
 
-import {
-  MultiToken,
-} from '../MultiToken';
+import { MultiToken } from '../MultiToken';
+import type { TxDataOutput, TxDataInput } from '../../types';
 
 export interface ISignRequest<T> {
-  inputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}>,
+  inputs(): Array<TxDataInput>;
   totalInput(): MultiToken;
-  outputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}>,
+  outputs(): Array<TxDataOutput>;
   totalOutput(): MultiToken;
   fee(): MultiToken;
   uniqueSenderAddresses(): Array<string>;

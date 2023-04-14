@@ -1160,6 +1160,7 @@ export async function connectorRecordSubmittedErgoTransaction(
     ).toString('hex');
     addresses.to.push({
       address,
+      isForeign: false,
       value,
     });
     if (allAddresses.has(address)) {
@@ -1279,6 +1280,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     addresses.to.push({
       address,
       value,
+      isForeign: false,
     });
     if (allAddresses.has(address)) {
       amount.joinAddMutable(value);
@@ -1386,6 +1388,7 @@ export async function connectorGenerateReorgTx(
   for (let i = 0; i < reorgOutputCount; i++) {
     includeTargets.push({
       address: unusedAddresses[i],
+      isForeign: false,
       value: REORG_OUTPUT_AMOUNT,
     });
     collateralOutputAddressSet.add(unusedAddresses[i]);
