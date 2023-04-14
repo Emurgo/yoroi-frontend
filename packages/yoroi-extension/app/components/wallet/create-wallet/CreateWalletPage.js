@@ -50,6 +50,7 @@ function CreateWalletPage(props: Props): Node {
   } = props;
   const [currentStep, setCurrentStep] = useState(getFirstStep());
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
+  const [isRecoveryPhraseEntered, markRecoveryPhraseAsEntered] = useState<boolean>(false);
 
   const manageDialogsProps = {
     isDialogOpen,
@@ -67,7 +68,7 @@ function CreateWalletPage(props: Props): Node {
           setSelectedNetwork(network);
           setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
         }}
-        goBack={() => goToRoute(ROUTES.WALLETS.ROOT)}
+        goBack={() => goToRoute(ROUTES.WALLETS.ADD)}
       />
     ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
@@ -86,7 +87,7 @@ function CreateWalletPage(props: Props): Node {
         }}
         prevStep={() => {
           if (environment.isProduction()) {
-            return goToRoute(ROUTES.WALLETS.ROOT);
+            return goToRoute(ROUTES.WALLETS.ADD);
           }
           setCurrentStep(CREATE_WALLET_SETPS.SELECT_NETWORK);
         }}
@@ -101,16 +102,25 @@ function CreateWalletPage(props: Props): Node {
       />
     ),
     [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
-      <VerifyRecoveryPhraseStep recoveryPhrase={recoveryPhrase} setCurrentStep={setCurrentStep} />
+      <VerifyRecoveryPhraseStep
+        recoveryPhrase={recoveryPhrase}
+        prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
+        nextStep={() => {
+          markRecoveryPhraseAsEntered(true);
+          setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
+        }}
+        isRecoveryPhraseEntered={isRecoveryPhraseEntered}
+      />
     ),
     [CREATE_WALLET_SETPS.ADD_WALLET_DETAILS]: (
       <AddWalletDetailsStep
-        setCurrentStep={setCurrentStep}
+        isRecoveryPhraseEntered={isRecoveryPhraseEntered}
         recoveryPhrase={recoveryPhrase}
         selectedNetwork={selectedNetwork}
+        prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE)}
         onSubmit={(walletName: string, walletPassword: string) => {
           if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
-          if (environment.isProduction()) {
+          if (!environment.isDev() && !environment.isNightly()) {
             setSelectedNetwork(networks.CardanoMainnet);
           }
 

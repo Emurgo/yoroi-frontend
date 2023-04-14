@@ -3,12 +3,13 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography, Box, Button } from '@mui/material';
+import { Stack, Typography, Box } from '@mui/material';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import styles from './SelectNetworkStep.scss';
 import globalMessages from '../../../i18n/global-messages';
+import StepController from './StepController';
 
 const messages: * = defineMessages({
   title: {
@@ -26,8 +27,8 @@ type Intl = {|
 |};
 
 type Props = {|
-  onSelect(network: $ReadOnly<NetworkRow>): void,
-  goBack(): void,
+  onSelect: (network: $ReadOnly<NetworkRow>) => void,
+  goBack: () => void,
 |};
 
 function SelectNetworkStep(props: Props & Intl): Node {
@@ -64,7 +65,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
         <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
       </Box>
       <Stack direction="column" alignItems="center" justifyContent="center">
-        <Stack mb="48px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
+        <Stack mb="38px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
           <Typography>
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
@@ -82,23 +83,17 @@ function SelectNetworkStep(props: Props & Intl): Node {
             </Box>
           ))}
         </Stack>
-        <Button
-          variant="outlined"
-          disableRipple={false}
-          onClick={goBack}
-          sx={{
-            width: '144px',
-            height: '40px',
-            minWidth: 'unset',
-            minHeight: 'unset',
-            fontSize: '14px',
-            lineHeight: '15px',
-            mt: '96px',
-          }}
-        >
-          {intl.formatMessage(globalMessages.backButtonLabel)}
-        </Button>
       </Stack>
+      <StepController
+        actions={[
+          {
+            label: intl.formatMessage(globalMessages.backButtonLabel),
+            disabled: false,
+            onClick: goBack,
+            type: 'secondary',
+          },
+        ]}
+      />
     </Stack>
   );
 }

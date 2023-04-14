@@ -6,13 +6,13 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Box, Typography, Button } from '@mui/material';
 import StepController from './StepController';
-import { CREATE_WALLET_SETPS } from './steps';
 import styles from './VerifyRecoveryPhraseStep.scss';
 import classnames from 'classnames';
 import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg';
 import environment from '../../../environment';
 import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
 import globalMessages from '../../../i18n/global-messages';
+import Fade from '@mui/material/Fade';
 
 const messages = defineMessages({
   description: {
@@ -35,21 +35,22 @@ type Intl = {|
 |};
 
 type Props = {|
-  setCurrentStep(stepId: string): void,
   recoveryPhrase: Array<string> | null,
+  nextStep: () => void,
+  prevStep: () => void,
+  isRecoveryPhraseEntered: boolean,
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
-  const { intl, recoveryPhrase, setCurrentStep } = props;
-  // const recoveryPhrase = ['b', 'a', 'b'];
-
+  const { intl, recoveryPhrase, isRecoveryPhraseEntered, nextStep, prevStep } = props;
   if (!recoveryPhrase) throw new Error('Missing recovery phrase, should never happen');
 
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState(
-    new Array(recoveryPhrase.length).fill(null)
+    isRecoveryPhraseEntered ? recoveryPhrase : new Array(recoveryPhrase.length).fill(null)
   );
   const [wrongWordIdx, setWrongWordIdx] = useState<number | null>(null);
   const [addedWordsIndxes, setAddedWordsIndexes] = useState(new Set());
+  const [fadeOutWordIdx, setFadeOutWordIdx] = useState<number>(-1); // Recovery phrase word index
 
   function onAddWord(word: string, idx: number): void {
     if (addedWordsIndxes.has(idx)) return;
@@ -66,6 +67,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
       return copy;
     });
     setWrongWordIdx(null);
+    setFadeOutWordIdx(idx);
 
     // Mark word as added
     const addedWords = new Set(addedWordsIndxes);
@@ -78,7 +80,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
   return (
     <Stack alignItems="center" justifyContent="center" className={styles.component}>
-      <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="690px">
+      <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
@@ -86,63 +88,80 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         <Box className={styles.verifyRecoveryPhraseArea}>
           <Stack
             gap="8px"
-            p="16px 14px"
             flexDirection="row"
             flexWrap="wrap"
             alignItems="center"
             justifyContent="center"
+            sx={{
+              paddingY: '16px',
+            }}
           >
-            {enteredRecoveryPhrase.map((word, idx) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <Stack item key={idx}>
+            {enteredRecoveryPhrase.map((word, idx) => {
+              const isLastEnteredWord =
+                !isRecoveryPhraseEntered &&
+                (idx === enteredRecoveryPhrase.length - 1 ||
+                  enteredRecoveryPhrase[idx + 1] === null);
+
+              const Word = (
                 <Box
                   sx={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    width: '120px',
+                    background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
+                    borderRadius: '8px',
+                    width: '93px',
                     height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    ml: '4px',
                   }}
-                  variant="body1"
-                  color="primary.200"
                 >
                   <Typography
-                    variant="body1"
-                    color="primary.200"
-                    width="20px"
+                    sx={{
+                      display: 'block',
+                      cursor: 'default',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {word}
+                  </Typography>
+                </Box>
+              );
+              return (
+                <Stack
+                  item
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={idx}
+                >
+                  <Box
                     sx={{
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'center',
+                      justifyContent: 'flex-start',
+                      width: '117px',
+                      height: '40px',
                     }}
+                    variant="body1"
+                    color="primary.200"
                   >
-                    {idx + 1}.
-                  </Typography>
-                  {word && (
-                    <Typography
-                      sx={{
-                        background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
-                        width: '100px',
-                        height: '40px',
-                        textAlign: 'center',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '8px',
-                        ml: '4px',
-                      }}
-                    >
-                      {word}
+                    {/* Todo: update hex color to come from the theme */}
+                    <Typography variant="body1" color="#7892E8" width="20px">
+                      {idx + 1}.
                     </Typography>
-                  )}
-                </Box>
-              </Stack>
-            ))}
+                    {word &&
+                      (isLastEnteredWord ? (
+                        <Fade in timeout={500}>
+                          {Word}
+                        </Fade>
+                      ) : (
+                        Word
+                      ))}
+                  </Box>
+                </Stack>
+              );
+            })}
           </Stack>
         </Box>
 
@@ -154,30 +173,42 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           gap="8px"
         >
           {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
-            return (
-              <button
-                type="button"
+            const isAdded = addedWordsIndxes.has(idx);
+            const button = (
+              <Box
+                component="button"
                 key={internalWordId}
                 className={classnames(styles.wordChip, {
-                  [styles.wordAdded]: addedWordsIndxes.has(idx),
+                  [styles.wordAdded]: isAdded,
                   [styles.wrongWord]: wrongWordIdx === idx,
                 })}
                 onClick={() => onAddWord(word, idx)}
+                sx={{
+                  width: '123px',
+                }}
               >
                 <Typography
                   sx={{
-                    width: '127px',
+                    width: '100%',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     px: '10px',
+                    zIndex: 10,
                   }}
                   variant="body1"
-                  color="primary.200"
+                  color={isAdded ? '#7892E8' : 'primary.200'} // Todo: update the color to come from the theme
                 >
                   {word}
                 </Typography>
-              </button>
+              </Box>
+            );
+            return fadeOutWordIdx === idx ? (
+              <Fade in timeout={500}>
+                {button}
+              </Fade>
+            ) : (
+              button
             );
           })}
         </Stack>
@@ -189,14 +220,14 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             </Typography>
           )}
 
-          {isValidPhrase && (
+          <Fade in={isValidPhrase}>
             <Stack gap="10px" direction="row">
               <VerifiedIcon />
               <Typography variant="body1" fontWeight={500}>
                 {intl.formatMessage(messages.verified)}
               </Typography>
             </Stack>
-          )}
+          </Fade>
         </Box>
 
         <Box mt="10px">
@@ -205,13 +236,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,
-                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE),
+                onClick: prevStep,
                 type: 'secondary',
               },
               {
                 label: intl.formatMessage(globalMessages.nextButtonLabel),
                 disabled: !isValidPhrase,
-                onClick: () => setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS),
+                onClick: nextStep,
                 type: 'primary',
               },
             ]}
@@ -228,7 +259,6 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             }}
             onDoubleClick={() => {
               setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null));
-              setWrongWordIdx(null);
               setAddedWordsIndexes(new Set());
             }}
           >

@@ -24,24 +24,31 @@ function StepController(props: Props): Node {
       py="24px"
       gap="24px"
     >
-      {actions.map(({ type, label, disabled, onClick }) => (
-        <Button
-          variant={type === 'primary' ? 'rv-primary' : 'outlined'}
-          disableRipple={false}
-          onClick={onClick}
-          disabled={disabled}
-          sx={{
-            width: '144px',
-            height: '40px',
-            minWidth: 'unset',
-            minHeight: 'unset',
-            fontSize: '14px',
-            lineHeight: '15px',
-          }}
-        >
-          {label}
-        </Button>
-      ))}
+      {actions.map(({ type, label, disabled, onClick }) => {
+        const isPrimary = type === 'primary';
+        return (
+          <Button
+            variant={isPrimary ? 'rv-primary' : 'outlined'}
+            disableRipple={false}
+            onClick={onClick}
+            disabled={disabled}
+            sx={{
+              width: '144px',
+              height: '40px',
+              minWidth: 'unset',
+              minHeight: 'unset',
+              fontSize: '14px',
+              lineHeight: '15px',
+              borderWidth: isPrimary ? 'inherit' : '2px',
+              ':hover': {
+                borderWidth: isPrimary ? 'inherit' : '2px',
+              },
+            }}
+          >
+            {label}
+          </Button>
+        );
+      })}
     </Stack>
   );
 }
