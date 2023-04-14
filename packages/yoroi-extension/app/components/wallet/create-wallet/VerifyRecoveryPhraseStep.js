@@ -36,9 +36,8 @@ type Intl = {|
 
 type Props = {|
   recoveryPhrase: Array<string> | null,
-  nextStep(): void,
-  prevStep(): void,
-  markRecoveryPhraseAsEntered(): void,
+  nextStep: () => void,
+  prevStep: () => void,
   isRecoveryPhraseEntered: boolean,
 |};
 

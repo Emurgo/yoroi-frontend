@@ -49,11 +49,10 @@ const messages: * = defineMessages({
 });
 
 type Props = {|
-  prevStep(): void,
+  prevStep: () => void,
   recoveryPhrase: Array<string> | null,
   selectedNetwork: $ReadOnly<NetworkRow>,
   isRecoveryPhraseEntered: boolean,
-  markRecoveryPhraseAsEntered(): void,
   onSubmit: (walletName: string, walletPassword: string) => void,
   ...ManageDialogsProps,
 |};
