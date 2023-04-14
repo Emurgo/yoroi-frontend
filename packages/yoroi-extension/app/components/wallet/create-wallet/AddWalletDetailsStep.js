@@ -19,14 +19,9 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-pri
 import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from '../../common/TextField';
-import { generateShelleyPlate } from '../../../api/ada/lib/cardanoCrypto/plate';
-import { generateWalletRootKey } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { HARD_DERIVATION_START } from '../../../config/numbersConfig';
-import { NUMBER_OF_VERIFIED_ADDRESSES } from '../../../stores/toplevel/WalletRestoreStore';
-import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import WalletAccountIcon from '../../topbar/WalletAccountIcon';
-import WalletChecksumTipsDialog from './WalletChecksumTipsDialog';
+import WalletPlate from './WalletPlate';
 import type { ManageDialogsProps } from './CreateWalletPage';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages: * = defineMessages({
   description: {
@@ -56,9 +51,7 @@ const messages: * = defineMessages({
 type Props = {|
   setCurrentStep(step: string): void,
   recoveryPhrase: Array<string> | null,
-  shouldShowDialog: boolean,
-  hideDialog(): void,
-  showDialog(): void,
+  selectedNetwork: $ReadOnly<NetworkRow>,
   onSubmit: (walletName: string, walletPassword: string) => void,
   ...ManageDialogsProps,
 |};
@@ -133,7 +126,14 @@ export default class AddWalletDetailsStep extends Component<Props> {
   );
 
   render(): Node {
-    const { setCurrentStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog } = this.props;
+    const {
+      setCurrentStep,
+      recoveryPhrase,
+      isDialogOpen,
+      openDialog,
+      closeDialog,
+      selectedNetwork,
+    } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
@@ -144,19 +144,6 @@ export default class AddWalletDetailsStep extends Component<Props> {
 
     if (!recoveryPhrase)
       throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
-
-    // Todo: network should be dynamic.
-    const network = networks.CardanoPreprodTestnet;
-    const { plate } = generateShelleyPlate(
-      generateWalletRootKey(recoveryPhrase.join(' ')),
-      0 + HARD_DERIVATION_START, // Account Index
-      NUMBER_OF_VERIFIED_ADDRESSES,
-      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
-    );
-
-    const plateImagePart = (
-      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={6} scalePx={4} />
-    );
 
     return (
       <Stack alignItems="center" justifyContent="center">
@@ -208,42 +195,26 @@ export default class AddWalletDetailsStep extends Component<Props> {
             </Box>
           </Box>
 
-          <Stack
-            direction="row"
-            gap="8px"
-            alignItems="center"
-            justifyContent="center"
-            mt="-3px"
-            mb="90px"
-          >
-            {plateImagePart}
-            <Typography variant="body1">{plate.TextPart}</Typography>
-            <Box
-              component="button"
-              sx={{
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onClick={() => openDialog(WalletChecksumTipsDialog)}
-            >
-              <InfoIcon />
-            </Box>
-          </Stack>
+          <WalletPlate
+            recoveryPhrase={recoveryPhrase}
+            selectedNetwork={selectedNetwork}
+            openDialog={openDialog}
+            closeDialog={closeDialog}
+            isDialogOpen={isDialogOpen}
+          />
 
           <StepController
             actions={[
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
-                disabled: true,
+                disabled: false,
                 onClick: () => setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE),
                 type: 'secondary',
               },
               {
-                label: intl.formatMessage(globalMessages.nextButtonLabel),
+                label: intl.formatMessage(globalMessages.create),
                 disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
-                  field => field.isValid
+                  field => !field.isValid
                 ),
                 onClick: () => {
                   this.props.onSubmit(walletName, walletPassword);
@@ -256,13 +227,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
 
         <WalletNameAndPasswordTipsDialog
           open={isDialogOpen(WalletNameAndPasswordTipsDialog)}
-          onClose={closeDialog}
-        />
-        <WalletChecksumTipsDialog
-          open={isDialogOpen(WalletChecksumTipsDialog)}
-          onClose={closeDialog}
-          plateImagePart={plateImagePart}
-          plateTextPart={plate.TextPart}
+          onClose={() => closeDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
         />
       </Stack>
     );

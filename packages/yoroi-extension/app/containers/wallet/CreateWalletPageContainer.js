@@ -10,6 +10,7 @@ import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
@@ -33,9 +34,11 @@ export default class CreateWalletPageContainer extends Component<Props> {
             genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
             createWallet={actions.ada.wallets.createWallet.trigger}
             setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+            selectedNetwork={stores.profile.selectedNetwork}
             openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
             closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
             isDialogOpen={stores.uiDialogs.isOpen}
+            goToRoute={route => actions.router.goToRoute.trigger({ route })}
           />
         </Suspense>
       </TopBarLayout>
@@ -73,6 +76,15 @@ export default class CreateWalletPageContainer extends Component<Props> {
           trigger: (params: void | $ReadOnly<NetworkRow>) => void,
         |},
       |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       substores: {|
@@ -84,6 +96,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
       |},
       uiDialogs: {|
         isOpen: any => boolean,
+      |},
+      profile: {|
+        selectedNetwork: void | $ReadOnly<NetworkRow>,
       |},
     |},
   |} {
@@ -106,6 +121,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
         },
+        profile: {
+          selectedNetwork: stores.profile.selectedNetwork,
+        },
       },
       actions: {
         ada: {
@@ -127,6 +145,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
           open: {
             trigger: actions.dialogs.open.trigger,
           },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),

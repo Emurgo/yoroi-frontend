@@ -43,12 +43,12 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   text-align: start;
   margin-right: auto;
 
-  .name { 
+  .name {
     font-size: 14px;
     line-height: 22px;
     color: #242838;
@@ -60,7 +60,7 @@
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0.2px;
-    color: #6B7384;
+    color: #6b7384;
   }
 }
 
@@ -94,7 +94,6 @@
   width: 100%;
 }
 
-
 .amount {
   font-weight: 500;
 
@@ -108,8 +107,6 @@
       margin-top: -2px;
     }
   }
-
-
 }
 
 .highlightAmount {

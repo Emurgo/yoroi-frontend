@@ -1,4 +1,5 @@
 // @flow
+import { useEffect } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -7,7 +8,9 @@ import { Stack, Typography, Box } from '@mui/material';
 import StepController from './StepController';
 import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
+import { isDialogShownBefore, TIPS_DIALOGS } from './steps';
 import globalMessages from '../../../i18n/global-messages';
+import type { ManageDialogsProps } from './CreateWalletPage';
 
 const messages: * = defineMessages({
   description: {
@@ -23,13 +26,19 @@ type Intl = {|
 
 type Props = {|
   nextStep(): void,
-  shouldShowDialog: boolean,
-  showDialog(): void,
-  hideDialog(): void,
+  prevStep(): void,
+  ...ManageDialogsProps,
 |};
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
-  const { nextStep, shouldShowDialog, showDialog, hideDialog, intl } = props;
+  const { nextStep, prevStep, isDialogOpen, openDialog, closeDialog, intl } = props;
+
+  const isActiveDialog = isDialogOpen(SaveRecoveryPhraseTipsDialog);
+
+  useEffect(() => {
+    if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE))
+      openDialog(SaveRecoveryPhraseTipsDialog);
+  }, []);
 
   return (
     <Stack alignItems="center" justifyContent="center">
@@ -45,7 +54,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
                 mb: '-5px',
               },
             }}
-            onClick={showDialog}
+            onClick={() => openDialog(SaveRecoveryPhraseTipsDialog)}
           >
             <InfoIcon />
           </Box>
@@ -68,8 +77,8 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           actions={[
             {
               label: intl.formatMessage(globalMessages.backButtonLabel),
-              disabled: true,
-              onClick: () => {},
+              disabled: false,
+              onClick: prevStep,
               type: 'secondary',
             },
             {
@@ -81,7 +90,10 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           ]}
         />
       </Stack>
-      <SaveRecoveryPhraseTipsDialog open={shouldShowDialog} onClose={hideDialog} />
+      <SaveRecoveryPhraseTipsDialog
+        open={isActiveDialog}
+        onClose={() => closeDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
+      />
     </Stack>
   );
 }
