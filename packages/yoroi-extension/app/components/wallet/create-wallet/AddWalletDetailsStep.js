@@ -31,11 +31,11 @@ const messages: * = defineMessages({
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
-    defaultMessage: '!!!Enter wallet name',
+    defaultMessage: '!!!Wallet name',
   },
   enterPassword: {
     id: 'wallet.create.forthStep.enterPasswordInputLabel',
-    defaultMessage: '!!!Enter password',
+    defaultMessage: '!!!Password',
   },
   passwordHint: {
     id: 'wallet.create.forthStep.passwordHint',
