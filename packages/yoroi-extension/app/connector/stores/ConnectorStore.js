@@ -1,9 +1,5 @@
 /* eslint-disable promise/always-return */
 // @flow
-import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed, toJS } from 'mobx';
-import Request from '../../stores/lib/LocalizedRequest';
-import Store from '../../stores/base/Store';
 import type {
   ConfirmedSignData,
   ConnectedSites,
@@ -26,7 +22,25 @@ import type { StoresMap } from './index';
 import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
+  TxDataInput,
+  TxDataOutput,
 } from '../types';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import type {
+  GetUtxoDataResponse,
+  RemoteUnspentOutput,
+  UtxoData,
+} from '../../api/ada/lib/state-fetch/types';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import BigNumber from 'bignumber.js';
+import { observable, action, runInAction, computed, toJS } from 'mobx';
+import Request from '../../stores/lib/LocalizedRequest';
+import Store from '../../stores/base/Store';
 import { LoadingWalletStates } from '../types';
 import { getWallets } from '../../api/common/index';
 import {
@@ -44,13 +58,16 @@ import {
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/connector/utils';
 import { Logger } from '../../utils/logging';
-import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
+import {
+  asAddressedUtxo,
+  multiTokenFromCardanoValue,
+  multiTokenFromRemote,
+} from '../../api/ada/transactions/utils';
 import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
@@ -60,30 +77,15 @@ import {
   connectorRecordSubmittedCardanoTransaction,
 } from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
-import {
-  WalletTypeOption,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { loadSubmittedTransactions } from '../../api/localStorage';
-import {
-  signTransaction as shelleySignTransaction
-} from '../../api/ada/transactions/shelley/transactions';
-import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData } from '../../api/ada/lib/state-fetch/types';
-import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import type {
-  HaskellShelleyTxSignRequest
-} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet';
-import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { signTransaction as shelleySignTransaction } from '../../api/ada/transactions/shelley/transactions';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
-import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils'
+import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils';
 import {
   toLedgerSignRequest,
   buildConnectorSignedTransaction as buildSignedLedgerTransaction,
@@ -95,43 +97,42 @@ import {
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
 import type LocalizableError from '../../i18n/LocalizableError';
-import {
-  convertToLocalizableError as convertToLocalizableLedgerError,
-} from '../../domain/LedgerLocalizedError';
-import {
-  convertToLocalizableError as convertToLocalizableTrezorError,
-} from '../../domain/TrezorLocalizedError';
+import { convertToLocalizableError as convertToLocalizableLedgerError } from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError as convertToLocalizableTrezorError } from '../../domain/TrezorLocalizedError';
 import {
   transactionHashMismatchError,
   unsupportedTransactionError,
   ledgerSignDataUnsupportedError,
-  trezorSignDataUnsupportedError
+  trezorSignDataUnsupportedError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(
-      message,
-      response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject(`Could not establish connection: ${JSON.stringify(typeof message === 'object' ? message : '')}`);
-          return;
-        }
-        resolve(response);
+    window.chrome.runtime.sendMessage(message, response => {
+      if (window.chrome.runtime.lastError) {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject(
+          `Could not establish connection: ${JSON.stringify(
+            typeof message === 'object' ? message : ''
+          )}`
+        );
+        return;
       }
-    );
-  })
+      resolve(response);
+    });
+  });
 }
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
 async function sendMsgConnect(): Promise<?ConnectingMessage> {
   if (!initedConnecting) {
-    const res = await connectorCall<ConnectRetrieveData, ConnectingMessage>({ type: 'connect_retrieve_data' })
-    initedConnecting = true
-    return res
+    const res = await connectorCall<ConnectRetrieveData, ConnectingMessage>({
+      type: 'connect_retrieve_data',
+    });
+    initedConnecting = true;
+    return res;
   }
 }
 
@@ -148,30 +149,30 @@ async function sendMsgSigningTx(): Promise<?SigningMessage> {
 }
 
 export async function getProtocol(): Promise<?Protocol> {
-  return connectorCall<GetConnectionProtocolData, Protocol>({ type: 'get_protocol' })
+  return connectorCall<GetConnectionProtocolData, Protocol>({ type: 'get_protocol' });
 }
 
 export function getUtxosAndAddresses(
   tabId: number,
   select: string[]
-  ): Promise<{|
-    utxos: IGetAllUtxosResponse,
-    usedAddresses: string[],
-    unusedAddresses: string[],
-    changeAddress: string,
-  |}> {
+): Promise<{|
+  utxos: IGetAllUtxosResponse,
+  usedAddresses: string[],
+  unusedAddresses: string[],
+  changeAddress: string,
+|}> {
   return new Promise((resolve, reject) => {
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_utxos/cardano ');
-          }
-
-          resolve(response);
+    window.chrome.runtime.sendMessage(
+      ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
+      response => {
+        if (window.chrome.runtime.lastError) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject('Could not establish connection: get_utxos/cardano ');
         }
-      );
+
+        resolve(response);
+      }
+    );
   });
 }
 
@@ -194,33 +195,34 @@ export function getConnectedSites(): Promise<ConnectedSites> {
 
 export async function parseWalletsList(
   wallets: Array<PublicDeriver<>>
-  ): Promise<Array<PublicDeriverCache>> {
+): Promise<Array<PublicDeriverCache>> {
   const result = [];
   for (const currentWallet of wallets) {
     const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
     const withPubKey = asGetPublicKey(currentWallet);
 
     const canGetBalance = asGetBalance(currentWallet);
-    const balance = canGetBalance == null
-      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-      : await canGetBalance.getBalance();
+    const balance =
+      canGetBalance == null
+        ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+        : await canGetBalance.getBalance();
     result.push({
       publicDeriver: currentWallet,
       name: conceptualInfo.Name,
       balance,
-      checksum: await getWalletChecksum(withPubKey)
+      checksum: await getWalletChecksum(withPubKey),
     });
   }
 
-  return result
+  return result;
 }
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
-type SetWhitelistFunc = {|
+type SetWhitelistFunc = ({|
   whitelist: Array<WhitelistEntry> | void,
-|} => Promise<void>;
+|}) => Promise<void>;
 
-export type ForeignUtxoFetcher = Array<string> => Promise<Array<?RemoteUnspentOutput>>;
+export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
@@ -239,21 +241,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
    */
   @observable filteredWallets: Array<PublicDeriverCache> = [];
   @observable allWallets: Array<PublicDeriverCache> = [];
-  @observable protocol: ?string = ''
-  @observable getConnectorWhitelist: Request<
-    GetWhitelistFunc
-  > = new Request<GetWhitelistFunc>(
-     this.api.localStorage.getWhitelist
+  @observable protocol: ?string = '';
+  @observable getConnectorWhitelist: Request<GetWhitelistFunc> = new Request<GetWhitelistFunc>(
+    this.api.localStorage.getWhitelist
   );
-  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<
-    SetWhitelistFunc
-  >(({ whitelist }) => this.api.localStorage.setWhitelist(whitelist));
+  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<SetWhitelistFunc>(
+    ({ whitelist }) => this.api.localStorage.setWhitelist(whitelist)
+  );
 
-  @observable getConnectedSites: Request<
+  @observable getConnectedSites: Request<typeof getConnectedSites> = new Request<
     typeof getConnectedSites
-  > = new Request<typeof getConnectedSites>(
-    getConnectedSites
-  );
+  >(getConnectedSites);
 
   @observable signingMessage: ?SigningMessage = null;
 
@@ -276,7 +274,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     super.setup();
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(async (password) => {
+    this.actions.connector.confirmSignInTx.listen(async password => {
       await this._confirmSignInTx(password);
     });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
@@ -286,7 +284,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
-    this._getProtocol()
+    this._getProtocol();
     this.currentConnectorWhitelist;
   }
 
@@ -315,11 +313,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @action
   _getProtocol: () => Promise<void> = async () => {
-    const protocol = await getProtocol()
+    const protocol = await getProtocol();
     runInAction(() => {
-      this.protocol = protocol?.type
-    })
-  }
+      this.protocol = protocol?.type;
+    });
+  };
 
   @action
   _getSigningMsg: () => Promise<void> = async () => {
@@ -345,7 +343,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action
-  _confirmSignInTx: string => Promise<void> = async (password) => {
+  _confirmSignInTx: string => Promise<void> = async password => {
     runInAction(() => {
       this.submissionError = null;
     });
@@ -353,7 +351,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const { signingMessage, connectedWallet: wallet } = this;
 
     if (signingMessage == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
+      throw new Error(
+        `${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`
+      );
     }
 
     if (!wallet) {
@@ -379,7 +379,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         await connectorSendTxCardano(
           wallet.publicDeriver,
           Buffer.from(signedTx.to_bytes()),
-          this.api.localStorage,
+          this.api.localStorage
         );
       } catch {
         runInAction(() => {
@@ -394,15 +394,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         await connectorRecordSubmittedCardanoTransaction(
           wallet.publicDeriver,
           signedTx,
-          asAddressedUtxo(signingMessage.sign.tx.utxos),
+          asAddressedUtxo(signingMessage.sign.tx.utxos)
         );
       } catch {
         // ignore
       }
       const utxos = this.getUtxosAfterReorg(
-        Buffer.from(
-          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-        ).toString('hex')
+        Buffer.from(RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()).toString(
+          'hex'
+        )
       );
       sendData = {
         type: 'sign_confirmed',
@@ -413,8 +413,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       };
     } else if (
       signingMessage.sign.type === 'tx' ||
-        signingMessage.sign.type === 'tx_input' ||
-        signingMessage.sign.type === 'tx/cardano'
+      signingMessage.sign.type === 'tx_input' ||
+      signingMessage.sign.type === 'tx/cardano'
     ) {
       const tx = toJS(signingMessage.sign.tx);
       if (wallet.publicDeriver.getParent().getWalletType() !== WalletTypeOption.WEB_WALLET) {
@@ -423,10 +423,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           throw new Error('unexpected nullish transaction');
         }
 
-        const witnessSetHex = (await this.hwSignTx(
-          wallet.publicDeriver,
-          rawTxBody,
-        )).witness_set().to_hex();
+        const witnessSetHex = (await this.hwSignTx(wallet.publicDeriver, rawTxBody))
+          .witness_set()
+          .to_hex();
 
         sendData = {
           type: 'sign_confirmed',
@@ -464,7 +463,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @action
   _cancelSignInTx: void => void = () => {
     if (this.signingMessage == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
+      throw new Error(
+        `${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`
+      );
     }
     const { signingMessage } = this;
     const sendData: FailedSignData = {
@@ -499,19 +500,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         const isWalletErgo = isErgo(wallet.getParent().getNetworkInfo());
         return isProtocolErgo === isWalletErgo;
       };
-      const filteredWallets = isProtocolDefined
-        ? wallets.filter(protocolFilter)
-        : wallets;
+      const filteredWallets = isProtocolDefined ? wallets.filter(protocolFilter) : wallets;
 
       if (
         this.signingMessage?.sign.type !== 'tx/cardano' &&
-          this.signingMessage?.sign.type !== 'tx-reorg/cardano'
+        this.signingMessage?.sign.type !== 'tx-reorg/cardano'
       ) {
         await this._getTxAssets(filteredWallets);
       }
 
-      const filteredWalletsResult = await parseWalletsList(filteredWallets)
-      const allWallets = await parseWalletsList(wallets)
+      const filteredWalletsResult = await parseWalletsList(filteredWallets);
+      const allWallets = await parseWalletsList(wallets);
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
@@ -519,7 +518,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         // note: "replace" is a mobx-specific function
         (this.wallets: any).replace(filteredWalletsResult);
         (this.filteredWallets: any).replace(filteredWalletsResult);
-        (this.allWallets: any).replace(allWallets)
+        (this.allWallets: any).replace(allWallets);
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
         this.createAdaTransaction();
@@ -539,7 +538,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   // for Ergo wallets only
-  _getTxAssets: Array<PublicDeriver<>> => Promise<void> = async (publicDerivers) => {
+  _getTxAssets: (Array<PublicDeriver<>>) => Promise<void> = async publicDerivers => {
     const persistentDb = this.stores.loading.getDatabase();
     if (persistentDb == null) {
       throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
@@ -558,28 +557,26 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const tx: Tx = (signingMessage.sign.tx: any);
     // it's possible we minted assets in this tx, so looking them up will fail
     const mintedTokenIds = mintedTokenInfo(tx, Logger.info).map(t => t.Identifier);
-    const tokenIdentifiers = Array.from(new Set([
-      ...tx.inputs
-        .flatMap(output => output.assets)
-        .map(asset => asset.tokenId),
-      ...tx.outputs
-        .flatMap(output => output.assets)
-        .map(asset => asset.tokenId),
-      // force inclusion of primary token for chain
-      selectedWallet.getParent().getDefaultToken().defaultIdentifier
-    ])).filter(id => !mintedTokenIds.includes(id));
+    const tokenIdentifiers = Array.from(
+      new Set([
+        ...tx.inputs.flatMap(output => output.assets).map(asset => asset.tokenId),
+        ...tx.outputs.flatMap(output => output.assets).map(asset => asset.tokenId),
+        // force inclusion of primary token for chain
+        selectedWallet.getParent().getDefaultToken().defaultIdentifier,
+      ])
+    ).filter(id => !mintedTokenIds.includes(id));
     const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
     try {
       await addErgoAssets({
         db: selectedWallet.getDb(),
         tokenIdentifiers,
-        getAssetInfo: async (req) => {
+        getAssetInfo: async req => {
           try {
             return await stateFetcher.getAssetInfo(req);
           } catch (e) {
             // eslint-disable-next-line no-console
-              console.error('Aseet info request failed', e);
-              return {};
+            console.error('Aseet info request failed', e);
+            return {};
           }
         },
         network: selectedWallet.getParent().getNetworkInfo(),
@@ -588,7 +585,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       console.error('Failed to add ergo assets!', error);
     }
-  }
+  };
 
   // De-serialize the tx so that the signing dialog could show the tx info (
   // inputs, outputs, fee, ...) to the user.
@@ -598,31 +595,35 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/* , partialSign */, tabId } = signingMessage.sign.tx;
+    const { tx /* , partialSign */, tabId } = signingMessage.sign.tx;
 
     const network = connectedWallet.publicDeriver.getParent().getNetworkInfo();
 
     if (!isCardanoHaskell(network)) {
-      throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
+      throw new Error(
+        `${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`
+      );
     }
-    const response = await getUtxosAndAddresses(tabId, ['utxos', 'usedAddresses', 'unusedAddresses', 'changeAddress'])
+    const response = await getUtxosAndAddresses(tabId, [
+      'utxos',
+      'usedAddresses',
+      'unusedAddresses',
+      'changeAddress',
+    ]);
 
     if (!response.utxos) {
-      throw new Error('Missgin utxos for signing tx')
+      throw new Error('Missgin utxos for signing tx');
     }
 
     const submittedTxs = loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(response.utxos),
       connectedWallet.publicDeriver,
-      submittedTxs,
+      submittedTxs
     );
     this.addressedUtxos = addressedUtxos;
 
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
-      network.NetworkId
-    );
-
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
 
     let txBody;
     const bytes = Buffer.from(tx, 'hex');
@@ -646,7 +647,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const allUsedUtxoIdsSet = new Set(
       submittedTxs.flatMap(({ usedUtxos }) =>
-        (usedUtxos||[]).map(({ txHash, index }) => `${txHash}${index}`))
+        (usedUtxos || []).map(({ txHash, index }) => `${txHash}${index}`)
+      )
     );
 
     for (let i = 0; i < txBody.inputs().len(); i++) {
@@ -654,22 +656,21 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
       const txIndex = input.index();
       if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
-        window.chrome.runtime.sendMessage(
-          {
-            type: 'sign_error',
-            errorType: 'spent_utxo',
-            data: `${txHash}${txIndex}`,
-            uid: signingMessage.sign.uid,
-            tabId: signingMessage.tabId,
-          }
-        );
+        window.chrome.runtime.sendMessage({
+          type: 'sign_error',
+          errorType: 'spent_utxo',
+          data: `${txHash}${txIndex}`,
+          uid: signingMessage.sign.uid,
+          tabId: signingMessage.tabId,
+        });
         this._closeWindow();
         return;
       }
-      // eslint-disable-next-line camelcase
-      const utxo = addressedUtxos.find(({ tx_hash, tx_index }) =>
-        // eslint-disable-next-line camelcase
-        tx_hash === txHash && tx_index === txIndex
+
+      const utxo = addressedUtxos.find(
+        (
+          { tx_hash, tx_index } // eslint-disable-line camelcase
+        ) => tx_hash === txHash && tx_index === txIndex // eslint-disable-line camelcase
       );
       if (utxo) {
         inputs.push({
@@ -677,7 +678,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           value: multiTokenFromRemote(utxo, defaultToken.NetworkId),
         });
       } else {
-        foreignInputs.push({ txHash, txIndex })
+        foreignInputs.push({ txHash, txIndex });
       }
     }
 
@@ -685,23 +686,21 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ...response.utxos.map(utxo => utxo.address),
       ...response.usedAddresses,
       ...response.unusedAddresses,
-      response.changeAddress
-    ])
+      response.changeAddress,
+    ]);
 
-    const outputs: Array<{| address: string, isForeign: boolean, value: MultiToken |}> = [];
+    const outputs: Array<TxDataOutput> = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
       const output = txBody.outputs().get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
-      outputs.push(
-        {
-          address,
-          isForeign: !ownAddresses.has(address),
-          value: multiTokenFromCardanoValue(
-            output.amount(),
-            connectedWallet.publicDeriver.getParent().getDefaultToken(),
-          ),
-        }
-      );
+      outputs.push({
+        address,
+        isForeign: !ownAddresses.has(address),
+        value: multiTokenFromCardanoValue(
+          output.amount(),
+          connectedWallet.publicDeriver.getParent().getDefaultToken()
+        ),
+      });
     }
     const fee = {
       tokenId: defaultToken.Identifier,
@@ -715,52 +714,43 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       outputs,
       fee,
       response.utxos,
-      ownAddresses,
+      ownAddresses
     );
 
     if (foreignInputs.length) {
-      const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData(
-        {
-          network: connectedWallet.publicDeriver.getParent().networkInfo,
-          utxos: foreignInputs,
-        }
-      )
+      const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
+        network: connectedWallet.publicDeriver.getParent().networkInfo,
+        utxos: foreignInputs,
+      });
       for (let i = 0; i < foreignUtxos.length; i++) {
         const foreignUtxo = foreignUtxos[i];
         if (foreignUtxo == null) {
-          window.chrome.runtime.sendMessage(
-            {
-              type: 'sign_error',
-              errorType: 'missing_utxo',
-              data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
-              uid: signingMessage.sign.uid,
-              tabId: signingMessage.tabId,
-            }
-          );
+          window.chrome.runtime.sendMessage({
+            type: 'sign_error',
+            errorType: 'missing_utxo',
+            data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+          });
           this._closeWindow();
           return;
         }
         if (foreignUtxo.spendingTxHash != null) {
-          window.chrome.runtime.sendMessage(
-            {
-              type: 'sign_error',
-              errorType: 'spent_utxo',
-              data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
-              uid: signingMessage.sign.uid,
-              tabId: signingMessage.tabId,
-            }
-          );
+          window.chrome.runtime.sendMessage({
+            type: 'sign_error',
+            errorType: 'spent_utxo',
+            data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+          });
           this._closeWindow();
           return;
         }
-        const value = multiTokenFromRemote(
-          foreignUtxo.output,
-          defaultToken.NetworkId
-        );
+        const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
         inputs.push({
-          address: Buffer.from(RustModule.WalletV4.Address.from_bech32(
-            foreignUtxo.output.address
-          ).to_bytes()).toString('hex'),
+          address: Buffer.from(
+            RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
+          ).toString('hex'),
           value,
         });
       }
@@ -770,45 +760,47 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // $FlowFixMe[prop-missing]
       this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
     });
-  }
+  };
 
-  static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher =
-    (fetcher, networkInfo) => {
-      return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
-        const foreignInputs = utxoIds.map((id: string) => {
-          // tx hash length is 64
-          if ((id?.length ?? 0) < 65) {
-            throw new Error(`Invalid utxo ID "${id}", expected \`{hash}{index}\` with no separator`);
-          }
-          try {
-            return {
-              txHash: id.substring(0, 64),
-              txIndex: parseInt(id.substring(64), 10),
-            }
-          } catch (e) {
-            throw new Error(`Failed to parse utxo ID "${id}": ${String(e)}`);
-          }
-        })
-        const fetchedData: GetUtxoDataResponse = await fetcher.getUtxoData({
-          network: networkInfo,
-          utxos: foreignInputs,
-        });
-        return fetchedData.map((data: (UtxoData | null), i): ?RemoteUnspentOutput => {
-          if (data == null) {
-            return null;
-          }
-          const { txHash, txIndex } = foreignInputs[i];
+  static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher = (
+    fetcher,
+    networkInfo
+  ) => {
+    return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
+      const foreignInputs = utxoIds.map((id: string) => {
+        // tx hash length is 64
+        if ((id.length ?? 0) < 65) {
+          throw new Error(`Invalid utxo ID "${id}", expected \`{hash}{index}\` with no separator`);
+        }
+        try {
           return {
-            utxo_id: utxoIds[i],
-            tx_hash: txHash,
-            tx_index: txIndex,
-            receiver: data.output.address,
-            amount: data.output.amount,
-            assets: data.output.assets,
+            txHash: id.substring(0, 64),
+            txIndex: parseInt(id.substring(64), 10),
           };
-        })
-      };
-    }
+        } catch (e) {
+          throw new Error(`Failed to parse utxo ID "${id}": ${String(e)}`);
+        }
+      });
+      const fetchedData: GetUtxoDataResponse = await fetcher.getUtxoData({
+        network: networkInfo,
+        utxos: foreignInputs,
+      });
+      return fetchedData.map((data: UtxoData | null, i): ?RemoteUnspentOutput => {
+        if (data == null) {
+          return null;
+        }
+        const { txHash, txIndex } = foreignInputs[i];
+        return {
+          utxo_id: utxoIds[i],
+          tx_hash: txHash,
+          tx_index: txIndex,
+          receiver: data.output.address,
+          amount: data.output.amount,
+          assets: data.output.assets,
+        };
+      });
+    };
+  };
 
   generateReorgTransaction: void => Promise<void> = async () => {
     const { signingMessage, connectedWallet } = this;
@@ -826,7 +818,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       usedUtxoIds,
       reorgTargetAmount,
       addressedUtxos,
-      submittedTxs,
+      submittedTxs
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating
@@ -845,10 +837,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       unsignedTx.inputs(),
       unsignedTx.outputs(),
       fee,
-      utxos,
+      utxos
     );
     runInAction(() => {
       this.adaTransaction = {
+        foreignInputs: [],
         inputs: unsignedTx.inputs(),
         outputs: unsignedTx.outputs(),
         fee,
@@ -856,7 +849,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         total,
       };
     });
-  }
+  };
   signReorgTx: (PublicDeriver<>, string) => Promise<RustModule.WalletV4.Transaction> = async (
     publicDeriver,
     password
@@ -887,19 +880,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         signRequest.senderUtxos,
         signRequest.unsignedTx,
         withLevels.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(normalizedKey.prvKeyHex, 'hex')
-        ),
+        RustModule.WalletV4.Bip32PrivateKey.from_bytes(Buffer.from(normalizedKey.prvKeyHex, 'hex')),
         signRequest.neededStakingKeyHashes.wits,
-        signRequest.metadata,
+        signRequest.metadata
       );
     }
-    return this.hwSignTx(
-      publicDeriver,
-      Buffer.from(signRequest.unsignedTx.build().to_bytes()),
-    );
-  }
-  getUtxosAfterReorg: (string) => Array<RemoteUnspentOutput> = (txId) => {
+    return this.hwSignTx(publicDeriver, Buffer.from(signRequest.unsignedTx.build().to_bytes()));
+  };
+  getUtxosAfterReorg: string => Array<RemoteUnspentOutput> = txId => {
     const allOutputs = this.adaTransaction?.outputs;
     if (!allOutputs) {
       throw new Error('unexpected nullish transaction');
@@ -922,28 +910,26 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     return collateralOutputs;
-  }
+  };
 
   async _calculateAmountAndTotal(
     publicDeriver: PublicDeriver<>,
-    inputs: $ReadOnlyArray<{| address: string, value: MultiToken |}>,
-    outputs: $ReadOnlyArray<$ReadOnly<{ address: string, value: MultiToken, ... }>>,
+    inputs: $ReadOnlyArray<TxDataInput>,
+    outputs: $ReadOnlyArray<$ReadOnly<TxDataOutput>>,
     fee: {| tokenId: string, networkId: number, amount: string |},
     utxos: IGetAllUtxosResponse,
-    ownAddresses: ?Set<string>,
+    ownAddresses: ?Set<string>
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
-
     if (!ownAddresses) {
       ownAddresses = new Set([
         ...utxos.map(utxo => utxo.address),
-        ...await connectorGetUsedAddresses(publicDeriver, null),
-        ...await connectorGetUnusedAddresses(publicDeriver),
+        ...(await connectorGetUsedAddresses(publicDeriver, null)),
+        ...(await connectorGetUnusedAddresses(publicDeriver)),
         await connectorGetChangeAddress(publicDeriver),
       ]);
     }
 
-    const { defaultNetworkId, defaultIdentifier } =
-          publicDeriver.getParent().getDefaultToken();
+    const { defaultNetworkId, defaultIdentifier } = publicDeriver.getParent().getDefaultToken();
 
     const total = new MultiToken(
       [
@@ -951,7 +937,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           amount: new BigNumber('0'),
           identifier: defaultIdentifier,
           networkId: defaultNetworkId,
-        }
+        },
       ],
       { defaultNetworkId, defaultIdentifier }
     );
@@ -972,7 +958,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             identifier: fee.tokenId,
             networkId: fee.networkId,
             amount: new BigNumber(fee.amount),
-          }
+          },
         ],
         { defaultNetworkId, defaultIdentifier }
       )
@@ -992,23 +978,20 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // Since this is Ergo, we know the type of `tx` must be `Tx`.
       const tx: Tx = (signingMessage.sign: any).tx;
 
-      const config = getErgoBaseConfig(
-        network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
+      const config = getErgoBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
       const networkSettingSnapshot = {
         NetworkId: network.NetworkId,
         ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10): any),
         FeeAddress: config.FeeAddress,
-      }
+      };
       return new ErgoExternalTxSignRequest({
-        inputUtxos: tx.inputs
-          .map(
-            // eslint-disable-next-line no-unused-vars
-            ({ extension, ...rest }) => toRemoteUtxo(rest, networkSettingSnapshot.ChainNetworkId)
-          ),
+        inputUtxos: tx.inputs.map(
+          // eslint-disable-next-line no-unused-vars
+          ({ extension, ...rest }) => toRemoteUtxo(rest, networkSettingSnapshot.ChainNetworkId)
+        ),
         unsignedTx: RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx)),
         changeAddr: [],
-        networkSettingSnapshot
+        networkSettingSnapshot,
       });
     }
     // If this is Cardano wallet, the return value is ignored
@@ -1032,9 +1015,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.setConnectorWhitelist.execute({ whitelist });
     await this.getConnectorWhitelist.execute();
   };
-  _removeWalletFromWhitelist: (
-    request: {| url: string, protocol: string |}
-    ) => Promise<void> = async (request) => {
+  _removeWalletFromWhitelist: (request: {|
+    url: string,
+    protocol: string,
+  |}) => Promise<void> = async request => {
     const filter = this.currentConnectorWhitelist.filter(
       e => !(e.url === request.url && e.protocol === request.protocol)
     );
@@ -1042,15 +1026,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
-    window.chrome.runtime.sendMessage(({
-      type: 'remove_wallet_from_whitelist',
-      url: request.url,
-    }: RemoveWalletFromWhitelistData));
+    window.chrome.runtime.sendMessage(
+      ({
+        type: 'remove_wallet_from_whitelist',
+        url: request.url,
+      }: RemoveWalletFromWhitelistData)
+    );
   };
 
   _refreshActiveSites: void => Promise<void> = async () => {
     await this.getConnectedSites.execute();
-  }
+  };
 
   // ========== active websites ========== //
   @computed get activeSites(): ConnectedSites {
@@ -1066,14 +1052,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (signingMessage == null) {
       return null;
     }
-    return this.wallets.find(wallet =>
-      wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    return this.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
     );
   }
 
   async hwSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer,
+    rawTxBody: Buffer
   ): Promise<RustModule.WalletV4.Transaction> {
     if (isLedgerNanoWallet(publicDeriver.getParent())) {
       return this.ledgerSignTx(publicDeriver, rawTxBody);
@@ -1086,11 +1072,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async trezorSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer,
+    rawTxBody: Buffer
   ): Promise<RustModule.WalletV4.Transaction> {
-    const config = getCardanoHaskellBaseConfig(
-      publicDeriver.getParent().getNetworkInfo()
-    ).reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo()).reduce(
+      (acc, next) => Object.assign(acc, next),
+      {}
+    );
 
     const addresses = await getAllAddressesWithPaths(publicDeriver);
     const ownUtxoAddressMap = {};
@@ -1116,7 +1103,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         config.ByronNetworkId,
         ownUtxoAddressMap,
         ownStakeAddressMap,
-        addressedUtxos,
+        addressedUtxos
       );
     } catch {
       runInAction(() => {
@@ -1128,14 +1115,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     let trezorSignTxResp;
     try {
-      const signResult = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
-        {
+      const signResult = await wrapWithFrame(trezor =>
+        trezor.cardanoSignTransaction({
           ...trezorSignTxPayload,
           allowSeedlessDevice: true,
-        }
-      ));
+        })
+      );
       if (!signResult.success) {
-        throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+        throw new Error(
+          `Trezor signing error: ${signResult.payload.error} (code=${String(
+            signResult.payload.code
+          )})`
+        );
       }
       trezorSignTxResp = signResult.payload;
     } catch (error) {
@@ -1146,7 +1137,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw error;
     }
 
-    if (trezorSignTxResp.hash !== blake2b(256 / 8).update(rawTxBody).digest('hex')) {
+    if (
+      trezorSignTxResp.hash !==
+      blake2b(256 / 8)
+        .update(rawTxBody)
+        .digest('hex')
+    ) {
       runInAction(() => {
         this.hwWalletError = transactionHashMismatchError;
         this.isHwWalletErrorRecoverable = false;
@@ -1154,20 +1150,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(
-      txBody,
-      trezorSignTxResp.witnesses,
-      undefined
-    );
+    return buildSignedTrezorTransaction(txBody, trezorSignTxResp.witnesses, undefined);
   }
 
   async ledgerSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer,
+    rawTxBody: Buffer
   ): Promise<RustModule.WalletV4.Transaction> {
-    const config = getCardanoHaskellBaseConfig(
-      publicDeriver.getParent().getNetworkInfo()
-    ).reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo()).reduce(
+      (acc, next) => Object.assign(acc, next),
+      {}
+    );
 
     const addresses = await getAllAddressesWithPaths(publicDeriver);
     const ownUtxoAddressMap = {};
@@ -1193,7 +1186,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         config.ByronNetworkId,
         ownUtxoAddressMap,
         ownStakeAddressMap,
-        addressedUtxos,
+        addressedUtxos
       );
     } catch {
       runInAction(() => {
@@ -1223,7 +1216,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw error;
     }
 
-    if (ledgerSignResult.txHashHex !== blake2b(256 / 8).update(rawTxBody).digest('hex')) {
+    if (
+      ledgerSignResult.txHashHex !==
+      blake2b(256 / 8)
+        .update(rawTxBody)
+        .digest('hex')
+    ) {
       runInAction(() => {
         this.hwWalletError = transactionHashMismatchError;
         this.isHwWalletErrorRecoverable = false;
@@ -1241,9 +1239,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const publicKey = await withPublicKey.getPublicKey();
 
     const publicKeyInfo = {
-      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicKey.Hash, 'hex')
-      ),
+      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(Buffer.from(publicKey.Hash, 'hex')),
       addressing: {
         startLevel: 1,
         path: withLevels.getPathToPublic(),
@@ -1263,13 +1259,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (connectedWallet == null) {
       return;
     }
-    if (
-      connectedWallet.publicDeriver.getParent().getWalletType()
-        !== WalletTypeOption.WEB_WALLET
-    ) {
-      const hwWalletError = isLedgerNanoWallet(connectedWallet.publicDeriver.getParent()) ?
-            ledgerSignDataUnsupportedError :
-            trezorSignDataUnsupportedError;
+    if (connectedWallet.publicDeriver.getParent().getWalletType() !== WalletTypeOption.WEB_WALLET) {
+      const hwWalletError = isLedgerNanoWallet(connectedWallet.publicDeriver.getParent())
+        ? ledgerSignDataUnsupportedError
+        : trezorSignDataUnsupportedError;
       runInAction(() => {
         this.hwWalletError = hwWalletError;
         this.isHwWalletErrorRecoverable = false;

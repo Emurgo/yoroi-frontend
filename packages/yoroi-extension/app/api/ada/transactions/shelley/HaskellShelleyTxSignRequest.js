@@ -1,14 +1,15 @@
 // @flow
 
+import type { CardanoAddressedUtxo } from '../types';
+import type { TxDataOutput } from '../../../common/types';
+import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
-import type { CardanoAddressedUtxo } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
-import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -145,10 +146,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     return values;
   }
 
-  outputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  outputs(): Array<TxDataOutput> {
     const body = this.unsignedTx.build();
 
     const values = [];
@@ -165,6 +163,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
               defaultNetworkId: this.networkSettingSnapshot.NetworkId,
             },
           ),
+        isForeign: false,
         address: Buffer.from(output.address().to_bytes()).toString('hex'),
       });
     }
