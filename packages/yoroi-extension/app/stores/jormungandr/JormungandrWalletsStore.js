@@ -33,7 +33,7 @@ export default class JormungandrWalletsStore extends Store<StoresMap, ActionsMap
       }
     );
     walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
-    jormungandr.wallets.createWallet.listen(this._startWalletCreation);
+    jormungandr.wallets.startWalletCreation.listen(this._startWalletCreation);
   }
 
   // =================== SEND MONEY ==================== //

@@ -1,54 +1,78 @@
 // @flow
 import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import CreateWalletSteps from './CreateWalletSteps';
 import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
-import { CREATE_WALLET_SETPS, TIPS_DIALOGS } from './steps';
+import { CREATE_WALLET_SETPS, getFirstStep, markDialogAsShown } from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
-
-const messages: * = defineMessages({
-  title: {
-    id: 'wallet.create.page.title',
-    defaultMessage: '!!!Create a Wallet',
-  },
-});
-
-type Intl = {|
-  intl: $npm$ReactIntl$IntlShape,
-|};
+import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
+import AddWalletDetailsStep from './AddWalletDetailsStep';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import CreateWalletPageHeader from './CreateWalletPageHeader';
+import SelectNetworkStep from './SelectNetworkStep';
+import environment from '../../../environment';
+import { ROUTES } from '../../../routes-config';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
   genWalletRecoveryPhrase: void => Promise<Array<string>>,
+  createWallet: ({|
+    walletName: string,
+    walletPassword: string,
+    recoveryPhrase: Array<string>,
+  |}) => void,
+  selectedNetwork: $ReadOnly<NetworkRow>,
+  setSelectedNetwork: (params: void | $ReadOnly<NetworkRow>) => void,
+  openDialog(dialog: any): void,
+  closeDialog(): void,
+  isDialogOpen(dialog: any): boolean,
+  goToRoute(route: string): void,
 |};
 
-function CreateWalletPage(props: Props & Intl): Node {
-  const { intl, genWalletRecoveryPhrase } = props;
-  const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
+export type ManageDialogsProps = {|
+  openDialog(dialog: any): void,
+  closeDialog(dialogId: string): void,
+  isDialogOpen(dialog: any): boolean,
+|};
+
+function CreateWalletPage(props: Props): Node {
+  const {
+    genWalletRecoveryPhrase,
+    createWallet,
+    setSelectedNetwork,
+    selectedNetwork,
+    isDialogOpen,
+    openDialog,
+    closeDialog,
+    goToRoute,
+  } = props;
+  const [currentStep, setCurrentStep] = useState(getFirstStep());
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
-  const [dialogs, setDialogs] = useState({
-    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: true,
-    [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: true,
-  });
+  const [isRecoveryPhraseEntered, markRecoveryPhraseAsEntered] = useState<boolean>(false);
 
-  function showDialog(dialogId: string): void {
-    setDialogs(prev => ({ ...prev, [dialogId]: true }));
-  }
-
-  function hideDialog(dialogId: string): void {
-    setDialogs(prev => ({ ...prev, [dialogId]: false }));
-  }
+  const manageDialogsProps = {
+    isDialogOpen,
+    openDialog,
+    closeDialog: (dialogId: string) => {
+      closeDialog();
+      markDialogAsShown(dialogId);
+    },
+  };
 
   const steps = {
+    [CREATE_WALLET_SETPS.SELECT_NETWORK]: (
+      <SelectNetworkStep
+        onSelect={network => {
+          setSelectedNetwork(network);
+          setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
+        }}
+        goBack={() => goToRoute(ROUTES.WALLETS.ADD)}
+      />
+    ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
-        shouldShowDialog={dialogs.LEARN_ABOUT_RECOVER_PHRASE}
-        hideDialog={() => hideDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-        showDialog={() => showDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
         nextStep={() => {
           setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase === null) {
@@ -61,40 +85,69 @@ function CreateWalletPage(props: Props & Intl): Node {
               });
           }
         }}
+        prevStep={() => {
+          if (environment.isProduction()) {
+            return goToRoute(ROUTES.WALLETS.ADD);
+          }
+          setCurrentStep(CREATE_WALLET_SETPS.SELECT_NETWORK);
+        }}
+        {...manageDialogsProps}
       />
     ),
     [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
       <SaveRecoveryPhraseStep
-        shouldShowDialog={dialogs.SAVE_RECOVERY_PHRASE}
-        hideDialog={() => hideDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
-        showDialog={() => showDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
         setCurrentStep={setCurrentStep}
         recoveryPhrase={recoveryPhrase}
+        {...manageDialogsProps}
+      />
+    ),
+    [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
+      <VerifyRecoveryPhraseStep
+        recoveryPhrase={recoveryPhrase}
+        prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
+        nextStep={() => {
+          markRecoveryPhraseAsEntered(true);
+          setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
+        }}
+        isRecoveryPhraseEntered={isRecoveryPhraseEntered}
+      />
+    ),
+    [CREATE_WALLET_SETPS.ADD_WALLET_DETAILS]: (
+      <AddWalletDetailsStep
+        isRecoveryPhraseEntered={isRecoveryPhraseEntered}
+        recoveryPhrase={recoveryPhrase}
+        selectedNetwork={selectedNetwork}
+        prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE)}
+        onSubmit={(walletName: string, walletPassword: string) => {
+          if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
+          if (!environment.isDev() && !environment.isNightly()) {
+            setSelectedNetwork(networks.CardanoMainnet);
+          }
+
+          if (!selectedNetwork)
+            throw new Error('Network must be selected to create a wallet. Should never happen');
+
+          createWallet({
+            walletName,
+            walletPassword,
+            recoveryPhrase,
+          });
+        }}
+        {...manageDialogsProps}
       />
     ),
   };
 
   const CurrentStep = steps[currentStep];
+  if (currentStep === CREATE_WALLET_SETPS.SELECT_NETWORK) return CurrentStep;
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}
-      >
-        <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
-          <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
-        </Box>
-        <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
-      </Box>
+      <CreateWalletPageHeader />
       <CreateWalletSteps currentStep={currentStep} setCurrentStep={setCurrentStep} />
       {CurrentStep}
     </Box>
   );
 }
 
-export default (injectIntl(observer(CreateWalletPage)): ComponentType<Props>);
+export default (observer(CreateWalletPage): ComponentType<Props>);

@@ -30,6 +30,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
+import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -85,10 +86,10 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) return;
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-    const activeCategory = categories.find(
-      category => this.generated.stores.app.currentRoute.startsWith(category.route)
+    const activeCategory = categories.find(category =>
+      this.generated.stores.app.currentRoute.startsWith(category.route)
     );
 
     // if we're on a page that isn't applicable for the currently selected wallet
@@ -96,8 +97,7 @@ class Wallet extends Component<AllProps> {
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
     if (!activeCategory?.isVisible(visibilityContext)) {
-      const firstValidCategory = categories
-        .find(c => c.isVisible(visibilityContext));
+      const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
@@ -109,31 +109,16 @@ class Wallet extends Component<AllProps> {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
 
-  renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
-    const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
-
-    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
-      return (
-        <WalletSyncingOverlay
-          classicTheme={this.generated.stores.profile.isClassicTheme}
-          onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
-        />
-      )
-    }
-    return null
-  }
-
   render(): Node {
     // abort rendering if the page isn't valid for this wallet
     if (this.checkRoute() != null) {
       return null;
     }
     const { intl } = this.context;
-    const { wallets } = this.generated.stores;
-    const { actions } = this.generated;
+    const { actions, stores } = this.generated;
+    const selectedWallet = stores.wallets.selected;
 
-    if (!wallets.selected) {
+    if (!selectedWallet) {
       return (
         <TopBarLayout
           banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -147,11 +132,12 @@ class Wallet extends Component<AllProps> {
         </TopBarLayout>
       );
     }
-    const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
+    if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const isFirstSync = stores.wallets.firstSync === selectedWallet.getPublicDeriverId();
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (
@@ -190,26 +176,31 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         <WalletWithNavigation
-          categories={
-            allCategories
-              .filter(c => c.isVisible(visibilityContext))
-              .map(category => ({
-                className: category.className,
-                icon: category.icon,
-                label: category.label,
-                isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
-                onClick: () => this.generated.actions.router.goToRoute.trigger({
+          categories={allCategories
+            .filter(c => c.isVisible(visibilityContext))
+            .map(category => ({
+              className: category.className,
+              icon: category.icon,
+              label: category.label,
+              isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
+              onClick: () =>
+                this.generated.actions.router.goToRoute.trigger({
                   route: category.route,
                 }),
             }))}
         >
           {this.props.children}
-          {this.renderOverlay()}
+          {isFirstSync && (
+            <WalletSyncingOverlay
+              classicTheme={this.generated.stores.profile.isClassicTheme}
+              onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
+            />
+          )}
         </WalletWithNavigation>
       </TopBarLayout>
     );
 
-    const walletRevamp = (
+    const walletRevamp = !isFirstSync ? (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
@@ -224,8 +215,11 @@ class Wallet extends Component<AllProps> {
         showAsCard
       >
         {warning}
-        {this.renderOverlay()}
         {this.props.children}
+      </TopBarLayout>
+    ) : (
+      <TopBarLayout sidebar={sidebarContainer}>
+        <WalletLoadingAnimation />
       </TopBarLayout>
     );
 
@@ -290,8 +284,8 @@ class Wallet extends Component<AllProps> {
         isRevampTheme: boolean,
         isClassicTheme: boolean,
       |},
-    |}
-    |} {
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -319,9 +313,10 @@ class Wallet extends Component<AllProps> {
         },
         transactions: {
           getBalanceRequest: (() => {
-            if (stores.wallets.selected == null) return {
-              result: undefined,
-            };
+            if (stores.wallets.selected == null)
+              return {
+                result: undefined,
+              };
             const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
 
             return {
@@ -332,7 +327,7 @@ class Wallet extends Component<AllProps> {
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
           isClassicTheme: stores.profile.isClassicTheme,
-        }
+        },
       },
       actions: {
         router: {
@@ -341,7 +336,7 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
-        }
+        },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),

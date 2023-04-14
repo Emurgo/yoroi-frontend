@@ -29,11 +29,6 @@ const messages: Object = defineMessages({
     defaultMessage:
       '!!!It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.',
   },
-  fifthTip: {
-    id: 'wallet.create.dialog.howToSaveRecoveryPhrase.fifthTip',
-    defaultMessage:
-      '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
-  },
 });
 
 type Intl = {|
@@ -45,7 +40,7 @@ type Props = {|
   +onClose: void => void,
 |};
 
-function CreateWalletPage(props: Props & Intl): Node {
+function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
   const { open, onClose, intl } = props;
 
   // [tipId, tipTxt]
@@ -54,7 +49,6 @@ function CreateWalletPage(props: Props & Intl): Node {
     [2, messages.secondTip],
     [3, messages.thirdTip],
     [4, messages.forthTip],
-    [5, messages.fifthTip],
   ];
 
   return (
@@ -75,4 +69,4 @@ function CreateWalletPage(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(CreateWalletPage)): ComponentType<Props>);
+export default (injectIntl(observer(HowToSaveRecoveryPhraseTipsDialog)): ComponentType<Props>);
