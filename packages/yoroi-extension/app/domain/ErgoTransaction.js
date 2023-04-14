@@ -1,23 +1,13 @@
 // @flow
-import { action } from 'mobx';
-import type {
-  UserAnnotation,
-} from '../api/ada/transactions/types';
-import type {
-  ErgoTxIO,
-} from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
-import type {
-  DbBlock,
-  NetworkRow,
-} from '../api/ada/lib/storage/database/primitives/tables';
-import WalletTransaction, { toAddr } from './WalletTransaction';
-import type {
-  DefaultTokenEntry,
-} from '../api/common/lib/MultiToken';
+import type { UserAnnotation } from '../api/ada/transactions/types';
+import type { ErgoTxIO } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
+import type { DbBlock, NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
+import type { DefaultTokenEntry } from '../api/common/lib/MultiToken';
 import type { WalletTransactionCtorData } from './WalletTransaction';
+import { action } from 'mobx';
+import WalletTransaction, { toAddr } from './WalletTransaction';
 
 export default class ErgoTransaction extends WalletTransaction {
-
   @action
   static fromData(data: WalletTransactionCtorData): ErgoTransaction {
     return new ErgoTransaction(data);
@@ -32,7 +22,7 @@ export default class ErgoTransaction extends WalletTransaction {
     |},
     addressLookupMap: Map<number, string>,
     network: $ReadOnly<NetworkRow>,
-    defaultToken: DefaultTokenEntry
+    defaultToken: DefaultTokenEntry,
   |}): ErgoTransaction {
     const { addressLookupMap, defaultToken, tx } = request;
 
@@ -42,12 +32,15 @@ export default class ErgoTransaction extends WalletTransaction {
       type: tx.type,
       amount: tx.amount.joinAddCopy(tx.fee),
       fee: tx.fee,
-      date: tx.block != null
-        ? tx.block.BlockTime
-        : new Date(tx.transaction.LastUpdateTime),
+      date: tx.block != null ? tx.block.BlockTime : new Date(tx.transaction.LastUpdateTime),
       addresses: {
-        from: toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
-        to: toAddr({ rows: tx.utxoOutputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
+        from: toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken }),
+        to: toAddr({
+          rows: tx.utxoOutputs,
+          addressLookupMap,
+          tokens: tx.tokens,
+          defaultToken,
+        }).map(a => ({ ...a, isForeign: false })),
       },
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,

@@ -28,6 +28,8 @@ import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
 import { ReactComponent as AddCollateralIcon } from '../../../assets/images/dapp-connector/add-collateral.inline.svg';
+import type LocalizableError from '../../../i18n/LocalizableError';
+import ErrorBlock from '../../../components/widgets/ErrorBlock';
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,
@@ -36,6 +38,8 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   +selectedExplorer: SelectedExplorer,
   +submissionError: ?SignSubmissionErrorType,
+  +walletType: 'ledger' | 'trezor' | 'web',
+  +hwWalletError: ?LocalizableError,
 |};
 
 const messages = defineMessages({
@@ -106,27 +110,34 @@ class AddCollateralPage extends Component<Props, State> {
   );
 
   submit(): void {
-    this.form.submit({
-      onSuccess: form => {
-        const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true });
-        this.props
-          .onConfirm(walletPassword)
-          .finally(() => {
-            this.setState({ isSubmitting: false });
-          })
-          .catch(error => {
-            if (error instanceof WrongPassphraseError) {
-              this.form
-                .$('walletPassword')
-                .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
-            } else {
-              throw error;
-            }
-          });
-      },
-      onError: () => {},
-    });
+    if (this.props.walletType === 'web') {
+      this.form.submit({
+        onSuccess: form => {
+          const { walletPassword } = form.values();
+          this.setState({ isSubmitting: true });
+          this.props
+            .onConfirm(walletPassword)
+            .finally(() => {
+              this.setState({ isSubmitting: false });
+            })
+            .catch(error => {
+              if (error instanceof WrongPassphraseError) {
+                this.form
+                  .$('walletPassword')
+                  .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+              } else {
+                throw error;
+              }
+            });
+        },
+        onError: () => {},
+      });
+    } else {
+      this.setState({ isSubmitting: true });
+      this.props.onConfirm('').finally(() => {
+        this.setState({ isSubmitting: false });
+      }).catch(error => { throw error; });
+    }
   }
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
@@ -223,6 +234,20 @@ class AddCollateralPage extends Component<Props, State> {
       </Link>
     );
 
+    const { walletType } = this.props;
+    let confirmButtonLabel;
+    switch (walletType) {
+    case 'ledger':
+      confirmButtonLabel = globalMessages.confirmOnLedger;
+      break;
+    case 'trezor':
+      confirmButtonLabel = globalMessages.confirmOnTrezor;
+      break;
+    default:
+      confirmButtonLabel = globalMessages.confirm;
+      break;
+    }
+
     return (
       <Box overflowWrap="break-word" display="flex" height="100%" flexDirection="column">
         <Box maxWidth={480} margin="0 auto" padding="32px" flex="1" flexGrow="1" overflow="auto">
@@ -283,17 +308,20 @@ class AddCollateralPage extends Component<Props, State> {
               </Box>
             </Box>
           </Box>
-          <Box mt="26px">
-            <TextField
-              type="password"
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-            />
-            {submissionError === 'SEND_TX_ERROR' && (
-              <Alert severity="error">{intl.formatMessage(messages.sendError)}</Alert>
-            )}
-          </Box>
+          {walletType === 'web' && (
+            <Box mt="26px">
+              <TextField
+                type="password"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
+              />
+              {submissionError === 'SEND_TX_ERROR' && (
+                <Alert severity="error">{intl.formatMessage(messages.sendError)}</Alert>
+              )}
+            </Box>
+          )}
         </Box>
+        <ErrorBlock error={this.props.hwWalletError} />
         <Box borderTop="1px solid var(--yoroi-palette-gray-300)">
           <Box
             sx={{
@@ -312,11 +340,11 @@ class AddCollateralPage extends Component<Props, State> {
               sx={{ minWidth: 'auto' }}
               variant="primary"
               fullWidth
-              disabled={!walletPasswordField.isValid}
+              disabled={walletType === 'web' && !walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
               loading={isSubmitting}
             >
-              {intl.formatMessage(globalMessages.confirm)}
+              {intl.formatMessage(confirmButtonLabel)}
             </LoadingButton>
           </Box>
         </Box>

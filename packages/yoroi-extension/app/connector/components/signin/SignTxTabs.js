@@ -1,89 +1,110 @@
 // @flow
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { injectIntl, defineMessages } from 'react-intl'
+import { injectIntl, defineMessages } from 'react-intl';
 import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
-import globalMessages from '../../../i18n/global-messages';
+import { connectorMessages } from '../../../i18n/global-messages';
 import { Box, styled } from '@mui/system';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { observer } from 'mobx-react';
-import { Tab } from '@mui/material';
+import { Tab, Typography } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import environment from '../../../environment';
-import useMediaQuery from '@mui/material/useMediaQuery'
 
 type Props = {|
-  overviewContent: Node,
-  utxoAddressContent: Node,
+  connectionContent: Node,
+  utxosContent: Node,
+  detailsContent: Node,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
 const messages = defineMessages({
-  utxoAddresses: {
-    id: 'connector.signIn.tabs.utxoAddreses',
-    defaultMessage: '!!!UTXO addresses',
-  },
+  details: { id: 'connector.signIn.tabs.details', defaultMessage: '!!!Details' },
+  utxos: { id: 'connector.signIn.tabs.utxos', defaultMessage: '!!!UTxOs' },
+  connection: { id: 'connector.signIn.tabs.connection', defaultMessage: '!!!Connection' },
 });
 
-function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl): Node {
+function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
-  const match = useMediaQuery('(min-width: 700px)')
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const match = useMediaQuery('(min-width:1441px)');
+
+  const handleChange = (event, newValue) => setValue(newValue);
 
   const tabs = [
-    {
-      id: 0,
-      label: intl.formatMessage(globalMessages.overview),
-      component: overviewContent,
-    },
-    {
-      id: 1,
-      label: intl.formatMessage(messages.utxoAddresses),
-      component: utxoAddressContent,
-    },
+    { id: 0, label: intl.formatMessage(messages.details), component: detailsContent },
+    { id: 1, label: intl.formatMessage(messages.utxos), component: utxosContent },
+    { id: 2, label: intl.formatMessage(messages.connection), component: connectionContent },
   ];
+
+  const isTestEnv = environment.isNightly() || environment.isTest();
 
   return (
     <Background>
+      <Typography color="#242838" variant="h4" align="center" my="32px">
+        {intl.formatMessage(connectorMessages.signTransaction)}
+      </Typography>
       <TabContext value={value}>
         <Box
-          sx={match && {
+          sx={{
             backgroundColor: 'var(--yoroi-palette-common-white)',
-            boxShadow: '0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74)',
-            heigh: '100%',
+            marginLeft: '32px',
+            marginRight: '32px',
           }}
         >
           <TabList
             sx={{
-              '& .MuiTabs-indicator': { height: '4px' },
-              width: match ? '600px' : 'auto',
-              margin: 'auto',
+              width: match ? '640px' : '480px',
               boxShadow: 'none',
+              '&.MuiTabs-indicator': { height: '2px' },
             }}
+            textColor="primary"
+            indicatorColor="primary"
             onChange={handleChange}
             aria-label="Staking tabs"
           >
-            {tabs.map(({ label, id }) => (
-              <StyledTab label={label} value={id} />
-            ))}
+            {tabs.map(
+              ({ label, component, id }) =>
+                component !== null && (
+                  <StyledTab
+                    key={id}
+                    disableRipple
+                    label={
+                      <Typography variant="body1" fontWeight={500}>
+                        {label}
+                      </Typography>
+                    }
+                    value={id}
+                  />
+                )
+            )}
           </TabList>
+          <div style={{ backgroundColor: '#DCE0E9', height: '1px', width: '100%' }} />
         </Box>
-        {tabs.map(({ component, id }) => (
-          <TabPanel
-            sx={{
-              height: environment.isNightly() || environment.isTest() ? 'calc(84vh - 55px)': 'calc(100vh - 103px)', // 103 = 52px (topbar) + 51px (tabs bar)
-              overflowY: 'scroll',
-              width: match ? '600px' : 'auto',
-              margin: 'auto',
-            }}
-            value={id}
-          >
-            {component}
-          </TabPanel>
-        ))}
+        {tabs.map(
+          ({ component, id }) =>
+            component !== null && (
+              <TabPanel
+                sx={{
+                  height: isTestEnv
+                    ? 'calc(84vh - 55px)'
+                    : 'calc(100vh - 48px - 88px - 50px - 120px)',
+                  overflowY: 'scroll',
+                  margin: 'auto',
+                  boxShadow: 'none',
+                  backgroundColor: 'var(--yoroi-palette-common-white)',
+                  p: '32px',
+                  pr: '12px',
+                  width: match ? '640px' : '480px',
+                }}
+                value={id}
+                key={id}
+              >
+                {component}
+              </TabPanel>
+            )
+        )}
       </TabContext>
     </Background>
   );
@@ -91,23 +112,18 @@ function SignTxTabs({ overviewContent, utxoAddressContent, intl }: Props & Intl)
 
 export default (injectIntl(observer(SignTxTabs)): ComponentType<Props>);
 
-const Background = styled(Box)({
-  backgroundColor: 'var(--yoroi-palette-common-white)',
-});
+const Background = styled(Box)({ backgroundColor: 'var(--yoroi-palette-common-white)' });
 
 const StyledTab = styled(Tab)({
-  '&.MuiTabs-root': {
-    boxShadow:
-      '0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74)',
-  },
-  '&.Mui-selected': {
-    fontWeight: 700,
-  },
   '&.MuiTab-root': {
     paddingLeft: 0,
     paddingRight: 0,
-    paddingTop: '24px',
-    paddingBottom: '8px',
-    marginLeft: '35px',
+    paddingTop: '11px',
+    paddingBottom: '11px',
+    marginRight: '24px',
+    minWidth: 0,
+  },
+  '&.MuiTab-root:hover': {
+    color: '#3154CB',
   },
 });

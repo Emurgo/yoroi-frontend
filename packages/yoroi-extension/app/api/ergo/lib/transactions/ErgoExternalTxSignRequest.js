@@ -1,15 +1,16 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
-import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import type {
   Address, Value, Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
+import type { ErgoAddressedUtxo } from './types';
+import type { RemoteUnspentOutput } from '../state-fetch/types';
+import type { TxDataOutput, TxDataInput } from '../../../common/types';
+import BigNumber from 'bignumber.js';
+import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
-import type { ErgoAddressedUtxo } from './types';
-import type { RemoteUnspentOutput } from '../state-fetch/types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
 
@@ -41,10 +42,7 @@ export class ErgoExternalTxSignRequest
     this.networkSettingSnapshot = signRequest.networkSettingSnapshot;
   }
 
-  inputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  inputs(): Array<TxDataInput> {
     return getTxInputs(
       this.inputUtxos,
       this.changeAddr,
@@ -59,10 +57,7 @@ export class ErgoExternalTxSignRequest
     );
   }
 
-  outputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  outputs(): Array<TxDataOutput> {
     return getTxOutputs(
       this.unsignedTx,
       this.networkSettingSnapshot.ChainNetworkId,
@@ -210,10 +205,7 @@ export function getTxOutputs(
   chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   feeAddress: string,
   networkId: number,
-): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+): Array<TxDataOutput> {
   const values = [];
 
   const outputs = tx.output_candidates();
@@ -252,6 +244,7 @@ export function getTxOutputs(
     }
     values.push({
       value,
+      isForeign: false,
       address: addr,
     });
   }

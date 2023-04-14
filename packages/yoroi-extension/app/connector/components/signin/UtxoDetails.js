@@ -1,26 +1,26 @@
 /* eslint-disable no-nested-ternary */
 // @flow
-import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Notification } from '../../../types/notificationType';
+import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { Tx } from '../../../../chrome/extension/connector/types';
+import type { TxDataInput, TxDataOutput } from '../../types';
+import React, { Component } from 'react';
+import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
-import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
-import type { Tx } from '../../../../chrome/extension/connector/types';
 import { Logger } from '../../../utils/logging';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
@@ -81,10 +81,7 @@ class UtxoDetails extends Component<Props> {
   displayUnAvailableToken: TokenEntry => Node = tokenEntry => {
     return (
       <>
-        <span>
-          +
-          {tokenEntry.amount.toString()}
-        </span>{' '}
+        <span>+{tokenEntry.amount.toString()}</span>{' '}
         <span>{truncateAddressShort(tokenEntry.identifier)}</span>
       </>
     );
@@ -104,10 +101,7 @@ class UtxoDetails extends Component<Props> {
       if (price != null) {
         return (
           <>
-            <span>
-              {calculateAndFormatValue(shiftedAmount, price)}
-            </span>{' '}
-            {currency}
+            <span>{calculateAndFormatValue(shiftedAmount, price)}</span> {currency}
             <div>
               {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
             </div>
@@ -128,15 +122,14 @@ class UtxoDetails extends Component<Props> {
     return (
       <>
         <span>{adjustedBefore}</span>
-        <span>{afterDecimalRewards}</span>{' '}
-        {this.getTicker(tokenInfo)}
+        <span>{afterDecimalRewards}</span> {this.getTicker(tokenInfo)}
       </>
     );
   };
 
   renderRow: ({|
     kind: string,
-    address: {| address: string, value: MultiToken |},
+    address: TxDataInput | TxDataOutput,
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {

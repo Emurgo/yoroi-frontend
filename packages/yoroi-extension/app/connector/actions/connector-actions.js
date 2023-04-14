@@ -15,6 +15,6 @@ export default class ConnectorActions {
     url: string,
     protocol: string,
   |}> = new AsyncAction();
-  confirmSignInTx: Action<string> = new Action();
+  confirmSignInTx: AsyncAction<string> = new AsyncAction();
   cancelSignInTx: Action<void> = new Action();
 }
