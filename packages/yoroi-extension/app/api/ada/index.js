@@ -92,7 +92,7 @@ import {
   unscramblePaperAdaMnemonic,
 } from './lib/cardanoCrypto/paperWallet';
 import Notice from '../../domain/Notice';
-import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
+import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
 import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
 import {
