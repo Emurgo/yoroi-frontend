@@ -1,58 +1,59 @@
 /* eslint-disable no-nested-ternary */
 // @flow
-import React, { Component } from 'react';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
+import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
+import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
+import type {
+  CertificateRow,
+  TokenRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
+import type { Notification } from '../../../types/notificationType';
+import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
+import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
-import styles from './Transaction.scss';
+import BigNumber from 'bignumber.js';
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
 import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
 import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
 import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
+import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
+import styles from './Transaction.scss';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
 import globalMessages, { memoMessages } from '../../../i18n/global-messages';
-import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
-import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
-import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { TxStatusCodes } from '../../../api/ada/lib/storage/database/primitives/enums';
-import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
-import type {
-  CertificateRow,
-  TokenRow,
-} from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
-import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
   parseMetadata,
   parseMetadataDetailed,
 } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
-import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import {
   assuranceLevelTranslations,
   jormungandrCertificateKinds,
@@ -408,10 +409,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   renderRow: ({|
     kind: string,
     data: WalletTransaction,
-    address: {|
-      address: string,
-      value: MultiToken,
-    |},
+    address: TxDataOutput | TxDataInput,
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
@@ -550,7 +548,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
-              <Box sx={columnTXStyles.status} id='txStatus'>
+              <Box sx={columnTXStyles.status} id="txStatus">
                 {state === TxStatusCodes.IN_BLOCK ? (
                   <Typography
                     sx={{
@@ -581,7 +579,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 variant="body1"
                 color="var(--yoroi-palette-gray-900)"
                 sx={columnTXStyles.fee}
-                id='txFee'
+                id="txFee"
               >
                 {this.renderFeeDisplay({
                   amount: data.fee,
@@ -590,7 +588,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                 })}
               </Typography>
               <Box sx={columnTXStyles.amount}>
-                <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)" id='transactionAmount'>
+                <Typography
+                  variant="body1"
+                  fontWeight="500"
+                  color="var(--yoroi-palette-gray-900)"
+                  id="transactionAmount"
+                >
                   {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
                     timestamp: data.date.valueOf(),
@@ -768,45 +771,49 @@ export default class TransactionRevamp extends Component<Props, State> {
   jormungandrCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
-    switch (kind) {
-      case RustModule.WalletV3.CertificateKind.PoolRegistration:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
-      case RustModule.WalletV3.CertificateKind.PoolUpdate:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
-      case RustModule.WalletV3.CertificateKind.PoolRetirement:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
-      case RustModule.WalletV3.CertificateKind.StakeDelegation:
-        return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
-      case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
-        return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
-      default: {
-        throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
+    return RustModule.WasmScope(Scope => {
+      switch (kind) {
+        case Scope.WalletV3.CertificateKind.PoolRegistration:
+          return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
+        case Scope.WalletV3.CertificateKind.PoolUpdate:
+          return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
+        case Scope.WalletV3.CertificateKind.PoolRetirement:
+          return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
+        case Scope.WalletV3.CertificateKind.StakeDelegation:
+          return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
+        case Scope.WalletV3.CertificateKind.OwnerStakeDelegation:
+          return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
+        default: {
+          throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
+        }
       }
-    }
+    });
   };
 
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
-    switch (kind) {
-      case RustModule.WalletV4.CertificateKind.StakeRegistration:
-        return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
-      case RustModule.WalletV4.CertificateKind.StakeDeregistration:
-        return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
-      case RustModule.WalletV4.CertificateKind.StakeDelegation:
-        return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
-      case RustModule.WalletV4.CertificateKind.PoolRegistration:
-        return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
-      case RustModule.WalletV4.CertificateKind.PoolRetirement:
-        return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
-      case RustModule.WalletV4.CertificateKind.GenesisKeyDelegation:
-        return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
-      case RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
-        return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
-      default: {
-        throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
+    return RustModule.WasmScope(Scope => {
+      switch (kind) {
+        case Scope.WalletV4.CertificateKind.StakeRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
+        case Scope.WalletV4.CertificateKind.StakeDeregistration:
+          return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
+        case Scope.WalletV4.CertificateKind.StakeDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
+        case Scope.WalletV4.CertificateKind.PoolRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
+        case Scope.WalletV4.CertificateKind.PoolRetirement:
+          return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
+        case Scope.WalletV4.CertificateKind.GenesisKeyDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
+        case Scope.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
+          return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
+        default: {
+          throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
+        }
       }
-    }
+    });
   };
 
   getWithdrawals: WalletTransaction => ?Node = data => {
