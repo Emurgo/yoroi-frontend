@@ -175,14 +175,17 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
             const isAdded = addedWordsIndxes.has(idx);
             const button = (
-              <button
-                type="button"
+              <Box
+                component="button"
                 key={internalWordId}
                 className={classnames(styles.wordChip, {
                   [styles.wordAdded]: isAdded,
                   [styles.wrongWord]: wrongWordIdx === idx,
                 })}
                 onClick={() => onAddWord(word, idx)}
+                sx={{
+                  width: '123px',
+                }}
               >
                 <Typography
                   sx={{
@@ -198,7 +201,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 >
                   {word}
                 </Typography>
-              </button>
+              </Box>
             );
             return fadeOutWordIdx === idx ? (
               <Fade in timeout={500}>
