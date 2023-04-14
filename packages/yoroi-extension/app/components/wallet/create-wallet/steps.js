@@ -9,6 +9,8 @@ export const CREATE_WALLET_SETPS = Object.freeze({
 export const TIPS_DIALOGS = Object.freeze({
   LEARN_ABOUT_RECOVERY_PHRASE: 'LEARN_ABOUT_RECOVER_PHRASE',
   SAVE_RECOVERY_PHRASE: 'SAVE_RECOVERY_PHRASE',
+  WALLET_NAME_AND_PASSWORD: 'WALLET_NAME_AND_PASSWORD',
+  WALLET_CHECKSUM: 'WALLET_CHECKSUM',
 });
 
 const asDialogId: string => string = (dialogId: string) => `dialog__${dialogId}`;

@@ -9,6 +9,7 @@ import type { GeneratedData as BannerContainerData } from '../banners/BannerCont
 import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
@@ -20,6 +21,8 @@ type Props = InjectedOrGenerated<GeneratedData>;
 @observer
 export default class CreateWalletPageContainer extends Component<Props> {
   render(): Node {
+    const { stores, actions } = this.generated;
+
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -27,9 +30,12 @@ export default class CreateWalletPageContainer extends Component<Props> {
       >
         <Suspense fallback={null}>
           <CreateWalletPage
-            genWalletRecoveryPhrase={
-              this.generated.stores.substores.ada.wallets.genWalletRecoveryPhrase
-            }
+            genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
+            createWallet={actions.ada.wallets.createWallet.trigger}
+            setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+            openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
+            closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+            isDialogOpen={stores.uiDialogs.isOpen}
           />
         </Suspense>
       </TopBarLayout>
@@ -39,7 +45,35 @@ export default class CreateWalletPageContainer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    actions: {||} | Object,
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void,
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any,
+          |}) => void,
+        |},
+      |},
+      ada: {|
+        wallets: {|
+          createWallet: {|
+            trigger: ({|
+              walletName: string,
+              walletPassword: string,
+              recoveryPhrase: Array<string>,
+            |}) => Promise<void>,
+          |},
+        |},
+      |},
+      profile: {|
+        setSelectedNetwork: {|
+          trigger: (params: void | $ReadOnly<NetworkRow>) => void,
+        |},
+      |},
+    |},
     stores: {|
       substores: {|
         ada: {|
@@ -47,6 +81,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
             genWalletRecoveryPhrase: void => Promise<Array<string>>,
           |},
         |},
+      |},
+      uiDialogs: {|
+        isOpen: any => boolean,
       |},
     |},
   |} {
@@ -66,8 +103,32 @@ export default class CreateWalletPageContainer extends Component<Props> {
             },
           },
         },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+        },
       },
-      actions: Object.freeze({}),
+      actions: {
+        ada: {
+          wallets: {
+            createWallet: {
+              trigger: actions.ada.wallets.createWallet.trigger,
+            },
+          },
+        },
+        profile: {
+          setSelectedNetwork: {
+            trigger: actions.profile.setSelectedNetwork.trigger,
+          },
+        },
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
+          open: {
+            trigger: actions.dialogs.open.trigger,
+          },
+        },
+      },
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
     });

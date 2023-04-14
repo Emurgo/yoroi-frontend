@@ -11,6 +11,9 @@ import LearnAboutRecoveryPhrase from './LearnAboutRecoveryPhrase';
 import { CREATE_WALLET_SETPS, isDialogShownBefore, markDialogAsShown, TIPS_DIALOGS } from './steps';
 import SaveRecoveryPhraseStep from './SaveRecoveryPhraseStep';
 import VerifyRecoveryPhraseStep from './VerifyRecoveryPhraseStep';
+import AddWalletDetailsStep from './AddWalletDetailsStep';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages: * = defineMessages({
   title: {
@@ -25,25 +28,58 @@ type Intl = {|
 
 type Props = {|
   genWalletRecoveryPhrase: void => Promise<Array<string>>,
+  createWallet: ({|
+    walletName: string,
+    walletPassword: string,
+    recoveryPhrase: Array<string>,
+  |}) => void,
+  setSelectedNetwork: (params: void | $ReadOnly<NetworkRow>) => void,
+  openDialog(dialog: any): void,
+  closeDialog(): void,
+  isDialogOpen(dialog: any): boolean,
+|};
+
+export type ManageDialogsProps = {|
+  openDialog(dialog: any): void,
+  closeDialog(): void,
+  isDialogOpen(dialog: any): boolean,
 |};
 
 function CreateWalletPage(props: Props & Intl): Node {
-  const { intl, genWalletRecoveryPhrase } = props;
+  const {
+    intl,
+    genWalletRecoveryPhrase,
+    createWallet,
+    setSelectedNetwork,
+    isDialogOpen,
+    openDialog,
+    closeDialog,
+  } = props;
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [dialogs, setDialogs] = useState({
-    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]:
-      !isDialogShownBefore(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE),
+    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: !isDialogShownBefore(
+      TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE
+    ),
     [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE),
+    [TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD]: !isDialogShownBefore(
+      TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD
+    ),
   });
 
   function showDialog(dialogId: string): void {
     setDialogs(prev => ({ ...prev, [dialogId]: true }));
-  };
+  }
 
   function hideDialog(dialogId: string): void {
     markDialogAsShown(dialogId);
     setDialogs(prev => ({ ...prev, [dialogId]: false }));
+  }
+
+  const manageDialogsProps = {
+    isDialogOpen,
+    openDialog,
+    closeDialog,
   };
 
   const steps = {
@@ -76,11 +112,27 @@ function CreateWalletPage(props: Props & Intl): Node {
       />
     ),
     [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
-      <VerifyRecoveryPhraseStep
-        recoveryPhrase={recoveryPhrase}
+      <VerifyRecoveryPhraseStep recoveryPhrase={recoveryPhrase} setCurrentStep={setCurrentStep} />
+    ),
+    [CREATE_WALLET_SETPS.ADD_WALLET_DETAILS]: (
+      <AddWalletDetailsStep
+        shouldShowDialog={dialogs.WALLET_NAME_AND_PASSWORD}
+        hideDialog={() => hideDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
+        showDialog={() => showDialog(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)}
         setCurrentStep={setCurrentStep}
+        recoveryPhrase={recoveryPhrase}
+        onSubmit={(walletName: string, walletPassword: string) => {
+          if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
+          setSelectedNetwork(networks.CardanoPreprodTestnet);
+          createWallet({
+            walletName,
+            walletPassword,
+            recoveryPhrase,
+          });
+        }}
+        {...manageDialogsProps}
       />
-    )
+    ),
   };
 
   const CurrentStep = steps[currentStep];

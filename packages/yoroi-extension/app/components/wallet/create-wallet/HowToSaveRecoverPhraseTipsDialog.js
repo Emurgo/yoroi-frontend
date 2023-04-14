@@ -45,7 +45,7 @@ type Props = {|
   +onClose: void => void,
 |};
 
-function CreateWalletPage(props: Props & Intl): Node {
+function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
   const { open, onClose, intl } = props;
 
   // [tipId, tipTxt]
@@ -75,4 +75,4 @@ function CreateWalletPage(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(CreateWalletPage)): ComponentType<Props>);
+export default (injectIntl(observer(HowToSaveRecoveryPhraseTipsDialog)): ComponentType<Props>);
