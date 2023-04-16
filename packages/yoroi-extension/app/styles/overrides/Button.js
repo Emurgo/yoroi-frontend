@@ -119,6 +119,32 @@ const ModernButton = {
       },
     },
     {
+      props: { variant: 'secondary-blue' },
+      style: {
+        backgroundColor: 'var(--yoroi-comp-button-secondary-background)',
+        color: 'var(--yoroi-comp-button-primary-text)',
+        border: '2px solid',
+        borderColor: 'var(--yoroi-comp-button-primary-border)',
+        ':hover': {
+          color: 'var(--yoroi-comp-button-primary-text)',
+          borderColor: 'var(--yoroi-comp-button-primary-border-hover)',
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-hover)',
+        },
+        '&.Mui-active': {
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-active)',
+        },
+        '&.Mui-disabled': {
+          border: '2px solid',
+          opacity: 0.4,
+          borderColor: 'var(--yoroi-comp-button-primary-border)',
+          color: 'var(--yoroi-comp-button-primary-text)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-primary-text)',
+        },
+      },
+    },
+    {
       props: { variant: 'secondary' },
       style: {
         backgroundColor: 'var(--yoroi-comp-button-secondary-background)',
@@ -190,6 +216,33 @@ const ModernButton = {
         },
         '& .MuiLoadingButton-loadingIndicator': {
           color: 'var(--yoroi-comp-button-danger-background)',
+        },
+      },
+    },
+    // Todo: this button `varient` should be part of the new revam design system
+    {
+      props: { variant: 'rv-primary' },
+      style: {
+        minWidth: 'unset',
+        minHeight: 'unset',
+        width: 'unset',
+        height: 'unset',
+        // Todo: get the colors from the design system
+        backgroundColor: '#4B6DDE',
+        color: 'var(--yoroi-palette-common-white)',
+        border: 1,
+        ':hover': {
+          backgroundColor: '#3154CB',
+        },
+        '&.Mui-active': {
+          backgroundColor: '#1737A3',
+        },
+        '&.Mui-disabled': {
+          color: '#C4CFF5',
+          opacity: 0.4,
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: '#C4CFF5',
         },
       },
     },

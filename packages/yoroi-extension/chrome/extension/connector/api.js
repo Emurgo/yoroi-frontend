@@ -383,17 +383,17 @@ async function getAllFullAddresses(
   const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
   const addressTypes = isCardano ? [
     CoreAddressTypes.CARDANO_BASE,
-    CoreAddressTypes.CARDANO_ENTERPRISE,
-    CoreAddressTypes.CARDANO_LEGACY,
-    CoreAddressTypes.CARDANO_PTR,
-    // CoreAddressTypes.CARDANO_REWARD
   ] : [
     CoreAddressTypes.ERGO_P2PK,
     CoreAddressTypes.ERGO_P2SH,
     CoreAddressTypes.ERGO_P2S
   ]
   const promises = addressTypes
-    .map(type => getAllAddressesForDisplay({ publicDeriver: wallet, type }));
+    .map(type => getAllAddressesForDisplay({
+      publicDeriver: wallet,
+      type,
+      ignoreCutoff: true,
+    }));
   await RustModule.load();
   const addresses: FullAddressPayload[] =
     (await Promise.all(promises)).flat();
@@ -1160,6 +1160,7 @@ export async function connectorRecordSubmittedErgoTransaction(
     ).toString('hex');
     addresses.to.push({
       address,
+      isForeign: false,
       value,
     });
     if (allAddresses.has(address)) {
@@ -1279,6 +1280,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     addresses.to.push({
       address,
       value,
+      isForeign: false,
     });
     if (allAddresses.has(address)) {
       amount.joinAddMutable(value);
@@ -1386,6 +1388,7 @@ export async function connectorGenerateReorgTx(
   for (let i = 0; i < reorgOutputCount; i++) {
     includeTargets.push({
       address: unusedAddresses[i],
+      isForeign: false,
       value: REORG_OUTPUT_AMOUNT,
     });
     collateralOutputAddressSet.add(unusedAddresses[i]);

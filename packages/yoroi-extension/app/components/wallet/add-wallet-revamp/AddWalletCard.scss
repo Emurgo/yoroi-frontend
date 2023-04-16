@@ -1,0 +1,32 @@
+.component {
+  background: linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%);
+  border-radius: 8px;
+  padding: 16px;
+  width: 312px;
+  height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    position: absolute;
+    content: '';
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background: linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%);
+    border-radius: 8px;
+    z-index: -1;
+    transition: opacity 300ms linear;
+    opacity: 0;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}

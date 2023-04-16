@@ -14,12 +14,14 @@ import type {
   CardanoAssetGroup,
   CardanoToken,
   CardanoSignedTxWitness,
-} from 'trezor-connect/lib/types/networks/cardano';
+} from 'trezor-connect-flow';
 import {
-  CERTIFICATE_TYPE,
-  ADDRESS_TYPE,
-} from 'trezor-connect/lib/constants/cardano';
-import { CardanoTxSigningMode } from 'trezor-connect';
+  CardanoCertificateType,
+  CardanoAddressType,
+  CardanoTxSigningMode,
+  CardanoTxOutputSerializationFormat,
+  CardanoTxWitnessType,
+} from 'trezor-connect-flow';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -35,6 +37,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
+import blake2b from 'blake2b';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -113,11 +116,11 @@ export async function createTrezorSignTxPayload(
     request = {
       ...request,
       auxiliaryData: {
-        catalystRegistrationParameters: {
+        governanceRegistrationParameters: {
           votingPublicKey: votingPublicKey.replace(/^0x/, ''),
           stakingPath: stakingKeyPath,
           rewardAddressParameters: {
-            addressType: ADDRESS_TYPE.Reward,
+            addressType: CardanoAddressType.REWARD,
             path: stakingKeyPath,
           },
           nonce: String(nonce),
@@ -130,7 +133,9 @@ export async function createTrezorSignTxPayload(
       ? request
       : {
         ...request,
-        auxiliaryData: { blob: Buffer.from(metadata.to_bytes()).toString('hex') }
+        auxiliaryData: {
+          hash: blake2b(256 / 8).update(metadata.to_bytes()).digest('hex')
+        }
       };
   }
   return request;
@@ -164,14 +169,14 @@ function formatTrezorCertificates(
     const cert = certificates.get(i);
     if (cert.as_stake_registration() != null) {
       result.push({
-        type: CERTIFICATE_TYPE.StakeRegistration,
+        type: CardanoCertificateType.STAKE_REGISTRATION,
         path: path[i],
       });
       continue;
     }
     if (cert.as_stake_deregistration() != null) {
       result.push({
-        type: CERTIFICATE_TYPE.StakeDeregistration,
+        type: CardanoCertificateType.STAKE_DEREGISTRATION,
         path: path[i],
       });
       continue;
@@ -179,7 +184,7 @@ function formatTrezorCertificates(
     const delegationCert = cert.as_stake_delegation();
     if (delegationCert != null) {
       result.push({
-        type: CERTIFICATE_TYPE.StakeDelegation,
+        type: CardanoCertificateType.STAKE_DELEGATION,
         path: path[i],
         pool: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
       });
@@ -265,7 +270,7 @@ function _generateTrezorOutputs(
       if (RustModule.WalletV4.BaseAddress.from_address(address)) {
         result.push({
           addressParameters: {
-            addressType: ADDRESS_TYPE.Base,
+            addressType: CardanoAddressType.BASE,
             path: changeAddr.addressing.path,
             stakingPath: stakingKeyPath,
           },
@@ -275,7 +280,7 @@ function _generateTrezorOutputs(
       } else if (RustModule.WalletV4.ByronAddress.from_address(address)) {
         result.push({
           addressParameters: {
-            addressType: ADDRESS_TYPE.Byron,
+            addressType: CardanoAddressType.BYRON,
             path: changeAddr.addressing.path,
           },
           amount: output.amount().coin().to_str(),
@@ -305,7 +310,7 @@ export function toTrezorAddressParameters(
     const byronAddr = RustModule.WalletV4.ByronAddress.from_address(address);
     if (byronAddr) {
       return {
-        addressType: ADDRESS_TYPE.Byron,
+        addressType: CardanoAddressType.BYRON,
         path: toDerivationPathString(path),
       };
     }
@@ -319,7 +324,7 @@ export function toTrezorAddressParameters(
         throw new Error(`${nameof(toTrezorAddressParameters)} unknown hash type`);
       }
       return {
-        addressType: ADDRESS_TYPE.Base,
+        addressType: CardanoAddressType.BASE,
         path: toDerivationPathString(path),
         // can't always know staking key path since address may not belong to the wallet
         // (mangled address)
@@ -332,7 +337,7 @@ export function toTrezorAddressParameters(
     if (ptrAddr) {
       const pointer = ptrAddr.stake_pointer();
       return {
-        addressType: ADDRESS_TYPE.Pointer,
+        addressType: CardanoAddressType.POINTER,
         path: toDerivationPathString(path),
         certificatePointer: {
           blockIndex: pointer.slot(),
@@ -346,7 +351,7 @@ export function toTrezorAddressParameters(
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(address);
     if (enterpriseAddr) {
       return {
-        addressType: ADDRESS_TYPE.Enterprise,
+        addressType: CardanoAddressType.ENTERPRISE,
         path: toDerivationPathString(path),
       };
     }
@@ -355,7 +360,7 @@ export function toTrezorAddressParameters(
     const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(address);
     if (rewardAddr) {
       return {
-        addressType: ADDRESS_TYPE.Reward,
+        addressType: CardanoAddressType.REWARD,
         path: toDerivationPathString(path),
       };
     }
@@ -508,20 +513,22 @@ export function toTrezorSignRequest(
       const ownUtxo = addressedUtxos.find(utxo =>
         utxo.tx_hash === hash && utxo.tx_index === index
       );
-      formatted.push({
+      const cardanoInput: CardanoInput = {
         prev_hash: hash,
         prev_index: index,
-        ...(ownUtxo ? { path: ownUtxo.addressing.path } : {})
-      });
+      };
+      if (ownUtxo) {
+        cardanoInput.path = ownUtxo.addressing.path;
+      }
+      formatted.push(cardanoInput);
     }
     return formatted.sort(compareInputs);
   }
 
   function formatOutput(output: RustModule.WalletV4.TransactionOutput): CardanoOutput {
     const amount =  output.amount().coin().to_str();
-    const tokenBundle = toTrezorTokenBundle(output.amount().multiasset());
+    const { tokenBundle } = toTrezorTokenBundle(output.amount().multiasset());
     const outputDataHash = output.data_hash();
-    const datumHash = outputDataHash ? { datumHash: outputDataHash.to_hex() } : {};
 
     const addr = output.address();
     let result;
@@ -530,34 +537,28 @@ export function toTrezorSignRequest(
     const byronAddr = RustModule.WalletV4.ByronAddress.from_address(addr);
     const pointerAddr = RustModule.WalletV4.PointerAddress.from_address(addr);
     if (byronAddr || pointerAddr) {
-      result = {
+      result = ({
         address: addr.to_bech32(),
         amount,
-        ...tokenBundle,
-        ...datumHash,
-      };
+      }: CardanoOutput);
     }
 
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) {
       const ownAddressPath = ownUtxoAddressMap[addr.to_bech32()];
       if (ownAddressPath) {
-        result = {
+        result = ({
           addressParameters: {
-            addressType: ADDRESS_TYPE.Enterprise,
+            addressType: CardanoAddressType.ENTERPRISE,
             path: ownAddressPath,
           },
           amount,
-          ...tokenBundle,
-          ...datumHash,
-        };
+        }: CardanoOutput);
       } else {
-        result = {
+        result = ({
           address: addr.to_bech32(),
           amount,
-          ...tokenBundle,
-          ...datumHash,
-        };
+        }: CardanoOutput);
       }
     }
 
@@ -577,43 +578,37 @@ export function toTrezorSignRequest(
         const ownStakePath = ownStakeAddressMap[stakeAddr];
         if (ownStakePath) {
           // stake address is ours
-          result = {
+          result = ({
             addressParameters: {
-              addressType: ADDRESS_TYPE.Base,
+              addressType: CardanoAddressType.BASE,
               path: ownPaymentPath,
               stakingPath: ownStakePath,
             },
             amount,
-            ...tokenBundle,
-            ...datumHash,
-          };
+          }: CardanoOutput);
         } else {
           const keyHash = stake.to_keyhash();
           const scriptHash = stake.to_scripthash();
           if (keyHash) {
             // stake address is foreign key hash
-            result = {
+            result = ({
               addressParameters: {
-                addressType: ADDRESS_TYPE.Base,
+                addressType: CardanoAddressType.BASE,
                 path: ownPaymentPath,
-                stakingKeyHas: keyHash.to_hex(),
+                stakingKeyHash: keyHash.to_hex(),
               },
               amount,
-              ...tokenBundle,
-              ...datumHash,
-            };
+            }: CardanoOutput);
           } else if (scriptHash) {
             // stake address is script hash
-            result = {
+            result = ({
               addressParameters: {
-                addressType: ADDRESS_TYPE.Base,
+                addressType: CardanoAddressType.BASE,
                 path: ownPaymentPath,
                 stakingScriptHash: scriptHash.to_hex(),
               },
               amount,
-              ...tokenBundle,
-              ...datumHash,
-            };
+            }: CardanoOutput);
           } else {
             throw new Error('unexpected stake credential type in base address');
           }
@@ -621,18 +616,33 @@ export function toTrezorSignRequest(
         // not having BASE_PAYMENT_SCRIPT_ because payment script is
         // treated as third party address
       } else { // payment address is not ours
-        result = {
+        result = ({
           address: addr.to_bech32(),
           amount,
-          ...tokenBundle,
-          ...datumHash,
-        };
+        }: CardanoOutput);
       }
     }
 
     // we do not allow payment to RewardAddresses
     if (!result) {
       throw new Error('not expecting to pay to reward address');
+    }
+    if (tokenBundle) {
+      result.tokenBundle = tokenBundle;
+    }
+    if (outputDataHash) {
+      result.datumHash = outputDataHash.to_hex();
+    }
+    const inlineDatum = output.plutus_data();
+    if (inlineDatum) {
+      result.inlineDatum = inlineDatum.to_hex();
+      result.format = CardanoTxOutputSerializationFormat.MAP_BABBAGE;
+    }
+
+    const refScript = output.script_ref();
+    if (refScript) {
+      result.referenceScript = refScript.to_hex();
+      result.format = CardanoTxOutputSerializationFormat.MAP_BABBAGE;
     }
 
     return result;
@@ -644,6 +654,7 @@ export function toTrezorSignRequest(
   }
 
   const formattedRequiredSigners = [];
+  const additionalWitnessRequests = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
     for (let i = 0; i < requiredSigners.len(); i++) {
@@ -657,6 +668,7 @@ export function toTrezorSignRequest(
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
         });
+        additionalWitnessRequests.push(ownAddressPath);
       } else {
         formattedRequiredSigners.push({
           keyHash: hash.to_hex(),
@@ -690,7 +702,7 @@ export function toTrezorSignRequest(
       const registrationCert = cert.as_stake_registration();
       if (registrationCert != null) {
         result.push({
-          type: CERTIFICATE_TYPE.StakeRegistration,
+          type: CardanoCertificateType.STAKE_REGISTRATION,
           path: getPath(registrationCert.stake_credential()),
         });
         continue;
@@ -698,7 +710,7 @@ export function toTrezorSignRequest(
       const deregistrationCert = cert.as_stake_deregistration();
       if (deregistrationCert != null) {
         result.push({
-          type: CERTIFICATE_TYPE.StakeDeregistration,
+          type: CardanoCertificateType.STAKE_DEREGISTRATION,
           path: getPath(deregistrationCert.stake_credential()),
         });
         continue;
@@ -706,9 +718,9 @@ export function toTrezorSignRequest(
       const delegationCert = cert.as_stake_delegation();
       if (delegationCert != null) {
         result.push({
-          type: CERTIFICATE_TYPE.StakeDelegation,
+          type: CardanoCertificateType.STAKE_DELEGATION,
           path: getPath(delegationCert.stake_credential()),
-          pool:delegationCert.pool_keyhash().to_hex(),
+          pool: delegationCert.pool_keyhash().to_hex(),
         });
         continue;
       }
@@ -759,19 +771,6 @@ export function toTrezorSignRequest(
     formattedCollateral = formatInputs(collateral);
   }
 
-  let formattedCollateralReturn = null;
-  const collateralReturn = txBody.collateral_return();
-  if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(collateralReturn);
-  }
-
-  let formattedReferenceInputs = null;
-  const referenceInputs = txBody.reference_inputs();
-  if (referenceInputs) {
-    // eslint-disable-next-line no-unused-vars
-    formattedReferenceInputs = formatInputs(referenceInputs);
-  }
-
   const validityIntervalStart = txBody.validity_start_interval_bignum()?.to_str() ?? null;
   // temp workaround for buggy Mint.to_js_value()
   const formattedMint = JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(([policyId, assets]) => ({
@@ -782,7 +781,7 @@ export function toTrezorSignRequest(
   }));
 
   const scriptDataHash = txBody.script_data_hash()?.to_hex();
-  
+
   const result: $Exact<CardanoSignTransaction> = {
     signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
     inputs: formatInputs(txBody.inputs()),
@@ -790,10 +789,12 @@ export function toTrezorSignRequest(
     fee: txBody.fee().to_str(),
     protocolMagic,
     networkId,
-    ttl: String(txBody.ttl()),
-    //includeNetworkId: txBody.network_id() != null,
+    includeNetworkId: txBody.network_id() != null,
   };
 
+  if (txBody.ttl()) {
+    result.ttl = String(txBody.ttl());
+  }
   if (validityIntervalStart) {
     result.validityIntervalStart = validityIntervalStart;
   }
@@ -810,14 +811,67 @@ export function toTrezorSignRequest(
     result.mint = formattedMint;
   }
   if (scriptDataHash) {
-    //result.scriptDataHash = scriptDataHash;
+    result.scriptDataHash = scriptDataHash;
   }
-  if (formattedCollateralReturn) {
-    //result.collateralInputs = formattedCollateral;
+  if (formattedCollateral) {
+    result.collateralInputs = formattedCollateral;
   }
   if (requiredSigners) {
-    //result.requiredSigners = formattedRequiredSigners;
+    result.requiredSigners = formattedRequiredSigners;
   }
-  // connector API doesn't support additionalWitnessRequests
+  const collateralReturn = txBody.collateral_return();
+  if (collateralReturn) {
+    result.collateralReturn = formatOutput(collateralReturn);
+  }
+  const totalCollateral = txBody.total_collateral();
+  if (totalCollateral) {
+    result.totalCollateral = totalCollateral.to_str();
+  }
+  const referenceInputs = txBody.reference_inputs();
+  if (referenceInputs) {
+    const formattedReferenceInputs = [];
+    for (let i = 0; i < referenceInputs.len(); i++) {
+      const input = referenceInputs.get(i);
+      formattedReferenceInputs.push({
+        prev_hash: input.transaction_id().to_hex(),
+        prev_index: input.index(),
+      });
+    }
+    result.referenceInputs = formattedReferenceInputs;
+  }
+  if (additionalWitnessRequests.length > 0) {
+    result.additionalWitnessRequests = additionalWitnessRequests;
+  }
+
   return result;
+}
+
+export function buildConnectorSignedTransaction(
+  txBody: RustModule.WalletV4.TransactionBody,
+  witnesses: Array<CardanoSignedTxWitness>,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
+): RustModule.WalletV4.Transaction {
+  const vkeyWitnesses = RustModule.WalletV4.Vkeywitnesses.new();
+  for (const witness of witnesses) {
+    if (witness.type === CardanoTxWitnessType.BYRON_WITNESS) {
+      throw new Error('Byron wallet does not support connector API');
+    } else if (witness.type === CardanoTxWitnessType.SHELLEY_WITNESS) {
+      const vkeyWitness = RustModule.WalletV4.Vkeywitness.new(
+        RustModule.WalletV4.Vkey.new(
+          RustModule.WalletV4.PublicKey.from_hex(witness.pubKey)
+        ),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
+      );
+      vkeyWitnesses.add(vkeyWitness);
+    } else {
+      throw new Error('unexpected witness type');
+    }
+  }
+  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witnessSet.set_vkeys(vkeyWitnesses);
+  return RustModule.WalletV4.Transaction.new(
+    txBody,
+    witnessSet,
+    metadata
+  );
 }

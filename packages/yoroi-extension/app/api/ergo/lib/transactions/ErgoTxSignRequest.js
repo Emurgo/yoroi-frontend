@@ -1,14 +1,13 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
-import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import type {
   Address, Value, Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  MultiToken,
-} from '../../../common/lib/MultiToken';
+import type { TxDataOutput, TxDataInput } from '../../../common/types';
 import type { ErgoAddressedUtxo } from './types';
+import BigNumber from 'bignumber.js';
+import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
+import { MultiToken } from '../../../common/lib/MultiToken';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
 
@@ -38,10 +37,7 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
     this.networkSettingSnapshot = signRequest.networkSettingSnapshot;
   }
 
-  inputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  inputs(): Array<TxDataInput> {
     return getTxInputs(
       this.unsignedTx,
       this.changeAddr,
@@ -57,10 +53,7 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
     );
   }
 
-  outputs(): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+  outputs(): Array<TxDataOutput> {
     return getTxOutputs(
       this.unsignedTx,
       this.networkSettingSnapshot.ChainNetworkId,
@@ -136,10 +129,7 @@ export function getTxInputs(
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   networkId: number,
   chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
-): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+): Array<TxDataInput> {
   const values = [];
 
   const inputs = tx.box_selection().boxes();
@@ -224,10 +214,7 @@ export function getTxOutputs(
   chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   feeAddress: string,
   networkId: number,
-): Array<{|
-    address: string,
-    value: MultiToken,
-  |}> {
+): Array<TxDataOutput> {
   const values = [];
 
   const outputs = tx.build().output_candidates();
@@ -266,6 +253,7 @@ export function getTxOutputs(
     }
     values.push({
       value,
+      isForeign: false,
       address: addr,
     });
   }

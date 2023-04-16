@@ -27,6 +27,8 @@ import {
   StakeCredentialParamsType,
   CIP36VoteRegistrationFormat,
   TxRequiredSignerType,
+  DatumType,
+  TxOutputFormat,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -37,6 +39,7 @@ import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
+import cbor from 'cbor';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -608,7 +611,10 @@ export function toLedgerSignRequest(
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
+  rawTxBody: Buffer,
 ): SignTransactionRequest {
+  const parsedCbor = cbor.decode(rawTxBody);
+
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     const formatted = [];
     for (let i = 0; i < inputs.len(); i++) {
@@ -627,7 +633,10 @@ export function toLedgerSignRequest(
     return formatted.sort(compareInputs);
   }
 
-  function formatOutput(output: RustModule.WalletV4.TransactionOutput): TxOutput {
+  function formatOutput(
+    output: RustModule.WalletV4.TransactionOutput,
+    isPostAlonzoTransactionOutput: boolean,
+  ): TxOutput {
     const addr = output.address();
     let destination;
 
@@ -741,37 +750,76 @@ export function toLedgerSignRequest(
       throw new Error('not expecting to pay to reward address');
     }
 
+    const amount = output.amount().coin().to_str();
+    const tokenBundle = toLedgerTokenBundle(output.amount().multiasset());
     const outputDataHash = output.data_hash();
+    const plutusData = output.plutus_data();
+    const scriptRef = output.script_ref();
 
-    // TODO: Babbage-era output support
+    if (isPostAlonzoTransactionOutput || scriptRef || plutusData) {
+      let datum = null;
+      if (plutusData) {
+        datum = {
+          type: DatumType.INLINE,
+          datumHex: plutusData.to_hex(),
+        };
+      } else if (outputDataHash) {
+        datum = {
+          type: DatumType.HASH,
+          datumHashHex: outputDataHash.to_hex(),
+        };
+      }
+      return {
+        format: TxOutputFormat.MAP_BABBAGE,
+        amount,
+        destination,
+        tokenBundle,
+        datum,
+        referenceScriptHex: scriptRef ? scriptRef.to_hex() : null,
+      };
+    }
+
     return {
-      amount: output.amount().coin().to_str(),
+      format: TxOutputFormat.ARRAY_LEGACY,
+      amount,
       destination,
-      tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
+      tokenBundle,
       datumHashHex: outputDataHash ? outputDataHash.to_hex() : null,
     };
   }
 
   const outputs = [];
   for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(formatOutput(txBody.outputs().get(i)));
+    outputs.push(
+      formatOutput(
+        txBody.outputs().get(i),
+        parsedCbor.get(1)[i].constructor.name === 'Map',
+      )
+    );
   }
 
+  const additionalWitnessPaths = [];
   const formattedRequiredSigners = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
     for (let i = 0; i < requiredSigners.len(); i++) {
       const hash = requiredSigners.get(i);
-      const address = RustModule.WalletV4.EnterpriseAddress.new(
+      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
         RustModule.WalletV4.StakeCredential.from_keyhash(hash),
       ).to_address().to_hex();
-      const ownAddressPath = ownUtxoAddressMap[address];
+      const stakeAddress = RustModule.WalletV4.RewardAddress.new(
+        networkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+      ).to_address().to_hex();
+      const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
+        ownStakeAddressMap[stakeAddress];
       if (ownAddressPath) {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.PATH,
           path: ownAddressPath,
         });
+        additionalWitnessPaths.push(ownAddressPath);
       } else {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.HASH,
@@ -829,7 +877,10 @@ export function toLedgerSignRequest(
   let formattedCollateralReturn = null;
   const collateralReturn = txBody.collateral_return();
   if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(collateralReturn);
+    formattedCollateralReturn = formatOutput(
+      collateralReturn,
+      parsedCbor.get(16).constructor.name === 'Map',
+    );
   }
 
   let formattedReferenceInputs = null;
@@ -838,8 +889,13 @@ export function toLedgerSignRequest(
     formattedReferenceInputs = formatInputs(referenceInputs);
   }
 
+  let signingMode = TransactionSigningMode.ORDINARY_TRANSACTION;
+  if (formattedCollateral) {
+    signingMode = TransactionSigningMode.PLUTUS_TRANSACTION;
+  }
+
   return {
-    signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
+    signingMode,
     tx: {
       network: {
         networkId,
@@ -853,12 +909,13 @@ export function toLedgerSignRequest(
       withdrawals: formattedWithdrawals,
       auxiliaryData: formattedAuxiliaryData,
       validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
-      mint: txBody.mint()?.to_js_value().map(([policyIdHex, assets]) => ({
-        policyIdHex,
-        tokens: Object.keys(assets).map(assetNameHex => (
-          { assetNameHex, amount: assets[assetNameHex] }
-        )),
-      })) ?? null,
+      mint: JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(
+        ([policyIdHex, assets]) => ({
+          policyIdHex,
+          tokens: Object.keys(assets).map(assetNameHex => (
+            { assetNameHex, amount: assets[assetNameHex] }
+          )),
+        })) ?? null,
       scriptDataHashHex: txBody.script_data_hash()?.to_hex() ??  null,
       collateralInputs: formattedCollateral,
       requiredSigners: requiredSigners ? formattedRequiredSigners : null,
@@ -867,6 +924,49 @@ export function toLedgerSignRequest(
       totalCollateral: txBody.total_collateral()?.to_str() ?? null,
       referenceInputs: formattedReferenceInputs,
     },
-    additionalWitnessPaths: [],
+    additionalWitnessPaths,
   };
+}
+
+export function buildConnectorSignedTransaction(
+  txBody: RustModule.WalletV4.TransactionBody,
+  witnesses: Array<Witness>,
+  publicKey: {|
+    ...Addressing,
+    key: RustModule.WalletV4.Bip32PublicKey,
+  |},
+  metadata: RustModule.WalletV4.AuxiliaryData | void
+): RustModule.WalletV4.Transaction {
+  const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
+
+  const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
+
+  for (const witness of witnesses) {
+    const addressing = {
+      path: witness.path,
+      startLevel: 1,
+    };
+    verifyFromBip44Root(addressing);
+
+    const witnessKey = derivePublicByAddressing({
+      addressing,
+      startingFrom: {
+        level: keyLevel,
+        key: publicKey.key,
+      }
+    });
+    const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+      RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
+      RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.witnessSignatureHex, 'hex')),
+    );
+    vkeyWitWasm.add(vkeyWit);
+  }
+  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witSet.set_vkeys(vkeyWitWasm);
+
+  return RustModule.WalletV4.Transaction.new(
+    txBody,
+    witSet,
+    metadata
+  );
 }

@@ -207,11 +207,13 @@ class StakingPageContent extends Component<AllProps> {
     ) {
       return null;
     }
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
-      return null;
-    }
+
+    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) return null;
+
     const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
     const currentPage = this.generated.stores.delegation.selectedPage;
+
+    if (currentPools.length === 0) return null;
 
     const currentPool = currentPools[0][currentPage];
     const meta = this.generated.stores.delegation.getLocalPoolInfo(
@@ -252,21 +254,14 @@ class StakingPageContent extends Component<AllProps> {
         ? async () => {
             this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
             const delegationTransaction = this.generated.actions.jormungandr.delegationTransaction;
-            await delegationTransaction.createTransaction.trigger(
-              {
-                publicDeriver,
-                poolRequest: undefined,
-              }
-            );
+            await delegationTransaction.createTransaction.trigger({
+              publicDeriver,
+              poolRequest: undefined,
+            });
           }
         : undefined;
 
-    return (
-      <DelegatedStakePoolCard
-        delegatedPool={delegatedPool}
-        undelegate={undelegate}
-      />
-    );
+    return <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />;
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
@@ -392,14 +387,14 @@ class StakingPageContent extends Component<AllProps> {
             onClose={this.onClose}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             totalRewards={
-                !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
-                  ? undefined
-                  : delegationRequests.getDelegatedBalance.result.accountPart
-              }
+              !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
+                ? undefined
+                : delegationRequests.getDelegatedBalance.result.accountPart
+            }
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
             unitOfAccount={this.toUnitOfAccount}
             withdrawRewards={
-                this._isRegistered(delegationRequests.publicDeriver) === true
+              this._isRegistered(delegationRequests.publicDeriver) === true
                 ? () => {
                     this.generated.actions.dialogs.open.trigger({
                       dialog: DeregisterDialogContainer,
@@ -408,7 +403,7 @@ class StakingPageContent extends Component<AllProps> {
                 : undefined
             }
           />
-          ) : null}
+        ) : null}
         {uiDialogs.isOpen(DeregisterDialogContainer) ? (
           <DeregisterDialogContainer
             {...this.generated.DeregisterDialogContainerProps}
@@ -440,7 +435,7 @@ class StakingPageContent extends Component<AllProps> {
               this.generated.actions.dialogs.closeActiveDialog.trigger();
             }}
           />
-          ) : null}
+        ) : null}
         {uiDialogs.isOpen(RewardHistoryDialog) ? (
           <RewardHistoryDialog
             onClose={this.onClose}
@@ -676,4 +671,3 @@ const RightCardsWrapper = styled(Box)({
   flexDirection: 'column',
   gap: '40px',
 });
-
