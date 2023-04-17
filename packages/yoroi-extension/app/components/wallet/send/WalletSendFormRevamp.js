@@ -46,7 +46,6 @@ import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
 import IncludedTokens from './WalletSendFormSteps/IncludedTokens';
 import { getNFTs, getTokens } from '../../../utils/wallet';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../utils/wallet';
-import QRScannerDialog from './WalletSendFormSteps/QRScannerDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
@@ -662,7 +661,6 @@ export default class WalletSendForm extends Component<Props, State> {
     const { currentStep } = this.state;
     return (
       <>
-        {this.renderDialog()}
         <div className={styles.component}>
           <div className={styles.wrapper}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
@@ -674,22 +672,6 @@ export default class WalletSendForm extends Component<Props, State> {
     );
   }
 
-  renderDialog(): Node {
-    const { form } = this;
-    const receiverField = form.$('receiver');
-
-    if (this.props.isOpen(QRScannerDialog)) {
-      return (
-        <QRScannerDialog
-          onClose={this.props.closeDialog}
-          onReadQR={address => {
-            receiverField.set('value', address);
-          }}
-        />
-      );
-    }
-    return '';
-  }
   onUpdateStep(step: number) {
     if (step > 3) throw new Error('Invalid Step number.');
     this.setState({ currentStep: step });

@@ -4,8 +4,8 @@
     border-radius: 8px;
     background-image: linear-gradient(
         0deg,
-        var(--yoroi-palette-gray-50),
-        var(--yoroi-palette-gray-50)
+        var(--yoroi-palette-common-white),
+        var(--yoroi-palette-common-white)
       ),
       linear-gradient(269.97deg, #e4e8f7 0%, #c6f7ed 99.98%);
     background-origin: border-box;
@@ -51,8 +51,8 @@
       border: double 2px transparent;
       background-image: linear-gradient(
           0deg,
-          var(--yoroi-palette-gray-50),
-          var(--yoroi-palette-gray-50)
+          var(--yoroi-palette-common-white),
+          var(--yoroi-palette-common-white)
         ),
         linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%);
       cursor: not-allowed;
