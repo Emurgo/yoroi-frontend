@@ -4,6 +4,7 @@ import { observable, action, runInAction } from 'mobx';
 import Store from '../base/Store';
 
 import type {
+  PaperWalletRestoreMeta,
   WalletRestoreMeta,
   RestoreModeType,
 } from '../../actions/common/wallet-restore-actions';
@@ -92,7 +93,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   @observable step: RestoreStepsType;
 
   // only to handle the back button
-  @observable walletRestoreMeta: void | WalletRestoreMeta;
+  @observable walletRestoreMeta: void | PaperWalletRestoreMeta;
 
   @observable mode: void | RestoreModeType;
 
@@ -133,7 +134,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   };
 
   @action
-  _processRestoreMeta: WalletRestoreMeta => Promise<void> = async restoreMeta => {
+  _processRestoreMeta: PaperWalletRestoreMeta => Promise<void> = async restoreMeta => {
     this.walletRestoreMeta = restoreMeta;
 
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
@@ -232,10 +233,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
     const api = getApiForNetwork(selectedNetwork);
     return this.stores.substores[api].walletRestore.isValidMnemonic(request);
-  };
-
-  getMode: void => void | RestoreModeType = () => {
-    return this.mode;
   };
 }
 

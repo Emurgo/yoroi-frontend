@@ -13,12 +13,22 @@ type Intl = {|
 type Props = {|
   goNext?: void => void,
   goBack?: void => void,
+  nextButtonLabel?: null | string,
+  backButtonLabel?: null | string,
   showBackButton?: boolean,
   showNextButton?: boolean,
 |};
 
 function StepController(props: Props & Intl): Node {
-  const { intl, showBackButton = true, showNextButton = true, goBack, goNext } = props;
+  const {
+    intl,
+    nextButtonLabel,
+    backButtonLabel,
+    showBackButton = true,
+    showNextButton = true,
+    goBack,
+    goNext,
+  } = props;
 
   return (
     <Stack
@@ -44,7 +54,7 @@ function StepController(props: Props & Intl): Node {
             lineHeight: '15px',
           }}
         >
-          {intl.formatMessage(globalMessages.backButtonLabel)}
+          {backButtonLabel ?? intl.formatMessage(globalMessages.backButtonLabel)}
         </Button>
       )}
       {showNextButton && (
@@ -60,7 +70,7 @@ function StepController(props: Props & Intl): Node {
             lineHeight: '15px',
           }}
         >
-          {intl.formatMessage(globalMessages.nextButtonLabel)}
+          {nextButtonLabel ?? intl.formatMessage(globalMessages.nextButtonLabel)}
         </Button>
       )}
     </Stack>
@@ -70,6 +80,10 @@ function StepController(props: Props & Intl): Node {
 StepController.defaultProps = {
   goNext: undefined,
   goBack: undefined,
+  nextButtonLabel: null,
+  backButtonLabel: null,
+  showBackButton: true,
+  showNextButton: true,
 };
 
 export default (injectIntl(observer(StepController)): ComponentType<Props>);

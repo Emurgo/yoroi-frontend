@@ -35,6 +35,8 @@ function useCachedOptions(options) {
   const cachedOptions = {};
 
   const getCachedOptions = inputValue => {
+    if (!inputValue) return [];
+
     if (!cachedOptions[inputValue]) {
       cachedOptions[inputValue] = options.filter(w =>
         w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? '')
@@ -105,20 +107,21 @@ function Autocomplete({
     },
     // eslint-disable-next-line no-shadow
     onStateChange: ({ inputValue, type, selectedItem }) => {
+      const trimmedValue = inputValue?.trim() ?? '';
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
-          if (inputValue.length === 0) {
+          if (trimmedValue.length === 0) {
             closeMenu();
-            onChange(inputValue);
+            onChange(trimmedValue);
           }
-          setInputValue(inputValue);
+          setInputValue(trimmedValue);
           break;
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          if (selectedItem || Boolean(inputValue)) {
-            onChange(selectedItem || inputValue);
-            setInputValue(selectedItem || inputValue);
+          if (selectedItem || Boolean(trimmedValue)) {
+            onChange(selectedItem || trimmedValue);
+            setInputValue(selectedItem || trimmedValue);
             closeMenu();
           }
           break;
@@ -291,11 +294,11 @@ const InputWrapper = styled(Box)(
       !error
         ? `&:not([value=""]):not(:focus) {
         border-color: transparent;
-        background-origin: border-box;
+        border: 0;
         background: ${
           isVerified
             ? 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%);'
-            : 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%'
+            : 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%'
         });
       }`
         : ''

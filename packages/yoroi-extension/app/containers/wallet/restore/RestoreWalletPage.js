@@ -11,6 +11,8 @@ import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/Wal
 import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
+import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
+import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -39,7 +41,7 @@ export default class RestoreWalletPage extends Component<Props> {
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
       >
         <RestoreWalletPageComponent
-          createWallet={actions.ada.wallets.createWallet.trigger}
+          restoreWallet={actions.walletRestore.restoreWallet.trigger}
           stores={stores}
           actions={actions}
           openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
@@ -55,24 +57,8 @@ export default class RestoreWalletPage extends Component<Props> {
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
       walletRestore: {|
-        back: {| trigger: (params: void) => void |},
-        reset: {| trigger: (params: void) => void |},
         setMode: {| trigger: (params: RestoreModeType) => void |},
-        startCheck: {| trigger: (params: void) => Promise<void> |},
-        startRestore: {| trigger: (params: void) => Promise<void> |},
-        submitFields: {| trigger: (params: WalletRestoreMeta) => Promise<void> |},
-        verifyMnemonic: {| trigger: (params: void) => Promise<void> |},
-      |},
-      ada: {|
-        wallets: {|
-          createWallet: {|
-            trigger: ({|
-              walletName: string,
-              walletPassword: string,
-              recoveryPhrase: Array<string>,
-            |}) => Promise<void>,
-          |},
-        |},
+        restoreWallet: {| trigger: (params: WalletRestoreMeta) => Promise<void> |},
       |},
       profile: {|
         setSelectedNetwork: {| trigger: (params: void | $ReadOnly<NetworkRow>) => void |},
@@ -100,21 +86,21 @@ export default class RestoreWalletPage extends Component<Props> {
       transactions: {| getTxRequests: (PublicDeriver<>) => TxRequests |},
       tokenInfoStore: {| tokenInfo: TokenInfoMap |},
       uiDialogs: {| isOpen: any => boolean |},
-      walletSettings: {|
-        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
-      |},
       walletRestore: {|
-        recoveryResult: void | {| plates: Array<PlateWithMeta>, phrase: string |},
-        step: RestoreStepsType,
-        duplicatedWallet: null | void | PublicDeriver<>,
-        walletRestoreMeta: void | WalletRestoreMeta,
         isValidMnemonic: ({| mnemonic: string, mode: RestoreModeType |}) => boolean,
         selectedAccount: number,
-        getMode: () => void | RestoreModeType,
+        mode: void | RestoreModeType,
       |},
       wallets: {|
         restoreRequest: {| error: ?LocalizableError, isExecuting: boolean, reset: () => void |},
         publicDerivers: Array<PublicDeriver<>>,
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests,
+      |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
       |},
     |},
   |} {
@@ -137,22 +123,22 @@ export default class RestoreWalletPage extends Component<Props> {
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
+        },
         wallets: {
           restoreRequest: {
             isExecuting: stores.wallets.restoreRequest.isExecuting,
             error: stores.wallets.restoreRequest.error,
             reset: stores.wallets.restoreRequest.reset,
           },
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
           publicDerivers: stores.wallets.publicDerivers,
         },
         walletRestore: {
-          step: stores.walletRestore.step,
-          duplicatedWallet: stores.walletRestore.duplicatedWallet,
-          recoveryResult: stores.walletRestore.recoveryResult,
-          walletRestoreMeta: stores.walletRestore.walletRestoreMeta,
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
           selectedAccount: stores.walletRestore.selectedAccount,
-          getMode: stores.walletRestore.getMode,
+          mode: stores.walletRestore.mode,
         },
       },
       actions: {
@@ -164,23 +150,11 @@ export default class RestoreWalletPage extends Component<Props> {
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
         },
         walletRestore: {
-          reset: { trigger: actions.walletRestore.reset.trigger },
           setMode: { trigger: actions.walletRestore.setMode.trigger },
-          back: { trigger: actions.walletRestore.back.trigger },
-          verifyMnemonic: { trigger: actions.walletRestore.verifyMnemonic.trigger },
-          startRestore: { trigger: actions.walletRestore.startRestore.trigger },
-          startCheck: { trigger: actions.walletRestore.startCheck.trigger },
-          submitFields: { trigger: actions.walletRestore.submitFields.trigger },
+          restoreWallet: { trigger: actions.walletRestore.restoreWallet.trigger },
         },
         profile: {
           setSelectedNetwork: { trigger: actions.profile.setSelectedNetwork.trigger },
-        },
-        ada: {
-          wallets: {
-            createWallet: {
-              trigger: actions.ada.wallets.createWallet.trigger,
-            },
-          },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

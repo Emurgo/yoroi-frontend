@@ -2,6 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
+import type { ManageDialogsProps } from '../../../dialogs/types';
 import { useState } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -16,6 +17,14 @@ import classnames from 'classnames';
 import Autocomplete from '../../../../common/Autocomplete';
 import globalMessages from '../../../../../i18n/global-messages';
 import RestoreRecoveryPhraseForm from './RestoreRecoveryPhraseForm';
+import { truncateToken } from '../../../../../utils/formatters';
+import { getTokenName } from '../../../../../stores/stateless/tokenHelpers';
+import { calculateAndFormatValue } from '../../../../../utils/unit-of-account';
+import { hiddenAmount } from '../../../../../utils/strings';
+import { MultiToken } from '../../../../../api/common/lib/MultiToken';
+import DuplicatedWalletDialog from './DuplicatedWalletDialog';
+import { TIPS_DIALOGS } from '../../../dialogs/constants';
+import { ROUTES } from '../../../../../routes-config';
 
 const messages = defineMessages({
   description: {
@@ -25,21 +34,39 @@ const messages = defineMessages({
   },
 });
 
-type Intl = {| intl: $npm$ReactIntl$IntlShape |};
+type Intl = {|
+  intl: $npm$ReactIntl$IntlShape,
+|};
 
 type Props = {|
-  walletRestore: any,
   walletData: any,
+  initialRecoveryPhrase: string,
+  openDuplicatedWallet(duplicatedWallet: PublicDeriver<>): void,
   setCurrentStep(stepId: string): void,
   checkValidPhrase(enteredPhrase: string): boolean,
   onSubmit(phrase: string): PossiblyAsync<PublicDeriver<> | typeof undefined>,
+  ...ManageDialogsProps,
 |};
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const [enableNext, setEnableNext] = useState(false);
   const [duplicatedWallet, setDuplicatedWallet] = useState(null);
-  const { intl, setCurrentStep, walletRestore, walletData, checkValidPhrase, onSubmit } = props;
-  const mode = walletData.getMode();
+  const {
+    intl,
+    setCurrentStep,
+    walletData,
+    checkValidPhrase,
+    onSubmit,
+    openDuplicatedWallet,
+    isDialogOpen,
+    closeDialog,
+    openDialog,
+    initialRecoveryPhrase,
+  } = props;
+
+  const isActiveDialog = isDialogOpen(DuplicatedWalletDialog);
+
+  const mode = walletData.mode;
 
   function goNextStepCallback() {
     return () => setCurrentStep(RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS);
@@ -54,22 +81,17 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   async function handleSubmit(recoveryPhrase) {
     const duplicatedWallet = await onSubmit(recoveryPhrase);
     if (!Boolean(duplicatedWallet)) setEnableNext(true);
-    else setDuplicatedWallet(duplicatedWallet);
+    else {
+      setDuplicatedWallet(duplicatedWallet);
+      openDialog(DuplicatedWalletDialog);
+    }
   }
 
-  function getDuplicatedWalletData() {
-    const publicDeriver = duplicatedWallet;
-    if (!Boolean(publicDeriver)) {
-      throw new Error(`${nameof(VerifyRecoveryPhraseStep)} no duplicated wallet`);
-    }
-    const parent = publicDeriver?.getParent();
-    const settingsCache = stores.walletSettings.getConceptualWalletSettingsCache(parent);
-    const withPubKey = asGetPublicKey(publicDeriver);
-    const plate = withPubKey == null ? null : stores.wallets.getPublicKeyCache(withPubKey).plate;
-    const txRequests = stores.transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+  const goBack = () => setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
 
-    return balance;
+  function handleClose() {
+    goBack();
+    closeDialog(TIPS_DIALOGS.DUPLICATED_WALLET);
   }
 
   return (
@@ -88,17 +110,20 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           numberOfMnemonics={mode.length}
           isValidMnemonic={checkMnemonic}
           onSubmit={handleSubmit}
+          initialRecoveryPhrase={initialRecoveryPhrase}
         />
 
-        {Boolean(duplicatedWallet) && <>TODO: Wallet duped - {getDuplicatedWalletData()}</>}
-
         <Box mt="10px">
-          <StepController
-            goNext={enableNext ? goNextStepCallback() : undefined}
-            goBack={() => setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE)}
-          />
+          <StepController goNext={enableNext ? goNextStepCallback() : undefined} goBack={goBack} />
         </Box>
       </Stack>
+      <DuplicatedWalletDialog
+        duplicatedWalletData={null}
+        open={isActiveDialog}
+        onClose={handleClose}
+        // $FlowFixMe incompatible-call
+        onNext={() => openDuplicatedWallet(duplicatedWallet)}
+      />
     </Stack>
   );
 }

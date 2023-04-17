@@ -9,7 +9,7 @@ export const RESTORE_WALLET_STEPS = Object.freeze({
 });
 
 export function getFirstRestorationStep() {
-  if (!environment.isProduction()) return RESTORE_WALLET_STEPS.SELECT_NETWORK;
+  if (environment.isDev() || environment.isNightly()) return RESTORE_WALLET_STEPS.SELECT_NETWORK;
 
   return RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE;
 }

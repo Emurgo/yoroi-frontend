@@ -68,7 +68,7 @@ function CreateWalletPage(props: Props): Node {
           setSelectedNetwork(network);
           setCurrentStep(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
         }}
-        prevStep={() => goToRoute(ROUTES.WALLETS.ADD)}
+        goBack={() => goToRoute(ROUTES.WALLETS.ADD)}
       />
     ),
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (

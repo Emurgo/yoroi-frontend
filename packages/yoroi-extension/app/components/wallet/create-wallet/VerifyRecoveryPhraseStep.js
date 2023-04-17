@@ -38,7 +38,7 @@ type Props = {|
   recoveryPhrase: Array<string> | null,
   nextStep(): void,
   prevStep(): void,
-  markRecoveryPhraseAsEntered(): void,
+  markRecoveryPhraseAsEntered?: () => void,
   isRecoveryPhraseEntered: boolean,
 |};
 

@@ -19,6 +19,7 @@ import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
 import environment from '../../../environment';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages: * = defineMessages({
   title: {
@@ -46,24 +47,54 @@ type Intl = {|
 type Props = {|
   stores: any,
   actions: any,
-  createWallet: ({|
+  restoreWallet: ({|
     walletName: string,
     walletPassword: string,
-    recoveryPhrase: Array<string>,
+    recoveryPhrase: string,
   |}) => void,
   openDialog(dialog: any): void,
   closeDialog(): void,
   isDialogOpen(dialog: any): boolean,
 |};
 
+// function getDuplicatedWalletData(duplicatedWallet: PublicDeriver<>) {
+//   if (!Boolean(duplicatedWallet)) {
+//     throw new Error(`${nameof(getDuplicatedWalletData)} no duplicated wallet`);
+//   }
+//   const parent = duplicatedWallet?.getParent();
+//   const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
+//   // $FlowFixMe[prop-missing]
+//   // $FlowFixMe[incompatible-call]
+//   const withPubKey = asGetPublicKey(duplicatedWallet);
+//   const plate = withPubKey == null ? null : wallets.getPublicKeyCache(withPubKey).plate;
+//   const txRequests = transactions.getTxRequests(duplicatedWallet);
+//   const balance = txRequests.requests.getBalanceRequest.result ?? null;
+
+//   const balances = getMainTokenAmount({
+//     amount: balance,
+//     currency: '',
+//     getCurrentPrice: null,
+//     getTokenInfo: null,
+//     shouldHideBalance: false,
+//   });
+
+//   return null;
+// }
+
 function RestoreWalletPage(props: Props & Intl): Node {
-  const { intl, stores, actions, createWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { walletRestore, profile, router } = actions;
-  const { walletRestore: walletData, profile: profileData, wallets } = stores;
+  const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
+  const { walletRestore, profile, router, wallets: walletsActions } = actions;
+  const {
+    walletRestore: walletData,
+    profile: profileData,
+    wallets,
+    walletSettings,
+    transactions,
+  } = stores;
 
   const [currentStep, setCurrentStep] = useState(getFirstRestorationStep());
-
-  const { recoveryPhrase, setRestoreWalletData } = useRestoreWallet();
+  const { recoveryPhrase, setRestoreWalletData, resetRestoreWalletData } = useRestoreWallet();
+  // const { plates } = useDuplicatedWallet();
 
   const manageDialogsProps = {
     isDialogOpen,
@@ -74,8 +105,25 @@ function RestoreWalletPage(props: Props & Intl): Node {
     },
   };
 
+  const recoveryPhraseStepProps = {
+    setCurrentStep,
+    walletRestore,
+    walletSettings,
+    transactions,
+    wallets,
+    walletData,
+    isDialogOpen,
+    openDialog,
+    closeDialog,
+    initialRecoveryPhrase: recoveryPhrase,
+  };
+
+  function handleGoToRoute(route) {
+    router.goToRoute.trigger(route);
+  }
+
   function goToAddWalletScreen() {
-    router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    handleGoToRoute({ route: ROUTES.WALLETS.ADD });
   }
 
   const steps = {
@@ -98,14 +146,17 @@ function RestoreWalletPage(props: Props & Intl): Node {
       component: (
         <SelectWalletTypeStep
           onNext={mode => {
-            if (environment.isProduction())
+            resetRestoreWalletData();
+
+            if (!environment.isDev() && !environment.isNightly())
               profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
 
             walletRestore.setMode.trigger(mode);
             setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
           }}
           goBack={() => {
-            if (environment.isProduction()) goToAddWalletScreen();
+            resetRestoreWalletData();
+            if (!environment.isDev() && !environment.isNightly()) goToAddWalletScreen();
             else setCurrentStep(RESTORE_WALLET_STEPS.SELECT_NETWORK);
           }}
         />
@@ -116,26 +167,26 @@ function RestoreWalletPage(props: Props & Intl): Node {
       message: messages.secondStep,
       component: (
         <EnterRecoveryPhraseStep
-          setCurrentStep={setCurrentStep}
-          walletRestore={walletRestore}
-          walletData={walletData}
+          {...recoveryPhraseStepProps}
           checkValidPhrase={phrase =>
-            walletData.isValidMnemonic({ mnemonic: phrase, mode: walletData.getMode() })
+            walletData.isValidMnemonic({ mnemonic: phrase, mode: walletData.mode })
           }
+          openDuplicatedWallet={duplicatedWallet => {
+            resetRestoreWalletData();
+            walletsActions.setActiveWallet.trigger({ wallet: duplicatedWallet });
+            handleGoToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
+          }}
           onSubmit={async recoveryPhrase => {
             const importedWallets = wallets.publicDerivers;
             const accountIndex = walletData.selectedAccount;
-            console.log('🚀 > recoveryPhrase:', recoveryPhrase);
 
             const duplicatedWallet = await isWalletExist(
               importedWallets,
-              walletData.getMode().type,
+              walletData.mode.type,
               recoveryPhrase,
               accountIndex,
               profileData.selectedNetwork
             );
-
-            console.log('🚀 > duplicatedWallet:', duplicatedWallet);
 
             setRestoreWalletData({ isDuplicated: Boolean(duplicatedWallet), recoveryPhrase });
 
@@ -158,13 +209,17 @@ function RestoreWalletPage(props: Props & Intl): Node {
             if (!profileData.selectedNetwork)
               throw new Error('Network must be selected to create a wallet. Should never happen');
 
-            createWallet({ walletName, walletPassword, recoveryPhrase: recoveryPhrase.split(' ') });
+            restoreWallet({ walletName, walletPassword, recoveryPhrase });
           }}
           {...manageDialogsProps}
         />
       ),
     },
   };
+
+  const stepperSteps = Object.keys(steps)
+    .map(key => ({ stepId: steps[key].stepId, message: steps[key].message }))
+    .filter(step => step.stepId !== RESTORE_WALLET_STEPS.SELECT_NETWORK);
 
   const CurrentStep = steps[currentStep].component;
 
@@ -185,11 +240,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
         </Box>
         <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
       </Box>
-      <Stepper
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        steps={Object.values(steps).slice(1)}
-      />
+      <Stepper currentStep={currentStep} setCurrentStep={setCurrentStep} steps={stepperSteps} />
       {CurrentStep}
     </Box>
   );

@@ -29,11 +29,7 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-type StepProps = {|
-  stepId: string,
-  message: any,
-  component?: Node | null,
-|};
+type StepProps = {| stepId: string, message: any |};
 
 type Props = {|
   steps: Array<StepProps>,

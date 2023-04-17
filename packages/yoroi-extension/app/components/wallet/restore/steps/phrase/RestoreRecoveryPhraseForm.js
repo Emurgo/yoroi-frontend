@@ -58,6 +58,7 @@ type Props = {|
   ) => boolean,
   +numberOfMnemonics: any | 12 | 15 | 21 | 24 | 27,
   +error?: ?LocalizableError,
+  +initialRecoveryPhrase?: string,
 |};
 
 type State = {|
@@ -79,7 +80,9 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
   };
 
   getInitRecoveryPhrase: void => Array<string> = () => {
-    return new Array(this.props.numberOfMnemonics).fill('');
+    return this.props.initialRecoveryPhrase
+      ? this.props.initialRecoveryPhrase.split(' ')
+      : new Array(this.props.numberOfMnemonics).fill('');
   };
 
   inputRefs: Array<any> = [];

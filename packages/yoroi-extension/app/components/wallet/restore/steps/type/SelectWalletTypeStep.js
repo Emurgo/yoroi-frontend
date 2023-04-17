@@ -39,7 +39,7 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
         <Box className={styles.container}>
           <AddWalletCard
-            onClick={() => onNext({ type: 'bip44', extra: undefined, length: 15 })}
+            onClick={() => onNext({ type: 'cip1852', extra: undefined, length: 15 })}
             imageSx={{ pt: '10px' }}
             imageSrc={fifteenImg}
             label={intl.formatMessage(messages.fifteenWords)}
