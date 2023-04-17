@@ -970,6 +970,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.loading',
     defaultMessage: '!!!Loading...',
   },
+  confirmOnLedger: {
+    id: 'label.confirm.ledger',
+    defaultMessage: '!!!Confirm on Ledger',
+  },
+  confirmOnTrezor: {
+    id: 'label.confirm.trezor',
+    defaultMessage: '!!!Confirm on Trezor',
+  },
 });
 export default globalMessages;
 
@@ -1027,6 +1035,58 @@ export const connectorMessages: * = defineMessages({
   connector: {
     id: 'connector.appNameShort',
     defaultMessage: '!!!Connector',
+  },
+  yourAddresses: {
+    id: 'connector.yourAddresses',
+    defaultMessage: '!!!Your Addresses',
+  },
+  foreignAddresses: {
+    id: 'connector.foreignAddresses',
+    defaultMessage: '!!!Foreign Addresses',
+  },
+  fromWallet: {
+    id: 'connector.fromWallet',
+    defaultMessage: '!!!From wallet',
+  },
+  fromAddresses: {
+    id: 'connector.from',
+    defaultMessage: '!!!From (Inputs): {qty}',
+  },
+  toAddresses: {
+    id: 'connector.to',
+    defaultMessage: '!!!To (Outputs): {qty}',
+  },
+  send: {
+    id: 'wallet.navigation.send',
+    defaultMessage: '!!!Send',
+  },
+  receive: {
+    id: 'wallet.navigation.receive',
+    defaultMessage: '!!!Receive',
+  },
+  assetsSent: {
+    id: 'connector.assetsSent',
+    defaultMessage: '!!!{quantity} assets sent',
+  },
+  assetsReceived: {
+    id: 'connector.assetsReceived',
+    defaultMessage: '!!!{quantity} assets received',
+  },
+  assetSent: {
+    id: 'connector.assetSent',
+    defaultMessage: '!!!{assetName} sent',
+  },
+  assetReceived: {
+    id: 'connector.assetReceived',
+    defaultMessage: '!!!{assetName} received',
+  },
+  noAssetsSent: {
+    id: 'connector.noAssetsSent',
+    defaultMessage: '!!!No assets sent',
+  },
+  noAssetsReceived: {
+    id: 'connector.noAssetsReceived',
+    defaultMessage: '!!!No assets received',
   },
 });
 

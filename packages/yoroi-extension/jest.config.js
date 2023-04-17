@@ -14,7 +14,8 @@ module.exports = {
     '<rootDir>/node_modules/(?!@emurgo/ledger-connect-handler)'
   ],
   setupFiles: [
-    'jest-canvas-mock'
+    'jest-canvas-mock',
+    './jestSetup',
   ],
   // ignore manifest.test.js file, because it isn't a test
   testPathIgnorePatterns: ['manifest.test.js'],

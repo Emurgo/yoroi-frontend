@@ -36,9 +36,8 @@ type Intl = {|
 
 type Props = {|
   recoveryPhrase: Array<string> | null,
-  nextStep(): void,
-  prevStep(): void,
-  markRecoveryPhraseAsEntered?: () => void,
+  nextStep: () => void,
+  prevStep: () => void,
   isRecoveryPhraseEntered: boolean,
 |};
 
@@ -49,32 +48,31 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const [enteredRecoveryPhrase, setRecoveryPhrase] = useState(
     isRecoveryPhraseEntered ? recoveryPhrase : new Array(recoveryPhrase.length).fill(null)
   );
-  const [wrongWord, setWrongWord] = useState<string | null>(null);
+  const [wrongWordIdx, setWrongWordIdx] = useState<number | null>(null);
+  const [addedWordsIndxes, setAddedWordsIndexes] = useState(new Set());
   const [fadeOutWordIdx, setFadeOutWordIdx] = useState<number>(-1); // Recovery phrase word index
 
   function onAddWord(word: string, idx: number): void {
-    if (isWordAdded(word)) return;
+    if (addedWordsIndxes.has(idx)) return;
 
     const nextWordIdx = enteredRecoveryPhrase.findIndex(w => w === null);
     if (nextWordIdx === -1) throw new Error('Entered recovery phrase words list is full');
 
     const isInCorrectOrder = recoveryPhrase[nextWordIdx] === word;
-    if (!isInCorrectOrder) {
-      return setWrongWord(word);
-    }
+    if (!isInCorrectOrder) return setWrongWordIdx(idx);
 
     setRecoveryPhrase(prev => {
       const copy = [...prev];
-      copy[idx] = word;
+      copy[nextWordIdx] = word;
       return copy;
     });
-    setWrongWord(null);
+    setWrongWordIdx(null);
     setFadeOutWordIdx(idx);
-  }
 
-  // Todo: handle the case if the recovery phrase has 2+ similar words.
-  function isWordAdded(word: string): boolean {
-    return enteredRecoveryPhrase.some(w => w === word);
+    // Mark word as added
+    const addedWords = new Set(addedWordsIndxes);
+    addedWords.add(idx);
+    setAddedWordsIndexes(addedWords);
   }
 
   const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);
@@ -148,7 +146,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     variant="body1"
                     color="primary.200"
                   >
-                    <Typography variant="body1" color="primary.200" width="20px">
+                    {/* Todo: update hex color to come from the theme */}
+                    <Typography variant="body1" color="#7892E8" width="20px">
                       {idx + 1}.
                     </Typography>
                     {word &&
@@ -173,16 +172,20 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           justifyContent="center"
           gap="8px"
         >
-          {sortedRecoveryPhrase.map(({ word, id, originalIdx }) => {
+          {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
+            const isAdded = addedWordsIndxes.has(idx);
             const button = (
-              <button
-                type="button"
-                key={id}
+              <Box
+                component="button"
+                key={internalWordId}
                 className={classnames(styles.wordChip, {
-                  [styles.wordAdded]: isWordAdded(word),
-                  [styles.wrongWord]: wrongWord === word,
+                  [styles.wordAdded]: isAdded,
+                  [styles.wrongWord]: wrongWordIdx === idx,
                 })}
-                onClick={() => onAddWord(word, originalIdx)}
+                onClick={() => onAddWord(word, idx)}
+                sx={{
+                  width: '123px',
+                }}
               >
                 <Typography
                   sx={{
@@ -194,13 +197,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     zIndex: 10,
                   }}
                   variant="body1"
-                  color="primary.200"
+                  color={isAdded ? '#7892E8' : 'primary.200'} // Todo: update the color to come from the theme
                 >
                   {word}
                 </Typography>
-              </button>
+              </Box>
             );
-            return fadeOutWordIdx === originalIdx ? (
+            return fadeOutWordIdx === idx ? (
               <Fade in timeout={500}>
                 {button}
               </Fade>
@@ -211,20 +214,20 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         </Stack>
 
         <Box height="28px" mt="16px">
-          {wrongWord !== null && (
+          {wrongWordIdx !== null && (
             <Typography variant="body2" color="error.100">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
           )}
 
-          {isValidPhrase && (
+          <Fade in={isValidPhrase}>
             <Stack gap="10px" direction="row">
               <VerifiedIcon />
               <Typography variant="body1" fontWeight={500}>
                 {intl.formatMessage(messages.verified)}
               </Typography>
             </Stack>
-          )}
+          </Fade>
         </Box>
 
         <Box mt="10px">
@@ -251,9 +254,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             onClick={() => {
               if (!recoveryPhrase) return;
               setRecoveryPhrase(recoveryPhrase);
-              setWrongWord(null);
+              setWrongWordIdx(null);
+              setAddedWordsIndexes(new Set(recoveryPhrase.map((_, idx) => idx)));
             }}
-            onDoubleClick={() => setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null))}
+            onDoubleClick={() => {
+              setRecoveryPhrase(new Array(recoveryPhrase.length).fill(null));
+              setAddedWordsIndexes(new Set());
+            }}
           >
             Auto Enter
           </Button>

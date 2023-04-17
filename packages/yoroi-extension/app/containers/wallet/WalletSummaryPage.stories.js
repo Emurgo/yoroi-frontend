@@ -435,6 +435,7 @@ export const Transaction = (): Node => {
       to: [
         {
           address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+          isForeign: false,
           value: new MultiToken(
             [{
               identifier: primaryAssetConstant.Identifier,
@@ -446,6 +447,7 @@ export const Transaction = (): Node => {
         },
         {
           address: 'DdzFFzCqrhseVmPAqenKdENxL5Fp7DW82CF6wk8SnWoCiUDFfVfqD6cHFCFgv1ySmFhpPod3hYqzuRFs48BbT6QR9rk9bYMdgodBXFny',
+          isForeign: false,
           value: new MultiToken(
             [{
               identifier: primaryAssetConstant.Identifier,
@@ -573,6 +575,7 @@ export const TransactionWithMemo = (): Node => {
       }],
       to: [{
         address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        isForeign: false,
         value: new MultiToken(
           [{
             identifier: primaryAssetConstant.Identifier,
@@ -686,6 +689,7 @@ export const MemoDialog = (): Node => {
       }],
       to: [{
         address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        isForeign: false,
         value: new MultiToken(
           [{
             identifier: primaryAssetConstant.Identifier,
@@ -848,6 +852,7 @@ export const ManyTransactions = (): Node => {
         }],
         to: [{
           address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+          isForeign: false,
           value: new MultiToken(
             [{
               identifier: primaryAssetConstant.Identifier,
@@ -946,6 +951,7 @@ export const TxHistoryExport = (): Node => {
       }],
       to: [{
         address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        isForeign: false,
         value: new MultiToken(
           [{
             identifier: primaryAssetConstant.Identifier,

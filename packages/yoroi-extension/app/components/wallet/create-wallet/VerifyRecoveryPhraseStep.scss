@@ -24,7 +24,6 @@
     height: 40px;
     cursor: pointer;
 
-    border: double 2px var(--yoroi-palette-gray-50);
     background-image: linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%),
       linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%);
     background-origin: border-box;
@@ -40,7 +39,7 @@
       background: linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%);
       border-radius: 8px;
       z-index: 1;
-      transition: opacity 300ms linear;
+      transition: opacity 200ms linear;
       opacity: 0;
     }
 

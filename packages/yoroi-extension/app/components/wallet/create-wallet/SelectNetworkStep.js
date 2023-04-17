@@ -27,8 +27,8 @@ type Intl = {|
 |};
 
 type Props = {|
-  onSelect(network: $ReadOnly<NetworkRow>): void,
-  goBack(): void,
+  onSelect: (network: $ReadOnly<NetworkRow>) => void,
+  goBack: () => void,
 |};
 
 function SelectNetworkStep(props: Props & Intl): Node {

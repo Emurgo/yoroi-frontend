@@ -114,12 +114,13 @@ function CreateWalletPage(props: Props): Node {
     ),
     [CREATE_WALLET_SETPS.ADD_WALLET_DETAILS]: (
       <AddWalletDetailsStep
+        isRecoveryPhraseEntered={isRecoveryPhraseEntered}
         recoveryPhrase={recoveryPhrase}
         selectedNetwork={selectedNetwork}
         prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE)}
         onSubmit={(walletName: string, walletPassword: string) => {
           if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
-          if (environment.isProduction()) {
+          if (!environment.isDev() && !environment.isNightly()) {
             setSelectedNetwork(networks.CardanoMainnet);
           }
 

@@ -1,12 +1,14 @@
 .component {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  flex-direction: row-reverse;
 
   .copyIconBig {
     cursor: pointer;
     object-fit: contain;
     display: inline-flex;
-    margin-left: 2px;
+    margin-right: 2px;
     width: 32px;
     height: 32px;
     border-radius: 50%;

@@ -85,7 +85,7 @@ Feature: dApp connector errors checking
     Then I request unused addresses
     Then I request signing the data:
     | payload   |
-    | sign data anonymous wallet |
+    | sign data authorized wallet |
     Then I should see the connector popup for signing data
     Then I cancel signing the transaction
     And The user reject for signing data is received
@@ -102,7 +102,7 @@ Feature: dApp connector errors checking
     Then I request used addresses
     Then I request signing the data:
     | payload   |
-    | sign data anonymous wallet |
+    | sign data authorized wallet |
     Then I should see the connector popup for signing data
     Then I cancel signing the transaction
     And The user reject for signing data is received

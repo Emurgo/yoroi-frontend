@@ -36,11 +36,11 @@ const messages: * = defineMessages({
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
-    defaultMessage: '!!!Enter wallet name',
+    defaultMessage: '!!!Wallet name',
   },
   enterPassword: {
     id: 'wallet.create.forthStep.enterPasswordInputLabel',
-    defaultMessage: '!!!Enter password',
+    defaultMessage: '!!!Password',
   },
   passwordHint: {
     id: 'wallet.create.forthStep.passwordHint',
@@ -54,7 +54,7 @@ const messages: * = defineMessages({
 });
 
 type Props = {|
-  prevStep(): void,
+  prevStep: () => void,
   recoveryPhrase: Array<string> | null,
   selectedNetwork: $ReadOnly<NetworkRow>,
   isRecovery?: boolean,
@@ -149,6 +149,11 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
     const repeatedPasswordField = form.$('repeatPassword');
 
+    const isValidFields =
+      isValidWalletName(walletName) &&
+      isValidWalletPassword(walletPassword) &&
+      isValidRepeatPassword(walletPassword, repeatPassword);
+
     if (!recoveryPhrase)
       throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
 
@@ -224,9 +229,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
                 label: intl.formatMessage(
                   Boolean(isRecovery) ? globalMessages.restore : globalMessages.create
                 ),
-                disabled: [walletNameField, walletPasswordField, repeatedPasswordField].some(
-                  field => !field.isValid
-                ),
+                disabled: !isValidFields,
                 onClick: () => {
                   this.props.onSubmit(walletName, walletPassword);
                 },

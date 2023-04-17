@@ -51,10 +51,7 @@ class StakingPage extends Component<Props> {
         showAsCard
       >
         <Suspense fallback={null}>
-          <StakingPageContent
-            stores={this.props.stores}
-            actions={this.props.actions}
-          />
+          <StakingPageContent stores={this.props.stores} actions={this.props.actions} />
         </Suspense>
       </TopBarLayout>
     );
