@@ -109,7 +109,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <NavBarRevamp
           title={this.props.title}
           menu={this.props.menu}
-          walletDetails={<DropdownHead />}
+          walletDetails={walletsStore.selected !== null ? <DropdownHead /> : null}
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() =>
