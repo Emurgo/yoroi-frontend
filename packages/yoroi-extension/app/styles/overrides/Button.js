@@ -275,9 +275,9 @@ function makeContainedBtnStyles(color: 'primary' | 'secondary'): Object {
 function makeOutlinedBtnStyles(color: 'primary' | 'secondary'): Object {
   return {
     backgroundColor: 'transparent',
-    color: revampBaseTheme.palette[color][600],
+    color: revampBaseTheme.palette[color][500],
     border: '2px solid',
-    borderColor: revampBaseTheme.palette[color][600],
+    borderColor: revampBaseTheme.palette[color][500],
     ':hover': {
       border: '2px solid',
       color: revampBaseTheme.palette[color][600],
