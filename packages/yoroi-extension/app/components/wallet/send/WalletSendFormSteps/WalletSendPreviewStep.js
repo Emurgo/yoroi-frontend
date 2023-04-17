@@ -484,7 +484,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           size="large"
           onClick={this.submit.bind(this)}
           disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}

@@ -485,7 +485,7 @@ export default class WalletSendForm extends Component<Props, State> {
             />
             <Button
               variant="contained"
-              color="secondary"
+              color="primary"
               size="large"
               onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
               disabled={invalidMemo || !receiverField.isValid}
@@ -562,6 +562,9 @@ export default class WalletSendForm extends Component<Props, State> {
                 {!isErgo(this.props.selectedNetwork) && (
                   <Button
                     variant="ternary"
+                    sx={{
+                      width: '51px',
+                    }}
                     disabled={maxSendableAmount.isExecuting}
                     className={classnames([
                       styles.maxBtn,
@@ -631,7 +634,7 @@ export default class WalletSendForm extends Component<Props, State> {
             <Box sx={{ marginTop: '60px' }}>
               <Button
                 variant="contained"
-                color="secondary"
+                color="primary"
                 size="large"
                 onClick={() => {
                   this.props.onSubmit();
@@ -664,7 +667,6 @@ export default class WalletSendForm extends Component<Props, State> {
         <div className={styles.component}>
           <div className={styles.wrapper}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
-
             <div className={styles.formBody}>{this.renderCurrentStep(currentStep)}</div>
           </div>
         </div>
