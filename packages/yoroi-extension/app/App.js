@@ -68,14 +68,14 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
-  @observable mergedMessages: null | {| [key: string]: string, |} = null;
+  @observable mergedMessages: null | {| [key: string]: string |} = null;
 
   componentDidMount: () => void = () => {
     autorun(async () => {
       const locale = this.props.stores.profile.currentLocale;
       const _mergedMessages = {
-        ...await translations['en-US'],
-        ...await translations[locale]
+        ...(await translations['en-US']),
+        ...(await translations[locale]),
       };
       runInAction(() => {
         this.mergedMessages = _mergedMessages;
@@ -84,7 +84,7 @@ class App extends Component<Props, State> {
     this.props.history.listen(({ pathname }) => {
       trackNavigation(pathname);
     });
-  }
+  };
 
   state: State = {
     crashed: false,
