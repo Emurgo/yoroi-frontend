@@ -184,7 +184,7 @@ function getBtnVariant(
   isRevampLayout: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
-  color?: 'primary' | 'secondary',
+  color?: 'primary' | 'secondary' | 'error',
 |} {
   if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
 

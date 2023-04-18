@@ -9,8 +9,8 @@ import { urlResolveIpfs } from '../../../../coreUtils';
 type Props = {|
   name: string,
   image: string | null,
-  width: number,
-  height: number,
+  width: number | string,
+  height: number | string,
 |};
 
 type State = {|

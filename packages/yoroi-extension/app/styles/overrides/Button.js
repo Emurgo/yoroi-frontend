@@ -1,7 +1,7 @@
 // @flow
 import { revampBaseTheme } from '../themes/revamp-base-theme';
 
-const ClassicButton = {
+const ClassicButton: any = {
   styleOverrides: {
     root: {
       fontSize: '0.875rem',
@@ -81,7 +81,7 @@ const ClassicButton = {
   ],
 };
 
-const ModernButton = {
+const ModernButton: any = {
   styleOverrides: {
     root: {
       fontSize: '1rem',
@@ -301,7 +301,7 @@ function makeOutlinedBtnStyles(color: 'primary' | 'secondary'): Object {
 }
 
 // Button in Figam: https://bit.ly/3Ky4uvo
-const RevampButton = {
+const RevampButton: any = {
   styleOverrides: {
     root: {
       fontSize: '1rem',

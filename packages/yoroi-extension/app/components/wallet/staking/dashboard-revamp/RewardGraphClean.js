@@ -49,7 +49,7 @@ export default class RewardGraphClean extends Component<Props> {
         const values = [
           [epochTitle, label],
           [primaryBarLabel, payload[0].value],
-          poolName ? [stakepoolNameTitle, poolName] : null,
+          poolName ? [stakepoolNameTitle, poolName] : [],
         ];
         return (
           <Box
@@ -62,7 +62,7 @@ export default class RewardGraphClean extends Component<Props> {
             }}
           >
             {values
-              .filter(value => value !== null)
+              .filter(value => value !== null && value.length > 0)
               .map(([key, value], idx) => (
                 <Stack direction="row" mb="2px">
                   <Typography width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
