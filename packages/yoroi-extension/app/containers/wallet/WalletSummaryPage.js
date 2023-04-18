@@ -10,7 +10,7 @@ import NotificationMessage from '../../components/widgets/NotificationMessage';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
-import { ReactComponent as successIcon }  from '../../assets/images/success-small.inline.svg';
+import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
@@ -365,8 +365,14 @@ class WalletSummaryPage extends Component<AllProps> {
         </NotificationMessage>
         {!recentTransactionsRequest.wasExecuted || hasAny ? null : (
           <WalletEmptyBanner
-            isOpen={this.generated.stores.transactions.showWalletEmptyBanner}
-            onClose={this.generated.actions.transactions.closeWalletEmptyBanner.trigger}
+            goToSendPage={() =>
+              this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND })
+            }
+            goToReceivePage={() => {
+              this.generated.actions.router.goToRoute.trigger({
+                route: ROUTES.WALLETS.RECEIVE.ROOT,
+              });
+            }}
             onBuySellClick={() =>
               this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
             }
@@ -576,9 +582,6 @@ class WalletSummaryPage extends Component<AllProps> {
         |},
       |},
       transactions: {|
-        closeWalletEmptyBanner: {|
-          trigger: (params: void) => void,
-        |},
         closeExportTransactionDialog: {|
           trigger: (params: void) => void,
         |},
@@ -621,7 +624,6 @@ class WalletSummaryPage extends Component<AllProps> {
       |},
       transactions: {|
         exportError: ?LocalizableError,
-        showWalletEmptyBanner: boolean,
         hasAny: boolean,
         isExporting: boolean,
         shouldIncludeTxIds: boolean,
@@ -698,7 +700,6 @@ class WalletSummaryPage extends Component<AllProps> {
           txMemoMap: stores.memos.txMemoMap,
         },
         transactions: {
-          showWalletEmptyBanner: stores.transactions.showWalletEmptyBanner,
           hasAny: stores.transactions.hasAny,
           totalAvailable: stores.transactions.totalAvailable,
           recent: stores.transactions.recent,
@@ -751,9 +752,6 @@ class WalletSummaryPage extends Component<AllProps> {
           selectTransaction: { trigger: actions.memos.selectTransaction.trigger },
         },
         transactions: {
-          closeWalletEmptyBanner: {
-            trigger: actions.transactions.closeWalletEmptyBanner.trigger,
-          },
           exportTransactionsToFile: {
             trigger: actions.transactions.exportTransactionsToFile.trigger,
           },

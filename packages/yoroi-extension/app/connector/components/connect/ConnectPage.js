@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable no-nested-ternary */
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -33,6 +33,7 @@ import { ReactComponent as NoWalletImage } from '../../assets/images/no-websites
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   subtitle: {
@@ -106,8 +107,10 @@ type Props = {|
   +isSelectWalletHardware: boolean,
 |};
 
+type InjectedProps = {| +isRevampLayout: boolean |};
+
 @observer
-class ConnectPage extends Component<Props> {
+class ConnectPage extends Component<Props & InjectedProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -196,6 +199,7 @@ class ConnectPage extends Component<Props> {
       isAppAuth,
       onUpdateHideBalance,
       isSelectWalletHardware,
+      isRevampLayout,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -246,7 +250,7 @@ class ConnectPage extends Component<Props> {
         <Stack direction="row" spacing={4} mt="15px">
           <Button
             fullWidth
-            variant="secondary"
+            variant={isRevampLayout ? 'outlined' : 'secondary'}
             onClick={this.hidePasswordForm}
             sx={{ minWidth: 'auto' }}
           >
@@ -254,7 +258,7 @@ class ConnectPage extends Component<Props> {
           </Button>
           {!isSelectWalletHardware && (
             <Button
-              variant="primary"
+              variant={isRevampLayout ? 'contained' : 'primary'}
               sx={{ minWidth: 'auto' }}
               fullWidth
               disabled={!walletPasswordField.isValid}
@@ -355,7 +359,7 @@ class ConnectPage extends Component<Props> {
   }
 }
 
-export default ConnectPage;
+export default (withLayout(ConnectPage): ComponentType<Props>);
 
 const WalletButton = styled('button')({
   cursor: 'pointer',

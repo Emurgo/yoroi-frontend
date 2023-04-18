@@ -11,8 +11,8 @@ import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg'
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import MuiAccordion  from '@mui/material/Accordion';
-import MuiAccordionSummary  from '@mui/material/AccordionSummary';
+import MuiAccordion from '@mui/material/Accordion';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import type { GraphData } from '../dashboard/StakingDashboard';
 

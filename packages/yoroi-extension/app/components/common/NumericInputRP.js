@@ -13,7 +13,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
-import styles from './AmountInput.scss'
+import styles from './AmountInput.scss';
 
 type NumericInputValue = null | number | string | BigNumber;
 

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { Button } from '@mui/material';
@@ -8,6 +8,7 @@ import type { SelectedExternalStorageProvider } from '../../../domain/ExternalSt
 import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   sectionTitle: {
@@ -20,25 +21,27 @@ const messages = defineMessages({
   },
   sectionIntro: {
     id: 'settings.externalStorage.intro',
-    defaultMessage: '!!!Select an external storage service to connect your account and save your memo notes.'
+    defaultMessage:
+      '!!!Select an external storage service to connect your account and save your memo notes.',
   },
   buttonDisconnect: {
     id: 'settings.externalStorage.button.disconnect',
     defaultMessage: '!!!Disconnect',
-  }
+  },
 });
 
 type Props = {|
   onConnect: string => void,
   onDisconnect: void => Promise<void>,
-  externalStorageProviders: { [key: string] : ProvidersType, ... },
+  externalStorageProviders: { [key: string]: ProvidersType, ... },
   selectedExternalStorage: ?SelectedExternalStorageProvider,
 |};
 
-@observer
-export default class ExternalStorageSettings extends Component<Props> {
+type InjectedProps = {| +isRevampLayout: boolean |};
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+@observer
+class ExternalStorageSettings extends Component<Props & InjectedProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -50,22 +53,19 @@ export default class ExternalStorageSettings extends Component<Props> {
       selectedExternalStorage,
     } = this.props;
     const { intl } = this.context;
+    const { isRevampLayout } = this.props;
 
     const providersButtons = [];
     for (const provider of Object.keys(externalStorageProviders)) {
       const authorizeUrl = externalStorageProviders[provider].authorizeUrl;
-      const showDisconnect = (
-        selectedExternalStorage
-        && selectedExternalStorage.provider === provider
-      );
-      const disabledCondition = (
-        selectedExternalStorage
-        && selectedExternalStorage.provider !== provider
-      );
+      const showDisconnect =
+        selectedExternalStorage && selectedExternalStorage.provider === provider;
+      const disabledCondition =
+        selectedExternalStorage && selectedExternalStorage.provider !== provider;
       providersButtons.push(
         <Button
           key={provider}
-          variant="primary"
+          variant={isRevampLayout ? 'contained' : 'primary'}
           onClick={() => (showDisconnect === true ? onDisconnect() : onConnect(authorizeUrl))}
           disabled={disabledCondition}
           sx={{
@@ -89,5 +89,6 @@ export default class ExternalStorageSettings extends Component<Props> {
       </div>
     );
   }
-
 }
+
+export default (withLayout(ExternalStorageSettings): ComponentType<Props>);

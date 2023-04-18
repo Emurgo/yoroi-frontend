@@ -309,7 +309,7 @@ class SignTxPage extends Component<Props, State> {
                   justifyContent="space-between"
                   alignItems="center"
                   borderRadius="6px"
-                  backgroundColor="var(--yoroi-palette-primary-300)"
+                  backgroundColor="primary.600"
                   color="var(--yoroi-palette-common-white)"
                 >
                   <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>

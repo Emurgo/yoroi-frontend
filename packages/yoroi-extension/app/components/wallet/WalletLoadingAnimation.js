@@ -42,7 +42,7 @@ function WalletLoadingAnimation(props: Props & Intl): Node {
       <Typography
         variant="h1"
         mt="25px"
-        color="primary.200"
+        color="primary.600"
         sx={{
           display: 'flex',
           alignItems: 'flex-end',

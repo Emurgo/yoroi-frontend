@@ -28,21 +28,13 @@ function StepController(props: Props): Node {
         const isPrimary = type === 'primary';
         return (
           <Button
-            variant={isPrimary ? 'rv-primary' : 'outlined'}
+            variant={isPrimary ? 'contained' : 'outlined'}
+            color="primary"
             disableRipple={false}
             onClick={onClick}
             disabled={disabled}
             sx={{
               width: '144px',
-              height: '40px',
-              minWidth: 'unset',
-              minHeight: 'unset',
-              fontSize: '14px',
-              lineHeight: '15px',
-              borderWidth: isPrimary ? 'inherit' : '2px',
-              ':hover': {
-                borderWidth: isPrimary ? 'inherit' : '2px',
-              },
             }}
           >
             {label}

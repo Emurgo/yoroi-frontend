@@ -28,6 +28,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        bgcolor="common.white"
       >
         <Suspense fallback={null}>
           <CreateWalletPage
