@@ -676,11 +676,16 @@ export function toTrezorSignRequest(
   if (requiredSigners) {
     for (let i = 0; i < requiredSigners.len(); i++) {
       const hash = requiredSigners.get(i);
-      const address = RustModule.WalletV4.EnterpriseAddress.new(
+      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
         RustModule.WalletV4.StakeCredential.from_keyhash(hash),
       ).to_address().to_hex();
-      const ownAddressPath = ownUtxoAddressMap[address];
+      const stakeAddress = RustModule.WalletV4.RewardAddress.new(
+        networkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+      ).to_address().to_hex();
+      const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
+        ownStakeAddressMap[stakeAddress];
       if (ownAddressPath) {
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
