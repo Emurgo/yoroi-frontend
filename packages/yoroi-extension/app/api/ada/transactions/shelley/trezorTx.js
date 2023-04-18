@@ -832,6 +832,7 @@ export function toTrezorSignRequest(
   }
   if (formattedCollateral) {
     result.collateralInputs = formattedCollateral;
+    result.signingMode = CardanoTxSigningMode.PLUTUS_TRANSACTION;
   }
   if (requiredSigners) {
     result.requiredSigners = formattedRequiredSigners;
