@@ -50,6 +50,7 @@ import {
   loadCatalystRoundInfo,
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums.js';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -275,6 +276,11 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const nonce = timeToSlot({ time: new Date() }).slot;
 
+    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
+      publicDeriver,
+      type: CoreAddressTypes.CARDANO_BASE,
+    });
+
     let votingRegTxPromise;
 
     if (
@@ -361,15 +367,10 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         password: spendingPassword,
       });
 
-      const rewardAddress = RustModule.WalletV4.RewardAddress.new(
-        Number.parseInt(config.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash()),
-      );
-
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
-        receiverAddress: Buffer.from(rewardAddress.to_address().to_bytes()),
+        receiverAddress: allAddresses[0].address,
         slotNumber: nonce,
       });
 
