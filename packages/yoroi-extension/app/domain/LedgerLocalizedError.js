@@ -39,6 +39,10 @@ export const ledgerErrors: * = defineMessages({
     id: 'wallet.hw.ledger.app.not.running',
     defaultMessage: '!!!The Cardano App is not running on your Ledger',
   },
+  cip36NotSupported: {
+    id: 'wallet.hw.ledger.catalyst.cip36.unsupported',
+    defaultMessage: '!!!Catalyst registration requires Ledger app version 6.',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -107,6 +111,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'DeviceStatusError: General error 0x6e01. Please consult https://github.com/cardano-foundation/ledger-app-cardano/blob/master/src/errors.h':
         localizableError = new LocalizableError(
           ledgerErrors.cardanoAppNotRunning
+        );
+        break;
+      case 'DeviceVersionUnsupported: CIP36 registration not supported by Ledger app version 5.0.0.':
+        localizableError = new LocalizableError(
+          ledgerErrors.cip36NotSupported
         );
         break;
       default:

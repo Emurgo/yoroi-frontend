@@ -112,7 +112,13 @@ import type {
   CardanoUtxoScriptWitness,
   V4UnsignedTxAddressedUtxoResponse,
 } from './transactions/types';
-import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
+import {
+  HaskellShelleyTxSignRequest,
+} from './transactions/shelley/HaskellShelleyTxSignRequest';
+import type {
+  LedgerNanoCatalystRegistrationTxSignData,
+  TrezorTCatalystRegistrationTxSignData,
+} from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
@@ -414,22 +420,10 @@ export type CreateVotingRegTxRequest = {|
   |}
 |} | {|
   ...CreateVotingRegTxRequestCommon,
-  trezorTWallet: {|
-    votingPublicKey: string,
-    stakingKeyPath: Array<number>,
-    stakingKey: string,
-    rewardAddress: string,
-    nonce: number,
-  |}
+  trezorTWallet: TrezorTCatalystRegistrationTxSignData,
 |} | {|
   ...CreateVotingRegTxRequestCommon,
-  ledgerNanoWallet: {|
-    votingPublicKey: string,
-    stakingKeyPath: Array<number>,
-    stakingKey: string,
-    rewardAddress: string,
-    nonce: number,
-  |}
+  ledgerNanoWallet: LedgerNanoCatalystRegistrationTxSignData,
 |};
 
 
@@ -1782,7 +1776,7 @@ export default class AdaApi {
         trxMetadata = generateRegistrationMetadata(
           hwWallet.votingPublicKey,
           hwWallet.stakingKey,
-          hwWallet.rewardAddress,
+          hwWallet.paymentAddress,
           hwWallet.nonce,
           (_hashedMetadata) => {
             return '0'.repeat(64 * 2)
