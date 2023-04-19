@@ -1,10 +1,10 @@
 // @flow
-import { Component, } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as ExportTxToFileSvg }  from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
+import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
@@ -13,13 +13,9 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { formatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
@@ -62,30 +58,28 @@ type Props = {|
   +isLoadingTransactions: boolean,
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
 |};
 
 @observer
 export default class WalletSummary extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  renderAmountDisplay: {|
+  renderAmountDisplay: ({|
     shouldHideBalance: boolean,
-    amount: MultiToken
-  |} => Node = (request) => {
+    amount: MultiToken,
+  |}) => Node = request => {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
 
     let balanceDisplay;
     if (request.shouldHideBalance) {
-      balanceDisplay = (<span>{hiddenAmount}</span>);
+      balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
-      const shiftedAmount = defaultEntry.amount
-        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
       const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
         shiftedAmount,
         tokenInfo.Metadata.numberOfDecimals
@@ -99,12 +93,16 @@ export default class WalletSummary extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
-  }
+    return (
+      <>
+        {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
+      </>
+    );
+  };
 
   renderPendingAmount(
     timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>,
-    label: string,
+    label: string
   ): Node {
     if (!timestampedAmount.length) {
       return null;
@@ -141,11 +139,7 @@ export default class WalletSummary extends Component<Props> {
             throw new Error('unexpected main token type');
           }
 
-          const price = getHistoricalPrice(
-            ticker,
-            currency,
-            timestamp
-          );
+          const price = getHistoricalPrice(ticker, currency, timestamp);
           if (price == null) {
             totalFiatAmount = null;
             break;
@@ -162,11 +156,7 @@ export default class WalletSummary extends Component<Props> {
           pendingAmount = (
             <>
               {beforeDecimal}
-              {afterDecimal && (
-                <span className={styles.afterDecimal}>
-                  .{afterDecimal}
-                </span>
-              )}
+              {afterDecimal && <span className={styles.afterDecimal}>.{afterDecimal}</span>}
               &nbsp;
               {currency}
             </>
@@ -178,18 +168,16 @@ export default class WalletSummary extends Component<Props> {
     if (!pendingAmount) {
       pendingAmount = this.renderAmountDisplay({
         shouldHideBalance,
-        amount: timestampedAmount.map(({ amount }) => amount).reduce(
-          (accuAmount, curAmount) => accuAmount.joinAddCopy(curAmount)
-        ),
+        amount: timestampedAmount
+          .map(({ amount }) => amount)
+          .reduce((accuAmount, curAmount) => accuAmount.joinAddCopy(curAmount)),
       });
     }
 
     return (
       <div className={styles.pendingConfirmation}>
         {label}:&nbsp;
-        <span className={styles.amount}>
-          {pendingAmount}
-        </span>
+        <span className={styles.amount}>{pendingAmount}</span>
       </div>
     );
   }
@@ -204,7 +192,7 @@ export default class WalletSummary extends Component<Props> {
     const { intl } = this.context;
 
     const content = (
-      <div className={styles.content} id='walletSummary_box'>
+      <div className={styles.content} id="walletSummary_box">
         <div className={styles.leftBlock} />
         <div className={styles.middleBlock}>
           <BorderedBox>
@@ -263,10 +251,6 @@ export default class WalletSummary extends Component<Props> {
       </div>
     );
 
-    return (
-      <div className={styles.component}>
-        {content}
-      </div>
-    );
+    return <div className={styles.component}>{content}</div>;
   }
 }

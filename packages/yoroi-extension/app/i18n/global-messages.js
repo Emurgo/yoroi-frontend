@@ -8,9 +8,17 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
+  buy: {
+    id: 'global.buy',
+    defaultMessage: '!!!Buy',
+  },
+  receive: {
+    id: 'global.receive',
+    defaultMessage: '!!!Receive',
+  },
   yoroi: {
     id: 'global.yoroi',
-    defaultMessage: 'Yoroi',
+    defaultMessage: '!!!Yoroi',
   },
   here: {
     id: 'global.util.here',

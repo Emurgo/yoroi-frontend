@@ -9,20 +9,6 @@
   text-transform: uppercase;
   border-bottom: 3px solid transparent;
   width: initial;
-
-  &.active {
-    border-bottom-color: var(--yoroi-palette-secondary-300);
-    color: var(--yoroi-palette-secondary-300);
-    font-weight: 500;
-
-    &:hover {
-      border-bottom-color: var(--yoroi-palette-secondary-300);
-    }
-  }
-
-  & + .component {
-    margin-left: 43px;
-  }
 }
 
 .enabled {

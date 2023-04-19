@@ -32,7 +32,9 @@ function CreateWalletPageHeader(props: Props & Intl): Node {
       <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
         <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
       </Box>
-      <Typography variant="h3">{intl.formatMessage(messages.title)}</Typography>
+      <Typography variant="h3" fontWeight={500}>
+        {intl.formatMessage(messages.title)}
+      </Typography>
     </Box>
   );
 }
