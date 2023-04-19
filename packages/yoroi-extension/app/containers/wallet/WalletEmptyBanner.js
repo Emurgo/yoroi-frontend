@@ -29,12 +29,7 @@ const messages = defineMessages({
   },
 });
 
-function WalletEmptyBanner({
-  onBuySellClick,
-  intl,
-  goToSendPage,
-  goToReceivePage,
-}: Props & Intl): Node {
+function WalletEmptyBanner({ onBuySellClick, intl, goToReceivePage }: Props & Intl): Node {
   return (
     <Box
       sx={{
@@ -67,11 +62,6 @@ function WalletEmptyBanner({
         >
           <Typography variant="button2" fontWeight={500}>
             {intl.formatMessage(globalMessages.buy)}
-          </Typography>
-        </Button>
-        <Button variant="outlined" color="primary" sx={{ width: '100px' }} onClick={goToSendPage}>
-          <Typography variant="button2" fontWeight={500}>
-            {intl.formatMessage(globalMessages.sendButtonLabel)}
           </Typography>
         </Button>
         <Button

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -15,6 +15,9 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { Notification } from '../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { Box } from '@mui/material';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -23,7 +26,8 @@ const messages = defineMessages({
   },
   walletReceiveInstructions: {
     id: 'wallet.receive.page.walletReceiveInstructions',
-    defaultMessage: '!!!Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.',
+    defaultMessage:
+      '!!!Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.',
   },
   generateNewAddressButtonLabel: {
     id: 'wallet.receive.page.generateNewAddressButtonLabel',
@@ -44,31 +48,35 @@ type Props = {|
 |};
 
 @observer
-export default class StandardHeader extends Component<Props> {
-  static defaultProps: {|error: void|} = {
-    error: undefined
+class StandardHeader extends Component<Props & InjectedLayoutProps> {
+  static defaultProps: {| error: void |} = {
+    error: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   submit: void => Promise<void> = async () => {
     await this.props.onGenerateAddress();
-  }
+  };
 
   render(): Node {
     const {
       walletAddress,
-      isSubmitting, error, isWalletAddressUsed,
-      onCopyAddressTooltip, notification,
+      isSubmitting,
+      error,
+      isWalletAddressUsed,
+      onCopyAddressTooltip,
+      notification,
+      isRevampLayout,
     } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
 
     const generateAddressForm = (
       <LoadingButton
-        variant="primary"
+        variant={isRevampLayout ? 'contained' : 'primary'}
         loading={isSubmitting}
         className="generateAddressButton"
         onClick={this.submit}
@@ -78,51 +86,54 @@ export default class StandardHeader extends Component<Props> {
       </LoadingButton>
     );
 
-    const copyableHashClass = classnames([
-      styles.copyableHash,
-    ]);
+    const copyableHashClass = classnames([styles.copyableHash]);
 
     const walletHeader = (
       <div className={styles.qrCodeAndInstructions}>
         <div className={styles.instructions}>
-          <div className={styles.hashLabel}>
-            {intl.formatMessage(messages.walletAddressLabel)}
-          </div>
-          <CopyableAddress
-            darkVariant
-            hash={walletAddress}
-            elementId={mainAddressNotificationId}
-            onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
-            notification={notification}
-            placementTooltip="bottom-start"
+          <div className={styles.hashLabel}>{intl.formatMessage(messages.walletAddressLabel)}</div>
+          <Box
+            sx={{
+              '& > div': {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              },
+            }}
           >
-            <ExplorableHashContainer
-              selectedExplorer={this.props.selectedExplorer}
+            <CopyableAddress
+              darkVariant
               hash={walletAddress}
-              light={isWalletAddressUsed}
-              linkType="address"
+              elementId={mainAddressNotificationId}
+              onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
+              notification={notification}
+              placementTooltip="bottom-start"
             >
-              <RawHash light={isWalletAddressUsed}>
-                <span className={copyableHashClass}>
-                  {truncateAddress(walletAddress)}
-                </span>
-              </RawHash>
-            </ExplorableHashContainer>
-          </CopyableAddress>
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={walletAddress}
+                light={isWalletAddressUsed}
+                linkType="address"
+              >
+                <RawHash light={isWalletAddressUsed}>
+                  <span className={copyableHashClass}>{truncateAddress(walletAddress)}</span>
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
+          </Box>
           <div className={styles.postCopyMargin} />
           <div className={styles.instructionsText}>
             <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
           </div>
           {generateAddressForm}
-          {error
-            ? <p className={styles.error}>{intl.formatMessage(error)}</p>
-            : <p className={styles.error}>&nbsp;</p>}
+          {error ? (
+            <p className={styles.error}>{intl.formatMessage(error)}</p>
+          ) : (
+            <p className={styles.error}>&nbsp;</p>
+          )}
         </div>
         <div className={styles.qrCode}>
-          <QrCodeWrapper
-            value={walletAddress}
-            size={152}
-          />
+          <QrCodeWrapper value={walletAddress} size={152} />
         </div>
       </div>
     );
@@ -130,3 +141,5 @@ export default class StandardHeader extends Component<Props> {
     return walletHeader;
   }
 }
+
+export default (withLayout(StandardHeader): ComponentType<Props>);
