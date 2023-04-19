@@ -17,7 +17,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
-import { Box } from '@mui/material';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -92,35 +91,25 @@ class StandardHeader extends Component<Props & InjectedLayoutProps> {
       <div className={styles.qrCodeAndInstructions}>
         <div className={styles.instructions}>
           <div className={styles.hashLabel}>{intl.formatMessage(messages.walletAddressLabel)}</div>
-          <Box
-            sx={{
-              '& > div': {
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              },
-            }}
+          <CopyableAddress
+            darkVariant
+            hash={walletAddress}
+            elementId={mainAddressNotificationId}
+            onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
+            notification={notification}
+            placementTooltip="bottom-start"
           >
-            <CopyableAddress
-              darkVariant
+            <ExplorableHashContainer
+              selectedExplorer={this.props.selectedExplorer}
               hash={walletAddress}
-              elementId={mainAddressNotificationId}
-              onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
-              notification={notification}
-              placementTooltip="bottom-start"
+              light={isWalletAddressUsed}
+              linkType="address"
             >
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                hash={walletAddress}
-                light={isWalletAddressUsed}
-                linkType="address"
-              >
-                <RawHash light={isWalletAddressUsed}>
-                  <span className={copyableHashClass}>{truncateAddress(walletAddress)}</span>
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
-          </Box>
+              <RawHash light={isWalletAddressUsed}>
+                <span className={copyableHashClass}>{truncateAddress(walletAddress)}</span>
+              </RawHash>
+            </ExplorableHashContainer>
+          </CopyableAddress>
           <div className={styles.postCopyMargin} />
           <div className={styles.instructionsText}>
             <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
