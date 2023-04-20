@@ -106,6 +106,12 @@ class CardanoUtxoDetails extends Component<Props> {
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
+    if (request.address == null) return null;
+
+    const addressValue = request.address.value ?? request.address.values;
+
+    if (addressValue == undefined) return null;
+
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
     const divKey = identifier =>
       `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
@@ -122,12 +128,14 @@ class CardanoUtxoDetails extends Component<Props> {
       );
     };
 
-    const addressHash = this.props.addressToDisplayString(request.address.address);
+    const addressHash = request.address.address
+      ? this.props.addressToDisplayString(request.address.address)
+      : '';
 
     return (
       // eslint-disable-next-line react/no-array-index-key
       <Box
-        key={divKey(request.address.value.getDefaultEntry().identifier)}
+        key={divKey(addressValue.getDefaultEntry().identifier)}
         display="flex"
         alignItems="flex-start"
         justifyContent="space-between"
@@ -165,8 +173,8 @@ class CardanoUtxoDetails extends Component<Props> {
             },
           }}
         >
-          {renderAmount(request.address.value.getDefaultEntry())}
-          {request.address.value.nonDefaultEntries().map(entry => (
+          {renderAmount(addressValue.getDefaultEntry())}
+          {addressValue.nonDefaultEntries().map(entry => (
             <React.Fragment key={divKey(entry.identifier)}>
               <div />
               <div />
