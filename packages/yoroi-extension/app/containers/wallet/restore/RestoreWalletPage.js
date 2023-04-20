@@ -13,6 +13,7 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -62,6 +63,7 @@ export default class RestoreWalletPage extends Component<Props> {
       |},
       profile: {|
         setSelectedNetwork: {| trigger: (params: void | $ReadOnly<NetworkRow>) => void |},
+        updateHideBalance: {| trigger: (params: void) => Promise<void> |},
       |},
       wallets: {|
         setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
@@ -82,7 +84,11 @@ export default class RestoreWalletPage extends Component<Props> {
     |},
     stores: {|
       explorers: {| selectedExplorer: Map<number, SelectedExplorer> |},
-      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
+      profile: {|
+        selectedNetwork: void | $ReadOnly<NetworkRow>,
+        unitOfAccount: UnitOfAccountSettingType,
+        shouldHideBalance: boolean,
+      |},
       transactions: {| getTxRequests: (PublicDeriver<>) => TxRequests |},
       tokenInfoStore: {| tokenInfo: TokenInfoMap |},
       uiDialogs: {| isOpen: any => boolean |},
@@ -116,7 +122,11 @@ export default class RestoreWalletPage extends Component<Props> {
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       stores: {
         explorers: { selectedExplorer: stores.explorers.selectedExplorer },
-        profile: { selectedNetwork: stores.profile.selectedNetwork },
+        profile: {
+          selectedNetwork: stores.profile.selectedNetwork,
+          unitOfAccount: stores.profile.unitOfAccount,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
         transactions: { getTxRequests: stores.transactions.getTxRequests },
         tokenInfoStore: { tokenInfo: stores.tokenInfoStore.tokenInfo },
         uiDialogs: { isOpen: stores.uiDialogs.isOpen },
@@ -155,6 +165,7 @@ export default class RestoreWalletPage extends Component<Props> {
         },
         profile: {
           setSelectedNetwork: { trigger: actions.profile.setSelectedNetwork.trigger },
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

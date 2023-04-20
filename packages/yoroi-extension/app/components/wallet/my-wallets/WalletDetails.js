@@ -25,7 +25,7 @@ type Props = {|
     * null => still calculating
     * value => done calculating
   */
-  +rewards: null | void | MultiToken,
+  +rewards?: null | void | MultiToken,
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,

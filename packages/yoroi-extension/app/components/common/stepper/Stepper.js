@@ -4,6 +4,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Stack, Box, Typography } from '@mui/material';
+import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg';
 import styles from './Stepper.scss';
 
 const messages: * = defineMessages({
@@ -52,8 +53,8 @@ function Stepper(props: Props & Intl): Node {
           let stepColor = 'grey.400';
           let cursor = 'pointer';
 
-          if (isCurrentStep) stepColor = 'primary.200';
-          else if (isPrevStep) stepColor = '#A0B3F2'; // Todo: add the color to the design system
+          if (isCurrentStep) stepColor = 'primary.600';
+          else if (isPrevStep) stepColor = 'primary.300';
 
           if (isFutureStep) cursor = 'not-allowed';
 
@@ -71,9 +72,13 @@ function Stepper(props: Props & Intl): Node {
                 className={styles.stackStep}
                 sx={{ borderColor: stepColor, cursor }}
               >
-                <Typography variant="body2" fontWeight={500} color={stepColor}>
-                  {idx + 1}
-                </Typography>
+                {isPrevStep ? (
+                  <StepMarkIcon />
+                ) : (
+                  <Typography variant="body2" fontWeight={500} color={stepColor}>
+                    {idx + 1}
+                  </Typography>
+                )}
               </Box>
               <Typography sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
                 {intl.formatMessage(message)}

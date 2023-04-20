@@ -8,6 +8,10 @@ import InfoDialog from '../../../../widgets/infoDialog';
 import globalMessages from '../../../../../i18n/global-messages';
 import React from 'react';
 import StepController from '../../StepController';
+import { genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
+import WalletDetails from '../../../my-wallets/WalletDetails';
+import NavPlate from '../../../../topbar/NavPlate';
+import WalletInfo from '../../../../common/walletInfo/WalletInfo';
 
 const messages: Object = defineMessages({
   dialogTitle: {
@@ -39,15 +43,14 @@ const Transition = React.forwardRef((props, ref) => {
 });
 
 function DuplicatedWalletDialog(props: Props & Intl): Node {
-  const { open, onClose, onNext, intl } = props;
-
+  const { open, onClose, onNext, intl, duplicatedWalletData } = props;
   return (
     <Dialog
       open={open}
       onClose={onClose}
       TransitionComponent={Transition}
       sx={{
-        background: 'var(--yoroi-comp-dialog-overlay-background-color)',
+        background: 'rgb(18 31 77 / 70%)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -78,34 +81,36 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             {intl.formatMessage(messages.title)}
           </Typography>
           <Box component="ul" sx={{ listStyle: 'outside', mt: '16px' }}>
-            [DuplicatedWallet]
+            <Box sx={{ display: 'flex', flexFlow: 'row', gap: '8px' }}>
+              <WalletInfo
+                plate={duplicatedWalletData?.plate}
+                wallet={duplicatedWalletData?.settingsCache}
+                walletAmount={duplicatedWalletData?.balance}
+                onUpdateHideBalance={duplicatedWalletData?.updateHideBalance}
+                shouldHideBalance={duplicatedWalletData?.shouldHideBalance}
+                getTokenInfo={genLookupOrFail(duplicatedWalletData?.tokenInfo)}
+                isRefreshing={false}
+              />
+            </Box>
           </Box>
         </Box>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" gap="24px">
           <Button
             variant="outlined"
+            color="primary"
             disableRipple={false}
             onClick={onClose}
-            sx={{
-              width: '100%',
-              height: '48px',
-              minWidth: 'unset',
-              minHeight: 'unset',
-              fontSize: '16px',
-              borderWidth: 2,
-              borderColor: 'var(--yoroi-palette-primary-200)',
-              '&:hover': { borderWidth: 2 },
-            }}
+            style={{ width: '100%', height: '48px', fontSize: '16px' }}
           >
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
-
           <Button
-            variant="rv-primary"
+            variant="contained"
+            color="primary"
             disableRipple={false}
             onClick={onNext}
-            sx={{ width: '100%', height: '48px', fontSize: '16px' }}
+            style={{ width: '100%', height: '48px', fontSize: '16px' }}
           >
             {intl.formatMessage(messages.openWallet)}
           </Button>

@@ -264,7 +264,7 @@ const ULList = styled(Box)({
 const InputWrapper = styled(Box)(
   ({ theme, error, isVerified, isOpen }) => `
   width: 100%;
-  background-color: var(--yoroi-palette-common-white);
+  background-color: ${theme.palette.common['white']};
   height: 40px;
   align-content: baseline;
   display: inline-flex;
@@ -276,18 +276,18 @@ const InputWrapper = styled(Box)(
   
   & input {
     background-color: transparent;
-    color: var(--yoroi-palette-primary-200);
+    color: ${theme.palette.primary[600]};
     font-size: 1rem;
     padding: 8px;
     letter-spacing: 0;
     text-align: center;
-    border: 2px solid ${error ? '#ff1351' : '#7892E8'};
+    border: 2px solid ${error ? '#FF1351' : theme.palette.primary[300]};
     border-radius: 8px;
     height: 40px;
     box-sizing: border-box;
 
     &:focus {
-      border-color: ${error ? '#ff1351' : 'var(--yoroi-palette-primary-200)'};
+      border-color: ${error ? '#FF1351' : theme.palette.primary[600]};
     }
 
     ${
@@ -297,9 +297,9 @@ const InputWrapper = styled(Box)(
         border: 0;
         background: ${
           isVerified
-            ? 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%);'
-            : 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%'
-        });
+            ? 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)'
+            : 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)'
+        };
       }`
         : ''
     }

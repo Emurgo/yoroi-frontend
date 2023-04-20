@@ -1,6 +1,7 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -13,13 +14,13 @@ import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { useRestoreWallet } from './hooks';
+import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { isWalletExist } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
 import environment from '../../../environment';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { useRestoreWallet } from './hooks';
 
 const messages: * = defineMessages({
   title: {
@@ -57,30 +58,6 @@ type Props = {|
   isDialogOpen(dialog: any): boolean,
 |};
 
-// function getDuplicatedWalletData(duplicatedWallet: PublicDeriver<>) {
-//   if (!Boolean(duplicatedWallet)) {
-//     throw new Error(`${nameof(getDuplicatedWalletData)} no duplicated wallet`);
-//   }
-//   const parent = duplicatedWallet?.getParent();
-//   const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
-//   // $FlowFixMe[prop-missing]
-//   // $FlowFixMe[incompatible-call]
-//   const withPubKey = asGetPublicKey(duplicatedWallet);
-//   const plate = withPubKey == null ? null : wallets.getPublicKeyCache(withPubKey).plate;
-//   const txRequests = transactions.getTxRequests(duplicatedWallet);
-//   const balance = txRequests.requests.getBalanceRequest.result ?? null;
-
-//   const balances = getMainTokenAmount({
-//     amount: balance,
-//     currency: '',
-//     getCurrentPrice: null,
-//     getTokenInfo: null,
-//     shouldHideBalance: false,
-//   });
-
-//   return null;
-// }
-
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
   const { walletRestore, profile, router, wallets: walletsActions } = actions;
@@ -90,11 +67,45 @@ function RestoreWalletPage(props: Props & Intl): Node {
     wallets,
     walletSettings,
     transactions,
+    tokenInfoStore,
   } = stores;
 
   const [currentStep, setCurrentStep] = useState(getFirstRestorationStep());
-  const { recoveryPhrase, setRestoreWalletData, resetRestoreWalletData } = useRestoreWallet();
-  // const { plates } = useDuplicatedWallet();
+  const {
+    recoveryPhrase,
+    duplicatedWallet,
+    setRestoreWalletData,
+    resetRestoreWalletData,
+  } = useRestoreWallet();
+
+  const getDuplicatedWalletData = () => {
+    const publicDeriver = duplicatedWallet;
+
+    if (!publicDeriver) {
+      console.log(`${nameof(RestoreWalletPage)} no duplicated wallet`);
+      return {};
+    }
+
+    const parent = publicDeriver.getParent();
+    const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate = withPubKey == null ? null : wallets.getPublicKeyCache(withPubKey).plate;
+    const txRequests: TxRequests = transactions.getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+
+    const shouldHideBalance = profileData.shouldHideBalance;
+    const updateHideBalance = () => profile.updateHideBalance.trigger();
+    const tokenInfo = tokenInfoStore.tokenInfo;
+
+    return {
+      plate,
+      settingsCache,
+      balance,
+      shouldHideBalance,
+      tokenInfo,
+      updateHideBalance,
+    };
+  };
 
   const manageDialogsProps = {
     isDialogOpen,
@@ -107,14 +118,11 @@ function RestoreWalletPage(props: Props & Intl): Node {
 
   const recoveryPhraseStepProps = {
     setCurrentStep,
-    walletRestore,
-    walletSettings,
-    transactions,
-    wallets,
     walletData,
     isDialogOpen,
     openDialog,
     closeDialog,
+    duplicatedWalletData: getDuplicatedWalletData(),
     initialRecoveryPhrase: recoveryPhrase,
   };
 
@@ -188,7 +196,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
               profileData.selectedNetwork
             );
 
-            setRestoreWalletData({ isDuplicated: Boolean(duplicatedWallet), recoveryPhrase });
+            setRestoreWalletData({ duplicatedWallet, recoveryPhrase });
 
             return duplicatedWallet;
           }}

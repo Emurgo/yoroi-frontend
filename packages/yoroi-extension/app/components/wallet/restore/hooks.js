@@ -29,63 +29,6 @@ export function useRestoreWallet() {
   };
 }
 
-type TokenAmountValues = {|
-  balance: string,
-  unit: string,
-  fiatBalance: string,
-  fiatUnit: string,
-|};
-
-type UseDuplicatedWalletProps = {|
-  getTokenInfo: any,
-  currency: string,
-  getCurrentPrice: any,
-|};
-
-export function useDuplicatedWallet({
-  getTokenInfo,
-  currency,
-  getCurrentPrice,
-}): UseDuplicatedWalletProps => TokenAmountValues {
-  const getMainTokenAmount = () => {
-    const { amount, shouldHideBalance } = request;
-    if (amount == null) throw new Error('Amount is required to be rendered');
-
-    const defaultEntry = amount.getDefaultEntry();
-    const tokenInfo = getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-    let balance = shouldHideBalance
-      ? hiddenAmount
-      : shiftedAmount.decimalPlaces(tokenInfo.Metadata.numberOfDecimals).toString();
-
-    const unit = truncateToken(getTokenName(tokenInfo));
-
-    let fiatUnit = '';
-    let fiatBalance = shouldHideBalance ? hiddenAmount : '-';
-
-    if (currency != null && currency.trim().length !== 0) {
-      const ticker = tokenInfo.Metadata.ticker;
-
-      if (ticker == null) throw new Error('unexpected main token type');
-
-      const price = getCurrentPrice(ticker, currency);
-
-      if (!shouldHideBalance && price != null) {
-        fiatBalance = calculateAndFormatValue(shiftedAmount, price);
-      }
-
-      fiatUnit = currency;
-    }
-
-    return { balance, unit, fiatBalance, fiatUnit };
-  };
-
-  return {
-    getMainTokenAmount,
-  };
-}
-
 export function useDialogs() {
   const [dialogs, setDialogs] = useState({
     [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: !isDialogShownBefore(

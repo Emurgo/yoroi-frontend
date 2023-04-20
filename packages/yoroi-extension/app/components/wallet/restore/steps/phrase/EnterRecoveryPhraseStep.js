@@ -11,7 +11,7 @@ import { RESTORE_WALLET_STEPS } from '../../steps';
 import { PublicDeriver } from '../../../../../api/ada/lib/storage/models/PublicDeriver';
 import { asGetPublicKey } from '../../../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import validWords from 'bip39/src/wordlists/english.json';
-import StepController from '../../StepController';
+import StepController from '../../../create-wallet/StepController';
 import styles from './EnterRecoveryPhraseStep.scss';
 import classnames from 'classnames';
 import Autocomplete from '../../../../common/Autocomplete';
@@ -41,6 +41,7 @@ type Intl = {|
 type Props = {|
   walletData: any,
   initialRecoveryPhrase: string,
+  duplicatedWalletData: any,
   openDuplicatedWallet(duplicatedWallet: PublicDeriver<>): void,
   setCurrentStep(stepId: string): void,
   checkValidPhrase(enteredPhrase: string): boolean,
@@ -61,6 +62,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     isDialogOpen,
     closeDialog,
     openDialog,
+    duplicatedWalletData,
     initialRecoveryPhrase,
   } = props;
 
@@ -114,11 +116,26 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         />
 
         <Box mt="10px">
-          <StepController goNext={enableNext ? goNextStepCallback() : undefined} goBack={goBack} />
+          <StepController
+            actions={[
+              {
+                label: intl.formatMessage(globalMessages.backButtonLabel),
+                disabled: false,
+                onClick: goBack,
+                type: 'secondary',
+              },
+              {
+                label: intl.formatMessage(globalMessages.nextButtonLabel),
+                disabled: !enableNext,
+                onClick: goNextStepCallback(),
+                type: 'primary',
+              },
+            ]}
+          />
         </Box>
       </Stack>
       <DuplicatedWalletDialog
-        duplicatedWalletData={null}
+        duplicatedWalletData={duplicatedWalletData}
         open={isActiveDialog}
         onClose={handleClose}
         // $FlowFixMe incompatible-call

@@ -5,11 +5,12 @@ import type { RestoreModeType } from '../../../../../actions/common/wallet-resto
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Stack, Typography, Box } from '@mui/material';
-import StepController from '../../StepController';
+import StepController from '../../../create-wallet/StepController';
 import fifteenImg from '../../../../../assets/images/add-wallet/restore/15-word.inline.svg';
 import twentyfourImg from '../../../../../assets/images/add-wallet/restore/24-word.inline.svg';
 import AddWalletCard from '../../../add-wallet-revamp/AddWalletCard';
 import styles from './SelectWalletTypeStep.scss';
+import globalMessages from '../../../../../i18n/global-messages';
 
 const messages: * = defineMessages({
   fifteenWords: {
@@ -51,8 +52,16 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
             label={intl.formatMessage(messages.twentyfourWords)}
           />
         </Box>
-
-        <StepController goBack={goBack} showNextButton={false} />
+        <StepController
+          actions={[
+            {
+              label: intl.formatMessage(globalMessages.backButtonLabel),
+              disabled: false,
+              onClick: goBack,
+              type: 'secondary',
+            },
+          ]}
+        />
       </Stack>
     </Stack>
   );

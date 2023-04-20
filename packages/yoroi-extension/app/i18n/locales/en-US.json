@@ -804,6 +804,8 @@
   "wallet.restore.dialog.walletExist.explanation": "The wallet you are trying to restore already exists.",
   "wallet.restore.dialog.walletExist.openWallet": "Open Wallet",
   "wallet.restore.dialog.walletExist.title": "Wallet Already Exist",
+  "wallet.restore.dialog.existingWallet.dialogTitle": "Wallet already exists",
+  "wallet.restore.dialog.existingWallet.title": "This wallet already exists on your device, You can open it or go back and restore another wallet.",
   "wallet.send.confirmationDialog.addressToLabel": "To",
   "wallet.send.confirmationDialog.amountLabel": "Amount",
   "wallet.send.confirmationDialog.feesLabel": "Fees",

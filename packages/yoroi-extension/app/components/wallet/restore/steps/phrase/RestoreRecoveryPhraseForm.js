@@ -181,9 +181,8 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                     gap: '4px',
                   }}
                   variant="body1"
-                  color="primary.200"
                 >
-                  <Typography variant="body1" color="#7892E8" width="24px">
+                  <Typography variant="body1" color="primary.400" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -210,6 +209,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
             <Box sx={{ width: '100px' }}>
               <Button
                 variant="outlined"
+                color="primary"
                 onClick={form.onReset}
                 sx={{
                   border: 0,

@@ -58,6 +58,7 @@ type Props = {|
   recoveryPhrase: Array<string> | null,
   selectedNetwork: $ReadOnly<NetworkRow>,
   isRecovery?: boolean,
+  isRecoveryPhraseEntered?: boolean,
   onSubmit: (walletName: string, walletPassword: string) => void,
   ...ManageDialogsProps,
 |};
