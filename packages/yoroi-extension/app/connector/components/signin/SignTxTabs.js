@@ -88,8 +88,8 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
               <TabPanel
                 sx={{
                   height: isTestEnv
-                    ? 'calc(84vh - 55px)'
-                    : 'calc(100vh - 48px - 88px - 50px - 120px)',
+                    ? 'calc(100vh - 306px - 46px)' // 46px for nightly banner
+                    : 'calc(100vh - 306px)',
                   overflowY: 'scroll',
                   margin: 'auto',
                   boxShadow: 'none',
