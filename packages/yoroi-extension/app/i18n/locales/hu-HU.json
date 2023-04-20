@@ -122,7 +122,7 @@
   "global.receive": "Receive",
   "global.connector.connectedWebsites": "Connected Websites",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",
-  "global.connector.yoroiDappConnector": "Yoroi dApp Connector",
+  "global.connector.yoroiDappConnector": "Yoroi Dapp Connector",
   "global.contact": "contact support",
   "global.copyTooltipMessage": "Copied",
   "global.errors.fieldIsRequired": "This field is required.",
