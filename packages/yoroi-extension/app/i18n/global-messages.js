@@ -32,6 +32,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.nft',
     defaultMessage: '!!!NFTs',
   },
+  passwordLabel: {
+    id: 'global.labels.password',
+    defaultMessage: '!!!Password',
+  },
   receiverLabel: {
     id: 'wallet.send.form.receiver.label',
     defaultMessage: '!!!Receiver',
