@@ -5,8 +5,8 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import type { Node } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { ReactComponent as IconCopy }  from '../../assets/images/copy.inline.svg';
-import { ReactComponent as IconCopied }  from '../../assets/images/copied.inline.svg';
+import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg';
+import { ReactComponent as IconCopied } from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
 import { Tooltip, Typography } from '@mui/material';
 import type { Notification } from '../../types/notificationType';
@@ -35,7 +35,7 @@ type Props = {|
 
 @observer
 export default class CopyableAddress extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -48,16 +48,14 @@ export default class CopyableAddress extends Component<Props> {
     onCopyAddress: undefined,
     placementTooltip: 'bottom',
     elementId: undefined,
-    darkVariant: false
+    darkVariant: false,
   };
 
   render(): Node {
     const { hash, elementId, onCopyAddress, notification, darkVariant } = this.props;
     const { intl } = this.context;
 
-    const Icon = notification && notification.id === elementId
-      ? IconCopied
-      : IconCopy;
+    const Icon = notification && notification.id === elementId ? IconCopied : IconCopy;
     const tooltipComponent = (
       <Tooltip
         title={
@@ -76,19 +74,11 @@ export default class CopyableAddress extends Component<Props> {
     );
 
     return (
-      <div
-        className={classnames([
-          styles.component,
-          darkVariant === true && styles.componentDark
-        ])}
-      >
+      <div className={classnames([styles.component, darkVariant === true && styles.componentDark])}>
         <span>{this.props.children}</span>
         <CopyToClipboard
           text={hash}
-          onCopy={onCopyAddress == null
-            ? undefined
-            : (_text, _result) => onCopyAddress()
-          }
+          onCopy={onCopyAddress == null ? undefined : (_text, _result) => onCopyAddress()}
         >
           {tooltipComponent}
         </CopyToClipboard>
