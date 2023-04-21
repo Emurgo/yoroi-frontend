@@ -8,6 +8,12 @@ export type LayoutComponentMap = {|
   [key: Layouts]: Node,
 |};
 
+export type InjectedLayoutProps = {|
+  +selectedLayout: Layouts,
+  +isRevampLayout: boolean,
+  +renderLayoutComponent: (layoutMap: LayoutComponentMap) => Node,
+|};
+
 const LayoutContext = React.createContext();
 
 const LayoutProvider = (props: Object): Node => {

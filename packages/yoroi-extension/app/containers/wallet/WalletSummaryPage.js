@@ -365,9 +365,6 @@ class WalletSummaryPage extends Component<AllProps> {
         </NotificationMessage>
         {!recentTransactionsRequest.wasExecuted || hasAny ? null : (
           <WalletEmptyBanner
-            goToSendPage={() =>
-              this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND })
-            }
             goToReceivePage={() => {
               this.generated.actions.router.goToRoute.trigger({
                 route: ROUTES.WALLETS.RECEIVE.ROOT,
