@@ -10,8 +10,7 @@ import { observer } from 'mobx-react';
 
 type Props = {|
   onBuySellClick: () => void,
-  goToSendPage(): void,
-  goToReceivePage(): void,
+  goToReceivePage: () => void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
