@@ -364,9 +364,6 @@ class StakingPageContent extends Component<AllProps> {
             onBuySellClick={() =>
               this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
             }
-            goToSendPage={() =>
-              this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND })
-            }
             goToReceivePage={() => {
               this.generated.actions.router.goToRoute.trigger({
                 route: ROUTES.WALLETS.RECEIVE.ROOT,
