@@ -100,14 +100,12 @@ function InfoDialog(props: Props & Intl): Node {
         </Link>
         <Stack alignItems="center" justifyContent="center">
           <Button
-            variant="rv-primary"
+            variant="contained"
+            color="primary"
             disableRipple={false}
             onClick={onClose}
             sx={{
               width: '176px',
-              height: '40px',
-              fontSize: '14px',
-              lineHeight: '15px',
             }}
           >
             {intl.formatMessage(globalMessages.continue)}

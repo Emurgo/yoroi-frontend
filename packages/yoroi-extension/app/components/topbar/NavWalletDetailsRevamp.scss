@@ -8,6 +8,7 @@
   border: 1px solid var(--yoroi-palette-gray-300);
   border-radius: 8px;
   min-width: 360px;
+  height: 56px;
 }
 
 .outerWrapper {
@@ -72,6 +73,7 @@
   line-height: 22px;
   width: 100%;
 }
+
 .balance {
   display: flex;
   flex-direction: column;
@@ -81,6 +83,8 @@
   font-size: 16px;
   line-height: 22px;
   width: 100%;
+  margin-left: 24px;
+  margin-right: 8px;
 }
 
 .spinnerWrapper {
@@ -111,22 +115,6 @@
 
 .highlightAmount {
   color: var(--yoroi-palette-secondary-300);
-}
-
-.toggleButton {
-  margin-left: auto;
-  background-color: var(--yoroi-palette-primary-200);
-  width: 56px;
-  height: 56px;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  &:hover {
-    cursor: pointer;
-  }
-
-  g {
-    stroke: #ffffff;
-  }
 }
 
 .fixedAmount {

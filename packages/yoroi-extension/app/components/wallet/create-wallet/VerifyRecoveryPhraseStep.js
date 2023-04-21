@@ -144,10 +144,10 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                       height: '40px',
                     }}
                     variant="body1"
-                    color="primary.200"
+                    color="primary.600"
                   >
                     {/* Todo: update hex color to come from the theme */}
-                    <Typography variant="body1" color="#7892E8" width="20px">
+                    <Typography variant="body1" color="primary.400" width="20px">
                       {idx + 1}.
                     </Typography>
                     {word &&
@@ -197,7 +197,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     zIndex: 10,
                   }}
                   variant="body1"
-                  color={isAdded ? '#7892E8' : 'primary.200'} // Todo: update the color to come from the theme
+                  color={isAdded ? 'primary.400' : 'primary.600'}
                 >
                   {word}
                 </Typography>

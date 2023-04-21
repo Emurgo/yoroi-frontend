@@ -1,6 +1,6 @@
 // @flow
-import { lazy, Component, Suspense  } from 'react';
-import type { Node, ComponentType, } from 'react';
+import { lazy, Component, Suspense } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
@@ -14,9 +14,9 @@ import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import globalMessages from '../../../i18n/global-messages';
 import { withLayout } from '../../../styles/context/layout';
-import type { LayoutComponentMap } from '../../../styles/context/layout'
-import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer'
-import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer'
+import type { LayoutComponentMap } from '../../../styles/context/layout';
+import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer';
+import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
 
 // $FlowFixMe[signature-verification-failure]
@@ -24,7 +24,7 @@ export const VotingPageContentPromise = () => import('./VotingPageContent');
 const VotingPageContent = lazy(VotingPageContentPromise);
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
-type Props = InjectedOrGenerated<GeneratedData>
+type Props = InjectedOrGenerated<GeneratedData>;
 type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {|
   ...Props,
@@ -40,11 +40,9 @@ class VotingPage extends Component<AllProps> {
 
     const content = (
       <Suspense fallback={null}>
-        <VotingPageContent
-          {...this.generated.VotingPageContentProps}
-        />
+        <VotingPageContent {...this.generated.VotingPageContentProps} />
       </Suspense>
-    )
+    );
 
     const revampLayout = (
       <TopBarLayout
@@ -97,8 +95,7 @@ class VotingPage extends Component<AllProps> {
       }: InjectedOrGenerated<NavBarContainerRevampData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
-  };
-};
-
+  }
+}
 
 export default (withLayout(VotingPage): ComponentType<Props>);
