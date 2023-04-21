@@ -1032,6 +1032,10 @@ export const connectorMessages: * = defineMessages({
     id: 'connector.settings.signTransaction',
     defaultMessage: '!!!Sign transaction',
   },
+  signData: {
+    id: 'connector.signin.signData',
+    defaultMessage: '!!!Sign data',
+  },
   connect: {
     id: 'connector.settings.connect',
     defaultMessage: '!!!Connect',

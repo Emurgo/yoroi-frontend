@@ -15,7 +15,9 @@ type Props = {|
   connectionContent: Node,
   utxosContent: Node,
   detailsContent: Node,
+  isDataSignin: boolean,
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -26,7 +28,13 @@ const messages = defineMessages({
   connection: { id: 'connector.signIn.tabs.connection', defaultMessage: '!!!Connection' },
 });
 
-function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: Props & Intl): Node {
+function SignTxTabs({
+  connectionContent,
+  utxosContent,
+  detailsContent,
+  isDataSignin,
+  intl,
+}: Props & Intl): Node {
   const [value, setValue] = useState(0);
   const match = useMediaQuery('(min-width:1441px)');
 
@@ -43,7 +51,7 @@ function SignTxTabs({ connectionContent, utxosContent, detailsContent, intl }: P
   return (
     <Background>
       <Typography color="#242838" variant="h4" align="center" my="32px">
-        {intl.formatMessage(connectorMessages.signTransaction)}
+        {intl.formatMessage(connectorMessages[isDataSignin ? 'signData' : 'signTransaction'])}
       </Typography>
       <TabContext value={value}>
         <Box

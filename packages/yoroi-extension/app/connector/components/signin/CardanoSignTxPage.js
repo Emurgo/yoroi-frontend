@@ -460,6 +460,7 @@ class SignTxPage extends Component<Props, State> {
     return (
       <Box height="100%" display="flex" flexDirection="column">
         <SignTxTabs
+          isDataSignin={!txData && Boolean(signData)}
           detailsContent={<Box overflowWrap="break-word">{content}</Box>}
           connectionContent={
             <ConnectionInfo
