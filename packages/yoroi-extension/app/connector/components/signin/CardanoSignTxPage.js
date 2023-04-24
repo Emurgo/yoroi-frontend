@@ -125,10 +125,8 @@ class SignTxPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(
-            globalMessages.walletPasswordFieldPlaceholder
-          ),
+          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
@@ -435,6 +433,14 @@ class SignTxPage extends Component<Props, State> {
           >
             <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
+
+          <Box mt="16px">
+            <TextField
+              type="password"
+              {...walletPasswordField.bind()}
+              error={walletPasswordField.error}
+            />
+          </Box>
         </Box>
       );
       utxosContent = null;
@@ -454,6 +460,7 @@ class SignTxPage extends Component<Props, State> {
     return (
       <Box height="100%" display="flex" flexDirection="column">
         <SignTxTabs
+          isDataSignin={!txData && Boolean(signData)}
           detailsContent={<Box overflowWrap="break-word">{content}</Box>}
           connectionContent={
             <ConnectionInfo

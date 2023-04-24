@@ -316,7 +316,7 @@ const RevampButton: any = {
       },
       '&.MuiButton-sizeMedium': {
         padding: '10px',
-        height: '40px',
+        height: '48px',
       },
       '&.MuiButton-sizeSmall': {
         padding: '7px',
@@ -350,7 +350,7 @@ const RevampButton: any = {
       props: { variant: 'ternary' },
       style: {
         width: '160px',
-        height: '40px',
+        height: '48px',
         padding: '8px',
         fontSize: '0.875rem',
         backgroundColor: 'transparent',
