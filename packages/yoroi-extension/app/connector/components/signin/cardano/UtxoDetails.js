@@ -110,7 +110,7 @@ class CardanoUtxoDetails extends Component<Props> {
 
     const addressValue = request.address.value;
 
-    if (addressValue === undefined) return null;
+    if (addressValue == null) return null;
 
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
     const divKey = identifier =>
