@@ -2,9 +2,9 @@
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Box } from '@mui/material';
 import StepController from '../../../create-wallet/StepController';
 import fifteenImg from '../../../../../assets/images/add-wallet/restore/15-word.inline.svg';
 import twentyfourImg from '../../../../../assets/images/add-wallet/restore/24-word.inline.svg';
@@ -41,13 +41,11 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
         <Box className={styles.container}>
           <AddWalletCard
             onClick={() => onNext({ type: 'cip1852', extra: undefined, length: 15 })}
-            imageSx={{ pt: '10px' }}
             imageSrc={fifteenImg}
             label={intl.formatMessage(messages.fifteenWords)}
           />
           <AddWalletCard
             onClick={() => onNext({ type: 'cip1852', extra: undefined, length: 24 })}
-            imageSx={{ pt: '10px' }}
             imageSrc={twentyfourImg}
             label={intl.formatMessage(messages.twentyfourWords)}
           />

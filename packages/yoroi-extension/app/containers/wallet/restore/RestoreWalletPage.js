@@ -3,9 +3,6 @@ import type { Node } from 'react';
 import type { GeneratedData as BannerContainerData } from '../../banners/BannerContainer';
 import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import type { WalletRestoreMeta } from '../../../actions/common/wallet-restore-actions';
-import type { PlateWithMeta, RestoreStepsType } from '../../../stores/toplevel/WalletRestoreStore';
-import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
@@ -14,6 +11,10 @@ import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type {
+  WalletRestoreMeta,
+  RestoreModeType,
+} from '../../../actions/common/wallet-restore-actions';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -102,9 +103,6 @@ export default class RestoreWalletPage extends Component<Props> {
         publicDerivers: Array<PublicDeriver<>>,
         getPublicKeyCache: IGetPublic => PublicKeyCache,
       |},
-      transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
-      |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
       |},
@@ -127,15 +125,12 @@ export default class RestoreWalletPage extends Component<Props> {
           unitOfAccount: stores.profile.unitOfAccount,
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
-        transactions: { getTxRequests: stores.transactions.getTxRequests },
         tokenInfoStore: { tokenInfo: stores.tokenInfoStore.tokenInfo },
         uiDialogs: { isOpen: stores.uiDialogs.isOpen },
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
-        transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
-        },
+        transactions: { getTxRequests: stores.transactions.getTxRequests },
         wallets: {
           restoreRequest: {
             isExecuting: stores.wallets.restoreRequest.isExecuting,

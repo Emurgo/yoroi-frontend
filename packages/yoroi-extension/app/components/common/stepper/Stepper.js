@@ -1,30 +1,11 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Stack, Box, Typography } from '@mui/material';
 import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg';
 import styles from './Stepper.scss';
-
-const messages: * = defineMessages({
-  firstStep: {
-    id: 'wallet.create.firstStep',
-    defaultMessage: '!!!Learn about recovery phrase',
-  },
-  secondStep: {
-    id: 'wallet.create.secondStep',
-    defaultMessage: '!!!Save recovery phrase',
-  },
-  thirdStep: {
-    id: 'wallet.create.thirdStep',
-    defaultMessage: '!!!Verify recovery phrase',
-  },
-  forthStep: {
-    id: 'wallet.create.forthStep',
-    defaultMessage: '!!!Add wallet details',
-  },
-});
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,

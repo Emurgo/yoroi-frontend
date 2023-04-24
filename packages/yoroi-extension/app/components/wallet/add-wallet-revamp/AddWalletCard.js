@@ -5,13 +5,12 @@ import styles from './AddWalletCard.scss';
 
 type Props = {|
   label: string,
-  imageSx?: Object,
   imageSrc: string,
   onClick(): void,
 |};
 
 export default function AddWalletCard(props: Props): Node {
-  const { label, imageSx = {}, imageSrc, onClick } = props;
+  const { label, imageSrc, onClick } = props;
   return (
     <button onClick={onClick} className={styles.component} type="button">
       <Box>

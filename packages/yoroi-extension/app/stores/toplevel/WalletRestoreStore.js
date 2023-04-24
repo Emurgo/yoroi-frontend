@@ -5,7 +5,6 @@ import Store from '../base/Store';
 
 import type {
   PaperWalletRestoreMeta,
-  WalletRestoreMeta,
   RestoreModeType,
 } from '../../actions/common/wallet-restore-actions';
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';

@@ -1,6 +1,6 @@
+// @flow
 import environment from '../../../environment';
 
-// @flow
 export const RESTORE_WALLET_STEPS = Object.freeze({
   SELECT_NETWORK: 'SELECT_NETWORK',
   SELECT_WALLET_TYPE: 'SELECT_WALLET_TYPE',

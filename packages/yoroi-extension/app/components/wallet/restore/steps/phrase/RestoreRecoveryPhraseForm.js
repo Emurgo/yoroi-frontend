@@ -4,7 +4,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import validWords from 'bip39/src/wordlists/english.json';
@@ -16,6 +15,7 @@ import Autocomplete from '../../../../common/autocomplete/Autocomplete';
 import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import styles from './EnterRecoveryPhraseStep.scss';
+import environment from '../../../../../environment';
 
 const messages = defineMessages({
   title: {
@@ -67,8 +67,9 @@ type State = {|
 
 @observer
 export default class RestoreRecoveryPhraseFormClass extends Component<Props, State> {
-  static defaultProps: {| error: void |} = {
+  static defaultProps: {| error: void, initialRecoveryPhrase: string |} = {
     error: undefined,
+    initialRecoveryPhrase: '',
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -90,7 +91,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        recoveryPhrase: this.getInitRecoveryPhrase().map((word, idx) => ({
+        recoveryPhrase: this.getInitRecoveryPhrase().map((word, _) => ({
           value: word,
           label: '',
         })),
@@ -127,17 +128,16 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
 
   // hack to get the refs
   componentDidMount() {
-    // console.log(this.inputRefs);
     this.setState({ mounted: true });
+    if (environment.isDev()) console.log(this.state.mounted);
   }
 
   render(): Node {
     const { intl } = this.context;
-    const { error, isValidMnemonic, numberOfMnemonics } = this.props;
+    const { isValidMnemonic, numberOfMnemonics } = this.props;
     const { form } = this;
     const { recoveryPhrase } = form.values();
 
-    const recoveryPhraseField = form.$('recoveryPhrase');
     const allWordsEntered =
       recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
     const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
@@ -187,7 +187,9 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                   </Typography>
 
                   <Autocomplete
-                    inputRef={ref => (this.inputRefs[idx] = ref)}
+                    inputRef={ref => {
+                      this.inputRefs[idx] = ref;
+                    }}
                     prevFieldRef={!isFirstField ? this.inputRefs[idx - 1] : null}
                     nextFieldRef={!isLastField ? this.inputRefs[idx + 1] : null}
                     options={validWords}

@@ -4,13 +4,9 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Typography, Box, Stack, Button, Dialog, Fade } from '@mui/material';
 import { observer } from 'mobx-react';
-import InfoDialog from '../../../../widgets/infoDialog';
 import globalMessages from '../../../../../i18n/global-messages';
 import React from 'react';
-import StepController from '../../StepController';
 import { genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
-import WalletDetails from '../../../my-wallets/WalletDetails';
-import NavPlate from '../../../../topbar/NavPlate';
 import WalletInfo from '../../../../common/walletInfo/WalletInfo';
 
 const messages: Object = defineMessages({

@@ -12,7 +12,6 @@ import SelectWalletTypeStep from './steps/type/SelectWalletTypeStep';
 import Stepper from '../../common/stepper/Stepper';
 import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
-import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { isWalletExist } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -81,10 +80,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
   const getDuplicatedWalletData = () => {
     const publicDeriver = duplicatedWallet;
 
-    if (!publicDeriver) {
-      console.log(`${nameof(RestoreWalletPage)} no duplicated wallet`);
-      return {};
-    }
+    if (!publicDeriver) return {};
 
     const parent = publicDeriver.getParent();
     const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
@@ -179,26 +175,29 @@ function RestoreWalletPage(props: Props & Intl): Node {
           checkValidPhrase={phrase =>
             walletData.isValidMnemonic({ mnemonic: phrase, mode: walletData.mode })
           }
-          openDuplicatedWallet={duplicatedWallet => {
+          openDuplicatedWallet={lastDuplicatedWallet => {
             resetRestoreWalletData();
-            walletsActions.setActiveWallet.trigger({ wallet: duplicatedWallet });
+            walletsActions.setActiveWallet.trigger({ wallet: lastDuplicatedWallet });
             handleGoToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
           }}
-          onSubmit={async recoveryPhrase => {
+          onSubmit={async enteredRecoveryPhrase => {
             const importedWallets = wallets.publicDerivers;
             const accountIndex = walletData.selectedAccount;
 
-            const duplicatedWallet = await isWalletExist(
+            const existingWallet = await isWalletExist(
               importedWallets,
               walletData.mode.type,
-              recoveryPhrase,
+              enteredRecoveryPhrase,
               accountIndex,
               profileData.selectedNetwork
             );
 
-            setRestoreWalletData({ duplicatedWallet, recoveryPhrase });
+            setRestoreWalletData({
+              duplicatedWallet: existingWallet,
+              recoveryPhrase: enteredRecoveryPhrase,
+            });
 
-            return duplicatedWallet;
+            return existingWallet;
           }}
         />
       ),
@@ -208,10 +207,10 @@ function RestoreWalletPage(props: Props & Intl): Node {
       message: messages.thirdStep,
       component: (
         <AddWalletDetailsStep
+          isRecovery
           prevStep={() => setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE)}
           recoveryPhrase={recoveryPhrase.split(' ')}
           selectedNetwork={profileData.selectedNetwork}
-          isRecovery={true}
           onSubmit={(walletName: string, walletPassword: string) => {
             if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
             if (!profileData.selectedNetwork)

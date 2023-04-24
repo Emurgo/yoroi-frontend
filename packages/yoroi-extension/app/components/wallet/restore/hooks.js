@@ -1,19 +1,26 @@
+// @flow
 import { useState } from 'react';
-import { isDialogShownBefore, markDialogAsShown } from '../dialogs/utils';
-import { TIPS_DIALOGS } from '../dialogs/constants';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../../utils/formatters';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+
+type RestoreWalletDataReturnValue = {|
+  recoveryPhrase: string,
+  walletName: string,
+  walletPassword: string,
+  duplicatedWallet: null | PublicDeriver<>,
+  plates: Array<any>,
+  setRestoreWalletData(data: any): void,
+  resetRestoreWalletData(): void,
+|};
 
 const initialRestoreWalletData = {
   recoveryPhrase: '',
   walletName: '',
   walletPassword: '',
   plates: [],
-  isDuplicated: false,
+  duplicatedWallet: null,
 };
 
-export function useRestoreWallet() {
+export function useRestoreWallet(): RestoreWalletDataReturnValue {
   const [restoreWallet, setRestoreWallet] = useState(initialRestoreWalletData);
 
   const setRestoreWalletData = data => {
@@ -27,22 +34,4 @@ export function useRestoreWallet() {
     setRestoreWalletData,
     resetRestoreWalletData,
   };
-}
-
-export function useDialogs() {
-  const [dialogs, setDialogs] = useState({
-    [TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE]: !isDialogShownBefore(
-      TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE
-    ),
-    [TIPS_DIALOGS.SAVE_RECOVERY_PHRASE]: !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE),
-  });
-
-  function showDialog(dialogId: string): void {
-    setDialogs(prev => ({ ...prev, [dialogId]: true }));
-  }
-
-  function hideDialog(dialogId: string): void {
-    markDialogAsShown(dialogId);
-    setDialogs(prev => ({ ...prev, [dialogId]: false }));
-  }
 }

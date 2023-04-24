@@ -1,25 +1,23 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
 import { Typography, Tooltip } from '@mui/material';
-import { ReactComponent as ConceptualIcon } from '../../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
-import { ReactComponent as TrezorIcon } from '../../../assets/images/wallet-nav/trezor-wallet.inline.svg';
-import { ReactComponent as LedgerIcon } from '../../../assets/images/wallet-nav/ledger-wallet.inline.svg';
-import { truncateLongName, maxNameLengthBeforeTruncation } from '../../../utils/formatters';
-import { splitAmount, truncateToken } from '../../../utils/formatters';
+import {
+  splitAmount,
+  truncateToken,
+  truncateLongName,
+  maxNameLengthBeforeTruncation,
+} from '../../../utils/formatters';
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletInfo.scss';
 import WalletAccountIcon from './WalletAccountIcon';
 
@@ -56,13 +54,11 @@ function constructPlate(
 
 @observer
 export default class WalletInfo extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat, infoText: void |} = {
-    intl: intlShape.isRequired,
+  static contextTypes: {| infoText: void |} = {
     infoText: undefined,
   };
 
   render(): Node {
-    const { intl } = this.context;
     const { shouldHideBalance, onUpdateHideBalance, walletAmount } = this.props;
 
     const [accountPlateId, iconComponent] = this.props.plate

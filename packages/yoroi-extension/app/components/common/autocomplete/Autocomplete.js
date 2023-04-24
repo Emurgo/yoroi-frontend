@@ -1,24 +1,17 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/no-array-index-key */
 // @flow
-import { useMemo, useRef, useState } from 'react';
 import type { Node } from 'react';
+import { useState } from 'react';
 import { useCombobox } from 'downshift';
-import { Input, Box, InputLabel, FormControl, FormHelperText, Chip, useTheme } from '@mui/material';
+import { Input, Box, FormControl } from '@mui/material';
 import { styled } from '@mui/system';
-import { slice } from 'lodash';
-import { ReactComponent as CloseIcon } from '../../../assets/images/close-chip.inline.svg';
 
 type Props = {|
   +options: Array<string>,
-  +done?: boolean,
-  +disabled?: boolean,
   +error?: boolean,
   +maxVisibleOptions?: number,
   +noResultsMessage?: string,
   +id: string,
   +placeholder: string,
-  +label: string,
   +onChange: string => void,
   +onFocus: any => void,
   +value: string,
@@ -51,12 +44,9 @@ function useCachedOptions(options) {
 
 function Autocomplete({
   options,
-  done,
   error = null,
   maxVisibleOptions = 5,
   noResultsMessage,
-  label,
-  disabled,
   id,
   onChange,
   onFocus,
@@ -78,14 +68,12 @@ function Autocomplete({
 
   const {
     isOpen,
-    getLabelProps,
     getMenuProps,
     getInputProps,
     getComboboxProps,
     highlightedIndex,
     getItemProps,
     closeMenu,
-    selectItem,
   } = useCombobox({
     inputValue,
     defaultHighlightedIndex: 0,
@@ -132,7 +120,7 @@ function Autocomplete({
   });
 
   const handleKeyDownEvent = e => {
-    const { target, key, code, shiftKey } = e;
+    const { target, code, shiftKey } = e;
     const noInputValue = inputValue?.length === 0;
 
     // Prevent tab if word not correct
@@ -236,8 +224,6 @@ function Autocomplete({
 export default Autocomplete;
 
 Autocomplete.defaultProps = {
-  done: false,
-  disabled: false,
   error: false,
   autoFocus: false,
   maxVisibleOptions: 5,
@@ -262,9 +248,9 @@ const ULList = styled(Box)({
 });
 
 const InputWrapper = styled(Box)(
-  ({ theme, error, isVerified, isOpen }) => `
+  ({ theme, error, isVerified }) => `
   width: 100%;
-  background-color: ${theme.palette.common['white']};
+  background-color: ${theme.palette.common.white};
   height: 40px;
   align-content: baseline;
   display: inline-flex;
