@@ -269,6 +269,7 @@ class SignTxPage extends Component<Props, State> {
 
     return (
       <SignTxTabs
+        isDataSignin={false}
         connectionContent={
           <Box paddingTop="8px" overflowWrap="break-word">
             <Box pt="32px">

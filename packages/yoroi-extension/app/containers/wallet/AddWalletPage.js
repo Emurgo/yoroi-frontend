@@ -385,7 +385,7 @@ class AddWalletPage extends Component<AllProps> {
         <AddWalletPageRevamp
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
           onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
-          onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
+          onRestore={() => goToRoute.trigger({ route: ROUTES.WALLETS.RESTORE_WALLET })}
         />
         {activeDialog}
       </TopBarLayout>

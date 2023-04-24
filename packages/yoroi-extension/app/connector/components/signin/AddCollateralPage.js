@@ -81,10 +81,8 @@ class AddCollateralPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(
-            globalMessages.walletPasswordFieldPlaceholder
-          ),
+          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
@@ -124,7 +122,9 @@ class AddCollateralPage extends Component<Props, State> {
               if (error instanceof WrongPassphraseError) {
                 this.form
                   .$('walletPassword')
-                  .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+                  .invalidate(
+                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                  );
               } else {
                 throw error;
               }
@@ -134,9 +134,14 @@ class AddCollateralPage extends Component<Props, State> {
       });
     } else {
       this.setState({ isSubmitting: true });
-      this.props.onConfirm('').finally(() => {
-        this.setState({ isSubmitting: false });
-      }).catch(error => { throw error; });
+      this.props
+        .onConfirm('')
+        .finally(() => {
+          this.setState({ isSubmitting: false });
+        })
+        .catch(error => {
+          throw error;
+        });
     }
   }
 
@@ -237,15 +242,15 @@ class AddCollateralPage extends Component<Props, State> {
     const { walletType } = this.props;
     let confirmButtonLabel;
     switch (walletType) {
-    case 'ledger':
-      confirmButtonLabel = globalMessages.confirmOnLedger;
-      break;
-    case 'trezor':
-      confirmButtonLabel = globalMessages.confirmOnTrezor;
-      break;
-    default:
-      confirmButtonLabel = globalMessages.confirm;
-      break;
+      case 'ledger':
+        confirmButtonLabel = globalMessages.confirmOnLedger;
+        break;
+      case 'trezor':
+        confirmButtonLabel = globalMessages.confirmOnTrezor;
+        break;
+      default:
+        confirmButtonLabel = globalMessages.confirm;
+        break;
     }
 
     return (
