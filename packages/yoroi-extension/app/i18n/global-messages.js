@@ -152,6 +152,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.create',
     defaultMessage: '!!!Create',
   },
+  restore: {
+    id: 'global.labels.restore',
+    defaultMessage: '!!!Restore',
+  },
   remove: {
     id: 'global.labels.remove',
     defaultMessage: '!!!Remove',

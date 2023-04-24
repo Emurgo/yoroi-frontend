@@ -1,0 +1,26 @@
+.stackContainer {
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+  margin-bottom: 48px;
+}
+
+.stackSteps {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.stackStep {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  border-width: 2.5px;
+  border-style: solid;
+  border-radius: 50%;
+  transition: color 300ms ease;
+}

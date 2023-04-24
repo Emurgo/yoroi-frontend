@@ -11,42 +11,40 @@ import TransferSummaryPage from '../../../components/transfer/TransferSummaryPag
 import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanation';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import globalMessages from '../../../i18n/global-messages';
-import {
-  CheckAddressesInUseApiError,
-  NoInputsError,
-} from '../../../api/common/errors';
-import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/common/wallet-restore-actions';
+import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
+import type {
+  RestoreModeType,
+  PaperWalletRestoreMeta,
+} from '../../../actions/common/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import { defineMessages, intlShape } from 'react-intl';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
-import { TransferStatus, } from '../../../types/TransferTypes';
+import { TransferStatus } from '../../../types/TransferTypes';
 import ErrorPage from '../../../components/transfer/ErrorPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
+import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { RestoreStepsType, PlateWithMeta } from '../../../stores/toplevel/WalletRestoreStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
 import type { Notification } from '../../../types/notificationType';
-import type {
-  NetworkRow,
-} from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
+import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
-import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore'
-import { asGetPublicKey, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits'
+import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
+import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import NavPlate from '../../../components/topbar/NavPlate';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { ROUTES } from '../../../routes-config';
-import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces'
+import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
@@ -64,19 +62,18 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
   +mode: RestoreModeType,
-  +introMessage ?: string,
+  +introMessage?: string,
   +onBack: void => void,
 |};
 
 @observer
 export default class WalletRestoreDialogContainer extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
-  static defaultProps: {|introMessage: void|} = {
-    introMessage: undefined
+  static defaultProps: {| introMessage: void |} = {
+    introMessage: undefined,
   };
 
   @observable notificationElementId: string = '';
@@ -87,7 +84,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       throw new Error(`${nameof(WalletRestoreDialogContainer)} no API selected`);
     }
     return selectedNetwork;
-  }
+  };
 
   componentDidMount() {
     const { walletRestore } = this.props.generated
@@ -110,16 +107,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   updateHideBalance: void => Promise<void> = async () => {
     await this.generated.actions.profile.updateHideBalance.trigger();
-  }
+  };
 
-  getRewardBalance: PublicDeriver<> => null | void | MultiToken = (
-    publicDeriver
-  ) => {
-    const delegationRequest = this.generated.stores
-      .delegation
-      .getDelegationRequests(
-        publicDeriver
-      );
+  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
+    const delegationRequest = this.generated.stores.delegation.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return undefined;
 
     const balanceResult = delegationRequest.getDelegatedBalance.result;
@@ -127,13 +118,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       return null;
     }
     return balanceResult.accountPart;
-  }
+  };
 
-  openToTransactions: PublicDeriver<> => void = (
-    publicDeriver
-  ) => {
+  openToTransactions: (PublicDeriver<>) => void = publicDeriver => {
     this.generated.actions.wallets.setActiveWallet.trigger({
-      wallet: publicDeriver
+      wallet: publicDeriver,
     });
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.TRANSACTIONS,
@@ -143,8 +132,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   render(): null | Node {
     const walletRestoreActions = this.generated.actions.walletRestore;
     const actions = this.generated.actions;
-    const { uiNotifications, } = this.generated.stores;
-    const { walletRestore, } = this.generated.stores;
+    const { uiNotifications } = this.generated.stores;
+    const { walletRestore } = this.generated.stores;
     const { wallets } = this.generated.stores;
     const { restoreRequest } = wallets;
 
@@ -162,59 +151,60 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           throw new Error(`${nameof(WalletRestoreDialogContainer)} no length in mode`);
         }
         const wordsCount = mode.length;
-        return (<WalletRestoreDialog
-          mnemonicValidator={mnemonic => (
-            this.generated.stores.walletRestore.isValidMnemonic({
-              mnemonic,
-              mode,
-            })
-          )}
-          validWords={validWords}
-          numberOfMnemonics={wordsCount}
-          onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
-          onCancel={this.onCancel}
-          onBack={this.props.onBack}
-          error={restoreRequest.error}
-          isPaper={isPaper}
-          showPaperPassword={isPaper}
-          classicTheme={this.generated.stores.profile.isClassicTheme}
-          initValues={walletRestore.walletRestoreMeta}
-          introMessage={this.props.introMessage || ''}
-        />);
+        return (
+          <WalletRestoreDialog
+            mnemonicValidator={mnemonic =>
+              this.generated.stores.walletRestore.isValidMnemonic({ mnemonic, mode })
+            }
+            validWords={validWords}
+            numberOfMnemonics={wordsCount}
+            onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
+            onCancel={this.onCancel}
+            onBack={this.props.onBack}
+            error={restoreRequest.error}
+            isPaper={isPaper}
+            showPaperPassword={isPaper}
+            classicTheme={this.generated.stores.profile.isClassicTheme}
+            initValues={walletRestore.walletRestoreMeta}
+            introMessage={this.props.introMessage || ''}
+          />
+        );
       }
       case RestoreSteps.WALLET_EXIST: {
-        const publicDeriver = walletRestore.duplicatedWallet
+        const publicDeriver = walletRestore.duplicatedWallet;
         if (!publicDeriver) {
           throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
         }
         const parent = publicDeriver.getParent();
-        const settingsCache = this.generated.stores.walletSettings
-          .getConceptualWalletSettingsCache(parent);
+        const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+          parent
+        );
         const withPubKey = asGetPublicKey(publicDeriver);
-        const plate = withPubKey == null
-          ? null
-          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-          const txRequests: TxRequests = this.generated.stores.transactions
-          .getTxRequests(publicDeriver);
-          const balance = txRequests.requests.getBalanceRequest.result ?? null;
+        const plate =
+          withPubKey == null
+            ? null
+            : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+        const txRequests: TxRequests = this.generated.stores.transactions.getTxRequests(
+          publicDeriver
+        );
+        const balance = txRequests.requests.getBalanceRequest.result ?? null;
 
         return (
           <WalletAlreadyExistDialog
-            walletPlate={
-              <NavPlate
-                plate={plate}
-                wallet={settingsCache}
+            walletPlate={<NavPlate plate={plate} wallet={settingsCache} />}
+            walletSumDetails={
+              <WalletDetails
+                walletAmount={balance}
+                rewards={this.getRewardBalance(publicDeriver)}
+                onUpdateHideBalance={this.updateHideBalance}
+                shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+                getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+                isRefreshing={false}
               />
             }
-            walletSumDetails={<WalletDetails
-              walletAmount={balance}
-              rewards={this.getRewardBalance(publicDeriver)}
-              onUpdateHideBalance={this.updateHideBalance}
-              shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-              getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-              isRefreshing={false}
-            />}
-            openWallet={() => { this.openToTransactions(publicDeriver) }}
+            openWallet={() => {
+              this.openToTransactions(publicDeriver);
+            }}
             onCancel={walletRestoreActions.back.trigger}
           />
         );
@@ -231,13 +221,18 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         if (restoreRequest.error instanceof CheckAddressesInUseApiError === false) {
           error = restoreRequest.error;
         }
-        const isSubmitting = restoreRequest.isExecuting ||
-          (restoreRequest.error instanceof CheckAddressesInUseApiError);
+        const isSubmitting =
+          restoreRequest.isExecuting || restoreRequest.error instanceof CheckAddressesInUseApiError;
         return (
           <WalletRestoreVerifyDialog
             plates={walletRestore.recoveryResult?.plates ?? []}
-            selectedExplorer={this.generated.stores.explorers.selectedExplorer
-              .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+            selectedExplorer={
+              this.generated.stores.explorers.selectedExplorer.get(
+                this.getSelectedNetwork().NetworkId
+              ) ??
+              (() => {
+                throw new Error('No explorer for wallet network');
+              })()
             }
             onNext={actions.walletRestore.verifyMnemonic.trigger}
             onCancel={walletRestoreActions.back.trigger}
@@ -253,9 +248,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
                 });
               }
             }}
-            notification={uiNotifications.getTooltipActiveNotification(
-              this.notificationElementId
-            )}
+            notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
             isSubmitting={!isJormungandr(this.getSelectedNetwork()) && isSubmitting}
             error={error}
           />
@@ -276,7 +269,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       case RestoreSteps.TRANSFER_TX_GEN: {
         return this._transferDialogContent();
       }
-      default: return null;
+      default:
+        return null;
     }
   }
 
@@ -289,51 +283,55 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const { yoroiTransfer } = this.generated.stores;
     const adaWalletRestoreActions = this.generated.actions[ApiOptions.ada].walletRestore;
     const walletRestoreActions = this.generated.actions.walletRestore;
-    const { profile, } = this.generated.stores;
+    const { profile } = this.generated.stores;
     const { intl } = this.context;
 
     switch (yoroiTransfer.status) {
       // we have to verify briefly go through this step
       // and we don't want to throw an error for it
-      case TransferStatus.DISPLAY_CHECKSUM: return null;
+      case TransferStatus.DISPLAY_CHECKSUM:
+        return null;
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
-        return (
-          <YoroiTransferWaitingPage status={yoroiTransfer.status} />
-        );
+        return <YoroiTransferWaitingPage status={yoroiTransfer.status} />;
       case TransferStatus.READY_TO_TRANSFER: {
         if (yoroiTransfer.transferTx == null) {
           return null; // TODO: throw error? Shouldn't happen
         }
-        return (<TransferSummaryPage
-          form={null}
-          transferTx={yoroiTransfer.transferTx}
-          selectedExplorer={this.generated.stores.explorers.selectedExplorer
-            .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
-          }
-          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-          onSubmit={{
-            label: intl.formatMessage(globalMessages.nextButtonLabel),
-            trigger: adaWalletRestoreActions.transferFromLegacy.trigger,
-          }}
-          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-          onCancel={{
-            label: intl.formatMessage(globalMessages.cancel),
-            trigger: this.onCancel
-          }}
-          error={yoroiTransfer.error}
-          addressLookup={
-            /** no wallet is created yet so we can't know this information */
-            () => undefined
-          }
-          dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
-          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
-          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-          addressToDisplayString={
-            addr => addressToDisplayString(addr, this.getSelectedNetwork())
-          }
-        />);
+        return (
+          <TransferSummaryPage
+            form={null}
+            transferTx={yoroiTransfer.transferTx}
+            selectedExplorer={
+              this.generated.stores.explorers.selectedExplorer.get(
+                this.getSelectedNetwork().NetworkId
+              ) ??
+              (() => {
+                throw new Error('No explorer for wallet network');
+              })()
+            }
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            onSubmit={{
+              label: intl.formatMessage(globalMessages.nextButtonLabel),
+              trigger: adaWalletRestoreActions.transferFromLegacy.trigger,
+            }}
+            isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+            onCancel={{
+              label: intl.formatMessage(globalMessages.cancel),
+              trigger: this.onCancel,
+            }}
+            error={yoroiTransfer.error}
+            addressLookup={
+              /** no wallet is created yet so we can't know this information */
+              () => undefined
+            }
+            dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+            addressToDisplayString={addr => addressToDisplayString(addr, this.getSelectedNetwork())}
+          />
+        );
       }
       case TransferStatus.ERROR: {
         if (!(yoroiTransfer.error instanceof NoInputsError)) {
@@ -365,7 +363,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       case TransferStatus.UNINITIALIZED: {
         return null;
       }
-      default: throw new Error(`${nameof(WalletRestoreDialogContainer)} tx status ${yoroiTransfer.status}`);
+      default:
+        throw new Error(
+          `${nameof(WalletRestoreDialogContainer)} tx status ${yoroiTransfer.status}`
+        );
     }
   }
 
@@ -373,58 +374,58 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     actions: {|
       profile: {|
         updateHideBalance: {|
-          trigger: (params: void) => Promise<void>
-        |}
+          trigger: (params: void) => Promise<void>,
+        |},
       |},
       router: {|
         goToRoute: {|
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
-          |}) => void
-        |}
+            route: string,
+          |}) => void,
+        |},
       |},
       walletRestore: {|
         back: {| trigger: (params: void) => void |},
         reset: {| trigger: (params: void) => void |},
         setMode: {|
-          trigger: (params: RestoreModeType) => void
+          trigger: (params: RestoreModeType) => void,
         |},
         startCheck: {|
-          trigger: (params: void) => Promise<void>
+          trigger: (params: void) => Promise<void>,
         |},
         startRestore: {|
-          trigger: (params: void) => Promise<void>
+          trigger: (params: void) => Promise<void>,
         |},
         submitFields: {|
-          trigger: (params: WalletRestoreMeta) => Promise<void>
+          trigger: (params: PaperWalletRestoreMeta) => Promise<void>,
         |},
         verifyMnemonic: {|
-          trigger: (params: void) => Promise<void>
-        |}
+          trigger: (params: void) => Promise<void>,
+        |},
       |},
       ada: {|
         walletRestore: {|
           transferFromLegacy: {|
-            trigger: (params: void) => Promise<void>
+            trigger: (params: void) => Promise<void>,
           |},
-        |}
+        |},
       |},
       notifications: {|
-        open: {| trigger: (params: Notification) => void |}
+        open: {| trigger: (params: Notification) => void |},
       |},
       wallets: {|
         setActiveWallet: {|
           trigger: (params: {|
-            wallet: PublicDeriver<>
-          |}) => void
-        |}
-      |}
+            wallet: PublicDeriver<>,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?string
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -436,18 +437,16 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         shouldHideBalance: boolean,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests
+        getTxRequests: (PublicDeriver<>) => TxRequests,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
       walletSettings: {|
-        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
       |},
       delegation: {|
-        getDelegationRequests: (
-          PublicDeriver<>
-        ) => void | DelegationRequests
+        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
       walletRestore: {|
         recoveryResult: void | {|
@@ -456,7 +455,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         |},
         step: RestoreStepsType,
         duplicatedWallet: null | void | PublicDeriver<>,
-        walletRestoreMeta: void | WalletRestoreMeta,
+        walletRestoreMeta: void | PaperWalletRestoreMeta,
         isValidMnemonic: ({|
           mnemonic: string,
           mode: RestoreModeType,
@@ -465,30 +464,30 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       yoroiTransfer: {|
         error: ?LocalizableError,
         status: TransferStatusT,
-        transferTx: ?TransferTx
+        transferTx: ?TransferTx,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
-        isOpen: string => boolean
+        isOpen: string => boolean,
       |},
       wallets: {|
         sendMoneyRequest: {| isExecuting: boolean |},
         restoreRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
-          reset: () => void
+          reset: () => void,
         |},
         getPublicKeyCache: IGetPublic => PublicKeyCache,
-      |}
-    |}
-    |} {
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(WalletRestoreDialogContainer)} no way to generated props`);
     }
-    const { stores, actions, } = this.props;
+    const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
         explorers: {
@@ -508,8 +507,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
         walletSettings: {
-          getConceptualWalletSettingsCache:
-            stores.walletSettings.getConceptualWalletSettingsCache,
+          getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
