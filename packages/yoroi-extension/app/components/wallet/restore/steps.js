@@ -8,7 +8,7 @@ export const RESTORE_WALLET_STEPS = Object.freeze({
   ADD_WALLET_DETAILS: 'ADD_WALLET_DETAILS',
 });
 
-export function getFirstRestorationStep() {
+export function getFirstRestorationStep(): string {
   if (environment.isDev() || environment.isNightly()) return RESTORE_WALLET_STEPS.SELECT_NETWORK;
 
   return RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE;
