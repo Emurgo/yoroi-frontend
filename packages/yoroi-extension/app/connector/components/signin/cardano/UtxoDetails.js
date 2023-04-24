@@ -106,11 +106,11 @@ class CardanoUtxoDetails extends Component<Props> {
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
-    if (request.address == null) return null;
+    if (Boolean(request.address)) return null;
 
-    const addressValue = request.address.value ?? request.address.values;
+    const addressValue = request.address.value;
 
-    if (addressValue == undefined) return null;
+    if (addressValue === undefined) return null;
 
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
     const divKey = identifier =>
