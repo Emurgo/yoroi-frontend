@@ -122,7 +122,7 @@
   "global.receive": "Receive",
   "global.connector.connectedWebsites": "Các Websites đã được kết nối",
   "global.connector.messageReadOnly": "Chúng tôi đang cấp quyền chỉ đọc để xem utxos/địa chỉ.",
-  "global.connector.yoroiDappConnector": "Yoroi dApp Connector",
+  "global.connector.yoroiDappConnector": "Yoroi Dapp Connector",
   "global.contact": "liên hệ hỗ trợ",
   "global.copyTooltipMessage": "Đã sao lưu",
   "global.errors.fieldIsRequired": "Đây là trường thông tin cần nhập.",

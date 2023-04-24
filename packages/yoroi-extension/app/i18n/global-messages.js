@@ -32,6 +32,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.nft',
     defaultMessage: '!!!NFTs',
   },
+  passwordLabel: {
+    id: 'global.labels.password',
+    defaultMessage: '!!!Password',
+  },
   receiverLabel: {
     id: 'wallet.send.form.receiver.label',
     defaultMessage: '!!!Receiver',
@@ -1031,6 +1035,10 @@ export const connectorMessages: * = defineMessages({
   signTransaction: {
     id: 'connector.settings.signTransaction',
     defaultMessage: '!!!Sign transaction',
+  },
+  signData: {
+    id: 'connector.signin.signData',
+    defaultMessage: '!!!Sign data',
   },
   connect: {
     id: 'connector.settings.connect',
