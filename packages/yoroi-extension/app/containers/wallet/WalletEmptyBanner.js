@@ -29,51 +29,69 @@ const messages = defineMessages({
 });
 
 function WalletEmptyBanner({ onBuySellClick, intl, goToReceivePage }: Props & Intl): Node {
+  const actions = [
+    {
+      label: intl.formatMessage(globalMessages.buy),
+      variant: 'contained',
+      onClick: onBuySellClick,
+    },
+    {
+      label: intl.formatMessage(globalMessages.receive),
+      variant: 'outlined',
+      onClick: goToReceivePage,
+    },
+  ];
+
   return (
-    <Box
-      sx={{
-        background: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
-        minHeight: 198,
-        marginBottom: '40px',
-        borderRadius: '8px',
-        overflowY: 'hidden',
-        position: 'relative',
-        padding: '24px',
-      }}
-    >
-      <Box sx={{ position: 'absolute', right: '10%', top: '-10%' }}>
-        <CoverBg />
-      </Box>
-      <Box>
-        <Typography variant="h3" color="common.black" fontWeight={500} mb="8px">
-          {intl.formatMessage(messages.welcomeMessage)}
-        </Typography>
-        <Typography variant="body1" color="common.black" maxWidth="500px" mb="48px">
-          {intl.formatMessage(messages.welcomeMessageSubtitle)}
-        </Typography>
-      </Box>
-      <Stack direction="row" gap="16px">
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ width: '100px' }}
-          onClick={onBuySellClick}
-        >
-          <Typography variant="button2" fontWeight={500}>
-            {intl.formatMessage(globalMessages.buy)}
+    <Box>
+      <Box
+        sx={{
+          background: theme => theme.palette.background.gradients.walletEmptyCard,
+          marginBottom: '40px',
+          borderRadius: '8px',
+          overflowY: 'hidden',
+          position: 'relative',
+          padding: '24px',
+        }}
+      >
+        <Box sx={{ position: 'absolute', right: '10%', top: '-10%' }}>
+          <CoverBg />
+        </Box>
+        <Box>
+          <Typography variant="h3" color="common.black" fontWeight={500} mb="8px">
+            {intl.formatMessage(messages.welcomeMessage)}
           </Typography>
-        </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          sx={{ width: '100px' }}
-          onClick={goToReceivePage}
-        >
-          <Typography variant="button2" fontWeight={500}>
-            {intl.formatMessage(globalMessages.receive)}
+          <Typography variant="body1" color="common.black" maxWidth="500px" mb="48px">
+            {intl.formatMessage(messages.welcomeMessageSubtitle)}
           </Typography>
-        </Button>
-      </Stack>
+        </Box>
+        <Stack direction="row" gap="16px">
+          {actions.map(action => (
+            <Button
+              key={action.label}
+              variant={action.variant}
+              color="primary"
+              sx={{
+                width: '100px',
+                '&.MuiButton-sizeMedium': {
+                  height: '40px',
+                },
+              }}
+              onClick={action.onClick}
+            >
+              <Typography
+                variant="button2"
+                fontWeight={500}
+                sx={{
+                  lineHeight: '19px',
+                }}
+              >
+                {action.label}
+              </Typography>
+            </Button>
+          ))}
+        </Stack>
+      </Box>
     </Box>
   );
 }

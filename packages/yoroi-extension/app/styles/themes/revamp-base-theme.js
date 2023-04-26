@@ -51,6 +51,9 @@ const theme = {
         title: '#ffffff',
         subtitle: '#ffffff',
       },
+      gradients: {
+        walletEmptyCard: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
+      },
     },
   },
   shape: {
@@ -155,4 +158,3 @@ const theme = {
   },
 };
 export const revampBaseTheme: Object = createTheme(deepmerge(commonTheme, theme));
-
