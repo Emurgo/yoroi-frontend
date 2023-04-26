@@ -1007,20 +1007,20 @@ function handleInjectorConnect(port) {
                 rpcResponse(resp);
               } else {
                 const resultWitnessSetHex: string = resp.ok;
-                const inputWitnessSetHex: string | null = RustModule.WasmScope(Scope => {
-                  try {
-                    const fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
-                    return fullTx.witness_set().to_hex();
-                  } catch {
-                    // no input witness set
-                    return null;
-                  }
-                });
-                const isFullTx = inputWitnessSetHex != null;
-                const finalWitnessSetHex = inputWitnessSetHex == null
-                  ? resultWitnessSetHex
-                  : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
                 if (returnTx) {
+                  const inputWitnessSetHex: string | null = RustModule.WasmScope(Scope => {
+                    try {
+                      const fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
+                      return fullTx.witness_set().to_hex();
+                    } catch {
+                      // no input witness set
+                      return null;
+                    }
+                  });
+                  const isFullTx = inputWitnessSetHex != null;
+                  const finalWitnessSetHex = inputWitnessSetHex == null
+                    ? resultWitnessSetHex
+                    : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
                   RustModule.WasmScope(Scope => {
                     const fullTx = isFullTx
                       ? Scope.WalletV4.FixedTransaction.from_hex(tx)
@@ -1032,7 +1032,7 @@ function handleInjectorConnect(port) {
                     rpcResponse({ ok: fullTx.to_hex() });
                   });
                 } else {
-                  rpcResponse({ ok: finalWitnessSetHex });
+                  rpcResponse({ ok: resultWitnessSetHex });
                 }
               }
             } catch (e) {
