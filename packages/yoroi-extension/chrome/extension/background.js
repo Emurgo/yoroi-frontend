@@ -1017,8 +1017,9 @@ function handleInjectorConnect(port) {
                   }
                 });
                 const isFullTx = inputWitnessSetHex != null;
-                const finalWitnessSetHex =
-                  mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
+                const finalWitnessSetHex = inputWitnessSetHex == null
+                  ? resultWitnessSetHex
+                  : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
                 if (returnTx) {
                   RustModule.WasmScope(Scope => {
                     const fullTx = isFullTx
