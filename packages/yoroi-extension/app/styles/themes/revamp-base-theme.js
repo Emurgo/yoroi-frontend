@@ -51,6 +51,9 @@ const theme = {
         title: '#ffffff',
         subtitle: '#ffffff',
       },
+      gradients: {
+        primary: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
+      },
     },
   },
   shape: {
@@ -155,4 +158,3 @@ const theme = {
   },
 };
 export const revampBaseTheme: Object = createTheme(deepmerge(commonTheme, theme));
-

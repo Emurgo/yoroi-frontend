@@ -4,13 +4,14 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, Link } from '@mui/material';
 import StepController from './StepController';
 import SaveRecoveryPhraseTipsDialog from './SaveRecoveryPhraseTipsDialog';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import { isDialogShownBefore, TIPS_DIALOGS } from './steps';
 import globalMessages from '../../../i18n/global-messages';
 import type { ManageDialogsProps } from './CreateWalletPage';
+import { messages as infoDialogMessages } from '../../widgets/infoDialog';
 
 const messages: * = defineMessages({
   description: {
@@ -30,7 +31,8 @@ type Props = {|
   ...ManageDialogsProps,
 |};
 
-function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
+// eslint-disable-next-line no-unused-vars
+function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   const { nextStep, prevStep, isDialogOpen, openDialog, closeDialog, intl } = props;
 
   const isActiveDialog = isDialogOpen(SaveRecoveryPhraseTipsDialog);
@@ -94,6 +96,108 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         open={isActiveDialog}
         onClose={() => closeDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
       />
+    </Stack>
+  );
+}
+
+const text: * = defineMessages({
+  shortDescription: {
+    id: 'wallet.create.firstStep.shortDescription',
+    defaultMessage:
+      '!!!<strong>Read this information carefully</strong> before saving your recovery phrase:',
+  },
+  firstTip: {
+    id: 'wallet.create.firstStep.firstTip',
+    defaultMessage: '!!!<strong>Recovery phrase</strong> is a unique combination of words',
+  },
+  secondTip: {
+    id: 'wallet.create.firstStep.secondTip',
+    defaultMessage: '!!!<strong>Recovery phrase</strong> is the only way to access your wallet',
+  },
+  thirdTip: {
+    id: 'wallet.create.firstStep.thirdTip',
+    defaultMessage:
+      '!!!If you lose your <strong>recovery phrase</strong>, it will not be possible to recover your wallet',
+  },
+  fourthTip: {
+    id: 'wallet.create.firstStep.fourthTip',
+    defaultMessage:
+      '!!!You are the only person who knows and stores your <strong>recovery phrase</strong>',
+  },
+  fifthTip: {
+    id: 'wallet.create.firstStep.fifthTip',
+    defaultMessage:
+      '!!!<strong>Yoroi NEVER</strong> asks for your <strong>recovery phrase</strong>. Watch out for scammers and impersonators',
+  },
+});
+
+function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
+  const { nextStep, prevStep, intl } = props;
+  const tips = [text.firstTip, text.secondTip, text.thirdTip, text.fourthTip, text.fifthTip];
+
+  return (
+    <Stack alignItems="center" justifyContent="center">
+      <Stack maxWidth="648px">
+        <Typography mb="16px" variant="body1">
+          <FormattedHTMLMessage {...text.shortDescription} />
+        </Typography>
+
+        <Stack
+          sx={{
+            background: theme => theme.palette.background.gradients.primary,
+            borderRadius: theme => theme.shape.borderRadius + 'px',
+            padding: '16px',
+            paddingLeft: '40px',
+            color: 'primary.600',
+          }}
+        >
+          <Box
+            component="ul"
+            sx={{
+              listStyle: 'outside',
+            }}
+          >
+            {tips.map(tip => (
+              <Box component="li" key={tip.id}>
+                <Typography variant="body1" color="primary.600" mb="4px">
+                  <FormattedHTMLMessage {...tip} />
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Stack>
+
+        <Link
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi-"
+          target="_blank"
+          rel="noreferrer noopener"
+          sx={{
+            textDecoration: 'none',
+            display: 'block',
+            py: '16px',
+            mb: '20px',
+          }}
+        >
+          {intl.formatMessage(infoDialogMessages.learnMore)}
+        </Link>
+
+        <StepController
+          actions={[
+            {
+              label: intl.formatMessage(globalMessages.backButtonLabel),
+              disabled: false,
+              onClick: prevStep,
+              type: 'secondary',
+            },
+            {
+              label: intl.formatMessage(globalMessages.nextButtonLabel),
+              disabled: false,
+              onClick: nextStep,
+              type: 'primary',
+            },
+          ]}
+        />
+      </Stack>
     </Stack>
   );
 }
