@@ -31,6 +31,8 @@ type Props = {|
   ...ManageDialogsProps,
 |};
 
+//! Note: this component will be disabled for now until the video about creating
+//! new wallet is ready.
 // eslint-disable-next-line no-unused-vars
 function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   const { nextStep, prevStep, isDialogOpen, openDialog, closeDialog, intl } = props;
