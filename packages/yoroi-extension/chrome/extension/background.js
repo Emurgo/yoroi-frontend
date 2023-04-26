@@ -91,6 +91,7 @@ import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
+import { mergeWitnessSets } from './connector/utils';
 
 /*::
 declare var chrome;
@@ -1004,110 +1005,34 @@ function handleInjectorConnect(port) {
                 );
               if (resp?.ok == null) {
                 rpcResponse(resp);
-              } else if (returnTx) {
-                const bodyOrTxBytes = hexToBytes(tx);
-                // $FlowFixMe[prop-missing]
-                const witnessSetBytes = hexToBytes(resp.ok);
-                // eslint-disable-next-line no-shadow
-                RustModule.WasmScope(Scope => {
-                  let fullTx;
-                  try {
-                    fullTx = Scope.WalletV4.FixedTransaction.new(
-                      bodyOrTxBytes,
-                      witnessSetBytes,
-                      true,
-                    );
-                  } catch {
-                    // merge new witness set into the input witness set
-                    fullTx = Scope.WalletV4.FixedTransaction.from_bytes(bodyOrTxBytes);
-                    const originalWitnessSet = fullTx.witness_set();
-                    const newWitnessSet = Scope.WalletV4.TransactionWitnessSet.from_bytes(
-                      witnessSetBytes
-                    );
-                    const mergedWitnessSet = Scope.WalletV4.TransactionWitnessSet.new();
-                    let vkeys = originalWitnessSet.vkeys();
-                    const newVkeys = newWitnessSet.vkeys();
-                    if (vkeys && newVkeys) {
-                      for (let i = 0; i < newVkeys.len(); i++) {
-                        vkeys.add(newVkeys.get(i));
-                      }
-                    } else if (newVkeys) {
-                      vkeys = newVkeys;
-                    }
-                    if (vkeys) {
-                      mergedWitnessSet.set_vkeys(vkeys);
-                    }
-
-                    let nativeScripts = originalWitnessSet.native_scripts();
-                    const newNativeScripts = newWitnessSet.native_scripts();
-                    if (nativeScripts && newNativeScripts) {
-                      for (let i = 0; i < newNativeScripts.len(); i++) {
-                        nativeScripts.add(newNativeScripts.get(i));
-                      }
-                    } else if (newNativeScripts) {
-                      nativeScripts = newNativeScripts;
-                    }
-                    if (nativeScripts) {
-                      mergedWitnessSet.set_native_scripts(nativeScripts);
-                    }
-
-                    let bootstraps = originalWitnessSet.bootstraps();
-                    const newBootstraps = newWitnessSet.bootstraps();
-                    if (bootstraps && newBootstraps) {
-                      for (let i =0; i < newBootstraps.len(); i++) {
-                        bootstraps.add(newBootstraps.get(i));
-                      }
-                    } else if (newBootstraps) {
-                      bootstraps = newBootstraps;
-                    }
-                    if (bootstraps) {
-                      mergedWitnessSet.set_bootstraps(bootstraps);
-                    }
-
-                    let plutusScripts = originalWitnessSet.plutus_scripts();
-                    const newPlutusScripts = newWitnessSet.plutus_scripts();
-                    if (plutusScripts && newPlutusScripts) {
-                      for (let i = 0; i < newPlutusScripts.len(); i++) {
-                        plutusScripts.add(newPlutusScripts.get(i));
-                      }
-                    } else if (newPlutusScripts) {
-                      plutusScripts = newPlutusScripts;
-                    }
-                    if (plutusScripts) {
-                      mergedWitnessSet.set_plutus_scripts(plutusScripts);
-                    }
-
-                    let plutusData = originalWitnessSet.plutus_data();
-                    const newPlutusData = newWitnessSet.plutus_data();
-                    if (plutusData && newPlutusData) {
-                      for (let i = 0; i < newPlutusData.len(); i++) {
-                        plutusData.add(newPlutusData.get(i));
-                      }
-                    } else if (newPlutusData) {
-                      plutusData = newPlutusData;
-                    }
-                    if (plutusData) {
-                      mergedWitnessSet.set_plutus_data(plutusData);
-                    }
-
-                    let redeemers = originalWitnessSet.redeemers();
-                    const newRedeemers = newWitnessSet.redeemers();
-                    if (redeemers && newRedeemers) {
-                      for (let i = 0; i < newRedeemers.len(); i++) {
-                        redeemers.add(newRedeemers.get(i));
-                      }
-                    } else if (newRedeemers) {
-                      redeemers = newRedeemers;
-                    }
-                    if (redeemers) {
-                      mergedWitnessSet.set_redeemers(redeemers);
-                    }
-                    fullTx.set_witness_set(mergedWitnessSet.to_bytes());
-                  }
-                  rpcResponse({ ok: fullTx.to_hex() });
-                });
               } else {
-                rpcResponse({ ok: resp.ok });
+                const resultWitnessSetHex: string = resp.ok;
+                const inputWitnessSetHex: string | null = RustModule.WasmScope(Scope => {
+                  try {
+                    const fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
+                    return fullTx.witness_set().to_hex();
+                  } catch {
+                    // no input witness set
+                    return null;
+                  }
+                });
+                const isFullTx = inputWitnessSetHex != null;
+                const finalWitnessSetHex =
+                  mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
+                if (returnTx) {
+                  RustModule.WasmScope(Scope => {
+                    const fullTx = isFullTx
+                      ? Scope.WalletV4.FixedTransaction.from_hex(tx)
+                      : Scope.WalletV4.FixedTransaction.new(
+                        hexToBytes(tx),
+                        hexToBytes(finalWitnessSetHex),
+                        true,
+                      );
+                    rpcResponse({ ok: fullTx.to_hex() });
+                  });
+                } else {
+                  rpcResponse({ ok: finalWitnessSetHex });
+                }
               }
             } catch (e) {
               handleError(e);
