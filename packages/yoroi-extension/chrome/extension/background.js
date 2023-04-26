@@ -1022,13 +1022,17 @@ function handleInjectorConnect(port) {
                     ? resultWitnessSetHex
                     : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
                   RustModule.WasmScope(Scope => {
-                    const fullTx = isFullTx
-                      ? Scope.WalletV4.FixedTransaction.from_hex(tx)
-                      : Scope.WalletV4.FixedTransaction.new(
+                    let fullTx;
+                    if (isFullTx) {
+                      fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
+                      fullTx.set_witness_set(hexToBytes(finalWitnessSetHex));
+                    } else {
+                      fullTx = Scope.WalletV4.FixedTransaction.new(
                         hexToBytes(tx),
                         hexToBytes(finalWitnessSetHex),
                         true,
                       );
+                    }
                     rpcResponse({ ok: fullTx.to_hex() });
                   });
                 } else {
