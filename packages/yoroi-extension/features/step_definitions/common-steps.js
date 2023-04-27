@@ -560,6 +560,10 @@ Given(/^I have opened the extension$/, async function () {
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();
   }
+  // this string is for local debug only. It sets the same resolution as on Github virtual display
+  if (process.env.LIKE_GITHUB_DISPLAY != null && process.env.LIKE_GITHUB_DISPLAY === '1') {
+    this.driver.manage().window().setRect({ x: 0, y: 0, width: 989, height: 1113 });
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
