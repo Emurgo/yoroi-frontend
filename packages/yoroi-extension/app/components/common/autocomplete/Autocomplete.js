@@ -93,11 +93,27 @@ function Autocomplete({
           return changes;
       }
     },
-    onStateChange: ({ inputValue: stateInputValue, type, selectedItem }) => {
+    onStateChange: ({ inputValue: stateInputValue, type: stateType, selectedItem }) => {
       const stateTrimmedValue = stateInputValue?.trim() ?? '';
       const trimmedValue = inputValue?.trim() ?? '';
 
-      switch (type) {
+      // edge case where the user doesn't select an option
+      // neither uses the keyboard to enter, space or tab
+      if (stateType === useCombobox.stateChangeTypes.InputBlur) {
+        const index = highlightedIndex !== -1 ? highlightedIndex : 0;
+        const firstOption = filteredList[index] ?? '';
+        const noFullValue = !selectedItem && !Boolean(stateTrimmedValue);
+        const hasSuggestionsFromValue = Boolean(trimmedValue) && Boolean(firstOption);
+        if (noFullValue && hasSuggestionsFromValue) {
+          onChange(firstOption);
+          setInputValue(firstOption);
+          closeMenu();
+          return;
+        }
+      }
+
+      // all other cases
+      switch (stateType) {
         case useCombobox.stateChangeTypes.InputChange:
           if (stateTrimmedValue.length === 0) {
             closeMenu();
@@ -111,20 +127,6 @@ function Autocomplete({
           if (selectedItem || Boolean(stateTrimmedValue)) {
             onChange(selectedItem || stateTrimmedValue);
             setInputValue(selectedItem || stateTrimmedValue);
-            closeMenu();
-            return;
-          }
-
-          const firstOption = filteredList[highlightedIndex] ?? '';
-          if (
-            type === useCombobox.stateChangeTypes.InputBlur &&
-            !selectedItem &&
-            !Boolean(stateTrimmedValue) &&
-            Boolean(trimmedValue) &&
-            firstOption
-          ) {
-            onChange(firstOption);
-            setInputValue(firstOption);
             closeMenu();
           }
           break;
