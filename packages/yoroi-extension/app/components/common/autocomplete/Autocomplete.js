@@ -93,23 +93,38 @@ function Autocomplete({
           return changes;
       }
     },
-    // eslint-disable-next-line no-shadow
-    onStateChange: ({ inputValue, type, selectedItem }) => {
+    onStateChange: ({ inputValue: stateInputValue, type, selectedItem }) => {
+      const stateTrimmedValue = stateInputValue?.trim() ?? '';
       const trimmedValue = inputValue?.trim() ?? '';
+
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
-          if (trimmedValue.length === 0) {
+          if (stateTrimmedValue.length === 0) {
             closeMenu();
-            onChange(trimmedValue);
+            onChange(stateTrimmedValue);
           }
-          setInputValue(trimmedValue);
+          setInputValue(stateTrimmedValue);
           break;
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          if (selectedItem || Boolean(trimmedValue)) {
-            onChange(selectedItem || trimmedValue);
-            setInputValue(selectedItem || trimmedValue);
+          if (selectedItem || Boolean(stateTrimmedValue)) {
+            onChange(selectedItem || stateTrimmedValue);
+            setInputValue(selectedItem || stateTrimmedValue);
+            closeMenu();
+            return;
+          }
+
+          const firstOption = filteredList[highlightedIndex] ?? '';
+          if (
+            type === useCombobox.stateChangeTypes.InputBlur &&
+            !selectedItem &&
+            !Boolean(stateTrimmedValue) &&
+            Boolean(trimmedValue) &&
+            firstOption
+          ) {
+            onChange(firstOption);
+            setInputValue(firstOption);
             closeMenu();
           }
           break;
