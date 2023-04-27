@@ -93,23 +93,40 @@ function Autocomplete({
           return changes;
       }
     },
-    // eslint-disable-next-line no-shadow
-    onStateChange: ({ inputValue, type, selectedItem }) => {
+    onStateChange: ({ inputValue: stateInputValue, type: stateType, selectedItem }) => {
+      const stateTrimmedValue = stateInputValue?.trim() ?? '';
       const trimmedValue = inputValue?.trim() ?? '';
-      switch (type) {
+
+      // edge case where the user doesn't select an option
+      // neither uses the keyboard to enter, space or tab
+      if (stateType === useCombobox.stateChangeTypes.InputBlur) {
+        const index = highlightedIndex !== -1 ? highlightedIndex : 0;
+        const firstOption = filteredList[index] ?? '';
+        const noFullValue = !selectedItem && !Boolean(stateTrimmedValue);
+        const hasSuggestionsFromValue = Boolean(trimmedValue) && Boolean(firstOption);
+        if (noFullValue && hasSuggestionsFromValue) {
+          onChange(firstOption);
+          setInputValue(firstOption);
+          closeMenu();
+          return;
+        }
+      }
+
+      // all other cases
+      switch (stateType) {
         case useCombobox.stateChangeTypes.InputChange:
-          if (trimmedValue.length === 0) {
+          if (stateTrimmedValue.length === 0) {
             closeMenu();
-            onChange(trimmedValue);
+            onChange(stateTrimmedValue);
           }
-          setInputValue(trimmedValue);
+          setInputValue(stateTrimmedValue);
           break;
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          if (selectedItem || Boolean(trimmedValue)) {
-            onChange(selectedItem || trimmedValue);
-            setInputValue(selectedItem || trimmedValue);
+          if (selectedItem || Boolean(stateTrimmedValue)) {
+            onChange(selectedItem || stateTrimmedValue);
+            setInputValue(selectedItem || stateTrimmedValue);
             closeMenu();
           }
           break;
