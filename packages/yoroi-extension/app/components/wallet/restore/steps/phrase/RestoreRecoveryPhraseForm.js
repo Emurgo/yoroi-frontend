@@ -229,11 +229,13 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
               </Button>
             </Box>
 
-            <Box>
-              <Typography variant="body2" color={allWordsEntered ? '#FF1351' : 'transparent'}>
-                {mnemonicError}
-              </Typography>
-            </Box>
+            {allWordsEntered && (
+              <Box>
+                <Typography variant="body2" color="#FF1351">
+                  {mnemonicError}
+                </Typography>
+              </Box>
+            )}
           </>
         )}
 
