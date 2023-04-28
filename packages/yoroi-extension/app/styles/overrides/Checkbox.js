@@ -1,6 +1,6 @@
+// @flow
 import { revampBaseTheme } from '../themes/revamp-base-theme';
 
-// @flow
 const ClassicCheckbox = {
   styleOverrides: {
     root: {
@@ -33,7 +33,7 @@ const ModernCheckbox = {
   },
 };
 
-const RevampCheckbox = {
+const RevampCheckbox: any = {
   styleOverrides: {
     root: {
       padding: 0,
