@@ -139,8 +139,8 @@ TextField.defaultProps = {
 };
 
 function getEyeIcon(theme: 'revamp' | 'classic' | 'modern', showPassword: boolean): Node {
-  if (theme === 'revamp' && showPassword) return <ClosedEyeIconRevamp />;
-  if (theme === 'revamp' && !showPassword) return <OpenedEyeIconRevamp />;
+  if (theme === 'revamp' && !showPassword) return <ClosedEyeIconRevamp />;
+  if (theme === 'revamp' && showPassword) return <OpenedEyeIconRevamp />;
 
   return showPassword ? <CloseEyeIcon /> : <EyeIcon />;
 }
