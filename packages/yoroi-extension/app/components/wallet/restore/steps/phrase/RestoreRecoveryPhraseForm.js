@@ -208,11 +208,12 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
 
         {!isValidPhrase && (
           <>
-            <Box sx={{ width: '100px' }}>
+            <Box>
               <Button
                 variant="outlined"
                 color="primary"
                 onClick={form.onReset}
+                disabled={!recoveryPhrase.some(word => Boolean(word.value))}
                 sx={{
                   border: 0,
                   height: '1.5rem',
@@ -223,6 +224,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                   minWidth: 0,
                   minHeight: 0,
                   '&:hover': { border: 0 },
+                  '&.Mui-disabled': { border: 0 },
                 }}
               >
                 {intl.formatMessage(messages.clearAll)}

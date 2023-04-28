@@ -9,10 +9,14 @@ import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
 
-const messages: Object = defineMessages({
+export const messages: Object = defineMessages({
   dialogTitle: {
     id: 'wallet.infoDialog.title',
     defaultMessage: '!!!Tips',
+  },
+  learnMore: {
+    id: 'wallet.infoDialog.learnMore',
+    defaultMessage: '!!!Learn more on Yoroi Zendesk',
   },
 });
 
@@ -96,7 +100,7 @@ function InfoDialog(props: Props & Intl): Node {
             py: '24px',
           }}
         >
-          Learn more on Yoroi Zendesk
+          {intl.formatMessage(messages.learnMore)}
         </Link>
         <Stack alignItems="center" justifyContent="center">
           <Button

@@ -2,7 +2,7 @@
 import { createTheme } from '@mui/material/styles';
 import { RubikFonts, RobotoMonoFonts } from '../fonts';
 import {
-  ModernCheckbox,
+  RevampCheckbox,
   ModernTextField,
   ModernOutlinedInput,
   ModernFormHelperText,
@@ -30,7 +30,7 @@ const theme = {
     `,
     },
     MuiButton: RevampButton,
-    MuiCheckbox: ModernCheckbox,
+    MuiCheckbox: RevampCheckbox,
     MuiTextField: ModernTextField,
     MuiOutlinedInput: ModernOutlinedInput,
     MuiFormHelperText: ModernFormHelperText,
