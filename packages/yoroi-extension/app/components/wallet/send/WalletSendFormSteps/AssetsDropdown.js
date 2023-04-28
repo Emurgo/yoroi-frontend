@@ -8,9 +8,7 @@ import { ReactComponent as ArrowDownIcon } from '../../../../assets/images/arrow
 import globalMessages from '../../../../i18n/global-messages';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactComponent as DefaultNFTIcon } from '../../../../assets/images/nft-no.inline.svg';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
-import { urlResolveIpfs } from '../../../../coreUtils';
 import { NftImage } from '../../assets/NFTsList';
 import { Box } from '@mui/material';
 

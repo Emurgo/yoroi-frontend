@@ -78,7 +78,7 @@ function TextField({
         theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
       }
       InputProps={{
-        disableUnderline: revamp,
+        ...(Boolean(revamp) ? { disableUnderline: true } : {}),
         ...(theme.name === 'classic' ? { notched: false } : {}),
         endAdornment:
           type === 'password' ? (
