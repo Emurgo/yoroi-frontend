@@ -250,7 +250,7 @@ export default class SignTxContainer extends Component<
         component = null;
     }
 
-    return <Box sx={{ height: 'calc(100vh - 52px)' }}>{component}</Box>;
+    return <Box sx={{ height: 'calc(100vh - 52px)', bgcolor: "white" }}>{component}</Box>;
   }
 
   @computed get generated(): {|
