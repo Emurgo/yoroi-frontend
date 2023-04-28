@@ -82,10 +82,6 @@ export const messages: Object = defineMessages({
     id: 'wallet.send.form.dialog.noNFTsYet',
     defaultMessage: '!!!There are no NFTs in your wallet yet',
   },
-  add: {
-    id: 'wallet.send.form.dialog.confirm',
-    defaultMessage: '!!!confirm',
-  },
   nNft: {
     id: 'wallet.send.form.dialog.nNft',
     defaultMessage: '!!!NFT ({number})',
@@ -296,7 +292,7 @@ export default class AddNFTDialog extends Component<Props, State> {
             onClick={this.onAddAll}
             variant="ternary"
           >
-            {intl.formatMessage(messages.add)}
+            {intl.formatMessage(globalMessages.confirm)}
           </Button>
         )}
       </Dialog>
