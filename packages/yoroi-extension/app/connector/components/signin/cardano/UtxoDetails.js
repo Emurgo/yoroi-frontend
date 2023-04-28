@@ -106,7 +106,7 @@ class CardanoUtxoDetails extends Component<Props> {
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
-    if (Boolean(request.address)) return null;
+    if (!Boolean(request.address)) return null;
 
     const addressValue = request.address.value;
 
