@@ -7,13 +7,16 @@ import CheckboxLabel from '../../common/CheckboxLabel';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
 import globalMessages from '../../../i18n/global-messages';
-import { ReactComponent as NightlyIcon }  from '../../../assets/images/yoroi-nightly-icon.inline.svg';
+import { ReactComponent as NightlyIcon } from '../../../assets/images/yoroi-nightly-icon.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   header: {
     id: 'profile.nightly.header',
-    defaultMessage: '!!!<strong>Yoroi Nightly automatically updates nightly</strong> with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.',
+    defaultMessage:
+      '!!!<strong>Yoroi Nightly automatically updates nightly</strong> with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.',
   },
   warningHeader: {
     id: 'profile.nightly.warningHeader',
@@ -25,7 +28,8 @@ const messages = defineMessages({
   },
   warning2: {
     id: 'profile.nightly.warning2',
-    defaultMessage: '!!!Any transactions you send will be visible on-chain and in production servers.',
+    defaultMessage:
+      '!!!Any transactions you send will be visible on-chain and in production servers.',
   },
   recommendationHeader: {
     id: 'profile.nightly.recommendationHeader',
@@ -54,7 +58,7 @@ type State = {|
 |};
 
 @observer
-export default class NightlyForm extends Component<Props, State> {
+class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -69,6 +73,7 @@ export default class NightlyForm extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
+    const { onSubmit, isRevampLayout } = this.props;
 
     return (
       <div className={styles.component}>
@@ -78,29 +83,18 @@ export default class NightlyForm extends Component<Props, State> {
           </div>
           <div className={styles.content}>
             <FormattedHTMLMessage {...messages.header} />
-            <br /><br />
-            <div className={styles.header}>
-              {intl.formatMessage(messages.warningHeader)}
-            </div>
+            <br />
+            <br />
+            <div className={styles.header}>{intl.formatMessage(messages.warningHeader)}</div>
             <ul>
-              <li>
-                {intl.formatMessage(messages.warning1)}
-              </li>
-              <li>
-                {intl.formatMessage(messages.warning2)}
-              </li>
+              <li>{intl.formatMessage(messages.warning1)}</li>
+              <li>{intl.formatMessage(messages.warning2)}</li>
             </ul>
             <br />
-            <div className={styles.header}>
-              {intl.formatMessage(messages.recommendationHeader)}
-            </div>
+            <div className={styles.header}>{intl.formatMessage(messages.recommendationHeader)}</div>
             <ul>
-              <li>
-                {intl.formatMessage(messages.recommendation1)}
-              </li>
-              <li>
-                {intl.formatMessage(messages.recommendation2)}
-              </li>
+              <li>{intl.formatMessage(messages.recommendation1)}</li>
+              <li>{intl.formatMessage(messages.recommendation2)}</li>
             </ul>
           </div>
           <div className={styles.checkbox}>
@@ -111,8 +105,8 @@ export default class NightlyForm extends Component<Props, State> {
             />
           </div>
           <Button
-            variant="primary"
-            onClick={this.props.onSubmit}
+            variant={isRevampLayout ? 'contained' : 'primary'}
+            onClick={onSubmit}
             disabled={!this.state.acknowledgedRisks}
             sx={{ width: '480px' }}
           >
@@ -123,3 +117,5 @@ export default class NightlyForm extends Component<Props, State> {
     );
   }
 }
+
+export default (withLayout(NightlyForm): ComponentType<Props>);
