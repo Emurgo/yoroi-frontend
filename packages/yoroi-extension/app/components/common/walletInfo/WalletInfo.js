@@ -13,8 +13,8 @@ import {
   truncateLongName,
   maxNameLengthBeforeTruncation,
 } from '../../../utils/formatters';
-import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../../assets/images/forms/password-eye.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../../assets/images/forms/password-eye-close.inline.svg';
 import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
