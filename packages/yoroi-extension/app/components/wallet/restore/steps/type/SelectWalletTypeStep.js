@@ -50,16 +50,18 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
             label={intl.formatMessage(messages.twentyfourWords)}
           />
         </Box>
-        <StepController
-          actions={[
-            {
-              label: intl.formatMessage(globalMessages.backButtonLabel),
-              disabled: false,
-              onClick: goBack,
-              type: 'secondary',
-            },
-          ]}
-        />
+        <Box mt="74px">
+          <StepController
+            actions={[
+              {
+                label: intl.formatMessage(globalMessages.backButtonLabel),
+                disabled: false,
+                onClick: goBack,
+                type: 'secondary',
+              },
+            ]}
+          />
+        </Box>
       </Stack>
     </Stack>
   );
