@@ -135,7 +135,7 @@ class Wallet extends Component<AllProps> {
     const warning = this.getWarning(selectedWallet);
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const isFirstSync = stores.wallets.firstSync === selectedWallet.getPublicDeriverId();
+    const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
@@ -271,7 +271,7 @@ class Wallet extends Component<AllProps> {
       wallets: {|
         selected: null | PublicDeriver<>,
         publicDerivers: Array<PublicDeriver<>>,
-        firstSync: ?number,
+        firstSyncWalletId: ?number,
         getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       router: {| location: any |},
@@ -302,7 +302,7 @@ class Wallet extends Component<AllProps> {
         wallets: {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
-          firstSync: stores.wallets.firstSync,
+          firstSyncWalletId: stores.wallets.firstSyncWalletId,
           getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
         },
         walletSettings: {
