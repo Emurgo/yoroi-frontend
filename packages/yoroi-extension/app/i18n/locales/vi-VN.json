@@ -826,7 +826,6 @@
   "wallet.send.form.cannotSendToLegacy": "Không thể gửi tiền đến các địa chỉ cũ (bất kỳ địa chỉ nào được tạo trước ngày 29 tháng 7 năm 2020).",
   "wallet.send.form.cannotSendToP2SH": "Bạn không thể gửi tới địa chỉ pay-to-script-hash.",
   "wallet.send.form.cannotSendToReward": "Không thể gửi tiền vào tài khoản phần thưởng.",
-  "wallet.send.form.dialog.confirm": "!!!Confirm",
   "wallet.send.form.dialog.maxNumberAllowed": "<strong>{number} tài sản</strong> là số lượng tối đa được phép gửi trong một giao dịch",
   "wallet.send.form.dialog.minAda": "Min-ADA: {minAda}",
   "wallet.send.form.dialog.nNft": "NFT ({number})",
