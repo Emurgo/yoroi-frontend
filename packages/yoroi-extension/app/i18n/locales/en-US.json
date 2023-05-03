@@ -826,7 +826,6 @@
   "wallet.send.form.cannotSendToLegacy": "Unable to send funds to legacy addresses (any address created before July 29th, 2020).",
   "wallet.send.form.cannotSendToP2SH": "Unable to send funds to pay-to-script-hash addresses.",
   "wallet.send.form.cannotSendToReward": "Unable to send funds to a reward account.",
-  "wallet.send.form.dialog.confirm": "!!!Confirm",
   "wallet.send.form.dialog.maxNumberAllowed": "<strong>{number} Assets</strong> is maximum number allowed to be send in one transaction",
   "wallet.send.form.dialog.minAda": "Min-ADA: {minAda}",
   "wallet.send.form.dialog.nNft": "NFT ({number})",
