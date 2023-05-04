@@ -107,10 +107,6 @@ export const messages: Object = defineMessages({
     id: 'wallet.send.form.dialog.noTokensYet',
     defaultMessage: '!!!There are no tokens in your wallet yet',
   },
-  add: {
-    id: 'wallet.send.form.dialog.confirm',
-    defaultMessage: '!!!Confirm',
-  },
   minAda: {
     id: 'wallet.send.form.dialog.minAda',
     defaultMessage: '!!!Min-ADA: {minAda}',
@@ -424,7 +420,7 @@ export default class AddTokenDialog extends Component<Props, State> {
             onClick={this.onAddAll}
             variant="ternary"
           >
-            {intl.formatMessage(messages.add)}
+            {intl.formatMessage(globalMessages.confirm)}
           </Button>
         )}
       </Dialog>
