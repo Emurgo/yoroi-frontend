@@ -78,8 +78,8 @@ function TextField({
         theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
       }
       InputProps={{
-        disableUnderline: revamp,
-        ...(theme.name === 'classic' ? { notched: false } : {}),
+        ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
+        ...((theme.name === 'classic' ? { notched: false } : {}): any),
         endAdornment:
           type === 'password' ? (
             <InputAdornment
@@ -139,8 +139,8 @@ TextField.defaultProps = {
 };
 
 function getEyeIcon(theme: 'revamp' | 'classic' | 'modern', showPassword: boolean): Node {
-  if (theme === 'revamp' && showPassword) return <ClosedEyeIconRevamp />;
-  if (theme === 'revamp' && !showPassword) return <OpenedEyeIconRevamp />;
+  if (theme === 'revamp' && !showPassword) return <ClosedEyeIconRevamp />;
+  if (theme === 'revamp' && showPassword) return <OpenedEyeIconRevamp />;
 
   return showPassword ? <CloseEyeIcon /> : <EyeIcon />;
 }

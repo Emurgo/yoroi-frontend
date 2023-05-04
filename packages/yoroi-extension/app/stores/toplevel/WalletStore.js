@@ -32,7 +32,7 @@ import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/P
 import { getApiForNetwork } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getCurrentWalletFromLS, markExistingWalletsAsSynced, updateSyncedWallets } from '../../utils/localStorage';
+import { getCurrentWalletFromLS, updateSyncedWallets } from '../../utils/localStorage';
 import { getWalletChecksum } from '../../api/export/utils';
 
 type GroupedWallets = {|
@@ -93,7 +93,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable firstSync: ?number;
+  @observable firstSyncWalletId: ?number;
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -155,9 +155,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     document.addEventListener(
       'visibilitychange',
-      debounce((_e) => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
+      debounce(_e => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
     );
-
   }
 
   @action
@@ -229,12 +228,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
-      await markExistingWalletsAsSynced(this.stores.wallets.publicDerivers)
       const wallet = await getCurrentWalletFromLS(publicDeriver);
       if (!wallet || !wallet.isSynced) {
         runInAction(() => {
-          this.firstSync = publicDeriver.getPublicDeriverId()
-        })
+          this.firstSyncWalletId = publicDeriver.getPublicDeriverId();
+        });
       }
 
       await this.stores.transactions.refreshTransactionData({
@@ -242,14 +240,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         localRequest: false,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
+      await updateSyncedWallets(publicDeriver);
 
-      await updateSyncedWallets(publicDeriver)
-       if (typeof this.firstSync === 'number') {
+      if (typeof this.firstSyncWalletId === 'number') {
         runInAction(() => {
-          this.firstSync = null
-        })
+          this.firstSyncWalletId = null;
+        });
       }
-
     } catch (error) {
       Logger.error(
         `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
@@ -375,20 +372,19 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void =
-    ({ wallet }) => {
-      this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
-      this.selected = wallet;
-      // Cache select wallet
-      this.api.localStorage.setSelectedWalletId(wallet.getPublicDeriverId())
-      // do not await on purpose since the UI will handle adding loaders while refresh is happening
-      this.refreshWalletFromRemote(wallet);
-    };
+  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void = ({ wallet }) => {
+    this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
+    this.selected = wallet;
+    // Cache select wallet
+    this.api.localStorage.setSelectedWalletId(wallet.getPublicDeriverId());
+    // do not await on purpose since the UI will handle adding loaders while refresh is happening
+    this.refreshWalletFromRemote(wallet);
+  };
 
   getLastSelectedWallet: void => ?PublicDeriver<> = () => {
     const walletId = this.api.localStorage.getSelectedWalletId();
     return this.publicDerivers.find(pd => pd.getPublicDeriverId() === walletId);
-  }
+  };
 
   @action _unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);
@@ -424,7 +420,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     } else {
       this._refreshAllWalletsSerial();
     }
-  }
+  };
   _refreshAllWalletsSerial: void => Promise<void> = async () => {
     for (const publicDeriver of this.publicDerivers) {
       if (this.stores.serverConnectionStore.parallelSync) {
@@ -439,10 +435,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
     }
     setTimeout(this._refreshAllWalletsSerial, this.WALLET_REFRESH_INTERVAL);
-  }
-  _startParallelRefreshForWallet: (PublicDeriver<>) => Promise<void> = async (
-    publicDeriver
-  ) => {
+  };
+  _startParallelRefreshForWallet: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     if (!this.stores.serverConnectionStore.parallelSync) {
       return;
     }
@@ -453,7 +447,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this._startParallelRefreshForWallet.bind(this, publicDeriver),
       this.WALLET_REFRESH_INTERVAL
     );
-  }
+  };
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
