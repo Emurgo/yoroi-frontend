@@ -141,7 +141,7 @@ function Autocomplete({
     const noInputValue = inputValue?.length === 0;
 
     // Prevent tab if word not correct
-    if (code === 'Tab' && (hasError || noInputValue) && !shiftKey) {
+    if (code === 'Tab' && hasError && !shiftKey) {
       e.preventDefault();
     }
 

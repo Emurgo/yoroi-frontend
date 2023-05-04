@@ -13,7 +13,7 @@ import globalMessages from '../../../../../i18n/global-messages';
 import config from '../../../../../config';
 import Autocomplete from '../../../../common/autocomplete/Autocomplete';
 import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Fade, Stack, Typography } from '@mui/material';
 import styles from './EnterRecoveryPhraseStep.scss';
 import environment from '../../../../../environment';
 
@@ -126,7 +126,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
     });
   };
 
-  // hack to get the refs
+  //! hack to get the refs
   componentDidMount() {
     this.setState({ mounted: true });
     if (environment.isDev()) console.log(this.state.mounted);
@@ -208,19 +208,21 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
 
         {!isValidPhrase && (
           <>
-            <Box>
+            <Fade in={!isValidPhrase}>
               <Button
                 variant="outlined"
                 color="primary"
+                size="small"
                 onClick={form.onReset}
                 disabled={!recoveryPhrase.some(word => Boolean(word.value))}
                 sx={{
                   border: 0,
-                  height: '1.5rem',
+                  height: '32px',
                   fontSize: '14px',
                   lineHeight: '15px',
-                  padding: 0,
-                  mb: '16px',
+                  padding: '0px',
+                  mb: '8px',
+                  ml: '-6px',
                   minWidth: 0,
                   minHeight: 0,
                   '&:hover': { border: 0 },
@@ -229,26 +231,24 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
               >
                 {intl.formatMessage(messages.clearAll)}
               </Button>
-            </Box>
+            </Fade>
 
-            {allWordsEntered && (
-              <Box>
-                <Typography variant="body2" color="#FF1351">
-                  {mnemonicError}
-                </Typography>
-              </Box>
-            )}
+            <Fade in={!isValidPhrase && allWordsEntered}>
+              <Typography variant="body2" color="#FF1351">
+                {mnemonicError}
+              </Typography>
+            </Fade>
           </>
         )}
 
-        {isValidPhrase && (
+        <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
             <Typography variant="body1" fontWeight={500}>
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>
-        )}
+        </Fade>
       </Box>
     );
   }
