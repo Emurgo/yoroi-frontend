@@ -640,6 +640,7 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
 
 Given(/^I connected Trezor emulator device$/, async function () {
   // select connecting a HW wallet
+  this.webDriverLogger.info(`Step: I connected Trezor device`);
   await this.click(connectHwButton);
   // pick up currency
   await this.waitForElement(pickUpCurrencyDialog);
@@ -661,6 +662,9 @@ Given(/^I connected Trezor emulator device$/, async function () {
   const name = await this.getValue(walletNameInput);
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
+  this.webDriverLogger.info(`Step: Wallet is connected and saved`);
+  await this.waitForElementNotPresent(walletSyncingOverlayComponent);
+  this.webDriverLogger.info(`Step: Wallet is fully synchronized`);
 });
 
 async function restoreWalletsFromStorage(client) {
