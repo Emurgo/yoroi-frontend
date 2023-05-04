@@ -663,6 +663,7 @@ Given(/^I connected Trezor emulator device$/, async function () {
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
   this.webDriverLogger.info(`Step: Wallet is connected and saved`);
+  await this.waitForElement(walletSyncingOverlayComponent);
   await this.waitForElementNotPresent(walletSyncingOverlayComponent);
   this.webDriverLogger.info(`Step: Wallet is fully synchronized`);
 });
