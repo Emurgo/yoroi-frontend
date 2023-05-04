@@ -211,7 +211,9 @@ function Autocomplete({
               </Box>
             ) : (
               filteredList.map((item, index) => {
-                const regularPart = Boolean(inputValue) ? item.replace(inputValue || '', '') : item;
+                const regularPart = Boolean(inputValue)
+                  ? item.replace(inputValue.toLowerCase() || '', '')
+                  : item;
                 return (
                   <Box
                     key={`${item}${index}`}
