@@ -141,7 +141,7 @@ function Autocomplete({
     const noInputValue = inputValue?.length === 0;
 
     // Prevent tab if word not correct
-    if (code === 'Tab' && (hasError || noInputValue) && !shiftKey) {
+    if (code === 'Tab' && hasError && !shiftKey) {
       e.preventDefault();
     }
 
@@ -211,7 +211,9 @@ function Autocomplete({
               </Box>
             ) : (
               filteredList.map((item, index) => {
-                const regularPart = Boolean(inputValue) ? item.replace(inputValue || '', '') : item;
+                const regularPart = inputValue != null
+                  ? item.replace(inputValue.toLowerCase(), '')
+                  : item;
                 return (
                   <Box
                     key={`${item}${index}`}
