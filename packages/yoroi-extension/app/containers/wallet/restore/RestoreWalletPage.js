@@ -41,6 +41,7 @@ export default class RestoreWalletPage extends Component<Props> {
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        bgcolor="common.white"
       >
         <RestoreWalletPageComponent
           restoreWallet={actions.walletRestore.restoreWallet.trigger}
