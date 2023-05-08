@@ -26,7 +26,7 @@ test('Generate Catalyst registration tx', async () => {
     const nonce = 1234;
     const metadata = generateRegistration({
       stakePrivateKey,
-      catalystPrivateKey,
+      votingPublicKey: catalystPrivateKey.to_public(),
       receiverAddress: Buffer.from(address.to_address().to_bytes()).toString('hex'),
       slotNumber: nonce,
     });

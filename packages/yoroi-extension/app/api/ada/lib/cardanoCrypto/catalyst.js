@@ -3,6 +3,16 @@
 import { RustModule } from './rustLoader';
 import blake2b from 'blake2b';
 
+const HARDENED = 0x80000000;
+
+export const VoteKeyDerivationPath: Array<number> = [
+  1694 + HARDENED,
+  1815 + HARDENED,
+  0 + HARDENED, // acount'
+  0, // chain
+  0, // address_index
+];
+
 export const CatalystLabels = Object.freeze({
   DATA: 61284,
   SIG: 61285,
@@ -89,16 +99,21 @@ export function generateRegistrationMetadata(
 }
 
 export function generateRegistration(request: {|
-  stakePrivateKey: RustModule.WalletV4.PrivateKey,
-  catalystPrivateKey: RustModule.WalletV4.PrivateKey,
+  stakePrivateKey: ?RustModule.WalletV4.PrivateKey,
+  votingPublicKey: RustModule.WalletV4.PublicKey,
   receiverAddress: string,
   slotNumber: number,
 |}): RustModule.WalletV4.AuxiliaryData {
   return generateRegistrationMetadata(
-    Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
-    Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),
+    request.votingPublicKey.to_hex(),
+    request.stakePrivateKey ?
+      Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex') :
+      '0'.repeat(32 * 2),
     request.receiverAddress,
     request.slotNumber,
-    (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),
+    (hashedMetadata) => (
+      request.stakePrivateKey?.sign(hashedMetadata).to_hex() ??
+        '0'.repeat(64 * 2)
+    ),
   );
 }
