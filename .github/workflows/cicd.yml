@@ -1,0 +1,90 @@
+on:
+  release:
+    types: [created, published]
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Install Octopus CLI 🐙
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
+        with:
+          version: latest
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yoroi-extension-node-modules
+        with:
+          path: packages/yoroi-extension/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: npm install
+        run: |
+          cd packages/yoroi-extension
+          npm install
+      - name: Build
+        run: |
+          cd packages/yoroi-extension
+          npm run prod:stable
+      - name: Push package to Octopus Deploy 
+        uses: OctopusDeploy/push-package-action@v1.0.1
+        with:
+          packages: 'packages/yoroi-extension/Yoroi.zip'
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+      - name: Create release 
+        uses: OctopusDeploy/create-release-action@v1.1.3
+        with:
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+          project: 'yoroi-frontend'
+          channel: ${{ inputs.channel }}
+          packages: 'yoroi-frontend:prod-${{ steps.get_release.outputs.tag_name }}'
+          release_number: '${{ steps.get_release.outputs.tag_name }}'
+          wait_for_deployment: true
+      - name: npm clean
+        run: |
+          cd packages/yoroi-extension
+          npm run clean
+            - name: Build
+      - name: npm build (nightly)
+        run: |
+          cd packages/yoroi-extension
+          npm run prod:nightly
+      - name: Push package to Octopus Deploy
+        uses: OctopusDeploy/push-package-action@v1.0.1
+        with:
+          packages: 'packages/yoroi-extension/Yoroi Nightly.zip'
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+      - name: Create release
+        uses: OctopusDeploy/create-release-action@v1.1.3
+        with:
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+          project: 'yoroi-frontend'
+          channel: ${{ inputs.channel }}
+          packages: 'yoroi-frontend:nightly-${{ steps.get_release.outputs.tag_name }}'
+          release_number: '${{ steps.get_release.outputs.tag_name }}'
+          wait_for_deployment: true
+
+
+
