@@ -7,7 +7,7 @@ import styles from './SidebarRevamp.scss';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as yoroiLogo } from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
@@ -68,8 +68,8 @@ export default class SidebarRevamp extends Component<Props> {
         </div>
         <a
           className={styles.faq}
-          href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
-          target='_blank'
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+          target="_blank"
           rel="noreferrer"
         >
           {intl.formatMessage(globalMessages.sidebarFaq)}
