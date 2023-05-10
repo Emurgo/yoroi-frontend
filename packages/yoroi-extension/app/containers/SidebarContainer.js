@@ -30,6 +30,12 @@ class SidebarContainer extends Component<AllProps> {
     await this.generated.actions.profile.toggleSidebar.trigger();
   };
 
+  static defaultProps: {|
+    onLogoClick: void,
+  |} = {
+    onLogoClick: undefined,
+  };
+
   render(): Node {
     const { stores, actions } = this.generated;
     const { profile } = stores;

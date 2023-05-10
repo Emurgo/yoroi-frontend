@@ -29,6 +29,7 @@ export default class SidebarRevamp extends Component<Props> {
     children: void,
     isActiveCategory: void,
     onCategoryClicked: void,
+    onLogoClick: void,
   |} = {
     children: undefined,
     categories: undefined,
