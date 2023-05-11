@@ -13,6 +13,9 @@ jobs:
     - name: Check if version has been updated
       id: check
       uses: EndBug/version-check@v2
+      with:
+        diff-search: true
+        file-name: ./packages/yoroi-extension/package.json
 
     - name: Log when version changed
       if: steps.check.outputs.changed == 'true'
