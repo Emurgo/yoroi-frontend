@@ -526,7 +526,7 @@ export function toTrezorSignRequest(
       }
       formatted.push(cardanoInput);
     }
-    return formatted.sort(compareInputs);
+    return formatted;
   }
 
   function formatOutput(

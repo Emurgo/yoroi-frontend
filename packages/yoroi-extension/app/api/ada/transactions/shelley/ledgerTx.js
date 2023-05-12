@@ -630,7 +630,7 @@ export function toLedgerSignRequest(
         path: ownUtxo ? ownUtxo.addressing.path : null,
       });
     }
-    return formatted.sort(compareInputs);
+    return formatted;
   }
 
   function formatOutput(
