@@ -100,18 +100,3 @@ export function getCryptoDaedalusWalletFromMasterKey(
   const wallet = RustModule.WalletV2.DaedalusWallet.new(privateKey);
   return wallet;
 }
-
-/**
- * Generate catalyst private key for QR code
- */
-
-export function generatePrivateKeyForCatalyst(): RustModule.WalletV4.Bip32PrivateKey {
-  const mnemonic = generateMnemonic(160);
-  const bip39entropy = mnemonicToEntropy(mnemonic);
-  const EMPTY_PASSWORD = Buffer.from('');
-  const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
-    EMPTY_PASSWORD
-  );
-  return rootKey;
-}

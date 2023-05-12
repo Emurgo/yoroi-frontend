@@ -50,8 +50,7 @@ const messages = defineMessages({
   },
   ledgerNanoRequirement: {
     id: 'wallet.voting.ledgerNanoRequirement',
-    defaultMessage:
-      '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/">Update</a>the Cardano app on your Ledger to version 2.3.2 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
+    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/">Update</a>the Cardano app on your Ledger to version 6 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
   },
 });
 
