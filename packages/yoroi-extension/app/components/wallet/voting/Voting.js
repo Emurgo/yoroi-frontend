@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -7,12 +7,13 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from '@mui/material';
-import { ReactComponent as AppStoreBadge }  from '../../../assets/images/app-store-badge.inline.svg';
-import { ReactComponent as PlayStoreBadge }  from '../../../assets/images/google-play-badge.inline.svg';
+import { ReactComponent as AppStoreBadge } from '../../../assets/images/app-store-badge.inline.svg';
+import { ReactComponent as PlayStoreBadge } from '../../../assets/images/google-play-badge.inline.svg';
 import WarningBox from '../../widgets/WarningBox';
 
 import styles from './Voting.scss';
 import type { WalletType } from './types';
+import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   lineTitle: {
@@ -29,23 +30,28 @@ const messages = defineMessages({
   },
   line4: {
     id: 'wallet.voting.line4',
-    defaultMessage: '!!!Open the Catalyst Voting App and click on the Complete registration button.',
+    defaultMessage:
+      '!!!Open the Catalyst Voting App and click on the Complete registration button.',
   },
   notDelegated: {
     id: 'wallet.voting.notDelegated',
-    defaultMessage: '!!!You haven\'t delegated anything. Your voting power is determined by the amount you delegate and voting rewards are distributed to your delegation reward address. Please remember to delegate prior to voting.',
+    defaultMessage:
+      "!!!You haven't delegated anything. Your voting power is determined by the amount you delegate and voting rewards are distributed to your delegation reward address. Please remember to delegate prior to voting.",
   },
   keepDelegated: {
     id: 'wallet.voting.keepDelegated',
-    defaultMessage: '!!!Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please keep delegated until the voting ends.',
+    defaultMessage:
+      '!!!Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please keep delegated until the voting ends.',
   },
   trezorTRequirement: {
     id: 'wallet.voting.trezorTRequirement',
-    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware">Update</a> your Trezor Model T firmware version to 2.4.1 or above.',
+    defaultMessage:
+      '!!!<a target="_blank" rel="noopener noreferrer" href="https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware">Update</a> your Trezor Model T firmware version to 2.4.1 or above.',
   },
   ledgerNanoRequirement: {
     id: 'wallet.voting.ledgerNanoRequirement',
-    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/">Update</a>the Cardano app on your Ledger to version 2.3.2 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
+    defaultMessage:
+      '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/">Update</a>the Cardano app on your Ledger to version 2.3.2 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
   },
 });
 
@@ -58,8 +64,12 @@ type Props = {|
   +walletType: WalletType,
 |};
 
+type InjectedProps = {|
+  +isRevampLayout: boolean,
+|};
+
 @observer
-export default class Voting extends Component<Props> {
+class Voting extends Component<Props & InjectedProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -99,18 +109,14 @@ export default class Voting extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-
     const fundName = this.props.name;
+    const isRevamp = this.props.isRevampLayout;
 
-    const pendingTxWarningComponent = this.props.hasAnyPending
-      ? (
-        <div className={styles.warningBox}>
-          <WarningBox>
-            {this.context.intl.formatMessage(globalMessages.sendingIsDisabled)}
-          </WarningBox>
-        </div>
-      )
-      : (null);
+    const pendingTxWarningComponent = this.props.hasAnyPending ? (
+      <div className={styles.warningBox}>
+        <WarningBox>{this.context.intl.formatMessage(globalMessages.sendingIsDisabled)}</WarningBox>
+      </div>
+    ) : null;
 
     return (
       <>
@@ -118,29 +124,20 @@ export default class Voting extends Component<Props> {
 
         <div className={styles.voting}>
           <div className={styles.delegationStatus}>
-            {this.props.isDelegated ?
-              (
-                <div className={styles.lineText}>
-                  {intl.formatMessage(messages.keepDelegated)}
-                </div>
-              ) :
-              (
-                <div className={styles.warningBox}>
-                  <WarningBox>
-                    {intl.formatMessage(messages.notDelegated)}
-                  </WarningBox>
-                </div>
-              )
-            }
+            {this.props.isDelegated ? (
+              <div className={styles.lineText}>{intl.formatMessage(messages.keepDelegated)}</div>
+            ) : (
+              <div className={styles.warningBox}>
+                <WarningBox>{intl.formatMessage(messages.notDelegated)}</WarningBox>
+              </div>
+            )}
           </div>
 
           <div className={classnames([styles.lineTitle, styles.firstItem])}>
             {intl.formatMessage(messages.lineTitle, { fundName })}
           </div>
 
-          <div className={styles.lineText}>
-            {intl.formatMessage(messages.line2)}
-          </div>
+          <div className={styles.lineText}>{intl.formatMessage(messages.line2)}</div>
 
           <div className={styles.cardContainer}>
             <div className={classnames([styles.card, styles.bgStep1])}>
@@ -179,7 +176,8 @@ export default class Voting extends Component<Props> {
           </div>
           <div className={styles.registerButton}>
             <Button
-              variant="primary"
+              variant={isRevamp ? 'contained' : 'primary'}
+              color={isRevamp ? 'primary' : undefined}
               onClick={this.props.start}
               disabled={this.props.hasAnyPending}
               sx={{ width: '400px' }}
@@ -192,3 +190,5 @@ export default class Voting extends Component<Props> {
     );
   }
 }
+
+export default (withLayout(Voting): ComponentType<Props>);

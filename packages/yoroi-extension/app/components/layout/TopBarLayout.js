@@ -16,6 +16,7 @@ type Props = {|
   +showInContainer?: boolean,
   +showAsCard?: boolean,
   +asModern?: boolean,
+  +bgcolor?: string,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -32,6 +33,7 @@ function TopBarLayout({
   showAsCard,
   isRevampLayout,
   asModern,
+  bgcolor,
 }: Props & InjectedProps) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
@@ -65,7 +67,7 @@ function TopBarLayout({
           }}
         >
           {isRevampLayout && asModern !== true ? (
-            <Box sx={{ background: 'var(--yoroi-palette-gray-50)', height: '100%' }}>
+            <Box sx={{ background: bgcolor || 'var(--yoroi-palette-gray-50)', height: '100%' }}>
               <Box
                 sx={{
                   maxWidth: 'calc(1366px - 90px)',
@@ -79,7 +81,7 @@ function TopBarLayout({
                     height: '100%',
                     minHeight: '200px',
                     padding: '40px',
-                    backgroundColor: 'var(--yoroi-palette-gray-50)',
+                    backgroundColor: bgcolor || 'var(--yoroi-palette-gray-50)',
                     overflow: 'auto',
                   }}
                 >
@@ -190,4 +192,5 @@ TopBarLayout.defaultProps = {
   showInContainer: false,
   showAsCard: false,
   asModern: false,
+  bgcolor: undefined,
 };

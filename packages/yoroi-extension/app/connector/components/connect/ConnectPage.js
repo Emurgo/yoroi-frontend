@@ -1,7 +1,7 @@
-/* eslint-disable no-nested-ternary */
 // @flow
+/* eslint-disable no-nested-ternary */
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -11,7 +11,7 @@ import { intlShape, defineMessages } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
-import WalletCard from './WalletCard';
+import ConnectedWallet from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -33,6 +33,7 @@ import { ReactComponent as NoWalletImage } from '../../assets/images/no-websites
 import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   subtitle: {
@@ -45,7 +46,8 @@ const messages = defineMessages({
   },
   connectWalletAuthRequest: {
     id: 'connector.label.connectWalletAuthRequest',
-    defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
+    defaultMessage:
+      '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
   },
   yourWallets: {
     id: 'connector.label.yourWallets',
@@ -105,8 +107,10 @@ type Props = {|
   +isSelectWalletHardware: boolean,
 |};
 
+type InjectedProps = {| +isRevampLayout: boolean |};
+
 @observer
-class ConnectPage extends Component<Props> {
+class ConnectPage extends Component<Props & InjectedProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -195,6 +199,7 @@ class ConnectPage extends Component<Props> {
       isAppAuth,
       onUpdateHideBalance,
       isSelectWalletHardware,
+      isRevampLayout,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -245,7 +250,7 @@ class ConnectPage extends Component<Props> {
         <Stack direction="row" spacing={4} mt="15px">
           <Button
             fullWidth
-            variant="secondary"
+            variant={isRevampLayout ? 'outlined' : 'secondary'}
             onClick={this.hidePasswordForm}
             sx={{ minWidth: 'auto' }}
           >
@@ -253,7 +258,7 @@ class ConnectPage extends Component<Props> {
           </Button>
           {!isSelectWalletHardware && (
             <Button
-              variant="primary"
+              variant={isRevampLayout ? 'contained' : 'primary'}
               sx={{ minWidth: 'auto' }}
               fullWidth
               disabled={!walletPasswordField.isValid}
@@ -270,13 +275,15 @@ class ConnectPage extends Component<Props> {
       <div className={componentClasses}>
         {hasWallets ? (
           <>
-            <ProgressBar step={1} />
+            <ProgressBar step={isAppAuth ? 2 : 1} max={2} />
             <Typography
-              variant="h3"
-              color="var(--yoroi-palette-gray-900)"
-              marginTop="20px"
-              paddingLeft="32px"
-              fontWeight="400"
+              variant="h4"
+              color="gray.900"
+              marginTop="32px"
+              paddingX="32px"
+              fontWeight="500"
+              textAlign="center"
+              fontSize="20px"
               className={styles.pageTitle}
             >
               {intl.formatMessage(messages.connectWallet)}
@@ -290,9 +297,9 @@ class ConnectPage extends Component<Props> {
                 )}
               </div>
               <Box marginTop="16px">
-                <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-900)">
+                <Typography variant="body-1" fontWeight="400" color="gray.900">
                   {intl.formatMessage(messages.subtitle)}{' '}
-                  <Typography as="span" variant="h5" fontWeight="500">
+                  <Typography as="span" variant="body-1" fontWeight="500">
                     {url}
                   </Typography>
                 </Typography>
@@ -300,7 +307,7 @@ class ConnectPage extends Component<Props> {
             </div>
           </>
         ) : null}
-        <Box flex={1} padding="0 10px 18px">
+        <Box flex={1}>
           {isAppAuth ? (
             passwordForm
           ) : (
@@ -311,9 +318,9 @@ class ConnectPage extends Component<Props> {
                   <LoadingSpinner />
                 </div>
               ) : hasWallets ? (
-                <Box>
+                <div className={styles.walletsContainer}>
                   <div className={styles.titleWallet}>
-                    <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-600)">
+                    <Typography variant="body-1" lineHeight="24px" color="gray.900">
                       {intl.formatMessage(messages.yourWallets)}
                     </Typography>
                     <button
@@ -331,18 +338,12 @@ class ConnectPage extends Component<Props> {
                         <WalletButton
                           onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
                         >
-                          <WalletCard
-                            shouldHideBalance={shouldHideBalance}
-                            publicDeriver={item}
-                            getTokenInfo={this.props.getTokenInfo}
-                            unitOfAccountSetting={this.props.unitOfAccount}
-                            getCurrentPrice={this.props.getCurrentPrice}
-                          />
+                          <ConnectedWallet publicDeriver={item} />
                         </WalletButton>
                       </li>
                     ))}
                   </ul>
-                </Box>
+                </div>
               ) : null}
             </>
           )}
@@ -360,12 +361,11 @@ class ConnectPage extends Component<Props> {
   }
 }
 
-export default ConnectPage;
+export default (withLayout(ConnectPage): ComponentType<Props>);
 
 const WalletButton = styled('button')({
   cursor: 'pointer',
   width: '100%',
   fontSize: '1rem',
-  paddingTop: 5,
-  paddingBottom: 5,
+  padding: '16px',
 });

@@ -1,51 +1,77 @@
-/* eslint-disable no-nested-ternary */
 // @flow
-import React, { Component } from 'react';
+/* eslint-disable no-nested-ternary */
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button, Typography } from '@mui/material';
-import TextField from '../../../components/common/TextField';
-import globalMessages from '../../../i18n/global-messages';
-import { observer } from 'mobx-react';
-import CopyableAddress from '../../../components/widgets/CopyableAddress';
-import config from '../../../config';
-import vjf from 'mobx-react-form/lib/validators/VJF';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import type { Notification } from '../../../types/notificationType';
-import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import type {
   DefaultTokenEntry,
   TokenLookupKey,
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type {
+  PublicDeriverCache,
+  WhitelistEntry,
+} from '../../../../chrome/extension/connector/types';
+import type {
+  CardanoConnectorSignRequest,
+  SignSubmissionErrorType,
+  TxDataOutput,
+} from '../../types';
+import type LocalizableError from '../../../i18n/LocalizableError';
+import { Component } from 'react';
+import { intlShape, defineMessages } from 'react-intl';
+import { Button, Typography } from '@mui/material';
+import globalMessages from '../../../i18n/global-messages';
+import { observer } from 'mobx-react';
+import config from '../../../config';
+import vjf from 'mobx-react-form/lib/validators/VJF';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import {
   getTokenName,
   getTokenIdentifierIfExists,
   assetNameFromIdentifier,
 } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import type {
-  PublicDeriverCache,
-  WhitelistEntry,
-} from '../../../../chrome/extension/connector/types';
-import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
-import CardanoUtxoDetails from './CardanoUtxoDetails';
+import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
-import WalletCard from '../connect/WalletCard';
 import SignTxTabs from './SignTxTabs';
 import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import { LoadingButton } from '@mui/lab';
-import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
-import type LocalizableError from '../../../i18n/LocalizableError';
+import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
+import CardanoSignTx from './cardano/SignTx';
+import ConnectionInfo from './cardano/ConnectionInfo';
+import CardanoSignTxSummary from './cardano/SignTxSummary';
+import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
+
+const messages = defineMessages({
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
+  sendError: {
+    id: 'connector.signin.error.sendError',
+    defaultMessage: '!!!An error occured when sending the transaction.',
+  },
+});
+
+export type SummaryAssetsData = {|
+  total: DisplayAmount | Object,
+  isOnlyTxFee: boolean,
+  sent: Array<any>,
+  received: Array<any>,
+|};
+
+type TokenEntryWithFee = {|
+  ...TokenEntry,
+  +fee: BigNumber,
+|};
 
 type Props = {|
   +txData: ?CardanoConnectorSignRequest,
@@ -71,19 +97,17 @@ type Props = {|
   +tx: ?string,
 |};
 
-const messages = defineMessages({
-  incorrectWalletPasswordError: {
-    id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
-  },
-  sendError: {
-    id: 'connector.signin.error.sendError',
-    defaultMessage: '!!!An error occured when sending the transaction.',
-  },
-});
-
 type State = {|
   isSubmitting: boolean,
+|};
+
+type DisplayAmount = {|
+  fiatAmount: string | null,
+  currency: string | null,
+  amount: string,
+  fee: string,
+  total: string,
+  ticker: Node | string,
 |};
 
 @observer
@@ -101,10 +125,8 @@ class SignTxPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(
-            globalMessages.walletPasswordFieldPlaceholder
-          ),
+          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
@@ -144,7 +166,9 @@ class SignTxPage extends Component<Props, State> {
               if (error instanceof WrongPassphraseError) {
                 this.form
                   .$('walletPassword')
-                  .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+                  .invalidate(
+                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                  );
               } else {
                 throw error;
               }
@@ -154,9 +178,14 @@ class SignTxPage extends Component<Props, State> {
       });
     } else {
       this.setState({ isSubmitting: true });
-      this.props.onConfirm('').finally(() => {
-        this.setState({ isSubmitting: false });
-      }).catch(error => { throw error; });
+      this.props
+        .onConfirm('')
+        .finally(() => {
+          this.setState({ isSubmitting: false });
+        })
+        .catch(error => {
+          throw error;
+        });
     }
   }
 
@@ -176,6 +205,22 @@ class SignTxPage extends Component<Props, State> {
     );
   };
 
+  renderAddressExplorerUrl: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
+    const fingerprint = this.getFingerprint(tokenInfo);
+    return fingerprint !== undefined ? (
+      <ExplorableHashContainer
+        selectedExplorer={this.props.selectedExplorer}
+        hash={fingerprint}
+        light
+        linkType="address"
+      >
+        <span>{truncateAddressShort(getTokenName(tokenInfo), 10)}</span> <ExternalLinkIcon />
+      </ExplorableHashContainer>
+    ) : (
+      truncateAddressShort(getTokenName(tokenInfo), 10)
+    );
+  };
+
   getFingerprint: ($ReadOnly<TokenRow>) => string | void = tokenInfo => {
     if (tokenInfo.Metadata.type === 'Cardano') {
       return getTokenIdentifierIfExists(tokenInfo);
@@ -183,149 +228,118 @@ class SignTxPage extends Component<Props, State> {
     return undefined;
   };
 
-  _resolveTokenInfo: TokenEntry => ?$ReadOnly<TokenRow> = tokenEntry => {
-    return this.props.getTokenInfo(tokenEntry);
-  };
-
-  renderBundle: ({|
-    amount: MultiToken,
-    render: TokenEntry => Node,
-  |}) => Node = request => {
-    return (
-      <>
-        {request.render(request.amount.getDefaultEntry())}
-        {request.amount.nonDefaultEntries().map(entry => (
-          <React.Fragment key={entry.identifier}>{request.render(entry)}</React.Fragment>
-        ))}
-      </>
-    );
-  };
-
-  renderAmountDisplay: ({|
-    entry: TokenEntry,
-  |}) => Node = request => {
-    const tokenInfo = this._resolveTokenInfo(request.entry);
+  getDisplayAmount: TokenEntryWithFee => DisplayAmount = request => {
+    const tokenInfo = this.props.getTokenInfo(request);
     if (!tokenInfo) {
       throw new Error('missing token info');
     }
 
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
-    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
+    const shiftedAmount = request.amount.shiftedBy(-numberOfDecimals);
+    const shiftedFee = request.fee.shiftedBy(-numberOfDecimals);
+    const onlyFeeOrSend = request.amount.toNumber() === 0 || request.amount.toNumber() < 0;
+    const shiftedTotal = request.amount
+      .plus(onlyFeeOrSend ? request.fee.negated() : request.fee)
+      .shiftedBy(-numberOfDecimals);
+
     const ticker = tokenInfo
       ? this.getTicker(tokenInfo)
-      : assetNameFromIdentifier(request.entry.identifier);
+      : assetNameFromIdentifier(request.identifier);
 
     let fiatAmountDisplay = null;
+    let fiatCurrency = null;
 
     // this is a feature flag
-    if (false && this.props.unitOfAccountSetting.enabled === true) {
+    if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(getTokenName(tokenInfo), currency);
       if (price != null) {
         const fiatAmount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = fiatAmount.split('.');
-        let beforeDecimalSigned;
-        if (beforeDecimal.startsWith('-')) {
-          beforeDecimalSigned = beforeDecimal;
-        } else {
-          beforeDecimalSigned = '+' + beforeDecimal;
-        }
-        fiatAmountDisplay = (
-          <>
-            <span>{beforeDecimalSigned}</span>
-            {afterDecimal && <span>.{afterDecimal}</span>} {currency}
-          </>
-        );
+        fiatAmountDisplay = beforeDecimal + (afterDecimal ? '.' + afterDecimal : '.00');
+        fiatCurrency = currency;
       }
     }
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount,
-      numberOfDecimals
-    );
 
-    // we may need to explicitly add + for positive values
-    const adjustedBefore = beforeDecimalRewards.startsWith('-')
-      ? beforeDecimalRewards
-      : '+' + beforeDecimalRewards;
+    const [beforeDecimalAmount, afterDecimalAmount] = splitAmount(shiftedAmount, numberOfDecimals);
+    const [beforeDecimalFee, afterDecimalFee] = splitAmount(shiftedFee, numberOfDecimals);
+    const [beforeDecimalTotal, afterDecimalTotal] = splitAmount(shiftedTotal, numberOfDecimals);
 
-    const cryptoAmountDisplay = (
-      <>
-        <span>{adjustedBefore}</span>
-        <span>{afterDecimalRewards}</span> {ticker}
-      </>
-    );
-
-    if (fiatAmountDisplay) {
-      return (
-        <>
-          <div>{fiatAmountDisplay}</div>
-          <div>{cryptoAmountDisplay}</div>
-        </>
-      );
-    }
-
-    return <div>{cryptoAmountDisplay}</div>;
+    return {
+      fiatAmount: fiatAmountDisplay,
+      currency: fiatCurrency,
+      amount: beforeDecimalAmount + (afterDecimalAmount || ''),
+      fee: beforeDecimalFee + (afterDecimalFee || ''),
+      total: beforeDecimalTotal + (afterDecimalTotal || ''),
+      ticker,
+    };
   };
 
-  renderRow: ({|
-    kind: string,
-    address: {| address: string, value: MultiToken |},
-    addressIndex: number,
-    transform?: BigNumber => BigNumber,
-  |}) => Node = request => {
-    const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
-    const divKey = identifier =>
-      `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
-    const renderAmount = entry => {
-      return (
-        <div>
-          {this.renderAmountDisplay({
-            entry: {
-              ...entry,
-              amount: request.transform ? request.transform(entry.amount) : entry.amount,
-            },
-          })}
-        </div>
-      );
+  getAssetsExplorerLink: Object = () => {
+    return null;
+  };
+
+  getUniqueAssets: (
+    Array<TxDataOutput>
+  ) => Array<{|
+    tokenInfo: ?$ReadOnly<TokenRow>,
+    amount: BigNumber,
+  |}> = assets => {
+    return assets.reduce((acc, curr) => {
+      const newAcc: Array<{|
+        tokenInfo: ?$ReadOnly<TokenRow>,
+        amount: BigNumber,
+      |}> = [].concat(acc);
+
+      const defaultEntry = curr.value.getDefaultEntry();
+
+      [defaultEntry].concat(curr.value.nonDefaultEntries()).forEach(e => {
+        if (!newAcc.some(a => a.tokenInfo?.Identifier === e.identifier) && e.identifier) {
+          const tokenInfo = this.props.getTokenInfo(e);
+          tokenInfo && newAcc.push({ tokenInfo, amount: e.amount });
+        }
+      });
+
+      return newAcc;
+    }, []);
+  };
+
+  getSummaryAssetsData: void => SummaryAssetsData = () => {
+    const { txData } = this.props;
+
+    const assetsData = {
+      total: {},
+      isOnlyTxFee: false,
+      sent: [],
+      received: [],
     };
 
-    return (
-      // eslint-disable-next-line react/no-array-index-key
-      <div key={divKey(request.address.value.getDefaultEntry().identifier)}>
-        <CopyableAddress
-          hash={this.props.addressToDisplayString(request.address.address)}
-          elementId={notificationElementId}
-          onCopyAddress={() =>
-            this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
-          }
-          notification={this.props.notification}
-        >
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            hash={this.props.addressToDisplayString(request.address.address)}
-            light
-            linkType="address"
-          >
-            <Typography
-              as="span"
-              variant="body2"
-              color="var(--yoroi-palette-gray-600)"
-              sx={{ marginBottom: '8px', marginTop: '4px' }}
-            >
-              {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
-            </Typography>
-          </ExplorableHashContainer>
-        </CopyableAddress>
-        {renderAmount(request.address.value.getDefaultEntry())}
-        {request.address.value.nonDefaultEntries().map(entry => (
-          <React.Fragment key={divKey(entry.identifier)}>
-            <div />
-            <div />
-            {renderAmount(entry)}
-          </React.Fragment>
-        ))}
-      </div>
-    );
+    if (txData) {
+      const defaultTokenId = txData.amount.defaults.defaultIdentifier;
+      const defaultTokenAmount = txData.amount.get(defaultTokenId) ?? new BigNumber('0');
+      const txFeeAmount = new BigNumber(txData.fee.amount);
+      const sentAssets = this.getUniqueAssets(txData.outputs.filter(o => !o.isForeign));
+      const receivedAssets = this.getUniqueAssets(
+        txData.inputs.map(i => ({ ...i, isForeign: false }))
+      );
+
+      // only tx fee (no sign) & one asset sent/received
+      assetsData.total = this.getDisplayAmount({
+        identifier: txData.fee.tokenId,
+        networkId: txData.fee.networkId,
+        amount: defaultTokenAmount,
+        fee: txFeeAmount,
+      });
+
+      assetsData.isOnlyTxFee = defaultTokenAmount.toNumber() === 0;
+
+      // More than 1 asset sent/received (rather is NFT or not)
+      if (sentAssets.length > 1 || receivedAssets.length > 1) {
+        assetsData.sent = sentAssets.filter(Boolean);
+        assetsData.received = receivedAssets.filter(Boolean);
+      }
+    }
+    return assetsData;
   };
 
   renderPayload(payloadHex: string): string {
@@ -345,24 +359,16 @@ class SignTxPage extends Component<Props, State> {
 
     const { isSubmitting } = this.state;
 
-    const url = connectedWebsite?.url ?? '';
-    const faviconUrl = connectedWebsite?.image ?? '';
-
     const { walletType, hwWalletError, isHwWalletErrorRecoverable } = this.props;
 
     if (hwWalletError && isHwWalletErrorRecoverable === false) {
       return (
         <>
           <ErrorBlock error={hwWalletError} />
-          {this.props.tx && (
+          {Boolean(this.props.tx) && (
             <Box>
               <Typography>Transaction:</Typography>
-              <textarea
-                rows="10"
-                style={{ width: '100%' }}
-                disabled
-                value={this.props.tx}
-              />
+              <textarea rows="10" style={{ width: '100%' }} disabled value={this.props.tx} />
             </Box>
           )}
         </>
@@ -372,70 +378,34 @@ class SignTxPage extends Component<Props, State> {
     let content;
     let utxosContent;
     if (txData) {
-      // signing a tx
-      const txAmountDefaultToken = txData.amount.defaults.defaultIdentifier;
-      const txAmount = txData.amount.get(txAmountDefaultToken) ?? new BigNumber('0');
-      const txFeeAmount = new BigNumber(txData.fee.amount).negated();
-      const txTotalAmount = txAmount.plus(txFeeAmount);
+      const summaryAssetsData = this.getSummaryAssetsData();
+
       content = (
-        <Box pt="32px">
-          <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-            {intl.formatMessage(signTxMessages.totals)}
-          </Typography>
-          <Box
-            width="100%"
-            px="12px"
-            py="20px"
-            pb="12px"
-            border="1px solid var(--yoroi-palette-gray-100)"
-            borderRadius="6px"
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="flex-start"
-              color="var(--yoroi-palette-gray-600)"
-              py="6px"
-              px="10px"
-            >
-              <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-              <Typography textAlign='right'>
-                {this.renderAmountDisplay({
-                  entry: {
-                    identifier: txData.fee.tokenId,
-                    networkId: txData.fee.networkId,
-                    amount: txFeeAmount,
-                  },
-                })}
-              </Typography>
-            </Box>
-            <Box
-              px="12px"
-              py="23px"
-              mt="10px"
-              display="flex"
-              justifyContent="space-between"
-              alignItems="flex-start"
-              borderRadius="6px"
-              backgroundColor="var(--yoroi-palette-primary-300)"
-              color="var(--yoroi-palette-common-white)"
-            >
-              <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
-              <Typography variant="h3" textAlign='right'>
-                {this.renderAmountDisplay({
-                  entry: {
-                    identifier: txAmountDefaultToken,
-                    networkId: txData.amount.defaults.defaultNetworkId,
-                    amount: txTotalAmount,
-                  },
-                })}
-              </Typography>
-            </Box>
-          </Box>
+        <Box>
+          <CardanoSignTx
+            txAssetsData={summaryAssetsData}
+            renderExplorerHashLink={this.renderAddressExplorerUrl}
+            walletType={walletType}
+            hwWalletError={hwWalletError}
+            passwordFormField={
+              <TextField
+                type="password"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
+              />
+            }
+          />
         </Box>
       );
+
       utxosContent = (
         <Box>
+          <Box mb="32px">
+            <CardanoSignTxSummary
+              txAssetsData={summaryAssetsData}
+              renderExplorerHashLink={this.renderAddressExplorerUrl}
+            />
+          </Box>
           <CardanoUtxoDetails
             txData={txData}
             onCopyAddressTooltip={this.props.onCopyAddressTooltip}
@@ -451,19 +421,25 @@ class SignTxPage extends Component<Props, State> {
     } else if (signData) {
       // signing data
       content = (
-        <Box pt="32px">
-          <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+        <Box>
+          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
             {intl.formatMessage(signTxMessages.signMessage)}
           </Typography>
           <Box
             width="100%"
-            px="12px"
-            py="20px"
-            pb="12px"
+            p="16px"
             border="1px solid var(--yoroi-palette-gray-100)"
             borderRadius="6px"
           >
             <pre>{this.renderPayload(signData.payload)}</pre>
+          </Box>
+
+          <Box mt="16px">
+            <TextField
+              type="password"
+              {...walletPasswordField.bind()}
+              error={walletPasswordField.error}
+            />
           </Box>
         </Box>
       );
@@ -482,99 +458,53 @@ class SignTxPage extends Component<Props, State> {
     }
 
     return (
-      <SignTxTabs
-        overviewContent={
-          <Box paddingTop="8px" overflowWrap="break-word">
-            <Box mb="20px" mt="20px">
-              <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-                {intl.formatMessage(signTxMessages.connectedTo)}
-              </Typography>
-              <Box
-                display="flex"
-                alignItems="center"
-                px="28px"
-                py="20px"
-                border="1px solid var(--yoroi-palette-gray-100)"
-                borderRadius="6px"
-                minHeight="88px"
-                mb="8px"
-              >
-                <Box
-                  sx={{
-                    marginRight: '12px',
-                    width: '32px',
-                    height: '32px',
-                    border: '1px solid #a7afc0',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#f8f8f8',
-                    img: {
-                      width: '20px',
-                    },
-                  }}
-                >
-                  {faviconUrl != null && faviconUrl !== '' ? (
-                    <img src={faviconUrl} alt={`${url} favicon`} />
-                  ) : (
-                    <NoDappIcon />
-                  )}
-                </Box>
-                <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
-                  {url}
-                </Typography>
-              </Box>
-              <Box
-                display="flex"
-                alignItems="center"
-                px="28px"
-                py="20px"
-                border="1px solid var(--yoroi-palette-gray-100)"
-                borderRadius="6px"
-                minHeight="88px"
-              >
-                <WalletCard
-                  shouldHideBalance={this.props.shouldHideBalance}
-                  publicDeriver={this.props.selectedWallet}
-                  getTokenInfo={this.props.getTokenInfo}
-                  getCurrentPrice={(_from, _to) => null}
-                  unitOfAccountSetting={({
-                    enabled: false,
-                    currency: null,
-                  })}
-                />
-              </Box>
-            </Box>
-            {content}
-            <Box mt="46px">
-              {walletType === 'web' && (
-                <TextField
-                  type="password"
-                  {...walletPasswordField.bind()}
-                  error={walletPasswordField.error}
-                />
-              )}
-              <ErrorBlock error={hwWalletError} />
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '15px' }}>
-                <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
-                  {intl.formatMessage(globalMessages.cancel)}
-                </Button>
-                <LoadingButton
-                  variant="primary"
-                  fullWidth
-                  disabled={walletType === 'web' && !walletPasswordField.isValid}
-                  onClick={this.submit.bind(this)}
-                  loading={isSubmitting}
-                >
-                  {intl.formatMessage(confirmButtonLabel)}
-                </LoadingButton>
-              </Box>
-            </Box>
+      <Box height="100%" display="flex" flexDirection="column">
+        <SignTxTabs
+          isDataSignin={!txData && Boolean(signData)}
+          detailsContent={<Box overflowWrap="break-word">{content}</Box>}
+          connectionContent={
+            <ConnectionInfo
+              connectedWallet={this.props.selectedWallet}
+              connectedWebsite={connectedWebsite}
+            />
+          }
+          utxosContent={utxosContent}
+        />
+        <Box
+          sx={{
+            padding: '32px',
+            borderTop: '1px solid #DCE0E9',
+            maxWidth: '100%',
+            backgroundColor: '#fff',
+          }}
+        >
+          <Box sx={{ display: 'flex', gap: '15px' }}>
+            <Button
+              sx={{ minWidth: 0 }}
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={
+                (walletType === 'web' && !walletPasswordField.isValid) ||
+                  isSubmitting
+              }
+              onClick={this.submit.bind(this)}
+              sx={{ minWidth: 0 }}
+            >
+              {intl.formatMessage(confirmButtonLabel)}
+            </Button>
           </Box>
-        }
-        utxoAddressContent={utxosContent}
-      />
+        </Box>
+      </Box>
     );
   }
 }
