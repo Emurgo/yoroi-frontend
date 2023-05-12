@@ -1,59 +1,80 @@
-name: Publish to Nightly
-
 on:
   push:
     branches:
-      - nightly
+      - 'release/**'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: packages/yoroi-extension
+
+      - name: Check if version has been updated
+        id: check
+        uses: EndBug/version-check@v2
+        with:
+          diff-search: true
+          file-name: ./packages/yoroi-extension/package.json
+
       - name: Read .nvmrc
+        if: steps.check.outputs.changed == 'true'
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
+
       - name: Setup node
+        if: steps.check.outputs.changed == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-yoroi-extension-node-modules
-        with:
-          # https://github.com/actions/cache/blob/main/examples.md#node---npm
-          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
-          # But we put node version into the cache key and cache node_modules.
-          path: packages/yoroi-extension/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
 
       - name: npm install
+        if: steps.check.outputs.changed == 'true'
         run: |
-          cd packages/yoroi-extension
-          npm install
+          npm i 
+          npm i --prefix packages/yoroi-extension 
+          npm i --prefix packages/yoroi-connector 
+
       - name: Build
+        if: steps.check.outputs.changed == 'true'
         run: |
           cd packages/yoroi-extension
           npm run prod:nightly
-        env:
-          YOROI_NIGHTLY_PEM: ${{ secrets.YOROI_NIGHTLY_PEM }}
-      - name: publish nightly
-        uses: SebastienGllmt/chrome-addon@v3
+
+      - name: Install Octopus CLI 
+        if: steps.check.outputs.changed == 'true'
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
         with:
-          # ID of the extension that you are updating
-          extension: poonlenmfdfbjfeeballhiibknlknepo
-          # Path to a .zip of your addon
-          zip: "packages/yoroi-extension/Yoroi Nightly.zip"
-          # TODO: only share with trusted testers for now
-          publishTarget: trustedTesters
-          # Google OAuth2
-          client-id: ${{ secrets.CHROME_CLIENT_ID }}
-          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
-          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          version: latest
+
+      - name: Move package file 
+        if: steps.check.outputs.changed == 'true'
+        run: mv "packages/yoroi-extension/Yoroi Nightly.zip" yoroi-frontend.${{ steps.check.outputs.version }}.zip
+
+      - name: Push package to Octopus Deploy 
+        if: steps.check.outputs.changed == 'true'
+        uses: OctopusDeploy/push-package-action@v1.0.1
+        with:
+          packages: 'yoroi-frontend.${{ steps.check.outputs.version }}.zip'
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+
+      - name: Create release 
+        if: steps.check.outputs.changed == 'true'
+        uses: OctopusDeploy/create-release-action@v1.1.3
+        with:
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+          project: 'yoroi-frontend'
+          channel: 'Nightly'
+          packages: 'yoroi-frontend:${{ steps.check.outputs.version }}'
+          release_number: '${{ steps.check.outputs.version }}'
+  
+
