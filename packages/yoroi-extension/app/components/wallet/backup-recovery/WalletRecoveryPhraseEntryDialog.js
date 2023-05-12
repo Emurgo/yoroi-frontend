@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import CheckboxLabel from '../../common/CheckboxLabel'
+import CheckboxLabel from '../../common/CheckboxLabel';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -34,7 +34,8 @@ const messages = defineMessages({
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
-    defaultMessage: '!!!I understand that my money are held securely on this device only, not on the company servers',
+    defaultMessage:
+      '!!!I understand that my money are held securely on this device only, not on the company servers',
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
@@ -43,8 +44,8 @@ const messages = defineMessages({
   },
   phraseDoesNotMatch: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.error.phraseDoesNotMatch',
-    defaultMessage: '!!!Recovery phrase does not match.'
-  }
+    defaultMessage: '!!!Recovery phrase does not match.',
+  },
 });
 
 type Props = {|
@@ -60,7 +61,7 @@ type Props = {|
   +isTermDeviceAccepted: boolean,
   +isTermRecoveryAccepted: boolean,
   +isSubmitting: boolean,
-  +onAddWord: {| index: number, word: string |} => void,
+  +onAddWord: ({| index: number, word: string |}) => void,
   +onClear: void => void,
   +onAcceptTermDevice: void => void,
   +onAcceptTermRecovery: void => void,
@@ -74,8 +75,7 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -99,10 +99,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       hasWord,
       classicTheme,
     } = this.props;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletRecoveryPhraseEntryDialog',
-    ]);
+    const dialogClasses = classnames([styles.component, 'WalletRecoveryPhraseEntryDialog']);
 
     const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
@@ -114,13 +111,13 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         label: intl.formatMessage(messages.buttonLabelRemoveLast),
         onClick: removeWord,
         disabled: !hasWord,
-        primary: true
+        primary: true,
       });
       actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
         disabled: !hasWord,
-        primary: true
+        primary: true,
       });
     } else {
       actions.push({
@@ -128,7 +125,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         label: intl.formatMessage(messages.buttonLabelConfirm),
         onClick: onFinishBackup,
         disabled: isSubmitting || !isTermDeviceAccepted || !isTermRecoveryAccepted,
-        primary: true
+        primary: true,
       });
     }
 
@@ -137,7 +134,9 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       <div className={styles.phraseWrapper}>
         {enteredPhrase.map((item, i) => (
           // eslint-disable-next-line react/no-array-index-key
-          <div key={item.word + i} className={styles.phraseWord}>{item.word}</div>
+          <div key={item.word + i} className={styles.phraseWord}>
+            {item.word}
+          </div>
         ))}
       </div>
     ) : (
@@ -146,10 +145,10 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       </p>
     );
 
-    const phraseDoesNotMatchError =!isValid && (
-      enteredPhrase.length === recoveryPhraseSorted.length
-      ) ? intl.formatMessage(messages.phraseDoesNotMatch): ''
-
+    const phraseDoesNotMatchError =
+      !isValid && enteredPhrase.length === recoveryPhraseSorted.length
+        ? intl.formatMessage(messages.phraseDoesNotMatch)
+        : '';
 
     return (
       <Dialog
@@ -167,29 +166,33 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           />
         ) : null}
 
-        {!isValid && <WalletRecoveryPhraseMnemonic
-          filled={!classicTheme && Boolean(enteredPhrase.length)}
-          phrase={classicTheme ? phraseOld : phrase}
-          classicTheme={classicTheme}
-          phraseDoesNotMatch={phraseDoesNotMatchError}
-        />}
+        {!isValid && (
+          <WalletRecoveryPhraseMnemonic
+            filled={!classicTheme && Boolean(enteredPhrase.length)}
+            phrase={classicTheme ? phraseOld : phrase}
+            classicTheme={classicTheme}
+            phraseDoesNotMatch={phraseDoesNotMatchError}
+          />
+        )}
 
         {!isValid && (
           <div className={styles.words}>
-            {recoveryPhraseSorted.map(({ word, isActive }, index) => isActive ? (
-              <MnemonicWord
-                key={word + index} // eslint-disable-line react/no-array-index-key
-                word={word}
-                index={index}
-                isActive={isActive}
-                onClick={(value) => {
-                  if (isActive) {
-                    onAddWord(value);
-                  }
-                }}
-                classicTheme={classicTheme}
-              />
-            ) : null)}
+            {recoveryPhraseSorted.map(({ word, isActive }, index) =>
+              isActive ? (
+                <MnemonicWord
+                  key={word + index} // eslint-disable-line react/no-array-index-key
+                  word={word}
+                  index={index}
+                  isActive={isActive}
+                  onClick={value => {
+                    if (isActive) {
+                      onAddWord(value);
+                    }
+                  }}
+                  classicTheme={classicTheme}
+                />
+              ) : null
+            )}
           </div>
         )}
 
@@ -224,5 +227,4 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       </Dialog>
     );
   }
-
 }

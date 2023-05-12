@@ -53,6 +53,7 @@ import { generateGraphData } from '../../../utils/graph';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
+import { ROUTES } from '../../../routes-config';
 
 export type GeneratedData = typeof StakingPageContent.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -207,11 +208,13 @@ class StakingPageContent extends Component<AllProps> {
     ) {
       return null;
     }
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
-      return null;
-    }
+
+    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) return null;
+
     const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
     const currentPage = this.generated.stores.delegation.selectedPage;
+
+    if (currentPools.length === 0) return null;
 
     const currentPool = currentPools[0][currentPage];
     const meta = this.generated.stores.delegation.getLocalPoolInfo(
@@ -252,21 +255,14 @@ class StakingPageContent extends Component<AllProps> {
         ? async () => {
             this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
             const delegationTransaction = this.generated.actions.jormungandr.delegationTransaction;
-            await delegationTransaction.createTransaction.trigger(
-              {
-                publicDeriver,
-                poolRequest: undefined,
-              }
-            );
+            await delegationTransaction.createTransaction.trigger({
+              publicDeriver,
+              poolRequest: undefined,
+            });
           }
         : undefined;
 
-    return (
-      <DelegatedStakePoolCard
-        delegatedPool={delegatedPool}
-        undelegate={undelegate}
-      />
-    );
+    return <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />;
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
@@ -365,11 +361,14 @@ class StakingPageContent extends Component<AllProps> {
       <Box>
         {isWalletWithNoFunds ? (
           <WalletEmptyBanner
-            isOpen={this.generated.stores.transactions.showWalletEmptyBanner}
-            onClose={this.generated.actions.transactions.closeWalletEmptyBanner.trigger}
             onBuySellClick={() =>
               this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
             }
+            goToReceivePage={() => {
+              this.generated.actions.router.goToRoute.trigger({
+                route: ROUTES.WALLETS.RECEIVE.ROOT,
+              });
+            }}
           />
         ) : null}
         {hasNeverDelegated ? null : (
@@ -392,14 +391,14 @@ class StakingPageContent extends Component<AllProps> {
             onClose={this.onClose}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             totalRewards={
-                !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
-                  ? undefined
-                  : delegationRequests.getDelegatedBalance.result.accountPart
-              }
+              !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
+                ? undefined
+                : delegationRequests.getDelegatedBalance.result.accountPart
+            }
             shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
             unitOfAccount={this.toUnitOfAccount}
             withdrawRewards={
-                this._isRegistered(delegationRequests.publicDeriver) === true
+              this._isRegistered(delegationRequests.publicDeriver) === true
                 ? () => {
                     this.generated.actions.dialogs.open.trigger({
                       dialog: DeregisterDialogContainer,
@@ -408,7 +407,7 @@ class StakingPageContent extends Component<AllProps> {
                 : undefined
             }
           />
-          ) : null}
+        ) : null}
         {uiDialogs.isOpen(DeregisterDialogContainer) ? (
           <DeregisterDialogContainer
             {...this.generated.DeregisterDialogContainerProps}
@@ -440,7 +439,7 @@ class StakingPageContent extends Component<AllProps> {
               this.generated.actions.dialogs.closeActiveDialog.trigger();
             }}
           />
-          ) : null}
+        ) : null}
         {uiDialogs.isOpen(RewardHistoryDialog) ? (
           <RewardHistoryDialog
             onClose={this.onClose}
@@ -493,11 +492,17 @@ class StakingPageContent extends Component<AllProps> {
         |},
       |},
       transactions: {|
-        closeWalletEmptyBanner: {|
-          trigger: (params: void) => void,
-        |},
         closeDelegationBanner: {|
           trigger: (params: void) => void,
+        |},
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
+          |}) => void,
         |},
       |},
     |},
@@ -530,7 +535,6 @@ class StakingPageContent extends Component<AllProps> {
       |},
       wallets: {| selected: null | PublicDeriver<> |},
       transactions: {|
-        showWalletEmptyBanner: boolean,
         showDelegationBanner: boolean,
         getTxRequests: (PublicDeriver<>) => TxRequests,
       |},
@@ -592,7 +596,6 @@ class StakingPageContent extends Component<AllProps> {
           getParam: stores.uiDialogs.getParam,
         },
         transactions: {
-          showWalletEmptyBanner: stores.transactions.showWalletEmptyBanner,
           showDelegationBanner: stores.transactions.showDelegationBanner,
           getTxRequests: stores.transactions.getTxRequests,
         },
@@ -630,9 +633,6 @@ class StakingPageContent extends Component<AllProps> {
           },
         },
         transactions: {
-          closeWalletEmptyBanner: {
-            trigger: actions.transactions.closeWalletEmptyBanner.trigger,
-          },
           closeDelegationBanner: {
             trigger: actions.transactions.closeDelegationBanner.trigger,
           },
@@ -642,6 +642,9 @@ class StakingPageContent extends Component<AllProps> {
             trigger: actions.dialogs.open.trigger,
           },
           closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
       UnmangleTxDialogContainerProps: ({
@@ -676,4 +679,3 @@ const RightCardsWrapper = styled(Box)({
   flexDirection: 'column',
   gap: '40px',
 });
-

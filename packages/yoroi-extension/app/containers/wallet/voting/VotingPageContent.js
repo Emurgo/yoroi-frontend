@@ -10,9 +10,7 @@ import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import type { GeneratedData as VotingRegistrationDialogContainerData } from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import {
-  WalletTypeOption,
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -28,10 +26,10 @@ import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
-import type { CatalystRoundInfoResponse } from '../../../api/ada/lib/state-fetch/types'
+import type { CatalystRoundInfoResponse } from '../../../api/ada/lib/state-fetch/types';
 
 export type GeneratedData = typeof VotingPageContent.prototype.generated;
-type Props = InjectedOrGenerated<GeneratedData>
+type Props = InjectedOrGenerated<GeneratedData>;
 
 const messages: * = defineMessages({
   mainTitle: {
@@ -40,7 +38,8 @@ const messages: * = defineMessages({
   },
   mainSubtitle: {
     id: 'wallet.registrationOver.mainSubtitle',
-    defaultMessage: '!!!The registration period for fund {roundNumber} has ended. For more information, check the Catalyst app.',
+    defaultMessage:
+      '!!!The registration period for fund {roundNumber} has ended. For more information, check the Catalyst app.',
   },
   unavailableTitle: {
     id: 'wallet.registrationOver.unavailableTitle',
@@ -52,24 +51,24 @@ const messages: * = defineMessages({
   },
   earlyForRegistrationTitle: {
     id: 'wallet.registrationOver.earlyForRegistrationTitle',
-    defaultMessage: '!!!Registration hasn\'t started yet.'
+    defaultMessage: "!!!Registration hasn't started yet.",
   },
   earlyForRegistrationSubTitle: {
     id: 'wallet.registrationOver.earlyForRegistrationSubTitle',
-    defaultMessage: '!!!Registration for Round {roundNumber} begins at {registrationStart}.'
+    defaultMessage: '!!!Registration for Round {roundNumber} begins at {registrationStart}.',
   },
   beforeVotingSubtitle: {
     id: 'wallet.registrationOver.beforeVotingSubtitle',
-    defaultMessage: '!!!Registration has ended. Voting starts at {votingStart}'
+    defaultMessage: '!!!Registration has ended. Voting starts at {votingStart}',
   },
   betweenVotingSubtitle: {
     id: 'wallet.registrationOver.betweenVotingSubtitle',
-    defaultMessage: '!!!"Registration has ended.  Voting ends at  {votingEnd}'
+    defaultMessage: '!!!"Registration has ended.  Voting ends at  {votingEnd}',
   },
   nextFundRegistration: {
     id: 'wallet.registrationOver.nextFundRegistration',
-    defaultMessage: 'Round {roundNumber} starts at {registrationStart}'
-  }
+    defaultMessage: 'Round {roundNumber} starts at {registrationStart}',
+  },
 });
 
 @observer
@@ -105,7 +104,7 @@ class VotingPageContent extends Component<Props> {
     ) {
       return undefined;
     }
-    if(
+    if (
       !currentDelegation.result.currEpoch ||
       currentDelegation.result.currEpoch.pools.length === 0
     ) {
@@ -115,14 +114,14 @@ class VotingPageContent extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context
+    const { intl } = this.context;
     const {
       uiDialogs,
       wallets: { selected },
     } = this.generated.stores;
     let activeDialog = null;
 
-    if(selected == null){
+    if (selected == null) {
       throw new Error(`${nameof(VotingPageContent)} no wallet selected`);
     }
 
@@ -136,8 +135,10 @@ class VotingPageContent extends Component<Props> {
     }
 
     // keep enabled on the testnet
-    const { catalystRoundInfo, loadingCatalystRoundInfo } =
-      this.generated.stores.substores.ada.votingStore;
+    const {
+      catalystRoundInfo,
+      loadingCatalystRoundInfo,
+    } = this.generated.stores.substores.ada.votingStore;
 
     if (loadingCatalystRoundInfo) {
       return (
@@ -148,7 +149,7 @@ class VotingPageContent extends Component<Props> {
     }
 
     if (!environment.isTest()) {
-      if (!catalystRoundInfo || (!catalystRoundInfo.currentFund && !catalystRoundInfo.nextFund)){
+      if (!catalystRoundInfo || (!catalystRoundInfo.currentFund && !catalystRoundInfo.nextFund)) {
         return (
           <RegistrationOver
             title={intl.formatMessage(messages.unavailableTitle)}
@@ -160,24 +161,24 @@ class VotingPageContent extends Component<Props> {
       const { currentFund, nextFund } = catalystRoundInfo;
       const nextFundRegistrationSubtitle = intl.formatMessage(messages.nextFundRegistration, {
         roundNumber: nextFund?.id,
-        registrationStart: nextFund?.registrationStart
-      })
+        registrationStart: nextFund?.registrationStart,
+      });
 
       const fund = {
-        'id': 8,
-        'name': 'Fund9',
-        'registrationStart': '2021-01-27T11:00:00Z',
-        'registrationEnd': '2023-08-04T11:00:00Z',
-        'votingStart': '2021-08-11T11:00:00Z',
-        'votingEnd': '2023-08-25T11:00:00Z',
-        'votingPowerThreshold': '450'
+        id: 8,
+        name: 'Fund9',
+        registrationStart: '2021-01-27T11:00:00Z',
+        registrationEnd: '2023-08-04T11:00:00Z',
+        votingStart: '2021-08-11T11:00:00Z',
+        votingEnd: '2023-08-25T11:00:00Z',
+        votingPowerThreshold: '450',
       };
 
       if (currentFund) {
-        const isLate = new Date() >= new Date(Date.parse(fund.registrationEnd))
-        const isEarly = new Date() <= new Date(Date.parse(fund.registrationStart))
-        const isBeforeVoting = new Date() <= new Date(Date.parse(fund.votingStart))
-        const isAfterVoting = new Date() >= new Date(Date.parse(fund.votingEnd))
+        const isLate = new Date() >= new Date(Date.parse(fund.registrationEnd));
+        const isEarly = new Date() <= new Date(Date.parse(fund.registrationStart));
+        const isBeforeVoting = new Date() <= new Date(Date.parse(fund.votingStart));
+        const isAfterVoting = new Date() >= new Date(Date.parse(fund.votingEnd));
         const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
         if (isEarly) {
@@ -186,7 +187,7 @@ class VotingPageContent extends Component<Props> {
               title={intl.formatMessage(messages.earlyForRegistrationTitle)}
               subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
                 roundNumber: currentFund.id,
-                registrationStart: currentFund.registrationStart
+                registrationStart: currentFund.registrationStart,
               })}
             />
           );
@@ -199,7 +200,7 @@ class VotingPageContent extends Component<Props> {
               <RegistrationOver
                 title={intl.formatMessage(messages.mainTitle)}
                 subtitle={intl.formatMessage(messages.beforeVotingSubtitle, {
-                  votingStart: currentFund.votingStart
+                  votingStart: currentFund.votingStart,
                 })}
               />
             );
@@ -210,7 +211,7 @@ class VotingPageContent extends Component<Props> {
               <RegistrationOver
                 title={intl.formatMessage(messages.mainTitle)}
                 subtitle={intl.formatMessage(messages.betweenVotingSubtitle, {
-                  votingEnd: currentFund.votingEnd
+                  votingEnd: currentFund.votingEnd,
                 })}
               />
             );
@@ -220,12 +221,12 @@ class VotingPageContent extends Component<Props> {
             /* if we after the voting date (= between funds) and no next funds
             will dispaly "round is over" */
             let subtitle = intl.formatMessage(messages.mainSubtitle, {
-              roundNumber: currentFund.id
-            })
+              roundNumber: currentFund.id,
+            });
 
             // Check for the next funds if we are after voting
-            if(nextFund) {
-              subtitle = nextFundRegistrationSubtitle
+            if (nextFund) {
+              subtitle = nextFundRegistrationSubtitle;
             }
 
             return (
@@ -256,21 +257,19 @@ class VotingPageContent extends Component<Props> {
       });
       return (
         <InsufficientFundsPage
-          currentBalance={
-            balance.getDefaultEntry().amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-          }
-          requiredBalance={
-            CATALYST_DISPLAYED_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-          }
+          currentBalance={balance
+            .getDefaultEntry()
+            .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
+          requiredBalance={CATALYST_DISPLAYED_MIN_AMOUNT.shiftedBy(
+            -tokenInfo.Metadata.numberOfDecimals
+          )}
           tokenName={getTokenName(tokenInfo)}
         />
-      )
+      );
     }
 
     let walletType;
-    if (
-      selected.getParent().getWalletType() !== WalletTypeOption.HARDWARE_WALLET
-    ) {
+    if (selected.getParent().getWalletType() !== WalletTypeOption.HARDWARE_WALLET) {
       walletType = 'mnemonic';
     } else if (isTrezorTWallet(selected.getParent())) {
       walletType = 'trezorT';
@@ -297,7 +296,7 @@ class VotingPageContent extends Component<Props> {
     2. this page you can see it in test environment even if you
     out of the registration dates.
     */
-    const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
+    const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5;
     const fundName = catalystRoundInfo?.currentFund?.name || round.toString();
     return (
       <div>
@@ -349,9 +348,9 @@ class VotingPageContent extends Component<Props> {
           votingStore: {|
             catalystRoundInfo: ?CatalystRoundInfoResponse,
             loadingCatalystRoundInfo: boolean,
-          |}
-        |}
-      |}
+          |},
+        |},
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -364,10 +363,11 @@ class VotingPageContent extends Component<Props> {
     const { stores, actions } = this.props;
     const txInfo = (() => {
       const selected = stores.wallets.selected;
-      if (selected == null) return {
-        hasAnyPending: false,
-        balance: null,
-      };
+      if (selected == null)
+        return {
+          hasAnyPending: false,
+          balance: null,
+        };
       const txRequests = stores.transactions.getTxRequests(selected);
       return {
         hasAnyPending: (txRequests.requests.pendingRequest.result ?? []).length > 0,
@@ -405,17 +405,16 @@ class VotingPageContent extends Component<Props> {
             votingStore: {
               catalystRoundInfo: stores.substores.ada.votingStore.catalystRoundInfo,
               loadingCatalystRoundInfo: stores.substores.ada.votingStore.loadingCatalystRoundInfo,
-            }
-          }
-        }
+            },
+          },
+        },
       },
       VotingRegistrationDialogProps: ({
         actions,
         stores,
       }: InjectedOrGenerated<VotingRegistrationDialogContainerData>),
     });
-  };
-};
-
+  }
+}
 
 export default VotingPageContent;
