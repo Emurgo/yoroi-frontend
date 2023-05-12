@@ -33,7 +33,7 @@ import { connectorButton } from '../pages/sidebarPage';
 import {
   ApiErrorCode,
   DataSignErrorCode,
-  TxSignErrorCode
+  TxSignErrorCode,
 } from '../support/helpers/connectorErrors';
 import type { DAppConnectorResponse } from '../support/helpers/dapp-helpers';
 
@@ -45,7 +45,7 @@ const connectorPopUpIsDisplayed = async (customWorld: Object) => {
   await customWorld.driver.sleep(2000);
   await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await customWorld.driver.getTitle();
-  expect(windowTitle).to.equal('Yoroi dApp Connector');
+  expect(windowTitle).to.equal('Yoroi Dapp Connector');
 };
 
 Given(/^I have opened the mock dApp$/, async function () {
@@ -323,12 +323,10 @@ Then(/^The user reject for signing is received$/, async function () {
   const signingResult = (await this.mockDAppPage.getSigningTxResult(): DAppConnectorResponse);
   expect(signingResult.success).to.equal(false);
   const errorObject = signingResult.error;
-  expect(errorObject.code, `The reject signing code is different`)
-    .to
-    .equal(TxSignErrorCode.UserDeclined);
-  expect(errorObject.info)
-    .to
-    .equal(userRejectSigningMsg, 'Wrong error message');
+  expect(errorObject.code, `The reject signing code is different`).to.equal(
+    TxSignErrorCode.UserDeclined
+  );
+  expect(errorObject.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });
 
 Then(/^I should see "No Cardano wallets is found" message$/, async function () {
@@ -388,12 +386,10 @@ Then(/^The user reject for signing data is received$/, async function () {
   const signingResult = (await this.mockDAppPage.getSigningDataResult(): DAppConnectorResponse);
   expect(signingResult.success).to.equal(false);
   const errorObject = signingResult.error;
-  expect(errorObject.code, `The reject signing code is different`)
-    .to
-    .equal(DataSignErrorCode.UserDeclined);
-  expect(errorObject.info)
-    .to
-    .equal(userRejectSigningMsg, 'Wrong error message');
+  expect(errorObject.code, `The reject signing code is different`).to.equal(
+    DataSignErrorCode.UserDeclined
+  );
+  expect(errorObject.info).to.equal(userRejectSigningMsg, 'Wrong error message');
 });
 
 When(/^I ask to get Collateral for (.+) ADA$/, async function (amount) {
@@ -402,16 +398,20 @@ When(/^I ask to get Collateral for (.+) ADA$/, async function (amount) {
   await this.mockDAppPage.addCollateral(amountString);
 });
 
-Then(/^The dApp should see collateral: (.+) for (.+)$/, async function (expectedCollateral, utxosAmount) {
-  const expectedUtxos = JSON.parse(expectedCollateral);
-  this.webDriverLogger.info(
-    `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
-  );
-  const collateralResponse = (
-    await this.mockDAppPage.getCollateral(utxosAmount): DAppConnectorResponse
-  );
-  expect(collateralResponse.success).to.equal(true);
-  expect(collateralResponse.retValue[0], 'Collateral is different to expected').to.be.deep.equal(expectedUtxos);
+Then(
+  /^The dApp should see collateral: (.+) for (.+)$/,
+  async function (expectedCollateral, utxosAmount) {
+    const expectedUtxos = JSON.parse(expectedCollateral);
+    this.webDriverLogger.info(
+      `Step: The dApp should see collateral: ${expectedCollateral} for ${utxosAmount}`
+    );
+    const collateralResponse = (await this.mockDAppPage.getCollateral(
+      utxosAmount
+    ): DAppConnectorResponse);
+    expect(collateralResponse.success).to.equal(true);
+    expect(collateralResponse.retValue[0], 'Collateral is different to expected').to.be.deep.equal(
+      expectedUtxos
+    );
   }
 );
 
@@ -425,7 +425,9 @@ Then(/^The dApp should receive collateral$/, async function (table) {
 });
 
 Then(/^I should see the connector popup to Add Collateral with fee info$/, async function (table) {
-  this.webDriverLogger.info(`Step: I should see the connector popup to Add Collateral with fee info`);
+  this.webDriverLogger.info(
+    `Step: I should see the connector popup to Add Collateral with fee info`
+  );
   await connectorPopUpIsDisplayed(this);
   await this.waitForElement(addCollateralTitle);
   const fields = table.hashes()[0];

@@ -22,8 +22,7 @@ type GeneratedData = typeof NightlyPage.prototype.generated;
 
 @observer
 export default class NightlyPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -35,19 +34,10 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
-    const topBar = (
-      <TopBar
-        title={topBartitle}
-      />
-    );
+    const topBar = <TopBar title={topBartitle} />;
     return (
-      <TopBarLayout
-        topbar={topBar}
-        banner={undefined}
-      >
-        <NightlyForm
-          onSubmit={this.acceptNightly}
-        />
+      <TopBarLayout topbar={topBar} banner={undefined}>
+        <NightlyForm onSubmit={this.acceptNightly} />
       </TopBarLayout>
     );
   }
@@ -57,8 +47,8 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
   }
 
   @computed get generated(): {|
-    actions: {|profile: {|acceptNightly: {|trigger: (params: void) => void|}|}|},
-    |} {
+    actions: {| profile: {| acceptNightly: {| trigger: (params: void) => void |} |} |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

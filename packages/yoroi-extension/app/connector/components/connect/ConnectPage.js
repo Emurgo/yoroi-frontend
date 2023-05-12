@@ -275,13 +275,15 @@ class ConnectPage extends Component<Props & InjectedProps> {
       <div className={componentClasses}>
         {hasWallets ? (
           <>
-            <ProgressBar step={1} />
+            <ProgressBar step={isAppAuth ? 2 : 1} max={2} />
             <Typography
-              variant="h3"
-              color="var(--yoroi-palette-gray-900)"
-              marginTop="20px"
-              paddingLeft="32px"
-              fontWeight="400"
+              variant="h4"
+              color="gray.900"
+              marginTop="32px"
+              paddingX="32px"
+              fontWeight="500"
+              textAlign="center"
+              fontSize="20px"
               className={styles.pageTitle}
             >
               {intl.formatMessage(messages.connectWallet)}
@@ -295,9 +297,9 @@ class ConnectPage extends Component<Props & InjectedProps> {
                 )}
               </div>
               <Box marginTop="16px">
-                <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-900)">
+                <Typography variant="body-1" fontWeight="400" color="gray.900">
                   {intl.formatMessage(messages.subtitle)}{' '}
-                  <Typography as="span" variant="h5" fontWeight="500">
+                  <Typography as="span" variant="body-1" fontWeight="500">
                     {url}
                   </Typography>
                 </Typography>
@@ -305,7 +307,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
             </div>
           </>
         ) : null}
-        <Box flex={1} padding="0 10px 18px">
+        <Box flex={1}>
           {isAppAuth ? (
             passwordForm
           ) : (
@@ -316,9 +318,9 @@ class ConnectPage extends Component<Props & InjectedProps> {
                   <LoadingSpinner />
                 </div>
               ) : hasWallets ? (
-                <Box>
+                <div className={styles.walletsContainer}>
                   <div className={styles.titleWallet}>
-                    <Typography variant="h5" fontWeight="300" color="var(--yoroi-palette-gray-600)">
+                    <Typography variant="body-1" lineHeight="24px" color="gray.900">
                       {intl.formatMessage(messages.yourWallets)}
                     </Typography>
                     <button
@@ -341,7 +343,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                       </li>
                     ))}
                   </ul>
-                </Box>
+                </div>
               ) : null}
             </>
           )}
@@ -365,6 +367,5 @@ const WalletButton = styled('button')({
   cursor: 'pointer',
   width: '100%',
   fontSize: '1rem',
-  paddingTop: 5,
-  paddingBottom: 5,
+  padding: '16px',
 });

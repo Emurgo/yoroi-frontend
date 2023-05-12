@@ -33,9 +33,7 @@ function StepController(props: Props): Node {
             disableRipple={false}
             onClick={onClick}
             disabled={disabled}
-            sx={{
-              width: '144px',
-            }}
+            style={{ width: '144px', height: '48px' }}
           >
             {label}
           </Button>

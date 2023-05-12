@@ -39,6 +39,7 @@ import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import blake2b from 'blake2b';
+import cbor from 'cbor';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -513,7 +514,10 @@ export function toTrezorSignRequest(
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
+  rawTxBody: Buffer,
 ): $Exact<CardanoSignTransaction> {
+  const parsedCbor = cbor.decode(rawTxBody);
+
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
     const formatted = [];
     for (let i = 0; i < inputs.len(); i++) {
@@ -535,7 +539,10 @@ export function toTrezorSignRequest(
     return formatted.sort(compareInputs);
   }
 
-  function formatOutput(output: RustModule.WalletV4.TransactionOutput): CardanoOutput {
+  function formatOutput(
+    output: RustModule.WalletV4.TransactionOutput,
+    isPostAlonzoTransactionOutput: boolean,
+  ): CardanoOutput {
     const amount =  output.amount().coin().to_str();
     const { tokenBundle } = toTrezorTokenBundle(output.amount().multiasset());
     const outputDataHash = output.data_hash();
@@ -643,6 +650,11 @@ export function toTrezorSignRequest(
     if (outputDataHash) {
       result.datumHash = outputDataHash.to_hex();
     }
+
+    if (isPostAlonzoTransactionOutput) {
+      result.format = CardanoTxOutputSerializationFormat.MAP_BABBAGE;
+    }
+
     const inlineDatum = output.plutus_data();
     if (inlineDatum) {
       result.inlineDatum = inlineDatum.to_hex();
@@ -660,7 +672,12 @@ export function toTrezorSignRequest(
 
   const outputs = [];
   for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(formatOutput(txBody.outputs().get(i)));
+    outputs.push(
+      formatOutput(
+        txBody.outputs().get(i),
+        parsedCbor.get(1)[i].constructor.name === 'Map',
+      )
+    );
   }
 
   const formattedRequiredSigners = [];
@@ -669,11 +686,16 @@ export function toTrezorSignRequest(
   if (requiredSigners) {
     for (let i = 0; i < requiredSigners.len(); i++) {
       const hash = requiredSigners.get(i);
-      const address = RustModule.WalletV4.EnterpriseAddress.new(
+      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
         RustModule.WalletV4.StakeCredential.from_keyhash(hash),
       ).to_address().to_hex();
-      const ownAddressPath = ownUtxoAddressMap[address];
+      const stakeAddress = RustModule.WalletV4.RewardAddress.new(
+        networkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+      ).to_address().to_hex();
+      const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
+        ownStakeAddressMap[stakeAddress];
       if (ownAddressPath) {
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
@@ -825,13 +847,17 @@ export function toTrezorSignRequest(
   }
   if (formattedCollateral) {
     result.collateralInputs = formattedCollateral;
+    result.signingMode = CardanoTxSigningMode.PLUTUS_TRANSACTION;
   }
   if (requiredSigners) {
     result.requiredSigners = formattedRequiredSigners;
   }
   const collateralReturn = txBody.collateral_return();
   if (collateralReturn) {
-    result.collateralReturn = formatOutput(collateralReturn);
+    result.collateralReturn = formatOutput(
+      collateralReturn,
+      parsedCbor.get(16).constructor.name === 'Map',
+    );
   }
   const totalCollateral = txBody.total_collateral();
   if (totalCollateral) {

@@ -23,6 +23,10 @@ import ConnectedWebsitesPage, {
 import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
+// Todo: Add lazy loading
+import RestoreWalletPage, {
+  RestoreWalletPagePromise,
+} from './containers/wallet/restore/RestoreWalletPage';
 import CreateWalletPage, {
   CreateWalletPagePromise,
 } from './containers/wallet/CreateWalletPageContainer';
@@ -124,6 +128,7 @@ export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
   CreateWalletPagePromise,
+  RestoreWalletPagePromise,
   LanguageSelectionPagePromise,
   TermsOfUsePagePromise,
   UriPromptPagePromise,
@@ -223,13 +228,13 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
       />
       <Route
         exact
-        path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-        component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
+        path={ROUTES.WALLETS.RESTORE_WALLET}
+        component={props => <RestoreWalletPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
         path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-        component={(props) => <CreateWalletPage {...props} stores={stores} actions={actions} />}
+        component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact

@@ -921,7 +921,6 @@ async function __connectorSignCardanoTx(
     ),
     new Set(), // stakingKeyWits
     auxiliaryData, // metadata
-    witnessSet,
     otherRequiredSigners,
   );
 
