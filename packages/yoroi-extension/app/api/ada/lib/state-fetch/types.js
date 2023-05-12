@@ -90,7 +90,8 @@ export type RemoteTransactionShelley = {|
   +fee: string,
   +certificates: $ReadOnlyArray<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
-  +metadata: null | string,
+  // A backend update changed metadata to raw hex to parsed JSON
+  +metadata: null | string | Object,
   // The updated backend will always return this field, but we allow it to be
   // missing which is treated as `true` for backward compatiblity.
   // This way we don't have to update the frontend and backend in lockstep.
