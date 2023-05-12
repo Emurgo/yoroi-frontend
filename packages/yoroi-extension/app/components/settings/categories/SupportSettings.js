@@ -1,12 +1,13 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   faqTitle: {
@@ -15,7 +16,8 @@ const messages = defineMessages({
   },
   faqContent: {
     id: 'settings.support.faq.content',
-    defaultMessage: '!!!If you are experiencing issues, please see the {faqLink} for guidance on known issues.',
+    defaultMessage:
+      '!!!If you are experiencing issues, please see the {faqLink} for guidance on known issues.',
   },
   faqLink: {
     id: 'settings.support.faq.faqLink',
@@ -27,7 +29,8 @@ const messages = defineMessages({
   },
   reportProblemContent: {
     id: 'settings.support.reportProblem.content',
-    defaultMessage: '!!!If the FAQ does not solve the issue you are experiencing, please use our {supportRequestLink} feature.',
+    defaultMessage:
+      '!!!If the FAQ does not solve the issue you are experiencing, please use our {supportRequestLink} feature.',
   },
   supportRequestLink: {
     id: 'settings.support.reportProblem.link',
@@ -44,15 +47,16 @@ type Props = {|
   +onDownloadLogs: void => void,
 |};
 
-@observer
-export default class SupportSettings extends Component<Props> {
+type InjectedProps = {| +isRevampLayout: boolean |};
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+@observer
+class SupportSettings extends Component<Props & InjectedProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { onExternalLinkClick, onDownloadLogs } = this.props;
+    const { onExternalLinkClick, onDownloadLogs, isRevampLayout } = this.props;
     const { intl } = this.context;
 
     const faqLink = (
@@ -68,7 +72,7 @@ export default class SupportSettings extends Component<Props> {
     const supportRequestLink = (
       <a
         className={styles.link}
-        href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'
+        href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
         onClick={event => onExternalLinkClick(event)}
       >
         {intl.formatMessage(messages.supportRequestLink)}
@@ -91,7 +95,9 @@ export default class SupportSettings extends Component<Props> {
       <div className={styles.component}>
         <h1>{intl.formatMessage(messages.faqTitle)}</h1>
 
-        <p><FormattedMessage {...messages.faqContent} values={{ faqLink }} /></p>
+        <p>
+          <FormattedMessage {...messages.faqContent} values={{ faqLink }} />
+        </p>
 
         <h1>{intl.formatMessage(messages.reportProblemTitle)}</h1>
 
@@ -101,18 +107,20 @@ export default class SupportSettings extends Component<Props> {
 
         <h1>{intl.formatMessage(messages.logsTitle)}</h1>
 
-        <p><FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /></p>
+        <p>
+          <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} />
+        </p>
 
         <Button
-          variant="primary"
+          variant={isRevampLayout ? 'contained' : 'primary'}
           onClick={onDownloadLogs}
           sx={{ marginTop: '20px' }}
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
         </Button>
-
       </div>
     );
   }
-
 }
+
+export default (withLayout(SupportSettings): ComponentType<Props>);

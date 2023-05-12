@@ -16,12 +16,10 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import OneSideBarDecoration from '../../widgets/OneSideBarDecoration';
 import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
@@ -52,14 +50,13 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +addressToDisplayString: string => string,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => ?$ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
 |};
 
 @observer
 export default class WalletTransactionsList extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -75,7 +72,9 @@ export default class WalletTransactionsList extends Component<Props> {
   loadingSpinner: ?LoadingSpinner;
   localizedDateFormat: 'MM/DD/YYYY';
 
-  groupTransactionsByDay(transactions: Array<WalletTransaction>): Array<{|
+  groupTransactionsByDay(
+    transactions: Array<WalletTransaction>
+  ): Array<{|
     date: string,
     transactions: Array<WalletTransaction>,
   |}> {
@@ -86,7 +85,7 @@ export default class WalletTransactionsList extends Component<Props> {
     for (const transaction of transactions) {
       const date: string = moment(transaction.date).format(dateFormat);
       // find the group this transaction belongs in
-      let group = groups.find((g) => g.date === date);
+      let group = groups.find(g => g.date === date);
       // if first transaction in this group, create the group
       if (!group) {
         group = { date, transactions: [] };
@@ -131,14 +130,18 @@ export default class WalletTransactionsList extends Component<Props> {
       onAddMemo,
       onEditMemo,
       notification,
-      onCopyAddressTooltip
+      onCopyAddressTooltip,
     } = this.props;
 
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
     const loadingSpinner = isLoadingTransactions ? (
       <div className={styles.loading}>
-        <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />
+        <LoadingSpinner
+          ref={component => {
+            this.loadingSpinner = component;
+          }}
+        />
       </div>
     ) : null;
 
@@ -163,9 +166,10 @@ export default class WalletTransactionsList extends Component<Props> {
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
-                  numberOfConfirmations={transaction.block == null
-                    ? null
-                    : this.props.lastSyncBlock - transaction.block.Height
+                  numberOfConfirmations={
+                    transaction.block == null
+                      ? null
+                      : this.props.lastSyncBlock - transaction.block.Height
                   }
                   assuranceLevel={transaction.getAssuranceLevelForMode(
                     assuranceMode,
@@ -185,7 +189,7 @@ export default class WalletTransactionsList extends Component<Props> {
           </div>
         ))}
         {loadingSpinner}
-        {!isLoadingTransactions && hasMoreToLoad &&
+        {!isLoadingTransactions && hasMoreToLoad && (
           <Button
             variant="primary"
             disabled={isLoadingTransactions}
@@ -194,9 +198,8 @@ export default class WalletTransactionsList extends Component<Props> {
           >
             {intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
           </Button>
-        }
+        )}
       </div>
     );
   }
-
 }

@@ -17,6 +17,8 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
+import cs from 'react-intl/locale-data/cs';
+import sk from 'react-intl/locale-data/sk';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
@@ -30,6 +32,7 @@ import type { RouterHistory } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
+import { LayoutProvider } from '../styles/context/layout';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -46,6 +49,8 @@ addLocaleData([
   ...es,
   ...it,
   ...tr,
+  ...cs,
+  ...sk,
 ]);
 
 type Props = {|
@@ -59,19 +64,19 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
-  @observable mergedMessages: null | {| [key: string]: string, |} = null;
+  @observable mergedMessages: null | {| [key: string]: string |} = null;
 
   componentDidMount: () => void = () => {
     autorun(async () => {
       const _mergedMessages = {
-        ...await translations['en-US'],
-        ...await translations[this.props.stores.profile.currentLocale]
+        ...(await translations['en-US']),
+        ...(await translations[this.props.stores.profile.currentLocale]),
       };
       runInAction(() => {
         this.mergedMessages = _mergedMessages;
       });
     });
-  }
+  };
 
   state: State = {
     crashed: false,
@@ -106,15 +111,17 @@ class App extends Component<Props, State> {
     changeToplevelTheme(currentTheme);
 
     return (
-      <div style={{ height: '100%' }}>
-        <ThemeProvider theme={muiTheme}>
-          <CssBaseline />
-          {globalStyles(muiTheme)}
-          <ThemeManager cssVariables={themeVars} />
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+      <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
+        <LayoutProvider layout={currentTheme}>
+          <ThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
+            <ThemeManager cssVariables={themeVars} />
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </LayoutProvider>
       </div>
     );
   }

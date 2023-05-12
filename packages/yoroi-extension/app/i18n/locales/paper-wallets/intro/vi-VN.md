@@ -1,7 +1,7 @@
-# Paper Wallets
+# Ví giấy
 
-A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
+**"Ví giấy"** là một tài liệu đặc biệt, chứa các từ gợi nhớ bí mật và một tập hợp nhỏ các địa chỉ. Khi ví giấy được tạo **Nó KHÔNG lưu trữ bởi Ví Yoroi**. Tài liệu PDF được tạo là bản sao duy nhất của ví này tồn tại.
 
-You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
+Bạn có thể sử dụng ví giấy để nhận tiền bằng các địa chỉ được tạo trước. Bạn cũng có thể khôi phục ví giấy của mình bất cứ lúc nào trên Ví Yoroi để sử dụng tài sản của bạn. Tuy nhiên, Lúc đó bạn nên ngừng sử dụng ví giấy này ví vì nó sẽ không còn là ví "lạnh" nữa.
 
-Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
+Ví giấy Yoroi được bảo vệ bằng **mật khẩu người dùng tùy chỉnh** và chứa 21 từ bí mật. Ngay cả khi ai đó có quyền truy cập vào ví giấy này, họ cũng sẽ cần biết mật khẩu của bạn để có quyền truy cập vào tài sản. **Nhưng nếu bạn mất hoặc quên mật khẩu, tiền của bạn sẽ bị mất vĩnh viễn và không ai có thể khôi phục chúng**. Nhập sai mật khẩu ví sẽ cung cấp cho bạn một ví khác. Điều này cho phép từ chối hợp lý.

@@ -1,10 +1,20 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 // eslint-disable-next-line no-unused-vars
-import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Notification } from '../../../types/notificationType';
+import type {
+  DefaultTokenEntry,
+  TokenLookupKey,
+  TokenEntry,
+} from '../../../api/common/lib/MultiToken';
+import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { PublicDeriverCache, Tx } from '../../../../chrome/extension/connector/types';
+import { Component } from 'react';
+import { intlShape, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
@@ -12,54 +22,27 @@ import { observer } from 'mobx-react';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import type {
-  DefaultTokenEntry,
-  TokenLookupKey,
-  TokenEntry,
-} from '../../../api/common/lib/MultiToken';
-import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
-import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
-import type { PublicDeriverCache, Tx, WhitelistEntry } from '../../../../chrome/extension/connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
-import WalletCard from '../connect/WalletCard';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
-import { ReactComponent as NoDappIcon }  from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
-
-type Props = {|
-  +tx: Tx,
-  +txData: ISignRequest<any>,
-  +onCopyAddressTooltip: (string, string) => void,
-  +onCancel: () => void,
-  +onConfirm: string => Promise<void>,
-  +notification: ?Notification,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +defaultToken: DefaultTokenEntry,
-  +network: $ReadOnly<NetworkRow>,
-  +unitOfAccountSetting: UnitOfAccountSettingType,
-  +addressToDisplayString: string => string,
-  +selectedExplorer: SelectedExplorer,
-  +getCurrentPrice: (from: string, to: string) => ?string,
-  +shouldHideBalance: boolean,
-  +selectedWallet: PublicDeriverCache,
-  +connectedWebsite: ?WhitelistEntry,
-|};
 
 export const signTxMessages: Object = defineMessages({
   title: {
     id: 'connector.signin.title',
     defaultMessage: '!!!Sign transaction',
+  },
+  summary: {
+    id: 'connector.signin.summary',
+    defaultMessage: '!!!Summary',
   },
   txDetails: {
     id: 'connector.signin.txDetails',
@@ -87,7 +70,7 @@ export const signTxMessages: Object = defineMessages({
   },
   more: {
     id: 'connector.signin.more',
-    defaultMessage: '!!!more'
+    defaultMessage: '!!!more',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
@@ -99,9 +82,27 @@ export const signTxMessages: Object = defineMessages({
   },
 });
 
+type Props = {|
+  +tx: Tx,
+  +txData: ISignRequest<any>,
+  +onCopyAddressTooltip: (string, string) => void,
+  +onCancel: () => void,
+  +onConfirm: string => Promise<void>,
+  +notification: ?Notification,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +defaultToken: DefaultTokenEntry,
+  +network: $ReadOnly<NetworkRow>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +addressToDisplayString: string => string,
+  +selectedExplorer: SelectedExplorer,
+  +getCurrentPrice: (from: string, to: string) => ?string,
+  +shouldHideBalance: boolean,
+  +selectedWallet: PublicDeriverCache,
+|};
+
 type State = {|
   isSubmitting: boolean,
-|}
+|};
 
 @observer
 class SignTxPage extends Component<Props, State> {
@@ -111,8 +112,7 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     isSubmitting: false,
-  }
-
+  };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -151,16 +151,18 @@ class SignTxPage extends Component<Props, State> {
     this.form.submit({
       onSuccess: form => {
         const { walletPassword } = form.values();
-        this.setState({ isSubmitting: true })
+        this.setState({ isSubmitting: true });
         this.props.onConfirm(walletPassword).catch(error => {
           if (error instanceof WrongPassphraseError) {
-            this.form.$('walletPassword').invalidate(
-              this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
-            )
+            this.form
+              .$('walletPassword')
+              .invalidate(
+                this.context.intl.formatMessage(signTxMessages.incorrectWalletPasswordError)
+              );
           } else {
             throw error;
           }
-          this.setState({ isSubmitting: false })
+          this.setState({ isSubmitting: false });
         });
       },
       onError: () => {},
@@ -259,73 +261,17 @@ class SignTxPage extends Component<Props, State> {
     const walletPasswordField = form.$('walletPassword');
     const { isSubmitting } = this.state;
     const { intl } = this.context;
-    const { txData, onCancel, connectedWebsite } = this.props;
+    const { txData, onCancel } = this.props;
 
     const totalInput = txData.totalInput();
     const fee = txData.fee();
     const amount = totalInput.joinSubtractCopy(fee);
-    const url = connectedWebsite?.url ?? '';
-    const faviconUrl = connectedWebsite?.image ?? '';
 
     return (
       <SignTxTabs
-        overviewContent={
+        isDataSignin={false}
+        connectionContent={
           <Box paddingTop="8px" overflowWrap="break-word">
-            <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
-              {intl.formatMessage(signTxMessages.connectedTo)}
-            </Typography>
-            <Box
-              display="flex"
-              alignItems="center"
-              px="28px"
-              py="20px"
-              border="1px solid var(--yoroi-palette-gray-100)"
-              borderRadius="6px"
-              minHeight="88px"
-              mb="8px"
-            >
-              <Box
-                sx={{
-                  marginRight: '12px',
-                  width: '32px',
-                  height: '32px',
-                  border: '1px solid #a7afc0',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: '#f8f8f8',
-                  img: {
-                    width: '20px',
-                  },
-                }}
-              >
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
-              </Box>
-              <Typography variant="body1" fontWeight="300" color="var(--yoroi-palette-gray-900)">
-                {url}
-              </Typography>
-            </Box>
-            <Box
-              display="flex"
-              alignItems="center"
-              px="28px"
-              py="20px"
-              border="1px solid var(--yoroi-palette-gray-100)"
-              borderRadius="6px"
-              minHeight="88px"
-            >
-              <WalletCard
-                shouldHideBalance={this.props.shouldHideBalance}
-                publicDeriver={this.props.selectedWallet}
-                getTokenInfo={this.props.getTokenInfo}
-                getCurrentPrice={(_from, _to) => null}
-                unitOfAccountSetting={({
-                  enabled: false,
-                  currency: null,
-                })}
-              />
-            </Box>
             <Box pt="32px">
               <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
                 {intl.formatMessage(signTxMessages.totals)}
@@ -364,7 +310,7 @@ class SignTxPage extends Component<Props, State> {
                   justifyContent="space-between"
                   alignItems="center"
                   borderRadius="6px"
-                  backgroundColor="var(--yoroi-palette-primary-300)"
+                  backgroundColor="primary.600"
                   color="var(--yoroi-palette-common-white)"
                 >
                   <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
@@ -409,7 +355,8 @@ class SignTxPage extends Component<Props, State> {
             </Box>
           </Box>
         }
-        utxoAddressContent={
+        detailsContent={null}
+        utxosContent={
           <Box>
             <UtxoDetails
               txData={txData}

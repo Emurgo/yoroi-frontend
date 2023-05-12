@@ -480,7 +480,7 @@ function CustomWorld(cmdInput: WorldInput) {
         .then(response => callback(response))
         .catch(err => callback(err));
     });
-    const {name, version} = allDBs[0];
+    const { name, version } = allDBs[0];
 
     await this.driver.executeScript((dbName, dbVersion, table) => {
       const request = window.indexedDB.open(dbName, dbVersion);

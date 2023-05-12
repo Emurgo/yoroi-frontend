@@ -92,7 +92,7 @@ import {
   unscramblePaperAdaMnemonic,
 } from './lib/cardanoCrypto/paperWallet';
 import Notice from '../../domain/Notice';
-import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
+import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
 import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
 import {
@@ -344,6 +344,7 @@ export type CardanoTxRequest = {|
   includeTargets?: Array<{|
     address: string,
     value?: string,
+    isForeign: ?boolean,
     assets?: {| [assetId: string]: string |},
     dataHash?: string,
     mintRequest?: Array<CardanoTxRequestMint>, // this mint is sent directly to the target

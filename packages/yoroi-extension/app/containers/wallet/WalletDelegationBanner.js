@@ -4,7 +4,7 @@ import { Box, styled } from '@mui/system';
 import { Stack, Button, IconButton, Typography, Link } from '@mui/material';
 
 import { injectIntl, defineMessages } from 'react-intl';
-import { ReactComponent as CloseIcon }  from '../../assets/images/close.inline.svg';
+import { ReactComponent as CloseIcon } from '../../assets/images/close.inline.svg';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -74,14 +74,7 @@ function WalletDelegationBanner({
       </Box>
     );
   }
-  const {
-    id,
-    name,
-    avatar,
-    websiteUrl,
-    roa: estimatedRoa30d,
-    socialLinks
-  } = poolInfo || {};
+  const { id, name, avatar, websiteUrl, roa: estimatedRoa30d, socialLinks } = poolInfo || {};
 
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
@@ -106,7 +99,7 @@ function WalletDelegationBanner({
         >
           <Box sx={{ display: 'flex' }}>
             <AvatarWrapper>
-              {avatar != null ? (
+              {avatar ? (
                 <AvatarImg src={avatar} alt={name} />
               ) : (
                 <AvatarImg src={avatarGenerated} alt={name} />
@@ -145,22 +138,25 @@ function WalletDelegationBanner({
       <Stack direction="row" spacing="24px">
         <Link
           as={Button}
-          variant="secondary"
+          variant="outlined"
+          color="secondary"
           sx={{ width: '220px', textDecoration: 'none' }}
-          href="https://www.fixlink.com"
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
           target="_blank"
           rel="noreferrer noopener"
         >
           {intl.formatMessage(globalMessages.learnMore)}
         </Link>
-        <Button
-          variant="primary"
-          sx={{ width: '220px' }}
-          onClick={() => onDelegateClick(id)}
-          disabled={isWalletWithNoFunds}
-        >
-          {intl.formatMessage(globalMessages.delegateLabel)}
-        </Button>
+        {!isWalletWithNoFunds && (
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ width: '220px' }}
+            onClick={() => onDelegateClick(id)}
+          >
+            {intl.formatMessage(globalMessages.delegateLabel)}
+          </Button>
+        )}
       </Stack>
       <CloseBtn onClick={onClose}>
         <CloseIcon />

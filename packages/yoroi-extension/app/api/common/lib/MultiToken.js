@@ -1,15 +1,13 @@
 // @flow
 
-import {
-  BigNumber
-} from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 
 export type TokenLookupKey = {|
   +identifier: string,
   /**
-    * note: avoid putting asset metadata here directly
-    * since it can update over time so best not to cache it here
-    */
+   * note: avoid putting asset metadata here directly
+   * since it can update over time so best not to cache it here
+   */
   +networkId: number,
 |};
 
@@ -25,7 +23,7 @@ export type DefaultTokenEntry = {|
 
 export class MultiToken {
   // this could be a map, but the # of elements is small enough the perf difference is trivial
-  values: Array<TokenEntry>
+  values: Array<TokenEntry>;
   defaults: DefaultTokenEntry;
 
   static from(multiTokenData: {|
@@ -34,16 +32,15 @@ export class MultiToken {
   |}): MultiToken {
     return new MultiToken(
       multiTokenData.values.map(({ identifier, networkId, amount }) => ({
-        identifier, networkId, amount: new BigNumber(amount),
+        identifier,
+        networkId,
+        amount: new BigNumber(amount),
       })),
       multiTokenData.defaults
     );
   }
 
-  constructor(
-    values: Array<TokenEntry>,
-    defaults: DefaultTokenEntry
-   ) {
+  constructor(values: Array<TokenEntry>, defaults: DefaultTokenEntry) {
     this.values = [];
 
     // things are just easier if we enforce the default entry to be part of the list of tokens
@@ -60,18 +57,18 @@ export class MultiToken {
     return this.defaults;
   }
 
-  _checkNetworkId: number => void = (networkId) => {
+  _checkNetworkId: number => void = networkId => {
     const ownNetworkId = this.defaults.defaultNetworkId;
     if (ownNetworkId !== networkId) {
       throw new Error(`${nameof(MultiToken)} network mismatch ${ownNetworkId} - ${networkId}`);
     }
-  }
+  };
 
-  get: string => BigNumber | void = (identifier) => {
+  get: string => BigNumber | void = identifier => {
     return this.values.find(value => value.identifier === identifier)?.amount;
-  }
+  };
 
-  add: TokenEntry => MultiToken = (entry) => {
+  add: TokenEntry => MultiToken = entry => {
     this._checkNetworkId(entry.networkId);
     const existingEntry = this.values.find(value => value.identifier === entry.identifier);
     if (existingEntry == null) {
@@ -81,12 +78,12 @@ export class MultiToken {
     existingEntry.amount = existingEntry.amount.plus(entry.amount);
     this._removeIfZero(entry.identifier);
     return this;
-  }
+  };
 
   /**
    * Add the entry amount but remove in case the value is equal or below zero
    */
-  addWithLimitZero: TokenEntry => MultiToken = (entry) => {
+  addWithLimitZero: TokenEntry => MultiToken = entry => {
     this._checkNetworkId(entry.networkId);
     const existingEntry = this.values.find(value => value.identifier === entry.identifier);
     if (existingEntry == null) {
@@ -96,9 +93,9 @@ export class MultiToken {
     existingEntry.amount = existingEntry.amount.plus(entry.amount);
     this._removeIfZeroOrBelow(entry.identifier);
     return this;
-  }
+  };
 
-  _removeIfZero: string => void = (identifier) => {
+  _removeIfZero: string => void = identifier => {
     // if after modifying a token value we end up with a value of 0,
     // we should just remove the token from the list
     // However, we must keep a value of 0 for the default entry
@@ -109,9 +106,9 @@ export class MultiToken {
     if (existingValue != null && existingValue.eq(0)) {
       this.values = this.values.filter(value => value.identifier !== identifier);
     }
-  }
+  };
 
-  _removeIfZeroOrBelow: string => void = (identifier) => {
+  _removeIfZeroOrBelow: string => void = identifier => {
     // if after modifying a token value we end up with a value of 0,
     // we should just remove the token from the list
     // However, we must keep a value of 0 for the default entry
@@ -122,114 +119,109 @@ export class MultiToken {
     if (existingValue != null && existingValue.lte(0)) {
       this.values = this.values.filter(value => value.identifier !== identifier);
     }
-  }
+  };
 
-  subtract: TokenEntry => MultiToken = (entry) => {
+  subtract: TokenEntry => MultiToken = entry => {
     return this.add({
       identifier: entry.identifier,
       amount: entry.amount.negated(),
       networkId: entry.networkId,
     });
-  }
+  };
 
   /**
    * Subtract the specified entry from this multitoken,
    * but remove the entry in case it's zero or below
    */
-  subtractWithLimitZero: TokenEntry => MultiToken = (entry) => {
+  subtractWithLimitZero: TokenEntry => MultiToken = entry => {
     return this.addWithLimitZero({
       identifier: entry.identifier,
       amount: entry.amount.negated(),
       networkId: entry.networkId,
     });
-  }
+  };
 
-  joinAddMutable: MultiToken => MultiToken = (target) => {
+  joinAddMutable: MultiToken => MultiToken = target => {
     for (const entry of target.values) {
       this.add(entry);
     }
     return this;
-  }
-  joinSubtractMutable: MultiToken => MultiToken = (target) => {
+  };
+  joinSubtractMutable: MultiToken => MultiToken = target => {
     for (const entry of target.values) {
       this.subtract(entry);
     }
     return this;
-  }
+  };
   /**
    * Subtract the specified multitoken from this multitoken,
    * remove any entries that are zero or below
    */
-  joinSubtractMutableWithLimitZero: MultiToken => MultiToken = (target) => {
+  joinSubtractMutableWithLimitZero: MultiToken => MultiToken = target => {
     for (const entry of target.values) {
       this.subtractWithLimitZero(entry);
     }
     return this;
-  }
-  joinAddCopy: MultiToken => MultiToken = (target) => {
-    const copy = new MultiToken(
-      this.values,
-      this.defaults
-    );
+  };
+  joinAddCopy: MultiToken => MultiToken = target => {
+    const copy = new MultiToken(this.values, this.defaults);
     return copy.joinAddMutable(target);
-  }
-  joinSubtractCopy: MultiToken => MultiToken = (target) => {
-    const copy = new MultiToken(
-      this.values,
-      this.defaults
-    );
+  };
+  joinSubtractCopy: MultiToken => MultiToken = target => {
+    const copy = new MultiToken(this.values, this.defaults);
     return copy.joinSubtractMutable(target);
-  }
+  };
 
   /**
    * Subtract the specified multitoken from a new copy of this multitoken,
    * remove any entries that are zero or below
    */
-  joinSubtractCopyWithLimitZero: MultiToken => MultiToken = (target) => {
-    const copy = new MultiToken(
-      this.values,
-      this.defaults
-    );
+  joinSubtractCopyWithLimitZero: MultiToken => MultiToken = target => {
+    const copy = new MultiToken(this.values, this.defaults);
     return copy.joinSubtractMutableWithLimitZero(target);
-  }
+  };
 
   absCopy: void => MultiToken = () => {
     return new MultiToken(
       this.values.map(token => ({ ...token, amount: token.amount.absoluteValue() })),
       this.defaults
     );
-  }
+  };
 
   negatedCopy: void => MultiToken = () => {
     return new MultiToken(
       this.values.map(token => ({ ...token, amount: token.amount.negated() })),
       this.defaults
     );
-  }
+  };
 
   getDefault: void => BigNumber = () => {
     return this.getDefaultEntry().amount;
-  }
+  };
 
   getDefaultEntry: void => TokenEntry = () => {
-    return this.values.filter(value => (
-      value.networkId === this.defaults.defaultNetworkId &&
-      value.identifier === this.defaults.defaultIdentifier
-    ))[0];
-  }
+    return this.values.filter(
+      value =>
+        value.networkId === this.defaults.defaultNetworkId &&
+        value.identifier === this.defaults.defaultIdentifier
+    )[0];
+  };
 
   nonDefaultEntries: void => Array<TokenEntry> = () => {
-    return this.values.filter(value => !(
-      value.networkId === this.defaults.defaultNetworkId &&
-      value.identifier === this.defaults.defaultIdentifier
-    ));
-  }
+    return this.values.filter(
+      value =>
+        !(
+          value.networkId === this.defaults.defaultNetworkId &&
+          value.identifier === this.defaults.defaultIdentifier
+        )
+    );
+  };
 
   asMap: void => Map<string, BigNumber> = () => {
     return new Map(this.values.map(value => [value.identifier, value.amount]));
-  }
+  };
 
-  isEqualTo: MultiToken => boolean = (tokens) => {
+  isEqualTo: MultiToken => boolean = tokens => {
     const remainingTokens = this.asMap();
 
     // remove tokens that match <identifier, amount> one at a time
@@ -242,18 +234,20 @@ export class MultiToken {
     }
     if (remainingTokens.size > 0) return false;
     return true;
-  }
+  };
 
   size: void => number = () => this.values.length;
 
   isEmpty: void => boolean = () => {
     return this.values.some(token => token.amount.gt(0)) === false;
-  }
+  };
 
   toString: () => string = () => {
     const defAmount = this.getDefault().toString();
-    const assetMap = this.nonDefaultEntries()
-      .reduce((acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }), {});
-    return `${nameof(MultiToken)}{amount=${defAmount}, assets=${JSON.stringify(assetMap)}}`
-  }
+    const assetMap = this.nonDefaultEntries().reduce(
+      (acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }),
+      {}
+    );
+    return `${nameof(MultiToken)}{amount=${defAmount}, assets=${JSON.stringify(assetMap)}}`;
+  };
 }
