@@ -10,11 +10,11 @@ import {
   Skeleton,
   OutlinedInput,
   Button,
-  IconButton
+  IconButton,
 } from '@mui/material';
-import { ReactComponent as Search }  from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
-import { ReactComponent as NotFound }  from '../../../assets/images/assets-page/no-nft-found.inline.svg';
+import { ReactComponent as NotFound } from '../../../assets/images/assets-page/no-nft-found.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
 import { ReactComponent as Grid3x3 } from '../../../assets/images/assets-page/grid-3x3.inline.svg';
 import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
@@ -45,7 +45,7 @@ const messages = defineMessages({
   },
   searchNFTs: {
     id: 'wallet.nftGallary.search',
-    defaultMessage: '!!!Search NFTs'
+    defaultMessage: '!!!Search NFTs',
   },
   nftsCount: {
     id: 'wallet.nftGallary.details.nftsCount',
@@ -67,13 +67,20 @@ function NfTsList({ list, intl }: Props & Intl): Node {
     const regExp = new RegExp(keyword, 'gi');
     const nftsListCopy = [...list];
     const filteredAssetsList = nftsListCopy.filter(a => {
-      return [a.name, a.id].some(val => val.match(regExp))
+      return [a.name, a.id].some(val => val.match(regExp));
     });
     setNftList(filteredAssetsList);
-  }, [keyword, list])
+  }, [keyword, list]);
 
   return (
-    <Box sx={{ height: 'content', width: '100%', bgcolor: 'var(--yoroi-palette-common-white)', borderRadius: '8px' }}>
+    <Box
+      sx={{
+        height: 'content',
+        width: '100%',
+        bgcolor: 'var(--yoroi-palette-common-white)',
+        borderRadius: '8px',
+      }}
+    >
       <Box
         display="flex"
         alignItems="center"
@@ -81,12 +88,12 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         marginBottom="30px"
         sx={{
           padding: '16px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)'
+          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
         }}
       >
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-          {list.length === 0 ?
-            intl.formatMessage(globalMessages.sidebarNfts)
+          {list.length === 0
+            ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
         </Typography>
         <Box display="flex" alignItems="center">
@@ -104,8 +111,11 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                   backgroundColor:
                     Column.count === columns.count ? 'var(--yoroi-palette-gray-200)' : 'none',
                   '&:hover': {
-                    backgroundColor: Column.count !== columns.count ? 'var(--yoroi-palette-gray-50)' : 'var(--yoroi-palette-gray-200)'
-                  }
+                    backgroundColor:
+                      Column.count !== columns.count
+                        ? 'var(--yoroi-palette-gray-50)'
+                        : 'var(--yoroi-palette-gray-200)',
+                  },
                 }}
               >
                 <Column.Icon />
@@ -115,19 +125,21 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           <SearchInput
             disableUnderline
             value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+            onChange={e => setKeyword(e.target.value)}
             placeholder={intl.formatMessage(messages.searchNFTs)}
             startAdornment={
               <InputAdornment position="start">
                 <Search />
               </InputAdornment>
             }
-            endAdornment={keyword !== '' &&
-              <InputAdornment position="end">
-                <IconButton sx={{ mr: '-10px' }} onClick={() => setKeyword('')}>
-                  <Close />
-                </IconButton>
-              </InputAdornment>
+            endAdornment={
+              keyword !== '' && (
+                <InputAdornment position="end">
+                  <IconButton sx={{ mr: '-10px' }} onClick={() => setKeyword('')}>
+                    <Close />
+                  </IconButton>
+                </InputAdornment>
+              )
             }
           />
         </Box>
@@ -176,11 +188,16 @@ function imageExists(imageSrc: string, onload: void => void, onerror: void => vo
   img.src = imageSrc;
 }
 
-export function NftImage({ imageUrl, name, width, height }: {|
+export function NftImage({
+  imageUrl,
+  name,
+  width,
+  height,
+}: {|
   imageUrl: string | null,
   name: string,
   width: string,
-  height: string
+  height: string,
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -188,54 +205,77 @@ export function NftImage({ imageUrl, name, width, height }: {|
 
   useEffect(() => {
     if (url !== null)
-    imageExists(
+      imageExists(
         String(url),
-        () => { setLoading(false); setError(false) }, // on-success
-        () => { setLoading(false); setError(true) }, // on-error
-      )
-  }, [url])
+        () => {
+          setLoading(false);
+          setError(false);
+        }, // on-success
+        () => {
+          setLoading(false);
+          setError(true);
+        } // on-error
+      );
+  }, [url]);
 
-  if (error || url === null) return (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'var(--yoroi-palette-gray-100)',
-      width,
-      height,
-    }}
-    >
-      <DefaultNFT />
-    </Box>
-  )
+  if (error || url === null)
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width,
+          height,
+        }}
+      >
+        <DefaultNFT />
+      </Box>
+    );
 
-  if (loading) return <Skeleton variant='rectangular' animation='wave' sx={{ width, height }} />
-  return  (
+  if (loading) return <Skeleton variant="rectangular" animation="wave" sx={{ width, height }} />;
+  return (
     <img
       style={{
-        width, height,
-        minWidth: width, minHeight: height,
-        maxWidth: width, maxHeight: height,
-        flex: '1', objectFit: 'cover', display: 'inline-block' }}
+        width,
+        height,
+        minWidth: width,
+        minHeight: height,
+        maxWidth: width,
+        maxHeight: height,
+        flex: '1',
+        objectFit: 'cover',
+        display: 'inline-block',
+      }}
       src={url}
       alt={name}
       loading="lazy"
     />
-  )
+  );
 }
 
-function NftCardImage({ ipfsUrl, name, width, height }: {|
+function NftCardImage({
+  ipfsUrl,
+  name,
+  width,
+  height,
+}: {|
   ipfsUrl: string | null,
   name: string,
   width: string,
   height: string,
 |}) {
   return (
-    <ImageListItem sx={{ height: '100%', width, }}>
+    <ImageListItem sx={{ height: '100%', width }}>
       <Box sx={{ width, height, overflow: 'hidden', borderRadius: '4px' }}>
         <NftImage imageUrl={ipfsUrl} name={name} width={width} height={height} />
       </Box>
-      <Typography mt="16px" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} minHeight="48px" color="var(--yoroi-palette-gray-900)">
+      <Typography
+        mt="16px"
+        sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+        minHeight="48px"
+        color="var(--yoroi-palette-gray-900)"
+      >
         {name}
       </Typography>
     </ImageListItem>

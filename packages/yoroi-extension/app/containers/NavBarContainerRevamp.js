@@ -109,7 +109,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <NavBarRevamp
           title={this.props.title}
           menu={this.props.menu}
-          walletDetails={<DropdownHead />}
+          walletDetails={walletsStore.selected !== null ? <DropdownHead /> : null}
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() =>
@@ -131,8 +131,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
       balance = txRequests.requests.getBalanceRequest.result;
     }
 
-    const ergoWallets = []
-    const cardanoWallets = []
+    const ergoWallets = [];
+    const cardanoWallets = [];
 
     wallets.forEach(wallet => {
       const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
@@ -159,8 +159,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
         shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
       };
 
-      if(isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap)
-      else cardanoWallets.push(walletMap)
+      if (isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap);
+      else cardanoWallets.push(walletMap);
     });
 
     if (this.generated.stores.uiDialogs.isOpen(WalletListDialog)) {
@@ -177,7 +177,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           walletAmount={balance}
           onAddWallet={() => {
             this.generated.actions.dialogs.closeActiveDialog.trigger();
-            this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+            this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
           }}
           updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
           walletsNavigation={this.generated.stores.profile.walletsNavigation}
@@ -204,10 +204,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
   ) => {
     const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
       const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache =
-        this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
-          parent
-        );
+      const settingsCache: ConceptualWalletSettingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+        parent
+      );
 
       const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
         wallet.getParent().getNetworkInfo().NetworkId
@@ -273,7 +272,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           trigger: (params: void) => Promise<void>,
         |},
         updateSortedWalletList: {|
-          trigger: (WalletsNavigation) => Promise<void>,
+          trigger: WalletsNavigation => Promise<void>,
         |},
       |},
       router: {|

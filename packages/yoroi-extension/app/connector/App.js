@@ -32,6 +32,7 @@ import type { RouterHistory } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
+import { LayoutProvider } from '../styles/context/layout';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -110,15 +111,17 @@ class App extends Component<Props, State> {
     changeToplevelTheme(currentTheme);
 
     return (
-      <div style={{ height: '100%' }}>
-        <ThemeProvider theme={muiTheme}>
-          <CssBaseline />
-          {globalStyles(muiTheme)}
-          <ThemeManager cssVariables={themeVars} />
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+      <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
+        <LayoutProvider layout={currentTheme}>
+          <ThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
+            <ThemeManager cssVariables={themeVars} />
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </LayoutProvider>
       </div>
     );
   }

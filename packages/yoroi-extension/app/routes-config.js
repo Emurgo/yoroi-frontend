@@ -36,6 +36,8 @@ export const ROUTES = {
   WALLETS: {
     ROOT: '/wallets',
     ADD: '/wallets/add',
+    CREATE_NEW_WALLET: '/wallets/new',
+    RESTORE_WALLET: '/wallets/restore',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',
     ASSETS: '/wallets/assets',

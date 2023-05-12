@@ -6,14 +6,12 @@ import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
-import { ReactComponent as IconEyeOpen }  from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed }  from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
@@ -21,25 +19,25 @@ type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
   /**
-    * undefined => wallet is not a reward wallet
-    * null => still calculating
-    * value => done calculating
-  */
-  +rewards: null | void | MultiToken,
+   * undefined => wallet is not a reward wallet
+   * null => still calculating
+   * value => done calculating
+   */
+  +rewards?: null | void | MultiToken,
   +walletAmount: null | MultiToken,
   +infoText?: string,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isRefreshing: boolean,
 |};
 
 @observer
 export default class WalletDetails extends Component<Props> {
-
-  static defaultProps: {|infoText: void|} = {
+  static defaultProps: {| infoText: void, rewards: null |} = {
     infoText: undefined,
+    rewards: null,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -82,37 +80,32 @@ export default class WalletDetails extends Component<Props> {
             </span>
           </div> */}
         </div>
-        <button
-          type="button"
-          className={styles.toggleButton}
-          onClick={onUpdateHideBalance}
-        >
+        <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
           {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
         </button>
       </div>
     );
   }
 
-  renderAmountDisplay: {|
+  renderAmountDisplay: ({|
     shouldHideBalance: boolean,
     amount: ?MultiToken,
-  |} => Node = (request) => {
+  |}) => Node = request => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
     }
 
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     let balanceDisplay;
     if (request.shouldHideBalance) {
-      balanceDisplay = (<span>{hiddenAmount}</span>);
+      balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
       const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
         shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals,
+        tokenInfo.Metadata.numberOfDecimals
       );
 
       balanceDisplay = (
@@ -129,5 +122,5 @@ export default class WalletDetails extends Component<Props> {
         {this.props.isRefreshing && <div className={styles.isSyncing} />}
       </>
     );
-  }
+  };
 }

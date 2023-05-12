@@ -30,7 +30,7 @@ class NavBarRevamp extends Component<Props> {
   };
 
   render(): Node {
-    const { title, children, walletDetails, menu } = this.props;
+    const { title, children, walletDetails, menu, buyButton } = this.props;
     return (
       <Box
         sx={{
@@ -71,10 +71,8 @@ class NavBarRevamp extends Component<Props> {
                 sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
               >
                 {children}
-                {this.props.buyButton != null && (
-                  <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
-                )}
-                {this.props.walletDetails != null && (
+                {buyButton && <Box sx={{ marginLeft: '24px' }}>{buyButton}</Box>}
+                {walletDetails && (
                   <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
                     {walletDetails}
                   </Box>

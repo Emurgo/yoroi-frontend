@@ -81,10 +81,8 @@ class AddCollateralPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(
-            globalMessages.walletPasswordFieldPlaceholder
-          ),
+          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
@@ -124,7 +122,9 @@ class AddCollateralPage extends Component<Props, State> {
               if (error instanceof WrongPassphraseError) {
                 this.form
                   .$('walletPassword')
-                  .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+                  .invalidate(
+                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                  );
               } else {
                 throw error;
               }
@@ -134,9 +134,14 @@ class AddCollateralPage extends Component<Props, State> {
       });
     } else {
       this.setState({ isSubmitting: true });
-      this.props.onConfirm('').finally(() => {
-        this.setState({ isSubmitting: false });
-      }).catch(error => { throw error; });
+      this.props
+        .onConfirm('')
+        .finally(() => {
+          this.setState({ isSubmitting: false });
+        })
+        .catch(error => {
+          throw error;
+        });
     }
   }
 
@@ -237,15 +242,15 @@ class AddCollateralPage extends Component<Props, State> {
     const { walletType } = this.props;
     let confirmButtonLabel;
     switch (walletType) {
-    case 'ledger':
-      confirmButtonLabel = globalMessages.confirmOnLedger;
-      break;
-    case 'trezor':
-      confirmButtonLabel = globalMessages.confirmOnTrezor;
-      break;
-    default:
-      confirmButtonLabel = globalMessages.confirm;
-      break;
+      case 'ledger':
+        confirmButtonLabel = globalMessages.confirmOnLedger;
+        break;
+      case 'trezor':
+        confirmButtonLabel = globalMessages.confirmOnTrezor;
+        break;
+      default:
+        confirmButtonLabel = globalMessages.confirm;
+        break;
     }
 
     return (
@@ -253,9 +258,11 @@ class AddCollateralPage extends Component<Props, State> {
         <Box maxWidth={480} margin="0 auto" padding="32px" flex="1" flexGrow="1" overflow="auto">
           <Typography
             textAlign="center"
-            color="var(--yoroi-palette-gray-900)"
-            variant="h5"
+            color="gray.900"
+            variant="h4"
+            fontWeight={500}
             marginBottom="8px"
+            fontSize="20px"
           >
             {intl.formatMessage(messages.reorgTitle)}
           </Typography>
@@ -272,7 +279,7 @@ class AddCollateralPage extends Component<Props, State> {
               }}
             />
           </Typography>
-          <Box pt="32px">
+          <Box pt="24px">
             <Box
               width="100%"
               padding="16px"
@@ -309,7 +316,7 @@ class AddCollateralPage extends Component<Props, State> {
             </Box>
           </Box>
           {walletType === 'web' && (
-            <Box mt="26px">
+            <Box mt="24px">
               <TextField
                 type="password"
                 {...walletPasswordField.bind()}
@@ -321,7 +328,9 @@ class AddCollateralPage extends Component<Props, State> {
             </Box>
           )}
         </Box>
-        <ErrorBlock error={this.props.hwWalletError} />
+
+        {this.props.hwWalletError && <ErrorBlock error={this.props.hwWalletError} />}
+
         <Box borderTop="1px solid var(--yoroi-palette-gray-300)">
           <Box
             sx={{
@@ -333,12 +342,25 @@ class AddCollateralPage extends Component<Props, State> {
               padding: '32px',
             }}
           >
-            <Button sx={{ minWidth: 'auto' }} fullWidth variant="secondary" onClick={onCancel}>
+            <Button
+              sx={{
+                // width: '144px',
+                height: '40px',
+                minWidth: 'unset',
+                minHeight: 'unset',
+                fontSize: '14px',
+                lineHeight: '15px',
+              }}
+              disableRipple={false}
+              variant="outlined"
+              color="primary"
+              onClick={onCancel}
+            >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </Button>
             <LoadingButton
               sx={{ minWidth: 'auto' }}
-              variant="primary"
+              variant="contained"
               fullWidth
               disabled={walletType === 'web' && !walletPasswordField.isValid}
               onClick={this.submit.bind(this)}

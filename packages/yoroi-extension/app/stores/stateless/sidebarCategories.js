@@ -132,12 +132,17 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   // Open `/wallets` only if the user is on any other page other than `/wallets/add`
   makeWalletCategory(
     ROUTES.WALLETS.ROOT,
-    ({ currentRoute }) => currentRoute !== ROUTES.WALLETS.ADD
+    ({ currentRoute, hasAnyWallets }) => currentRoute !== ROUTES.WALLETS.ADD && hasAnyWallets,
   ),
   // Open `/wallets/transactions` if the user is on the `/wallet/add`
   makeWalletCategory(
     ROUTES.WALLETS.TRANSACTIONS,
-    ({ currentRoute }) => currentRoute === ROUTES.WALLETS.ADD
+    ({ currentRoute, hasAnyWallets }) => currentRoute === ROUTES.WALLETS.ADD && hasAnyWallets,
+  ),
+  // If user didn't restored any wallets, it should redirect to the add wallet page.
+  makeWalletCategory(
+    ROUTES.WALLETS.ADD,
+    ({ hasAnyWallets }) => !hasAnyWallets,
   ),
   {
     className: 'staking',

@@ -1,8 +1,13 @@
 // @flow
-import { AsyncAction, } from '../lib/Action';
+import { AsyncAction } from '../lib/Action';
 
 // ======= WALLET ACTIONS =======
 
 export default class AdaWalletsActions {
-  createWallet: AsyncAction<{| name: string, password: string |}> = new AsyncAction();
+  startWalletCreation: AsyncAction<{| name: string, password: string |}> = new AsyncAction();
+  createWallet: AsyncAction<{|
+    walletName: string,
+    walletPassword: string,
+    recoveryPhrase: Array<string>,
+  |}> = new AsyncAction();
 }
