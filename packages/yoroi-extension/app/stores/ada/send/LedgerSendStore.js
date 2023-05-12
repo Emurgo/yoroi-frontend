@@ -233,7 +233,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         const {
           votingPublicKey,
           stakingKey,
-          rewardAddress,
+          paymentAddress,
           nonce,
         } = request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
 
@@ -250,7 +250,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         metadata = generateRegistrationMetadata(
           votingPublicKey,
           stakingKey,
-          rewardAddress,
+          paymentAddress,
           nonce,
           (_hashedMetadata) => {
             return cip36VoteRegistrationSignatureHex;

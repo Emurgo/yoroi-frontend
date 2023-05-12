@@ -29,6 +29,7 @@ import {
   TxRequiredSignerType,
   DatumType,
   TxOutputFormat,
+  CIP36VoteDelegationType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -90,25 +91,33 @@ export async function createLedgerSignTxPayload(request: {|
 
   let auxiliaryData = undefined;
   if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
-    const { votingPublicKey, stakingKeyPath, nonce } =
+    const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } =
       request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
 
     auxiliaryData = {
       type: TxAuxiliaryDataType.CIP36_REGISTRATION,
       params: {
-        format: CIP36VoteRegistrationFormat.CIP_15,
-        voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+        format: CIP36VoteRegistrationFormat.CIP_36,
+        delegations: [
+          {
+            type: CIP36VoteDelegationType.KEY,
+            voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+            weight: 1,
+          },
+        ],
         stakingPath: stakingKeyPath,
         paymentDestination: {
           type: TxOutputDestinationType.DEVICE_OWNED,
           params: {
-            type: AddressType.REWARD_KEY,
+            type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
             params: {
+              spendingPath: paymentKeyPath,
               stakingPath: stakingKeyPath,
             },
           },
         },
         nonce,
+        votingPurpose: 0,
       }
     };
   } else if (request.signRequest.metadata != null) {
@@ -630,7 +639,7 @@ export function toLedgerSignRequest(
         path: ownUtxo ? ownUtxo.addressing.path : null,
       });
     }
-    return formatted.sort(compareInputs);
+    return formatted;
   }
 
   function formatOutput(
