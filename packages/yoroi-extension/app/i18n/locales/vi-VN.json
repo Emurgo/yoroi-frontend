@@ -1015,7 +1015,7 @@
   "wallet.voting.dialog.title": "Đăng ký bỏ phiếu",
   "wallet.voting.dialog.transactionLabel": "Giao dịch",
   "wallet.voting.keepDelegated": "Quyền biểu quyết của bạn là số tiền bạn ủy quyền và phần thưởng biểu quyết sẽ được phân phối tới địa chỉ phần thưởng ủy quyền của bạn. Vui lòng tiếp tục được ủy quyền cho đến khi cuộc biểu quyết kết thúc.",
-  "wallet.voting.ledgerNanoRequirement": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/\">Update</a>the Cardano app on your Ledger to version 6 or above with <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ledger.com/ledger-live\"> Ledger Live</a>.",
+  "wallet.voting.ledgerNanoRequirement": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/\">Cập nhật</a>ứng dụng Cardano trên ví Ledger lên phiên bản 6 hoặc cao hơn <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ledger.com/ledger-live\"> Ledger Live</a>.",
   "wallet.voting.line2": "Trước khi bạn bắt đầu, hãy đảm bảo hoàn thành các bước bên dưới",
   "wallet.voting.line3": "Tải xuống ứng dụng bỏ phiếu Catalyst.",
   "wallet.voting.line4": "Mở Ứng dụng bỏ phiếu của Catalyst và nhấp vào nút Hoàn thành đăng ký.",
