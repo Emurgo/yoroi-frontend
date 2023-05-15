@@ -23,6 +23,7 @@ const messages: * = defineMessages({
 
 type Props = {|
   +goToCurrentWallet: void => void,
+  +hasAnyWallets: boolean,
 |};
 
 @observer
@@ -33,18 +34,20 @@ export default class AddWalletPageHeader extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { goToCurrentWallet } = this.props;
+    const { goToCurrentWallet, hasAnyWallets } = this.props;
 
     return (
       <Box>
-        <Button sx={{ color: 'gray.900' }} onClick={goToCurrentWallet}>
-          <Box mr="10px">
-            <BackIcon />
-          </Box>
-          <Typography variant="button2" fontWeight={500} color="gray.900">
-            {intl.formatMessage(messages.backButtonLabel)}
-          </Typography>
-        </Button>
+        {hasAnyWallets && (
+          <Button sx={{ color: 'gray.900' }} onClick={goToCurrentWallet}>
+            <Box mr="10px">
+              <BackIcon />
+            </Box>
+            <Typography variant="button2" fontWeight={500} color="gray.900">
+              {intl.formatMessage(messages.backButtonLabel)}
+            </Typography>
+          </Button>
+        )}
         <Box
           sx={{
             display: 'flex',
