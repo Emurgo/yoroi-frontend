@@ -921,14 +921,6 @@ const globalMessages: * = defineMessages({
     id: 'global.invalidKeyFormat.label',
     defaultMessage: '!!!Invalid key. Should be hexadecimal-encoded.',
   },
-  stepPin: {
-    id: 'wallet.voting.dialog.stepPin',
-    defaultMessage: '!!!PIN',
-  },
-  stepConfirm: {
-    id: 'wallet.voting.dialog.stepConfirm',
-    defaultMessage: '!!!Confirm',
-  },
   registerLabel: {
     id: 'wallet.voting.dialog.registerLabel',
     defaultMessage: '!!!Register',
@@ -936,10 +928,6 @@ const globalMessages: * = defineMessages({
   transactionLabel: {
     id: 'wallet.voting.dialog.transactionLabel',
     defaultMessage: '!!!Transaction',
-  },
-  stepQrCode: {
-    id: 'wallet.voting.dialog.stepQrCode',
-    defaultMessage: '!!!QR Code',
   },
   votingRegistrationTitle: {
     id: 'wallet.voting.dialog.title',
