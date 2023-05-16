@@ -1,0 +1,77 @@
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: packages/yoroi-extension
+
+      - name: Check if version has been updated
+        id: check
+        uses: EndBug/version-check@v2
+        with:
+          diff-search: true
+          file-name: ./packages/yoroi-extension/package.json
+
+      - name: Read .nvmrc
+        if: steps.check.outputs.changed == 'true'
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+
+      - name: Setup node
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
+      - name: npm install
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          npm i 
+          npm i --prefix packages/yoroi-extension 
+          npm i --prefix packages/yoroi-connector 
+
+      - name: Build
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          cd packages/yoroi-extension
+          npm run keygen && mv key.pem production-key.pem && npm run prod:stable
+
+      - name: Install Octopus CLI 
+        if: steps.check.outputs.changed == 'true'
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
+        with:
+          version: latest
+
+      - name: Move package file 
+        if: steps.check.outputs.changed == 'true'
+        run: mv "packages/yoroi-extension/Yoroi.zip" yoroi-frontend.${{ steps.check.outputs.version }}.zip
+
+      - name: Push package to Octopus Deploy 
+        if: steps.check.outputs.changed == 'true'
+        uses: OctopusDeploy/push-package-action@v1.0.1
+        with:
+          packages: 'yoroi-frontend.${{ steps.check.outputs.version }}.zip'
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+
+      - name: Create release 
+        if: steps.check.outputs.changed == 'true'
+        uses: OctopusDeploy/create-release-action@v1.1.3
+        with:
+          server: https://emurgo.octopus.app
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+          project: 'yoroi-frontend'
+          channel: 'Production'
+          packages: 'yoroi-frontend:${{ steps.check.outputs.version }}'
+          release_number: '${{ steps.check.outputs.version }}'
