@@ -42,12 +42,12 @@ jobs:
           version: latest
 
       - name: Move package file 
-        run: mv "packages/yoroi-extension/Yoroi.zip" yoroi-frontend.${{ steps.check.outputs.version }}.zip
+        run: mv "packages/yoroi-extension/Yoroi.zip" yoroi-frontend.${{ steps.package-version.outputs.current-version}}.zip
 
       - name: Push package to Octopus Deploy 
         uses: OctopusDeploy/push-package-action@v1.0.1
         with:
-          packages: 'yoroi-frontend.${{ steps.check.outputs.version }}.zip'
+          packages: 'yoroi-frontend.${{ steps.package-version.outputs.current-version}}.zip'
           server: https://emurgo.octopus.app
           api_key: ${{ secrets.OCTOPUS_API_KEY }}
 
@@ -58,5 +58,5 @@ jobs:
           api_key: ${{ secrets.OCTOPUS_API_KEY }}
           project: 'yoroi-frontend'
           channel: 'Production'
-          packages: 'yoroi-frontend:${{ steps.check.outputs.version }}'
-          release_number: '${{ steps.check.outputs.version }}'
+          packages: 'yoroi-frontend:${{ steps.package-version.outputs.current-version}}'
+          release_number: '${{ steps.package-version.outputs.current-version}}'
