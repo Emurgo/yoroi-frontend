@@ -1168,10 +1168,11 @@ function handleInjectorConnect(port) {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
+                    await RustModule.load();
                     const balance =
                       await connectorGetBalance(wallet, pendingTxs, tokenId, connectionProtocol);
+
                     if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
-                      await RustModule.load();
                       const W4 = RustModule.WalletV4;
                       const value = W4.Value.new(
                         W4.BigNum.from_str(balance.default),
