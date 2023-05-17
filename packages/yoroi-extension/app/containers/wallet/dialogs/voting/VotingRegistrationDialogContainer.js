@@ -57,7 +57,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             classicTheme={profile.isClassicTheme}
             cancel={this.cancel}
             submit={votingActions.submitTransaction.trigger}
-            goBack={votingActions.cancel.trigger}
+            goBack={this.cancel}
             onError={votingActions.submitTransactionError.trigger}
             walletType={walletType}
           />);
