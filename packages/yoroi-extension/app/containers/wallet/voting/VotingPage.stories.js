@@ -207,36 +207,6 @@ const genVotingRegistrationDialogProps: ({|
   RegisterDialogProps: request.RegisterDialogProps || (null: any),
 })
 
-const genRegisterDialogProps: ({|
-  progressInfo: *,
-  error: *,
-  shelleyTrx: *,
-|}) => * = request => ({
-  actions: {
-    ada: {
-      votingTransaction: {
-        createTransaction: {
-          trigger: async (req) => action('createTransaction')(req),
-        },
-      },
-    },
-  },
-  stores: {
-    substores: {
-      ada: {
-        votingStore: {
-          isActionProcessing: boolean('isActionProcessing', false),
-          progressInfo: request.progressInfo,
-          error: request.error,
-          createVotingRegTx: {
-            error: request.error,
-          },
-        },
-      },
-    },
-  },
-})
-
 const genTransactionDialogProps: ({|
   progressInfo: *,
   error: *,
@@ -390,94 +360,6 @@ export const MainPage = (): Node => {
     />)
 };
 
-export const Pin = (): Node => {
-  const wallet = genShelleyCIP1852SigningWalletWithCache();
-  return wrappedComponent(
-    <VotingPage
-      generated={defaultProps(Object.freeze({
-        openDialog: VotingRegistrationDialogContainer,
-        wallet,
-        balance: getSufficientFunds(wallet),
-        hasAnyPending: false,
-        VotingRegistrationDialogProps: {
-          generated: genVotingRegistrationDialogProps({
-            progressInfo: {
-              currentStep: ProgressStep.GENERATE,
-              stepState: StepState.LOAD,
-            }
-          })
-        }
-      }))}
-    />
-  )
-}
-
-export const ConfirmPin = (): Node => {
-  const wallet = genShelleyCIP1852SigningWalletWithCache();
-  return wrappedComponent(
-    <VotingPage
-      generated={defaultProps(Object.freeze({
-        openDialog: VotingRegistrationDialogContainer,
-        wallet,
-        balance: getSufficientFunds(wallet),
-        hasAnyPending: false,
-        VotingRegistrationDialogProps: {
-          generated: genVotingRegistrationDialogProps({
-            progressInfo: {
-              currentStep: ProgressStep.CONFIRM,
-              stepState: StepState.LOAD,
-            }
-          })
-        }
-      }))}
-    />
-  )
-}
-
-export const Register = (): Node => {
-  const wallet = genShelleyCIP1852SigningWalletWithCache();
-  const tentativeTx = genVotingShelleyTx(wallet.publicDeriver);
-  const errorCases = Object.freeze({
-    None: undefined,
-    InvalidWitness: new InvalidWitnessError(),
-  });
-  const getErrorValue = () => select(
-    'errorCases',
-    errorCases,
-    errorCases.None
-  );
-  return wrappedComponent(
-    <VotingPage
-      generated={defaultProps(Object.freeze({
-        openDialog: VotingRegistrationDialogContainer,
-        wallet,
-        balance: getSufficientFunds(wallet),
-        hasAnyPending: false,
-        VotingRegistrationDialogProps: {
-          generated: genVotingRegistrationDialogProps({
-            progressInfo: {
-              currentStep: ProgressStep.REGISTER,
-              stepState: StepState.LOAD,
-            },
-
-            RegisterDialogProps: {
-              generated: genRegisterDialogProps({
-                progressInfo: {
-                  currentStep: ProgressStep.REGISTER,
-                  stepState: StepState.LOAD,
-                },
-                error: getErrorValue(),
-                shelleyTrx: tentativeTx,
-              })
-            }
-          })
-        },
-      }))}
-    />
-  )
-}
-
-
 export const Transaction = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache();
   const tentativeTx = genVotingShelleyTx(wallet.publicDeriver);
@@ -534,7 +416,7 @@ export const QrCode = (): Node => {
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
-              currentStep: ProgressStep.QR_CODE,
+              currentStep: ProgressStep.DONE,
               stepState: StepState.LOAD,
             }
           })

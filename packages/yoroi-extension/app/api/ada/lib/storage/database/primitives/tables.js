@@ -319,7 +319,9 @@ export type CardanoShelleyTransactionInsert = {|
   Extra: {|
     Fee: string,
     Ttl?: string,
-    Metadata: null | string,
+    // A backend update changed metadata to raw hex to parsed JSON, so this field
+    // may either be string (old data stored before the change) or Object (new data)
+    Metadata: null | string | Object,
     // note if this field is not present, the tx is *valid*
     IsValid?: boolean,
   |},

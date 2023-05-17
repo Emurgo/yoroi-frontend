@@ -183,7 +183,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         const {
           votingPublicKey,
           stakingKey: stakingKeyHex,
-          rewardAddress,
+          paymentAddress,
           nonce,
         } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
 
@@ -201,7 +201,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         metadata = generateRegistrationMetadata(
           votingPublicKey,
           stakingKeyHex,
-          rewardAddress,
+          paymentAddress,
           nonce,
           (_hashedMetadata) => {
             return catalystSignature;
