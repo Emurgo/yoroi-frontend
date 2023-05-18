@@ -3,9 +3,10 @@ import type { Node } from 'react';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { PublicDeriverCache } from '../../../../chrome/extension/connector/types';
 import { Component } from 'react';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import styles from './ConnectedWallet.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
+import AmountDisplay from '../../../components/common/AmountDisplay';
 
 type Props = {|
   +publicDeriver: PublicDeriverCache,
@@ -39,7 +40,7 @@ export default class WalletCard extends Component<Props> {
     const checksum = this.props.publicDeriver.checksum?.TextPart;
 
     return (
-      <div className={styles.card}>
+      <Box className={styles.card}>
         <div className={styles.wrapper}>
           <div className={styles.avatar}>{iconComponent}</div>
           <div className={styles.nameWrapper}>
@@ -48,8 +49,24 @@ export default class WalletCard extends Component<Props> {
             </Typography>
             <div className={styles.checksum}>{checksum}</div>
           </div>
+          <Box
+            sx={{
+              ml: 'auto',
+              textAlign: 'right',
+            }}
+          >
+            <AmountDisplay
+              shouldHideBalance={this.props.shouldHideBalance}
+              amount={this.props.publicDeriver.balance}
+              getTokenInfo={this.props.getTokenInfo}
+              unitOfAccountSetting={this.props.unitOfAccount}
+              getCurrentPrice={this.props.getCurrentPrice}
+              showFiat
+              showAmount
+            />
+          </Box>
         </div>
-      </div>
+      </Box>
     );
   }
 }

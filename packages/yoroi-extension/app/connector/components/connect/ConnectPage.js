@@ -231,7 +231,6 @@ class ConnectPage extends Component<Props & InjectedProps> {
     }
 
     const walletPasswordField = this.form.$('walletPassword');
-
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
 
     const passwordForm = (
@@ -333,12 +332,21 @@ class ConnectPage extends Component<Props & InjectedProps> {
                   </div>
 
                   <ul className={styles.list}>
-                    {publicDerivers.map(item => (
-                      <li key={item.publicDeriver.getPublicDeriverId()} className={styles.listItem}>
+                    {publicDerivers.map(wallet => (
+                      <li
+                        key={wallet.publicDeriver.getPublicDeriverId()}
+                        className={styles.listItem}
+                      >
                         <WalletButton
-                          onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
+                          onClick={() => onSelectWallet(wallet.publicDeriver, wallet.checksum)}
                         >
-                          <ConnectedWallet publicDeriver={item} />
+                          <ConnectedWallet
+                            publicDeriver={wallet}
+                            getCurrentPrice={this.props.getCurrentPrice}
+                            unitOfAccount={this.props.unitOfAccount}
+                            getTokenInfo={this.props.getTokenInfo}
+                            shouldHideBalance={this.props.shouldHideBalance}
+                          />
                         </WalletButton>
                       </li>
                     ))}
