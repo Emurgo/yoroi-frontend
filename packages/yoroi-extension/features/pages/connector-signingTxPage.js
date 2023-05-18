@@ -18,19 +18,29 @@ const utxoAddresses = 'UTXO addresses';
 const getTabButton = (tabName: string) =>
   `//div[@role="tablist"]/button[contains(text(), "${tabName}")]`;
 
-export const transactionFeeTitle: LocatorObject = {
-  locator: '//p[contains(text(), "Transaction Fee")]',
-  method: 'xpath',
-};
+export const transactionFeeText: LocatorObject = {
+  locator: 'signTxAdditionalInfoPanelBox-fee',
+  method: 'id',
+}
+
+export const summaryBox: LocatorObject = {
+  locator: 'signTxMessagesSummaryBox',
+  method: 'id',
+}
 
 export const transactionTotalAmountField: LocatorObject = {
-  locator: '//p[contains(text(), "Total Amount")]',
-  method: 'xpath',
+  locator: 'signTxMessagesSummaryBox-total',
+  method: 'id',
 };
 
 const addressesPanel: LocatorObject = {
   locator: '//div[@role="tabpanel"][2]/div/div/div',
   method: 'xpath',
+};
+
+const amountTextField: LocatorObject = {
+  locator: 'asseetValueDisplayBox',
+  method: 'id',
 };
 
 const getToAddressesPanel = async (customWorld: Object): Promise<WebElement> => {
@@ -96,11 +106,14 @@ export const utxoAddressesTabButton: LocatorObject = {
 export const walletBalanceField: LocatorObject = { locator: '.WalletCard_balance', method: 'css' };
 
 export const getTransactionFee = async (customWorld: Object): Promise<string> => {
-  const titleElement = await customWorld.findElement(transactionFeeTitle);
-  const parentElement = await titleElement.findElement(By.xpath('./..'));
-  const amountFieldElement = (await parentElement.findElements(By.xpath('./p')))[1];
+  const amountFieldElement = await customWorld.findElement(transactionFeeText);
   return (await amountFieldElement.getText()).split(' ')[0];
 };
+
+export const getTransactionSentAmount = async (customWorld: Object): Promise<string> => {
+  const allAmountBlocks = await customWorld.findElements(amountTextField)
+  return (await allAmountBlocks[0].getText()).split(' ')[0];
+}
 
 export const getTransactionAmount = async (customWorld: Object): Promise<string> => {
   const titleElement = await customWorld.findElement(transactionTotalAmountField);

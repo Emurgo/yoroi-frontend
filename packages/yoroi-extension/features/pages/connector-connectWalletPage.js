@@ -14,31 +14,39 @@ export const createWalletBtn: LocatorObject = {
   method: 'css',
 };
 export const walletListElement: LocatorObject = { locator: '.ConnectPage_list', method: 'css' };
-export const walletNameField: LocatorObject = { locator: 'div.WalletCard_name', method: 'css' };
+export const walletNameField: LocatorObject = {
+  locator: 'div.ConnectedWallet_nameWrapper',
+  method: 'css',
+};
 export const walletItemButton: LocatorObject = { locator: './button', method: 'xpath' };
 export const walletBalanceField: LocatorObject = { locator: '.WalletCard_balance', method: 'css' };
 export const spendingPasswordInput: LocatorObject = {
-  locator: '//input[@name="walletPassword"]',
-  method: 'xpath',
+  locator: 'passwordField',
+  method: 'id',
 };
 export const spendingPasswordErrorField: LocatorObject = {
   locator: '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]',
   method: 'xpath',
 };
 export const eyeButton: LocatorObject = { locator: '.MuiIconButton-edgeEnd', method: 'css' };
-export const confirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
-export const backButton: LocatorObject = { locator: '.MuiButton-secondary', method: 'css' };
+export const confirmButton: LocatorObject = { locator: 'confirmButton', method: 'id' };
+export const backButton: LocatorObject = { locator: 'backButton', method: 'id' };
 
 export const getWallets = async (customWorld: Object): Promise<Array<WebElement>> => {
   const walletList = await customWorld.waitForElement(walletListElement);
   return await walletList.findElements(By.css('li'));
 };
 
-export const getWalletName = async (wallets: Array<WebElement>, index: number): Promise<string> => {
+export const getWalletNameAndPlate = async (
+  wallets: Array<WebElement>,
+  index: number
+): Promise<{| walletName: string, walletPlate: string |}> => {
   const walletNameFieldElem = await wallets[index].findElement(
     getMethod(walletNameField.method)(walletNameField.locator)
   );
-  return await walletNameFieldElem.getText();
+  const fullText = await walletNameFieldElem.getText();
+  const [name, walletPlate] = fullText.split('\n')
+  return { walletName: name, walletPlate };
 };
 
 export const getWalletBalance = async (
