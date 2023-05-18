@@ -116,6 +116,9 @@ const initialInject = `
         this._cardano_rpc_call = rpc;
       }
 
+      getVotingCredentials() {
+        return this._cardano_rpc_call('get_voting_credentials', []);
+      }
     }
 
     if (!await cardano_check_read_access()) {

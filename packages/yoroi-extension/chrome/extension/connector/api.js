@@ -28,6 +28,8 @@ import {
   asHasLevels,
   asHasUtxoChains,
   asGetAllAccounting,
+  asGetPublicKey,
+  asGetStakingKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
@@ -79,7 +81,10 @@ import type {
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelley/coinSelection';
-import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import {
+  derivePrivateByAddressing,
+  derivePublicByAddressing,
+} from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
@@ -89,6 +94,7 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import { VoteKeyDerivationPath } from '../../../app/api/ada/lib/cardanoCrypto/catalyst';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -1532,4 +1538,50 @@ export function getTokenMetadataFromIds(
       )).filter(row => row.NetworkId === networkId);
     }
   );
+}
+
+export async function getVotingCredentials(
+  publicDeriver: PublicDeriver<>,
+): Promise<{| voteKey: string, stakingCredential: string |}> {
+  return RustModule.WasmScope(async (RustModule) => {
+    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!withLevels) {
+      throw new Error('Cannot get level. Should never happen');
+    }
+
+    const asGetPublicKeyInstance = asGetPublicKey(publicDeriver);
+    if (!asGetPublicKeyInstance) {
+      throw new Error('Cannot get public key. Should never happen');
+    }
+    const publicKeyResp = await asGetPublicKeyInstance.getPublicKey();
+    const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+      Buffer.from(publicKeyResp.Hash, 'hex')
+    );
+
+    const voteKey = derivePublicByAddressing({
+      addressing: {
+        path: VoteKeyDerivationPath,
+        startLevel: 1,
+      },
+      startingFrom: {
+        level: withLevels.getParent().getPublicDeriverLevel(),
+        key: publicKey,
+      },
+    }).to_raw_key();
+
+    const withStakingKey = asGetStakingKey(publicDeriver);
+    if (!withStakingKey) {
+      throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
+    }
+    const stakingKeyResp = await withStakingKey.getStakingKey();
+    const stakingKey = derivePublicByAddressing({
+      addressing: stakingKeyResp.addressing,
+      startingFrom: {
+        level: withLevels.getParent().getPublicDeriverLevel(),
+        key: publicKey,
+      },
+    }).to_raw_key();
+
+    return { voteKey: voteKey.to_hex(), stakingCredential: stakingKey.to_hex() };
+  });
 }

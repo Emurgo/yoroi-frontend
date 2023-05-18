@@ -59,6 +59,7 @@ import {
   connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
+  getVotingCredentials,
 } from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -1856,7 +1857,7 @@ function handleInjectorConnect(port) {
               if (connection == null) {
                 rpcResponse({
                   err: {
-                    code: 5,
+                    code: APIErrorCodes.API_INVALID_REQUEST,
                     info: 'not connected to wallet'
                   }
                 });
@@ -1877,6 +1878,33 @@ function handleInjectorConnect(port) {
               }
               rpcResponse({ ok: result.enable });
             }
+          break;
+          case 'get_voting_credentials':
+            await RustModule.load();
+            await withDb(async (db, localStorageApi) => {
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+
+                  const whitelist = await localStorageApi.getCatalystWhitelist();
+                  if (!whitelist.find(entry => entry.url === message.url)) {
+                    rpcResponse({
+                      err: {
+                        code: APIErrorCodes.API_INVALID_REQUEST,
+                        info: 'catalyst function not enabled'
+                      }
+                    });
+                    return;
+                  }
+
+                  const result = await getVotingCredentials(wallet);
+                  rpcResponse({ ok: result });
+                },
+                db,
+                localStorageApi,
+                false,
+              )
+            });
           break;
           default:
             rpcResponse({

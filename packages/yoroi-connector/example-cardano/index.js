@@ -32,6 +32,7 @@ const utxosContainer = get("#utxos");
 const getNFTs = get("#nfts");
 const getNetworkId = get("#get-network-id");
 const enableCatalyst = get("#enable-catalyst");
+const getVotingCredentials= get("#get-voting-credentials");
 
 let accessGranted = false;
 let cardanoApi;
@@ -1097,6 +1098,23 @@ enableCatalyst.addEventListener("click", async () => {
     alertError(JSON.stringify(error));
     console.error(error);
   }
+  toggleSpinner("hide");
+});
+
+getVotingCredentials.addEventListener("click", async () => {
+  toggleSpinner("show");
+  if (!catalystApi) {
+    alertError("Catalyst not enabled");
+    return;
+  }
+  try {
+    const result = await catalystApi.getVotingCredentials();
+    alertSuccess(JSON.stringify(result));
+  } catch (error) {
+    alertError(JSON.stringify(error));
+    console.error(error);
+  }
+
   toggleSpinner("hide");
 });
 
