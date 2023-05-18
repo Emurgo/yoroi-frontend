@@ -7,7 +7,7 @@ import {
   confirmButton,
   createWalletBtn,
   getWalletBalance,
-  getWalletName,
+  getWalletNameAndPlate,
   getWallets,
   logoElement,
   noWalletsImg,
@@ -19,10 +19,9 @@ import { disconnectWallet, getWalletsWithConnectedWebsites } from '../pages/conn
 import {
   getTransactionFee,
   overviewTabButton,
-  getTransactionAmount,
+  getTransactionSentAmount,
   utxoAddressesTabButton,
   getUTXOAddresses,
-  transactionFeeTitle,
   cancelButton,
   transactionTotalAmountField,
 } from '../pages/connector-signingTxPage';
@@ -107,26 +106,27 @@ Then(/^There is no the connector popup$/, async function () {
 
 Then(
   /^I select the only wallet named (.+) with ([0-9.]+) balance$/,
-  async function (walletName, expectedBalance) {
+  async function (expectedWalletName, expectedBalance) {
     this.webDriverLogger.info(
-      `Step: I select the only wallet named ${walletName} with ${expectedBalance} balance`
+      `Step: I select the only wallet named ${expectedWalletName} with ${expectedBalance} balance`
     );
     const wallets = await getWallets(this);
     expect(wallets.length).to.equal(1, `expect 1 wallet but get ${wallets.length}`);
-    const name = await getWalletName(wallets, 0);
-    expect(name).to.equal(
-      walletName,
-      `expect wallet name ${walletName} but get wallet name ${name}`
+    const { walletName } = await getWalletNameAndPlate(wallets, 0);
+    expect(walletName).to.equal(
+      expectedWalletName,
+      `expect wallet name ${expectedWalletName} but get wallet name ${walletName}`
     );
-    const balance = await getWalletBalance(wallets, 0);
-    const match = balance.match(/^[0-9.]+/);
-    expect(match, 'Can not get wallet balance').to.not.be.null;
-    // $FlowFixMe[incompatible-use]
-    const balanceMatch = match[0];
-    expect(balanceMatch).to.equal(
-      expectedBalance,
-      `expect wallet balance ${expectedBalance} but get ${balanceMatch}`
-    );
+    // TODO uncomment when the balance will be displayed
+    // const balance = await getWalletBalance(wallets, 0);
+    // const match = balance.match(/^[0-9.]+/);
+    // expect(match, 'Can not get wallet balance').to.not.be.null;
+    // // $FlowFixMe[incompatible-use]
+    // const balanceMatch = match[0];
+    // expect(balanceMatch).to.equal(
+    //   expectedBalance,
+    //   `expect wallet balance ${expectedBalance} but get ${balanceMatch}`
+    // );
     await selectWallet(wallets, 0);
     await this.driver.sleep(1000);
   }
@@ -191,13 +191,12 @@ Then(/^I should see the transaction amount data:$/, async function (table) {
   await this.waitForElement(overviewTabButton);
   const fields = table.hashes()[0];
   const realFee = await getTransactionFee(this);
-  const expectedFee = `-${fields.fee}`;
-  const realFullAmount = await getTransactionAmount(this);
+  const realFullAmount = await getTransactionSentAmount(this);
   const expectedTotalAmount = `-${parseFloat(fields.amount) + parseFloat(fields.fee)}`;
   this.webDriverLogger.info(
-    `Step: I should see the transaction amount data: amount: ${expectedTotalAmount}, fee: ${expectedFee} `
+    `Step: I should see the transaction amount data: amount: ${expectedTotalAmount}, fee: ${fields.fee} `
   );
-  expect(realFee, 'Fee is different').to.equal(expectedFee);
+  expect(realFee, 'Fee is different').to.equal(fields.fee);
   expect(realFullAmount, 'Total amount is different').to.equal(expectedTotalAmount);
 });
 
@@ -242,7 +241,7 @@ Then(/^I should see the transaction addresses info:$/, async function (table) {
   Received:\n${JSON.stringify(realFromAddresses)}`
   ).to.equal(1);
   await this.click(overviewTabButton);
-  await this.waitForElement(transactionFeeTitle);
+  // await this.waitForElement(transactionFeeTitle);
 });
 
 Then(/^The signing transaction API should return (.+)$/, async function (txHex) {
