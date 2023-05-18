@@ -423,6 +423,11 @@ export type WhitelistEntry = {|
   image: string,
 |};
 
+export type CatalystWhitelistEntry = {|
+  url: string,
+  purposes: Array<number>,
+|};
+
 export type ConnectingMessage = {|
   tabId: number,
   url: string,
@@ -532,6 +537,16 @@ export type GetConnectionProtocolData = {|
   type: 'get_protocol',
 |}
 
+export type EnableCatalystRetrieveData = {|
+  type: 'enable_catalyst_retrieve_data',
+|};
+
+export type EnableCatalystResponse = {|
+  type: 'enable_catalyst_response',
+  enable: boolean,
+  tabId: number,
+|};
+
 // when a tx is submitted we mark those as potentially spent and filter
 // utxo/balance/etc calls for them until they can be confirmed as spent or not
 export type PendingTransaction = {|
@@ -563,3 +578,12 @@ export class ConnectorError extends Error {
     });
   }
 }
+
+export type EnableCatalystMessage = {|
+  publicDeriverId: number,
+  purposes: Array<number>,
+  requesterUrl: string,
+  favicon: string,
+  tabId: number,
+|};
+                                     

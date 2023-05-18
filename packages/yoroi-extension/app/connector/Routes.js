@@ -9,6 +9,7 @@ import { ROUTES } from './routes-config';
 import ConnectContainer from './containers/ConnectContainer';
 import Layout from './components/layout/Layout';
 import SignTxContainer from './containers/SignTxContainer';
+import EnableCatalystContainer from './containers/EnableCatalystContainer';
 import LoadingPage from '../containers/LoadingPage';
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
@@ -29,6 +30,11 @@ const getContent = (stores, actions) => (
       exact
       path={ROUTES.SIGNIN_TRANSACTION}
       component={props => <SignTxContainer {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ENABLE_CATALYST}
+      component={props => <EnableCatalystContainer {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );

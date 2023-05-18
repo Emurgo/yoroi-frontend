@@ -17,4 +17,5 @@ export default class ConnectorActions {
   |}> = new AsyncAction();
   confirmSignInTx: AsyncAction<string> = new AsyncAction();
   cancelSignInTx: Action<void> = new Action();
+  enableCatalyst: Action<boolean> = new Action();
 }

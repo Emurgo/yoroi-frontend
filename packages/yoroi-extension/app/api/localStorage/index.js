@@ -14,7 +14,10 @@ import {
   TabIdKeys,
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
+import type {
+  WhitelistEntry,
+  CatalystWhitelistEntry,
+} from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
 const networkForLocalStorage = String(environment.getNetworkName());
@@ -38,6 +41,7 @@ const storageKeys = {
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
+  CATALYST_WHITELIST: 'catalyst_whitelist',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -234,6 +238,19 @@ export default class LocalStorageApi {
     setLocalItem(
       storageKeys.ERGO_CONNECTOR_WHITELIST,
       JSON.stringify(value ?? [])
+    );
+
+  // ========== Catalyst whitelist  ========== //
+  getCatalystWhitelist: void => Promise<Array<CatalystWhitelistEntry>> = async () => {
+    const json = await getLocalItem(storageKeys.CATALYST_WHITELIST);
+    if (!json) return [];
+    return JSON.parse(json);
+  }
+
+  setCatalystWhitelist: Array<CatalystWhitelistEntry> => Promise<void> = value =>
+    setLocalItem(
+      storageKeys.CATALYST_WHITELIST,
+      JSON.stringify(value)
     );
 
   // =========== Common =============== //

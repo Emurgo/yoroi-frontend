@@ -16,6 +16,7 @@ import type {
   WhitelistEntry,
   GetUtxosRequest,
   GetConnectionProtocolData,
+  EnableCatalystMessage,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -270,6 +271,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // the tx is not supported.
   @observable isHwWalletErrorRecoverable: ?boolean = null;
 
+  @observable enableCatalystMessage: ?EnableCatalystMessage = null;
+
   setup(): void {
     super.setup();
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
@@ -281,10 +284,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
+    this.actions.connector.enableCatalyst.listen(this._enableCatalyst);
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
     this._getProtocol();
+    this._getEnableCatalystMsg();
     this.currentConnectorWhitelist;
   }
 
@@ -341,6 +346,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
+
+  _getEnableCatalystMsg: () => Promise<void> = async () => {
+    const response = await connectorCall(
+      { type: 'enable_catalyst_retrieve_data' },
+    );
+    runInAction(() => {
+      this.enableCatalystMessage = response;
+    });
+  }
 
   @action
   _confirmSignInTx: string => Promise<void> = async password => {
@@ -1269,5 +1283,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         this.isHwWalletErrorRecoverable = false;
       });
     }
+  }
+
+  _enableCatalyst: (boolean) => void = (enable) => {
+    window.chrome.runtime.sendMessage(
+      {
+        type: 'enable_catalyst_response',
+        enable,
+        tabId: this.enableCatalystMessage?.tabId,
+      }
+    );
+    window.close();
   }
 }

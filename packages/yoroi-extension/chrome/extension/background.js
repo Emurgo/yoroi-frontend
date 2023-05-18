@@ -24,6 +24,8 @@ import type {
   TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
+  EnableCatalystRetrieveData,
+  EnableCatalystResponse,
 } from './connector/types';
 import {
   APIErrorCodes,
@@ -135,6 +137,13 @@ type PendingSign = {|
   resolve: ({| ok: any |} | {| err: any |}) => void,
 |}
 
+type PendingEnableCatalyst = {|
+  url: string,
+  purposes: Array<number>,
+  openedWindow: boolean,
+  resolve: ({| enable: boolean |}) => void,
+|}
+
 let imgBase64Url: string = '';
 let connectionProtocol: 'cardano' | 'ergo' = 'cardano';
 
@@ -143,7 +152,8 @@ type ConnectedSite = {|
   protocol: 'cardano' | 'ergo',
   appAuthID?: string,
   status: ConnectedStatus,
-  pendingSigns: Map<RpcUid, PendingSign>
+  pendingSigns: Map<RpcUid, PendingSign>,
+  pendingEnableCatalyst: Map<RpcUid, PendingEnableCatalyst>,
 |};
 
 
@@ -401,6 +411,8 @@ const yoroiMessageHandler = async (
     | GetConnectedSitesData
     | GetConnectionProtocolData
     | GetUtxosRequest
+    | EnableCatalystRetrieveData
+    | EnableCatalystResponse
   ),
   sender,
   sendResponse
@@ -691,6 +703,34 @@ const yoroiMessageHandler = async (
     } catch (error) {
       Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
     }
+  } else if (request.type === 'enable_catalyst_retrieve_data') {
+    for (const [tabId, connection] of connectedSites) {
+      for (const [/* uid */, responseData] of connection.pendingEnableCatalyst.entries()) {
+        if (!responseData.openedWindow) {
+          responseData.openedWindow = true;
+          if (connection.status?.publicDeriverId == null) {
+            throw new Error(`${request.type} no public deriver set for request`);
+          }
+          sendResponse({
+            publicDeriverId: connection.status.publicDeriverId,
+            purposes: responseData.purposes,
+            requesterUrl: connection.url,
+            tabId,
+          });
+          return;
+        }
+      }
+    }
+  } else if (request.type === 'enable_catalyst_response') {
+    const { tabId } = request;
+    const connection = connectedSites.get(tabId);
+    if (connection == null) {
+      return;
+    }
+    for (const [/* uid */, responseData] of connection.pendingEnableCatalyst.entries()) {
+      responseData.resolve({ enable: request.enable });
+    }
+
   }
 };
 
@@ -733,6 +773,30 @@ async function confirmSign(
       chrome.windows.create({
         ...popupProps,
       url: chrome.extension.getURL(`/main_window_connector.html#/signin-transaction`),
+      left: (bounds.width + bounds.positionX) - popupProps.width,
+      top: bounds.positionY + 80,
+    });
+  });
+}
+
+async function confirmEnableCatalyst(
+  tabId: number,
+  messageUid: number,
+  url: string,
+  purposes: Array<number>,
+  connectedSite: ConnectedSite,
+): Promise<{| enable: boolean |}> {
+  const bounds = await getBoundsForTabWindow(tabId);
+  return new Promise(resolve => {
+    connectedSite.pendingEnableCatalyst.set(messageUid, {
+      url,
+      purposes,
+      openedWindow: false,
+      resolve,
+    });
+    chrome.windows.create({
+      ...popupProps,
+      url: chrome.extension.getURL(`/main_window_connector.html#/enable-catalyst?tab=${tabId}`),
       left: (bounds.width + bounds.positionX) - popupProps.width,
       top: bounds.positionY + 80,
     });
@@ -792,7 +856,8 @@ async function confirmConnect(
               publicDeriverId: whitelistEntry.publicDeriverId,
               auth: isAuthRequested ? whitelistEntry.auth : undefined,
             },
-            pendingSigns: new Map()
+            pendingSigns: new Map(),
+            pendingEnableCatalyst: new Map(),
           });
         }
         resolve({
@@ -816,7 +881,8 @@ async function confirmConnect(
           publicDeriverId: null,
           auth: null,
         },
-        pendingSigns: new Map()
+        pendingSigns: new Map(),
+        pendingEnableCatalyst: new Map(),
       });
       chrome.windows.create({
         ...popupProps,
@@ -1767,6 +1833,49 @@ function handleInjectorConnect(port) {
               });
             } catch (e) {
               handleError(e);
+            }
+          break;
+          case 'enable_catalyst':
+            const purposes = message.params[0];
+            if (!(purposes.length === 1 && purposes[0] === 0)) {
+              rpcResponse({
+                err: {
+                  code: -100,
+                  info: 'unsupported voting purpose'
+                }
+              });
+              return;
+            }
+            const localStorageApi = new LocalStorageApi();
+            const whitelist = await localStorageApi.getCatalystWhitelist();
+            if (whitelist.find(entry => entry.url === message.url)) {
+              rpcResponse({ ok: true });
+              return;
+            } else {
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                rpcResponse({
+                  err: {
+                    code: 5,
+                    info: 'not connected to wallet'
+                  }
+                });
+                return;
+              }
+
+              const result = await confirmEnableCatalyst(
+                tabId,
+                message.uid,
+                message.url,
+                purposes,
+                connection,
+              );
+              connection.pendingEnableCatalyst.delete(message.uid);
+              if (result.enable) {
+                whitelist.push({ url: message.url, purposes });
+                await localStorageApi.setCatalystWhitelist(whitelist);
+              }
+              rpcResponse({ ok: result.enable });
             }
           break;
           default:

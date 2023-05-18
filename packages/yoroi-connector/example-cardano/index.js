@@ -31,6 +31,7 @@ const spinner = get("#spinner");
 const utxosContainer = get("#utxos");
 const getNFTs = get("#nfts");
 const getNetworkId = get("#get-network-id");
+const enableCatalyst = get("#enable-catalyst");
 
 let accessGranted = false;
 let cardanoApi;
@@ -42,6 +43,7 @@ let unusedAddresses;
 let changeAddress;
 let unsignedTransactionHex;
 let transactionHex;
+let catalystApi;
 
 function isCBOR() {
   return returnType === "cbor";
@@ -1081,6 +1083,19 @@ getNFTs.addEventListener("click", async () => {
   } catch (error) {
     console.error(error);
     alertError(error.message);
+  }
+  toggleSpinner("hide");
+});
+
+enableCatalyst.addEventListener("click", async () => {
+  toggleSpinner("show");
+
+  try {
+    catalystApi = await window.cardano.yoroi.catalyst.enable([0]);
+    alertSuccess('success');
+  } catch (error) {
+    alertError(JSON.stringify(error));
+    console.error(error);
   }
   toggleSpinner("hide");
 });
