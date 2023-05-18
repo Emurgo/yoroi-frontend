@@ -244,7 +244,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               type="password"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              id="passwordField"
+              id="walletPassword"
             />
           )}
         </div>

@@ -390,9 +390,9 @@ class SignTxPage extends Component<Props, State> {
             passwordFormField={
               <TextField
                 type="password"
-                id="passwordField"
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
+                id="walletPassword"
               />
             }
           />
