@@ -390,6 +390,7 @@ class SignTxPage extends Component<Props, State> {
             passwordFormField={
               <TextField
                 type="password"
+                id="passwordField"
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
               />
@@ -486,6 +487,7 @@ class SignTxPage extends Component<Props, State> {
               color="primary"
               onClick={onCancel}
               disabled={isSubmitting}
+              id="cancelButton"
             >
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
@@ -499,6 +501,7 @@ class SignTxPage extends Component<Props, State> {
               }
               onClick={this.submit.bind(this)}
               sx={{ minWidth: 0 }}
+              id="confirmButton"
             >
               {intl.formatMessage(confirmButtonLabel)}
             </Button>
