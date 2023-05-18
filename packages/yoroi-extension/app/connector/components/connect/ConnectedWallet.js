@@ -6,10 +6,10 @@ import { Component } from 'react';
 import { Box, Typography } from '@mui/material';
 import styles from './ConnectedWallet.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
-import AmountDisplay from '../../../components/common/AmountDisplay';
 
 type Props = {|
   +publicDeriver: PublicDeriverCache,
+  +walletBalance?: Node,
 |};
 
 function constructPlate(
@@ -31,10 +31,15 @@ function constructPlate(
 }
 
 export default class WalletCard extends Component<Props> {
+  static defaultProps: {| walletBalance: void |} = {
+    walletBalance: undefined,
+  };
+
   render(): Node {
+    const { publicDeriver, walletBalance } = this.props;
     // eslint-disable-next-line no-unused-vars
-    const [_, iconComponent] = this.props.publicDeriver.checksum
-      ? constructPlate(this.props.publicDeriver.checksum, 0, styles.icon)
+    const [_, iconComponent] = publicDeriver.checksum
+      ? constructPlate(publicDeriver.checksum, 0, styles.icon)
       : [];
 
     const checksum = this.props.publicDeriver.checksum?.TextPart;
@@ -49,22 +54,7 @@ export default class WalletCard extends Component<Props> {
             </Typography>
             <div className={styles.checksum}>{checksum}</div>
           </div>
-          <Box
-            sx={{
-              ml: 'auto',
-              textAlign: 'right',
-            }}
-          >
-            <AmountDisplay
-              shouldHideBalance={this.props.shouldHideBalance}
-              amount={this.props.publicDeriver.balance}
-              getTokenInfo={this.props.getTokenInfo}
-              unitOfAccountSetting={this.props.unitOfAccount}
-              getCurrentPrice={this.props.getCurrentPrice}
-              showFiat
-              showAmount
-            />
-          </Box>
+          {walletBalance != null && <Box sx={{ ml: 'auto' }}>{walletBalance}</Box>}
         </div>
       </Box>
     );

@@ -34,6 +34,7 @@ import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connec
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import { withLayout } from '../../../styles/context/layout';
+import AmountDisplay from '../../../components/common/AmountDisplay';
 
 const messages = defineMessages({
   subtitle: {
@@ -342,10 +343,24 @@ class ConnectPage extends Component<Props & InjectedProps> {
                         >
                           <ConnectedWallet
                             publicDeriver={wallet}
-                            getCurrentPrice={this.props.getCurrentPrice}
-                            unitOfAccount={this.props.unitOfAccount}
-                            getTokenInfo={this.props.getTokenInfo}
-                            shouldHideBalance={this.props.shouldHideBalance}
+                            walletBalance={
+                              <Box
+                                sx={{
+                                  ml: 'auto',
+                                  textAlign: 'right',
+                                }}
+                              >
+                                <AmountDisplay
+                                  shouldHideBalance={this.props.shouldHideBalance}
+                                  amount={wallet.balance}
+                                  getTokenInfo={this.props.getTokenInfo}
+                                  unitOfAccountSetting={this.props.unitOfAccount}
+                                  getCurrentPrice={this.props.getCurrentPrice}
+                                  showFiat
+                                  showAmount
+                                />
+                              </Box>
+                            }
                           />
                         </WalletButton>
                       </li>
