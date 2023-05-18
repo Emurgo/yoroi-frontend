@@ -244,6 +244,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               type="password"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
+              id="passwordField"
             />
           )}
         </div>
@@ -253,6 +254,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
             variant={isRevampLayout ? 'outlined' : 'secondary'}
             onClick={this.hidePasswordForm}
             sx={{ minWidth: 'auto' }}
+            id="backButton"
           >
             {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
@@ -263,6 +265,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               fullWidth
               disabled={!walletPasswordField.isValid}
               onClick={this.submit}
+              id="confirmButton"
             >
               {intl.formatMessage(globalMessages.confirm)}
             </Button>
