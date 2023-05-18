@@ -172,6 +172,7 @@
     "copy-webpack-plugin": "6.0.0"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^1.10.3",
     "@cardano-foundation/ledgerjs-hw-app-cardano": "6.0.0",
     "@download/blockies": "1.0.3",
     "@emotion/react": "^11.4.1",
@@ -190,6 +191,7 @@
     "@mui/material": "^5.0.4",
     "@mui/x-date-pickers": "^5.0.8",
     "@svgr/webpack": "5.5.0",
+    "@yoroi/metrics-react": "^1.0.0",
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",
     "bech32": "2.0.0",
@@ -237,6 +239,7 @@
     "react-dom": "17.0.2",
     "react-intl": "2.9.0",
     "react-markdown": "5.0.3",
+    "react-query": "^3.39.3",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
     "recharts": "1.8.5",

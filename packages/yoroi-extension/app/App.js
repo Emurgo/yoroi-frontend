@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
@@ -21,6 +21,8 @@ import tr from 'react-intl/locale-data/tr';
 import cs from 'react-intl/locale-data/cs';
 import sk from 'react-intl/locale-data/sk';
 import { observable, autorun, runInAction } from 'mobx';
+import { QueryClientProvider, QueryClient } from 'react-query';
+import { getMetricsFactory, makeMetricsStorage, MetricsProvider, useMetrics } from '@yoroi/metrics-react';
 import { Routes } from './Routes';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
@@ -126,38 +128,79 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <LayoutProvider layout={currentTheme}>
-          <ThemeProvider theme={muiTheme}>
-            <CssBaseline />
-            {globalStyles(muiTheme)}
-            <ThemeManager cssVariables={themeVars} />
-            {/* Automatically pass a theme prop to all components in this subtree. */}
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
-        </LayoutProvider>
+        <QueryClientProvider client={queryClient}>
+          <MetricsProvider storage={metricsStorage} metrics={amplitudeClient}>
+            <LayoutProvider layout={currentTheme}>
+              <ThemeProvider theme={muiTheme}>
+                <CssBaseline />
+                {globalStyles(muiTheme)}
+                {/* Automatically pass a theme prop to all components in this subtree. */}
+                <ThemeManager cssVariables={themeVars} />
+                <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+                  {this.getContent()}
+                </IntlProvider>
+              </ThemeProvider>
+            </LayoutProvider>
+          </MetricsProvider>
+        </QueryClientProvider>
       </div>
     );
   }
 
-  getContent: void => ?Node = () => {
-    const { stores, actions, history } = this.props;
-    if (this.state.crashed === true) {
-      return <CrashPage />;
-    }
-    if (stores.serverConnectionStore.isMaintenance) {
-      return <MaintenancePage stores={stores} actions={actions} />;
-    }
+  getContent: void => Node = () => {
     return (
-      <Router history={history}>
-        <div style={{ height: '100%' }}>
-          <Support />
-          {Routes(stores, actions)}
-        </div>
-      </Router>
+      <YoroiApp
+        stores={this.props.stores}
+        actions={this.props.actions}
+        history={this.props.history}
+        isMaintenance={this.props.stores.serverConnectionStore.isMaintenance}
+        hasCrashed={this.state.crashed}
+      />
     );
   };
 }
+
+const queryClient = new QueryClient();
+const amplitudeClient = getMetricsFactory('amplitude')({
+  // TODO key should be update to according the env
+  apiKey: 'a518e0983cb9e4f1cccb9edcd66b3897',
+});
+const metricsStorage = makeMetricsStorage();
+
+type YoroiAppProps = {|
+  +stores: StoresMap,
+  +actions: ActionsMap,
+  +history: RouterHistory,
+  +isMaintenance: boolean,
+  +hasCrashed: boolean,
+|};
+const YoroiApp = (props: YoroiAppProps): Node => {
+  const { stores, actions, history, isMaintenance, hasCrashed } = props;
+  const metrics = useMetrics();
+
+  React.useEffect(() => {
+    return history.listen(location => {
+      if (location.pathname === '/nfts')
+        return metrics.track({
+          event: 'nft_click_navigate',
+          properties: {
+            buildVersion: '1.0.0',
+          },
+        });
+    });
+  }, [history]);
+
+  if (hasCrashed) return <CrashPage />;
+  if (isMaintenance) return <MaintenancePage stores={stores} actions={actions} />;
+
+  return (
+    <Router history={history}>
+      <div style={{ height: '100%' }}>
+        <Support />
+        {Routes(stores, actions)}
+      </div>
+    </Router>
+  );
+};
 
 export default App;
