@@ -21,12 +21,12 @@ export const walletNameField: LocatorObject = {
 export const walletItemButton: LocatorObject = { locator: './button', method: 'xpath' };
 export const walletBalanceField: LocatorObject = { locator: '.WalletCard_balance', method: 'css' };
 export const spendingPasswordInput: LocatorObject = {
-  locator: 'passwordField',
+  locator: 'walletPassword',
   method: 'id',
 };
 export const spendingPasswordErrorField: LocatorObject = {
-  locator: '//p[starts-with(@id, "walletPassword--") and contains(@id, "-helper-text")]',
-  method: 'xpath',
+  locator: 'walletPassword-helper-text',
+  method: 'id',
 };
 export const eyeButton: LocatorObject = { locator: '.MuiIconButton-edgeEnd', method: 'css' };
 export const confirmButton: LocatorObject = { locator: 'confirmButton', method: 'id' };
