@@ -19,7 +19,7 @@ export const walletNameField: LocatorObject = {
   method: 'css',
 };
 export const walletItemButton: LocatorObject = { locator: './button', method: 'xpath' };
-export const walletBalanceField: LocatorObject = { locator: '.WalletCard_balance', method: 'css' };
+export const walletBalanceField: LocatorObject = { locator: '.AmountDisplay_amount', method: 'css' };
 export const spendingPasswordInput: LocatorObject = {
   locator: 'walletPassword',
   method: 'id',

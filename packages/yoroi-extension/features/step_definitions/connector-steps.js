@@ -121,16 +121,15 @@ Then(
       expectedWalletName,
       `expect wallet name ${expectedWalletName} but get wallet name ${walletName}`
     );
-    // TODO uncomment when the balance will be displayed
-    // const balance = await getWalletBalance(wallets, 0);
-    // const match = balance.match(/^[0-9.]+/);
-    // expect(match, 'Can not get wallet balance').to.not.be.null;
-    // // $FlowFixMe[incompatible-use]
-    // const balanceMatch = match[0];
-    // expect(balanceMatch).to.equal(
-    //   expectedBalance,
-    //   `expect wallet balance ${expectedBalance} but get ${balanceMatch}`
-    // );
+    const balance = await getWalletBalance(wallets, 0);
+    const match = balance.match(/^[0-9.]+/);
+    expect(match, 'Can not get wallet balance').to.not.be.null;
+    // $FlowFixMe[incompatible-use]
+    const balanceMatch = match[0];
+    expect(balanceMatch).to.equal(
+      expectedBalance,
+      `expect wallet balance ${expectedBalance} but get ${balanceMatch}`
+    );
     await selectWallet(wallets, 0);
     await this.driver.sleep(1000);
   }
