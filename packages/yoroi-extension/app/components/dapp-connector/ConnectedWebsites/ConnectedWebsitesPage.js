@@ -35,7 +35,23 @@ const messages = defineMessages({
   },
   noWebsitesConnected: {
     id: 'connector.connect.noWebsitesConnected',
-    defaultMessage: `!!!You don't have any websites connected yet`,
+    defaultMessage: "!!!You don't have any websites connected yet",
+  },
+  walletsLabel: {
+    id: 'connector.connected-dapps.walletsLabel',
+    defaultMessage: '!!!Wallets',
+  },
+  dappsLabel: {
+    id: 'connector.connected-dapps.dappsLabel',
+    defaultMessage: '!!!Dapps',
+  },
+  cardanoLabel: {
+    id: 'connector.connected-dapps.cardanoLabel',
+    defaultMessage: '!!!Cardano, ADA',
+  },
+  ergoLabel: {
+    id: 'connector.connected-dapps.ergoLabel',
+    defaultMessage: '!!!Ergo, ERG',
   },
 });
 
@@ -107,22 +123,22 @@ export default class ConnectedWebsitesPage extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.container}>
           <div className={styles.header}>
-            <p>Wallets</p>
-            <p>Dapps</p>
+            <p>{intl.formatMessage(messages.walletsLabel)}</p>
+            <p>{intl.formatMessage(messages.dappsLabel)}</p>
           </div>
           <div>
             {cardanoNodes.length > 0 && (
               <div className={styles.chain}>
-                <h1>Cardano, ADA</h1>
+                <h1>{intl.formatMessage(messages.cardanoLabel)}</h1>
                 {cardanoNodes}
-                <div className={styles.line}>
-                  <div />
-                </div>
               </div>
             )}
+
+            {cardanoNodes.length > 0 && ergoNodes.length > 0 && <div className={styles.line} />}
+
             {ergoNodes.length > 0 && (
               <div className={styles.chain}>
-                <h1>Ergo, ERG</h1>
+                <h1>{intl.formatMessage(messages.ergoLabel)}</h1>
                 {ergoNodes}
               </div>
             )}
