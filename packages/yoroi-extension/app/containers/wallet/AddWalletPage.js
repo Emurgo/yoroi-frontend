@@ -58,7 +58,6 @@ import {
   networks,
   isJormungandr,
   isCardanoHaskell,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';

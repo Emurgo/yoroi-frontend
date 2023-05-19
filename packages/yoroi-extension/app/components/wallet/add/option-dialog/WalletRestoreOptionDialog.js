@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
@@ -46,7 +45,13 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onRestore15, onRestore24, onPaperRestore, } = this.props;
+    const {
+      onCancel,
+      onRestore15,
+      onRestore24,
+      // <TODO:PENDING_REMOVAL>
+      // onPaperRestore,
+    } = this.props;
 
     return (
       <Dialog
