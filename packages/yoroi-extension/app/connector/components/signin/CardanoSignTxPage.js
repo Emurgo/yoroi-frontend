@@ -497,10 +497,7 @@ class SignTxPage extends Component<Props, State> {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={
-                (walletType === 'web' && !walletPasswordField.isValid) ||
-                  isSubmitting
-              }
+              disabled={(walletType === 'web' && !walletPasswordField.isValid) || isSubmitting}
               onClick={this.submit.bind(this)}
               sx={{ minWidth: 0 }}
               id="confirmButton"

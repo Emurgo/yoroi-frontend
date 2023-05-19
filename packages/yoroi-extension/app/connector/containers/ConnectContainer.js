@@ -18,9 +18,7 @@ import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { createAuthEntry } from '../api';
-import {
-  WalletTypeOption,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;

@@ -3,12 +3,13 @@ import type { Node } from 'react';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { PublicDeriverCache } from '../../../../chrome/extension/connector/types';
 import { Component } from 'react';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import styles from './ConnectedWallet.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
 
 type Props = {|
   +publicDeriver: PublicDeriverCache,
+  +walletBalance?: Node,
 |};
 
 function constructPlate(
@@ -30,16 +31,21 @@ function constructPlate(
 }
 
 export default class WalletCard extends Component<Props> {
+  static defaultProps: {| walletBalance: void |} = {
+    walletBalance: undefined,
+  };
+
   render(): Node {
+    const { publicDeriver, walletBalance } = this.props;
     // eslint-disable-next-line no-unused-vars
-    const [_, iconComponent] = this.props.publicDeriver.checksum
-      ? constructPlate(this.props.publicDeriver.checksum, 0, styles.icon)
+    const [_, iconComponent] = publicDeriver.checksum
+      ? constructPlate(publicDeriver.checksum, 0, styles.icon)
       : [];
 
     const checksum = this.props.publicDeriver.checksum?.TextPart;
 
     return (
-      <div className={styles.card}>
+      <Box className={styles.card}>
         <div className={styles.wrapper}>
           <div className={styles.avatar}>{iconComponent}</div>
           <div className={styles.nameWrapper}>
@@ -48,8 +54,9 @@ export default class WalletCard extends Component<Props> {
             </Typography>
             <div className={styles.checksum}>{checksum}</div>
           </div>
+          {walletBalance != null && <Box sx={{ ml: 'auto' }}>{walletBalance}</Box>}
         </div>
-      </div>
+      </Box>
     );
   }
 }
