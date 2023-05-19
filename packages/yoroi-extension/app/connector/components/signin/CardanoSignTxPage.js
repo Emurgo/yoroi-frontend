@@ -423,7 +423,7 @@ class SignTxPage extends Component<Props, State> {
       // signing data
       content = (
         <Box>
-          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
+          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
             {intl.formatMessage(signTxMessages.signMessage)}
           </Typography>
           <Box
@@ -431,6 +431,7 @@ class SignTxPage extends Component<Props, State> {
             p="16px"
             border="1px solid var(--yoroi-palette-gray-100)"
             borderRadius="6px"
+            id="signMessageBox-payload"
           >
             <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
@@ -440,6 +441,7 @@ class SignTxPage extends Component<Props, State> {
               type="password"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
+              id="walletPassword"
             />
           </Box>
         </Box>
