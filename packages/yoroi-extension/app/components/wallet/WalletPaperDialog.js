@@ -37,6 +37,7 @@ type Props = {|
 |};
 
 @observer
+// <TODO:PENDING_REMOVAL>
 export default class PaperWalletDialog extends Component<Props> {
   static defaultProps: {|error: void|} = {
     error: undefined
