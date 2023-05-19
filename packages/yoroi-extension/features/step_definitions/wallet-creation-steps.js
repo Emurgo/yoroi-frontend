@@ -7,9 +7,6 @@ import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 import {
   clearButton,
-  createNormalWalletButton,
-  createOptionDialog,
-  createPaperWalletButton,
   createPersonalWalletButton,
   createWalletButton,
   createWalletNameError,
