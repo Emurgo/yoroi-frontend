@@ -181,8 +181,8 @@ export const getTransactionAmount = async (customWorld: Object): Promise<string>
   return (await amountFieldElement.getText()).split(' ')[0];
 };
 
-export const confirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
-export const cancelButton: LocatorObject = { locator: '.MuiButton-secondary', method: 'css' };
+export const confirmButton: LocatorObject = { locator: 'confirmButton', method: 'id' };
+export const cancelButton: LocatorObject = { locator: 'cancelButton', method: 'id' };
 
 export const getUTXOAddresses = async (customWorld: Object): Promise<AddressesWithAmount> => {
   const fromAddresses = await getFromAddresses(customWorld);
