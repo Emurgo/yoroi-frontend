@@ -909,6 +909,7 @@
   "wallet.staking.pool.unknownLabel": "Unknown pool",
   "wallet.staking.rewards.openRewardHistory": "Open Reward History",
   "wallet.staking.rewards.rewardHistory": "Reward History",
+  "wallet.staking.rewards.rewardHistory.epochNum": "Epoch {number}",
   "wallet.staking.summary": "Summary",
   "wallet.staking.warning.pendingTx": "You cannot change your delegation preference while a transaction is pending",
   "wallet.summary.no.transaction": "No transaction history.",
