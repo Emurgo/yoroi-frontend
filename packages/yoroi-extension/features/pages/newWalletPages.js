@@ -75,6 +75,18 @@ export const trezorWalletName: LocatorObject = {
 };
 export const trezorConfirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
 // Create wallet dialog
+export const createOptionDialog: LocatorObject = {
+  locator: '.WalletCreateOptionDialog',
+  method: 'css',
+};
+export const createNormalWalletButton: LocatorObject = {
+  locator: '.WalletCreateOptionDialog_createWallet',
+  method: 'css'
+};
+export const createPaperWalletButton: LocatorObject = {
+  locator: '.WalletCreateOptionDialog_restorePaperWallet',
+  method: 'css',
+};
 export const createWalletPasswordInput: LocatorObject = {
   locator: '.WalletCreateDialog .walletPassword input',
   method: 'css',

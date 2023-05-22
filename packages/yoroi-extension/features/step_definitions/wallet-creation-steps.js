@@ -39,8 +39,13 @@ When(/^I select the currency ([^"]*)$/, async function (currency) {
   await this.click(getCurrencyButton(currency));
 });
 
-When(/^I select Create Wallet$/, () => {
-  // <TODO:PENDING_REMOVAL>
+When(/^I select Create Wallet$/, async function () {
+  await this.waitForElement(createOptionDialog);
+  await this.click(createNormalWalletButton);
+});
+When(/^I select Paper Wallet$/, async function () {
+  await this.waitForElement(createOptionDialog);
+  await this.click(createPaperWalletButton);
 });
 
 When(/^I enter the created wallet password:$/, async function (table) {
