@@ -58,6 +58,8 @@ import {
   saveButton,
   byronEraButton,
   createWalletButton,
+  createOptionDialog,
+  createNormalWalletButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import {
@@ -474,6 +476,9 @@ Given(/^I create a new Shelley wallet with the name ([^"]*)$/, async function (w
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
+
+  await this.waitForElement(createOptionDialog);
+  await this.click(createNormalWalletButton);
 
   await this.waitForElement(walletInfoDialog);
   await this.input(walletNameInput, walletName);
