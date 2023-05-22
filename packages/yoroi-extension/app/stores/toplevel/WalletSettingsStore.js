@@ -276,7 +276,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     }
     await removeWalletFromLS(request.publicDeriver)
 
-    // remove this wallet from wallet sort list
+    // Remove this wallet from wallet sort list
     const walletType = getWalletType(request.publicDeriver)
     const walletsNavigation = this.stores.profile.walletsNavigation
     const newWalletsNavigation = {
@@ -285,8 +285,21 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       [walletType]: walletsNavigation[walletType].filter(
         walletId => walletId !== request.publicDeriver.publicDeriverId)
     }
-
     await this.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+
+    // ==================== Disconnect related dApps ====================
+    await this.actions.connector.getConnectorWhitelist.trigger();
+    const connectorWhitelist = this.stores.connector.currentConnectorWhitelist;
+    const connectedDapps = connectorWhitelist.filter(
+      dapp => dapp.publicDeriverId === request.publicDeriver.publicDeriverId
+    );
+
+    for (const dapp of connectedDapps) {
+      await this.actions.connector.removeWalletFromWhitelist.trigger({
+        protocol: dapp.protocol,
+        url: dapp.url,
+      });
+    };
 
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver,
