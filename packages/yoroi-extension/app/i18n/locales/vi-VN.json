@@ -68,7 +68,7 @@
   "connector.connected-dapps.cardanoLabel": "Cardano, ADA",
   "connector.connected-dapps.dappsLabel": "Dapps",
   "connector.connected-dapps.ergoLabel": "Ergo, ERG",
-  "connector.connected-dapps.walletsLabel": "Wallets",
+  "connector.connected-dapps.walletsLabel": "Các Ví",
   "connector.foreignAddresses": "Các địa chỉ bên ngoài",
   "connector.from": "Từ (đầu vào): {qty}",
   "connector.fromWallet": "Từ Ví",
