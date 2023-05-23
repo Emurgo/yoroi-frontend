@@ -970,6 +970,10 @@ const globalMessages: * = defineMessages({
     id: 'label.confirm.trezor',
     defaultMessage: '!!!Confirm on Trezor',
   },
+  incorrectWalletPasswordError: {
+    id: 'api.errors.IncorrectPasswordError',
+    defaultMessage: '!!!Incorrect wallet password.',
+  },
 });
 export default globalMessages;
 

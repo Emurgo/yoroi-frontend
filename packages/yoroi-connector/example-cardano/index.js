@@ -33,6 +33,7 @@ const getNFTs = get("#nfts");
 const getNetworkId = get("#get-network-id");
 const enableCatalyst = get("#enable-catalyst");
 const getVotingCredentials= get("#get-voting-credentials");
+const submitDelegation = get("#submit-delegation");
 
 let accessGranted = false;
 let cardanoApi;
@@ -45,6 +46,7 @@ let changeAddress;
 let unsignedTransactionHex;
 let transactionHex;
 let catalystApi;
+let votingCredentials;
 
 function isCBOR() {
   return returnType === "cbor";
@@ -1105,16 +1107,40 @@ getVotingCredentials.addEventListener("click", async () => {
   toggleSpinner("show");
   if (!catalystApi) {
     alertError("Catalyst not enabled");
-    return;
+  } else {
+    try {
+      votingCredentials = await catalystApi.getVotingCredentials();
+      alertSuccess(JSON.stringify(votingCredentials));
+    } catch (error) {
+      alertError(JSON.stringify(error));
+      console.error(error);
+    }
   }
-  try {
-    const result = await catalystApi.getVotingCredentials();
-    alertSuccess(JSON.stringify(result));
-  } catch (error) {
-    alertError(JSON.stringify(error));
-    console.error(error);
-  }
+  toggleSpinner("hide");
+});
 
+submitDelegation.addEventListener("click", async () => {
+  toggleSpinner("show");
+  if (!votingCredentials) {
+    alertError("Require voting credential");
+  } else {
+    const delegation = {
+      delegations: [
+        {
+          voteKey: votingCredentials.voteKey,
+          weight: 1,
+        }
+      ],
+      purpose: 0,
+    };
+    try {
+      const result = await catalystApi.submitDelegation(delegation);
+      alertSuccess(JSON.stringify(result));
+    } catch (error) {
+      alertError(JSON.stringify(error));
+      console.error(error);
+    }
+  }
   toggleSpinner("hide");
 });
 

@@ -26,11 +26,12 @@ function prefix0x(hex: string): string {
 }
 
 export function generateRegistrationMetadata(
-  votingPublicKey: string,
+  delegationsOrVotingPublicKey: Array<[string, number]> | string,
   stakingPublicKey: string,
   rewardAddress: string,
   nonce: number,
   signer: Uint8Array => string,
+  votingPurpose: number = 0,
 ): RustModule.WalletV4.AuxiliaryData {
 
   /**
@@ -50,13 +51,22 @@ export function generateRegistrationMetadata(
     * }
     */
 
+  let delegations;
+  if (typeof delegationsOrVotingPublicKey === 'string') {
+    delegations = [prefix0x(delegationsOrVotingPublicKey), 1];
+  } else {
+    delegations = delegationsOrVotingPublicKey.map(
+      ([votingPublicKey, weight]) => [prefix0x(votingPublicKey), weight]
+    );
+  }
+
   const registrationData = RustModule.WalletV4.encode_json_str_to_metadatum(
     JSON.stringify({
-      '1': [[prefix0x(votingPublicKey), 1]],
+      '1': delegations,
       '2': prefix0x(stakingPublicKey),
       '3': prefix0x(rewardAddress),
       '4': nonce,
-      '5': 0,
+      '5': votingPurpose,
     }),
     RustModule.WalletV4.MetadataJsonSchema.BasicConversions
   );

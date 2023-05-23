@@ -18,4 +18,6 @@ export default class ConnectorActions {
   confirmSignInTx: AsyncAction<string> = new AsyncAction();
   cancelSignInTx: Action<void> = new Action();
   enableCatalyst: Action<boolean> = new Action();
+  confirmSubmitDelegation: AsyncAction<?string> = new AsyncAction();
+  cancelSubmitDelegation: Action<void> = new Action();
 }

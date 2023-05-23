@@ -547,6 +547,16 @@ export type EnableCatalystResponse = {|
   tabId: number,
 |};
 
+export type SubmitDelegationRetrieveData = {|
+  type: 'submit_delegation_retrieve_data',
+|};
+
+export type SubmitDelegationResponse = {|
+  type: 'submit_delegation_response',
+  result: SignedDelegationMetadata,
+  tabId: number,
+|};
+
 // when a tx is submitted we mark those as potentially spent and filter
 // utxo/balance/etc calls for them until they can be confirmed as spent or not
 export type PendingTransaction = {|
@@ -586,4 +596,35 @@ export type EnableCatalystMessage = {|
   favicon: string,
   tabId: number,
 |};
-                                     
+
+type WeightedKey = {|
+  voteKey: string,
+  weight: number
+|};
+
+export type Delegation = {|
+  delegations: Array<WeightedKey>,
+  purpose: number,
+|};
+
+export type SubmitDelegationMessage = {|
+  publicDeriverId: number,
+  delegation: Delegation,
+  requesterUrl: string,
+  favicon: string,
+  tabId: number,
+|};
+                                       
+export type DelegatedCertificate = {|
+  delegations: Array<WeightedKey>,
+  stakingPub: string,
+  paymentAddress: string,
+  nonce: number,
+  purpose: number,
+|};
+
+export type SignedDelegationMetadata = {|
+  certificate: DelegatedCertificate,
+  signature: string,
+  txHash: string,
+|};

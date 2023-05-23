@@ -17,6 +17,8 @@ import type {
   GetUtxosRequest,
   GetConnectionProtocolData,
   EnableCatalystMessage,
+  SubmitDelegationMessage,
+  DelegatedCertificate,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -33,7 +35,9 @@ import type {
   UtxoData,
 } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import {
+  HaskellShelleyTxSignRequest
+} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
@@ -55,6 +59,8 @@ import {
   asGetPublicKey,
   asGetSigningKey,
   asHasLevels,
+  asGetStakingKey,
+  asGetAllAccounting,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
@@ -76,6 +82,7 @@ import {
   connectorSendTxCardano,
   connectorGenerateReorgTx,
   connectorRecordSubmittedCardanoTransaction,
+  getVotingCredentials,
 } from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -84,7 +91,10 @@ import {
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { loadSubmittedTransactions } from '../../api/localStorage';
-import { signTransaction as shelleySignTransaction } from '../../api/ada/transactions/shelley/transactions';
+import {
+  signTransaction as shelleySignTransaction,
+  newAdaUnsignedTx,
+} from '../../api/ada/transactions/shelley/transactions';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils';
 import {
@@ -97,7 +107,7 @@ import {
 } from '../../api/ada/transactions/shelley/trezorTx';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
-import type LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError from '../../i18n/LocalizableError';
 import { convertToLocalizableError as convertToLocalizableLedgerError } from '../../domain/LedgerLocalizedError';
 import { convertToLocalizableError as convertToLocalizableTrezorError } from '../../domain/TrezorLocalizedError';
 import {
@@ -107,6 +117,12 @@ import {
   trezorSignDataUnsupportedError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
+import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { generateRegistrationMetadata } from '../../api/ada/lib/cardanoCrypto/catalyst';
+import { GenericApiError } from '../../api/common/errors';
+import { genOwnStakingKey } from '../../api/ada';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -272,6 +288,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable isHwWalletErrorRecoverable: ?boolean = null;
 
   @observable enableCatalystMessage: ?EnableCatalystMessage = null;
+  @observable submitDelegationMessage: ?SubmitDelegationMessage = null;
+  @observable submitDelegationTxSignRequest: ?HaskellShelleyTxSignRequest = null;
+  @observable ownVoteKey: ?string = null;
+  @observable submitDelegationError: ?LocalizableError = null;
+  @observable submitDelegationWalletType: ?string = null;
+  delegatedCertificate: ?DelegatedCertificate = null;
 
   setup(): void {
     super.setup();
@@ -285,11 +307,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
     this.actions.connector.enableCatalyst.listen(this._enableCatalyst);
+    this.actions.connector.confirmSubmitDelegation.listen(
+      this._confirmSubmitDelegation
+    );
+    this.actions.connector.cancelSubmitDelegation.listen(
+      this._cancelSubmitDelegation
+    );
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
     this._getProtocol();
     this._getEnableCatalystMsg();
+    this._getSubmitDelegationMsg();
     this.currentConnectorWhitelist;
   }
 
@@ -354,6 +383,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.enableCatalystMessage = response;
     });
+  }
+
+  _getSubmitDelegationMsg: () => Promise<void> = async () => {
+    const response = await connectorCall(
+      { type: 'submit_delegation_retrieve_data' },
+    );
+    if (response) {
+      runInAction(() => {
+        this.submitDelegationMessage = response;
+      });
+      this.createSubmitDelegationTransaction();
+    }
   }
 
   @action
@@ -542,6 +583,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
       if (this.signingMessage?.sign.type === 'data') {
         this.checkHwWalletSignData();
+      }
+      if (this.submitDelegationMessage) {
+        this.createSubmitDelegationTransaction();
       }
     } catch (err) {
       runInAction(() => {
@@ -776,6 +820,300 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
+  createSubmitDelegationTransaction: void => Promise<void> = async () => {
+    const { submitDelegationMessage } = this;
+    if (!submitDelegationMessage) {
+      return;
+    }
+    const wallet = this.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === submitDelegationMessage.publicDeriverId
+    );
+    if (!wallet) {
+      return;
+    }
+
+    runInAction(() => {
+      if (isLedgerNanoWallet(wallet.publicDeriver.getParent())) {
+        this.submitDelegationWalletType = 'ledger';
+      } else if (isTrezorTWallet(wallet.publicDeriver.getParent())) {
+        this.submitDelegationWalletType = 'trezor';
+      } else {
+        this.submitDelegationWalletType = 'web';
+      }
+    });
+
+    const { voteKey, stakingCredential } = await getVotingCredentials(
+      wallet.publicDeriver
+    );
+
+    const { tabId } = submitDelegationMessage;
+
+    const network = wallet.publicDeriver.getParent().getNetworkInfo();
+
+    if (!isCardanoHaskell(network)) {
+      throw new Error('unexpected wallet type');
+    }
+
+    const response = await getUtxosAndAddresses(tabId, [
+      'utxos',
+      'usedAddresses',
+      'unusedAddresses',
+      'changeAddress',
+    ]);
+
+    if (!response.utxos) {
+      throw new Error('Missgin utxos for signing tx');
+    }
+
+    const submittedTxs = loadSubmittedTransactions() || [];
+    const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
+      asAddressedUtxo(response.utxos),
+      wallet.publicDeriver,
+      submittedTxs
+    );
+    this.addressedUtxos = addressedUtxos;
+
+    try {
+      const fullConfig = getCardanoHaskellBaseConfig(network);
+      const timeToSlot = await genTimeToSlot(fullConfig);
+      const absSlotNumber = timeToSlot({ time: new Date() }).slot;
+      const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+      const protocolParams = {
+        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        ),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+        networkId: network.NetworkId,
+      };
+      const changeAddr = await getReceiveAddress(wallet.publicDeriver);
+      if (changeAddr == null) {
+        throw new Error('no internal addresses left. Should never happen');
+      }
+      const allAddresses = await this.api.ada.getAllAddressesForDisplay({
+        publicDeriver: wallet.publicDeriver,
+        type: CoreAddressTypes.CARDANO_BASE,
+      });
+
+      const trxMetadata = generateRegistrationMetadata(
+        submitDelegationMessage.delegation.delegations.map(
+          ({voteKey, weight}) => [voteKey, weight]
+        ),
+        stakingCredential,
+        allAddresses[0].address,
+        absSlotNumber,
+        (_hashedMetadata) => '0'.repeat(64 * 2),
+        submitDelegationMessage.delegation.purpose,
+      );
+
+      const unsignedTx = newAdaUnsignedTx(
+        [],
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxos,
+        new BigNumber(absSlotNumber),
+        protocolParams,
+        [],
+        [],
+        false,
+        trxMetadata,
+      );
+
+      const submitDelegationTxSignRequest = new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        metadata: trxMetadata,
+        networkSettingSnapshot: {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: network.NetworkId,
+        },
+        neededStakingKeyHashes: {
+          neededHashes: new Set(),
+          wits: new Set(),
+        },
+        trezorTCatalystRegistrationTxSignData: undefined,
+        ledgerNanoCatalystRegistrationTxSignData: undefined,
+      });
+
+      this.delegatedCertificate = {
+        delegations: submitDelegationMessage.delegation.delegations,
+        stakingPub: stakingCredential,
+        paymentAddress: allAddresses[0].address,
+        nonce: absSlotNumber,
+        purpose: submitDelegationMessage.delegation.purpose,
+      };
+
+      runInAction(() => {
+        this.submitDelegationTxSignRequest = submitDelegationTxSignRequest;
+        this.ownVoteKey = voteKey;
+      });
+    } catch(error) {
+      let e;
+      if (error instanceof LocalizableError) {
+        e = error;
+      } else {
+        e = new GenericApiError();
+      }
+      runInAction(() => {
+        this.submitDelegationError = e;
+      });
+    }
+  };
+
+  @computed get submitDelegationTxFee(): ?string {
+    if (this.submitDelegationTxSignRequest == null) {
+      return null;
+    }
+    return this.submitDelegationTxSignRequest.fee().getDefaultEntry().amount.toString();
+  }
+
+  _confirmSubmitDelegation: (?string) => Promise<void> = async (password) => {
+    try {
+      const {
+        submitDelegationMessage,
+        submitDelegationTxSignRequest,
+        addressedUtxos,
+      } = this;
+
+      if (submitDelegationTxSignRequest == null) {
+        throw new Error('unexpectedly missing tx sign request');
+      }
+
+      if (submitDelegationMessage == null) {
+        throw new Error('unexpectedly missing submit delegation message');
+      }
+
+      const wallet = this.wallets.find(
+        wallet => wallet.publicDeriver.getPublicDeriverId() === submitDelegationMessage.publicDeriverId
+      );
+      if (!wallet) {
+        throw new Error('unexpectedly missing wallet');
+      }
+
+      //if web wallet
+      if (password == null) {
+        throw new Error('unexpectedly missing password');
+      }
+
+      const withSigning = asGetSigningKey(wallet.publicDeriver);
+      if (withSigning == null) {
+          throw new Error('public deriver missing signing functionality');
+      }
+
+      const withStakingKey = asGetAllAccounting(withSigning);
+      if (!withStakingKey) {
+        throw new Error('cannot get staking key');
+      }
+
+      const stakePrivateKey = await genOwnStakingKey({
+        publicDeriver: withStakingKey,
+        password,
+      });
+
+      const { delegatedCertificate } = this;
+      if (!delegatedCertificate) {
+        throw new Error('unexpectedly missing metadata');
+      }
+
+      let signature;
+      const trxMetadata = generateRegistrationMetadata(
+        delegatedCertificate.delegations.map(
+          ({voteKey, weight}) => [voteKey, weight]
+        ),
+        delegatedCertificate.stakingPub,
+        delegatedCertificate.paymentAddress,
+        delegatedCertificate.nonce,
+        (hashedMetadata) => {
+          signature = stakePrivateKey.sign(hashedMetadata).to_hex();
+          return signature;
+        },
+        delegatedCertificate.purpose,
+      );
+
+      submitDelegationTxSignRequest.unsignedTx.set_auxiliary_data(trxMetadata);
+
+      const signingKey = await withSigning.getSigningKey();
+      const normalizedKey = await withSigning.normalizeKey({
+        ...signingKey,
+        password,
+      });
+
+      const withLevels = asHasLevels<ConceptualWallet>(wallet.publicDeriver);
+      if (!withLevels) {
+        throw new Error('public deriver has no derivation level');
+      }
+
+      const signedTx = shelleySignTransaction(
+        submitDelegationTxSignRequest.senderUtxos,
+        submitDelegationTxSignRequest.unsignedTx,
+        withLevels.getParent().getPublicDeriverLevel(),
+        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Buffer.from(normalizedKey.prvKeyHex, 'hex')
+        ),
+        submitDelegationTxSignRequest.neededStakingKeyHashes.wits,
+        trxMetadata
+      );
+
+      await connectorSendTxCardano(
+        wallet.publicDeriver,
+        Buffer.from(signedTx.to_bytes()),
+        this.api.localStorage
+      );
+      if (addressedUtxos == null) {
+        throw new Error('unexpectedly missing utxos');
+      }
+
+      await connectorRecordSubmittedCardanoTransaction(
+        wallet.publicDeriver,
+        signedTx,
+        addressedUtxos,
+      );
+
+      window.chrome.runtime.sendMessage(
+        {
+          type: 'submit_delegation_response',
+          result: {
+            certificate: this.delegatedCertificate,
+            signature: null,
+            txHash: RustModule.WalletV4.hash_transaction(signedTx.body()).to_hex(),
+          },
+          tabId: submitDelegationMessage.tabId,
+        }
+      );
+      this.actions.connector.cancelSubmitDelegation.remove(this._cancelSubmitDelegation);
+      this._closeWindow();
+    } catch (error) {
+      let e;
+      if (error instanceof LocalizableError) {
+        e = error;
+      } else {
+        Logger.error(`submission error:, ${JSON.stringify(error)}`);
+        e = new GenericApiError();
+      }
+      runInAction(() => {
+        this.submitDelegationError = e;
+      });
+    }
+  }
+
+  _cancelSubmitDelegation: () => void = () => {
+    window.chrome.runtime.sendMessage(
+      {
+        type: 'submit_delegation_response',
+        result: null,
+        tabId: this.submitDelegationMessage?.tabId,
+      }
+    );
+    window.close();
+  }
+  
   static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher = (
     fetcher,
     networkInfo

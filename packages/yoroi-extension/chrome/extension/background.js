@@ -26,6 +26,10 @@ import type {
   WhitelistEntry,
   EnableCatalystRetrieveData,
   EnableCatalystResponse,
+  Delegation,
+  SubmitDelegationRetrieveData,
+  SubmitDelegationResponse,
+  SignedDelegationMetadata,
 } from './connector/types';
 import {
   APIErrorCodes,
@@ -143,7 +147,14 @@ type PendingEnableCatalyst = {|
   purposes: Array<number>,
   openedWindow: boolean,
   resolve: ({| enable: boolean |}) => void,
-|}
+|};
+
+type PendingSubmitDelegation = {|
+  url: string,
+  delegation: Delegation,
+  openedWindow: boolean,
+  resolve: (SignedDelegationMetadata) => void,
+|};
 
 let imgBase64Url: string = '';
 let connectionProtocol: 'cardano' | 'ergo' = 'cardano';
@@ -155,6 +166,7 @@ type ConnectedSite = {|
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>,
   pendingEnableCatalyst: Map<RpcUid, PendingEnableCatalyst>,
+  pendingSubmitDelegation: Map<RpcUid, PendingSubmitDelegation>,
 |};
 
 
@@ -414,6 +426,8 @@ const yoroiMessageHandler = async (
     | GetUtxosRequest
     | EnableCatalystRetrieveData
     | EnableCatalystResponse
+    | SubmitDelegationRetrieveData
+    | SubmitDelegationResponse
   ),
   sender,
   sendResponse
@@ -722,6 +736,7 @@ const yoroiMessageHandler = async (
         }
       }
     }
+    sendResponse(null);
   } else if (request.type === 'enable_catalyst_response') {
     const { tabId } = request;
     const connection = connectedSites.get(tabId);
@@ -731,7 +746,34 @@ const yoroiMessageHandler = async (
     for (const [/* uid */, responseData] of connection.pendingEnableCatalyst.entries()) {
       responseData.resolve({ enable: request.enable });
     }
-
+  } else if (request.type === 'submit_delegation_retrieve_data') {
+    for (const [tabId, connection] of connectedSites) {
+      for (const [/* uid */, responseData] of connection.pendingSubmitDelegation.entries()) {
+        if (!responseData.openedWindow) {
+          responseData.openedWindow = true;
+          if (connection.status?.publicDeriverId == null) {
+            throw new Error(`${request.type} no public deriver set for request`);
+          }
+          sendResponse({
+            publicDeriverId: connection.status.publicDeriverId,
+            delegation: responseData.delegation,
+            requesterUrl: connection.url,
+            tabId,
+          });
+          return;
+        }
+      }
+    }
+    sendResponse(null);
+  } else if (request.type === 'submit_delegation_response') {
+    const { tabId } = request;
+    const connection = connectedSites.get(tabId);
+    if (connection == null) {
+      return;
+    }
+    for (const [/* uid */, responseData] of connection.pendingSubmitDelegation.entries()) {
+      responseData.resolve(request.result);
+    }
   }
 };
 
@@ -804,6 +846,30 @@ async function confirmEnableCatalyst(
   });
 }
 
+async function confirmSubmitDelegation(
+  tabId: number,
+  messageUid: number,
+  url: string,
+  delegation: Delegation,
+  connectedSite: ConnectedSite,
+): Promise<?SignedDelegationMetadata> {
+  const bounds = await getBoundsForTabWindow(tabId);
+  return new Promise(resolve => {
+    connectedSite.pendingSubmitDelegation.set(messageUid, {
+      url,
+      delegation,
+      openedWindow: false,
+      resolve,
+    });
+    chrome.windows.create({
+      ...popupProps,
+      url: chrome.extension.getURL('/main_window_connector.html#/submit-delegation'),
+      left: (bounds.width + bounds.positionX) - popupProps.width,
+      top: bounds.positionY + 80,
+    });
+  });
+}
+
 async function findWhitelistedConnection(
   url: string,
   requestIdentification?: boolean,
@@ -859,6 +925,7 @@ async function confirmConnect(
             },
             pendingSigns: new Map(),
             pendingEnableCatalyst: new Map(),
+            pendingSubmitDelegation: new Map(),
           });
         }
         resolve({
@@ -884,6 +951,7 @@ async function confirmConnect(
         },
         pendingSigns: new Map(),
         pendingEnableCatalyst: new Map(),
+        pendingSubmitDelegation: new Map(),
       });
       chrome.windows.create({
         ...popupProps,
@@ -1837,6 +1905,7 @@ function handleInjectorConnect(port) {
             }
           break;
           case 'enable_catalyst':
+          {
             const purposes = message.params[0];
             if (!(purposes.length === 1 && purposes[0] === 0)) {
               rpcResponse({
@@ -1878,6 +1947,7 @@ function handleInjectorConnect(port) {
               }
               rpcResponse({ ok: result.enable });
             }
+          }
           break;
           case 'get_voting_credentials':
             await RustModule.load();
@@ -1905,6 +1975,53 @@ function handleInjectorConnect(port) {
                 false,
               )
             });
+          break;
+          case 'submit_delegation':
+          {
+            const delegation = message.params[0];
+
+            const connection = connectedSites.get(tabId);
+            if (connection == null) {
+              rpcResponse({
+                err: {
+                  code: APIErrorCodes.API_INVALID_REQUEST,
+                  info: 'not connected to wallet'
+                }
+              });
+              return;
+            }
+
+            await RustModule.load();
+            const localStorageApi = new LocalStorageApi();
+            const whitelist = await localStorageApi.getCatalystWhitelist();
+            if (!whitelist.find(entry => entry.url === message.url)) {
+              rpcResponse({
+                err: {
+                  code: APIErrorCodes.API_INVALID_REQUEST,
+                  info: 'catalyst function not enabled'
+                }
+              });
+              return;
+            }
+
+            const result = await confirmSubmitDelegation(
+              tabId,
+              message.uid,
+              message.url,
+              delegation,
+              connection,
+            );
+            if (result) {
+              rpcResponse({ ok: result });
+            } else {
+              rpcResponse({
+                err: {
+                  code: 2,
+                  info: 'user declined'
+                }
+              });
+            }
+          }
           break;
           default:
             rpcResponse({

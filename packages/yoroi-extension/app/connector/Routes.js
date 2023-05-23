@@ -10,6 +10,7 @@ import ConnectContainer from './containers/ConnectContainer';
 import Layout from './components/layout/Layout';
 import SignTxContainer from './containers/SignTxContainer';
 import EnableCatalystContainer from './containers/EnableCatalystContainer';
+import SubmitDelegationContainer from './containers/SubmitDelegationContainer';
 import LoadingPage from '../containers/LoadingPage';
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
@@ -35,6 +36,11 @@ const getContent = (stores, actions) => (
       exact
       path={ROUTES.ENABLE_CATALYST}
       component={props => <EnableCatalystContainer {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SUBMIT_DELEGATION}
+      component={props => <SubmitDelegationContainer {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );

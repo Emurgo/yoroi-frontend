@@ -50,17 +50,6 @@ import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 
-const messages = defineMessages({
-  incorrectWalletPasswordError: {
-    id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect wallet password.',
-  },
-  sendError: {
-    id: 'connector.signin.error.sendError',
-    defaultMessage: '!!!An error occured when sending the transaction.',
-  },
-});
-
 export type SummaryAssetsData = {|
   total: DisplayAmount | Object,
   isOnlyTxFee: boolean,
@@ -169,7 +158,9 @@ class SignTxPage extends Component<Props, State> {
                 this.form
                   .$('walletPassword')
                   .invalidate(
-                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                    this.context.intl.formatMessage(
+                      globalMessages.incorrectWalletPasswordError
+                    )
                   );
               } else {
                 throw error;
