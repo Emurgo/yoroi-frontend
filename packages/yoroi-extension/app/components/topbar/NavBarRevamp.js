@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-// import { Box, Grid } from '@mui/material';
 import { Box } from '@mui/material';
 import { revampTheme } from '../../styles/themes/revamp-theme';
 

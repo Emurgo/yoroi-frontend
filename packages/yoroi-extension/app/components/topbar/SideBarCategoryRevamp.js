@@ -23,11 +23,8 @@ export default class SideBarCategoryRevamp extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-
     const { icon, active, onClick, label, route } = this.props;
-
     const componentStyles = classNames([styles.component, active ? styles.active : null]);
-
     const SvgElem = icon;
     const isInternalLink = route.startsWith('/') || route.startsWith('#');
 
@@ -43,7 +40,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         <span className={styles.icon}>
           <SvgElem />
         </span>
-        {label ? <span className={styles.label}>{intl.formatMessage(label)}</span> : null}
+        {label ? <span>{intl.formatMessage(label)}</span> : null}
       </button>
     ) : (
       <a

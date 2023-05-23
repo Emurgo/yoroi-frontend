@@ -1,12 +1,12 @@
 .component {
-  padding: 4px 9px;
+  padding: 4px 0px 4px 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
   opacity: 0.5;
   text-decoration: none;
   font-size: 0.75rem;
-  color: #FFF;
+  color: #fff;
   transition: 0.3s opacity;
 
   & + & {
