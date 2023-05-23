@@ -108,13 +108,11 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                   minHeight: '40px',
                   minWidth: '40px',
                   padding: '10px',
-                  backgroundColor:
-                    Column.count === columns.count ? 'var(--yoroi-palette-gray-200)' : 'none',
+                  '&.MuiButton-sizeMedium': { height: '40px' },
+                  backgroundColor: Column.count === columns.count ? 'gray.200' : 'none',
+                  color: 'gray.200',
                   '&:hover': {
-                    backgroundColor:
-                      Column.count !== columns.count
-                        ? 'var(--yoroi-palette-gray-50)'
-                        : 'var(--yoroi-palette-gray-200)',
+                    backgroundColor: Column.count !== columns.count ? 'gray.50' : 'gray.200',
                   },
                 }}
               >
