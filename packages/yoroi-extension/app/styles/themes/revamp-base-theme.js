@@ -6,6 +6,18 @@ import { deepmerge } from '@mui/utils';
 const fontFamily = ['Rubik', 'sans-serif'].join(',');
 const theme = {
   name: 'revamp',
+  breakpoints: {
+    keys: ['xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'],
+    values: {
+      xxs: 0,
+      xs: 480,
+      sm: 768,
+      md: 1024,
+      lg: 1440,
+      xl: 1849,
+      xxl: 2048,
+    },
+  },
   palette: {
     /* `main` is added since MUI required it but we don't use it at all */
     primary: {
@@ -159,3 +171,5 @@ const theme = {
   },
 };
 export const revampBaseTheme: Object = createTheme(deepmerge(commonTheme, theme));
+
+console.log(revampBaseTheme)
