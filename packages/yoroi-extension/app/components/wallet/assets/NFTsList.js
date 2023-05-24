@@ -2,7 +2,6 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import {
-  ImageList,
   ImageListItem,
   InputAdornment,
   Stack,
@@ -162,17 +161,29 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <Grid container spacing="24px" maxWidth="1872px" margin="auto">
-          {nftList.map(nft => {
-            return (
-              <Grid item xs={6} lg={3} sx={{ border: '1px solid black' }}>
-                <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
-                  <NftCardImage ipfsUrl={nft.image} name={nft.name} width="100%" height="100%" />
-                </SLink>
-              </Grid>
-            );
-          })}
-        </Grid>
+        <Box
+          maxWidth="1872px"
+          margin="auto"
+          sx={{
+            pl: '16px',
+            [revampTheme.breakpoints.up('lg')]: {
+              pl: '24px',
+              pr: '1px',
+            },
+          }}
+        >
+          <Grid container spacing="24px">
+            {nftList.map(nft => {
+              return (
+                <Grid item xs={6} lg={3} sx={{ border: '1px solid black' }}>
+                  <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
+                    <NftCardImage ipfsUrl={nft.image} name={nft.name} width="100%" height="100%" />
+                  </SLink>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Box>
       )}
     </Box>
   );
