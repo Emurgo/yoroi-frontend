@@ -21,6 +21,7 @@ import {
   CardanoTxSigningMode,
   CardanoTxOutputSerializationFormat,
   CardanoTxWitnessType,
+  CardanoGovernanceRegistrationFormat,
 } from 'trezor-connect-flow';
 import type {
   Address, Value, Addressing,
@@ -113,18 +114,27 @@ export async function createTrezorSignTxPayload(
     };
 
   if (signRequest.trezorTCatalystRegistrationTxSignData) {
-    const { votingPublicKey, nonce } = signRequest.trezorTCatalystRegistrationTxSignData;
+    const { votingPublicKey, nonce, paymentKeyPath } =
+      signRequest.trezorTCatalystRegistrationTxSignData;
     request = {
       ...request,
       auxiliaryData: {
         governanceRegistrationParameters: {
-          votingPublicKey: votingPublicKey.replace(/^0x/, ''),
+          delegations: [
+            {
+              votingPublicKey: votingPublicKey.replace(/^0x/, ''),
+              weight: 1,
+            }
+          ],
           stakingPath: stakingKeyPath,
           rewardAddressParameters: {
-            addressType: CardanoAddressType.REWARD,
-            path: stakingKeyPath,
+            addressType: CardanoAddressType.BASE,
+            path: paymentKeyPath,
+            stakingPath: stakingKeyPath,
           },
           nonce: String(nonce),
+          format: CardanoGovernanceRegistrationFormat.CIP36,
+          votingPurpose: 0,
         },
       }
     };
@@ -526,7 +536,7 @@ export function toTrezorSignRequest(
       }
       formatted.push(cardanoInput);
     }
-    return formatted.sort(compareInputs);
+    return formatted;
   }
 
   function formatOutput(

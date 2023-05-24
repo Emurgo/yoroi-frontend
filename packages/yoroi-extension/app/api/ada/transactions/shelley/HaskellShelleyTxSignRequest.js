@@ -29,15 +29,16 @@ type NetworkSettingSnapshot = {|
   +KeyDeposit: BigNumber,
 |};
 
-type LedgerNanoCatalystRegistrationTxSignData = {|
+export type LedgerNanoCatalystRegistrationTxSignData = {|
   votingPublicKey: string,
   stakingKeyPath: Array<number>,
   stakingKey: string,
-  rewardAddress: string,
+  paymentAddress: string,
+  paymentKeyPath: Array<number>,
   nonce: number,
 |};
 
-type TrezorTCatalystRegistrationTxSignData =
+export type TrezorTCatalystRegistrationTxSignData =
   LedgerNanoCatalystRegistrationTxSignData;
 
 export class HaskellShelleyTxSignRequest

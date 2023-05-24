@@ -278,7 +278,7 @@ const GetAllUtxosMixin = (
         }
         const addressingInfo = addressingMap.get(addressHash);
         if (addressingInfo == null) {
-          throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)} should never happen`);
+          throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
         }
 
         const tokens = [ '', ...utxo.assets.map(asset => asset.assetId) ].map((tokenId, i) => {
@@ -362,7 +362,7 @@ const GetAllUtxosMixin = (
     for (const utxo of utxosInStorage) {
       const addressingInfo = addressingMap.get(utxo.UtxoTransactionOutput.AddressId);
       if (addressingInfo == null) {
-        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)} should never happen`);
+        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
       }
       addressedUtxos.push({
         output: utxo,

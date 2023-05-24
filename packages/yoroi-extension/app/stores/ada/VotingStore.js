@@ -50,6 +50,7 @@ import {
   loadCatalystRoundInfo,
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -272,8 +273,12 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);
     }
 
-    const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const nonce = timeToSlot({ time: new Date() }).slot;
+
+    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
+      publicDeriver,
+      type: CoreAddressTypes.CARDANO_BASE,
+    });
 
     let votingRegTxPromise;
 
@@ -310,7 +315,6 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
       }).to_raw_key();
 
-      const rewardAddress = stakingKeyResp.addr.Hash;
 
       if (isTrezorTWallet(publicDeriver.getParent())) {
         votingRegTxPromise = this.createVotingRegTx.execute({
@@ -320,7 +324,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            rewardAddress,
+            paymentKeyPath: allAddresses[0].addressing.path,
+            paymentAddress: allAddresses[0].address,
             nonce,
           },
         }).promise;
@@ -332,7 +337,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            rewardAddress,
+            paymentKeyPath: allAddresses[0].addressing.path,
+            paymentAddress: allAddresses[0].address,
             nonce,
           },
         }).promise;
@@ -361,15 +367,10 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         password: spendingPassword,
       });
 
-      const rewardAddress = RustModule.WalletV4.RewardAddress.new(
-        Number.parseInt(config.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash()),
-      );
-
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
-        receiverAddress: Buffer.from(rewardAddress.to_address().to_bytes()),
+        receiverAddress: allAddresses[0].address,
         slotNumber: nonce,
       });
 
