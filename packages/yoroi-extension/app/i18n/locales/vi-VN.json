@@ -444,8 +444,6 @@
   "wallet.add.optionDialog.connect.hw.ledger.title": "Ví cứng Ledger",
   "wallet.add.optionDialog.connect.hw.trezor.learnMoreText": "Ví cứng Trezor là một thiết bị USB nhỏ bổ sung thêm mức độ bảo mật cho ví của bạn. Nó an toàn hơn vì khóa riêng của bạn không bao giờ rời khỏi ví phần cứng. Điều này bảo vệ tiền của bạn ngay cả khi máy tính của bạn bị xâm phạm do phần mềm độc hại, nỗ lực lừa đảo, v. v.",
   "wallet.add.optionDialog.connect.hw.trezor.title": "Ví cứng Trezor",
-  "wallet.add.optionDialog.create.normalWallet.description": "Một ví tiêu chuẩn được hỗ trợ bởi một cụm từ khôi phục.",
-  "wallet.add.optionDialog.create.paperWallet.description": "Ví giấy có thể được tạo ngay cả trên các thiết bị không được kết nối với internet, điều này khiến chúng rất phù hợp để lưu trữ lạnh sử dụng một lần.",
   "wallet.add.optionDialog.restore.dialogTitle": "Khôi phục Ví",
   "wallet.add.optionDialog.restore.normalWallet.description": "Nếu bạn có một cụm từ khôi phục bao gồm {length} từ, hãy chọn tùy chọn này để khôi phục ví của bạn.",
   "wallet.add.optionDialog.restore.normalWallet.title": "Nhập {length}-từ trong cụm từ khôi phục",
