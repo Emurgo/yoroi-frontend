@@ -16,7 +16,6 @@ type Props = {|
   +showInContainer?: boolean,
   +showAsCard?: boolean,
   +asModern?: boolean,
-  +bgcolor?: string,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -33,7 +32,6 @@ function TopBarLayout({
   showAsCard,
   isRevampLayout,
   asModern,
-  bgcolor,
 }: Props & InjectedProps) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
@@ -52,36 +50,41 @@ function TopBarLayout({
               height: '7px',
               display: 'block',
             },
-            boxShadow: showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
-            borderRadius: showAsCard === true && '8px',
-            ...(showInContainer === true && {
-              marginTop: '4px',
-              background: 'var(--yoroi-palette-common-white)',
-              width: '100%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              flex: '0 1 auto',
-              height: '100%',
-            }),
+            boxShadow:
+              isRevampLayout === false && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
+            borderRadius: isRevampLayout === false && showAsCard === true && '8px',
+            ...(showInContainer === true &&
+              isRevampLayout === false && {
+                marginTop: '4px',
+                bgcolor: 'common.white',
+                width: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '0 1 auto',
+                height: '100%',
+              }),
           }}
         >
           {isRevampLayout && asModern !== true ? (
-            <Box sx={{ background: bgcolor || 'var(--yoroi-palette-gray-50)', height: '100%' }}>
+            <Box sx={{ bgcolor: 'common.white', height: '100%' }}>
               <Box
                 sx={{
-                  maxWidth: 'calc(1366px - 90px)',
+                  // maxWidth: 'calc(1366px - 90px)',
                   height: '100%',
                   width: '100%',
                   margin: 'auto',
+                  pb: '10px',
+                  bgcolor: 'common.white',
                 }}
               >
                 <Box
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    padding: '40px',
-                    backgroundColor: bgcolor || 'var(--yoroi-palette-gray-50)',
+                    // padding: '40px',
+                    // backgroundColor: bgcolor || 'var(--yoroi-palette-gray-50)',
+                    bgcolor: 'common.white',
                     overflow: 'auto',
                   }}
                 >
@@ -140,7 +143,7 @@ function TopBarLayout({
   return (
     <Box
       sx={{
-        backgroundColor: 'var(--yoroi-palette-common-white)',
+        backgroundColor: 'common.white',
         boxShadow: '0 0 70px 0 rgba(0, 0, 0, 0.75)',
         display: 'flex',
         flexDirection: 'column',
@@ -168,7 +171,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            background: showInContainer === true && 'var(--yoroi-palette-gray-50)',
+            bgcolor: isRevampLayout ? 'common.white' : showInContainer === true && 'gray.50',
           }}
         >
           {banner}
