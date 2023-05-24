@@ -11,6 +11,7 @@ import {
   OutlinedInput,
   Button,
   IconButton,
+  Grid,
 } from '@mui/material';
 import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
@@ -26,6 +27,7 @@ import { ROUTES } from '../../../routes-config';
 import { useState, useEffect } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 import { urlResolveIpfs } from '../../../coreUtils';
+import { revampTheme } from '../../../styles/themes/revamp-theme';
 
 type Props = {|
   list: Array<{| id: string, name: string, image: string | null |}>,
@@ -77,18 +79,20 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'var(--yoroi-palette-common-white)',
-        borderRadius: '8px',
+        pl: '16px',
+        [revampTheme.breakpoints.up('lg')]: {
+          pl: '24px',
+          pr: '4px',
+        },
       }}
     >
       <Box
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        marginBottom="30px"
         sx={{
-          padding: '16px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+          mt: '8px',
+          py: '16px',
         }}
       >
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
@@ -158,20 +162,17 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <ImageList sx={{ width: '100%', padding: '0px 24px 30px' }} cols={columns.count} gap={24}>
+        <Grid container spacing="24px" maxWidth="1872px" margin="auto">
           {nftList.map(nft => {
             return (
-              <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
-                <NftCardImage
-                  ipfsUrl={nft.image}
-                  name={nft.name}
-                  width={columns.imageDims}
-                  height={columns.imageDims}
-                />
-              </SLink>
+              <Grid item xs={6} lg={3} sx={{ border: '1px solid black' }}>
+                <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
+                  <NftCardImage ipfsUrl={nft.image} name={nft.name} width="100%" height="100%" />
+                </SLink>
+              </Grid>
             );
           })}
-        </ImageList>
+        </Grid>
       )}
     </Box>
   );

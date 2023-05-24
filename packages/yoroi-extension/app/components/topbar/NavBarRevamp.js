@@ -36,9 +36,9 @@ class NavBarRevamp extends Component<Props> {
       <Box
         sx={{
           backgroundColor: 'common.white',
-          // todo: box shadow should be removed
-          boxShadow:
-            '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgba(222, 226, 234, 0.82), 0 2px 4px 0 rgba(222, 226, 234, 0.74)',
+          borderWidth: '1px',
+          borderColor: 'gray.200',
+          borderStyle: 'solid',
         }}
       >
         <Box

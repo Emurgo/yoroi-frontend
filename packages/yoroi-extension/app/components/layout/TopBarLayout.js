@@ -70,7 +70,6 @@ function TopBarLayout({
             <Box sx={{ bgcolor: 'common.white', height: '100%' }}>
               <Box
                 sx={{
-                  // maxWidth: 'calc(1366px - 90px)',
                   height: '100%',
                   width: '100%',
                   margin: 'auto',
@@ -82,8 +81,6 @@ function TopBarLayout({
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    // padding: '40px',
-                    // backgroundColor: bgcolor || 'var(--yoroi-palette-gray-50)',
                     bgcolor: 'common.white',
                     overflow: 'auto',
                   }}
