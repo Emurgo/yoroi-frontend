@@ -195,5 +195,4 @@ TopBarLayout.defaultProps = {
   showInContainer: false,
   showAsCard: false,
   asModern: false,
-  bgcolor: undefined,
 };
