@@ -37,8 +37,6 @@ import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDia
 import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
 
 import WalletEraOptionDialogContainer from './dialogs/WalletEraOptionDialogContainer';
-import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
-import WalletCreateOptionDialogContainer from './dialogs/WalletCreateOptionDialogContainer';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import WalletPaperDialogContainer from './dialogs/WalletPaperDialogContainer';
 import type { GeneratedData as WalletPaperDialogContainerData } from './dialogs/WalletPaperDialogContainer';
@@ -60,7 +58,6 @@ import {
   networks,
   isJormungandr,
   isCardanoHaskell,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -143,37 +140,11 @@ class AddWalletPage extends Component<AllProps> {
         <PickCurrencyDialogContainer
           onClose={this.onClose}
           onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoMainnet)}
-          onCardanoTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoTestnet)
-          }
           onCardanoPreprodTestnet={() =>
             actions.profile.setSelectedNetwork.trigger(networks.CardanoPreprodTestnet)
           }
           onCardanoPreviewTestnet={() =>
             actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
-          }
-          onErgo={
-            uiDialogs.isOpen(WalletConnectHWOptionDialog) ||
-            uiDialogs.isOpen(WalletCreateOptionDialog)
-              ? undefined
-              : () => actions.profile.setSelectedNetwork.trigger(networks.ErgoMainnet)
-          }
-          onAlonzoTestnet={() => actions.profile.setSelectedNetwork.trigger(networks.AlonzoTestnet)}
-        />
-      );
-    } else if (uiDialogs.isOpen(WalletCreateOptionDialog)) {
-      if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(AddWalletPage)} no API selected`);
-      }
-      activeDialog = (
-        <WalletCreateOptionDialogContainer
-          onClose={this.onClose}
-          onCreate={() => actions.dialogs.push.trigger({ dialog: WalletCreateDialog })}
-          onPaper={
-            /* re-enable paper wallets once we have a good way to do them in Shelley */
-            !isCardanoHaskell(selectedNetwork)
-              ? undefined
-              : () => actions.dialogs.push.trigger({ dialog: WalletPaperDialog })
           }
         />
       );
@@ -185,6 +156,7 @@ class AddWalletPage extends Component<AllProps> {
         />
       );
     } else if (uiDialogs.isOpen(WalletPaperDialog)) {
+      // <TODO:PENDING_REMOVAL>
       activeDialog = (
         <WalletPaperDialogContainer
           {...this.generated.WalletPaperDialogContainerProps}
@@ -211,16 +183,6 @@ class AddWalletPage extends Component<AllProps> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
-          onRestore12={
-            !isErgo(selectedNetwork)
-              ? undefined
-              : () => {
-                  return actions.dialogs.push.trigger({
-                    dialog: WalletRestoreDialog,
-                    params: { restoreType: { type: 'bip44', extra: undefined, length: 12 } },
-                  });
-                }
-          }
           onRestore15={() => {
             if (isCardanoHaskell(selectedNetwork)) {
               return actions.dialogs.push.trigger({
@@ -242,6 +204,7 @@ class AddWalletPage extends Component<AllProps> {
                   })
           }
           onPaperRestore={
+            // <TODO:PENDING_REMOVAL>
             getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr(selectedNetwork)
               ? undefined
               : () =>
@@ -350,7 +313,7 @@ class AddWalletPage extends Component<AllProps> {
       >
         <AddAnotherWallet
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
-          onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
+          onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
           onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
         />
         {activeDialog}
@@ -366,7 +329,7 @@ class AddWalletPage extends Component<AllProps> {
         >
           <WalletAdd
             onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
-            onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
+            onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
             onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
             onSettings={this._goToSettingsRoot}
             onDaedalusTransfer={this._goToDaedalusTransferRoot}
