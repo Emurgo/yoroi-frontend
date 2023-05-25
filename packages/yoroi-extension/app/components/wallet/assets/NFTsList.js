@@ -166,6 +166,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           sx={{
             pl: '16px',
             mt: '16px',
+            ml: '-24px',
             [revampTheme.breakpoints.up('lg')]: {
               pl: '24px',
               pr: '1px',
