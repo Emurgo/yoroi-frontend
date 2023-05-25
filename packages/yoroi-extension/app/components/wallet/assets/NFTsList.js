@@ -2,7 +2,6 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import {
-  ImageListItem,
   InputAdornment,
   Stack,
   Typography,
@@ -166,6 +165,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           margin="auto"
           sx={{
             pl: '16px',
+            mt: '16px',
             [revampTheme.breakpoints.up('lg')]: {
               pl: '24px',
               pr: '1px',
@@ -175,8 +175,16 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           <Grid container spacing="24px">
             {nftList.map(nft => {
               return (
-                <Grid item xs={6} lg={3} sx={{ border: '1px solid black' }}>
-                  <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
+                <Grid item xs={6} lg={3}>
+                  <SLink
+                    sx={{
+                      display: 'block',
+                      height: '100%',
+                      width: '100%',
+                    }}
+                    key={nft.id}
+                    to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
+                  >
                     <NftCardImage ipfsUrl={nft.image} name={nft.name} width="100%" height="100%" />
                   </SLink>
                 </Grid>
@@ -276,19 +284,26 @@ function NftCardImage({
   height: string,
 |}) {
   return (
-    <ImageListItem sx={{ height: '100%', width }}>
-      <Box sx={{ width, height, overflow: 'hidden', borderRadius: '4px' }}>
+    <Box sx={{ height: '100%', width: '100%', display: 'block' }}>
+      <Box
+        sx={{
+          width: '100%',
+          height: 'calc(100% - 40px)',
+          overflow: 'hidden',
+          borderRadius: '4px',
+        }}
+      >
         <NftImage imageUrl={ipfsUrl} name={name} width={width} height={height} />
       </Box>
       <Typography
         mt="16px"
         sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
         minHeight="48px"
-        color="var(--yoroi-palette-gray-900)"
+        color="gray.900"
       >
         {name}
       </Typography>
-    </ImageListItem>
+    </Box>
   );
 }
 
