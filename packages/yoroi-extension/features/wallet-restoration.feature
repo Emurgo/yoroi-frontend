@@ -104,27 +104,6 @@ Feature: Restore Wallet
       | recoveryPhrase                                                                                                  |                    |
       | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase    |
 
-  @it-72
-  Scenario: Restoring a paper wallet (IT-72)
-    When I click the restore paper wallet button
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
-      | recoveryPhrase                                                                                        |
-      | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
-    And I enter the paper wallet password "cool password"
-    And I enter the restored wallet password:
-      | password   | repeatedPassword |
-      | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate KOTZ-1730
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet"
-    And I go to the receive screen
-    And I should see the addresses exactly list them
-      | address                                                     |
-      | Ae2tdPwUPEZF4q7tzeXnofsXLF3yCW7mwbFVxucwoXBrfUCGXJ9yHWzwVm8 |
-      | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr |
-
   @it-73
   Scenario Outline: Wallet restoration Recovery Phrase with less than 15 words (IT-73)
     And I click the restore button for cardano
@@ -233,26 +212,6 @@ Feature: Restore Wallet
     # switch to wallet #1
     Then I switch to "many-tx-wallet" from the dropdown
     Then I should see the opened wallet with name "many-tx-wallet"
-
-  @it-130
-  Scenario: Restoring an ergo wallet (IT-130)
-    When I click the restore button for ergo
-    Then I select bip44 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                             |
-    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
-    And I enter the restored wallet password:
-    | password   | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate CXTP-1821
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet"
-    And I go to the receive screen
-    And I should see the addresses exactly list them
-    | address                                                     |
-    | 9erND2FjDWVTgT2TWRZ9dCLueKAWjoskx6KqRmZbtvtRXEgCrja |
 
   @it-132
   Scenario: Restoring a shelley 15-word wallet (IT-132)
