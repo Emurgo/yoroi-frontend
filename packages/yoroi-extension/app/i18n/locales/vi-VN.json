@@ -466,6 +466,7 @@
   "wallet.add.page.revamp.createWallet": "Tạo ví mới",
   "wallet.add.page.revamp.restoreWallet": "Khôi phục ví đã tồn tại",
   "wallet.add.page.revamp.subtitle": "Ví nhẹ cho tài sản Cardano",
+  "wallet.add.page.revamp.backButtonLabel": "Back to current wallet",
   "wallet.add.page.subtitle.label": "Ví nhẹ Yoroi cho Cardano",
   "wallet.add.page.title": "Cửa ngõ <br> của bạn đến với thế giới tài chính <br>",
   "wallet.address.category.addressBook": "Địa chỉ không thuộc về bạn nhưng có liên quan đến ví của bạn",
