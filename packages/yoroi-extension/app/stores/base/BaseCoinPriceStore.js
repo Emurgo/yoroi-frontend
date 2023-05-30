@@ -126,7 +126,8 @@ export default class BaseCoinPriceStore
       return null;
     }
     const lastUpdateTimestamp: number = this.lastUpdateTimestamp;
-    if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
+
+    if (Date.now() / 1_000 - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
     }
     const normalizedFrom = from === 'TADA' ? 'ADA' : from;
