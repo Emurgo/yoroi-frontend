@@ -198,7 +198,8 @@ export default class TransactionRevamp extends Component<Props, State> {
       return <span>{hiddenAmount}</span>;
     }
     const tokenInfo = this.props.getTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(numberOfDecimals);
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
