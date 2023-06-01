@@ -9,6 +9,8 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography } from '@mui/material';
+import { withLayout } from '../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../styles/context/layout';
 
 type Props = {|
   +title: string,
@@ -21,8 +23,7 @@ type Props = {|
 |};
 
 @observer
-export default class SuccessPage extends Component<Props> {
-
+class SuccessPage extends Component<Props & InjectedLayoutProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
@@ -32,7 +33,7 @@ export default class SuccessPage extends Component<Props> {
   };
 
   render(): Node {
-    const { title, text } = this.props;
+    const { title, text, isRevampLayout } = this.props;
 
     const actions = this.props.closeInfo == null
       ? undefined
@@ -56,7 +57,7 @@ export default class SuccessPage extends Component<Props> {
             <div className={styles.successImg} />
             <Typography
               variant="body1"
-              color="primary"
+              color={isRevampLayout ? 'primary' : 'secondary.300'}
               textAlign="center"
               mt="16px"
               fontWeight={500}
@@ -82,3 +83,5 @@ export default class SuccessPage extends Component<Props> {
     );
   }
 }
+
+export default (withLayout(SuccessPage): ComponentType<Props>);

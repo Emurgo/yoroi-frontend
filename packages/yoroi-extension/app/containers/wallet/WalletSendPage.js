@@ -277,7 +277,7 @@ class WalletSendPage extends Component<AllProps> {
     if (uiDialogs.isOpen(MemoNoExternalStorageDialog)) {
       return this.noCloudWarningDialog();
     }
-    if(uiDialogs.isOpen(TransactionSuccessDialog) || true){
+    if(uiDialogs.isOpen(TransactionSuccessDialog)){
       return (<TransactionSuccessDialog
         onClose={this.closeTransactionSuccessDialog}
         classicTheme={this.generated.stores.profile.isClassicTheme}
