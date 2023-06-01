@@ -8,6 +8,7 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Typography } from '@mui/material';
 
 type Props = {|
   +title: string,
@@ -48,17 +49,28 @@ export default class SuccessPage extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={this.props.closeInfo ? this.props.closeInfo.onClose : undefined}
         className={styles.dialog}
-        closeButton={this.props.closeInfo ? (<DialogCloseButton />) : undefined}
+        closeButton={this.props.closeInfo ? <DialogCloseButton /> : undefined}
       >
         <div className={styles.component}>
           <div>
             <div className={styles.successImg} />
-            <div className={styles.title}>
+            <Typography
+              variant="body1"
+              color="primary"
+              textAlign="center"
+              mt="16px"
+              fontWeight={500}
+            >
               {title}
-            </div>
-            <div className={styles.text}>
+            </Typography>
+            <Typography
+              variant="body2"
+              color="gray.900"
+              textAlign="center"
+              mt="4px"
+            >
               {text}
-            </div>
+            </Typography>
             {this.props.closeInfo == null && (
               <div className={styles.spinnerSection}>
                 <LoadingSpinner />
