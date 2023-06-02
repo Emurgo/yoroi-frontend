@@ -361,7 +361,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    if (tokenInfo.Metadata.type === 'Cardano') {
+    if (tokenInfo?.Metadata.type === 'Cardano') {
       return getTokenIdentifierIfExists(tokenInfo);
     }
     return undefined;
