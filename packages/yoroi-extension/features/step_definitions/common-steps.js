@@ -535,6 +535,10 @@ Given(/^I have opened the extension$/, async function () {
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();
   }
+  // this string is for local debug only. It sets the same resolution as on Github virtual display
+  if (process.env.LIKE_GITHUB_DISPLAY != null && process.env.LIKE_GITHUB_DISPLAY === '1') {
+    this.driver.manage().window().setRect({ x: 0, y: 0, width: 989, height: 1113 });
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
@@ -611,6 +615,7 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
 
 Given(/^I connected Trezor emulator device$/, async function () {
   // select connecting a HW wallet
+  this.webDriverLogger.info(`Step: I connected Trezor device`);
   await this.click(connectHwButton);
   // pick up currency
   await this.waitForElement(pickUpCurrencyDialog);
@@ -632,6 +637,10 @@ Given(/^I connected Trezor emulator device$/, async function () {
   const name = await this.getValue(walletNameInput);
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
+  this.webDriverLogger.info(`Step: Wallet is connected and saved`);
+  await this.waitForElement(walletSyncingOverlayComponent);
+  await this.waitForElementNotPresent(walletSyncingOverlayComponent);
+  this.webDriverLogger.info(`Step: Wallet is fully synchronized`);
 });
 
 async function restoreWalletsFromStorage(client) {

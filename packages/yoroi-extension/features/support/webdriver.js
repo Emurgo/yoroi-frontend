@@ -371,8 +371,10 @@ function CustomWorld(cmdInput: WorldInput) {
     }, index);
   };
 
-  this.clickElementByQuery = async query => {
-    await this.driver.executeScript(`document.querySelector('${query}').click()`);
+  this.clickByScript = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clicking with executeScript on "${JSON.stringify(locator)}"`);
+    const element = await this.getElementBy(locator);
+    await this.driver.executeScript(`arguments[0].click()`, element);
   };
 
   this.checkIfExists = async (locator: LocatorObject) => {
