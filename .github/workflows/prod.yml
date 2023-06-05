@@ -59,4 +59,4 @@ jobs:
           project: 'yoroi-frontend'
           channel: 'Production'
           packages: 'yoroi-frontend:${{ steps.package-version.outputs.current-version}}-production'
-          release_number: '${{ steps.package-version.outputs.current-version}}'
+          release_number: '${{ steps.package-version.outputs.current-version}}-production'

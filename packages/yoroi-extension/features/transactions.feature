@@ -277,63 +277,6 @@ Feature: Send transaction
     Then I submit the wallet send form
     Then I should see an delegation incorrect wallet password error message
 
-  @it-162
-  Scenario Outline: Send from an ergo wallet (IT-162)
-    Given There is an Ergo wallet stored named ergo-simple-wallet
-    And I have an ERGO wallet with funds
-    When I go to the send transaction screen
-    And I fill the form:
-      | address                        | amount   |
-      | <address>                      | <amount> |
-    And The transaction fees are "<fee>"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I see CONFIRM TRANSACTION Pop up:
-      | address   | amount    |fee      | isErgo |
-      | <address> | <amount>  |<fee>    | 1    |
-    And I enter the wallet password:
-      | password   |
-      | asdfasdfasdf |
-    And I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
-
-    Examples:
-      | address                                             | amount       |fee         |
-      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 5.000000000  |0.001100000 |
-  
-  @it-163
-  Scenario: Send all from an ergo wallet (IT-163)
-    When I click the restore button for ergo
-    Then I select bip44 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                             |
-    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
-    And I enter the restored wallet password:
-    | password   | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate CXTP-1821
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet"
-    When I go to the send transaction screen
-    And I fill the address of the form:
-      | address                                                     |
-      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
-    And I open the amount dropdown and select send all
-    And The transaction fees are "0.001100000"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I enter the wallet password:
-      | password   |
-      | asdfasdfasdf |
-    And I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
-
   @it-164
   Scenario Outline: Can receive & send funds from enterprise address (IT-164)
     Given There is a Shelley wallet stored named shelley-enterprise
@@ -385,56 +328,6 @@ Feature: Send transaction
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
     And I should see 1 pending transactions
-
-  @it-170
-  Scenario Outline: Can send some of a custom token (IT-170)
-    Given There is an Ergo wallet stored named ergo-token-wallet
-    And I have an ERGO wallet with funds
-    When I go to the send transaction screen
-    And I open the token selection dropdown
-    And I select token "USD"
-    And I fill the form:
-      | address                        | amount   |
-      | <address>                      | <amount> |
-    And The transaction fees are "<fee>"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I see CONFIRM TRANSACTION Pop up:
-      | address   | amount    |fee      | isErgo |
-      | <address> | 0.010000000  |<fee>    | 1   |
-    And I enter the wallet password:
-      | password   |
-      | asdfasdfasdf |
-    And I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
-
-    Examples:
-      | address                                             | amount | fee |
-      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 123  |0.001100000 |
-
-  @it-171
-  Scenario: Can send all of a custom token (IT-171)
-    Given There is an Ergo wallet stored named ergo-token-wallet
-    And I have an ERGO wallet with funds
-    When I go to the send transaction screen
-    And I open the token selection dropdown
-    And I select token "USD"
-    And I fill the address of the form:
-      | address                                                     |
-      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
-    And I open the amount dropdown and select send all
-    And The transaction fees are "0.001100000"
-    And I click on the next button in the wallet send form
-    And I see send money confirmation dialog
-    And I enter the wallet password:
-      | password   |
-      | asdfasdfasdf |
-    And I submit the wallet send form
-    Then I should see the successfully sent page
-    And I click the transaction page button
-    Then I should see the summary screen
 
   @it-178
   Scenario Outline: Can send some of a custom Cardano token (IT-178)
