@@ -24,14 +24,14 @@ type Props = {|
 export default class AssetsPage extends Component<Props> {
 
   render(): Node {
-    const { assetDeposit, network } = this.props
+    const { assetDeposit, network, assetsList, getTokenInfo, shouldHideBalance } = this.props;
     return (
       <div className={styles.component}>
         <AssetsList
-          assetsList={this.props.assetsList}
+          assetsList={assetsList}
           assetDeposit={assetDeposit}
-          getTokenInfo={this.props.getTokenInfo}
-          shouldHideBalance={this.props.shouldHideBalance}
+          getTokenInfo={getTokenInfo}
+          shouldHideBalance={shouldHideBalance}
           network={network}
         />
       </div>

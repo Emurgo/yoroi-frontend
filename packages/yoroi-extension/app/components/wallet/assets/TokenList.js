@@ -263,7 +263,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
             color="primary.600"
             to={id !== '-' && ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
-            {name} 
+            {name}
           </Typography>
         </Box>
       }
