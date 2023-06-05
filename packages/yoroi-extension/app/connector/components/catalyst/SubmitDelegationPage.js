@@ -46,6 +46,7 @@ type Props = {|
   submitDelegationError: ?LocalizableError,
   ownVoteKey: ?string,
   submitDelegationWalletType: ?string,
+  isHwWalletErrorRecoverable: ?boolean,
 |};
 
 type State = {|
@@ -145,7 +146,15 @@ class SubmitDelegationPage extends Component<
       ownVoteKey,
       submitDelegationWalletType,
       onCancel,
+      isHwWalletErrorRecoverable,
     } = this.props;
+
+    if (submitDelegationError && isHwWalletErrorRecoverable === false) {
+      return (
+        <ErrorBlock error={submitDelegationError} />
+      );
+    }
+
     if (submitDelegationMessage == null) {
       return null;
     }

@@ -609,6 +609,16 @@ export function buildSignedTransaction(
 
 type AddressMap = { [addressHex: string]: Array<number> };
 
+export type Cip36Data = {|
+  delegations: Array<{| voteKey: string, weight: number |}>,
+  stakingKeyPath: Array<number>,
+  votePaymentKeyPath: Array<number>,
+  nonce: number,
+  purpose: number,
+  ownVoteKey: string,
+  ownVoteKeyPath: Array<number>,
+|};
+
 // Convert connector sign tx input into request to Ledger.
 // Note this function has some overlaps in functionality with above functions but
 // this function is more generic because above functions deal only with Yoroi
@@ -621,6 +631,7 @@ export function toLedgerSignRequest(
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
   rawTxBody: Buffer,
+  cip36Data: ?Cip36Data,
 ): SignTransactionRequest {
   const parsedCbor = cbor.decode(rawTxBody);
 
@@ -865,16 +876,54 @@ export function toLedgerSignRequest(
     );
   }
 
-  // TODO: support CIP36 aux data
   let formattedAuxiliaryData = null;
-  const auxiliaryDataHash = txBody.auxiliary_data_hash();
-  if (auxiliaryDataHash) {
+  if (cip36Data) {
     formattedAuxiliaryData = {
-      type: TxAuxiliaryDataType.ARBITRARY_HASH,
+      type: TxAuxiliaryDataType.CIP36_REGISTRATION,
       params: {
-        hashHex: auxiliaryDataHash.to_hex(),
+        format: CIP36VoteRegistrationFormat.CIP_36,
+        delegations: cip36Data.delegations.map(
+          ({voteKey, weight}) => {
+            if (voteKey === cip36Data.ownVoteKey) {
+              return {
+                type: CIP36VoteDelegationType.PATH,
+                voteKeyPath: cip36Data.ownVoteKeyPath,
+                weight,
+              };
+            } else {
+              return {
+                type: CIP36VoteDelegationType.KEY,
+                voteKeyHex: voteKey,
+                weight,
+              };
+            }
+          }
+        ),
+        stakingPath: cip36Data.stakingKeyPath,
+        paymentDestination: {
+          type: TxOutputDestinationType.DEVICE_OWNED,
+          params: {
+            type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+            params: {
+              spendingPath: cip36Data.votePaymentKeyPath,
+              stakingPath: cip36Data.stakingKeyPath,
+            }
+          },
+        },
+        nonce: cip36Data.nonce,
+        votingPurpose: cip36Data.purpose,
       }
     };
+  } else {
+    const auxiliaryDataHash = txBody.auxiliary_data_hash();
+    if (auxiliaryDataHash) {
+      formattedAuxiliaryData = {
+        type: TxAuxiliaryDataType.ARBITRARY_HASH,
+        params: {
+          hashHex: auxiliaryDataHash.to_hex(),
+        }
+      };
+    }
   }
 
   let formattedCollateral = null;

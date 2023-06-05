@@ -1542,7 +1542,12 @@ export function getTokenMetadataFromIds(
 
 export async function getVotingCredentials(
   publicDeriver: PublicDeriver<>,
-): Promise<{| voteKey: string, stakingCredential: string |}> {
+): Promise<{|
+  voteKey: string,
+  voteKeyPath: Array<number>,
+  stakingCredential: string,
+  stakingKeyPath: Array<number>,
+|}> {
   return RustModule.WasmScope(async (RustModule) => {
     const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!withLevels) {
@@ -1582,6 +1587,11 @@ export async function getVotingCredentials(
       },
     }).to_raw_key();
 
-    return { voteKey: voteKey.to_hex(), stakingCredential: stakingKey.to_hex() };
+    return {
+      voteKey: voteKey.to_hex(),
+      voteKeyPath: VoteKeyDerivationPath,
+      stakingCredential: stakingKey.to_hex(),
+      stakingKeyPath: stakingKeyResp.addressing.path,
+    };
   });
 }

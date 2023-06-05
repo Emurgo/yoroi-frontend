@@ -40,6 +40,8 @@ export default class SubmitDelegationContainer extends Component<
       submitDelegationError,
       ownVoteKey,
       submitDelegationWalletType,
+      hwWalletError,
+      isHwWalletErrorRecoverable,
     } = this.generated.stores.connector;
 
     if (submitDelegationMessage == null) {
@@ -51,11 +53,12 @@ export default class SubmitDelegationContainer extends Component<
         favicon={submitDelegationMessage.favicon}
         submitDelegationMessage={submitDelegationMessage}
         submitDelegationTxFee={submitDelegationTxFee}
-        submitDelegationError={submitDelegationError}
+        submitDelegationError={hwWalletError || submitDelegationError}
         ownVoteKey={ownVoteKey}
         submitDelegationWalletType={submitDelegationWalletType}
         onConfirm={this.onConfirm.bind(this)}
         onCancel={this.onCancel.bind(this)}
+        isHwWalletErrorRecoverable={isHwWalletErrorRecoverable}
       />
     );      
   }
@@ -77,6 +80,8 @@ export default class SubmitDelegationContainer extends Component<
         submitDelegationError: ?LocalizableError,
         ownVoteKey: ?string,
         submitDelegationWalletType: ?string,
+        hwWalletError: ?LocalizableError,
+        isHwWalletErrorRecoverable: ?boolean,
       |},
     |},
   |} {
@@ -95,6 +100,8 @@ export default class SubmitDelegationContainer extends Component<
           submitDelegationError: stores.connector.submitDelegationError,
           ownVoteKey: stores.connector.ownVoteKey,
           submitDelegationWalletType: stores.connector.submitDelegationWalletType,
+          hwWalletError: stores.connector.hwWalletError,
+          isHwWalletErrorRecoverable: stores.connector.isHwWalletErrorRecoverable,
         },
       },
       actions: {

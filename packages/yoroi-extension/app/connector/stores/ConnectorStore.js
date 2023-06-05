@@ -123,6 +123,7 @@ import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/
 import { generateRegistrationMetadata } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { GenericApiError } from '../../api/common/errors';
 import { genOwnStakingKey } from '../../api/ada';
+import type { Cip36Data } from '../../api/ada/transactions/shelley/ledgerTx';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -294,6 +295,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable submitDelegationError: ?LocalizableError = null;
   @observable submitDelegationWalletType: ?string = null;
   delegatedCertificate: ?DelegatedCertificate = null;
+  ownVoteKeyPath: ?Array<number> = null;
+  votePaymentKeyPath: ?Array<number> = null;
+  voteStakingKeyPath: ?Array<number> = null;
 
   setup(): void {
     super.setup();
@@ -842,7 +846,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
     });
 
-    const { voteKey, stakingCredential } = await getVotingCredentials(
+    const {
+      voteKey,
+      stakingCredential,
+      voteKeyPath,
+      stakingKeyPath,
+    } = await getVotingCredentials(
       wallet.publicDeriver
     );
 
@@ -954,6 +963,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         this.submitDelegationTxSignRequest = submitDelegationTxSignRequest;
         this.ownVoteKey = voteKey;
       });
+      this.votePaymentKeyPath = allAddresses[0].addressing.path;
+      this.ownVoteKeyPath = voteKeyPath;
+      this.voteStakingKeyPath = stakingKeyPath;
     } catch(error) {
       let e;
       if (error instanceof LocalizableError) {
@@ -975,11 +987,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   }
 
   _confirmSubmitDelegation: (?string) => Promise<void> = async (password) => {
+    // give the UI a change to update first (to disable the submit button)
+    await new Promise(resolve => {
+      setTimeout(resolve, 100);
+    });
+
     try {
       const {
         submitDelegationMessage,
         submitDelegationTxSignRequest,
         addressedUtxos,
+        delegatedCertificate,
       } = this;
 
       if (submitDelegationTxSignRequest == null) {
@@ -997,70 +1015,103 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         throw new Error('unexpectedly missing wallet');
       }
 
-      //if web wallet
-      if (password == null) {
-        throw new Error('unexpectedly missing password');
-      }
-
-      const withSigning = asGetSigningKey(wallet.publicDeriver);
-      if (withSigning == null) {
-          throw new Error('public deriver missing signing functionality');
-      }
-
-      const withStakingKey = asGetAllAccounting(withSigning);
-      if (!withStakingKey) {
-        throw new Error('cannot get staking key');
-      }
-
-      const stakePrivateKey = await genOwnStakingKey({
-        publicDeriver: withStakingKey,
-        password,
-      });
-
-      const { delegatedCertificate } = this;
       if (!delegatedCertificate) {
         throw new Error('unexpectedly missing metadata');
       }
 
       let signature;
-      const trxMetadata = generateRegistrationMetadata(
-        delegatedCertificate.delegations.map(
-          ({voteKey, weight}) => [voteKey, weight]
-        ),
-        delegatedCertificate.stakingPub,
-        delegatedCertificate.paymentAddress,
-        delegatedCertificate.nonce,
-        (hashedMetadata) => {
-          signature = stakePrivateKey.sign(hashedMetadata).to_hex();
-          return signature;
-        },
-        delegatedCertificate.purpose,
-      );
+      let signedTx;
 
-      submitDelegationTxSignRequest.unsignedTx.set_auxiliary_data(trxMetadata);
+      if (this.submitDelegationWalletType === 'web') {
+        if (password == null) {
+          throw new Error('unexpectedly missing password');
+        }
 
-      const signingKey = await withSigning.getSigningKey();
-      const normalizedKey = await withSigning.normalizeKey({
-        ...signingKey,
-        password,
-      });
+        const withSigning = asGetSigningKey(wallet.publicDeriver);
+        if (withSigning == null) {
+          throw new Error('public deriver missing signing functionality');
+        }
 
-      const withLevels = asHasLevels<ConceptualWallet>(wallet.publicDeriver);
-      if (!withLevels) {
-        throw new Error('public deriver has no derivation level');
+        const withStakingKey = asGetAllAccounting(withSigning);
+        if (!withStakingKey) {
+          throw new Error('cannot get staking key');
+        }
+
+        const stakePrivateKey = await genOwnStakingKey({
+          publicDeriver: withStakingKey,
+          password,
+        });
+
+        const trxMetadata = generateRegistrationMetadata(
+          delegatedCertificate.delegations.map(
+            ({voteKey, weight}) => [voteKey, weight]
+          ),
+          delegatedCertificate.stakingPub,
+          delegatedCertificate.paymentAddress,
+          delegatedCertificate.nonce,
+          (hashedMetadata) => {
+            signature = stakePrivateKey.sign(hashedMetadata).to_hex();
+            return signature;
+          },
+          delegatedCertificate.purpose,
+        );
+
+        submitDelegationTxSignRequest.unsignedTx.set_auxiliary_data(trxMetadata);
+
+        const signingKey = await withSigning.getSigningKey();
+        const normalizedKey = await withSigning.normalizeKey({
+          ...signingKey,
+          password,
+        });
+
+        const withLevels = asHasLevels<ConceptualWallet>(wallet.publicDeriver);
+        if (!withLevels) {
+          throw new Error('public deriver has no derivation level');
+        }
+
+        signedTx = shelleySignTransaction(
+          submitDelegationTxSignRequest.senderUtxos,
+          submitDelegationTxSignRequest.unsignedTx,
+          withLevels.getParent().getPublicDeriverLevel(),
+          RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+            Buffer.from(normalizedKey.prvKeyHex, 'hex')
+          ),
+          submitDelegationTxSignRequest.neededStakingKeyHashes.wits,
+          trxMetadata
+        );
+      } else if (this.submitDelegationWalletType === 'ledger') {
+        const {
+          ownVoteKey,
+          ownVoteKeyPath,
+          votePaymentKeyPath,
+          voteStakingKeyPath,
+        } = this;
+        if (
+          !ownVoteKey ||
+            !ownVoteKeyPath ||
+            !votePaymentKeyPath ||
+            !voteStakingKeyPath
+        ) {
+          throw new Error('unexpectedly missing delegation data')
+        }
+        const result = await this.ledgerSignTx(
+          wallet.publicDeriver,
+          Buffer.from(submitDelegationTxSignRequest.unsignedTx.build().to_bytes()),
+          {
+            delegations: delegatedCertificate.delegations,
+            stakingKeyPath: voteStakingKeyPath,
+            votePaymentKeyPath,
+            nonce: delegatedCertificate.nonce,
+            purpose: delegatedCertificate.purpose, 
+            ownVoteKey,
+            ownVoteKeyPath,
+          },
+        );
+        signedTx = result.signedTx;
+        signature = result.cip36Signature;
+      } else { // trezor
       }
-
-      const signedTx = shelleySignTransaction(
-        submitDelegationTxSignRequest.senderUtxos,
-        submitDelegationTxSignRequest.unsignedTx,
-        withLevels.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(normalizedKey.prvKeyHex, 'hex')
-        ),
-        submitDelegationTxSignRequest.neededStakingKeyHashes.wits,
-        trxMetadata
-      );
-
+      
       await connectorSendTxCardano(
         wallet.publicDeriver,
         Buffer.from(signedTx.to_bytes()),
@@ -1081,7 +1132,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           type: 'submit_delegation_response',
           result: {
             certificate: this.delegatedCertificate,
-            signature: null,
+            signature,
             txHash: RustModule.WalletV4.hash_transaction(signedTx.body()).to_hex(),
           },
           tabId: submitDelegationMessage.tabId,
@@ -1414,7 +1465,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     rawTxBody: Buffer
   ): Promise<RustModule.WalletV4.Transaction> {
     if (isLedgerNanoWallet(publicDeriver.getParent())) {
-      return this.ledgerSignTx(publicDeriver, rawTxBody);
+      return (await this.ledgerSignTx(publicDeriver, rawTxBody)).signedTx;
     }
     if (isTrezorTWallet(publicDeriver.getParent())) {
       return this.trezorSignTx(publicDeriver, rawTxBody);
@@ -1507,8 +1558,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async ledgerSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer
-  ): Promise<RustModule.WalletV4.Transaction> {
+    rawTxBody: Buffer,
+    cip36Data?: Cip36Data,
+  ): Promise<{| signedTx: RustModule.WalletV4.Transaction, cip36Signature: ?string |}> {
     const config = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo()).reduce(
       (acc, next) => Object.assign(acc, next),
       {}
@@ -1540,6 +1592,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         ownStakeAddressMap,
         addressedUtxos,
         rawTxBody,
+        cip36Data,
       );
     } catch {
       runInAction(() => {
@@ -1569,12 +1622,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw error;
     }
 
-    if (
-      ledgerSignResult.txHashHex !==
-      blake2b(256 / 8)
-        .update(rawTxBody)
-        .digest('hex')
-    ) {
+    const txHash = blake2b(256 / 8).update(rawTxBody).digest('hex');
+
+    // check if the tx hash matches, but only if it is not cip36 registration
+    if (!cip36Data && ledgerSignResult.txHashHex !== txHash) {
       runInAction(() => {
         this.hwWalletError = transactionHashMismatchError;
         this.isHwWalletErrorRecoverable = false;
@@ -1599,12 +1650,40 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       },
     };
 
-    return buildSignedLedgerTransaction(
+    const cip36Signature =
+      ledgerSignResult.auxiliaryDataSupplement?.cip36VoteRegistrationSignatureHex;
+
+    let metadata = undefined;
+    if (cip36Data) {
+      if (!cip36Signature) {
+        throw new Error('expect cip36 signature');
+      }
+      const { delegatedCertificate } = this;
+      if (!delegatedCertificate) {
+        throw new Error('unexpectedly missing delegated certificate data');
+      }
+      metadata = generateRegistrationMetadata(
+        delegatedCertificate.delegations.map(
+          ({voteKey, weight}) => [voteKey, weight]
+        ),
+        delegatedCertificate.stakingPub,
+        delegatedCertificate.paymentAddress,
+        delegatedCertificate.nonce,
+        (_hashedMetadata) => cip36Signature,
+        delegatedCertificate.purpose,
+      );
+      txBody.set_auxiliary_data_hash(
+        RustModule.WalletV4.hash_auxiliary_data(metadata)
+      );
+    }
+
+    const signedTx = buildSignedLedgerTransaction(
       txBody,
       ledgerSignResult.witnesses,
       publicKeyInfo,
-      undefined
+      metadata
     );
+    return { signedTx, cip36Signature};
   }
 
   checkHwWalletSignData(): void {
