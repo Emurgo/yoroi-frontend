@@ -63,6 +63,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   JormungandrMainnet: ({
     NetworkId: 1_00,
     NetworkName: 'Jormungandr Mainnet',
@@ -98,6 +99,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Jormungandr,
   }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   ErgoMainnet: ({
     NetworkId: 2_00,
     NetworkName: 'Ergo Mainnet',
@@ -120,6 +122,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.ERGO,
     Fork: ErgoForks.Primary,
   }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   CardanoTestnet: ({
     NetworkId: 3_00,
     NetworkName: 'Cardano Legacy Testnet',
@@ -160,6 +163,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   AlonzoTestnet: ({
     NetworkId: 4_00,
     NetworkName: 'Alonzo Testnet',

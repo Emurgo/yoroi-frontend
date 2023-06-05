@@ -24,6 +24,7 @@ import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
 import LocalizableError from '../../../i18n/LocalizableError';
+import { ROUTES } from '../../../routes-config';
 
 export const RestoreWalletPagePromise: void => Promise<any> = () =>
   import('../../../components/wallet/restore/RestoreWalletPage');
@@ -40,7 +41,12 @@ export default class RestoreWalletPage extends Component<Props> {
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        sidebar={
+          <SidebarContainer
+            {...this.generated.SidebarContainerProps}
+            onLogoClick={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })}
+          />
+        }
         bgcolor="common.white"
       >
         <RestoreWalletPageComponent
