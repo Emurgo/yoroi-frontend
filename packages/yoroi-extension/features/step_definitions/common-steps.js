@@ -50,16 +50,12 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  pickUpCurrencyDialogErgo,
   walletRestoreOptionDialog,
   restoreNormalWallet,
-  walletRestoreDialog,
   restoreWalletButton,
   saveButton,
   byronEraButton,
   createWalletButton,
-  createOptionDialog,
-  createNormalWalletButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import {
@@ -276,8 +272,9 @@ export async function getIndexedDBTablesInfo(customWorld: any, postfix: string =
   }
 };
 
-export async function getPlates(customWorld: any): Promise<any> {
+export async function getPlates(customWorld: any): Promise<Array<any>> {
   // check plate in confirmation dialog
+  await customWorld.waitForElement(restoringDialogPlate);
   let plateElements = await customWorld.findElements(restoringDialogPlate);
 
   // this makes this function also work for wallets that already exist
@@ -437,25 +434,6 @@ Then(/^I pause the test to debug$/, async function () {
   await this.waitForElement({ locator: '.element_that_does_not_exist', method: 'css' });
 });
 
-Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
-  this.webDriverLogger.info(`Step: There is an Ergo wallet stored named ${walletName}`);
-  const restoreInfo = testWallets[walletName];
-  expect(restoreInfo).to.not.equal(undefined);
-
-  await this.click(restoreWalletButton);
-
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(pickUpCurrencyDialogErgo);
-
-  await this.waitForElement(walletRestoreOptionDialog);
-
-  await this.click(restoreNormalWallet);
-  await this.waitForElement(walletRestoreDialog);
-
-  await inputMnemonicForWallet(this, restoreInfo);
-  await checkWalletPlate(this, walletName, restoreInfo);
-});
-
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   const browserName = await this.getBrowser();
@@ -476,9 +454,6 @@ Given(/^I create a new Shelley wallet with the name ([^"]*)$/, async function (w
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
-
-  await this.waitForElement(createOptionDialog);
-  await this.click(createNormalWalletButton);
 
   await this.waitForElement(walletInfoDialog);
   await this.input(walletNameInput, walletName);

@@ -19,6 +19,10 @@ import {
 
 const fs = require('fs');
 
+const firefoxBin = process.env.FIREFOX_BIN
+  ? process.env.FIREFOX_BIN
+  : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
+
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
 }
@@ -85,7 +89,7 @@ function getFirefoxBuilder() {
      * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
      * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
      */
-    .setBinary(process.env.FIREFOX_DEV)
+    .setBinary(firefoxBin)
     .addExtensions(path.resolve(__dirname, '../../Yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
