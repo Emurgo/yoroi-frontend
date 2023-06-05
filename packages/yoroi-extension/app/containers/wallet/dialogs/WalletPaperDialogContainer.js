@@ -15,6 +15,7 @@ type Props = {|
 |};
 
 @observer
+// <TODO:PENDING_REMOVAL>
 export default class WalletPaperDialogContainer
   extends Component<Props> {
 
