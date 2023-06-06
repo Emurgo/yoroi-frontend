@@ -48,7 +48,7 @@ type Intl = {|
 
 function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
   const rewardItems = graphData.rewardsGraphData.items;
-  const rewardList = rewardItems?.totalRewards.filter(p => Boolean(p.primary)) ?? [];
+  const rewardList = rewardItems?.perEpochRewards.filter(p => Boolean(p.primary)) ?? [];
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
 
   return (
@@ -82,7 +82,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
               key={poolName}
               // $FlowFixMe[incompatible-use]: Object entries flow type
               poolId={data.poolId}
-              poolName={poolName}
+              poolName={poolName || '-'}
               // $FlowFixMe[incompatible-use]: Object entries flow type
               poolAvatar={data.poolAvatar}
               // $FlowFixMe[incompatible-use]: Object entries flow type
