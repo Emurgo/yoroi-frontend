@@ -884,19 +884,23 @@ export function toLedgerSignRequest(
         format: CIP36VoteRegistrationFormat.CIP_36,
         delegations: cip36Data.delegations.map(
           ({voteKey, weight}) => {
+            // This is supposed to make the Ledger device display the vote key
+            // derivation path so that it's obvious to the user that her own vote key
+            // is being registered. But I always get wrong signature in this way.
+            /*
             if (voteKey === cip36Data.ownVoteKey) {
               return {
                 type: CIP36VoteDelegationType.PATH,
                 voteKeyPath: cip36Data.ownVoteKeyPath,
                 weight,
               };
-            } else {
-              return {
-                type: CIP36VoteDelegationType.KEY,
-                voteKeyHex: voteKey,
-                weight,
-              };
             }
+            */
+            return {
+              type: CIP36VoteDelegationType.KEY,
+              voteKeyHex: voteKey,
+              weight,
+            };
           }
         ),
         stakingPath: cip36Data.stakingKeyPath,
