@@ -53,7 +53,7 @@ export function generateRegistrationMetadata(
 
   let delegations;
   if (typeof delegationsOrVotingPublicKey === 'string') {
-    delegations = [prefix0x(delegationsOrVotingPublicKey), 1];
+    delegations = [[prefix0x(delegationsOrVotingPublicKey), 1]];
   } else {
     delegations = delegationsOrVotingPublicKey.map(
       ([votingPublicKey, weight]) => [prefix0x(votingPublicKey), weight]
