@@ -105,7 +105,10 @@ import {
   toTrezorSignRequest,
   buildConnectorSignedTransaction as buildSignedTrezorTransaction,
 } from '../../api/ada/transactions/shelley/trezorTx';
-import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
+import type {
+  CardanoAddressedUtxo,
+  Cip36Data,
+} from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
 import LocalizableError from '../../i18n/LocalizableError';
 import { convertToLocalizableError as convertToLocalizableLedgerError } from '../../domain/LedgerLocalizedError';
@@ -123,7 +126,6 @@ import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/
 import { generateRegistrationMetadata } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { GenericApiError } from '../../api/common/errors';
 import { genOwnStakingKey } from '../../api/ada';
-import type { Cip36Data } from '../../api/ada/transactions/shelley/ledgerTx';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -971,6 +973,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       if (error instanceof LocalizableError) {
         e = error;
       } else {
+        Logger.error(`preparing error:, ${error.stack}`);
         e = new GenericApiError();
       }
       runInAction(() => {
@@ -1102,14 +1105,45 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             stakingKeyPath: voteStakingKeyPath,
             votePaymentKeyPath,
             nonce: delegatedCertificate.nonce,
-            purpose: delegatedCertificate.purpose, 
+            purpose: delegatedCertificate.purpose,
             ownVoteKey,
             ownVoteKeyPath,
           },
         );
         signedTx = result.signedTx;
         signature = result.cip36Signature;
-      } else { // trezor
+      } else if (this.submitDelegationWalletType === 'trezor') {
+        const {
+          ownVoteKey,
+          ownVoteKeyPath,
+          votePaymentKeyPath,
+          voteStakingKeyPath,
+        } = this;
+        if (
+          !ownVoteKey ||
+            !ownVoteKeyPath ||
+            !votePaymentKeyPath ||
+            !voteStakingKeyPath
+        ) {
+          throw new Error('unexpectedly missing delegation data')
+        }
+        const result = await this.trezorSignTx(
+          wallet.publicDeriver,
+          Buffer.from(submitDelegationTxSignRequest.unsignedTx.build().to_bytes()),
+          {
+            delegations: delegatedCertificate.delegations,
+            stakingKeyPath: voteStakingKeyPath,
+            votePaymentKeyPath,
+            nonce: delegatedCertificate.nonce,
+            purpose: delegatedCertificate.purpose,
+            ownVoteKey,
+            ownVoteKeyPath,
+          },
+        );
+        signedTx = result.signedTx;
+        signature = result.cip36Signature;
+      } else {
+        throw new Error('unexpected wallet type');
       }
       
       await connectorSendTxCardano(
@@ -1145,7 +1179,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       if (error instanceof LocalizableError) {
         e = error;
       } else {
-        Logger.error(`submission error:, ${JSON.stringify(error)}`);
+        Logger.error(`submission error:, ${error.stack}`);
         e = new GenericApiError();
       }
       runInAction(() => {
@@ -1468,15 +1502,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       return (await this.ledgerSignTx(publicDeriver, rawTxBody)).signedTx;
     }
     if (isTrezorTWallet(publicDeriver.getParent())) {
-      return this.trezorSignTx(publicDeriver, rawTxBody);
+      return (await this.trezorSignTx(publicDeriver, rawTxBody)).signedTx;
     }
     throw new Error('unexpected wallet type');
   }
 
   async trezorSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer
-  ): Promise<RustModule.WalletV4.Transaction> {
+    rawTxBody: Buffer,
+    cip36Data?: Cip36Data,
+  ): Promise<{| signedTx: RustModule.WalletV4.Transaction, cip36Signature: ?string |}> {
     const config = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo()).reduce(
       (acc, next) => Object.assign(acc, next),
       {}
@@ -1506,7 +1541,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         config.ByronNetworkId,
         ownUtxoAddressMap,
         ownStakeAddressMap,
-        addressedUtxos
+        addressedUtxos,
+        cip36Data,
       );
     } catch {
       runInAction(() => {
@@ -1540,12 +1576,40 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw error;
     }
 
-    if (
-      trezorSignTxResp.hash !==
-      blake2b(256 / 8)
-        .update(rawTxBody)
-        .digest('hex')
-    ) {
+    const cip36Signature = trezorSignTxResp.auxiliaryDataSupplement?.governanceSignature;
+
+    let metadata = undefined;
+    if (cip36Data) {
+      if (!cip36Signature) {
+        throw new Error('expect cip36 signature');
+      }
+      const { delegatedCertificate } = this;
+      if (!delegatedCertificate) {
+        throw new Error('unexpectedly missing delegated certificate data');
+      }
+      metadata = generateRegistrationMetadata(
+        delegatedCertificate.delegations.map(
+          ({voteKey, weight}) => [voteKey, weight]
+        ),
+        delegatedCertificate.stakingPub,
+        delegatedCertificate.paymentAddress,
+        delegatedCertificate.nonce,
+        (_hashedMetadata) => cip36Signature,
+        delegatedCertificate.purpose,
+      );
+      txBody.set_auxiliary_data_hash(
+        RustModule.WalletV4.hash_auxiliary_data(metadata)
+      );
+    }
+
+    const signedTx = buildSignedTrezorTransaction(
+      txBody,
+      trezorSignTxResp.witnesses,
+      metadata,
+    );
+
+    const txHash = blake2b(256 / 8).update(signedTx.body().to_bytes()).digest('hex');
+    if (trezorSignTxResp.hash !== txHash) {
       runInAction(() => {
         this.hwWalletError = transactionHashMismatchError;
         this.isHwWalletErrorRecoverable = false;
@@ -1553,7 +1617,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(txBody, trezorSignTxResp.witnesses, undefined);
+    return { signedTx, cip36Signature };
   }
 
   async ledgerSignTx(
@@ -1622,17 +1686,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw error;
     }
 
-    const txHash = blake2b(256 / 8).update(rawTxBody).digest('hex');
-
-    // check if the tx hash matches, but only if it is not cip36 registration
-    if (!cip36Data && ledgerSignResult.txHashHex !== txHash) {
-      runInAction(() => {
-        this.hwWalletError = transactionHashMismatchError;
-        this.isHwWalletErrorRecoverable = false;
-      });
-      throw new Error('hash mismatch');
-    }
-
     const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
     if (withLevels == null) {
       throw new Error('No public deriver level for this public deriver');
@@ -1683,6 +1736,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       publicKeyInfo,
       metadata
     );
+
+    const txHash = blake2b(256 / 8).update(signedTx.body().to_bytes()).digest('hex');
+    if (ledgerSignResult.txHashHex !== txHash) {
+      runInAction(() => {
+        this.hwWalletError = transactionHashMismatchError;
+        this.isHwWalletErrorRecoverable = false;
+      });
+      throw new Error('hash mismatch');
+    }
+
     return { signedTx, cip36Signature};
   }
 

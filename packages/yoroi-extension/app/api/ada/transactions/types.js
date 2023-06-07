@@ -52,3 +52,13 @@ export type V4UnsignedTxAddressedUtxoResponse = {|
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
 |};
+
+export type Cip36Data = {|
+  delegations: Array<{| voteKey: string, weight: number |}>,
+  stakingKeyPath: Array<number>,
+  votePaymentKeyPath: Array<number>,
+  nonce: number,
+  purpose: number,
+  ownVoteKey: string,
+  ownVoteKeyPath: Array<number>,
+|};

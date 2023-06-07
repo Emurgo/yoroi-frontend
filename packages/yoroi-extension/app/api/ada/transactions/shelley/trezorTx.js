@@ -39,6 +39,7 @@ import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import blake2b from 'blake2b';
+import type { Cip36Data } from '../types';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -513,6 +514,7 @@ export function toTrezorSignRequest(
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
+  cip36Data?: Cip36Data,
 ): $Exact<CardanoSignTransaction> {
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
     const formatted = [];
@@ -765,13 +767,34 @@ export function toTrezorSignRequest(
     formattedWithdrawals = result;
   }
 
-  // TODO: support CIP36 aux data
   let formattedAuxiliaryData = null;
-  const auxiliaryDataHash = txBody.auxiliary_data_hash();
-  if (auxiliaryDataHash) {
+  if (cip36Data) {
     formattedAuxiliaryData = {
-      hash: auxiliaryDataHash.to_hex(),
+      governanceRegistrationParameters: {
+        format: CardanoGovernanceRegistrationFormat.CIP36,
+        delegations: cip36Data.delegations.map(
+          ({voteKey, weight}) => ({
+            votingPublicKey: voteKey,
+            weight,
+          })
+        ),
+        stakingPath: cip36Data.stakingKeyPath,
+        rewardAddressParameters: {
+          addressType: CardanoAddressType.BASE,
+          path: cip36Data.votePaymentKeyPath,
+          stakingPath: cip36Data.stakingKeyPath,
+        },
+        nonce: String(cip36Data.nonce),
+        votingPurpose: cip36Data.purpose,
+      },
     };
+  } else {
+    const auxiliaryDataHash = txBody.auxiliary_data_hash();
+    if (auxiliaryDataHash) {
+      formattedAuxiliaryData = {
+        hash: auxiliaryDataHash.to_hex(),
+      };
+    }
   }
 
   let formattedCollateral = null;

@@ -1,6 +1,7 @@
 // @flow
 import type {
   CardanoAddressedUtxo,
+  Cip36Data,
 } from '../types';
 import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
 import type {
@@ -608,16 +609,6 @@ export function buildSignedTransaction(
 }
 
 type AddressMap = { [addressHex: string]: Array<number> };
-
-export type Cip36Data = {|
-  delegations: Array<{| voteKey: string, weight: number |}>,
-  stakingKeyPath: Array<number>,
-  votePaymentKeyPath: Array<number>,
-  nonce: number,
-  purpose: number,
-  ownVoteKey: string,
-  ownVoteKeyPath: Array<number>,
-|};
 
 // Convert connector sign tx input into request to Ledger.
 // Note this function has some overlaps in functionality with above functions but
