@@ -2861,7 +2861,8 @@ async function certificateToDb(
         }));
         break;
       }
-      default: throw new Error(`${nameof(certificateToDb)} unknown cert kind ` + cert.kind);
+      default:
+        console.debug(`${nameof(certificateToDb)} unknown cert kind ` + cert.kind);
     }
   }
   return result;
