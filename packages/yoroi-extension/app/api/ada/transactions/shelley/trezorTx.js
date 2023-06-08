@@ -113,9 +113,13 @@ export async function createTrezorSignTxPayload(
       )
     };
 
-  if (signRequest.trezorTCatalystRegistrationTxSignData) {
-    const { votingPublicKey, nonce, paymentKeyPath } =
-      signRequest.trezorTCatalystRegistrationTxSignData;
+  if (signRequest.cip36Data) {
+    const { votingPublicKey, nonce, paymentAddressPath, stakingKeyPath } =
+      signRequest.cip36Data;
+    if (!votingPublicKey) {
+      throw new Error('require voting public key');
+    }
+
     request = {
       ...request,
       auxiliaryData: {
@@ -129,7 +133,7 @@ export async function createTrezorSignTxPayload(
           stakingPath: stakingKeyPath,
           rewardAddressParameters: {
             addressType: CardanoAddressType.BASE,
-            path: paymentKeyPath,
+            path: paymentAddressPath,
             stakingPath: stakingKeyPath,
           },
           nonce: String(nonce),

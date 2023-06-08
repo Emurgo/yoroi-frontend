@@ -91,9 +91,9 @@ export async function createLedgerSignTxPayload(request: {|
   const ttl = txBody.ttl();
 
   let auxiliaryData = undefined;
-  if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
-    const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } =
-      request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
+  if (request.signRequest.cip36Data) {
+    const { votingPublicKeyPath, stakingKeyPath, nonce, paymentAddressPath, } =
+      request.signRequest.cip36Data;
 
     auxiliaryData = {
       type: TxAuxiliaryDataType.CIP36_REGISTRATION,
@@ -101,8 +101,8 @@ export async function createLedgerSignTxPayload(request: {|
         format: CIP36VoteRegistrationFormat.CIP_36,
         delegations: [
           {
-            type: CIP36VoteDelegationType.KEY,
-            voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+            type: CIP36VoteDelegationType.PATH,
+            voteKeyPath: votingPublicKeyPath,
             weight: 1,
           },
         ],
@@ -112,7 +112,7 @@ export async function createLedgerSignTxPayload(request: {|
           params: {
             type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
             params: {
-              spendingPath: paymentKeyPath,
+              spendingPath: paymentAddressPath,
               stakingPath: stakingKeyPath,
             },
           },

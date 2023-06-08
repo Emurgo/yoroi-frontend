@@ -119,6 +119,26 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
+      let votingPublicKey;
+      const { cip36Data } = request.params.signRequest;
+      if (cip36Data) {
+        const getExtendedPublicKeyResp = await wrapWithFrame(
+          trezor => trezor.cardanoGetPublicKey(
+            {
+              path: cip36Data.votingPublicKeyPath,
+              showOnTrezor: false,
+            }
+          )
+        );
+        if (!getExtendedPublicKeyResp.success) {
+          throw new Error('error when getting voting key');
+        }
+        votingPublicKey = getExtendedPublicKeyResp.payload.publicKey;
+        // the trezor API could not take the voting public key path and requires
+        // the voting public key
+        cip36Data.votingPublicKey = votingPublicKey;
+      }
+
       const network = request.publicDeriver.getParent().getNetworkInfo();
       const trezorSignTxDataResp = await this.api.ada.createTrezorSignTxData({
         ...request.params,
@@ -179,13 +199,12 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       let metadata;
 
-      if (request.params.signRequest.trezorTCatalystRegistrationTxSignData) {
-        const {
-          votingPublicKey,
-          stakingKey: stakingKeyHex,
-          paymentAddress,
-          nonce,
-        } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
+      if (cip36Data) {
+        if (!votingPublicKey) {
+          throw new Error('unexpectedly missing voting public key');
+        }
+
+        const { paymentAddress, nonce, } = cip36Data;
 
         const auxDataSupplement = trezorSignTxResp.payload.auxiliaryDataSupplement;
         if (
@@ -198,9 +217,13 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         }
         const catalystSignature = auxDataSupplement.governanceSignature;
 
+        if (!stakingKey) {
+          throw new Error('missing staking key');
+        }
+
         metadata = generateRegistrationMetadata(
           votingPublicKey,
-          stakingKeyHex,
+          stakingKey.to_hex(),
           paymentAddress,
           nonce,
           (_hashedMetadata) => {

@@ -26,7 +26,10 @@ import {
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { genOwnStakingKey } from '../../api/ada/index';
+import {
+  genOwnStakingKey,
+  getCip36VotingKey,
+} from '../../api/ada/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
 import { StepState } from '../../components/widgets/ProgressSteps';
@@ -167,9 +170,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  // This function is invoked twice for hardware wallets, see the comments below.
   @action
-  _createTransaction: (?string) => Promise<void> = async spendingPassword => {
+  _createTransaction: () => Promise<void> = async () => {
     this.progressInfo.stepState = StepState.PROCESS;
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
@@ -211,6 +213,20 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       publicDeriver,
       type: CoreAddressTypes.CARDANO_BASE,
     });
+    const paymentAddress = allAddresses[0].address;
+
+    const metadata = generateRegistration({
+      stakePrivateKey: null,
+      votingPublicKey: null,
+      receiverAddress: paymentAddress,
+      slotNumber: nonce,
+    });
+
+    const withStakingKey = asGetStakingKey(publicDeriver);
+    if (!withStakingKey) {
+      throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
+    }
+    const stakingKeyResp = await withStakingKey.getStakingKey();
 
     const asGetPublicKeyInstance = asGetPublicKey(publicDeriver);
     if (!asGetPublicKeyInstance) {
@@ -225,113 +241,27 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     if (!withLevels) {
       throw new Error('Cannot get level. Should never happen');
     }
-
-    const voteKey = derivePublicByAddressing({
-      addressing: {
-        path: VoteKeyDerivationPath,
-        startLevel: 1,
-      },
+    const stakingKey = derivePublicByAddressing({
+      addressing: stakingKeyResp.addressing,
       startingFrom: {
         level: withLevels.getParent().getPublicDeriverLevel(),
         key: publicKey,
       },
     }).to_raw_key();
 
-    let votingRegTxPromise;
-
-    if (
-      publicDeriver.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-    ) {
-      const votingPublicKey = `0x${voteKey.to_hex()}`;
-
-      const withStakingKey = asGetStakingKey(publicDeriver);
-      if (!withStakingKey) {
-        throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
+    const votingRegTxPromise = this.createVotingRegTx.execute({
+      publicDeriver: withHasUtxoChains,
+      absSlotNumber,
+      metadata,
+      cip36Data: {
+        paymentAddress,
+        paymentAddressPath: allAddresses[0].addressing.path,
+        nonce,
+        stakingPublicKey: stakingKey.to_hex(), 
+        stakingKeyPath: stakingKeyResp.addressing.path,
+        votingPublicKeyPath: VoteKeyDerivationPath,
       }
-      const stakingKeyResp = await withStakingKey.getStakingKey();
-
-      const stakingKey = derivePublicByAddressing({
-        addressing: stakingKeyResp.addressing,
-        startingFrom: {
-          level: withLevels.getParent().getPublicDeriverLevel(),
-          key: publicKey,
-        },
-      }).to_raw_key();
-
-
-      if (isTrezorTWallet(publicDeriver.getParent())) {
-        votingRegTxPromise = this.createVotingRegTx.execute({
-          publicDeriver: withHasUtxoChains,
-          absSlotNumber,
-          trezorTWallet: {
-            votingPublicKey,
-            stakingKeyPath: stakingKeyResp.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
-            nonce,
-          },
-        }).promise;
-      } else if (isLedgerNanoWallet(publicDeriver.getParent())) {
-        votingRegTxPromise = this.createVotingRegTx.execute({
-          publicDeriver: withHasUtxoChains,
-          absSlotNumber,
-          ledgerNanoWallet: {
-            votingPublicKey,
-            stakingKeyPath: stakingKeyResp.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
-            nonce,
-          },
-        }).promise;
-      } else {
-        throw new Error(`${nameof(this._createTransaction)} unexpected hardware wallet type`);
-      }
-
-    } else if (
-      publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET
-    ) {
-      const withSigning = asGetSigningKey(publicDeriver);
-      if (withSigning == null) {
-        throw new Error(
-          `${nameof(this._createTransaction)} public deriver missing signing functionality.`
-        );
-      }
-      const withStakingKey = asGetAllAccounting(withSigning);
-      if (withStakingKey == null) {
-        throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
-      }
-
-      let stakingKey;
-      if (spendingPassword == null) {
-        // this is the first invocation, we don't have the spending password to
-        // decrypt the root key (to derive the stake key) yet, but we generate
-        // the transaction so that we can calculate fee
-        stakingKey = null;
-      } else {
-        // this is the second invocation. We generate the tx for submission.
-        stakingKey = await genOwnStakingKey({
-          publicDeriver: withStakingKey,
-          password: spendingPassword,
-        });
-      }
-
-      const trxMeta = generateRegistration({
-        stakePrivateKey: stakingKey,
-        votingPublicKey: voteKey,
-        receiverAddress: allAddresses[0].address,
-        slotNumber: nonce,
-      });
-
-      votingRegTxPromise = this.createVotingRegTx.execute({
-        publicDeriver: withHasUtxoChains,
-        absSlotNumber,
-        normalWallet: { metadata: trxMeta },
-      }).promise;
-    } else {
-      throw new Error(`${nameof(this._createTransaction)} unexpected wallet type`);
-    }
+    }).promise;
 
     if (votingRegTxPromise == null) {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);
@@ -345,13 +275,6 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     password?: string,
     publicDeriver: PublicDeriver<>,
   |}) => Promise<void> = async request => {
-    if (request.password) {
-      // we now have the password for the hardware wallet, and need to call
-      // `_createTransaction` again because previously without the password
-      // we only built a placeholder transaction to calculate the fee
-      await this._createTransaction(request.password);
-    }
-
     const result = this.createVotingRegTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
@@ -378,14 +301,49 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       });
     } else {
       // normal password-based wallet
-      if (request.password == null) {
+      const { cip36Data } = result;
+      if (!cip36Data) {
+        throw new Error('unexpectedly missing cip36 data');
+      }
+
+      const withSigning = asGetSigningKey(request.publicDeriver);
+      if (withSigning == null) {
+        throw new Error(
+          `${nameof(this._signTransaction)} public deriver missing signing functionality.`
+        );
+      }
+      const withStakingKey = asGetAllAccounting(withSigning);
+      if (withStakingKey == null) {
+        throw new Error(`${nameof(this._signTransaction)} missing staking key functionality`);
+      }
+
+      const { password } = request;
+      if (password == null) {
         throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
       }
+
+      const stakePrivateKey = await genOwnStakingKey({
+        publicDeriver: withStakingKey,
+        password,
+      });
+
+      const votingPrivateKey = await getCip36VotingKey({
+        publicDeriver: withSigning,
+        password,
+      });
+
+      const trxMeta = generateRegistration({
+        stakePrivateKey,
+        votingPublicKey: votingPrivateKey.to_public(),
+        receiverAddress: cip36Data.paymentAddress,
+        slotNumber: cip36Data.nonce,
+      });
+      
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           normal: {
             publicDeriver: request.publicDeriver,
-            password: request.password,
+            password,
             signRequest: result,
           },
         },

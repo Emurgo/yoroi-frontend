@@ -115,10 +115,7 @@ import type {
 import {
   HaskellShelleyTxSignRequest,
 } from './transactions/shelley/HaskellShelleyTxSignRequest';
-import type {
-  LedgerNanoCatalystRegistrationTxSignData,
-  TrezorTCatalystRegistrationTxSignData,
-} from './transactions/shelley/HaskellShelleyTxSignRequest';
+import type { Cip36Data } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
@@ -164,13 +161,17 @@ import { toSenderUtxos, } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
-import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
+import {
+  generateRegistrationMetadata,
+  VoteKeyDerivationPath,
+} from './lib/cardanoCrypto/catalyst';
 import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
+import { decryptKey } from './lib/storage/models/keyUtils';
 
 // ADA specific Request / Response params
 
@@ -408,24 +409,12 @@ export type CreateDelegationTxRequest = {|
   valueInAccount: MultiToken,
 |};
 
-type CreateVotingRegTxRequestCommon = {|
+export type CreateVotingRegTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
   absSlotNumber: BigNumber,
+  metadata: RustModule.WalletV4.AuxiliaryData,
+  cip36Data: Cip36Data,
 |};
-
-export type CreateVotingRegTxRequest = {|
-  ...CreateVotingRegTxRequestCommon,
-  normalWallet: {|
-    metadata: RustModule.WalletV4.AuxiliaryData,
-  |}
-|} | {|
-  ...CreateVotingRegTxRequestCommon,
-  trezorTWallet: TrezorTCatalystRegistrationTxSignData,
-|} | {|
-  ...CreateVotingRegTxRequestCommon,
-  ledgerNanoWallet: LedgerNanoCatalystRegistrationTxSignData,
-|};
-
 
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
@@ -1768,24 +1757,6 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
-      let trxMetadata;
-      if (request.trezorTWallet || request.ledgerNanoWallet) {
-        // Pass a placeholder metadata so that the tx fee is correctly
-        // calculated.
-        const hwWallet = request.trezorTWallet || request.ledgerNanoWallet;
-        trxMetadata = generateRegistrationMetadata(
-          hwWallet.votingPublicKey,
-          hwWallet.stakingKey,
-          hwWallet.paymentAddress,
-          hwWallet.nonce,
-          (_hashedMetadata) => {
-            return '0'.repeat(64 * 2)
-          },
-        );
-      } else {
-        // Mnemonic wallet
-        trxMetadata = request.normalWallet.metadata;
-      }
 
       const unsignedTx = shelleyNewAdaUnsignedTx(
         [],
@@ -1799,14 +1770,14 @@ export default class AdaApi {
         [],
         [],
         false,
-        trxMetadata,
+        request.metadata,
       );
 
       return new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
         unsignedTx: unsignedTx.txBuilder,
         changeAddr: unsignedTx.changeAddr,
-        metadata: trxMetadata,
+        metadata: request.metadata,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
@@ -1817,10 +1788,7 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
-        trezorTCatalystRegistrationTxSignData:
-          request.trezorTWallet ? request.trezorTWallet : undefined,
-        ledgerNanoCatalystRegistrationTxSignData:
-          request.ledgerNanoWallet ? request.ledgerNanoWallet: undefined,
+        cip36Data: request.cip36Data,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} error: ` + stringifyError(error));
@@ -2619,4 +2587,28 @@ export async function genOwnStakingKey(request: {|
     if (error instanceof LocalizableError) throw error;
     throw new GenericApiError();
   }
+}
+
+export async function getCip36VotingKey(request: {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
+  password: string,
+|}): Promise<RustModule.WalletV4.PrivateKey> {
+  const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
+  if (signingKeyFromStorage.level !== 0) {
+    throw new Error('expect the root key');
+  }
+
+  const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+    decryptKey(signingKeyFromStorage.row, request.password)
+  );
+  return derivePrivateByAddressing({
+    addressing: {
+      path: VoteKeyDerivationPath,
+      startLevel: 1,
+    },
+    startingFrom: {
+      key: rootKey,
+      level: 0,
+    },
+  }).to_raw_key();
 }

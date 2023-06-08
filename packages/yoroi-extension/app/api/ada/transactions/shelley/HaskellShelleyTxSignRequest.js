@@ -29,17 +29,17 @@ type NetworkSettingSnapshot = {|
   +KeyDeposit: BigNumber,
 |};
 
-export type LedgerNanoCatalystRegistrationTxSignData = {|
-  votingPublicKey: string,
-  stakingKeyPath: Array<number>,
-  stakingKey: string,
+export type Cip36Data = {|
   paymentAddress: string,
-  paymentKeyPath: Array<number>,
+  paymentAddressPath: Array<number>,
   nonce: number,
+  // only trezor wallet needs this because the trezor API does not support
+  // voting key path
+  votingPublicKey?: ?string,
+  votingPublicKeyPath: Array<number>,
+  stakingPublicKey: string,
+  stakingKeyPath: Array<number>,
 |};
-
-export type TrezorTCatalystRegistrationTxSignData =
-  LedgerNanoCatalystRegistrationTxSignData;
 
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
@@ -54,10 +54,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     neededHashes: Set<string>, // StakeCredential
     wits: Set<string>, // Vkeywitness
   |};
-  trezorTCatalystRegistrationTxSignData:
-    void | TrezorTCatalystRegistrationTxSignData;
-  ledgerNanoCatalystRegistrationTxSignData:
-    void | LedgerNanoCatalystRegistrationTxSignData;
+  cip36Data: ?Cip36Data;
 
   constructor(data: {|
     senderUtxos: Array<CardanoAddressedUtxo>,
@@ -69,10 +66,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
-    trezorTCatalystRegistrationTxSignData?:
-      void | TrezorTCatalystRegistrationTxSignData;
-    ledgerNanoCatalystRegistrationTxSignData?:
-      void | LedgerNanoCatalystRegistrationTxSignData;
+    cip36Data?: Cip36Data,
   |}) {
     this.senderUtxos = data.senderUtxos;
     this.unsignedTx = data.unsignedTx;
@@ -80,10 +74,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     this.metadata = data.metadata;
     this.networkSettingSnapshot = data.networkSettingSnapshot;
     this.neededStakingKeyHashes = data.neededStakingKeyHashes;
-    this.trezorTCatalystRegistrationTxSignData =
-      data.trezorTCatalystRegistrationTxSignData;
-    this.ledgerNanoCatalystRegistrationTxSignData =
-      data.ledgerNanoCatalystRegistrationTxSignData;
+    this.cip36Data = data.cip36Data;
   }
 
   txId(): string {

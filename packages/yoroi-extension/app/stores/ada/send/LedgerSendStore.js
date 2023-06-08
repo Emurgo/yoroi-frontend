@@ -207,6 +207,16 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         locale: this.stores.profile.currentLocale,
       });
 
+      let votingPublicKey;
+      if (request.signRequest.cip36Data) {
+        const getExtendedPublicKeyResp = await ledgerConnect.getExtendedPublicKey({
+          serial: request.expectedSerial,
+          params: { path: request.signRequest.cip36Data.votingPublicKeyPath },
+        });
+
+        votingPublicKey = getExtendedPublicKeyResp.response.publicKeyHex;
+      }
+
       const network = request.publicDeriver.getParent().getNetworkInfo();
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
@@ -229,13 +239,15 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
       let metadata;
 
-      if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
+      if (request.signRequest.cip36Data) {
         const {
-          votingPublicKey,
-          stakingKey,
           paymentAddress,
           nonce,
-        } = request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
+          stakingPublicKey,
+        } = request.signRequest.cip36Data;
+        if (!votingPublicKey) {
+          throw new Error('unexpectedly missing voting public key');
+        }
 
         if (
           !ledgerSignTxResp.auxiliaryDataSupplement ||
@@ -249,7 +261,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
         metadata = generateRegistrationMetadata(
           votingPublicKey,
-          stakingKey,
+          stakingPublicKey,
           paymentAddress,
           nonce,
           (_hashedMetadata) => {

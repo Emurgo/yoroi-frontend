@@ -949,8 +949,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           neededHashes: new Set(),
           wits: new Set(),
         },
-        trezorTCatalystRegistrationTxSignData: undefined,
-        ledgerNanoCatalystRegistrationTxSignData: undefined,
       });
 
       this.delegatedCertificate = {

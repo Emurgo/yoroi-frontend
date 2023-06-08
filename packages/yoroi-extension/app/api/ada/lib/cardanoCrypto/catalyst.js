@@ -110,15 +110,13 @@ export function generateRegistrationMetadata(
 
 export function generateRegistration(request: {|
   stakePrivateKey: ?RustModule.WalletV4.PrivateKey,
-  votingPublicKey: RustModule.WalletV4.PublicKey,
+  votingPublicKey: ?RustModule.WalletV4.PublicKey,
   receiverAddress: string,
   slotNumber: number,
 |}): RustModule.WalletV4.AuxiliaryData {
   return generateRegistrationMetadata(
-    request.votingPublicKey.to_hex(),
-    request.stakePrivateKey ?
-      Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex') :
-      '0'.repeat(32 * 2),
+    request.votingPublicKey?.to_hex() || '0'.repeat(32 * 2),
+    request.stakePrivateKey?.to_public().to_hex() || '0'.repeat(32 * 2),
     request.receiverAddress,
     request.slotNumber,
     (hashedMetadata) => (
