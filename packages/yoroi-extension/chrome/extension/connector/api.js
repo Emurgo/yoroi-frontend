@@ -1545,7 +1545,7 @@ export async function getVotingCredentials(
 ): Promise<{|
   voteKey: string,
   voteKeyPath: Array<number>,
-  stakingCredential: string,
+  stakingKey: string,
   stakingKeyPath: Array<number>,
 |}> {
   return RustModule.WasmScope(async (RustModule) => {
@@ -1563,17 +1563,6 @@ export async function getVotingCredentials(
       Buffer.from(publicKeyResp.Hash, 'hex')
     );
 
-    const voteKey = derivePublicByAddressing({
-      addressing: {
-        path: VoteKeyDerivationPath,
-        startLevel: 1,
-      },
-      startingFrom: {
-        level: withLevels.getParent().getPublicDeriverLevel(),
-        key: publicKey,
-      },
-    }).to_raw_key();
-
     const withStakingKey = asGetStakingKey(publicDeriver);
     if (!withStakingKey) {
       throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
@@ -1588,9 +1577,11 @@ export async function getVotingCredentials(
     }).to_raw_key();
 
     return {
-      voteKey: voteKey.to_hex(),
+      // due to a limitation in Yoroi storage layer, we are not able to derive
+      // with the vote key
+      voteKey: 'unknown',
       voteKeyPath: VoteKeyDerivationPath,
-      stakingCredential: stakingKey.to_hex(),
+      stakingKey: stakingKey.to_hex(),
       stakingKeyPath: stakingKeyResp.addressing.path,
     };
   });

@@ -20,4 +20,6 @@ export default class ConnectorActions {
   enableCatalyst: Action<boolean> = new Action();
   confirmSubmitDelegation: AsyncAction<?string> = new AsyncAction();
   cancelSubmitDelegation: Action<void> = new Action();
+  confirmGetVotingCredentials: AsyncAction<?string> = new AsyncAction();
+  cancelGetVotingCredentials: Action<void> = new Action();
 }

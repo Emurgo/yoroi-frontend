@@ -30,6 +30,9 @@ import type {
   SubmitDelegationRetrieveData,
   SubmitDelegationResponse,
   SignedDelegationMetadata,
+  VotingCredentials,
+  GetVotingCredentialsRetrieveData,
+  GetVotingCredentialsResponse,
 } from './connector/types';
 import {
   APIErrorCodes,
@@ -156,6 +159,12 @@ type PendingSubmitDelegation = {|
   resolve: (SignedDelegationMetadata) => void,
 |};
 
+type PendingGetVotingCredentials = {|
+  url: string,
+  openedWindow: boolean,
+  resolve: (?VotingCredentials) => void,
+|};
+
 let imgBase64Url: string = '';
 let connectionProtocol: 'cardano' | 'ergo' = 'cardano';
 
@@ -167,6 +176,7 @@ type ConnectedSite = {|
   pendingSigns: Map<RpcUid, PendingSign>,
   pendingEnableCatalyst: Map<RpcUid, PendingEnableCatalyst>,
   pendingSubmitDelegation: Map<RpcUid, PendingSubmitDelegation>,
+  pendingGetVotingCredentials: Map<RpcUid, PendingGetVotingCredentials>,
 |};
 
 
@@ -428,6 +438,8 @@ const yoroiMessageHandler = async (
     | EnableCatalystResponse
     | SubmitDelegationRetrieveData
     | SubmitDelegationResponse
+    | GetVotingCredentialsRetrieveData
+    | GetVotingCredentialsResponse
   ),
   sender,
   sendResponse
@@ -774,6 +786,33 @@ const yoroiMessageHandler = async (
     for (const [/* uid */, responseData] of connection.pendingSubmitDelegation.entries()) {
       responseData.resolve(request.result);
     }
+  } else if (request.type === 'get_voting_credentials_retrieve_data') {
+    for (const [tabId, connection] of connectedSites) {
+      for (const [/* uid */, responseData] of connection.pendingGetVotingCredentials.entries()) {
+        if (!responseData.openedWindow) {
+          responseData.openedWindow = true;
+          if (connection.status?.publicDeriverId == null) {
+            throw new Error(`${request.type} no public deriver set for request`);
+          }
+          sendResponse({
+            publicDeriverId: connection.status.publicDeriverId,
+            requesterUrl: connection.url,
+            tabId,
+          });
+          return;
+        }
+      }
+    }
+    sendResponse(null);
+  } else if (request.type === 'get_voting_credentials_response') {
+    const { tabId } = request;
+    const connection = connectedSites.get(tabId);
+    if (connection == null) {
+      return;
+    }
+    for (const [/* uid */, responseData] of connection.pendingGetVotingCredentials.entries()) {
+      responseData.resolve(request.result);
+    }
   }
 };
 
@@ -870,6 +909,28 @@ async function confirmSubmitDelegation(
   });
 }
 
+async function confirmGetVotingCredentials(
+  tabId: number,
+  messageUid: number,
+  url: string,
+  connectedSite: ConnectedSite,
+): Promise<?VotingCredentials> {
+  const bounds = await getBoundsForTabWindow(tabId);
+  return new Promise(resolve => {
+    connectedSite.pendingGetVotingCredentials.set(messageUid, {
+      url,
+      openedWindow: false,
+      resolve,
+    });
+    chrome.windows.create({
+      ...popupProps,
+      url: chrome.extension.getURL('/main_window_connector.html#/get-voting-credentials'),
+      left: (bounds.width + bounds.positionX) - popupProps.width,
+      top: bounds.positionY + 80,
+    });
+  });
+}
+
 async function findWhitelistedConnection(
   url: string,
   requestIdentification?: boolean,
@@ -926,6 +987,7 @@ async function confirmConnect(
             pendingSigns: new Map(),
             pendingEnableCatalyst: new Map(),
             pendingSubmitDelegation: new Map(),
+            pendingGetVotingCredentials: new Map(),
           });
         }
         resolve({
@@ -952,6 +1014,7 @@ async function confirmConnect(
         pendingSigns: new Map(),
         pendingEnableCatalyst: new Map(),
         pendingSubmitDelegation: new Map(),
+        pendingGetVotingCredentials: new Map(),
       });
       chrome.windows.create({
         ...popupProps,
@@ -1950,31 +2013,48 @@ function handleInjectorConnect(port) {
           }
           break;
           case 'get_voting_credentials':
+          {
+            const connection = connectedSites.get(tabId);
+            if (connection == null) {
+              rpcResponse({
+                err: {
+                  code: APIErrorCodes.API_INVALID_REQUEST,
+                  info: 'not connected to wallet'
+                }
+              });
+              return;
+            }
+
             await RustModule.load();
-            await withDb(async (db, localStorageApi) => {
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
+            const localStorageApi = new LocalStorageApi();
+            const whitelist = await localStorageApi.getCatalystWhitelist();
+            if (!whitelist.find(entry => entry.url === message.url)) {
+              rpcResponse({
+                err: {
+                  code: APIErrorCodes.API_INVALID_REQUEST,
+                  info: 'catalyst function not enabled'
+                }
+              });
+              return;
+            }
 
-                  const whitelist = await localStorageApi.getCatalystWhitelist();
-                  if (!whitelist.find(entry => entry.url === message.url)) {
-                    rpcResponse({
-                      err: {
-                        code: APIErrorCodes.API_INVALID_REQUEST,
-                        info: 'catalyst function not enabled'
-                      }
-                    });
-                    return;
-                  }
-
-                  const result = await getVotingCredentials(wallet);
-                  rpcResponse({ ok: result });
-                },
-                db,
-                localStorageApi,
-                false,
-              )
-            });
+            const result = await confirmGetVotingCredentials(
+              tabId,
+              message.uid,
+              message.url,
+              connection,
+            );
+            if (result) {
+              rpcResponse({ ok: result });
+            } else {
+              rpcResponse({
+                err: {
+                  code: 2,
+                  info: 'user declined'
+                }
+              });
+            }
+          }
           break;
           case 'submit_delegation':
           {

@@ -557,6 +557,16 @@ export type SubmitDelegationResponse = {|
   tabId: number,
 |};
 
+export type GetVotingCredentialsResponse = {|
+  type: 'get_voting_credentials_response',
+  result: ?VotingCredentials,
+  tabId: number,
+|};
+
+export type GetVotingCredentialsRetrieveData = {|
+  type: 'get_voting_credentials_retrieve_data'
+|};
+
 // when a tx is submitted we mark those as potentially spent and filter
 // utxo/balance/etc calls for them until they can be confirmed as spent or not
 export type PendingTransaction = {|
@@ -627,4 +637,16 @@ export type SignedDelegationMetadata = {|
   certificate: DelegatedCertificate,
   signature: string,
   txHash: string,
+|};
+
+export type GetVotingCredentialsMessage = {|
+  publicDeriverId: number,
+  requesterUrl: string,
+  favicon: string,
+  tabId: number,
+|};
+
+export type VotingCredentials = {|
+  voteKey: string,
+  stakingCredential: string,
 |};

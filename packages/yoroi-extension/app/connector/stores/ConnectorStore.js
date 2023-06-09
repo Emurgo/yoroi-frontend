@@ -19,6 +19,7 @@ import type {
   EnableCatalystMessage,
   SubmitDelegationMessage,
   DelegatedCertificate,
+  GetVotingCredentialsMessage,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -125,7 +126,10 @@ import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { generateRegistrationMetadata } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { GenericApiError } from '../../api/common/errors';
-import { genOwnStakingKey } from '../../api/ada';
+import {
+  genOwnStakingKey,
+  getCip36VotingKey,
+} from '../../api/ada';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -301,6 +305,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   votePaymentKeyPath: ?Array<number> = null;
   voteStakingKeyPath: ?Array<number> = null;
 
+  @observable getVotingCredentialsMessage: ?GetVotingCredentialsMessage = null;
+  @observable getVotingCredentialsError: ?LocalizableError = null;
+
   setup(): void {
     super.setup();
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
@@ -319,12 +326,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.cancelSubmitDelegation.listen(
       this._cancelSubmitDelegation
     );
+    this.actions.connector.confirmGetVotingCredentials.listen(
+      this._confirmGetVotingCredentials
+    );
+    this.actions.connector.cancelGetVotingCredentials.listen(
+      this._cancelGetVotingCredentials
+    );
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
     this._getProtocol();
     this._getEnableCatalystMsg();
     this._getSubmitDelegationMsg();
+    this._getGetVotingCredentialsMsg();
     this.currentConnectorWhitelist;
   }
 
@@ -400,6 +414,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         this.submitDelegationMessage = response;
       });
       this.createSubmitDelegationTransaction();
+    }
+  }
+
+  _getGetVotingCredentialsMsg: () => Promise<void> = async () => {
+    const response = await connectorCall(
+      { type: 'get_voting_credentials_retrieve_data' },
+    );
+    if (response) {
+      runInAction(() => {
+        this.getVotingCredentialsMessage = response;
+      });
     }
   }
 
@@ -850,7 +875,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const {
       voteKey,
-      stakingCredential,
+      stakingKey,
       voteKeyPath,
       stakingKeyPath,
     } = await getVotingCredentials(
@@ -912,7 +937,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         submitDelegationMessage.delegation.delegations.map(
           ({voteKey, weight}) => [voteKey, weight]
         ),
-        stakingCredential,
+        stakingKey,
         allAddresses[0].address,
         absSlotNumber,
         (_hashedMetadata) => '0'.repeat(64 * 2),
@@ -953,7 +978,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
       this.delegatedCertificate = {
         delegations: submitDelegationMessage.delegation.delegations,
-        stakingPub: stakingCredential,
+        stakingPub: stakingKey,
         paymentAddress: allAddresses[0].address,
         nonce: absSlotNumber,
         purpose: submitDelegationMessage.delegation.purpose,
@@ -1196,7 +1221,118 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
     window.close();
   }
-  
+
+  _confirmGetVotingCredentials: (?string) => Promise<void> = async (password) => {
+    const { getVotingCredentialsMessage } = this;
+    if (!getVotingCredentialsMessage) {
+      return;
+    }
+    const wallet = this.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === getVotingCredentialsMessage.publicDeriverId
+    );
+    if (!wallet) {
+      return;
+    }
+
+    const {
+      stakingKey,
+      voteKeyPath
+    } = await getVotingCredentials(wallet.publicDeriver);
+
+    let votingPublicKey;
+
+    if (isLedgerNanoWallet(wallet.publicDeriver.getParent())) {
+      const ledgerConnect = new LedgerConnect({
+        locale: this.stores.profile.currentLocale,
+      });
+
+      try {
+        const getExtendedPublicKeyResp = await ledgerConnect.getExtendedPublicKey({
+          serial: wallet.publicDeriver.getParent().hardwareInfo?.DeviceId || '',
+          params: { path: voteKeyPath },
+        });
+
+        votingPublicKey = getExtendedPublicKeyResp.response.publicKeyHex;
+      } catch (error) {
+        runInAction(() => {
+          this.getVotingCredentialsError = new convertToLocalizableLedgerError(error);
+        });
+        throw error;
+      }
+    } else if (isTrezorTWallet(wallet.publicDeriver.getParent())) {
+      const getExtendedPublicKeyResp = await wrapWithFrame(
+        trezor => trezor.cardanoGetPublicKey(
+          {
+            path: voteKeyPath,
+            showOnTrezor: false,
+          }
+        )
+      );
+      if (!getExtendedPublicKeyResp.success) {
+        runInAction(() => {
+          this.getVotingCredentialsError = new GenericApiError();
+        });
+        throw new Error(`error when getting voting key: ${JSON.stringify(getExtendedPublicKeyResp.payload)}`);
+      }
+      votingPublicKey = getExtendedPublicKeyResp.payload.publicKey;
+    } else {
+      if (!password) {
+        throw new Error('expect to have password');
+      }
+
+      const withSigning = asGetSigningKey(wallet.publicDeriver);
+      if (withSigning == null) {
+        throw new Error('public deriver missing signing functionality');
+      }
+
+      const votingPrivateKey = await getCip36VotingKey({
+        publicDeriver: withSigning,
+        password,
+      });
+      votingPublicKey = votingPrivateKey.to_public().to_hex();
+    }
+    window.chrome.runtime.sendMessage(
+      {
+        type: 'get_voting_credentials_response',
+        result: { voteKey: votingPublicKey, stakingCredential: stakingKey },
+        tabId: this.getVotingCredentialsMessage?.tabId,
+      }
+    );
+    window.close();
+  }
+
+  _cancelGetVotingCredentials: () => void = () => {
+    window.chrome.runtime.sendMessage(
+      {
+        type: 'get_voting_credentials_response',
+        result: null,
+        tabId: this.getVotingCredentialsMessage?.tabId,
+      }
+    );
+    window.close();
+  }
+
+  @computed get getVotingCredentialsWalletType(): ?string {
+    const { getVotingCredentialsMessage } = this;
+    if (!getVotingCredentialsMessage) {
+      return null;
+    }
+    const wallet = this.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === getVotingCredentialsMessage.publicDeriverId
+    );
+    if (!wallet) {
+      return null;
+    }
+
+    if (isLedgerNanoWallet(wallet.publicDeriver.getParent())) {
+      return 'ledger';
+    }
+    if (isTrezorTWallet(wallet.publicDeriver.getParent())) {
+      return 'trezor';
+    }
+    return 'web';
+  }
+
   static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher = (
     fetcher,
     networkInfo
