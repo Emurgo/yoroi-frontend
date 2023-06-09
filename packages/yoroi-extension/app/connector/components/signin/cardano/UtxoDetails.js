@@ -117,7 +117,7 @@ class CardanoUtxoDetails extends Component<Props> {
       `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
     const renderAmount = entry => {
       return (
-        <div>
+        <div id="addressRow-amount">
           {this.renderAmountDisplay({
             entry: {
               ...entry,
@@ -141,6 +141,7 @@ class CardanoUtxoDetails extends Component<Props> {
         justifyContent="space-between"
         py="16px"
         borderRadius="8px"
+        id="addressRow"
       >
         <CopyableAddress
           hash={addressHash}
@@ -204,7 +205,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <Typography variant="body1" fontWeight="500" color="#4A5065">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
-              <Box>
+              <Box id="fromAddressesBox-yourInputs">
                 {txData.inputs.map((address, addressIndex) => {
                   return this.renderRow({
                     kind: 'in',
@@ -223,7 +224,7 @@ class CardanoUtxoDetails extends Component<Props> {
                   <Typography variant="body1" fontWeight="500" color="#4A5065">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
-                  <Box>
+                  <Box id="fromAddressesBox-foreignInputs">
                     {txData.foreignInputs.map((address, addressIndex) => {
                       return this.renderRow({
                         kind: 'in-foreign',
@@ -249,7 +250,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <Typography variant="body1" fontWeight="500" color="#4A5065">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
-              <Box>
+              <Box id="toAddressesBox-yourOutputs">
                 {txData.outputs
                   .filter(o => !o.isForeign)
                   .map((address, addressIndex) => {
@@ -265,7 +266,7 @@ class CardanoUtxoDetails extends Component<Props> {
             {foreignOutputs.length > 0 && (
               <>
                 <Separator />
-                <Box>
+                <Box id="toAddressesBox-foreignOutputs">
                   <Typography variant="body1" fontWeight="500" color="#4A5065">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>

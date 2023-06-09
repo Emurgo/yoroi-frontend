@@ -379,15 +379,32 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.checkIfExists = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Checking if element exists "${JSON.stringify(locator)}"`);
-    return await this.driver.findElement(getMethod(locator.method)(locator.locator)).then(
-      () => true,
-      err => {
-        if (err instanceof error.NoSuchElementError) {
-          return false;
+    const state = this.driver
+      .findElement(getMethod(locator.method)(locator.locator))
+      .then(
+        (response) => {
+          this.webDriverLogger.info(`Webdriver:checkIfExists: Response is received: ${response}`);
+          this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" exists`);
+          return true;
+        },
+        (err) => {
+          if (err instanceof error.NoSuchElementError) {
+            this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" does not exists`);
+            return false;
+          }
+          promise.rejected(err); // some other error
         }
-        promise.rejected(err); // some other error
-      }
-    );
+      ).catch(
+        (err) => {
+          if (err instanceof error.NoSuchElementError){
+            this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" does not exists`);
+            return false;
+          }
+          throw(err)
+        }
+      )
+
+    return state;
   };
 
   this.customWaiter = async (

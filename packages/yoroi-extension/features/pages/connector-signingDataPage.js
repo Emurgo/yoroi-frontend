@@ -3,13 +3,13 @@
 import type { LocatorObject } from '../support/webdriver';
 
 export const signMessageTitle: LocatorObject = {
-  locator: '//h5[contains(text(), "Sign Message")]',
-  method: 'xpath',
+  locator: 'signMessageTitle',
+  method: 'id',
 };
 
 export const dataText: LocatorObject = {
-  locator: '//pre',
-  method: 'xpath',
+  locator: 'signMessageBox-payload',
+  method: 'id',
 };
 
 export const getSigningData = async (customWorld: Object): Promise<string> => {
