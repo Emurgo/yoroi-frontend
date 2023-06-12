@@ -392,6 +392,7 @@ class SignTxPage extends Component<Props, State> {
                 type="password"
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
+                id="walletPassword"
               />
             }
           />
@@ -422,7 +423,7 @@ class SignTxPage extends Component<Props, State> {
       // signing data
       content = (
         <Box>
-          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
+          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
             {intl.formatMessage(signTxMessages.signMessage)}
           </Typography>
           <Box
@@ -430,6 +431,7 @@ class SignTxPage extends Component<Props, State> {
             p="16px"
             border="1px solid var(--yoroi-palette-gray-100)"
             borderRadius="6px"
+            id="signMessageBox-payload"
           >
             <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
@@ -439,6 +441,7 @@ class SignTxPage extends Component<Props, State> {
               type="password"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
+              id="walletPassword"
             />
           </Box>
         </Box>
@@ -486,6 +489,7 @@ class SignTxPage extends Component<Props, State> {
               color="primary"
               onClick={onCancel}
               disabled={isSubmitting}
+              id="cancelButton"
             >
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
@@ -496,6 +500,7 @@ class SignTxPage extends Component<Props, State> {
               disabled={(walletType === 'web' && !walletPasswordField.isValid) || isSubmitting}
               onClick={this.submit.bind(this)}
               sx={{ minWidth: 0 }}
+              id="confirmButton"
             >
               {intl.formatMessage(confirmButtonLabel)}
             </Button>
