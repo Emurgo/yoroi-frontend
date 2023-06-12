@@ -14,14 +14,17 @@ import { testWallets } from '../mock-chain/TestWallets';
 import { errorBlockComponent } from '../pages/commonDialogPage';
 
 export async function switchToTrezorAndAllow(customWorld: any) {
-  // wait for a new tab
+  // wait for a new Trezor tab and switch to it
   await customWorld.windowManager.findNewWindowAndSwitchTo(trezorConnectTabName);
-  // tick the checkbox on the Trezor page and press Allow button
   await customWorld.driver.sleep(1000);
+  // tick the checkbox Don't ask again
   await customWorld.waitForElement(dontAskAgainCheckbox);
   await customWorld.click(dontAskAgainCheckbox);
+  // press the Allow button
   await customWorld.waitForElement(confirmUsingTrezorButton);
-  await customWorld.click(confirmUsingTrezorButton);
+  // this dirty trick is necessary because the button Allow is covered by the pop-up
+  // which is I can't find and close from the UI side
+  await customWorld.clickByScript(confirmUsingTrezorButton);
 }
 
 export async function switchToTrezorAndExport(customWorld: any) {
@@ -30,12 +33,17 @@ export async function switchToTrezorAndExport(customWorld: any) {
   // tick the checkbox on the Trezor page and press Allow button
   await customWorld.driver.sleep(1000);
   await customWorld.waitForElement(confirmUsingTrezorButton);
-  await customWorld.click(confirmUsingTrezorButton);
+  // this dirty trick is necessary because the button Allow is covered by the pop-up
+  // which is I can't find and close from the UI side
+  await customWorld.clickByScript(confirmUsingTrezorButton);
 }
 
 export async function allowPubKeysAndSwitchToYoroi(customWorld: any) {
   // press the Export button
-  await customWorld.click(exportTrezorButton);
+  await customWorld.waitForElement(exportTrezorButton);
+  // this dirty trick is necessary because the button Export is covered by the pop-up
+  // which is I can't find and close from the UI side
+  await customWorld.clickByScript(exportTrezorButton);
   // wait for closing the new tab
   await customWorld.windowManager.waitForClosingAndSwitchTo(trezorConnectTabName, extensionTabName);
 }

@@ -7,7 +7,7 @@ import {
   confirmButton,
   createWalletBtn,
   getWalletBalance,
-  getWalletName,
+  getWalletNameAndPlate,
   getWallets,
   logoElement,
   noWalletsImg,
@@ -18,16 +18,19 @@ import {
 import { disconnectWallet, getWalletsWithConnectedWebsites } from '../pages/connectedWebsitesPage';
 import {
   getTransactionFee,
-  overviewTabButton,
-  getTransactionAmount,
-  utxoAddressesTabButton,
+  detailsTabButton,
+  getTransactionSentAmount,
+  utxosTabButton,
   getUTXOAddresses,
-  transactionFeeTitle,
   cancelButton,
   transactionTotalAmountField,
+  transactionFeeText,
 } from '../pages/connector-signingTxPage';
 import { getSigningData, signMessageTitle } from '../pages/connector-signingDataPage';
-import { addCollateralTitle } from '../pages/connector-getCollateralPage';
+import {
+  addCollateralTitle,
+  getCollateralTransactionFee,
+} from '../pages/connector-getCollateralPage';
 import { mockDAppName, extensionTabName, popupConnectorName } from '../support/windowManager';
 import { connectorButton } from '../pages/sidebarPage';
 import {
@@ -107,25 +110,23 @@ Then(/^There is no the connector popup$/, async function () {
 
 Then(
   /^I select the only wallet named (.+) with ([0-9.]+) balance$/,
-  async function (walletName, expectedBalance) {
+  async function (expectedWalletName, expectedBalance) {
     this.webDriverLogger.info(
-      `Step: I select the only wallet named ${walletName} with ${expectedBalance} balance`
+      `Step: I select the only wallet named ${expectedWalletName} with ${expectedBalance} balance`
     );
     const wallets = await getWallets(this);
     expect(wallets.length).to.equal(1, `expect 1 wallet but get ${wallets.length}`);
-    const name = await getWalletName(wallets, 0);
-    expect(name).to.equal(
-      walletName,
-      `expect wallet name ${walletName} but get wallet name ${name}`
+    const { walletName } = await getWalletNameAndPlate(wallets, 0);
+    expect(walletName).to.equal(
+      expectedWalletName,
+      `expect wallet name ${expectedWalletName} but get wallet name ${walletName}`
     );
     const balance = await getWalletBalance(wallets, 0);
-    const match = balance.match(/^[0-9.]+/);
-    expect(match, 'Can not get wallet balance').to.not.be.null;
-    // $FlowFixMe[incompatible-use]
-    const balanceMatch = match[0];
-    expect(balanceMatch).to.equal(
+    expect(balance, 'Can not get wallet balance').to.not.be.null;
+    const realBalanceDigitsOnly = balance.split(' ')[0];
+    expect(realBalanceDigitsOnly).to.equal(
       expectedBalance,
-      `expect wallet balance ${expectedBalance} but get ${balanceMatch}`
+      `expect wallet balance ${expectedBalance} but get ${realBalanceDigitsOnly}`
     );
     await selectWallet(wallets, 0);
     await this.driver.sleep(1000);
@@ -179,6 +180,7 @@ Then(/^The dApp should see balance (\d+)$/, async function (expectedBalance) {
 });
 
 When(/^I request signing the transaction:$/, async function (table) {
+  this.webDriverLogger.info(`Step: I request signing the transaction`);
   const fields = table.hashes()[0];
   const normalizedAmount = `${parseFloat(fields.amount) * parseFloat('1000000')}`;
   this.webDriverLogger.info(
@@ -188,35 +190,30 @@ When(/^I request signing the transaction:$/, async function (table) {
 });
 
 Then(/^I should see the transaction amount data:$/, async function (table) {
-  await this.waitForElement(overviewTabButton);
   const fields = table.hashes()[0];
-  const realFee = await getTransactionFee(this);
-  const expectedFee = `-${fields.fee}`;
-  const realFullAmount = await getTransactionAmount(this);
-  const expectedTotalAmount = `-${parseFloat(fields.amount) + parseFloat(fields.fee)}`;
+
   this.webDriverLogger.info(
-    `Step: I should see the transaction amount data: amount: ${expectedTotalAmount}, fee: ${expectedFee} `
+    `Step: I should see the transaction amount data: amount: ${fields.amount}, fee: ${fields.fee} `
   );
-  expect(realFee, 'Fee is different').to.equal(expectedFee);
-  expect(realFullAmount, 'Total amount is different').to.equal(expectedTotalAmount);
+  await this.waitForElement(detailsTabButton);
+  const realFee = await getTransactionFee(this);
+  const realSentAmount = await getTransactionSentAmount(this);
+  expect(realFee, 'Fee is different').to.equal(fields.fee);
+  expect(realSentAmount, 'Sent amount is different').to.equal(fields.amount);
 });
 
 Then(/^I should see the transaction addresses info:$/, async function (table) {
-  await this.waitForElement(overviewTabButton);
-  const tableHashes = table.hashes();
-  const fields = tableHashes[0];
+  const fields = table.hashes()[0];
 
   this.webDriverLogger.info(
     `Step: I should see the transaction addresses info: from: ${fields.fromAddress}, to: ${fields.toAddress} `
   );
-
-  await this.click(utxoAddressesTabButton);
-
+  await this.waitForElement(detailsTabButton);
+  await this.click(utxosTabButton);
   const expectedFromAddress = fields.fromAddress;
   const expectedFromAddressAmount = fields.fromAddressAmount;
   const expectedToAddress = fields.toAddress;
   const expectedToAddressAmount = fields.toAddressAmount;
-
   const realAddresses = await getUTXOAddresses(this);
   const realFromAddresses = realAddresses.fromAddresses;
   const foundFromAddresses = realFromAddresses.filter(
@@ -241,8 +238,8 @@ Then(/^I should see the transaction addresses info:$/, async function (table) {
   address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}
   Received:\n${JSON.stringify(realFromAddresses)}`
   ).to.equal(1);
-  await this.click(overviewTabButton);
-  await this.waitForElement(transactionFeeTitle);
+  await this.click(detailsTabButton);
+  await this.waitForElement(transactionFeeText);
 });
 
 Then(/^The signing transaction API should return (.+)$/, async function (txHex) {
@@ -358,19 +355,17 @@ Then(/^I cancel signing the transaction$/, async function () {
 });
 
 When(/^I request signing the data:$/, async function (table) {
-  const tableHashes = table.hashes();
-  const fields = tableHashes[0];
+  const fields = table.hashes()[0];
   const payload = fields.payload;
   this.webDriverLogger.info(`Step: I request signing the data: ${payload}`);
   await this.mockDAppPage.requestSigningData(payload);
 });
 
 Then(/^I should see the data to sign:$/, async function (table) {
-  const tableHashes = table.hashes();
-  const fields = tableHashes[0];
+  const fields = table.hashes()[0];
   const payload = fields.payload;
-  const actualSigningData = await getSigningData(this);
   this.webDriverLogger.info(`Step: I should see the data to sign: ${payload}`);
+  const actualSigningData = await getSigningData(this);
   expect(actualSigningData, 'Signing Data is different').to.equal(payload);
 });
 
@@ -417,6 +412,9 @@ Then(
 
 Then(/^The dApp should receive collateral$/, async function (table) {
   const fields = table.hashes()[0];
+  this.webDriverLogger.info(
+    `Step: The dApp should receive collateral:\namount - ${fields.amount}, receiver - ${fields.receiver}`
+  );
   const collateralResponse = (await this.mockDAppPage.getCollateralResult(): DAppConnectorResponse);
   expect(collateralResponse.success).to.equal(true);
   const collateralUtxuJson = collateralResponse.retValue[0];
@@ -431,61 +429,8 @@ Then(/^I should see the connector popup to Add Collateral with fee info$/, async
   await connectorPopUpIsDisplayed(this);
   await this.waitForElement(addCollateralTitle);
   const fields = table.hashes()[0];
-  const realFee = await getTransactionFee(this);
+  const realFee = await getCollateralTransactionFee(this);
   expect(realFee, 'Fee is different').to.equal(fields.fee);
-});
-
-Then(/^I should see the collateral fee data:$/, async function (table) {
-  await this.waitForElement(overviewTabButton);
-  const fields = table.hashes()[0];
-  const realFee = await getTransactionFee(this);
-  const expectedFee = `-${fields.fee}`;
-  const realFullAmount = await getTransactionAmount(this);
-  this.webDriverLogger.info(`Step: I should see the collateral fee data: ${expectedFee}`);
-  expect(realFee, 'Fee is different').to.equal(expectedFee);
-  expect(realFullAmount, 'Total amount is different').to.equal(expectedFee);
-});
-
-Then(/^I should see the collateral from address info:$/, async function (table) {
-  await this.waitForElement(overviewTabButton);
-  const tableHashes = table.hashes();
-  const fields = tableHashes[0];
-  await this.click(utxoAddressesTabButton);
-
-  const expectedFromAddress = fields.fromAddress;
-  const expectedFromAddressAmount = fields.fromAddressAmount;
-
-  const actualAddresses = await getUTXOAddresses(this);
-  const actualFromAddresses = actualAddresses.fromAddresses;
-  const foundFromAddresses = actualFromAddresses.filter(
-    addr =>
-      addr.address === expectedFromAddress && addr.amount === parseFloat(expectedFromAddressAmount)
-  );
-  this.webDriverLogger.info(
-    `Step: I should see the collateral from address info: address: ${expectedFromAddress}, amount: ${expectedFromAddressAmount}`
-  );
-  expect(
-    foundFromAddresses.length,
-    `Expected fromAddress:
-  address:${expectedFromAddress}, amount: ${expectedFromAddressAmount}
-  Received:\n${JSON.stringify(actualFromAddresses)}`
-  ).to.equal(1);
-});
-
-Then(/^I should see the collateral to addresses info:$/, async function (table) {
-  this.webDriverLogger.info(`Step: I should see the collateral to addresses info`);
-  await this.waitForElement(overviewTabButton);
-  const tableHashes = table.hashes();
-  await this.click(utxoAddressesTabButton);
-
-  const actualAddresses = await getUTXOAddresses(this);
-  const actualToAddresses = actualAddresses.toAddresses;
-  actualToAddresses.forEach((addr, index) => {
-    expect(addr.address).to.equal(tableHashes[index].toAddresses);
-    expect(addr.amount).to.equal(parseFloat(tableHashes[index].toAddressesAmount));
-  });
-  await this.click(overviewTabButton);
-  await this.waitForElement(transactionFeeTitle);
 });
 
 When(/^I request unused addresses$/, async function () {
@@ -499,7 +444,7 @@ When(/^I request used addresses$/, async function () {
 });
 
 When(/^The collateral received the error:$/, async function (table) {
-  this.webDriverLogger.info(`Step: I should see the collateral to addresses info`);
+  this.webDriverLogger.info(`Step: The collateral received the error`);
   const tableHashes = table.hashes();
   const fields = tableHashes[0];
 
