@@ -18,7 +18,7 @@ import type { ConceptualWallet } from '../../api/ada/lib/storage/models/Conceptu
 import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -120,13 +120,18 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.currency])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <p className={styles.name}>
+                <Typography className={styles.name} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
-                </p>
-                <p className={styles.plateId}>{accountPlateId}</p>
+                </Typography>
+                <Typography className={styles.plateId} sx={{ color: 'grayscale.600' }}>
+                  {accountPlateId}
+                </Typography>
               </div>
               <div className={styles.balance}>
-                <div className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}>
+                <Box
+                  sx={{ color: 'grayscale.max' }}
+                  className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
+                >
                   <AmountDisplay
                     shouldHideBalance={shouldHideBalance}
                     amount={totalAmount}
@@ -135,7 +140,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     unitOfAccountSetting={unitOfAccountSetting}
                     getCurrentPrice={getCurrentPrice}
                   />
-                </div>
+                </Box>
               </div>
             </div>
           </button>

@@ -1,17 +1,16 @@
 .component {
   height: 100%;
   width: 100%;
-  background-color: #f0f3f5;
+  background-color: #fff;
   display: flex;
   justify-content: center;
 
   .container {
     width: 750px;
-    height: 600px;
+    height: 500px;
     overflow-y: scroll;
     background-color: white;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    border: 1px solid #DCE0E9;
     border-radius: 8px;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -29,7 +28,7 @@
     & > p {
       padding-left: 40px;
       padding-top: 28px;
-      color: #a7afc0;
+      color: #000;
       font-family: Rubik;
       font-size: 14px;
       letter-spacing: 0;

@@ -86,12 +86,14 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         alignItems="center"
         justifyContent="space-between"
         marginBottom="30px"
-        sx={{
-          padding: '16px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
-        }}
+        paddingBottom="16px"
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography
+          variant="h5"
+          color="var(--yoroi-palette-common-black)"
+          fontWeight={500}
+          fontSize="18px"
+        >
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -160,7 +162,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <ImageList sx={{ width: '100%', padding: '0px 24px 30px' }} cols={columns.count} gap={24}>
+        <ImageList sx={{ width: '100%', paddingBottom: '30px' }} cols={columns.count} gap={24}>
           {nftList.map(nft => {
             return (
               <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>

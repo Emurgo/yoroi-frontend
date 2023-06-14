@@ -469,7 +469,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           </ExplorableHashContainer>
         </CopyableAddress>
         {this.generateAddressButton(request.address.address)}
-        <Typography component="span" variant="body2" color="var(--yoroi-palette-gray-900)">
+        <Typography component="span" variant="body2" color="grayscale.900">
           {renderAmount(request.address.value.getDefaultEntry())}
         </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (
@@ -509,7 +509,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       <Box className={styles.component}>
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
-          sx={{ padding: '20px 0', borderBottom: '1px solid var(--yoroi-palette-gray-200)' }}
+          sx={{ padding: '20px 0', borderBottom: '1px solid', borderBottomColor: 'grayscale.200' }}
           onClick={this.toggleDetails.bind(this)}
           role="presentation"
           aria-hidden
@@ -529,21 +529,13 @@ export default class TransactionRevamp extends Component<Props, State> {
               <Box sx={columnTXStyles.transactionType}>
                 <Typography
                   variant="body1"
-                  color={
-                    isPendingTransaction
-                      ? 'var(--yoroi-palette-gray-400)'
-                      : 'var(--yoroi-palette-gray-900)'
-                  }
+                  color={isPendingTransaction ? 'grayscale.400' : 'grayscale.900'}
                 >
                   {txType.msg}
                 </Typography>
                 <Typography
                   variant="body3"
-                  color={
-                    isPendingTransaction
-                      ? 'var(--yoroi-palette-gray-400)'
-                      : 'var(--yoroi-palette-gray-600)'
-                  }
+                  color={isPendingTransaction ? 'grayscale.400' : 'grayscale.600'}
                 >
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
@@ -552,9 +544,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 {state === TxStatusCodes.IN_BLOCK ? (
                   <Typography
                     sx={{
-                      color: isPendingTransaction
-                        ? 'var(--yoroi-palette-gray-400)'
-                        : 'var(--yoroi-palette-gray-900)',
+                      color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
                       textTransform: 'capitalize',
                     }}
                   >
@@ -566,8 +556,8 @@ export default class TransactionRevamp extends Component<Props, State> {
                       color: isFailedTransaction
                         ? 'var(--yoroi-palette-error-100)'
                         : isPendingTransaction
-                        ? 'var(--yoroi-palette-gray-400)'
-                        : 'var(--yoroi-palette-gray-900)',
+                        ? 'grayscale.400'
+                        : 'grayscale.900',
                       textTransform: 'capitalize',
                     }}
                   >
@@ -575,12 +565,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </Typography>
                 )}
               </Box>
-              <Typography
-                variant="body1"
-                color="var(--yoroi-palette-gray-900)"
-                sx={columnTXStyles.fee}
-                id="txFee"
-              >
+              <Typography variant="body1" color="grayscale.900" sx={columnTXStyles.fee} id="txFee">
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
@@ -591,7 +576,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 <Typography
                   variant="body1"
                   fontWeight="500"
-                  color="var(--yoroi-palette-gray-900)"
+                  color="grayscale.900"
                   id="transactionAmount"
                 >
                   {this.renderAmountWithUnitOfAccount({
@@ -611,7 +596,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         </Box>
 
         {/* ==== Toggleable Transaction Details ==== */}
-        <Box className={contentStyles} sx={{ overflowX: 'overlay' }}>
+        <Box className={contentStyles} sx={{ overflowX: 'overlay', background: 'grayscale.50' }}>
           <div className={detailsStyles}>
             {/* converting assets is not implemented but we may use it in the future for tokens */}
             {data.type === transactionTypes.EXCHANGE && (
@@ -624,18 +609,18 @@ export default class TransactionRevamp extends Component<Props, State> {
                 </div>
               </div>
             )}
-            <div>
+            <Box sx={{ overflowX: 'overlay', background: 'common.white' }}>
               <div className={styles.addressContent}>
                 <div>
-                  <div className={styles.addressHeader}>
+                  <Box className={styles.addressHeader} sx={{ color: 'grayscale.900' }}>
                     <h2>
                       {intl.formatMessage(globalMessages.fromAddresses)}:
                       <span className={styles.addressCount}>{data.addresses.from.length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
                     <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
-                  </div>
-                  <div className={styles.addressList}>
+                  </Box>
+                  <Box className={styles.addressList} sx={{ color: 'grayscale.600' }}>
                     {data.addresses.from.map((address, addressIndex) => {
                       return this.renderRow({
                         kind: 'in',
@@ -645,17 +630,17 @@ export default class TransactionRevamp extends Component<Props, State> {
                         transform: amount => amount.abs().negated(), // ensure it shows as negative
                       });
                     })}
-                  </div>
+                  </Box>
                 </div>
                 <div>
-                  <div className={styles.addressHeader}>
+                  <Box className={styles.addressHeader} sx={{ color: 'grayscale.900' }}>
                     <h2>
                       {intl.formatMessage(globalMessages.toAddresses)}:
                       <span className={styles.addressCount}>{data.addresses.to.length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
                     <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
-                  </div>
+                  </Box>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => {
                       return this.renderRow({
@@ -740,7 +725,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </div>
                 </div>
               )}
-            </div>
+            </Box>
           </div>
         </Box>
       </Box>
