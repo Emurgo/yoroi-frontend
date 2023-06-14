@@ -466,6 +466,7 @@
   "wallet.add.page.revamp.createWallet": "Create new wallet",
   "wallet.add.page.revamp.restoreWallet": "Restore existing wallet",
   "wallet.add.page.revamp.subtitle": "Light wallet for Cardano assets",
+  "wallet.add.page.revamp.backButtonLabel": "Back to current wallet",
   "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
   "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.address.category.addressBook": "Addresses that do not belong to you, but are relevant to your wallet",

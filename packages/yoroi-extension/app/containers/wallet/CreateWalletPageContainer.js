@@ -11,6 +11,7 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { ROUTES } from '../../routes-config';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
@@ -27,7 +28,12 @@ export default class CreateWalletPageContainer extends Component<Props> {
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        sidebar={
+          <SidebarContainer
+            {...this.generated.SidebarContainerProps}
+            onLogoClick={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })}
+          />
+        }
         bgcolor="common.white"
       >
         <Suspense fallback={null}>

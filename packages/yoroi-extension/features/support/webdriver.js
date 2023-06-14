@@ -19,6 +19,10 @@ import {
 
 const fs = require('fs');
 
+const firefoxBin = process.env.FIREFOX_BIN
+  ? process.env.FIREFOX_BIN
+  : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
+
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
 }
@@ -85,7 +89,7 @@ function getFirefoxBuilder() {
      * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
      * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
      */
-    .setBinary(process.env.FIREFOX_DEV)
+    .setBinary(firefoxBin)
     .addExtensions(path.resolve(__dirname, '../../Yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
@@ -367,21 +371,40 @@ function CustomWorld(cmdInput: WorldInput) {
     }, index);
   };
 
-  this.clickElementByQuery = async query => {
-    await this.driver.executeScript(`document.querySelector('${query}').click()`);
+  this.clickByScript = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clicking with executeScript on "${JSON.stringify(locator)}"`);
+    const element = await this.getElementBy(locator);
+    await this.driver.executeScript(`arguments[0].click()`, element);
   };
 
   this.checkIfExists = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Checking if element exists "${JSON.stringify(locator)}"`);
-    return await this.driver.findElement(getMethod(locator.method)(locator.locator)).then(
-      () => true,
-      err => {
-        if (err instanceof error.NoSuchElementError) {
-          return false;
+    const state = this.driver
+      .findElement(getMethod(locator.method)(locator.locator))
+      .then(
+        (response) => {
+          this.webDriverLogger.info(`Webdriver:checkIfExists: Response is received: ${response}`);
+          this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" exists`);
+          return true;
+        },
+        (err) => {
+          if (err instanceof error.NoSuchElementError) {
+            this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" does not exists`);
+            return false;
+          }
+          promise.rejected(err); // some other error
         }
-        promise.rejected(err); // some other error
-      }
-    );
+      ).catch(
+        (err) => {
+          if (err instanceof error.NoSuchElementError){
+            this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" does not exists`);
+            return false;
+          }
+          throw(err)
+        }
+      )
+
+    return state;
   };
 
   this.customWaiter = async (

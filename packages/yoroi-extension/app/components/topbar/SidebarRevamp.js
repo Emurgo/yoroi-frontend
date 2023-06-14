@@ -6,7 +6,7 @@ import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCatego
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { Box, Link } from '@mui/material';
-import { ReactComponent as yoroiLogo } from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
 import globalMessages from '../../i18n/global-messages';
@@ -16,6 +16,7 @@ type Props = {|
   +categories?: Array<SidebarCategoryRevamp>,
   +isActiveCategory?: SidebarCategoryRevamp => boolean,
   +onCategoryClicked?: SidebarCategoryRevamp => void,
+  +onLogoClick?: void => void,
 |};
 
 @observer
@@ -29,23 +30,30 @@ export default class SidebarRevamp extends Component<Props> {
     children: void,
     isActiveCategory: void,
     onCategoryClicked: void,
+    onLogoClick: void,
   |} = {
     children: undefined,
     categories: undefined,
     isActiveCategory: undefined,
     onCategoryClicked: undefined,
+    onLogoClick: undefined,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { categories, isActiveCategory, onCategoryClicked } = this.props;
-    const YoroiLogo = yoroiLogo;
+    const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
 
     return (
       <Box className={styles.wrapper} sx={{ bgcolor: 'background.sidebar' }}>
         {this.props.children}
         <div className={styles.header}>
-          <YoroiLogo />
+          {onLogoClick ? (
+            <button type="button" onClick={onLogoClick}>
+              <YoroiLogo />
+            </button>
+          ) : (
+            <YoroiLogo />
+          )}
         </div>
         <div className={styles.categories}>
           {categories
