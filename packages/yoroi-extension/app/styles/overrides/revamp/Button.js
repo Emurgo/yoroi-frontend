@@ -60,7 +60,7 @@ export const DarkRevampButton: any = {
     },
     {
       props: { variant: 'secondary' },
-      style: getOutlinedStyles('secondary', darkTheme),
+      style: getOutlinedStyles('primary', darkTheme),
     },
     {
       props: { variant: 'tertiary', color: 'primary' },
