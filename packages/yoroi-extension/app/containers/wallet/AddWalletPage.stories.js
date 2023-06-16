@@ -37,7 +37,6 @@ import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDia
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import WalletEraOptionDialogContainer from './dialogs/WalletEraOptionDialogContainer';
 import { getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
-import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
@@ -232,19 +231,6 @@ export const CurrencySelect = (): Node => (
     )}
   />
 );
-
-export const CreateWalletOptions = (): Node => {
-  return (
-    <AddWalletPage
-      generated={defaultProps(
-        Object.freeze({
-          selectedNetwork: networks.CardanoMainnet,
-          openDialog: WalletCreateOptionDialog,
-        })
-      )}
-    />
-  );
-};
 
 export const CreateWalletStart = (): Node => (
   <AddWalletPage

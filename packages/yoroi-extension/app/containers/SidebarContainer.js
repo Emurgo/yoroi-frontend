@@ -16,6 +16,7 @@ export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  +onLogoClick?: void => void,
 |};
 type InjectedProps = {|
   +selectedLayout: string,
@@ -29,9 +30,16 @@ class SidebarContainer extends Component<AllProps> {
     await this.generated.actions.profile.toggleSidebar.trigger();
   };
 
+  static defaultProps: {|
+    onLogoClick: void,
+  |} = {
+    onLogoClick: undefined,
+  };
+
   render(): Node {
     const { stores, actions } = this.generated;
     const { profile } = stores;
+    const { onLogoClick } = this.props;
 
     const SidebarComponent = (
       <Sidebar
@@ -40,9 +48,7 @@ class SidebarContainer extends Component<AllProps> {
             route: category.route,
           });
         }}
-        isActiveCategory={category =>
-          stores.app.currentRoute.startsWith(category.route)
-        }
+        isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
         categories={allCategories.filter(category =>
           category.isVisible({
             hasAnyWallets: stores.wallets.hasAnyWallets,
@@ -57,6 +63,7 @@ class SidebarContainer extends Component<AllProps> {
 
     const SidebarRevampComponent = (
       <SidebarRevamp
+        onLogoClick={onLogoClick}
         onCategoryClicked={category => {
           actions.router.goToRoute.trigger({
             route: category.route,
@@ -130,7 +137,7 @@ class SidebarContainer extends Component<AllProps> {
           hasAnyWallets: stores.wallets.hasAnyWallets,
         },
         delegation: {
-          getDelegationRequests: stores.delegation.getDelegationRequests
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
       },
       actions: {

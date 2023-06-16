@@ -20,6 +20,8 @@ import styles from './VotingRegTxDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import { AmountInput } from '../../common/NumericInputRP';
+import { ProgressInfo } from '../../../stores/ada/VotingStore';
+import ProgressStepBlock from './ProgressStepBlock';
 import WarningBox from '../../widgets/WarningBox';
 import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
 import type {
@@ -31,7 +33,7 @@ import { truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
-import type { WalletType } from './types';
+import type { WalletType, StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
@@ -49,6 +51,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: StepsList,
+  +progressInfo: ProgressInfo,
   +staleTx: boolean,
   +transactionFee: MultiToken,
   +isSubmitting: boolean,
@@ -175,6 +179,11 @@ export default class VotingRegTxDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
+        <ProgressStepBlock
+          stepsList={this.props.stepsList}
+          progressInfo={this.props.progressInfo}
+          classicTheme={this.props.classicTheme}
+        />
         {this.props.staleTx && staleTxWarning}
 
         {this.renderInfoBlock()}

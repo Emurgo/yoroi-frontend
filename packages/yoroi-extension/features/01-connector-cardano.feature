@@ -32,9 +32,10 @@ Feature: dApp connector data signing
     | amount | toAddress                                                                                               |
     | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
     Then I should see the connector popup for signing
+    # remove minus sign after the fix https://emurgo.atlassian.net/browse/YOEXT-577
     And I should see the transaction amount data:
     | amount | fee      |
-    | 3      | 0.168317 |
+    | -3      | 0.168317 |
     And I should see the transaction addresses info:
     | fromAddress   | fromAddressAmount | toAddress     | toAddressAmount |
     | addr1...ajfkn | -5.5              | addr1...x8evw | 3               |
@@ -56,9 +57,10 @@ Feature: dApp connector data signing
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
     Then I should see the connector popup for signing
+    # remove minus sign after the fix https://emurgo.atlassian.net/browse/YOEXT-577
     And I should see the transaction amount data:
       | amount | fee      |
-      | 3      | 0.168317 |
+      | -3      | 0.168317 |
     And I should see the transaction addresses info:
       | fromAddress   | fromAddressAmount | toAddress     | toAddressAmount |
       | addr1...ajfkn | -5.5              | addr1...x8evw | 3               |
