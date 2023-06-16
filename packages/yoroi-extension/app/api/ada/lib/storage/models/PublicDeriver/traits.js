@@ -133,7 +133,6 @@ import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
 import {
   isCardanoHaskell,
-  isJormungandr,
 } from '../../database/prepackaged/networks';
 import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
 import {
@@ -2909,9 +2908,7 @@ export async function addTraitsForCip1852Child(
   // recall: adding addresses to public deriver in cip1852 is same as bip44
   currClass = AddBip44FromPublic(currClass);
 
-  if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-    currClass = PickReceive(Cip1852JormungandrPickReceive(currClass));
-  } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+  if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
     currClass = PickReceive(Cip1852PickReceive(currClass));
   } else {
     throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to pick receive address`);
@@ -2926,9 +2923,7 @@ export async function addTraitsForCip1852Child(
     currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-        currClass = ScanJormungandrAccountUtxo(currClass);
-      } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+      if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
         currClass = ScanShelleyAccountUtxo(currClass);
       } else {
         throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to scan for network`);

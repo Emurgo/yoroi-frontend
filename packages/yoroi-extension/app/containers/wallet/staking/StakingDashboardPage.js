@@ -9,12 +9,6 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
-import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
-import Dialog from '../../../components/widgets/Dialog';
-import { getJormungandrTxFee } from '../../../api/jormungandr/lib/transactions/JormungandrTxSignRequest';
-import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
-import ErrorBlock from '../../../components/widgets/ErrorBlock';
-import { ReactComponent as InvalidURIImg }  from '../../../assets/images/uri/invalid-uri.inline.svg';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
@@ -30,7 +24,6 @@ import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/Dele
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-//tmp import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
@@ -53,10 +46,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
 import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
 import type { NetworkRow, TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
-import {
-  isJormungandr,
-  isCardanoHaskell,
-} from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
@@ -96,7 +86,6 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
   }
 
@@ -185,80 +174,6 @@ export default class StakingDashboardPage extends Component<Props> {
     return epochLengthInDays;
   };
 
-  generatePopupDialog: (PublicDeriver<>) => null | Node = publicDeriver => {
-    if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) {
-      return null; // TODO
-    }
-
-    const { uiDialogs } = this.generated.stores;
-    const delegationTxStore = this.generated.stores.substores.jormungandr.delegationTransaction;
-
-    const cancel = () => {
-      this.generated.actions.dialogs.closeActiveDialog.trigger();
-      this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
-    };
-    if (delegationTxStore.createDelegationTx.error != null) {
-      const { intl } = this.context;
-
-      return (
-        <Dialog
-          title={intl.formatMessage(globalMessages.errorLabel)}
-          closeOnOverlayClick={false}
-          onClose={cancel}
-          closeButton={<DialogCloseButton onClose={cancel} />}
-          actions={[
-            {
-              label: intl.formatMessage(globalMessages.backButtonLabel),
-              onClick: cancel,
-              primary: true,
-            },
-          ]}
-        >
-          <>
-            <center>
-              <InvalidURIImg />
-            </center>
-            <ErrorBlock error={delegationTxStore.createDelegationTx.error} />
-          </>
-        </Dialog>
-      );
-    }
-
-    if (!uiDialogs.isOpen(UndelegateDialog)) {
-      return null;
-    }
-    const delegationTx = delegationTxStore.createDelegationTx.result;
-    if (delegationTx == null) {
-      return null;
-    }
-
-    return (
-      <UndelegateDialog
-        onCancel={cancel}
-        classicTheme={this.generated.stores.profile.isClassicTheme}
-        error={this.generated.stores.wallets.sendMoneyRequest.error}
-        onSubmit={async request => {
-          await this.generated.actions.jormungandr.delegationTransaction.signTransaction.trigger({
-            password: request.password,
-            publicDeriver,
-          });
-          cancel();
-        }}
-        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-        generatingTx={
-          this.generated.stores.substores.jormungandr.delegationTransaction.createDelegationTx
-            .isExecuting
-        }
-        isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-        transactionFee={getJormungandrTxFee(
-          delegationTx.signTxRequest.self(),
-          publicDeriver.getParent().getNetworkInfo().NetworkId,
-        )}
-        staleTx={delegationTxStore.isStale}
-      />
-    );
-  };
-
   getRewardInfo: (
     PublicDeriver<>
   ) => void | {|
@@ -298,7 +213,7 @@ export default class StakingDashboardPage extends Component<Props> {
           rewardPopup: (
             <UpcomingRewards
               unregistered={isRegistered === false}
-              useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
+              useEndOfEpoch
               content={[
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch,
@@ -420,7 +335,7 @@ export default class StakingDashboardPage extends Component<Props> {
         const rewardPopup = (
           <UpcomingRewards
             unregistered={isRegistered === false}
-            useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
+            useEndOfEpoch
             content={upcomingTuples}
             showWarning={upcomingRewards.length === 4}
             onExternalLinkClick={handleExternalLinkClick}
@@ -439,7 +354,7 @@ export default class StakingDashboardPage extends Component<Props> {
         rewardPopup: (
           <UpcomingRewards
             unregistered={isRegistered === false}
-            useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
+            useEndOfEpoch
             content={[null, null, null, null]}
             showWarning={false}
             onExternalLinkClick={handleExternalLinkClick}
@@ -464,11 +379,8 @@ export default class StakingDashboardPage extends Component<Props> {
     const endEpochTime = request.toRealTime({
       absoluteSlotNum: request.toAbsoluteSlot({
         epoch: request.epoch,
-        // in Jormungandr, rewards were distributed at the start of the epoch
-        // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
-        slot: isJormungandr(request.publicDeriver.getParent().getNetworkInfo())
-          ? 0
-          : request.getEpochLength(),
+        // Rewards are calculated at the start of the epoch but distributed at the end
+        slot: request.getEpochLength(),
       }),
       timeSinceGenesisFunc: request.timeSinceGenesis,
     });
@@ -608,21 +520,7 @@ export default class StakingDashboardPage extends Component<Props> {
                 ? null
                 : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
-            undelegate={
-              // don't support undelegation for ratio stake since it's a less intuitive UX
-              currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
-                ? async () => {
-                    this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                    await this.generated.actions.jormungandr.delegationTransaction.
-                    createTransaction.trigger(
-                      {
-                        publicDeriver,
-                        poolRequest: undefined,
-                      }
-                    );
-                  }
-                : undefined
-            }
+            undelegate={undefined}
             reputationInfo={meta.reputation}
             openReputationDialog={() =>
               this.generated.actions.dialogs.open.trigger({
@@ -943,12 +841,7 @@ export default class StakingDashboardPage extends Component<Props> {
           getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
         };
       }
-      if (api === ApiOptions.jormungandr) {
-        return {
-          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
-          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
-        };
-      }
+
       return {
         getTimeCalcRequests: (undefined: any),
         getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingDashboardPage)} api not supported`) },
@@ -1040,19 +933,6 @@ export default class StakingDashboardPage extends Component<Props> {
             },
             createWithdrawalTxForWallet: {
               trigger: actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger,
-            },
-          },
-        },
-        jormungandr: {
-          delegationTransaction: {
-            reset: {
-              trigger: actions.jormungandr.delegationTransaction.reset.trigger,
-            },
-            signTransaction: {
-              trigger: actions.jormungandr.delegationTransaction.signTransaction.trigger,
-            },
-            createTransaction: {
-              trigger: actions.jormungandr.delegationTransaction.createTransaction.trigger,
             },
           },
         },

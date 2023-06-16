@@ -64,42 +64,6 @@ export const networks = Object.freeze({
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
   // <TODO:PENDING_REMOVAL>
-  JormungandrMainnet: ({
-    NetworkId: 1_00,
-    NetworkName: 'Jormungandr Mainnet',
-    Backend: {
-      BackendService: environment.isTest()
-        ? 'http://localhost:21000' // TODO: pick a port for test
-        : 'https://shelley-itn-yoroi-backend.yoroiwallet.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000' // TODO: pick a port for test
-        : 'wss://shelley-itn-yoroi-backend.yoroiwallet.com:443',
-    },
-    BaseConfig: ([Object.freeze({
-      StartAt: 0,
-      Discriminant: (environment.isTest() || environment.isJest())
-        ? 0 // RustModule.WalletV3.AddressDiscrimination.Production
-        : 1, // RustModule.WalletV3.AddressDiscrimination.Test
-      ChainNetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
-      ByronNetworkId: 764824073,
-      GenesisDate: '1576264417000',
-      SlotsPerEpoch: 43200,
-      SlotDuration: 2,
-      PerEpochPercentageReward: 19666,
-      LinearFee: {
-        constant: '200000',
-        coefficient: '100000',
-        certificate: '400000',
-        per_certificate_fees: {
-          certificate_pool_registration: '500000000',
-          certificate_stake_delegation: '400000',
-        },
-      },
-    })]: JormungandrBaseConfig),
-    CoinType: CoinTypes.CARDANO,
-    Fork: CardanoForks.Jormungandr,
-  }: NetworkRow),
-  // <TODO:PENDING_REMOVAL>
   ErgoMainnet: ({
     NetworkId: 2_00,
     NetworkName: 'Ergo Mainnet',

@@ -44,8 +44,7 @@ import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
 import {
   defaultAssets,
-  networks,
-  isJormungandr,
+  networks
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
@@ -746,7 +745,7 @@ export const RestoreVerify = (): Node => {
               selectedNetwork,
               step: RestoreSteps.VERIFY_MNEMONIC,
               restoreRequest: {
-                isExecuting: !isJormungandr(selectedNetwork) && boolean('isExecuting', false),
+                isExecuting: boolean('isExecuting', false),
                 error: undefined,
                 reset: action('reset'),
               },

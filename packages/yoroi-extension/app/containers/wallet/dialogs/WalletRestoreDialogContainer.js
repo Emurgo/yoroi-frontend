@@ -31,7 +31,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
 import type { Notification } from '../../../types/notificationType';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
@@ -249,7 +248,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
               }
             }}
             notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
-            isSubmitting={!isJormungandr(this.getSelectedNetwork()) && isSubmitting}
+            isSubmitting={isSubmitting}
             error={error}
           />
         );
