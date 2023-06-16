@@ -299,7 +299,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         protocol: dapp.protocol,
         url: dapp.url,
       });
-    };
+    }
 
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver,
