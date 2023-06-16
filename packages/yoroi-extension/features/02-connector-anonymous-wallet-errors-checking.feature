@@ -23,6 +23,8 @@ Feature: dApp connector anonymous wallet errors checking
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    And The dApp should see balance 5500000
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
@@ -47,6 +49,8 @@ Feature: dApp connector anonymous wallet errors checking
     And I select the only wallet named shelley-simple-15 with 5.5 balance
     Then The popup window should be closed
     And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    And The dApp should see balance 5500000
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
@@ -62,6 +66,7 @@ Feature: dApp connector anonymous wallet errors checking
     Then The popup window should be closed
     And The access request should succeed
     And The wallet shelley-simple-15 is connected to the website localhost
+    And The dApp should see balance 5500000
     Then I request unused addresses
     And I request signing the data:
     | payload   |
