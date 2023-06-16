@@ -47,7 +47,7 @@ import CopyableAddress from '../../widgets/CopyableAddress';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
 import {
   parseMetadata,
   parseMetadataDetailed,
@@ -198,11 +198,12 @@ export default class TransactionRevamp extends Component<Props, State> {
       return <span>{hiddenAmount}</span>;
     }
     const tokenInfo = this.props.getTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals,
     );
 
     // we may need to explicitly add + for positive values
@@ -353,12 +354,14 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   getTicker: TokenEntry => string = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    return truncateToken(getTokenName(tokenInfo));
+    return tokenInfo != null
+      ? truncateToken(getTokenName(tokenInfo))
+      : assetNameFromIdentifier(tokenEntry.identifier);
   };
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    if (tokenInfo.Metadata.type === 'Cardano') {
+    if (tokenInfo?.Metadata.type === 'Cardano') {
       return getTokenIdentifierIfExists(tokenInfo);
     }
     return undefined;
@@ -896,29 +899,38 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { intl } = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
-      let jsonData = null;
+      let metadata;
+      if (typeof data.metadata === 'string') {
+        let jsonData = null;
 
-      try {
-        jsonData = parseMetadata(data.metadata);
-      } catch (error) {
-        // try to parse schema using detailed conversion if advanced user
-        if (this.props.complexityLevel === ComplexityLevels.Advanced) {
-          try {
-            jsonData = parseMetadataDetailed(data.metadata);
-          } catch (errDetailed) {
-            // discard error
-            // can not parse metadata as json
-            // show the metadata hex as is
+        try {
+          jsonData = parseMetadata(data.metadata);
+        } catch (error) {
+          // try to parse schema using detailed conversion if advanced user
+          if (this.props.complexityLevel === ComplexityLevels.Advanced) {
+            try {
+              jsonData = parseMetadataDetailed(data.metadata);
+            } catch (errDetailed) {
+              // discard error
+              // can not parse metadata as json
+              // show the metadata hex as is
+            }
           }
+          // do nothing for simple user
         }
-        // do nothing for simple user
+        if (jsonData !== null) {
+          metadata = (<CodeBlock code={jsonData} />);
+        } else {
+          metadata = (<span>0x{data.metadata}</span>);
+        }
+      } else {
+        metadata = (<CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 2)} </pre>} />);
       }
-
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
           <span className={styles.rowData}>
-            {jsonData !== null ? <CodeBlock code={jsonData} /> : <span>0x{data.metadata}</span>}
+            {metadata}
           </span>
         </div>
       );
