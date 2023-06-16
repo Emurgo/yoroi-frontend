@@ -13,7 +13,6 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
-import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import type {
   CurrentTimeRequests,
@@ -449,16 +448,6 @@ class StakingPageContent extends Component<AllProps> {
           reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
           createWithdrawalTxForWallet: {|
             trigger: (params: {| publicDeriver: PublicDeriver<> |}) => Promise<void>,
-          |},
-        |},
-      |},
-      jormungandr: {|
-        delegationTransaction: {|
-          createTransaction: {|
-            trigger: (params: {|
-              poolRequest: PoolRequest,
-              publicDeriver: PublicDeriver<>,
-            |}) => Promise<void>,
           |},
         |},
       |},

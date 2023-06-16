@@ -25,7 +25,6 @@ import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationSto
 import EpochProgressContainer from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   ToRealTimeFunc,
@@ -34,7 +33,6 @@ import type {
   TimeSinceGenesisFunc,
 } from '../../../api/common/lib/storage/bridge/timeUtils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { CreateDelegationTxFunc } from '../../../api/jormungandr/index';
 import type {
   CurrentTimeRequests,
   TimeCalcRequests,
@@ -150,10 +148,8 @@ export default class StakingDashboardPage extends Component<Props> {
       />
     );
 
-    const popup = this.generatePopupDialog(publicDeriver);
     return (
       <>
-        {popup}
         {this.getDialog(publicDeriver)}
         {dashboard}
       </>
@@ -720,23 +716,6 @@ export default class StakingDashboardPage extends Component<Props> {
           |},
         |},
       |},
-      jormungandr: {|
-        delegationTransaction: {|
-          createTransaction: {|
-            trigger: (params: {|
-              poolRequest: PoolRequest,
-              publicDeriver: PublicDeriver<>,
-            |}) => Promise<void>,
-          |},
-          reset: {| trigger: (params: void) => void |},
-          signTransaction: {|
-            trigger: (params: {|
-              password?: string,
-              publicDeriver: PublicDeriver<>,
-            |}) => Promise<void>,
-          |},
-        |},
-      |},
       delegation: {|
         setSelectedPage: {|
           trigger: (params: number) => void,
@@ -788,16 +767,6 @@ export default class StakingDashboardPage extends Component<Props> {
             getDelegationRequests: (PublicDeriver<>) => void | AdaDelegationRequests,
           |},
         |},
-        jormungandr: {|
-          delegationTransaction: {|
-            createDelegationTx: {|
-              error: ?LocalizableError,
-              isExecuting: boolean,
-              result: ?PromisslessReturnType<CreateDelegationTxFunc>,
-            |},
-            isStale: boolean,
-          |},
-        |},
       |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests,
@@ -827,7 +796,6 @@ export default class StakingDashboardPage extends Component<Props> {
       throw new Error(`${nameof(StakingDashboardPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const jormungandrStore = stores.substores.jormungandr;
 
     const selected = stores.wallets.selected;
     if (selected == null) {
@@ -893,16 +861,6 @@ export default class StakingDashboardPage extends Component<Props> {
           ada: {
             delegation: {
               getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
-            },
-          },
-          jormungandr: {
-            delegationTransaction: {
-              isStale: jormungandrStore.delegationTransaction.isStale,
-              createDelegationTx: {
-                isExecuting: jormungandrStore.delegationTransaction.createDelegationTx.isExecuting,
-                error: jormungandrStore.delegationTransaction.createDelegationTx.error,
-                result: jormungandrStore.delegationTransaction.createDelegationTx.result,
-              },
             },
           },
         },

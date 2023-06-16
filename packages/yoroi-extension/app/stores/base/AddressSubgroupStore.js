@@ -297,6 +297,7 @@ export class GroupMangledAddressesSubgroup extends AddressTypeStore implements I
     return this;
   }
 }
+
 export class P2PKAllAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({

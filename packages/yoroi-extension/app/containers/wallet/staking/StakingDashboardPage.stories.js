@@ -52,7 +52,8 @@ import {
   TransactionType,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type {
-  JormungandrTransactionInsert, NetworkRow,
+  CardanoShelleyTransactionInsert,
+  NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { IAddressTypeStore, IAddressTypeUiSubset, } from '../../../stores/stateless/addressStores';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
@@ -172,16 +173,6 @@ const genBaseProps: {|
             getDelegationRequests: request.lookup.getAdaDelegation,
           },
         },
-        jormungandr: {
-          delegationTransaction: request.delegationTransaction || {
-            isStale: false,
-            createDelegationTx: {
-              isExecuting: false,
-              error: undefined,
-              result: undefined,
-            },
-          },
-        },
       },
     },
     actions: {
@@ -210,19 +201,6 @@ const genBaseProps: {|
           },
           createWithdrawalTxForWallet: {
             trigger: async (req) => action('createWithdrawalTxForWallet')(req),
-          },
-        },
-      },
-      jormungandr: {
-        delegationTransaction: {
-          reset: {
-            trigger: action('closeActiveDialog'),
-          },
-          signTransaction: {
-            trigger: async (req) => action('closeActiveDialog')(req),
-          },
-          createTransaction: {
-            trigger: async (req) => action('closeActiveDialog')(req),
           },
         },
       },
@@ -348,24 +326,27 @@ const genBaseProps: {|
 };
 
 const delegateCert1 = {
-  relatedAddresses: [{
-    CertificateAddressId: 10,
-    CertificateId: 10,
-    AddressId: 81,
-    Relation: 0,
-  }],
+  relatedAddresses: [
+    {
+      CertificateAddressId: 10,
+      CertificateId: 10,
+      AddressId: 81,
+      Relation: 0,
+    },
+  ],
   certificate: {
     Ordinal: 0,
     CertificateId: 10,
     TransactionId: 14,
     Kind: 0,
-    Payload: 'a22d0b8709e6bc04d11257dc405410d1ace01f207c391ba4788ea17198ee1a0801f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512',
+    Payload:
+      'a22d0b8709e6bc04d11257dc405410d1ace01f207c391ba4788ea17198ee1a0801f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512',
   },
   transaction: {
     TransactionId: 14,
     ...({
-      Type: TransactionType.Jormungandr,
-      Digest: -5.739375206419183e+296,
+      Type: TransactionType.CardanoShelley,
+      Digest: -5.739375206419183e296,
       Hash: 'b5b44d983bfcd2ca9e28a9a00924d0262c9decfbee34dab07af30b6acd23ff97',
       BlockId: 14,
       Ordinal: 0,
@@ -373,7 +354,7 @@ const delegateCert1 = {
       Status: 1,
       ErrorMessage: null,
       Extra: null,
-    }: JormungandrTransactionInsert)
+    }: CardanoShelleyTransactionInsert),
   },
   block: {
     BlockId: 14,
@@ -383,9 +364,7 @@ const delegateCert1 = {
     Hash: '741b3112b3922c9b41b0c8bd77840473c4960dbefab1f212af675eefa4a343a9',
     BlockTime: new Date(1578179355000),
   },
-  pools: [[
-    'f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512', 1
-  ]],
+  pools: [['f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512', 1]],
 };
 
 const undelegateCert = {

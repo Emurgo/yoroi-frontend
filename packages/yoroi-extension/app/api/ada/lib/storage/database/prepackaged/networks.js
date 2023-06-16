@@ -7,7 +7,6 @@ import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
   ErgoBaseConfig,
-  JormungandrBaseConfig,
   TokenInsert,
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
@@ -16,8 +15,8 @@ import { decode, } from 'bs58';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
-  Jormungandr: 1,
 });
+
 export const ErgoForks = Object.freeze({
   Primary: 0,
 });
@@ -253,8 +252,7 @@ export const networks = Object.freeze({
 export function isTestnet(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
-  return network.NetworkId === networks.JormungandrMainnet.NetworkId
-    || network.NetworkId === networks.CardanoTestnet.NetworkId
+  return network.NetworkId === networks.CardanoTestnet.NetworkId
     || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId
     || network.NetworkId === networks.CardanoPreviewTestnet.NetworkId;
 
@@ -269,6 +267,7 @@ export function isJormungandr(
   ) return true;
   return false;
 }
+
 export function isCardanoHaskell(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
