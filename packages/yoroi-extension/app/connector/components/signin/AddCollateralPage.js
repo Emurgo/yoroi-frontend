@@ -263,6 +263,7 @@ class AddCollateralPage extends Component<Props, State> {
             fontWeight={500}
             marginBottom="8px"
             fontSize="20px"
+            id="addCollateralTitle"
           >
             {intl.formatMessage(messages.reorgTitle)}
           </Typography>
@@ -291,7 +292,7 @@ class AddCollateralPage extends Component<Props, State> {
             >
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Typography>{intl.formatMessage(globalMessages.amount)}</Typography>
-                <Typography>
+                <Typography id="addCollateralAmountTitle">
                   {this.renderAmountDisplay({
                     entry: {
                       identifier: txData.fee.tokenId,
@@ -303,7 +304,7 @@ class AddCollateralPage extends Component<Props, State> {
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-                <Typography>
+                <Typography id="addCollateralFeeTitle">
                   {this.renderAmountDisplay({
                     entry: {
                       identifier: txData.fee.tokenId,
@@ -321,6 +322,7 @@ class AddCollateralPage extends Component<Props, State> {
                 type="password"
                 {...walletPasswordField.bind()}
                 error={walletPasswordField.error}
+                id="walletPassword"
               />
               {submissionError === 'SEND_TX_ERROR' && (
                 <Alert severity="error">{intl.formatMessage(messages.sendError)}</Alert>
@@ -355,6 +357,7 @@ class AddCollateralPage extends Component<Props, State> {
               variant="outlined"
               color="primary"
               onClick={onCancel}
+              id="cancelButton"
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </Button>
@@ -365,6 +368,7 @@ class AddCollateralPage extends Component<Props, State> {
               disabled={walletType === 'web' && !walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
               loading={isSubmitting}
+              id="confirmButton"
             >
               {intl.formatMessage(confirmButtonLabel)}
             </LoadingButton>
