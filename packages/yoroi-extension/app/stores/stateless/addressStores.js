@@ -275,8 +275,7 @@ export const GROUP_EXTERNAL: AddressSubgroupMeta<
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
     asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Jormungandr)
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
   ),
   class: GroupExternalAddressesSubgroup,
   validFilters: standardFilter,
@@ -292,8 +291,7 @@ export const GROUP_INTERNAL: AddressSubgroupMeta<
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
     asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Jormungandr)
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
   ),
   class: GroupInternalAddressesSubgroup,
   validFilters: standardFilter,
@@ -308,8 +306,7 @@ export const GROUP_MANGLED: AddressSubgroupMeta<
 > = registerAddressSubgroup({
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Jormungandr)
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
   ),
   class: GroupMangledAddressesSubgroup,
   validFilters: standardFilter,
