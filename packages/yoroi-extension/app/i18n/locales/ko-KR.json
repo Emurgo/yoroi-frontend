@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "잔액을 가져오는 중 오류가 발생했습니다.",
   "api.errors.getBestBlockApiError": "블록을 받아오는 도중 서버에서 에러가 발생했습니다.",
   "api.errors.getPoolInfoApiError": "풀 정보를 서버에서 가져오는 도중 에러가 발생했습니다.",
-  "api.errors.getReputationError": "서버로부터 풀의 평판 데이터를 받아오는데 실패했습니다.",
   "api.errors.getRewardHistoryApiError": "서버로부터 보상 내역을 받아오는데 실패했습니다.",
   "api.errors.getTxHistoryForAddressesApiError": "거래를 가져오는 중 서버로부터 오류를 수신했습니다.",
   "api.errors.getTxsBodiesForUTXOsApiError": "TxBodies를 가져오는 중 서버로부터 오류를 수신했습니다.",

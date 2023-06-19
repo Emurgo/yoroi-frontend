@@ -404,7 +404,6 @@ const emurgo2Pool = {
       payloadHex: '0000000000000000000000000000000000000000000000000000000000000001da464571fc561c09439d040aa15b22f6094c7e824ceb9ac0fbfc6dcb7f79b1187df6bb3603be1a3f7cf44240469ea1b4dea93ed6a113dc1e3a0a33329433c2a701a6a920e3dee3dfec6b3cf9f104a432259e1988ab9eb4fe1dfe20789c368426bd000000000000000000000000000000003700000000000003e8000000000000000001d73444201a6785e43bcf83a0ee58632d130ea0242f33ae1322117b3cd87bcac5',
     },
   }],
-  reputation: Object.freeze({}),
 };
 
 const privatePoolInfo = {
@@ -423,7 +422,6 @@ const privatePoolInfo = {
       }
     }
   ],
-  reputation: Object.freeze({}),
 };
 const emurgo1Pool = {
   info: {
@@ -432,7 +430,6 @@ const emurgo1Pool = {
     description: 'EMURGO’s official Stake Pool. EMURGO is one of three organizations that contribute to the development of Cardano. Let’s make this Testnet successful by delegation to multiple stakepools.',
     homepage: 'https://emurgo.io'
   },
-  reputation: Object.freeze({}),
   ...privatePoolInfo,
   poolId: '1',
 };

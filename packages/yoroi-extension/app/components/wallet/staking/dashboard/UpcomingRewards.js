@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { toSvg } from 'jdenticon';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/types';
+import type { PoolTuples } from '../../../../api/common/lib/storage/bridge/delegationUtils';
 import CustomTooltip from '../../../widgets/CustomTooltip';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
@@ -76,10 +76,10 @@ export default class UpcomingRewards extends Component<Props> {
 
     const firstRewardWarning = this.props.showWarning
       ? [
-          <CustomTooltip
-            key="firstRewardWarning"
-            toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
-          />,
+        <CustomTooltip
+          key="firstRewardWarning"
+          toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
+        />,
         ]
       : [];
 

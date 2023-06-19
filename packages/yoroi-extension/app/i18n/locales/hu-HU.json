@@ -21,7 +21,6 @@
   "api.errors.getCatalystRoundApiError": "Error received from server while getting catalyst round info.",
   "api.errors.getMultiAssetMintMetadataApiError": "Error received from server while querying minting metadata.",
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
-  "api.errors.getReputationError": "Error received from server while getting reputation.",
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTokenInfoApiError": "Error received from server while getting token info.",
   "api.errors.getTxHistoryForAddressesApiError": "Error received from server while getting transactions.",

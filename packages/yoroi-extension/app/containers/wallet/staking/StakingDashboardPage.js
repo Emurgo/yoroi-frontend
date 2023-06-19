@@ -12,14 +12,13 @@ import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
-import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
-import type { PoolTuples, ReputationObject } from '../../../api/jormungandr/lib/state-fetch/types';
+import type { PoolTuples } from '../../../api/common/lib/storage/bridge/delegationUtils';
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
@@ -482,6 +481,7 @@ export default class StakingDashboardPage extends Component<Props> {
           // rewards: '81.000088',
           // age: '23',
         };
+
         return (
           <StakePool
             purpose="dashboard"
@@ -517,13 +517,6 @@ export default class StakingDashboardPage extends Component<Props> {
                 : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
             undelegate={undefined}
-            reputationInfo={meta.reputation}
-            openReputationDialog={() =>
-              this.generated.actions.dialogs.open.trigger({
-                dialog: PoolWarningDialog,
-                params: { reputation: meta.reputation },
-              })
-            }
           />
         );
       }),
@@ -537,15 +530,6 @@ export default class StakingDashboardPage extends Component<Props> {
       return (
         <LessThanExpectedDialog
           close={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
-        />
-      );
-    }
-
-    if (uiDialogs.isOpen(PoolWarningDialog)) {
-      return (
-        <PoolWarningDialog
-          close={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
-          reputationInfo={uiDialogs.getParam<ReputationObject>('reputation')}
         />
       );
     }
