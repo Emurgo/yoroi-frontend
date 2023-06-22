@@ -4,25 +4,6 @@
   align-items: center;
   justify-content: center;
 
-  .title {
-    color: var(--yoroi-palette-secondary-300);
-    text-transform: uppercase;
-    height: 19px;
-    font-weight: 500;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 19px;
-    text-align: center;
-  }
-
-  .text {
-    color: var(--yoroi-palette-gray-800);
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 22px;
-    text-align: center;
-  }
-
   .spinnerSection {
     margin-top: 12px;
     margin-bottom: 5px;
@@ -37,6 +18,7 @@
     width: 252px;
     height: 194px;
     margin: auto;
+    margin-top: 30px;
   }
 }
 :global(.YoroiModern):global(.YoroiShelley) .component, :global(.YoroiRevamp):global(.YoroiShelley) .component {
