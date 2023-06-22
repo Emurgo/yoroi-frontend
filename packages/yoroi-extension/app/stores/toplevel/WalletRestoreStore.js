@@ -39,33 +39,17 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.accountId.label',
     defaultMessage: '!!!Your Wallet Account checksum:',
   },
-  walletRestoreVerifyByronAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.byron.label',
-    defaultMessage: '!!!Byron account checksum:',
-  },
   walletRestoreVerifyShelleyAccountIdLabel: {
     id: 'wallet.restore.dialog.verify.accountId.shelley.label',
     defaultMessage: '!!!Shelley account checksum:',
-  },
-  walletRestoreVerifyJormungandrAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.itn.label',
-    defaultMessage: '!!!ITN account checksum:',
   },
   walletRestoreVerifyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.addressesLabel',
     defaultMessage: '!!!Your Wallet address[es]:',
   },
-  walletRestoreVerifyByronAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.byron.addressesLabel',
-    defaultMessage: '!!!Byron Wallet address[es]:',
-  },
   walletRestoreVerifyShelleyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.shelley.addressesLabel',
     defaultMessage: '!!!Shelley Wallet address[es]:',
-  },
-  walletRestoreVerifyJormungandrAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.itn.addressesLabel',
-    defaultMessage: '!!!ITN Wallet address[es]:',
   },
 });
 
@@ -253,27 +237,9 @@ export function generatePlates(
       : generateAdaWalletRootKey(recoveryPhrase);
   };
 
-  const shouldShowByronPlate = (() => {
-    if (
-      // generically show byron checksum if length is 15
-      // since 15-word wallets were supported in Byron
-      (isCardanoHaskell(network) && (mode.length === 15 || mode.extra === 'paper')) ||
-      // only show HW byron checksums if using bip44
-      (mode.type === 'bip44' && (mode.extra === 'trezor' || mode.extra === 'ledger'))
-    ) {
-      return true;
-    }
-    if (isJormungandr(network)) {
-      return true;
-    }
-    return false;
-  })();
-
   const shouldShowShelleyPlate = (() => {
     return isCardanoHaskell(network) && !isJormungandr(network) && mode.type === 'cip1852';
   })();
-
-  const shouldShowJormungandrPlate = false;
 
   if (shouldShowShelleyPlate) {
     const shelleyPlate = generateShelleyPlate(
@@ -286,50 +252,6 @@ export function generatePlates(
       ...shelleyPlate,
       checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
       addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
-    });
-  }
-  if (shouldShowByronPlate) {
-    const byronPlate = generateByronPlate(
-      getCardanoKey(),
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      (() => {
-        if (network.BaseConfig[0].ByronNetworkId != null) {
-          return network.BaseConfig[0].ByronNetworkId;
-        }
-        throw new Error(`${nameof(generatePlates)} missing Byron network id`);
-      })()
-    );
-    plates.push({
-      ...byronPlate,
-      checksumTitle:
-        shouldShowJormungandrPlate == null
-          ? messages.walletRestoreVerifyAccountIdLabel
-          : messages.walletRestoreVerifyByronAccountIdLabel,
-      addressMessage:
-        shouldShowJormungandrPlate == null
-          ? messages.walletRestoreVerifyAddressesLabel
-          : messages.walletRestoreVerifyByronAddressesLabel,
-    });
-  }
-  if (shouldShowJormungandrPlate) {
-    const jormungandrPlate = generateJormungandrPlate(
-      v4Bip32PrivateToV3(getCardanoKey()),
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      // recall: ITN used the test discriminant
-      RustModule.WalletV3.AddressDiscrimination.Test
-    );
-    plates.push({
-      ...jormungandrPlate,
-      checksumTitle:
-        shouldShowByronPlate == null
-          ? messages.walletRestoreVerifyAccountIdLabel
-          : messages.walletRestoreVerifyJormungandrAccountIdLabel,
-      addressMessage:
-        shouldShowByronPlate == null
-          ? messages.walletRestoreVerifyAddressesLabel
-          : messages.walletRestoreVerifyJormungandrAddressesLabel,
     });
   }
 
