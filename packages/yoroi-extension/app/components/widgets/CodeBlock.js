@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import styles from './CodeBlock.scss';
 
 type Props = {|
-  +code: string,
+  +code: string | Node,
 |};
 
 @observer
