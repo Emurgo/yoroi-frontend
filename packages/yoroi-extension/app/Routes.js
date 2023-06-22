@@ -13,6 +13,7 @@ import type { ConfigType } from '../config/config-types';
 import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
 import LoadingPage from './containers/LoadingPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
+import SwapPage, { SwapPageContentPromise } from './containers/wallet/swap/SwapPage';
 import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
@@ -210,6 +211,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.STAKING}
         component={props => <StakingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.SWAP.ROOT}
+        component={props => <SwapPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         path={ROUTES.ASSETS.ROOT}
