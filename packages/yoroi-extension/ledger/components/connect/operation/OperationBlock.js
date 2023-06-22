@@ -147,7 +147,7 @@ export default class OperationBlock extends React.Component<Props> {
 
     // By default performActionText block is hidden
     let performActionText;
-    if (showPerformActionText) {
+    if (showPerformActionText === true) {
       performActionText = (
         <div className={styles.performActionText}>
           {intl.formatMessage(message.topInfo)}

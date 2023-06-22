@@ -258,16 +258,6 @@ export function isTestnet(
 
 }
 
-export function isJormungandr(
-  network: $ReadOnly<NetworkRow>,
-): boolean {
-  if (
-    network.CoinType === CoinTypes.CARDANO &&
-    network.Fork === CardanoForks.Jormungandr
-  ) return true;
-  return false;
-}
-
 export function isCardanoHaskell(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
@@ -286,18 +276,14 @@ export function isErgo(
   ) return true;
   return false;
 }
+
 export function getCardanoHaskellBaseConfig(
   network: $ReadOnly<NetworkRow>,
 ): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
 }
-export function getJormungandrBaseConfig(
-  network: $ReadOnly<NetworkRow>,
-): JormungandrBaseConfig {
-  if (!isJormungandr(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
-  return (network.BaseConfig: any); // cast to return type
-}
+
 export function getErgoBaseConfig(
   network: $ReadOnly<NetworkRow>,
 ): ErgoBaseConfig {
@@ -310,23 +296,6 @@ export const defaultAssets: Array<
 > = Object.keys(networks)
   .map(key => networks[key])
   .flatMap(network => {
-    if (isJormungandr(network)) {
-      // TODO: not sure how Jormungandr will end up being used.
-      return [{
-        NetworkId: network.NetworkId,
-        Identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
-        IsDefault: true,
-        IsNFT: false,
-        Metadata: {
-          type: 'Cardano',
-          policyId: PRIMARY_ASSET_CONSTANTS.Jormungandr,
-          assetName: PRIMARY_ASSET_CONSTANTS.Jormungandr,
-          ticker: 'ADA',
-          longName: null,
-          numberOfDecimals: 6,
-        }
-      }];
-    }
     if (isCardanoHaskell(network)) {
       return [{
         NetworkId: network.NetworkId,

@@ -611,7 +611,6 @@ const GetAllAccountingMixin = (
     const allAccounts = await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables);
     const stakingKeyAccount = allAccounts[0];
     const stakingAddr = stakingKeyAccount.addrs.find(addr => (
-      addr.Type === CoreAddressTypes.JORMUNGANDR_ACCOUNT ||
       addr.Type === CoreAddressTypes.CARDANO_REWARD
     ));
     if (stakingAddr == null) {

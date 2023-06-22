@@ -12,9 +12,6 @@ import {
   EnterpriseExternalAddressesSubgroup,
   EnterpriseInternalAddressesSubgroup,
   RewardAddressesSubgroup,
-  GroupExternalAddressesSubgroup,
-  GroupInternalAddressesSubgroup,
-  GroupMangledAddressesSubgroup,
   P2PKAllAddressesSubgroup,
   P2PKExternalAddressesSubgroup,
   P2PKInternalAddressesSubgroup,
@@ -269,53 +266,7 @@ export const REWARD_ADDRESS: AddressSubgroupMeta<
   },
   isHidden: request => request.result == null || request.result.length === 0,
 });
-export const GROUP_EXTERNAL: AddressSubgroupMeta<
-  GroupExternalAddressesSubgroup
-> = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
-  ),
-  class: GroupExternalAddressesSubgroup,
-  validFilters: standardFilter,
-  name: {
-    subgroup: AddressSubgroup.external,
-    group: AddressGroupTypes.group,
-  },
-  isHidden: _request => false,
-});
-export const GROUP_INTERNAL: AddressSubgroupMeta<
-  GroupInternalAddressesSubgroup
-> = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
-  ),
-  class: GroupInternalAddressesSubgroup,
-  validFilters: standardFilter,
-  name: {
-    subgroup: AddressSubgroup.internal,
-    group: AddressGroupTypes.group,
-  },
-  isHidden: _request => false,
-});
-export const GROUP_MANGLED: AddressSubgroupMeta<
-  GroupMangledAddressesSubgroup
-> = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
-  ),
-  class: GroupMangledAddressesSubgroup,
-  validFilters: standardFilter,
-  name: {
-    subgroup: AddressSubgroup.mangled,
-    group: AddressGroupTypes.group,
-  },
-  isHidden: request => request.result == null || request.result.length === 0,
-});
+
 export const P2PK_ALL: AddressSubgroupMeta<
   P2PKAllAddressesSubgroup
 > = registerAddressSubgroup({
@@ -514,7 +465,7 @@ export function genAddressLookup(
   };
 }
 
-export const mangledStores = [GROUP_MANGLED, BASE_MANGLED];
+export const mangledStores = [BASE_MANGLED];
 
 export async function getReceiveAddress(
   publicDeriver: IPublicDeriver<>,

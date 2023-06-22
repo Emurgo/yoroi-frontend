@@ -33,7 +33,6 @@ import { AssociateTxWithAccountingIOs, } from '../../database/transactionModels/
 import {
   CardanoByronAssociateTxWithIOs,
   CardanoShelleyAssociateTxWithIOs,
-  JormungandrAssociateTxWithIOs,
   ErgoAssociateTxWithIOs,
 } from '../../database/transactionModels/multipart/api/read';
 import { GetDerivationSpecific, } from '../../database/walletTypes/common/api/read';
@@ -55,7 +54,6 @@ export async function removePublicDeriver(request: {|
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
-    JormungandrAssociateTxWithIOs,
     ErgoAssociateTxWithIOs,
     CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithAccountingIOs,

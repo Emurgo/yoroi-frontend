@@ -299,20 +299,6 @@ export function normalizeToAddress(
   return undefined;
 }
 
-export function isJormungandrAddress(
-  type: CoreAddressT
-): boolean {
-  // note: excluding legacy byron addresses
-  const types = [
-    CoreAddressTypes.JORMUNGANDR_SINGLE,
-    CoreAddressTypes.JORMUNGANDR_GROUP,
-    CoreAddressTypes.JORMUNGANDR_ACCOUNT,
-    CoreAddressTypes.JORMUNGANDR_MULTISIG,
-  ];
-
-  return types.some(t => t === type);
-}
-
 export function isErgoAddress(
   kind: CoreAddressT
 ): boolean {

@@ -5,7 +5,6 @@ import { isErgo, isCardanoHaskell } from '../ada/lib/storage/database/prepackage
 
 export const ApiOptions = Object.freeze({
   ada: 'ada',
-  jormungandr: 'jormungandr',
   ergo: 'ergo',
 });
 export type ApiOptionType = $Values<typeof ApiOptions>;

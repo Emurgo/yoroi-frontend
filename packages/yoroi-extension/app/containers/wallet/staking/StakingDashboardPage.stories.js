@@ -45,7 +45,7 @@ import type {
   AdaDelegationRequests,
 } from '../../../stores/ada/AdaDelegationStore';
 import { RewardAddressEmptyError, GenericApiError } from '../../../api/common/errors';
-import { GROUP_MANGLED, allAddressSubgroups } from '../../../stores/stateless/addressStores';
+import { allAddressSubgroups, BASE_MANGLED } from '../../../stores/stateless/addressStores';
 import type { MangledAmountFunc } from '../../../stores/stateless/mangledAddresses';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import {
@@ -301,7 +301,7 @@ const genBaseProps: {|
           },
           addresses: {
             addressSubgroupMap: new Map([[
-              GROUP_MANGLED.class,
+              BASE_MANGLED.class,
               {
                 all: request.mangledInfo?.addresses ?? [],
                 wasExecuted: true,
@@ -353,7 +353,10 @@ const delegateCert1 = {
       LastUpdateTime: 1580812939000,
       Status: 1,
       ErrorMessage: null,
-      Extra: null,
+      Extra: {
+        Fee: '1000000',
+        Metadata: null,
+      },
     }: CardanoShelleyTransactionInsert),
   },
   block: {
