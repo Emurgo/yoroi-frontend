@@ -4,33 +4,35 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import SuccessPage from '../../transfer/SuccessPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import Dialog from '../../widgets/Dialog';
+import { Stack, Typography } from '@mui/material';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import { ReactComponent as SuccessImg } from '../../../assets/images/transfer-success.inline.svg';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.transaction.success.title',
-    defaultMessage: '!!!Successfully sent',
+    defaultMessage: '!!!Transaction submitted',
   },
   buttonLabel: {
     id: 'wallet.transaction.success.button.label',
-    defaultMessage: '!!!Transaction page',
+    defaultMessage: '!!!Go To Transactions',
   },
   explanation: {
     id: 'wallet.transaction.success.explanation',
-    defaultMessage: '!!!Track the status of the transaction from the Transactions page',
-  }
+    defaultMessage: '!!!Check this transaction in the list of wallet transactions',
+  },
 });
 
 type Props = {|
-  +onClose: void => PossiblyAsync<void>;
+  +onClose: void => PossiblyAsync<void>,
   +classicTheme: boolean,
 |};
 
 @observer
 export default class TransactionSuccessDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -38,15 +40,31 @@ export default class TransactionSuccessDialog extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <SuccessPage
+      <Dialog
         title={intl.formatMessage(messages.title)}
-        text={intl.formatMessage(messages.explanation)}
-        classicTheme={this.props.classicTheme}
-        closeInfo={{
-          onClose: this.props.onClose,
-          closeLabel: intl.formatMessage(messages.buttonLabel),
-        }}
-      />
+        actions={[
+          {
+            label: intl.formatMessage(messages.buttonLabel),
+            onClick: this.props.onClose,
+            primary: true,
+          },
+        ]}
+        onClose={this.props.onClose}
+        closeButton={<DialogCloseButton />}
+      >
+        <Stack alignItems="center">
+          <SuccessImg />
+          <Typography
+            color="gray.700"
+            fontWeight={500}
+            mt="16px"
+            textAlign="center"
+            maxWidth="400px"
+          >
+            {intl.formatMessage(messages.explanation)}
+          </Typography>
+        </Stack>
+      </Dialog>
     );
   }
 }
