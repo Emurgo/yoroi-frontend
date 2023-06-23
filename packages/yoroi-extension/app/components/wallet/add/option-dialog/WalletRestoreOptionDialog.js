@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
@@ -32,9 +31,9 @@ const messages = defineMessages({
 
 type Props = {|
   +onCancel: void => void,
-  +onRestore12: void | (void => void),
   +onRestore15: void => void,
   +onRestore24: void | (void => void),
+  // <TODO:PENDING_REMOVAL>
   +onPaperRestore: void | (void => void),
 |};
 
@@ -46,7 +45,13 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onRestore12, onRestore15, onRestore24, onPaperRestore, } = this.props;
+    const {
+      onCancel,
+      onRestore15,
+      onRestore24,
+      // <TODO:PENDING_REMOVAL>
+      // onPaperRestore,
+    } = this.props;
 
     return (
       <Dialog
@@ -58,17 +63,6 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
-            {onRestore12 != null && (
-              <OptionBlock
-                parentName="WalletRestoreOptionDialog"
-                type="normal24WordWallet"
-                title={intl.formatMessage(messages.restoreNormalTitle, { length: 12 })}
-                learnMoreText={intl.formatMessage(
-                  messages.restoreNormalDescription, { length: 12 }
-                )}
-                onSubmit={onRestore12}
-              />
-            )}
             <OptionBlock
               parentName="WalletRestoreOptionDialog"
               type="restoreNormalWallet"
@@ -87,15 +81,18 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
                 onSubmit={onRestore24}
               />
             )}
-            {onPaperRestore != null && (
-              <OptionBlock
-                parentName="WalletRestoreOptionDialog"
-                type="restorePaperWallet"
-                title={intl.formatMessage(globalMessages.paperWalletLabel)}
-                learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}
-                onSubmit={onPaperRestore}
-              />
-            )}
+
+            {/* <TODO:PENDING_REMOVAL>*/}
+
+            {/*{onPaperRestore != null && (*/}
+            {/*  <OptionBlock*/}
+            {/*    parentName="WalletRestoreOptionDialog"*/}
+            {/*    type="restorePaperWallet"*/}
+            {/*    title={intl.formatMessage(globalMessages.paperWalletLabel)}*/}
+            {/*    learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}*/}
+            {/*    onSubmit={onPaperRestore}*/}
+            {/*  />*/}
+            {/*)}*/}
           </ul>
         </div>
       </Dialog>

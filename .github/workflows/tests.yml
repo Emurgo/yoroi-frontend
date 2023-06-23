@@ -181,9 +181,9 @@ jobs:
         working-directory: ../trezor-user-env
         run: cp -rf src/binaries/firmware/bin/trezor-emu-core-v2-master ./
 
-      - name: Copy the trezord-go-v2.0.31 to the root of the project
+      - name: Copy the trezord-go-v2.0.32 to the root of the project
         working-directory: ../trezor-user-env
-        run: cp -rf src/binaries/trezord-go/bin/trezord-go-v2.0.31 ./
+        run: cp -rf src/binaries/trezord-go/bin/trezord-go-v2.0.32 ./
 
       - name: Create the logs folder in the root of the trezor-user-env
         working-directory: ../trezor-user-env
@@ -191,7 +191,7 @@ jobs:
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 127.0.0.1:21325:21326 -p 21324:21324 -v logs:/trezor-user-env/logs/screens -v trezor-emu-core-v2-master:/trezor-user-env/src/binaries/firmware/bin/user_downloaded -v trezord-go-v2.0.31:/trezor-user-env/src/binaries/trezord-go/bin -d emurgornd/trezor-user-env:latest
+        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 127.0.0.1:21325:21326 -p 21324:21324 -v logs:/trezor-user-env/logs/screens -v trezor-emu-core-v2-master:/trezor-user-env/src/binaries/firmware/bin/user_downloaded -v trezord-go-v2.0.32:/trezor-user-env/src/binaries/trezord-go/bin -d emurgornd/trezor-user-env:latest
 
       - uses: actions/checkout@v3
 

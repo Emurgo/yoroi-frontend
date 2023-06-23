@@ -20,7 +20,7 @@ type Props = {|
   +amount: null | MultiToken,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-|}
+|};
 
 @observer
 export default class AmountDisplay extends Component<Props> {

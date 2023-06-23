@@ -40,6 +40,8 @@ Feature: dApp connector errors checking
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    And The dApp should see balance 5500000
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |
@@ -66,6 +68,8 @@ Feature: dApp connector errors checking
     Then I enter the spending password asdfasdfasdf and click confirm
     Then The popup window should be closed
     And The access request should succeed
+    And The wallet shelley-simple-15 is connected to the website localhost
+    And The dApp should see balance 5500000
     Then I request signing the transaction:
       | amount | toAddress                                                                                               |
       | 3      | addr1q97xu8uvdgjpqum6sjv9vptzulkc53x7tk69vj2lynywxppq3e92djqml4tjxz2avcgem3u8z7r54yvysm20qasxx5gqyx8evw |

@@ -11,7 +11,6 @@ import {
   confirmButton,
   errorInvalidRecoveryPhrase,
   getWords,
-  paperPasswordInput,
   recoveryPhraseField,
   repeatPasswordInput,
   walletPasswordInput,
@@ -20,14 +19,12 @@ import { masterKeyInput } from '../pages/walletClaimTransferPage';
 import {
   byronEraButton,
   pickUpCurrencyDialog,
-  pickUpCurrencyDialogCardano,
   recoveryPhraseDeleteIcon,
   recoveryPhraseError,
   restoreWalletButton,
   restore24WordWallet,
   restoreDialogButton,
   restoreNormalWallet,
-  restorePaperWalletButton,
   shelleyEraButton,
   walletAlreadyExistsComponent,
   walletRestoreDialog,
@@ -61,18 +58,6 @@ Then(/^I select Shelley-era 24-word wallet$/, async function () {
 
 Then(/^I select bip44 15-word wallet$/, async function () {
   await this.click(restoreNormalWallet);
-  await this.waitForElement(walletRestoreDialog);
-});
-
-When(/^I click the restore paper wallet button$/, async function () {
-  await this.click(restoreWalletButton);
-
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(pickUpCurrencyDialogCardano);
-
-  await this.waitForElement(walletRestoreOptionDialog);
-
-  await this.click(restorePaperWalletButton);
   await this.waitForElement(walletRestoreDialog);
 });
 
@@ -127,10 +112,6 @@ When(/^I enter the restored wallet password:$/, async function (table) {
 
 Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
   await this.input(repeatPasswordInput, password);
-});
-
-When(/^I enter the paper wallet password "([^"]*)"$/, async function (password) {
-  await this.input(paperPasswordInput, password);
 });
 
 When(/^I clear the restored wallet password ([^"]*)$/, async function (password) {

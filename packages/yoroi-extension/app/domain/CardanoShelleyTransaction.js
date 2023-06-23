@@ -33,7 +33,7 @@ export type CardanoShelleyTransactionCtorData = {|
   ...WalletTransactionCtorData,
   certificates: Array<CertificatePart>,
   ttl: void | BigNumber,
-  metadata: null | string,
+  metadata: null | string | Object,
   withdrawals: Array<{|
     address: string,
     value: MultiToken,
@@ -48,7 +48,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     value: MultiToken,
   |}>;
   @observable ttl: void | BigNumber;
-  @observable metadata: null | string;
+  @observable metadata: null | string | Object;
   @observable isValid: boolean;
 
   constructor(data: CardanoShelleyTransactionCtorData) {

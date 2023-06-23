@@ -34,6 +34,7 @@ import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connec
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import { withLayout } from '../../../styles/context/layout';
+import AmountDisplay from '../../../components/common/AmountDisplay';
 
 const messages = defineMessages({
   subtitle: {
@@ -231,7 +232,6 @@ class ConnectPage extends Component<Props & InjectedProps> {
     }
 
     const walletPasswordField = this.form.$('walletPassword');
-
     const hasWallets = isSuccess && Boolean(publicDerivers.length);
 
     const passwordForm = (
@@ -244,6 +244,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               type="password"
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
+              id="walletPassword"
             />
           )}
         </div>
@@ -253,6 +254,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
             variant={isRevampLayout ? 'outlined' : 'secondary'}
             onClick={this.hidePasswordForm}
             sx={{ minWidth: 'auto' }}
+            id="backButton"
           >
             {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
@@ -263,6 +265,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               fullWidth
               disabled={!walletPasswordField.isValid}
               onClick={this.submit}
+              id="confirmButton"
             >
               {intl.formatMessage(globalMessages.confirm)}
             </Button>
@@ -333,12 +336,35 @@ class ConnectPage extends Component<Props & InjectedProps> {
                   </div>
 
                   <ul className={styles.list}>
-                    {publicDerivers.map(item => (
-                      <li key={item.publicDeriver.getPublicDeriverId()} className={styles.listItem}>
+                    {publicDerivers.map(wallet => (
+                      <li
+                        key={wallet.publicDeriver.getPublicDeriverId()}
+                        className={styles.listItem}
+                      >
                         <WalletButton
-                          onClick={() => onSelectWallet(item.publicDeriver, item.checksum)}
+                          onClick={() => onSelectWallet(wallet.publicDeriver, wallet.checksum)}
                         >
-                          <ConnectedWallet publicDeriver={item} />
+                          <ConnectedWallet
+                            publicDeriver={wallet}
+                            walletBalance={
+                              <Box
+                                sx={{
+                                  ml: 'auto',
+                                  textAlign: 'right',
+                                }}
+                              >
+                                <AmountDisplay
+                                  shouldHideBalance={this.props.shouldHideBalance}
+                                  amount={wallet.balance}
+                                  getTokenInfo={this.props.getTokenInfo}
+                                  unitOfAccountSetting={this.props.unitOfAccount}
+                                  getCurrentPrice={this.props.getCurrentPrice}
+                                  showFiat
+                                  showAmount
+                                />
+                              </Box>
+                            }
+                          />
                         </WalletButton>
                       </li>
                     ))}

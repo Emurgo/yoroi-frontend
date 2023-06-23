@@ -10,8 +10,8 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
+import { splitAmount, truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 
@@ -36,11 +36,19 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         ].map(entry => ({
           entry,
           info: getTokenInfo(entry),
-        })).map(token => ({
-          name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-        }));
+        })).map(token => {
+          const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
+          const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
+          const [beforeDecimal, afterDecimal] = splitAmount(
+            shiftedAmount,
+            numberOfDecimals
+          );
+          return {
+            name: truncateToken(getTokenStrictName(token.info) ?? '-'),
+            id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+            amount: [beforeDecimal, afterDecimal].join(''),
+          }
+        });
       })();
 
     const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);

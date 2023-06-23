@@ -57,12 +57,12 @@ function CardanoSignTx({
         renderExplorerHashLink={renderExplorerHashLink}
         txAssetsData={txAssetsData}
       />
-      <Panel>
-        <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+      <Panel id="signTxAdditionalInfoPanel">
+        <Box display="flex" justifyContent="space-between" alignItems="flex-start" id="signTxAdditionalInfoPanelBox">
           <Typography color="#4A5065" fontWeight={500}>
             {intl.formatMessage(signTxMessages.transactionFee)}
           </Typography>
-          <Typography textAlign="right" color="#242838">
+          <Typography textAlign="right" color="#242838" id="signTxAdditionalInfoPanelBox-fee">
             {total.fee} {total.ticker}
           </Typography>
         </Box>
@@ -168,7 +168,7 @@ const ExpandableAssetsPanel = ({
 };
 
 const AsseetValueDisplay = ({ children }): Node => (
-  <Box mt="16px">
+  <Box mt="16px" id="asseetValueDisplayBox">
     <Typography textAlign="right" color="#242838">
       {children}
     </Typography>

@@ -50,16 +50,12 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  pickUpCurrencyDialogErgo,
   walletRestoreOptionDialog,
   restoreNormalWallet,
-  walletRestoreDialog,
   restoreWalletButton,
   saveButton,
   byronEraButton,
   createWalletButton,
-  createOptionDialog,
-  createNormalWalletButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import {
@@ -276,8 +272,9 @@ export async function getIndexedDBTablesInfo(customWorld: any, postfix: string =
   }
 };
 
-export async function getPlates(customWorld: any): Promise<any> {
+export async function getPlates(customWorld: any): Promise<Array<any>> {
   // check plate in confirmation dialog
+  await customWorld.waitForElement(restoringDialogPlate);
   let plateElements = await customWorld.findElements(restoringDialogPlate);
 
   // this makes this function also work for wallets that already exist
@@ -437,25 +434,6 @@ Then(/^I pause the test to debug$/, async function () {
   await this.waitForElement({ locator: '.element_that_does_not_exist', method: 'css' });
 });
 
-Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
-  this.webDriverLogger.info(`Step: There is an Ergo wallet stored named ${walletName}`);
-  const restoreInfo = testWallets[walletName];
-  expect(restoreInfo).to.not.equal(undefined);
-
-  await this.click(restoreWalletButton);
-
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(pickUpCurrencyDialogErgo);
-
-  await this.waitForElement(walletRestoreOptionDialog);
-
-  await this.click(restoreNormalWallet);
-  await this.waitForElement(walletRestoreDialog);
-
-  await inputMnemonicForWallet(this, restoreInfo);
-  await checkWalletPlate(this, walletName, restoreInfo);
-});
-
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
   this.webDriverLogger.info(`Step: There is a Shelley wallet stored named ${walletName}`);
   const browserName = await this.getBrowser();
@@ -476,9 +454,6 @@ Given(/^I create a new Shelley wallet with the name ([^"]*)$/, async function (w
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
-
-  await this.waitForElement(createOptionDialog);
-  await this.click(createNormalWalletButton);
 
   await this.waitForElement(walletInfoDialog);
   await this.input(walletNameInput, walletName);
@@ -560,6 +535,10 @@ Given(/^I have opened the extension$/, async function () {
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();
   }
+  // this string is for local debug only. It sets the same resolution as on Github virtual display
+  if (process.env.LIKE_GITHUB_DISPLAY != null && process.env.LIKE_GITHUB_DISPLAY === '1') {
+    this.driver.manage().window().setRect({ x: 0, y: 0, width: 989, height: 1113 });
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
@@ -636,6 +615,7 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
 
 Given(/^I connected Trezor emulator device$/, async function () {
   // select connecting a HW wallet
+  this.webDriverLogger.info(`Step: I connected Trezor device`);
   await this.click(connectHwButton);
   // pick up currency
   await this.waitForElement(pickUpCurrencyDialog);
@@ -657,6 +637,10 @@ Given(/^I connected Trezor emulator device$/, async function () {
   const name = await this.getValue(walletNameInput);
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
+  this.webDriverLogger.info(`Step: Wallet is connected and saved`);
+  await this.waitForElement(walletSyncingOverlayComponent);
+  await this.waitForElementNotPresent(walletSyncingOverlayComponent);
+  this.webDriverLogger.info(`Step: Wallet is fully synchronized`);
 });
 
 async function restoreWalletsFromStorage(client) {
