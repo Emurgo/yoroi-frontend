@@ -21,7 +21,7 @@ const messages = defineMessages({
 
 type Props = {|
   isTestnet: boolean,
-  isErgo: boolean,
+  isAnyErgo: boolean,
 |};
 
 @observer
@@ -58,16 +58,24 @@ export default class TestnetWarningBanner extends Component<Props> {
         </div>
       );
     }
-    if (this.props.isErgo) {
+    if (this.props.isAnyErgo) {
       return (
-        <div className={styles.ergoWarning}>
-          <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
-          <div className={styles.text}>
-            NOTE: Unfortunately the Ergo network support will be dropped from Yoroi in the near future.
-            <br />
-            Please make sure to migrate your Ergo funds and wallets to another application.
+        <>
+          <div className={styles.ergoWarning}>
+            <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
+            <div className={styles.text}>
+              NOTE: Due to the planned gradual termination of the Ergo wallets support in Yoroi extension,
+              <br />
+              Starting with the next version the Ergo wallets in the list will be visible, but not operational.
+            </div>
           </div>
-        </div>
+          <div className={styles.ergoWarning}>
+            <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
+            <div className={styles.text}>
+              Please make sure to migrate your Ergo funds and wallets to another application.
+            </div>
+          </div>
+        </>
       );
     }
     return null;

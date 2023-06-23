@@ -27,13 +27,11 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
   render(): Node {
     const serverStatus = this.generated.stores.serverConnectionStore.checkAdaServerStatus;
 
-    const { selected } = this.generated.stores.wallets;
+    const { selected, publicDerivers } = this.generated.stores.wallets;
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
-    const isWalletErgo = selected == null
-      ? false
-      : isErgo(selected.getParent().getNetworkInfo());
+    const isAnyWalletErgo = publicDerivers?.some(w => isErgo(w.getParent().getNetworkInfo()));
 
     const deprecationBanner = this.getDeprecationBanner();
     return (
@@ -47,7 +45,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
-        <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
+        <TestnetWarningBanner isTestnet={isWalletTestnet} isAnyErgo={isAnyWalletErgo} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
       </>
@@ -88,7 +86,10 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
-      wallets: {| selected: null | PublicDeriver<> |},
+      wallets: {|
+        publicDerivers: Array<PublicDeriver<>>,
+        selected: null | PublicDeriver<>,
+      |},
     |},
     actions: {||},
     |} {
@@ -109,6 +110,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
           tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         wallets: {
+          publicDerivers: stores.wallets.publicDerivers,
           selected: stores.wallets.selected,
         },
       },
