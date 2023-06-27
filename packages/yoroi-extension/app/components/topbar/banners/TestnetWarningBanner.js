@@ -21,7 +21,7 @@ const messages = defineMessages({
 
 type Props = {|
   isTestnet: boolean,
-  isAnyErgo: boolean,
+  isErgo: boolean,
 |};
 
 @observer
@@ -58,7 +58,7 @@ export default class TestnetWarningBanner extends Component<Props> {
         </div>
       );
     }
-    if (this.props.isAnyErgo) {
+    if (this.props.isErgo) {
       return (
         <div className={styles.ergoWarning}>
           <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>

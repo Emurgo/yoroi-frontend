@@ -31,7 +31,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
-    const isAnyWalletErgo = publicDerivers?.some(w => isErgo(w.getParent().getNetworkInfo()));
+    const isAnyWalletErgo = publicDerivers?.some(w => isErgo(w.getParent().getNetworkInfo())) ?? false;
 
     const deprecationBanner = this.getDeprecationBanner();
     return (
@@ -45,7 +45,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
-        <TestnetWarningBanner isTestnet={isWalletTestnet} isAnyErgo={isAnyWalletErgo} />
+        <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isAnyWalletErgo} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
       </>
@@ -87,7 +87,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         tokenInfo: TokenInfoMap,
       |},
       wallets: {|
-        publicDerivers: Array<PublicDeriver<>>,
+        publicDerivers?: Array<PublicDeriver<>>,
         selected: null | PublicDeriver<>,
       |},
     |},
