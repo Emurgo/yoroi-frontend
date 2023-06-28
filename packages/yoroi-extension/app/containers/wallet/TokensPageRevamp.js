@@ -51,6 +51,7 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
             name: truncateToken(getTokenStrictName(token.info) ?? '-'),
             id: getTokenIdentifierIfExists(token.info) ?? '-',
             amount: [beforeDecimal, afterDecimal].join(''),
+            amountForSorting: shiftedAmount,
           }
         });
     })();
