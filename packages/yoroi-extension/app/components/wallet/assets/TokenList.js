@@ -90,6 +90,10 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
     setState({ ...state, sortingDirection: newSortDirection });
 
     if (field === SORTING_COLUMNS.AMOUNT) {
+      const dedicatedField = 'amountForSorting';
+      if (a[dedicatedField] != null && b[dedicatedField] != null) {
+        return compareNumbers(a[dedicatedField], b[dedicatedField], newSortDirection);
+      }
       return compareNumbers(a[field], b[field], newSortDirection);
     }
     // Other fields
