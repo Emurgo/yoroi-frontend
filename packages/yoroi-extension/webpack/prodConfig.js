@@ -42,8 +42,8 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   },
   output: {
     path: path.join(__dirname, '../build/js'),
-    filename: '[name].bundle.js',
-    chunkFilename: '[name].chunk.js',
+    filename: '[name].[contenthash].bundle.js',
+    chunkFilename: '[name].[contenthash].chunk.js',
     publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
   },
   plugins: [
