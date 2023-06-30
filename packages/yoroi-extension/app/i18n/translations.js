@@ -34,7 +34,7 @@ import { ReactComponent as CzechFlag }  from '../assets/images/flags/czech.inlin
 import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inline.svg';
 import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
 
-export const locales = Object.freeze([
+export const locales: any = Object.freeze([
   ...en,
   ...ko,
   ...ja,
