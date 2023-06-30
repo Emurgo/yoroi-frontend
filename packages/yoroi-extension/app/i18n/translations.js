@@ -16,6 +16,7 @@ import { ReactComponent as IndonesianFlag }  from '../assets/images/flags/indone
 import { ReactComponent as TurkishFlag }  from '../assets/images/flags/turkish.inline.svg';
 import { ReactComponent as CzechFlag }  from '../assets/images/flags/czech.inline.svg';
 import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inline.svg';
+import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
 
 // This is essentially bulk require
 
@@ -120,6 +121,6 @@ export const LANGUAGES: Array<LanguageType> = [
   {
     value: 'vi-VN',
     label: globalMessages.languageVietnamese,
-    svg: '🇻🇳'
+    svg: VietnameseFlag
   }
 ];
