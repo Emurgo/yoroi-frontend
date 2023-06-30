@@ -116,5 +116,10 @@ export const LANGUAGES: Array<LanguageType> = [
     value: 'sk-SK',
     label: globalMessages.languageSlovak,
     svg: SlovakFlag
+  },
+  {
+    value: 'vi-VN',
+    label: globalMessages.languageVietnamese,
+    svg: '🇻🇳'
   }
 ];
