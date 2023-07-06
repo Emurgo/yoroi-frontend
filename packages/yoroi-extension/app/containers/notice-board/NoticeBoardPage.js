@@ -105,9 +105,10 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
       |},
     |},
     stores: {|
-      wallets: {|
-        selected: null | PublicDeriver<>
-      |},
+      wallets: {
+        selected: null | PublicDeriver<>,
+        ...
+      },
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
