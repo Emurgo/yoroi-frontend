@@ -229,11 +229,11 @@ export class MockDAppWebpage {
             callback({ success: true, error: null, retValue: null });
           },
           error => {
-            callback({ success: false, error: error.message, retValue: null });
+            callback({ success: false, error, retValue: null });
           }
         )
         .catch(error => {
-          callback({ success: false, error: error.message, retValue: null });
+          callback({ success: false, error, retValue: null });
         });
     }): DAppConnectorResponse);
     this.logger.info(`MockDApp: -> The access response: ${JSON.stringify(accessResponse)}`);

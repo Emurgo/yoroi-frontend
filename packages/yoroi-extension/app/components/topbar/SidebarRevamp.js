@@ -7,7 +7,7 @@ import styles from './SidebarRevamp.scss';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
@@ -15,6 +15,7 @@ type Props = {|
   +categories?: Array<SidebarCategoryRevamp>,
   +isActiveCategory?: SidebarCategoryRevamp => boolean,
   +onCategoryClicked?: SidebarCategoryRevamp => void,
+  +onLogoClick?: void => void,
 |};
 
 @observer
@@ -28,23 +29,30 @@ export default class SidebarRevamp extends Component<Props> {
     children: void,
     isActiveCategory: void,
     onCategoryClicked: void,
+    onLogoClick: void,
   |} = {
     children: undefined,
     categories: undefined,
     isActiveCategory: undefined,
     onCategoryClicked: undefined,
+    onLogoClick: undefined,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { categories, isActiveCategory, onCategoryClicked } = this.props;
-    const YoroiLogo = yoroiLogo;
+    const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
 
     return (
       <div className={styles.wrapper}>
         {this.props.children}
         <div className={styles.header}>
-          <YoroiLogo />
+          {onLogoClick ? (
+            <button type="button" onClick={onLogoClick}>
+              <YoroiLogo />
+            </button>
+          ) : (
+            <YoroiLogo />
+          )}
         </div>
         <div className={styles.categories}>
           {categories
@@ -68,8 +76,8 @@ export default class SidebarRevamp extends Component<Props> {
         </div>
         <a
           className={styles.faq}
-          href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
-          target='_blank'
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+          target="_blank"
           rel="noreferrer"
         >
           {intl.formatMessage(globalMessages.sidebarFaq)}
