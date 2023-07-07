@@ -370,31 +370,6 @@ export function getCardanoSpendingKeyHash(
   throw new Error(`${nameof(getCardanoSpendingKeyHash)} unknown address type`);
 }
 
-export function getJormungandrSpendingKey(
-  addr: RustModule.WalletV3.Address,
-): (
-  // null -> legacy address (no key hash)
-  RustModule.WalletV3.PublicKey | null
-) {
-  {
-    const groupAddr = addr.to_group_address();
-    if (groupAddr) return groupAddr.get_spending_key();
-  }
-  {
-    const multisig = addr.to_multisig_address();
-    if (multisig) throw new Error(`${nameof(getJormungandrSpendingKey)} multisig not supported`);
-  }
-  {
-    const singleAddr = addr.to_single_address();
-    if (singleAddr) return singleAddr.get_spending_key();
-  }
-  {
-    const accountAddr = addr.to_account_address();
-    if (accountAddr) return accountAddr.get_account_key();
-  }
-  throw new Error(`${nameof(getJormungandrSpendingKey)} unknown address type`);
-}
-
 export function addressToDisplayString(
   address: string,
   network: $ReadOnly<NetworkRow>,

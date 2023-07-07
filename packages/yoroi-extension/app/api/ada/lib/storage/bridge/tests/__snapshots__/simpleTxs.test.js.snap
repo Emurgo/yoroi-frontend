@@ -461,22 +461,6 @@ Array [
         "IsDefault": true,
         "IsNFT": false,
         "Metadata": Object {
-          "assetName": "",
-          "longName": null,
-          "numberOfDecimals": 6,
-          "policyId": "",
-          "ticker": "ADA",
-          "type": "Cardano",
-        },
-        "NetworkId": 100,
-        "TokenId": 2,
-      },
-      Object {
-        "Digest": 6.262633522161549e-167,
-        "Identifier": "",
-        "IsDefault": true,
-        "IsNFT": false,
-        "Metadata": Object {
           "boxId": "",
           "description": null,
           "height": 0,
@@ -486,7 +470,7 @@ Array [
           "type": "Ergo",
         },
         "NetworkId": 200,
-        "TokenId": 3,
+        "TokenId": 2,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -502,7 +486,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 300,
-        "TokenId": 4,
+        "TokenId": 3,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -518,7 +502,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 400,
-        "TokenId": 5,
+        "TokenId": 4,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -534,7 +518,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 250,
-        "TokenId": 6,
+        "TokenId": 5,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -550,7 +534,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 350,
-        "TokenId": 7,
+        "TokenId": 6,
       },
     ],
   },

@@ -60,7 +60,7 @@ type Props = {|
   +content: [?BoxInfo, ?BoxInfo, ?BoxInfo, ?BoxInfo],
   +showWarning: boolean,
   +baseUrl: void | string,
-  +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
+  +useEndOfEpoch: boolean,
   +onExternalLinkClick: MouseEvent => void,
   +unregistered: void | boolean,
 |};
