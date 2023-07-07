@@ -17,6 +17,7 @@ files:
         it: it-IT
         sk: sk-SK
         cs: cs-CZ
+        vi: vi-VN
   - source: /packages/yoroi-extension/app/i18n/locales/**/en-US.md
     translation: /packages/yoroi-extension/app/i18n/locales/**/%locale%.md
     languages_mapping:
@@ -34,4 +35,5 @@ files:
         it: it-IT
         sk: sk-SK
         cs: cs-CZ
+        vi: vi-VN
     content_segmentation: 0
