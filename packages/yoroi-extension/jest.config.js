@@ -19,5 +19,4 @@ module.exports = {
   ],
   // ignore manifest.test.js file, because it isn't a test
   testPathIgnorePatterns: ['manifest.test.js'],
-  modulePathIgnorePatterns: ['jormungandr'],
 };

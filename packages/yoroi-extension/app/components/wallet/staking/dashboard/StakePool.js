@@ -8,16 +8,13 @@ import { toSvg } from 'jdenticon';
 import { Button } from '@mui/material';
 
 import CardShadow from './CardShadow';
-// import ProgressCircle from './ProgressCircle';
 import type { Notification } from '../../../../types/notificationType';
 import CopyableAddress from '../../../widgets/CopyableAddress';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import styles from './StakePool.scss';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
-import type { ReputationObject } from '../../../../api/jormungandr/lib/state-fetch/types';
 import globalMessages from '../../../../i18n/global-messages';
-import { ReactComponent as WarningIcon }  from '../../../../assets/images/attention-modern.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateStakePool } from '../../../../utils/formatters';
 
@@ -98,8 +95,6 @@ type Props = {|
    * since the UX in this case is not obvious (undelegate from one pool or all pools)
   */
   +undelegate: void | (void => Promise<void>),
-  +reputationInfo: ReputationObject,
-  +openReputationDialog: void => void,
   +purpose: 'dashboard' | 'delegation',
 |};
 
@@ -159,15 +154,6 @@ export default class StakePool extends Component<Props> {
     // ];
 
     const poolIdNotificationId = 'poolId-copyNotification';
-
-    const poolWarning = (this.props.reputationInfo.node_flags ?? 0) === 0
-      ? null
-      : (
-        <div className={styles.warningIcon}>
-          <WarningIcon onClick={this.props.openReputationDialog} />
-        </div>
-      );
-
     return (
       <CardShadow title={
         this.props.purpose === 'dashboard'
@@ -181,7 +167,6 @@ export default class StakePool extends Component<Props> {
           <div className={styles.userInfo}>
             <h3 className={styles.userTitle}>{poolName}</h3>
             <div className={styles.subTitle}>
-              {poolWarning}
               <CopyableAddress
                 hash={hash}
                 elementId={poolIdNotificationId}

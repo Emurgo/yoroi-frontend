@@ -7,7 +7,7 @@ import { TransactionType } from '../../primitives/tables';
 import type {
   DbUtxoInputs, DbUtxoOutputs,
 } from '../utxo/tables';
-import type { DbAccountingInputs, DbAccountingOutputs, } from '../account/tables';
+import type { DbAccountingInputs, } from '../account/tables';
 
 export type CardanoByronTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "CardanoByron">,
@@ -38,17 +38,6 @@ export type ErgoTxIO = {|
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbTokenInfo,
 |};
-export type JormungandrTxIO = {|
-  +txType: $PropertyType<typeof TransactionType, "Jormungandr">,
-  +transaction: $ReadOnly<{|
-    ...$PropertyType<DbTransaction, 'transaction'>,
-    +Type: $PropertyType<typeof TransactionType, "Jormungandr">,
-  |}>,
-  +certificates: Array<CertificatePart>,
-  ...DbUtxoInputs, ...DbUtxoOutputs,
-  ...DbAccountingInputs, ...DbAccountingOutputs,
-  ...DbTokenInfo,
-|}
 
 export const populateMultipartTransactionsDb = (_schemaBuilder: lf$schema$Builder) => {
   // Does nothing for now but may be used in the future

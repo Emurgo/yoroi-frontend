@@ -22,9 +22,6 @@ import {
   genTentativeShelleyTx,
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import {
-  genJormungandrSigningWalletWithCache,
-} from '../../../stories/helpers/jormungandr/JormungandrMocks';
-import {
   genByronSigningWalletWithCache,
 } from '../../../stories/helpers/cardano/ByronMocks';
 import { GenericApiError, } from '../../api/common/errors';
@@ -45,7 +42,6 @@ import {
   routeForStore,
   ADDRESS_BOOK,
   BYRON_EXTERNAL,
-  GROUP_EXTERNAL,
   BASE_EXTERNAL,
   BASE_INTERNAL,
   BASE_MANGLED,
@@ -408,70 +404,6 @@ export const NoMatchFilter = (): Node => {
         generated={genBaseProps({
           location,
           wallet,
-          addressFilter,
-          addressSubgroupMap,
-        })}
-      />)
-    )
-  );
-};
-
-export const JormungandrExternalTab = (): Node => {
-  const wallet = genJormungandrSigningWalletWithCache();
-  const lookup = walletLookup([wallet]);
-  const addressCases = {
-    No: 0,
-    Yes: 1,
-  };
-  const getAddressGenerationValue = () => select(
-    'generatingAddress',
-    addressCases,
-    addressCases.No,
-  );
-
-  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = routeForStore(GROUP_EXTERNAL.name);
-
-  const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
-    all: [
-      unusedProps(
-        'addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez',
-        CoreAddressTypes.JORMUNGANDR_GROUP
-      ),
-      noUtxoProps(
-        'addr1ssruckcp4drq2cj8nul8lhmc9vgkxmz2rdepcxdec9sfh3ekpdgcuqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90lfrsm9',
-        CoreAddressTypes.JORMUNGANDR_GROUP
-      ),
-      withUtxo(
-        'addr1sjruv2a8v7g38w57ff2ffhwgk6jg93erv7txdvgnyjnl2ncnfakqvqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90dlxwna',
-        CoreAddressTypes.JORMUNGANDR_GROUP,
-        wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
-      ),
-    ],
-    wasExecuted: true,
-  });
-
-  return wrapWallet(
-    mockWalletProps({
-      location,
-      selected: wallet.publicDeriver,
-      ...lookup,
-    }),
-    wrapReceive(
-      mockReceiveProps({
-        selected: wallet.publicDeriver,
-        addressSubgroupMap,
-        addressFilter,
-        location,
-      }),
-      (<WalletReceivePage
-        generated={genBaseProps({
-          location,
-          wallet,
-          dialog: getAddressGenerationValue() === addressCases.Yes
-            ? LoadingSpinner
-            : undefined,
           addressFilter,
           addressSubgroupMap,
         })}

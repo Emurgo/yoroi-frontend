@@ -50,7 +50,6 @@ export type WalletNames =
   'simple-pending-wallet' |
   'tx-big-input-wallet' |
   'dump-wallet' |
-  'jormungandr-test' |
   'ledger-wallet' |
   'trezor-wallet' |
   'ergo-simple-wallet' |
@@ -112,13 +111,6 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     // but don't want to affect the other wallets for testing
     name: ('dump-wallet': WalletNames),
     mnemonic: 'proud nuclear patch arm digital theory peasant winner person knock mirror across immune certain power',
-    plate: 'XXXX-1111',
-    plateByron: '',
-    deviceId: '',
-  }),
-  createWallet({
-    name: ('jormungandr-test': WalletNames),
-    mnemonic: '',
     plate: 'XXXX-1111',
     plateByron: '',
     deviceId: '',

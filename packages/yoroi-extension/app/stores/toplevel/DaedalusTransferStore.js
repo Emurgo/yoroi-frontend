@@ -166,7 +166,7 @@ export default class DaedalusTransferStore extends Store<StoresMap, ActionsMap> 
               },
               ([]: Array<string>)
             )
-            : data.addresses; // Jormungandr filtered server-side
+            : data.addresses;
 
           const addressKeys = getAddressesKeys({ checker, fullUtxo });
           this._updateStatus(TransferStatus.GENERATING_TX);

@@ -127,7 +127,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         duplicatedWalletData={duplicatedWalletData}
         open={isActiveDialog}
         onClose={handleClose}
-        // $FlowFixMe incompatible-call
+        // $FlowFixMe[incompatible-call]
         onNext={() => openDuplicatedWallet(duplicatedWallet)}
       />
     </Stack>

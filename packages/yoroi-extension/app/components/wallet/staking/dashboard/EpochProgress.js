@@ -42,7 +42,7 @@ type Props = {|
     m: string,
     s: string,
   |},
-  +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
+  +useEndOfEpoch: boolean,
   +showTooltip: boolean,
 |};
 
