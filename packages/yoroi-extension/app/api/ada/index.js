@@ -297,6 +297,7 @@ export type CreateLedgerSignTxDataRequest = {|
   signRequest: HaskellShelleyTxSignRequest,
   network: $ReadOnly<NetworkRow>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  cip36: boolean,
 |};
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
@@ -961,6 +962,7 @@ export default class AdaApi {
         byronNetworkMagic: config.ByronNetworkId,
         networkId: Number.parseInt(config.ChainNetworkId, 10),
         addressingMap: request.addressingMap,
+        cip36: request.cip36,
       });
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
