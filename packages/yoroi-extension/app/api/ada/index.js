@@ -2384,6 +2384,8 @@ export default class AdaApi {
     const usedUtxos = signRequest.senderUtxos.map(utxo => (
       { txHash: utxo.tx_hash, index: utxo.tx_index }
     ));
+    const metadata = signRequest.unsignedTx.get_auxiliary_data;
+
     const transaction = CardanoShelleyTransaction.fromData({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
@@ -2399,8 +2401,8 @@ export default class AdaApi {
       block: null,
       certificates: [],
       ttl: new BigNumber(String(signRequest.unsignedTx.build().ttl())),
-      metadata: signRequest.metadata
-        ? Buffer.from(signRequest.metadata.to_bytes()).toString('hex')
+      metadata: metadata
+        ? Buffer.from(metadata.to_bytes()).toString('hex')
         : null,
       withdrawals: signRequest.withdrawals().map(withdrawal => ({
         address: withdrawal.address,
