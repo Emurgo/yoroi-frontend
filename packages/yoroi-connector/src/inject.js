@@ -185,6 +185,10 @@ class CardanoAPI {
       });
     }
     
+    getPubDRepKey = () => {
+        return 'hello world';
+    }
+    
     experimental = Object.freeze({
     
       setReturnType: (returnType) => {

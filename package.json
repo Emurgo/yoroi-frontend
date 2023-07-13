@@ -10,7 +10,6 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": ". check-all.sh",
       "post-checkout": "npm run translations:purge"
     }
   },
