@@ -97,7 +97,6 @@ import {
   generateWalletRootKey as cardanoGenerateWalletRootKey,
   generateWalletRootKey
 } from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
-import {ChainDerivations, CoinTypes, STAKING_KEY_INDEX, WalletTypePurpose} from "../../app/config/numbersConfig";
 
 /*::
 declare var chrome;
@@ -1814,12 +1813,12 @@ async function getActivePubStakeKeys() {
 
 async function getStakeKey() {
   const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
-  const stakingKey = rootPk
-      .derive(2)
-      .derive(0)
-      .to_raw_key();
+  const accountKey = rootPk.derive(HARDENED + (1852)) // purpose
+      .derive(HARDENED + (1815)) // coin type;
+      .derive(HARDENED + 0);
 
-  const stakeKey = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+
+  const stakeKey = accountKey.derive(2).derive(0).to_raw_key()
 
   return Buffer.from(stakeKey.to_public().as_bytes()).toString('hex');
 }
