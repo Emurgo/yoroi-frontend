@@ -108,10 +108,15 @@ const initialInject = `
   function cardano_check_read_access() {
     return cardano_rpc_call("is_enabled/cardano", []);
   }
+  
+  function exec_hello() {
+    return cardano_rpc_call("hello", []);
+  }
 
   window.cardano = {
     ...(window.cardano||{}),
     '${WALLET_NAME}': {
+      hello: exec_hello,
       icon: '${ICON_URL}',
       enable: cardano_request_read_access,
       isEnabled: cardano_check_read_access,
@@ -444,7 +449,7 @@ function createYoroiPort() {
     // events from Yoroi
     if (extensionId === 'self') {
       // this is part of Yoroi extension
-      yoroiPort = chrome.runtime.connect();    
+      yoroiPort = chrome.runtime.connect();
     } else {
       // this is the seperate connector extension
       yoroiPort = chrome.runtime.connect(extensionId);

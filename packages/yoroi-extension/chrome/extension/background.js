@@ -928,6 +928,10 @@ function handleInjectorConnect(port) {
         const isCBOR = isCardano && (returnType === 'cbor');
         Logger.debug(`[yoroi][handleInjectorConnect] ${message.function} (Return type is: ${returnType})`);
         switch (message.function) {
+          case 'hello':
+            checkParamCount(0);
+            rpcResponse({ ok: true });
+            break;
           case 'is_enabled/cardano':
             try {
               await withDb(
