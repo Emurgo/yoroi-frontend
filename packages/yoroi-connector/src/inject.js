@@ -186,6 +186,30 @@ class CardanoAPI {
     }
     
     getPubDRepKey = () => {
+        return this._cardano_rpc_call("CIP95/getPubDRepKey", []);
+    }
+    
+    getActivePubStakeKeys = () => {
+        return 'hello world';
+    }
+    
+    submitVoteDelegation = () => {
+        return 'hello world';
+    }
+    
+    submitDRepRegistrationCertificate = () => {
+        return 'hello world';
+    }
+    
+    submitDRepRetirementCertificate = () => {
+        return 'hello world';
+    }
+    
+    submitVote = () => {
+        return 'hello world';
+    }
+    
+    submitGovernanceAction = () => {
         return 'hello world';
     }
     

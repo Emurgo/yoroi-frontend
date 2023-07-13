@@ -93,6 +93,8 @@ import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
 import { mergeWitnessSets } from './connector/utils';
 
+import { generateWalletRootKey} from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
+
 /*::
 declare var chrome;
 */
@@ -928,6 +930,11 @@ function handleInjectorConnect(port) {
         const isCBOR = isCardano && (returnType === 'cbor');
         Logger.debug(`[yoroi][handleInjectorConnect] ${message.function} (Return type is: ${returnType})`);
         switch (message.function) {
+          case 'CIP95/getPubDRepKey': {
+            const pubKey = await getPubDRepKey();
+            rpcResponse({ok: pubKey});
+            break;
+          }
           case 'hello':
             checkParamCount(0);
             rpcResponse({ ok: true });
@@ -1777,3 +1784,20 @@ async function transformCardanoUtxos(
     };
   });
 }
+
+async function getPubDRepKey() {
+  const key = generateWalletRootKey('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share')
+  const currentAccountIndex = 0;
+  const privDRepKey = key.derive(HARDENED + (1718)) // purpose
+        .derive(HARDENED + (1815)) // coin type;
+        .derive(HARDENED + (parseInt(currentAccountIndex, 10)))
+        .derive(0)
+        .derive(0);
+  const pubDRepKey = Buffer.from(privDRepKey.to_raw_key().to_public().as_bytes()).toString('hex');
+  return pubDRepKey;
+}
+
+
+
+const HARDENED = 0x80000000;
+
