@@ -1814,20 +1814,14 @@ async function getActivePubStakeKeys() {
 
 async function getStakeKey() {
   const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
-  const accountPublicKey = rootPk
-      .derive(HARDENED + (1718))
-      .derive(CoinTypes.CARDANO)
+  const stakingKey = rootPk
+      .derive(2)
       .derive(0)
-      .to_public();
-
-  const stakingKey = accountPublicKey
-      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-      .derive(STAKING_KEY_INDEX)
       .to_raw_key();
 
   const stakeKey = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
 
-  return stakeKey.to_hex();
+  return Buffer.from(stakeKey.to_public().as_bytes()).toString('hex');
 }
 
 
