@@ -189,8 +189,9 @@ class CardanoAPI {
         return this._cardano_rpc_call("CIP95/getPubDRepKey", []);
     }
     
-    getActivePubStakeKeys = () => {
-        return 'hello world';
+    getActivePubStakeKeys = async () => {
+        const keys = await this._cardano_rpc_call("CIP95/getActivePubStakeKeys", []);
+        return keys[0]
     }
     
     submitVoteDelegation = () => {

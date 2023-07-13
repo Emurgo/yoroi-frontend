@@ -93,7 +93,11 @@ import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
 import { mergeWitnessSets } from './connector/utils';
 
-import { generateWalletRootKey} from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
+import {
+  generateWalletRootKey as cardanoGenerateWalletRootKey,
+  generateWalletRootKey
+} from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
+import {ChainDerivations, CoinTypes, STAKING_KEY_INDEX, WalletTypePurpose} from "../../app/config/numbersConfig";
 
 /*::
 declare var chrome;
@@ -933,6 +937,12 @@ function handleInjectorConnect(port) {
           case 'CIP95/getPubDRepKey': {
             const pubKey = await getPubDRepKey();
             rpcResponse({ok: pubKey});
+            break;
+          }
+
+          case 'CIP95/getActivePubStakeKeys': {
+            const pubKeys = await getActivePubStakeKeys();
+            rpcResponse({ok: pubKeys});
             break;
           }
           case 'hello':
@@ -1785,8 +1795,9 @@ async function transformCardanoUtxos(
   });
 }
 
+const recoveryPhrase = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share';
 async function getPubDRepKey() {
-  const key = generateWalletRootKey('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share')
+  const key = generateWalletRootKey(recoveryPhrase)
   const currentAccountIndex = 0;
   const privDRepKey = key.derive(HARDENED + (1718)) // purpose
         .derive(HARDENED + (1815)) // coin type;
@@ -1797,6 +1808,27 @@ async function getPubDRepKey() {
   return pubDRepKey;
 }
 
+async function getActivePubStakeKeys() {
+  return [await getStakeKey()];
+}
+
+async function getStakeKey() {
+  const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
+  const accountPublicKey = rootPk
+      .derive(HARDENED + (1718))
+      .derive(CoinTypes.CARDANO)
+      .derive(0)
+      .to_public();
+
+  const stakingKey = accountPublicKey
+      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+      .derive(STAKING_KEY_INDEX)
+      .to_raw_key();
+
+  const stakeKey = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+
+  return stakeKey;
+}
 
 
 const HARDENED = 0x80000000;
