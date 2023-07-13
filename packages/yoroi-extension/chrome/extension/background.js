@@ -1827,7 +1827,7 @@ async function getStakeKey() {
 
   const stakeKey = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
 
-  return stakeKey;
+  return stakeKey.to_hex();
 }
 
 
