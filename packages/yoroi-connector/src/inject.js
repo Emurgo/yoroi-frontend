@@ -190,8 +190,9 @@ class CardanoAPI {
     }
     
     getActivePubStakeKeys = async () => {
-        const keys = await this._cardano_rpc_call("CIP95/getActivePubStakeKeys", []);
-        return keys[0]
+        const result = await this._cardano_rpc_call("CIP95/getActivePubStakeKeys", []);
+        console.log('getActivePubStakeKeys', result); 
+        return result;
     }
     
     submitVoteDelegation = () => {
