@@ -2384,7 +2384,7 @@ export default class AdaApi {
     const usedUtxos = signRequest.senderUtxos.map(utxo => (
       { txHash: utxo.tx_hash, index: utxo.tx_index }
     ));
-    const metadata = signRequest.unsignedTx.get_auxiliary_data;
+    const metadata = signRequest.unsignedTx.get_auxiliary_data();
 
     const transaction = CardanoShelleyTransaction.fromData({
       txid: txId,
