@@ -54,7 +54,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
   networks,
-  isJormungandr,
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
@@ -187,18 +186,15 @@ class AddWalletPage extends Component<AllProps> {
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 15 } },
             });
           }}
-          onRestore24={
-            isJormungandr(selectedNetwork)
-              ? undefined
-              : () =>
-                  actions.dialogs.push.trigger({
-                    dialog: WalletRestoreDialogContainer,
-                    params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
-                  })
-          }
+          onRestore24={() => {
+            actions.dialogs.push.trigger({
+              dialog: WalletRestoreDialogContainer,
+              params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
+            });
+          }}
           onPaperRestore={
             // <TODO:PENDING_REMOVAL>
-            getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr(selectedNetwork)
+            getApiForNetwork(selectedNetwork) !== ApiOptions.ada 
               ? undefined
               : () =>
                   actions.dialogs.push.trigger({

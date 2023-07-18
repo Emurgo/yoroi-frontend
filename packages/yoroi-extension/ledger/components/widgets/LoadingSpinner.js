@@ -1,5 +1,5 @@
 // @flow //
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -38,7 +38,7 @@ export default class LoadingSpinner extends Component<Props> {
     return (
       <div className={styles.component}>
         <div className={styles.wrapper} ref={(div) => { this.root = div; }} />
-        {showText && textComp}
+        {showText === true && textComp}
       </div>
     );
   }

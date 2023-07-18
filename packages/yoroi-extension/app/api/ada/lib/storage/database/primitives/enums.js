@@ -7,7 +7,6 @@
 export const PRIMARY_ASSET_CONSTANTS = {
   Cardano: '',
   Ergo: '',
-  Jormungandr: ''
 };
 
 export const CoreAddressTypes = Object.freeze({
@@ -16,17 +15,6 @@ export const CoreAddressTypes = Object.freeze({
   CARDANO_PTR: 2,
   CARDANO_ENTERPRISE: 3,
   CARDANO_REWARD: 4,
-  /**
-   * Note: we store Shelley addresses as the full payload (not just payment key)
-   * since it's easier to extract a key from a payload then the inverse
-   *
-   * This also matches how the remote works as it has to return the full payload
-   * so we can tell the address type
-   */
-  JORMUNGANDR_SINGLE: 1_00,
-  JORMUNGANDR_GROUP: 1_01,
-  JORMUNGANDR_ACCOUNT: 1_02,
-  JORMUNGANDR_MULTISIG: 1_03,
   ERGO_P2PK: 2_00,
   ERGO_P2SH: 2_01,
   ERGO_P2S: 2_02,

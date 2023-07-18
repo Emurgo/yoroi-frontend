@@ -11,9 +11,7 @@ import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import { generateByronPlate, generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateErgoPlate } from '../../api/ergo/lib/crypto/plate';
-import { generateJormungandrPlate } from '../../api/jormungandr/lib/crypto/plate';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { v4Bip32PrivateToV3 } from '../../api/jormungandr/lib/crypto/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   generateWalletRootKey as generateAdaWalletRootKey,
@@ -23,7 +21,6 @@ import { generateWalletRootKey as generateErgoWalletRootKey } from '../../api/er
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
-  isJormungandr,
   isCardanoHaskell,
   isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -107,13 +104,8 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    if (isJormungandr(selectedNetwork)) {
-      runInAction(() => {
-        this.step = RestoreSteps.LEGACY_EXPLANATION;
-      });
-    } else {
-      await this.actions.walletRestore.startRestore.trigger();
-    }
+
+    await this.actions.walletRestore.startRestore.trigger();
   };
 
   @action
@@ -238,7 +230,7 @@ export function generatePlates(
   };
 
   const shouldShowShelleyPlate = (() => {
-    return isCardanoHaskell(network) && !isJormungandr(network) && mode.type === 'cip1852';
+    return isCardanoHaskell(network) && mode.type === 'cip1852';
   })();
 
   if (shouldShowShelleyPlate) {

@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Fout bij het ophalen van de balans.",
   "api.errors.getBestBlockApiError": "Fout ontvangen van de server bij het ophalen van het beste blok.",
   "api.errors.getPoolInfoApiError": "Fout ontvangen van de server bij het ophalen van informatie over de pools.",
-  "api.errors.getReputationError": "Fout ontvangen van de server bij het ophalen van de reputatie.",
   "api.errors.getRewardHistoryApiError": "Fout ontvangen van de server bij het ophalen van de beloningsgeschiedenis.",
   "api.errors.getTxHistoryForAddressesApiError": "Serverfout bij het ophalen van de transacties.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Serverfout bij het ophalen van de \"TxBodies\".",

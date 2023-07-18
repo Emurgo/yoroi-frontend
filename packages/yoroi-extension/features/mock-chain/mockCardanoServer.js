@@ -94,7 +94,7 @@ class MethodLogger {
 
   logRequest = (message?: string) => {
     this.localLogger.logInfo(
-      `${this.method}: ${this.url} <- request${message ? `\n    ${message}` : ''}`,
+      `${this.method}: ${this.url} <- request${message != null ? `\n    ${message}` : ''}`,
       false
     );
   };

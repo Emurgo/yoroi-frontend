@@ -146,11 +146,10 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     variant="body1"
                     color="primary.600"
                   >
-                    {/* Todo: update hex color to come from the theme */}
                     <Typography variant="body1" color="primary.400" width="20px">
                       {idx + 1}.
                     </Typography>
-                    {word &&
+                    {word !== null &&
                       (isLastEnteredWord ? (
                         <Fade in timeout={500}>
                           {Word}
