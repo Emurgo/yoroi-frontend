@@ -15,9 +15,9 @@ import {
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
 import {
-  CERTIFICATE_TYPE,
-  ADDRESS_TYPE,
-} from 'trezor-connect/lib/constants/cardano';
+  CardanoCertificateType,
+  CardanoAddressType,
+} from 'trezor-connect-flow';
 import { ChainDerivations } from '../../../../config/numbersConfig';
 
 beforeAll(async () => {
@@ -54,7 +54,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: ADDRESS_TYPE.Byron,
+      addressType: CardanoAddressType.BYRON,
       path: "m/44'/1815'/0'/1/1",
     });
   }
@@ -65,7 +65,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: ADDRESS_TYPE.Base,
+      addressType: CardanoAddressType.BASE,
       path: "m/44'/1815'/0'/1/1",
       stakingKeyHash: '63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132'
     });
@@ -77,7 +77,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: ADDRESS_TYPE.Enterprise,
+      addressType: CardanoAddressType.ENTERPRISE,
       path: "m/44'/1815'/0'/1/1",
     });
   }
@@ -88,7 +88,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: ADDRESS_TYPE.Pointer,
+      addressType: CardanoAddressType.POINTER,
       path: "m/44'/1815'/0'/1/1",
       certificatePointer: {
         blockIndex: 1,
@@ -105,7 +105,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, stakingKeyPath)).toEqual({
-      addressType: ADDRESS_TYPE.Reward,
+      addressType: CardanoAddressType.REWARD,
       path: "m/44'/1815'/0'/2/0",
     });
   }
@@ -271,7 +271,7 @@ test('Create Trezor transaction', async () => {
         2,
         0,
       ],
-      type: CERTIFICATE_TYPE.StakeRegistration,
+      type: CardanoCertificateType.STAKE_REGISTRATION,
     }],
     signingMode: 0,
   });

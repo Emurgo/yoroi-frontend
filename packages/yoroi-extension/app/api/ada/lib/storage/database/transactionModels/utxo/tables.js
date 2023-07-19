@@ -40,7 +40,7 @@ export const UtxoTransactionInputSchema: {|
   }
 };
 
-type ErgoFields = {|
+export type ErgoFields = {|
   ErgoBoxId: string,
   ErgoCreationHeight: number,
   ErgoTree: string,

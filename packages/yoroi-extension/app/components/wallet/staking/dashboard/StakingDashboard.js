@@ -14,7 +14,7 @@ import InformativeError from '../../../widgets/InformativeError';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import { ReactComponent as InvalidURIImg }  from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -31,7 +31,8 @@ const messages = defineMessages({
   },
   pendingTxWarning: {
     id: 'wallet.dashboard.warning.pendingTx',
-    defaultMessage: '!!!Staking dashboard information will update once your pending transaction is confirmed',
+    defaultMessage:
+      '!!!Staking dashboard information will update once your pending transaction is confirmed',
   },
   title: {
     id: 'wallet.dashboard.stakePool.title',
@@ -46,8 +47,9 @@ export const emptyDashboardMessages: Object = defineMessages({
   },
   text: {
     id: 'wallet.dashboard.empty.text',
-    defaultMessage: '!!!Go to the delegation page to choose what stake pool you want to delegate in.'
-  }
+    defaultMessage:
+      '!!!Go to the delegation page to choose what stake pool you want to delegate in.',
+  },
 });
 
 export type RewardsGraphData = {|
@@ -64,7 +66,7 @@ export type GraphData = {|
 
 type Props = {|
   +graphData: GraphData,
-  +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node | void> |},
+  +stakePools: {| error: LocalizableError |} | {| pools: null | Array<Node | void> |},
   +userSummary: Node,
   +upcomingRewards: void | Node,
   +hasAnyPending: boolean,
@@ -80,36 +82,27 @@ type Props = {|
 
 @observer
 export default class StakingDashboard extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const {
-      graphData,
-    } = this.props;
+    const { graphData } = this.props;
 
-    const pendingTxWarningComponent = this.props.hasAnyPending
-      ? (
-        <div className={styles.warningBox}>
-          <WarningBox>
-            {this.context.intl.formatMessage(messages.pendingTxWarning)}
-          </WarningBox>
-        </div>
-      )
-      : null;
+    const pendingTxWarningComponent = this.props.hasAnyPending ? (
+      <div className={styles.warningBox}>
+        <WarningBox>{this.context.intl.formatMessage(messages.pendingTxWarning)}</WarningBox>
+      </div>
+    ) : null;
 
     // don't show anything when user has never delegated
     const hideGraph =
-      this.props.delegationHistory != null
-      && this.props.delegationHistory.length === 0;
+      this.props.delegationHistory != null && this.props.delegationHistory.length === 0;
 
-    const graphs = hideGraph
-      ? null
-      : (
-        <div className={styles.graphsWrapper}>
-          {this._displayGraph(graphData.rewardsGraphData)}
-          {/* <GraphWrapper
+    const graphs = hideGraph ? null : (
+      <div className={styles.graphsWrapper}>
+        {this._displayGraph(graphData.rewardsGraphData)}
+        {/* <GraphWrapper
             themeVars={this.props.themeVars}
             tabs={[
               this.context.intl.formatMessage(messages.positionsLabel),
@@ -119,20 +112,16 @@ export default class StakingDashboard extends Component<Props> {
             graphName="positions"
             data={graphData.positionsGraphData}
           /> */}
-        </div>
-      );
+      </div>
+    );
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
           {pendingTxWarningComponent}
           <div className={styles.statsWrapper}>
             <div className={styles.summary}>
-              <div className={styles.summaryItem}>
-                {this.props.userSummary}
-              </div>
-              <div className={styles.summaryItem}>
-                {this.props.upcomingRewards}
-              </div>
+              <div className={styles.summaryItem}>{this.props.userSummary}</div>
+              <div className={styles.summaryItem}>{this.props.upcomingRewards}</div>
             </div>
           </div>
           <div className={styles.bodyWrapper}>
@@ -144,15 +133,15 @@ export default class StakingDashboard extends Component<Props> {
     );
   }
 
-  _displayGraph: RewardsGraphData => Node = (graphData) => {
+  _displayGraph: RewardsGraphData => Node = graphData => {
     const { intl } = this.context;
     if (graphData.error) {
       return (
         <div className={styles.poolError}>
-          <center><InvalidURIImg /></center>
-          <ErrorBlock
-            error={graphData.error}
-          />
+          <center>
+            <InvalidURIImg />
+          </center>
+          <ErrorBlock error={graphData.error} />
         </div>
       );
     }
@@ -175,14 +164,13 @@ export default class StakingDashboard extends Component<Props> {
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
             hideYAxis: graphData.hideYAxis,
           },
-          // intl.formatMessage(globalMessages.marginsLabel),
         ]}
         epochLength={this.props.epochLength}
       />
     );
-  }
+  };
 
-  displayStakePools: boolean => Node = (hideGraph) => {
+  displayStakePools: boolean => Node = hideGraph => {
     const width = classnames([
       // if they've delegated before we need to make space for the chart
       !hideGraph ? styles.stakePoolMaxWidth : null,
@@ -192,10 +180,10 @@ export default class StakingDashboard extends Component<Props> {
     if (this.props.stakePools.error) {
       return (
         <div className={styles.poolError}>
-          <center><InvalidURIImg /></center>
-          <ErrorBlock
-            error={this.props.stakePools.error}
-          />
+          <center>
+            <InvalidURIImg />
+          </center>
+          <ErrorBlock error={this.props.stakePools.error} />
         </div>
       );
     }
@@ -203,23 +191,18 @@ export default class StakingDashboard extends Component<Props> {
       this.props.stakePools.pools === null ||
       this.props.pageInfo == null ||
       (this.props.stakePools.pools.length > 0 &&
-       this.props.stakePools.pools[this.props.pageInfo.currentPage] == null)
+        this.props.stakePools.pools[this.props.pageInfo.currentPage] == null)
     ) {
       return (
         <div className={width}>
-          <Typography
-            fontWeight='500'
-            fontSize='18px'
-            lineHeight='22px'
-            marginBottom='16px'
-          >
+          <Typography fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Skeleton
-            variant='rectangular'
-            width='100%'
-            height='254px'
-            animation='wave'
+            variant="rectangular"
+            width="100%"
+            height="254px"
+            animation="wave"
             sx={{
               backgroundColor: 'var(--yoroi-palette-gray-50)',
               borderRadius: '4px',
@@ -233,14 +216,12 @@ export default class StakingDashboard extends Component<Props> {
       return (
         <div className={width}>
           <InformativeError
-            title={intl.formatMessage(
-              emptyDashboardMessages.title,
-              { ticker: this.props.ticker }
-            )}
-            text={!hideGraph
-              // no need to explain to user how to delegate their ADA if they've done it before
-              ? null
-              : intl.formatMessage(emptyDashboardMessages.text)
+            title={intl.formatMessage(emptyDashboardMessages.title, { ticker: this.props.ticker })}
+            text={
+              !hideGraph
+                ? // no need to explain to user how to delegate their ADA if they've done it before
+                  null
+                : intl.formatMessage(emptyDashboardMessages.text)
             }
           />
         </div>
@@ -255,10 +236,6 @@ export default class StakingDashboard extends Component<Props> {
         </div>
       );
     }
-    return (
-      <div className={width}>
-        {this.props.stakePools.pools[currPool]}
-      </div>
-    );
-  }
+    return <div className={width}>{this.props.stakePools.pools[currPool]}</div>;
+  };
 }

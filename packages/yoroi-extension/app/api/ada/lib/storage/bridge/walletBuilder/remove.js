@@ -20,7 +20,6 @@ import {
   asHasLevels,
 } from '../../models/PublicDeriver/traits';
 import { rawRemoveAllTransactions as cardanoRawRemoveAllTransactions } from '../updateTransactions';
-import { rawRemoveAllTransactions as jormungandrRawRemoveAllTransactions } from '../../../../../jormungandr/lib/storage/bridge/updateTransactions';
 import { rawRemoveAllTransactions as ergoRawRemoveAllTransactions } from '../../../../../ergo/lib/storage/bridge/updateTransactions';
 import {
   GetAddress,
@@ -34,13 +33,15 @@ import { AssociateTxWithAccountingIOs, } from '../../database/transactionModels/
 import {
   CardanoByronAssociateTxWithIOs,
   CardanoShelleyAssociateTxWithIOs,
-  JormungandrAssociateTxWithIOs,
   ErgoAssociateTxWithIOs,
 } from '../../database/transactionModels/multipart/api/read';
 import { GetDerivationSpecific, } from '../../database/walletTypes/common/api/read';
 import { rawGetAddressRowsForWallet } from '../traitUtils';
-import { isCardanoHaskell, isJormungandr, isErgo } from '../../database/prepackaged/networks';
-
+import { isCardanoHaskell, isErgo } from '../../database/prepackaged/networks';
+import {
+  ModifyUtxoAtSafePoint,
+  ModifyUtxoDiffToBestBlock,
+} from '../../database/utxo/api/write';
 
 export async function removePublicDeriver(request: {|
   publicDeriver: IPublicDeriver<>,
@@ -53,7 +54,6 @@ export async function removePublicDeriver(request: {|
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
-    JormungandrAssociateTxWithIOs,
     ErgoAssociateTxWithIOs,
     CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithAccountingIOs,
@@ -65,6 +65,8 @@ export async function removePublicDeriver(request: {|
     FreeBlocks,
     GetCertificates,
     ModifyTokenList,
+    ModifyUtxoAtSafePoint,
+    ModifyUtxoDiffToBestBlock,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -108,28 +110,7 @@ export async function removePublicDeriver(request: {|
               publicDeriver: withLevels,
             }
           );
-        } else if (isJormungandr(network)) {
-          await jormungandrRawRemoveAllTransactions(
-            db, dbTx,
-            {
-              GetPathWithSpecific: deps.GetPathWithSpecific,
-              GetAddress: deps.GetAddress,
-              JormungandrAssociateTxWithIOs: deps.JormungandrAssociateTxWithIOs,
-              AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-              AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-              GetDerivationSpecific: deps.GetDerivationSpecific,
-              DeleteAllTransactions: deps.DeleteAllTransactions,
-              ModifyAddress: deps.ModifyAddress,
-              GetTransaction: deps.GetTransaction,
-              FreeBlocks: deps.FreeBlocks,
-              ModifyTokenList: deps.ModifyTokenList,
-            },
-            withLevels.getParent().getDerivationTables(),
-            {
-              publicDeriver: withLevels,
-            }
-          );
-        }  else if (isErgo(network)) {
+        } else if (isErgo(network)) {
           await ergoRawRemoveAllTransactions(
             db, dbTx,
             {
@@ -177,6 +158,17 @@ export async function removePublicDeriver(request: {|
           walletAddressIds
         );
       }
+
+      // 3) remove utxos
+      await ModifyUtxoAtSafePoint.remove(
+        db, dbTx,
+        request.publicDeriver.getPublicDeriverId()
+      );
+      await ModifyUtxoDiffToBestBlock.removeAll(
+        db, dbTx,
+        request.publicDeriver.getPublicDeriverId()
+      );
+
       await deps.RemovePublicDeriver.remove(
         db, dbTx,
         { publicDeriverId: request.publicDeriver.getPublicDeriverId() }

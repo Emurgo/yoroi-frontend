@@ -84,30 +84,6 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-const JormungandrExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 2_00,
-    NetworkId: networks.JormungandrMainnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://adastat.net/address/',
-      transaction: 'https://adastat.net/transaction/',
-      pool: 'https://adastat.net/pool/',
-    },
-    Name: 'AdaStat',
-  },
-  {
-    ExplorerId: 2_01,
-    NetworkId: networks.JormungandrMainnet.NetworkId,
-    IsBackup: false,
-    Endpoints: {
-      address: 'https://itnexplorer.cardano.org/en/address/',
-      transaction: 'https://itnexplorer.cardano.org/en/transaction/',
-    },
-    Name: 'CardanoExplorer',
-  },
-];
-
 const ErgoExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 3_00,
@@ -163,11 +139,27 @@ const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
+const CardanoPreviewTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+  {
+    ExplorerId: 5_50,
+    NetworkId: networks.CardanoPreviewTestnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://preview.cardanoscan.io/address/',
+      transaction: 'https://preview.cardanoscan.io/transaction/',
+      pool: 'https://preview.cardanoscan.io/pool/',
+      stakeAddress: 'https://preview.cardanoscan.io/stakeKey/',
+      token: 'https://preview.cardanoscan.io/token/',
+    },
+    Name: 'CardanoScan',
+  },
+];
+
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
-  [networks.JormungandrMainnet.NetworkId, JormungandrExplorers],
+  [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
   [networks.ErgoMainnet.NetworkId, ErgoExplorers],
   [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],
 ]);
@@ -184,10 +176,10 @@ export const prepackagedDefaultExplorers:
       CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
     [networks.CardanoPreprodTestnet.NetworkId, getOrThrow(
-      CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
+      CardanoPreprodTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
-    [networks.JormungandrMainnet.NetworkId, getOrThrow(
-      JormungandrExplorers.find(explorer => explorer.IsBackup)
+    [networks.CardanoPreviewTestnet.NetworkId, getOrThrow(
+      CardanoPreviewTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
     [networks.ErgoMainnet.NetworkId, getOrThrow(
       ErgoExplorers.find(explorer => explorer.IsBackup)

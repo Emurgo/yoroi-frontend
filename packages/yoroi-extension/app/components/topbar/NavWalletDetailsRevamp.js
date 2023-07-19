@@ -7,8 +7,8 @@ import { intlShape } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
 import styles from './NavWalletDetailsRevamp.scss';
-import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open_24_revamp.png';
-import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_off_24_revamp.png';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
@@ -18,6 +18,7 @@ import type { ConceptualWallet } from '../../api/ada/lib/storage/models/Conceptu
 import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
+import { Box, IconButton } from '@mui/material';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -42,6 +43,7 @@ type Props = {|
   |},
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  +openWalletInfoDialog: () => void,
 |};
 
 function constructPlate(
@@ -87,6 +89,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       plate,
       unitOfAccountSetting,
       getCurrentPrice,
+      openWalletInfoDialog,
     } = this.props;
 
     const totalAmount = this.getTotalAmount();
@@ -95,9 +98,25 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
     return (
-      <div className={styles.wrapper}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          color: 'gray.900',
+          border: '1px solid',
+          borderColor: 'gray.300',
+          borderRadius: 1,
+          minWidth: '360px',
+          height: '56px',
+          ':hover': {
+            borderColor: 'primary.600',
+          },
+          transition: 'border-color 300ms ease',
+        }}
+      >
         <div className={styles.outerWrapper}>
-          <div className={styles.contentWrapper}>
+          <button type="button" onClick={openWalletInfoDialog} className={styles.contentWrapper}>
             <div className={classnames([styles.currency])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
@@ -107,11 +126,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                 <p className={styles.plateId}>{accountPlateId}</p>
               </div>
               <div className={styles.balance}>
-                <div
-                  className={classnames([
-                    totalAmount ? styles.amount : styles.spinnerWrapper,
-                  ])}
-                >
+                <div className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}>
                   <AmountDisplay
                     shouldHideBalance={shouldHideBalance}
                     amount={totalAmount}
@@ -123,12 +138,31 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                 </div>
               </div>
             </div>
-          </div>
-          <button disabled={totalAmount === null && !showEyeIconSafe} type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-            {shouldHideBalance ? <img src={IconEyeClosed} alt="Hide balance" /> : <img src={IconEyeOpen} alt="Show balance" />}
           </button>
+          <IconButton
+            disabled={totalAmount === null && !showEyeIconSafe}
+            onClick={onUpdateHideBalance}
+            sx={{
+              bgcolor: 'primary.600',
+              width: '56px',
+              height: '54px',
+              borderTopRightRadius: '6px',
+              borderBottomRightRadius: '6px',
+              borderTopLeftRadius: '0px',
+              borderBottomLeftRadius: '0px',
+              ':hover': {
+                bgcolor: 'primary.600',
+              },
+              ':disabled': {
+                bgcolor: 'primary.200',
+              },
+            }}
+            color="primary"
+          >
+            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+          </IconButton>
         </div>
-      </div>
+      </Box>
     );
   }
 

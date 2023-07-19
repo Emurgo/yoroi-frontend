@@ -1,7 +1,7 @@
 // @flow
 
 import { setWorldConstructor } from 'cucumber';
-import { Builder, Key, until, error, promise, WebElement } from 'selenium-webdriver';
+import { Builder, Key, until, error, promise, WebElement, logging } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
@@ -18,6 +18,10 @@ import {
 } from './helpers/common-constants';
 
 const fs = require('fs');
+
+const firefoxBin = process.env.FIREFOX_BIN != null
+  ? process.env.FIREFOX_BIN
+  : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 
 function encode(file) {
   return fs.readFileSync(file, { encoding: 'base64' });
@@ -41,24 +45,31 @@ function encode(file) {
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
 
+const prefs = new logging.Preferences();
+prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
+
 function getBraveBuilder() {
-  return new Builder().forBrowser('chrome').setChromeOptions(
-    new chrome.Options()
-      .setChromeBinaryPath('/usr/bin/brave-browser')
-      .addArguments(
-        '--no-sandbox', // Disables the sandbox for all process types that are normally sandboxed. Meant to be used as a browser-level switch for testing purposes only
-        '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
-        '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
-        '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
-        '--start-maximized' // Starts the browser maximized, regardless of any previous settings
-      )
-      .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
+  return new Builder()
+    .forBrowser('chrome')
+    .setLoggingPrefs(prefs)
+    .setChromeOptions(
+      new chrome.Options()
+        .setChromeBinaryPath('/usr/bin/brave-browser')
+        .addArguments(
+          '--no-sandbox', // Disables the sandbox for all process types that are normally sandboxed. Meant to be used as a browser-level switch for testing purposes only
+          '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
+          '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
+          '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
+          '--start-maximized' // Starts the browser maximized, regardless of any previous settings
+        )
+        .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
   );
 }
 
 function getChromeBuilder() {
   return new Builder()
     .forBrowser('chrome')
+    .setLoggingPrefs(prefs)
     .setChromeOptions(
       new chrome.Options()
         .addExtensions(encode(path.resolve(__dirname, '../../Yoroi-test.crx')))
@@ -78,7 +89,7 @@ function getFirefoxBuilder() {
      * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
      * Set the FIREFOX_DEV env variable to the "Firefix for Developers" executable
      */
-    .setBinary(process.env.FIREFOX_DEV)
+    .setBinary(firefoxBin)
     .addExtensions(path.resolve(__dirname, '../../Yoroi.xpi'))
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
@@ -87,6 +98,7 @@ function getFirefoxBuilder() {
      * The config is deprecated and may be removed in the future.
      */
     .setPreference('xpinstall.signatures.required', false)
+    .setPreference('devtools.console.stdout.content', true)
     .setPreference('extensions.webextensions.uuids', firefoxUuidMapping);
 
   return new Builder()
@@ -144,6 +156,10 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.trezorEmuLogger = undefined;
 
+  this.chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`;
+
+  this.firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`;
+
   this.addToLoggers = (logger: any) => {
     this._allLoggers.push(logger);
   } ;
@@ -161,9 +177,16 @@ function CustomWorld(cmdInput: WorldInput) {
        * so we can just hardcode this value if we keep e2etest-key.pem file
        * https://stackoverflow.com/a/10089780/3329806
        */
-      return 'chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg/main_window.html';
+      return `${this.chromeExtIdUrl}/main_window.html`;
     }
-    return `moz-extension://${firefoxExtensionId}/main_window.html`;
+    return `${this.firefoxExtIdUrl}/main_window.html`;
+  };
+
+  this.getBackgroundUrl = (): string => {
+    if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
+      return `${this.chromeExtIdUrl}/background.html`;
+    }
+    return `${this.firefoxExtIdUrl}/background.html`;
   };
 
   this.get = async (url: string) => {
@@ -266,6 +289,14 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
+  this.scrollIntoView = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Scroll into view "${JSON.stringify(locator)}"`);
+    await this.waitForElement(locator);
+    const clickable = await this.getElementBy(locator);
+    await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
+  };
+
+
   this.click = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     await this.waitForElement(locator);
@@ -317,8 +348,8 @@ function CustomWorld(cmdInput: WorldInput) {
       (k, l, callback) => {
         window.yoroi.translations[l]
           .then(translation => callback(translation[k]))
-          // eslint-disable-next-line no-console
           .catch(e => {
+            // eslint-disable-next-line no-console
             console.error('Intl fail: ', e);
           });
       },
@@ -340,21 +371,40 @@ function CustomWorld(cmdInput: WorldInput) {
     }, index);
   };
 
-  this.clickElementByQuery = async query => {
-    await this.driver.executeScript(`document.querySelector('${query}').click()`);
+  this.clickByScript = async (locator: LocatorObject) => {
+    this.webDriverLogger.info(`Webdriver: Clicking with executeScript on "${JSON.stringify(locator)}"`);
+    const element = await this.getElementBy(locator);
+    await this.driver.executeScript(`arguments[0].click()`, element);
   };
 
   this.checkIfExists = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Checking if element exists "${JSON.stringify(locator)}"`);
-    return await this.driver.findElement(getMethod(locator.method)(locator.locator)).then(
-      () => true,
-      err => {
-        if (err instanceof error.NoSuchElementError) {
-          return false;
+    const state = this.driver
+      .findElement(getMethod(locator.method)(locator.locator))
+      .then(
+        (response) => {
+          this.webDriverLogger.info(`Webdriver:checkIfExists: Response is received: ${response}`);
+          this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" exists`);
+          return true;
+        },
+        (err) => {
+          if (err instanceof error.NoSuchElementError) {
+            this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" does not exists`);
+            return false;
+          }
+          promise.rejected(err); // some other error
         }
-        promise.rejected(err); // some other error
-      }
-    );
+      ).catch(
+        (err) => {
+          if (err instanceof error.NoSuchElementError){
+            this.webDriverLogger.info(`Webdriver:checkIfExists: The element "${JSON.stringify(locator)}" does not exists`);
+            return false;
+          }
+          throw(err)
+        }
+      )
+
+    return state;
   };
 
   this.customWaiter = async (
@@ -403,6 +453,86 @@ function CustomWorld(cmdInput: WorldInput) {
     this.webDriverLogger.info(`Webdriver:hoverOnElement: Hovering on element "${JSON.stringify(locator)}"`);
     const actions = this.driver.actions();
     await actions.move({ origin: locator }).perform();
+  };
+
+  this.getInfoFromIndexedDB = async (tableName: string) => {
+    if (this.getBrowser() === 'firefox') {
+      return await this.getInfoFromIndexedDBFF(tableName);
+    }
+    return await this.getInfoFromIndexedDBChrome(tableName);
+  };
+
+  this.getInfoFromIndexedDBFF = async (tableName: string) => {
+    await this.driver.executeScript((dbName, table) => {
+      const dbRequest = window.indexedDB.open(dbName);
+      dbRequest.onsuccess = function (event) {
+          const db = event.target.result;
+          const tableContentRequest = db
+            .transaction(table, 'readonly')
+            .objectStore(table)
+            .getAll();
+            // eslint-disable-next-line no-shadow
+            tableContentRequest.onsuccess = function (event) {
+              window.tableData = event.target.result;
+            }
+      }
+    },
+      'yoroi-schema',
+      tableName
+    );
+    let tableContent;
+    try {
+      tableContent = await this.driver.executeScript(() => window.tableData);
+    // eslint-disable-next-line no-shadow
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      tableContent = {};
+    }
+
+    return tableContent;
+  };
+
+  this.getInfoFromIndexedDBChrome = async (tableName: string) => {
+    await this.driver.executeScript(() => {
+      window.allDBsPromise = window.indexedDB.databases();
+    });
+
+    const allDBs = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.allDBsPromise
+        .then(response => callback(response))
+        .catch(err => callback(err));
+    });
+    const { name, version } = allDBs[0];
+
+    await this.driver.executeScript((dbName, dbVersion, table) => {
+      const request = window.indexedDB.open(dbName, dbVersion);
+      request.onsuccess = function (event) {
+          const db = event.target.result;
+          const tableContentRequest = db
+            .transaction(table, 'readonly')
+            .objectStore(table)
+            .getAll();
+            // eslint-disable-next-line no-shadow
+            tableContentRequest.onsuccess = function (event) {
+              window.tableData = event.target.result;
+            }
+      }
+    },
+      name,
+      version,
+      tableName
+    );
+    let tableContent;
+    try {
+      tableContent = await this.driver.executeScript(() => window.tableData);
+    // eslint-disable-next-line no-shadow
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      tableContent = {};
+    }
+
+    return tableContent;
   };
 }
 

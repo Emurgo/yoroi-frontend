@@ -14,7 +14,6 @@ type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
   publicPath?: string,
-  ergoConnectorExtensionId?: ?string,
   isLight: "true" | "false"
 |};
 */
@@ -34,7 +33,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     ],
     ergo: [
       customPath,
-      path.join(__dirname, '../chrome/extension/ergo-connector/index')
+      path.join(__dirname, '../chrome/extension/connector/index')
     ],
     ledger: [
       customPath,
@@ -43,8 +42,8 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   },
   output: {
     path: path.join(__dirname, '../build/js'),
-    filename: '[name].bundle.js',
-    chunkFilename: '[name].chunk.js',
+    filename: '[name].[contenthash].bundle.js',
+    chunkFilename: '[name].[contenthash].chunk.js',
     publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
   },
   plugins: [
@@ -53,7 +52,6 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      env.ergoConnectorExtensionId,
       JSON.parse(env.isLight)
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),

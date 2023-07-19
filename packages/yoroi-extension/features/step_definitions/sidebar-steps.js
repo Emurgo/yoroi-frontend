@@ -2,7 +2,7 @@
 
 import { When, Then } from 'cucumber';
 import { expect } from 'chai';
-import { faqButton } from '../pages/sidebarPage';
+import { faqButton, walletButton } from '../pages/sidebarPage';
 import { faqTabName } from '../support/windowManager';
 
 When(/^I click on FAQ button$/, async function () {
@@ -20,4 +20,10 @@ Then(/^I should see a new tab opened with address (.+)$/, async function (addres
   await this.windowManager.findNewWindowAndSwitchTo(faqTabName);
   const actualAddresses = await this.driver.getCurrentUrl();
   expect(actualAddresses).to.equal(address);
+});
+
+When(/^I click on Wallet button$/, async function () {
+  this.webDriverLogger.info(`Step: I click on Wallet button`);
+  await this.click(walletButton);
+  await this.waitForElement()
 });

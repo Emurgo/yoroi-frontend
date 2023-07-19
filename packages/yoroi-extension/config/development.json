@@ -3,7 +3,7 @@
     "name": "testnet",
     "priceBackendUrl": "http://localhost:8080"
   },
-  "seiza": {
+  "poolExplorer": {
     "simpleTemplate": ""
   },
   "app": {

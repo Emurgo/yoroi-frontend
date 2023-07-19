@@ -1,0 +1,147 @@
+.component {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px);
+  overflow: auto;
+  background-color: #fff;
+  &.isNightly {
+    height: calc(100vh - 138px);
+  }
+}
+
+.connectWrapper {
+  padding-top: 32px;
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & .image {
+    width: 64px;
+    height: 64px;
+    border: 1px solid #a7afc0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+
+    img {
+      width: 44px;
+    }
+  }
+  & .title {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 500;
+  }
+}
+
+.toggleButton {
+  cursor: pointer;
+}
+
+.noWallets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 60px;
+  letter-spacing: 0;
+
+  .noWalletsImage {
+    margin-bottom: 33px;
+  }
+
+  .noWalletsText {
+    color: #242838;
+    font-size: 24px;
+    letter-spacing: 0;
+    line-height: 32px;
+    margin-bottom: 16px;
+  }
+
+  .createWallet {
+    color: #17d1aa;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}
+
+.walletsContainer {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.titleWallet {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  font-weight: 500;
+
+  & * + * {
+    padding-left: 10px;
+  }
+}
+
+.list {
+  & .listItem {
+    border: 1px solid #fff;
+    border-radius: 8px;
+
+    & > div {
+      width: 100%;
+    }
+
+    label {
+      width: 100%;
+      color: var(--yoroi-palette-gray-900);
+    }
+
+    &:hover {
+      border-color: #c4cad7;
+    }
+  }
+
+  overflow: auto;
+}
+
+.bottom {
+  border-top: 1px solid #dce0e9;
+  padding: 15px 32px;
+
+  .infoText {
+    color: var(--yoroi-palette-gray-600);
+    font-size: 12px;
+    line-height: 20px;
+  }
+}
+.errorMessage {
+  color: var(--yoroi-comp-input-error);
+  padding: 10px 0;
+  p {
+    margin-top: 10px;
+    overflow-wrap: break-word;
+  }
+}
+
+@media (min-width: 678px) {
+  .component {
+    max-width: 600px;
+    margin: auto;
+    padding-top: 40px;
+
+    .pageTitle {
+      text-align: center;
+      padding-left: 0px;
+    }
+  }
+}

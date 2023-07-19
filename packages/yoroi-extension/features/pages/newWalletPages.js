@@ -2,6 +2,7 @@
 
 import type { LocatorObject } from '../support/webdriver';
 
+export const seedPhrasePlaceholder = 'Tap each word in the correct order to verify your recovery phrase';
 export const connectHwButton: LocatorObject = { locator: '.WalletAdd_btnConnectHW', method: 'css' };
 export const createWalletButton: LocatorObject = {
   locator: '.WalletAdd_btnCreateWallet',
@@ -14,10 +15,6 @@ export const restoreWalletButton: LocatorObject = {
 // Currency options dialog
 export const pickUpCurrencyDialog: LocatorObject = {
   locator: '.PickCurrencyOptionDialog',
-  method: 'css',
-};
-export const pickUpCurrencyDialogErgo: LocatorObject = {
-  locator: '.PickCurrencyOptionDialog_ergo',
   method: 'css',
 };
 export const pickUpCurrencyDialogCardano: LocatorObject = {
@@ -37,7 +34,7 @@ export const restore24WordWallet: LocatorObject = {
   method: 'css',
 };
 export const walletRestoreDialog: LocatorObject = {
-  locator: '.WalletRestoreOptionDialog',
+  locator: '.WalletRestoreDialog',
   method: 'css',
 };
 export const getCurrencyButton = (currency: string): LocatorObject => {
@@ -74,18 +71,6 @@ export const trezorWalletName: LocatorObject = {
 };
 export const trezorConfirmButton: LocatorObject = { locator: '.MuiButton-primary', method: 'css' };
 // Create wallet dialog
-export const createOptionDialog: LocatorObject = {
-  locator: '.WalletCreateOptionDialog',
-  method: 'css',
-};
-export const createNormalWalletButton: LocatorObject = {
-  locator: '.WalletCreateOptionDialog_createWallet',
-  method: 'css'
-};
-export const createPaperWalletButton: LocatorObject = {
-  locator: '.WalletCreateOptionDialog_restorePaperWallet',
-  method: 'css',
-};
 export const createWalletPasswordInput: LocatorObject = {
   locator: '.WalletCreateDialog .walletPassword input',
   method: 'css',
@@ -132,33 +117,25 @@ export const clearButton: LocatorObject = {
   locator: "//button[contains(text(), 'Clear')]",
   method: 'xpath',
 };
+export const getRecoveryPhraseWord = (indexNumber: number): LocatorObject => {
+  return {
+    locator: `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${indexNumber}]`,
+    method: 'xpath'
+  };
+};
 
-// Paper Wallet dialog
-export const paperWalletDialogSelect: LocatorObject = {
-  locator: '.WalletPaperDialog_component .MuiSelect-select',
-  method: 'css',
-};
-export const restorePaperWalletButton: LocatorObject = {
-  locator: '.WalletRestoreOptionDialog_restorePaperWallet',
-  method: 'css',
-};
 export const restoreDialogButton: LocatorObject = {
   locator: '.WalletRestoreDialog .primary',
   method: 'css',
 };
-export const getAddressesAmountButton = (addressesAmount: string): LocatorObject => {
-  return { locator: `//li[contains(text(), "${addressesAmount}")]`, method: 'xpath' };
-};
+
 export const recoveryPhraseDeleteIcon = {
   locator: `(//span[contains(text(), '×')])[1]`,
   method: 'xpath',
 };
+
 export const recoveryPhraseError: LocatorObject = {
   locator: '//p[starts-with(@id, "recoveryPhrase--")]',
-  method: 'xpath',
-};
-export const addressElement : LocatorObject = {
-  locator: '//span[contains(@class, "RawHash_hash")]',
   method: 'xpath',
 };
 

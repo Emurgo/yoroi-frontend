@@ -24,14 +24,15 @@ export function generateRegistrationMetadata(
 ): RustModule.WalletV4.AuxiliaryData {
 
   /**
-    * Catalyst follows a certain standard to prove the voting power
+    * Catalyst follows CIP 36 to prove the voting power
     * A transaction is submitted with following metadata format for the registration process
     * label: 61284
     * {
-    *   1: "pubkey generated for catalyst app",
+    *   1: "the delegation array",
     *   2: "stake key public key",
     *   3: "address to receive rewards to"
-    *   4: "slot number"
+    *   4: "nonce (slot number)"
+    *   5: "purpose (0)"
     * }
     * label: 61285
     * {
@@ -41,10 +42,11 @@ export function generateRegistrationMetadata(
 
   const registrationData = RustModule.WalletV4.encode_json_str_to_metadatum(
     JSON.stringify({
-      '1': prefix0x(votingPublicKey),
+      '1': [[prefix0x(votingPublicKey), 1]],
       '2': prefix0x(stakingPublicKey),
       '3': prefix0x(rewardAddress),
       '4': nonce,
+      '5': 0,
     }),
     RustModule.WalletV4.MetadataJsonSchema.BasicConversions
   );
@@ -89,13 +91,13 @@ export function generateRegistrationMetadata(
 export function generateRegistration(request: {|
   stakePrivateKey: RustModule.WalletV4.PrivateKey,
   catalystPrivateKey: RustModule.WalletV4.PrivateKey,
-  receiverAddress: Buffer,
+  receiverAddress: string,
   slotNumber: number,
 |}): RustModule.WalletV4.AuxiliaryData {
   return generateRegistrationMetadata(
     Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
     Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),
-    Buffer.from(request.receiverAddress).toString('hex'),
+    request.receiverAddress,
     request.slotNumber,
     (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),
   );

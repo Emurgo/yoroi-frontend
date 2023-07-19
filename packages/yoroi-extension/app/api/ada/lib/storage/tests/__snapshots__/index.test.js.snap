@@ -782,24 +782,16 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://adastat.net/address/",
-        "pool": "https://adastat.net/pool/",
-        "transaction": "https://adastat.net/transaction/",
+        "address": "https://preview.cardanoscan.io/address/",
+        "pool": "https://preview.cardanoscan.io/pool/",
+        "stakeAddress": "https://preview.cardanoscan.io/stakeKey/",
+        "token": "https://preview.cardanoscan.io/token/",
+        "transaction": "https://preview.cardanoscan.io/transaction/",
       },
-      "ExplorerId": 200,
+      "ExplorerId": 550,
       "IsBackup": true,
-      "Name": "AdaStat",
-      "NetworkId": 100,
-    },
-    Object {
-      "Endpoints": Object {
-        "address": "https://itnexplorer.cardano.org/en/address/",
-        "transaction": "https://itnexplorer.cardano.org/en/transaction/",
-      },
-      "ExplorerId": 201,
-      "IsBackup": false,
-      "Name": "CardanoExplorer",
-      "NetworkId": 100,
+      "Name": "CardanoScan",
+      "NetworkId": 350,
     },
     Object {
       "Endpoints": Object {
@@ -1245,37 +1237,6 @@ Object {
     },
     Object {
       "Backend": Object {
-        "BackendService": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
-        "WebSocket": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443",
-      },
-      "BaseConfig": Array [
-        Object {
-          "ByronNetworkId": 764824073,
-          "ChainNetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
-          "Discriminant": 0,
-          "GenesisDate": "1576264417000",
-          "LinearFee": Object {
-            "certificate": "400000",
-            "coefficient": "100000",
-            "constant": "200000",
-            "per_certificate_fees": Object {
-              "certificate_pool_registration": "500000000",
-              "certificate_stake_delegation": "400000",
-            },
-          },
-          "PerEpochPercentageReward": 19666,
-          "SlotDuration": 2,
-          "SlotsPerEpoch": 43200,
-          "StartAt": 0,
-        },
-      ],
-      "CoinType": 2147485463,
-      "Fork": 1,
-      "NetworkId": 100,
-      "NetworkName": "Jormungandr Mainnet",
-    },
-    Object {
-      "Backend": Object {
         "BackendService": "https://ergo-backend.yoroiwallet.com",
       },
       "BaseConfig": Array [
@@ -1396,6 +1357,41 @@ Object {
       "NetworkId": 250,
       "NetworkName": "Cardano Preprod Testnet",
     },
+    Object {
+      "Backend": Object {
+        "BackendService": "https://preview-backend.emurgornd.com",
+        "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
+        "WebSocket": "wss://preview-backend.emurgornd.com:443",
+      },
+      "BaseConfig": Array [
+        Object {
+          "ByronNetworkId": 2,
+          "ChainNetworkId": "0",
+          "GenesisDate": "1666656000000",
+          "SlotDuration": 20,
+          "SlotsPerEpoch": 21600,
+          "StartAt": 0,
+        },
+        Object {
+          "CoinsPerUtxoWord": "34482",
+          "KeyDeposit": "2000000",
+          "LinearFee": Object {
+            "coefficient": "44",
+            "constant": "155381",
+          },
+          "MinimumUtxoVal": "1000000",
+          "PerEpochPercentageReward": 69344,
+          "PoolDeposit": "500000000",
+          "SlotDuration": 1,
+          "SlotsPerEpoch": 86400,
+          "StartAt": 0,
+        },
+      ],
+      "CoinType": 2147485463,
+      "Fork": 0,
+      "NetworkId": 350,
+      "NetworkName": "Cardano Preview Testnet",
+    },
   ],
   "PreferredExplorer": Array [],
   "PriceData": Array [],
@@ -1452,22 +1448,6 @@ Object {
       "IsDefault": true,
       "IsNFT": false,
       "Metadata": Object {
-        "assetName": "",
-        "longName": null,
-        "numberOfDecimals": 6,
-        "policyId": "",
-        "ticker": "ADA",
-        "type": "Cardano",
-      },
-      "NetworkId": 100,
-      "TokenId": 2,
-    },
-    Object {
-      "Digest": 6.262633522161549e-167,
-      "Identifier": "",
-      "IsDefault": true,
-      "IsNFT": false,
-      "Metadata": Object {
         "boxId": "",
         "description": null,
         "height": 0,
@@ -1477,7 +1457,7 @@ Object {
         "type": "Ergo",
       },
       "NetworkId": 200,
-      "TokenId": 3,
+      "TokenId": 2,
     },
     Object {
       "Digest": 6.262633522161549e-167,
@@ -1493,7 +1473,7 @@ Object {
         "type": "Cardano",
       },
       "NetworkId": 300,
-      "TokenId": 4,
+      "TokenId": 3,
     },
     Object {
       "Digest": 6.262633522161549e-167,
@@ -1509,7 +1489,7 @@ Object {
         "type": "Cardano",
       },
       "NetworkId": 400,
-      "TokenId": 5,
+      "TokenId": 4,
     },
     Object {
       "Digest": 6.262633522161549e-167,
@@ -1525,12 +1505,30 @@ Object {
         "type": "Cardano",
       },
       "NetworkId": 250,
+      "TokenId": 5,
+    },
+    Object {
+      "Digest": 6.262633522161549e-167,
+      "Identifier": "",
+      "IsDefault": true,
+      "IsNFT": false,
+      "Metadata": Object {
+        "assetName": "",
+        "longName": null,
+        "numberOfDecimals": 6,
+        "policyId": "",
+        "ticker": "TADA",
+        "type": "Cardano",
+      },
+      "NetworkId": 350,
       "TokenId": 6,
     },
   ],
   "TokenList": Array [],
   "Transaction": Array [],
   "TxMemo": Array [],
+  "UtxoAtSafePointTable": Array [],
+  "UtxoDiffToBestBlock": Array [],
   "UtxoTransactionInput": Array [],
   "UtxoTransactionOutput": Array [],
 }

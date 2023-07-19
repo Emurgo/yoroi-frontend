@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
-import { Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -11,8 +11,8 @@ import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg'
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import MuiAccordion  from '@mui/material/Accordion';
-import MuiAccordionSummary  from '@mui/material/AccordionSummary';
+import MuiAccordion from '@mui/material/Accordion';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import type { GraphData } from '../dashboard/StakingDashboard';
 
@@ -188,19 +188,14 @@ function RewardHistoryGraph({
   return (
     <Box
       p="24px"
+      pt="4px"
       sx={{ height: '278px', display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}
     >
-      <Typography
-        as="button"
-        variant="body2"
-        color="var(--yoroi-palette-secondary-300)"
-        display="block"
-        marginLeft="auto"
-        sx={{ textTransform: 'uppercase' }}
-        onClick={onOpenRewardList}
-      >
-        {title}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <Button color="secondary" size="medium" onClick={onOpenRewardList}>
+          {title}
+        </Button>
+      </Box>
       {rewardsGraphData.error && (
         <div>
           <center>

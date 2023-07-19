@@ -1,7 +1,6 @@
 // @flow
 
-
-import { select, } from '@storybook/addon-knobs';
+import { select } from '@storybook/addon-knobs';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -11,25 +10,20 @@ import TransactionsStore from '../../stores/toplevel/TransactionsStore';
 import DelegationStore from '../../stores/toplevel/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Wallet';
-import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
-import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { THEMES } from '../../styles/utils';
+import { mockFromDefaults, getDefaultEntryTokenInfo } from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-export const mockWalletProps: {
+export const mockWalletProps: ({
   selected: null | PublicDeriver<>,
   publicDerivers: Array<PublicDeriver<>>,
-  getWalletWarnings?: PublicDeriver<> => WarningList,
-  getConceptualWalletSettingsCache:
-    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
-  getPublicKeyCache:
-    typeof WalletStore.prototype.getPublicKeyCache,
-  getTransactions:
-    typeof TransactionsStore.prototype.getTxRequests,
-  getDelegation:
-    typeof DelegationStore.prototype.getDelegationRequests,
+  getWalletWarnings?: (PublicDeriver<>) => WarningList,
+  getConceptualWalletSettingsCache: typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+  getPublicKeyCache: typeof WalletStore.prototype.getPublicKeyCache,
+  getTransactions: typeof TransactionsStore.prototype.getTxRequests,
+  getDelegation: typeof DelegationStore.prototype.getDelegationRequests,
   location: string,
   ...
-} => {| generated: GeneratedData |} = (request) => ({
+}) => {| generated: GeneratedData |} = request => ({
   // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
   generated: {
     stores: {
@@ -37,11 +31,14 @@ export const mockWalletProps: {
         currentRoute: request.location,
       },
       profile: {
-        currentTheme: THEMES.YOROI_CLASSIC,
+        isRevampTheme: false,
+        isClassicTheme: false,
       },
       wallets: {
         selected: request.selected,
-        firstSync: null,
+        publicDerivers: request.selected ? [request.selected] : [],
+        firstSyncWalletId: null,
+        getLastSelectedWallet: () => request.selected,
       },
       transactions: {
         getBalanceRequest: {
@@ -49,18 +46,24 @@ export const mockWalletProps: {
         },
       },
       walletSettings: {
-        getWalletWarnings: request.getWalletWarnings ?? ((publicDeriver) => ({
-          publicDeriver,
-          dialogs: [],
-        }))
+        getWalletWarnings:
+          request.getWalletWarnings ??
+          (publicDeriver => ({
+            publicDeriver,
+            dialogs: [],
+          })),
       },
       router: {
         location: request.location,
-      },    },
+      },
+    },
     actions: {
       router: {
         goToRoute: { trigger: action('goToRoute') },
         redirect: { trigger: action('redirect') },
+      },
+      wallets: {
+        setActiveWallet: { trigger: action('setActiveWallet') },
       },
     },
     SidebarContainerProps: {
@@ -74,10 +77,13 @@ export const mockWalletProps: {
           profile: {
             isSidebarExpanded: false,
           },
+          delegation: {
+            getDelegationRequests: () => undefined,
+          },
         },
         actions: {
           profile: {
-            toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
+            toggleSidebar: { trigger: async req => action('toggleSidebar')(req) },
           },
           router: {
             goToRoute: { trigger: action('goToRoute') },
@@ -92,8 +98,7 @@ export const mockWalletProps: {
             currentRoute: request.location,
           },
           walletSettings: {
-            getConceptualWalletSettingsCache:
-              request.getConceptualWalletSettingsCache,
+            getConceptualWalletSettingsCache: request.getConceptualWalletSettingsCache,
           },
           wallets: {
             selected: request.selected,
@@ -102,10 +107,8 @@ export const mockWalletProps: {
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),
-            getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
-              networkId,
-              mockFromDefaults(defaultAssets)
-            ),
+            getDefaultTokenInfo: networkId =>
+              getDefaultEntryTokenInfo(networkId, mockFromDefaults(defaultAssets)),
           },
           profile: {
             shouldHideBalance: false,
@@ -129,13 +132,13 @@ export const mockWalletProps: {
             setActiveWallet: { trigger: action('setActiveWallet') },
           },
           profile: {
-            updateHideBalance: { trigger: async (req) => action('updateHideBalance')(req) },
+            updateHideBalance: { trigger: async req => action('updateHideBalance')(req) },
           },
           router: {
             goToRoute: { trigger: action('goToRoute') },
           },
         },
-      }
+      },
     },
     BannerContainerProps: {
       generated: {
@@ -144,7 +147,7 @@ export const mockWalletProps: {
             checkAdaServerStatus: select(
               'checkAdaServerStatus',
               ServerStatusErrors,
-              ServerStatusErrors.Healthy,
+              ServerStatusErrors.Healthy
             ),
             serverTime: undefined,
           },

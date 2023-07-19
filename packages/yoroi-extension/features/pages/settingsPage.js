@@ -9,10 +9,6 @@ export async function selectSubmenuSettings(customWorld: Object, buttonName: str
   const formattedButtonName = camelCase(buttonName);
   const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
   await customWorld.click({ locator: buttonSelector, method: 'css' });
-  await customWorld.waitForElement({
-    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
-    method: 'css',
-  });
 }
 
 export async function goToSettings(customWorld: Object) {
@@ -147,9 +143,5 @@ export const explorerSettingsDropdown: LocatorObject = {
 };
 export const cardanoPaymentsURLTitle: LocatorObject = {
   locator: "//h2[contains(text(), 'Cardano Payment URLs')]",
-  method: 'xpath',
-};
-export const currencyConversionText: LocatorObject = {
-  locator: "//h2[contains(text(), 'Currency Conversion')]",
   method: 'xpath',
 };

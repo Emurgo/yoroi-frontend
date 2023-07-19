@@ -7,7 +7,6 @@ import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
   ErgoBaseConfig,
-  JormungandrBaseConfig,
   TokenInsert,
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
@@ -16,8 +15,8 @@ import { decode, } from 'bs58';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
-  Jormungandr: 1,
 });
+
 export const ErgoForks = Object.freeze({
   Primary: 0,
 });
@@ -63,41 +62,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
-  JormungandrMainnet: ({
-    NetworkId: 1_00,
-    NetworkName: 'Jormungandr Mainnet',
-    Backend: {
-      BackendService: environment.isTest()
-        ? 'http://localhost:21000' // TODO: pick a port for test
-        : 'https://shelley-itn-yoroi-backend.yoroiwallet.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000' // TODO: pick a port for test
-        : 'wss://shelley-itn-yoroi-backend.yoroiwallet.com:443',
-    },
-    BaseConfig: ([Object.freeze({
-      StartAt: 0,
-      Discriminant: (environment.isTest() || environment.isJest())
-        ? 0 // RustModule.WalletV3.AddressDiscrimination.Production
-        : 1, // RustModule.WalletV3.AddressDiscrimination.Test
-      ChainNetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
-      ByronNetworkId: 764824073,
-      GenesisDate: '1576264417000',
-      SlotsPerEpoch: 43200,
-      SlotDuration: 2,
-      PerEpochPercentageReward: 19666,
-      LinearFee: {
-        constant: '200000',
-        coefficient: '100000',
-        certificate: '400000',
-        per_certificate_fees: {
-          certificate_pool_registration: '500000000',
-          certificate_stake_delegation: '400000',
-        },
-      },
-    })]: JormungandrBaseConfig),
-    CoinType: CoinTypes.CARDANO,
-    Fork: CardanoForks.Jormungandr,
-  }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   ErgoMainnet: ({
     NetworkId: 2_00,
     NetworkName: 'Ergo Mainnet',
@@ -120,6 +85,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.ERGO,
     Fork: ErgoForks.Primary,
   }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   CardanoTestnet: ({
     NetworkId: 3_00,
     NetworkName: 'Cardano Legacy Testnet',
@@ -160,6 +126,7 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  // <TODO:PENDING_REMOVAL>
   AlonzoTestnet: ({
     NetworkId: 4_00,
     NetworkName: 'Alonzo Testnet',
@@ -240,26 +207,57 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  CardanoPreviewTestnet: ({
+    NetworkId: 3_50,
+    NetworkName: 'Cardano Preview Testnet',
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://preview-backend.emurgornd.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000'
+        : 'wss://preview-backend.emurgornd.com:443',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
+    },
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 2,
+        GenesisDate: '1666656000000',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 0,
+        SlotsPerEpoch: 86400,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        CoinsPerUtxoWord: '34482',
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
+  }: NetworkRow),
 });
 
 export function isTestnet(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
-  return network.NetworkId === networks.JormungandrMainnet.NetworkId
-    || network.NetworkId === networks.CardanoTestnet.NetworkId
-    || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId;
+  return network.NetworkId === networks.CardanoTestnet.NetworkId
+    || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId
+    || network.NetworkId === networks.CardanoPreviewTestnet.NetworkId;
 
 }
 
-export function isJormungandr(
-  network: $ReadOnly<NetworkRow>,
-): boolean {
-  if (
-    network.CoinType === CoinTypes.CARDANO &&
-    network.Fork === CardanoForks.Jormungandr
-  ) return true;
-  return false;
-}
 export function isCardanoHaskell(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
@@ -278,18 +276,14 @@ export function isErgo(
   ) return true;
   return false;
 }
+
 export function getCardanoHaskellBaseConfig(
   network: $ReadOnly<NetworkRow>,
 ): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
 }
-export function getJormungandrBaseConfig(
-  network: $ReadOnly<NetworkRow>,
-): JormungandrBaseConfig {
-  if (!isJormungandr(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
-  return (network.BaseConfig: any); // cast to return type
-}
+
 export function getErgoBaseConfig(
   network: $ReadOnly<NetworkRow>,
 ): ErgoBaseConfig {
@@ -302,23 +296,6 @@ export const defaultAssets: Array<
 > = Object.keys(networks)
   .map(key => networks[key])
   .flatMap(network => {
-    if (isJormungandr(network)) {
-      // TODO: not sure how Jormungandr will end up being used.
-      return [{
-        NetworkId: network.NetworkId,
-        Identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
-        IsDefault: true,
-        IsNFT: false,
-        Metadata: {
-          type: 'Cardano',
-          policyId: PRIMARY_ASSET_CONSTANTS.Jormungandr,
-          assetName: PRIMARY_ASSET_CONSTANTS.Jormungandr,
-          ticker: 'ADA',
-          longName: null,
-          numberOfDecimals: 6,
-        }
-      }];
-    }
     if (isCardanoHaskell(network)) {
       return [{
         NetworkId: network.NetworkId,
@@ -330,7 +307,10 @@ export const defaultAssets: Array<
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
           assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
           ticker:
-            (network === networks.CardanoTestnet || network === networks.CardanoPreprodTestnet || network === networks.AlonzoTestnet)
+            (network === networks.CardanoTestnet
+              || network === networks.CardanoPreprodTestnet
+              || network === networks.CardanoPreviewTestnet
+              || network === networks.AlonzoTestnet)
               ? 'TADA'
               : 'ADA',
           longName: null,

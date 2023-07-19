@@ -1,47 +1,48 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import moment from 'moment';
-import classnames from 'classnames';
-import styles from './Transaction.scss';
-import { ReactComponent as AddMemoSvg }  from '../../../assets/images/add-memo.inline.svg';
-import { ReactComponent as EditSvg }  from '../../../assets/images/edit.inline.svg';
-import WalletTransaction from '../../../domain/WalletTransaction';
-import JormungandrTransaction from '../../../domain/JormungandrTransaction';
-import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
-import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
-import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
-import { Logger } from '../../../utils/logging';
-import { ReactComponent as ExpandArrow }  from '../../../assets/images/expand-arrow-grey.inline.svg';
-import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { TxStatusCodes } from '../../../api/ada/lib/storage/database/primitives/enums';
+import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type {
   CertificateRow,
   TokenRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
+import type { Notification } from '../../../types/notificationType';
+import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
+import moment from 'moment';
+import classnames from 'classnames';
+import styles from './Transaction.scss';
+import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
+import WalletTransaction from '../../../domain/WalletTransaction';
+import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
+import globalMessages, { memoMessages } from '../../../i18n/global-messages';
+import { transactionTypes } from '../../../api/ada/transactions/types';
+import { Logger } from '../../../utils/logging';
+import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import { TxStatusCodes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
-import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import {
   getTokenName,
   getTokenIdentifierIfExists,
-  assetNameFromIdentifier
+  assetNameFromIdentifier,
 } from '../../../stores/stateless/tokenHelpers';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
   parseMetadata,
   parseMetadataDetailed,
@@ -49,7 +50,6 @@ import {
 import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
 export const messages: Object = defineMessages({
   type: {
@@ -134,33 +134,7 @@ export const messages: Object = defineMessages({
   },
 });
 
-export const jormungandrCertificateKinds: Object = defineMessages({
-  PoolRegistration: {
-    id: 'wallet.transaction.certificate.PoolRegistration',
-    defaultMessage: '!!!Pool registration',
-  },
-  PoolUpdate: {
-    id: 'wallet.transaction.certificate.PoolUpdate',
-    defaultMessage: '!!!Pool update',
-  },
-  PoolRetirement: {
-    id: 'wallet.transaction.certificate.PoolRetirement',
-    defaultMessage: '!!!Pool retirement',
-  },
-  StakeDelegation: {
-    id: 'wallet.transaction.certificate.StakeDelegation',
-    defaultMessage: '!!!Stake delegation',
-  },
-  OwnerStakeDelegation: {
-    id: 'wallet.transaction.certificate.OwnerStakeDelegation',
-    defaultMessage: '!!!Owner stake delegation',
-  },
-});
-
 export const shelleyCertificateKinds: Object = {
-  PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
-  PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
-  StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
   StakeDeregistration: globalMessages.StakeDeregistration,
   ...defineMessages({
     StakeRegistration: {
@@ -174,6 +148,18 @@ export const shelleyCertificateKinds: Object = {
     MoveInstantaneousRewardsCert: {
       id: 'wallet.transaction.certificate.MoveInstantaneousRewardsCert',
       defaultMessage: '!!!Manually-initiated reward payout',
+    },
+    PoolRegistration: {
+      id: 'wallet.transaction.certificate.PoolRegistration',
+      defaultMessage: '!!!Pool registration',
+    },
+    PoolRetirement: {
+      id: 'wallet.transaction.certificate.PoolRetirement',
+      defaultMessage: '!!!Pool retirement',
+    },
+    StakeDelegation: {
+      id: 'wallet.transaction.certificate.StakeDelegation',
+      defaultMessage: '!!!Stake delegation',
     },
   }),
 };
@@ -304,7 +290,7 @@ export default class Transaction extends Component<Props, State> {
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
     assuranceLevel: AssuranceLevel,
-    isValid: boolean,
+    isValid: boolean
   ): string {
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
@@ -332,7 +318,7 @@ export default class Transaction extends Component<Props, State> {
     }
     const tokenInfo = this.props.getTokenInfo(request.entry);
     const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
-    const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
+    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
@@ -358,7 +344,7 @@ export default class Transaction extends Component<Props, State> {
   |}) => ?Node = request => {
     const { currency } = this.props.unitOfAccountSetting;
 
-    if (false && /* temporarily disable */this.props.unitOfAccountSetting.enabled) {
+    if (false && /* temporarily disable */ this.props.unitOfAccountSetting.enabled) {
       if (this.props.shouldHideBalance) {
         return (
           <>
@@ -381,26 +367,18 @@ export default class Transaction extends Component<Props, State> {
       if (currency == null) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
       }
-      const price = this.props.getHistoricalPrice(
-        ticker,
-        currency,
-        request.timestamp,
-      );
+      const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
       let fiatDisplay;
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = amount.split('.');
         const beforeDecimalWithSign = beforeDecimal.startsWith('-')
           ? beforeDecimal
-              : '+' + beforeDecimal;
+          : '+' + beforeDecimal;
         fiatDisplay = (
           <>
             {beforeDecimalWithSign}
-            {afterDecimal && (
-              <span className={styles.afterDecimal}>
-                .{afterDecimal}
-              </span>
-            )}
+            {afterDecimal && <span className={styles.afterDecimal}>.{afterDecimal}</span>}
           </>
         );
       } else {
@@ -412,9 +390,7 @@ export default class Transaction extends Component<Props, State> {
             {fiatDisplay}&nbsp;{currency}
           </div>
           <div className={styles.amountSmall}>
-            {this.renderAmountDisplay({ entry: request.entry })}
-            {' '}
-            {this.getTicker(request.entry)}
+            {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </div>
         </>
       );
@@ -422,12 +398,10 @@ export default class Transaction extends Component<Props, State> {
 
     return (
       <>
-        {this.renderAmountDisplay({ entry: request.entry })}
-        {' '}
-        {this.getTicker(request.entry)}
+        {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </>
     );
-  }
+  };
 
   renderFeeDisplay: ({|
     amount: MultiToken,
@@ -452,20 +426,16 @@ export default class Transaction extends Component<Props, State> {
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount.abs(),
-      numberOfDecimals,
+      numberOfDecimals
     );
 
-    if (false && /* temporarily disable */this.props.unitOfAccountSetting.enabled) {
+    if (false && /* temporarily disable */ this.props.unitOfAccountSetting.enabled) {
       const { currency } = this.props.unitOfAccountSetting;
       const ticker = tokenInfo.Metadata.ticker;
       if (ticker == null) {
         throw new Error('unexpected main token type');
       }
-      const price = this.props.getHistoricalPrice(
-        ticker,
-        currency,
-        request.timestamp,
-      );
+      const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
 
       let fiatDisplay;
       if (price != null) {
@@ -474,11 +444,7 @@ export default class Transaction extends Component<Props, State> {
         fiatDisplay = (
           <>
             {beforeDecimal}
-            {afterDecimal && (
-              <span className={styles.afterDecimal}>
-                .{afterDecimal}
-              </span>
-            )}
+            {afterDecimal && <span className={styles.afterDecimal}>.{afterDecimal}</span>}
           </>
         );
       } else {
@@ -486,11 +452,12 @@ export default class Transaction extends Component<Props, State> {
       }
       return (
         <>
-          <div>{fiatDisplay}&nbsp;{currency}</div>
+          <div>
+            {fiatDisplay}&nbsp;{currency}
+          </div>
           <div className={styles.amountSmall}>
             {beforeDecimalRewards}
-            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-            {' '}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
           </div>
         </>
@@ -507,9 +474,10 @@ export default class Transaction extends Component<Props, State> {
 
   getTicker: TokenEntry => string = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    return tokenInfo != null ? truncateToken(getTokenName(tokenInfo))
+    return tokenInfo != null
+      ? truncateToken(getTokenName(tokenInfo))
       : assetNameFromIdentifier(tokenEntry.identifier);
-  }
+  };
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
@@ -529,7 +497,7 @@ export default class Transaction extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })}{' '}{this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
         </div>
       );
     }
@@ -556,9 +524,7 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length}
-        {' '}
-        {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
   };
@@ -566,7 +532,7 @@ export default class Transaction extends Component<Props, State> {
   renderRow: ({|
     kind: string,
     data: WalletTransaction,
-    address: {| address: string, value: MultiToken |},
+    address: TxDataInput | TxDataOutput,
     addressIndex: number,
     transform?: BigNumber => BigNumber,
   |}) => Node = request => {
@@ -645,12 +611,8 @@ export default class Transaction extends Component<Props, State> {
     const { intl } = this.context;
     const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
     const isFailedTransaction = state < 0 && !isSubmittedTransaction;
-    const isPendingTransaction = (
-      state === TxStatusCodes.PENDING || isSubmittedTransaction
-    );
-    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
-      data.isValid :
-      true;
+    const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
+    const isValidTransaction = data instanceof CardanoShelleyTransaction ? data.isValid : true;
 
     const componentStyles = classnames([
       styles.component,
@@ -673,18 +635,13 @@ export default class Transaction extends Component<Props, State> {
 
     const labelClasses = classnames([
       styles.status,
-      (isFailedTransaction || !isValidTransaction) ? styles.failedLabel : '',
+      isFailedTransaction || !isValidTransaction ? styles.failedLabel : '',
       isPendingTransaction ? styles.pendingLabel : '',
     ]);
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(
-      intl,
-      state,
-      assuranceLevel,
-      isValidTransaction,
-    );
+    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
 
     return (
       <div className={componentStyles}>
@@ -889,48 +846,30 @@ export default class Transaction extends Component<Props, State> {
     );
   };
 
-  jormungandrCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
-    const { intl } = this.context;
-    const kind = certificate.Kind;
-    switch (kind) {
-      case RustModule.WalletV3.CertificateKind.PoolRegistration:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
-      case RustModule.WalletV3.CertificateKind.PoolUpdate:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
-      case RustModule.WalletV3.CertificateKind.PoolRetirement:
-        return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
-      case RustModule.WalletV3.CertificateKind.StakeDelegation:
-        return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
-      case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
-        return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
-      default: {
-        throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
-      }
-    }
-  };
-
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
-    switch (kind) {
-      case RustModule.WalletV4.CertificateKind.StakeRegistration:
-        return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
-      case RustModule.WalletV4.CertificateKind.StakeDeregistration:
-        return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
-      case RustModule.WalletV4.CertificateKind.StakeDelegation:
-        return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
-      case RustModule.WalletV4.CertificateKind.PoolRegistration:
-        return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
-      case RustModule.WalletV4.CertificateKind.PoolRetirement:
-        return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
-      case RustModule.WalletV4.CertificateKind.GenesisKeyDelegation:
-        return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
-      case RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
-        return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
-      default: {
-        throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
+    return RustModule.WasmScope(Scope => {
+      switch (kind) {
+        case Scope.WalletV4.CertificateKind.StakeRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
+        case Scope.WalletV4.CertificateKind.StakeDeregistration:
+          return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
+        case Scope.WalletV4.CertificateKind.StakeDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
+        case Scope.WalletV4.CertificateKind.PoolRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
+        case Scope.WalletV4.CertificateKind.PoolRetirement:
+          return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
+        case Scope.WalletV4.CertificateKind.GenesisKeyDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
+        case Scope.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
+          return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
+        default: {
+          throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
+        }
       }
-    }
+    });
   };
 
   getWithdrawals: WalletTransaction => ?Node = data => {
@@ -981,15 +920,7 @@ export default class Transaction extends Component<Props, State> {
         <span className={styles.rowData}>{node}</span>
       </>
     );
-    if (data instanceof JormungandrTransaction) {
-      if (data.certificates.length === 0) {
-        return null;
-      }
-      return wrapCertificateText(
-        this.jormungandrCertificateToText(data.certificates[0].certificate),
-        data.certificates.length > 1
-      );
-    }
+
     if (data instanceof CardanoShelleyTransaction) {
       if (data.certificates.length === 0) {
         return null;
@@ -1013,29 +944,38 @@ export default class Transaction extends Component<Props, State> {
     const { intl } = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
-      let jsonData = null;
+      let metadata;
+      if (typeof data.metadata === 'string') {
+        let jsonData = null;
 
-      try {
-        jsonData = parseMetadata(data.metadata);
-      } catch (error) {
-        // try to parse schema using detailed conversion if advanced user
-        if (this.props.complexityLevel === ComplexityLevels.Advanced) {
-          try {
-            jsonData = parseMetadataDetailed(data.metadata);
-          } catch (errDetailed) {
-            // discard error
-            // can not parse metadata as json
-            // show the metadata hex as is
+        try {
+          jsonData = parseMetadata(data.metadata);
+        } catch (error) {
+          // try to parse schema using detailed conversion if advanced user
+          if (this.props.complexityLevel === ComplexityLevels.Advanced) {
+            try {
+              jsonData = parseMetadataDetailed(data.metadata);
+            } catch (errDetailed) {
+              // discard error
+              // can not parse metadata as json
+              // show the metadata hex as is
+            }
           }
+          // do nothing for simple user
         }
-        // do nothing for simple user
+        if (jsonData !== null) {
+          metadata = (<CodeBlock code={jsonData} />);
+        } else {
+          metadata = (<span>0x{data.metadata}</span>);
+        }
+      } else {
+        metadata = (<CodeBlock code={JSON.stringify(data.metadata)} />);
       }
-
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
           <span className={styles.rowData}>
-            {jsonData !== null ? <CodeBlock code={jsonData} /> : <span>0x{data.metadata}</span>}
+            {metadata}
           </span>
         </div>
       );

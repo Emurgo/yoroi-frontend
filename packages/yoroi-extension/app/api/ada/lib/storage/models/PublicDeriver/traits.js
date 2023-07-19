@@ -54,9 +54,6 @@ import {
   unwrapStakingKey as unwrapCardanoStakingKey,
 } from '../../bridge/utils';
 import {
-  unwrapStakingKey as unwrapJormungandrStakingKey,
-} from '../../../../../jormungandr/lib/storage/bridge/utils';
-import {
   normalizeToPubDeriverLevel,
   rawChangePassword,
   decryptKey,
@@ -101,15 +98,19 @@ import {
   GetKeyDerivation,
   GetKey,
   GetAddress,
+  GetToken,
 } from '../../database/primitives/api/read';
 import { CoreAddressTypes } from '../../database/primitives/enums';
-import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
+import type {
+  KeyRow,
+  KeyDerivationRow,
+  TokenRow,
+} from '../../database/primitives/tables';
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
 import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
 import { scanBip44Chain, scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
-import { scanJormungandrCip1852Account } from '../../../../../jormungandr/lib/restoration/scan';
 import { scanShelleyCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
@@ -128,9 +129,15 @@ import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
 import {
   isCardanoHaskell,
-  isJormungandr,
 } from '../../database/prepackaged/networks';
 import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
+import {
+  GetUtxoAtSafePoint,
+  GetUtxoDiffToBestBlock,
+} from '../../database/utxo/api/read';
+import type {
+  Utxo,
+} from '@emurgo/yoroi-lib/dist/utxo/models';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -202,6 +209,116 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IGetAllUtxosRequest,
+    Map<number, string>,
+  ) => Promise<IGetAllUtxosResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
+  ) => {
+    // TODO: perhaps should use seperate types for Ergo and Cardano wallets instead
+    // of branching
+    if (isCardanoHaskell(this.getParent().getNetworkInfo())) {
+      const addresses = await this.rawGetAllUtxoAddresses(
+        tx,
+        {
+          GetAddress: deps.GetAddress,
+          GetPathWithSpecific: deps.GetPathWithSpecific,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
+        },
+        undefined,
+        derivationTables,
+      );
+
+      const utxoStorageApi = this.getUtxoStorageApi();
+      utxoStorageApi.setDb(super.getDb());
+      utxoStorageApi.setDbTx(tx);
+      const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
+
+      const networkId = this.getParent().getNetworkInfo().NetworkId;
+      const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
+        (await deps.GetToken.fromIdentifier(
+          super.getDb(), tx,
+          [
+            '',
+            ...utxosInStorage.flatMap(
+              ({ assets }) => assets.map(asset => asset.assetId)
+            )
+          ]
+        )).filter(token => token.NetworkId === networkId)
+          .map(token => [ token.Identifier, token ])
+      );
+
+      const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(
+        addresses.flatMap(family => family.addrs.map(addr => [addr.Hash, {
+          addressing: family.addressing,
+          address: addr.Hash,
+        }]))
+      );
+
+      const addressedUtxos = utxosInStorage.map(utxo => {
+        let addressHash;
+        try {
+          addressHash = Buffer.from(
+            RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
+          ).toString('hex')
+        } catch {
+          addressHash = utxo.receiver;
+        }
+        const addressingInfo = addressingMap.get(addressHash);
+        if (addressingInfo == null) {
+          throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
+        }
+
+        const tokens = [ '', ...utxo.assets.map(asset => asset.assetId) ].map((tokenId, i) => {
+          let amount;
+          if (i === 0) {
+            amount = utxo.amount;
+          } else {
+            amount = utxo.assets[i-1].amount;
+          }
+          const token = tokenMap.get(tokenId);
+          if (!token) {
+            throw new Error(`missing token ID in UTXO: ${tokenId}`);
+          }
+          return { Token: token, TokenList: { Amount: amount.toString() } };
+        });
+        return {
+          output: {
+            Transaction: { Hash: utxo.txHash },
+            UtxoTransactionOutput: {
+              OutputIndex: utxo.txIndex,
+              ErgoBoxId: null,
+              ErgoCreationHeight: null,
+              ErgoTree: null,
+              ErgoRegisters: null,
+            },
+            tokens,
+          },
+          addressing: addressingInfo.addressing,
+          address: addressingInfo.address,
+        };
+      });
+      return addressedUtxos;
+    }
+    // Ergo:
+    return this.rawGetAllUtxosFromOldDb(tx, deps, _body, derivationTables);
+  }
+  rawGetAllUtxosFromOldDb: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllUtxosRequest,
@@ -222,12 +339,14 @@ const GetAllUtxosMixin = (
       undefined,
       derivationTables,
     );
+
     const addressIds = addresses.flatMap(family => family.addrs.map(addr => addr.AddressId));
     const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
       addressIds,
       this.getParent().getNetworkInfo().NetworkId
     );
+
     const addressingMap = new Map<number, {| ...Address, ...Addressing |}>(
       addresses.flatMap(family => family.addrs.map(addr => [addr.AddressId, {
         addressing: family.addressing,
@@ -238,7 +357,7 @@ const GetAllUtxosMixin = (
     for (const utxo of utxosInStorage) {
       const addressingInfo = addressingMap.get(utxo.UtxoTransactionOutput.AddressId);
       if (addressingInfo == null) {
-        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)} should never happen`);
+        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
       }
       addressedUtxos.push({
         output: utxo,
@@ -246,8 +365,10 @@ const GetAllUtxosMixin = (
         address: addressingInfo.address,
       });
     }
+
     return addressedUtxos;
   }
+
   getAllUtxos: IGetAllUtxosRequest => Promise<IGetAllUtxosResponse> = async (
     _body
   ) => {
@@ -256,6 +377,9 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific,
       GetAddress,
       GetUtxoTxOutputsWithTx,
+      GetUtxoAtSafePoint,
+      GetUtxoDiffToBestBlock,
+      GetToken,
       GetDerivationSpecific,
     });
     const depTables = Object
@@ -269,6 +393,33 @@ const GetAllUtxosMixin = (
         ...mapToTables(super.getDb(), derivationTables),
       ],
       async tx => this.rawGetAllUtxos(tx, deps, undefined, derivationTables)
+    );
+  }
+
+  getAllUtxosFromOldDb: IGetAllUtxosRequest => Promise<IGetAllUtxosResponse> = async (
+    _body
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetUtxoTxOutputsWithTx,
+      GetUtxoAtSafePoint,
+      GetUtxoDiffToBestBlock,
+      GetToken,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+          .keys(deps)
+          .map(key => deps[key])
+          .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IGetAllUtxosResponse>(
+      super.getDb(),
+      [
+          ...depTables,
+          ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetAllUtxosFromOldDb(tx, deps, undefined, derivationTables)
     );
   }
 
@@ -460,7 +611,6 @@ const GetAllAccountingMixin = (
     const allAccounts = await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables);
     const stakingKeyAccount = allAccounts[0];
     const stakingAddr = stakingKeyAccount.addrs.find(addr => (
-      addr.Type === CoreAddressTypes.JORMUNGANDR_ACCOUNT ||
       addr.Type === CoreAddressTypes.CARDANO_REWARD
     ));
     if (stakingAddr == null) {
@@ -1026,84 +1176,6 @@ export const ErgoBip44PickReceive: * = Mixin<
   ErgoBip44PickReceiveMixinDependencies,
   IPickReceive
 >(ErgoBip44PickReceiveMixin);
-
-// ==================================
-//   Cip1852JormungandrPickReceive
-// ==================================
-
-type Cip1852JormungandrPickReceiveMixinDependencies = IPublicDeriver<> & IGetStakingKey;
-const Cip1852JormungandrPickReceiveMixin = (
-  superclass: Class<Cip1852JormungandrPickReceiveMixinDependencies>,
-) => (class Cip1852JormungandrPickReceive extends superclass implements IPickReceive {
-  rawPickReceive: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IPickReceiveRequest,
-    Map<number, string>,
-  ) => Promise<IPickReceiveResponse> = async (
-    tx,
-    deps,
-    body,
-    derivationTables,
-  ) => {
-    const stakingAddressDbRow = await this.rawGetStakingKey(
-      tx,
-      deps,
-      undefined,
-      derivationTables
-    );
-
-    const stakingKey = Buffer.from(unwrapJormungandrStakingKey(stakingAddressDbRow.addr.Hash).as_bytes()).toString('hex');
-    const ourGroupAddress = body.addrs
-      .filter(addr => (addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP))
-      .filter(addr => addr.Hash.includes(stakingKey));
-    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852JormungandrPickReceive)}::${nameof(this.rawPickReceive)} no group address found`);
-    return {
-      addr: ourGroupAddress[0],
-      row: body.row,
-      addressing: body.addressing,
-    };
-  }
-
-  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
-    body,
-  ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
-    const deps = Object.freeze({
-      GetPathWithSpecific,
-      GetAddress,
-      GetDerivationSpecific,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii<IPickReceiveResponse>(
-      super.getDb(),
-      [
-        ...depTables,
-        ...mapToTables(super.getDb(), derivationTables),
-      ],
-      async tx => this.rawPickReceive(
-        tx,
-        deps,
-        body,
-        derivationTables,
-      )
-    );
-  }
-});
-export const Cip1852JormungandrPickReceive: * = Mixin<
-  Cip1852JormungandrPickReceiveMixinDependencies,
-  IPickReceive
->(Cip1852JormungandrPickReceiveMixin);
 
 // =======================
 //   Cip1852PickReceive
@@ -1719,78 +1791,6 @@ export function asScanLegacyCardanoAccountUtxoInstance<
   return undefined;
 }
 
-// ==============================
-//   ScanJormungandrAccountUtxo
-// ==============================
-
-type ScanJormungandrAccountUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
-const ScanJormungandrAccountUtxoMixin = (
-  superclass: Class<ScanJormungandrAccountUtxoDependencies>,
-) => (class ScanJormungandrAccountUtxo extends superclass implements IScanAccountUtxo {
-  rawScanAccount: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IScanAccountRequest,
-    Map<number, string>,
-  ) => Promise<IScanAccountResponse> = async (
-    tx,
-    deps,
-    body,
-    derivationTables,
-  ): Promise<IScanAccountResponse> => {
-    const stakingAddressDbRow = await this.rawGetStakingKey(
-      tx,
-      deps,
-      undefined,
-      derivationTables
-    );
-
-    const address = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(stakingAddressDbRow.addr.Hash, 'hex')
-    );
-    const stakingAddress = address.to_account_address();
-    if (stakingAddress == null) {
-      throw new StaleStateError(`${nameof(ScanJormungandrAccountUtxo)}::${nameof(this.rawScanAccount)} Could non-account hash in staking key derivation`);
-    }
-    return await scanJormungandrCip1852Account({
-      accountPublicKey: body.accountPublicKey,
-      lastUsedInternal: body.lastUsedInternal,
-      lastUsedExternal: body.lastUsedExternal,
-      network: this.getParent().getNetworkInfo(),
-      checkAddressesInUse: body.checkAddressesInUse,
-      addByHash: rawGenAddByHash(
-        new Set([
-          ...body.internalAddresses,
-          ...body.externalAddresses,
-        ])
-      ),
-      stakingKey: stakingAddress.get_account_key(),
-    });
-  }
-});
-
-const ScanJormungandrAccountUtxo: * = Mixin<
-  ScanJormungandrAccountUtxoDependencies,
-  IScanAccountUtxo,
->(ScanJormungandrAccountUtxoMixin);
-const ScanJormungandrAccountUtxoInstance = (
-  (ScanJormungandrAccountUtxo: any): ReturnType<typeof ScanJormungandrAccountUtxoMixin>
-);
-export function asScanJormungandrAccountUtxoInstance<
-  T: IPublicDeriver<any>
->(
-  obj: T
-): void | (IScanAccountUtxo & ScanJormungandrAccountUtxoDependencies & T) {
-  if (obj instanceof ScanJormungandrAccountUtxoInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ==========================
 //   ScanShelleyAccountUtxo
 // ==========================
@@ -2350,18 +2350,24 @@ const GetUtxoBalanceMixin = (
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
+      GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
+      GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetUtxoBalanceRequest,
     Map<number, string>,
   ) => Promise<IGetUtxoBalanceResponse> = async (tx, deps, _body, derivationTables) => {
-    const utxos = await this.rawGetAllUtxos(
+    const utxos: IGetAllUtxosResponse = await this.rawGetAllUtxos(
       tx,
       {
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
+        GetUtxoAtSafePoint: deps.GetUtxoAtSafePoint,
+        GetUtxoDiffToBestBlock: deps.GetUtxoDiffToBestBlock,
+        GetToken: deps.GetToken,
         GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
@@ -2378,6 +2384,9 @@ const GetUtxoBalanceMixin = (
       GetPathWithSpecific,
       GetAddress,
       GetUtxoTxOutputsWithTx,
+      GetUtxoAtSafePoint,
+      GetUtxoDiffToBestBlock,
+      GetToken,
       GetDerivationSpecific,
     });
     const depTables = Object
@@ -2744,9 +2753,7 @@ export async function addTraitsForCip1852Child(
   // recall: adding addresses to public deriver in cip1852 is same as bip44
   currClass = AddBip44FromPublic(currClass);
 
-  if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-    currClass = PickReceive(Cip1852JormungandrPickReceive(currClass));
-  } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+  if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
     currClass = PickReceive(Cip1852PickReceive(currClass));
   } else {
     throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to pick receive address`);
@@ -2761,9 +2768,7 @@ export async function addTraitsForCip1852Child(
     currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-        currClass = ScanJormungandrAccountUtxo(currClass);
-      } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+      if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
         currClass = ScanShelleyAccountUtxo(currClass);
       } else {
         throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to scan for network`);

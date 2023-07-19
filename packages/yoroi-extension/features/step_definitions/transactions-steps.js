@@ -1,7 +1,6 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, generateTransaction } from '../mock-chain/mockCardanoImporter';
@@ -15,17 +14,18 @@ import { walletSummaryBox, walletSummaryComponent } from '../pages/walletTransac
 import {
   amountInput,
   disabledSubmitButton,
+  getAmountItems,
   getTokenLocator,
   invalidAddressError,
   nextButton,
-  notEnoughAdaError,
+  amountError,
   receiverInput,
   selectAssetDropDown,
   selectSendingAmountDropDown,
   sendAllCheckbox,
   sendAllItem,
+  sendInputDialogFeesText,
   sendConfirmationDialogAddressToText,
-  sendConfirmationDialogAmountText,
   sendConfirmationDialogError,
   sendConfirmationDialogFeesText,
   sendConfirmationDialogTotalAmountText,
@@ -35,11 +35,13 @@ import {
   transactionPageButton,
   warningBox,
 } from '../pages/walletSendPage';
-import { sendTab } from '../pages/walletPage';
+import { navDetailsAmount, sendTab } from '../pages/walletPage';
 import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
-import { unmangleButton } from '../pages/walletReceivePage';
-import { halfSecond, oneMinute } from '../support/helpers/common-constants';
+import { correctDelegationButton } from '../pages/walletReceivePage';
+import { fiveSeconds, halfSecond, oneMinute } from '../support/helpers/common-constants';
+import { stripZerosFromEnd } from '../support/helpers/transfer-helpers';
+import { getIndexedDBTablesInfo } from './common-steps';
 
 const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
   const browserName = await customWorld.getBrowser();
@@ -53,16 +55,30 @@ const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<a
   return fields;
 };
 
-Given(/^I have a wallet with funds$/, async function () {
-  await this.waitUntilContainsText(
-    { locator: '.NavWalletDetails_amount', method: 'css' },
-    'ADA',
-    oneMinute
-  );
-  const balanceTextElement = await this.findElement({ locator: '.NavWalletDetails_amount', method: 'css' });
+const walletIsEmpty = async (customWorld: any): Promise<void > => {
+  const balanceTextElement = await customWorld.findElement(navDetailsAmount);
   const balanceText = await balanceTextElement.getText();
   const [balance, ] = balanceText.split(' ');
   expect(parseFloat(balance), 'The wallet is empty').to.be.above(0);
+};
+
+Given(/^I have a wallet with funds$/, async function () {
+  await this.waitUntilContainsText(
+    navDetailsAmount,
+    'ADA',
+    oneMinute
+  );
+  await walletIsEmpty(this);
+  await getIndexedDBTablesInfo(this, 'first_wallet_synced');
+});
+
+Given(/^I have an ERGO wallet with funds$/, async function () {
+  await this.waitUntilContainsText(
+    navDetailsAmount,
+    'ERG',
+    oneMinute
+  );
+  await walletIsEmpty(this);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -98,15 +114,22 @@ When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
 
   await this.waitUntilText(sendConfirmationDialogAddressToText, truncateAddress(fields.address));
-  await this.waitUntilContainsText(sendConfirmationDialogFeesText, fields.fee);
-  await this.waitUntilContainsText(sendConfirmationDialogAmountText, fields.amount);
+  await this.waitUntilContainsText(sendConfirmationDialogFeesText, stripZerosFromEnd(fields.fee));
+  const allItems = await getAmountItems(this);
+  let mainCoinItem;
+  if (fields.isErgo && fields.isErgo === '1'){
+    mainCoinItem = allItems.filter(item => item.tokenName === 'erg')[0];
+  } else {
+    mainCoinItem = allItems.filter(item => item.tokenName === 'ada')[0];
+  }
+  expect(mainCoinItem.amount).to.be.equal(stripZerosFromEnd(fields.amount));
 
   const network = networks.CardanoMainnet;
   const assetInfo = defaultAssets.filter(asset => asset.NetworkId === network.NetworkId)[0];
-  const decimalPlaces = assetInfo.Metadata.numberOfDecimals;
+  const totalWithDecimals = total.toFixed(assetInfo.Metadata.numberOfDecimals);
   await this.waitUntilContainsText(
     sendConfirmationDialogTotalAmountText,
-    total.toFixed(decimalPlaces)
+    stripZerosFromEnd(totalWithDecimals)
   );
 });
 
@@ -123,14 +146,7 @@ When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
 });
 
 When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
-  const result = await this.customWaiter(async () => {
-    const messageElement = await this.driver
-      .findElement(By.css('.WalletSendForm_amountInput'))
-      .findElement(By.xpath('//p'));
-    const messageText = await messageElement.getText();
-    return messageText === `+ ${fee} of fees`;
-  });
-  expect(result).to.be.true;
+  await this.waitUntilText(sendInputDialogFeesText, `+ ${stripZerosFromEnd(fee)} of fees`, fiveSeconds);
 });
 
 When(/^I click on the next button in the wallet send form$/, async function () {
@@ -188,14 +204,17 @@ Then(/^Revamp. I should see the summary screen$/, async function () {
 });
 
 Then(/^I should see an invalid address error$/, async function () {
-  await this.waitForElement(invalidAddressError);
+  const errorMessage = await i18n.formatMessage(this.driver, {
+    id: 'wallet.send.form.errors.invalidAddress',
+  });
+  await this.waitUntilText(invalidAddressError, errorMessage);
 });
 
 Then(/^I should see a not enough ada error$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, {
     id: 'api.errors.NotEnoughMoneyToSendError',
   });
-  await this.waitUntilText(notEnoughAdaError, errorMessage);
+  await this.waitUntilText(amountError, errorMessage);
 });
 
 Then(/^I should not be able to submit$/, async function () {
@@ -242,7 +261,7 @@ Then(/^I should see no warning block$/, async function () {
 });
 
 When(/^I click on the unmangle button$/, async function () {
-  await this.click(unmangleButton);
+  await this.click(correctDelegationButton);
 });
 
 When(/^I open the token selection dropdown$/, async function () {

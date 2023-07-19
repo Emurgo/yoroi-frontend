@@ -5,6 +5,11 @@ import { By } from 'selenium-webdriver';
 
 const LANGUAGE_SELECTION_FORM = '.LanguageSelectionForm_component';
 
+export const loadingSpinnerComponent: LocatorObject = {
+  locator: '.LoadingSpinner_component',
+  method: 'css',
+};
+
 // language select page
 export const languageSelectionForm: LocatorObject = {
   locator: LANGUAGE_SELECTION_FORM,
@@ -24,6 +29,11 @@ export const japaneseLaguageSelection: LocatorObject = {
 export const continueButton: LocatorObject = {
   locator: '//button[text()="Continue"]',
   method: 'xpath',
+};
+
+export const confirmSelectedLanguageButton: LocatorObject = {
+  locator: `${LANGUAGE_SELECTION_FORM} > .LanguageSelectionForm_centeredBox > .MuiButton-primary`,
+  method: 'css'
 };
 // ToS page
 export const termsOfUseComponent: LocatorObject = {

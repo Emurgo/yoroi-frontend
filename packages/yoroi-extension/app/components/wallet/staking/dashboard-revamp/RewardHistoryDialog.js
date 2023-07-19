@@ -7,7 +7,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import { Typography } from '@mui/material';
 import Dialog from '../../../widgets/Dialog';
-import { injectIntl } from 'react-intl';
+import { injectIntl, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Box } from '@mui/system';
 import { RewardHistoryItem } from './RewardHistoryTab';
@@ -18,6 +18,13 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { groupByPoolName } from '../utils';
 import styles from './RewardHistoryDialog.scss';
+
+const messages = defineMessages({
+  epoch: {
+    id: 'wallet.staking.rewards.rewardHistory.epochNum',
+    defaultMessage: '!!!Epoch {number}',
+  },
+});
 
 export type GraphRewardData = {|
   error: ?LocalizableError,
@@ -41,8 +48,7 @@ type Intl = {|
 
 function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
   const rewardItems = graphData.rewardsGraphData.items;
-  const rewardList = rewardItems?.totalRewards.filter(p => Boolean(p.primary)) ?? [];
-
+  const rewardList = rewardItems?.perEpochRewards.filter(p => Boolean(p.primary)) ?? [];
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
 
   return (
@@ -76,13 +82,13 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
               key={poolName}
               // $FlowFixMe[incompatible-use]: Object entries flow type
               poolId={data.poolId}
-              poolName={poolName}
+              poolName={poolName || '-'}
               // $FlowFixMe[incompatible-use]: Object entries flow type
               poolAvatar={data.poolAvatar}
               // $FlowFixMe[incompatible-use]: Object entries flow type
               historyList={data.map(item => ({
                 // TODO: Make sure it's "received" in all use cases
-                type: 'Received',
+                type: intl.formatMessage(messages.epoch, { number: item.name }),
                 date: item.date,
                 balance: item.primary,
                 currency: item.currency,

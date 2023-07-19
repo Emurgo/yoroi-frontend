@@ -1,0 +1,44 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+
+  & .avatar {
+    margin-right: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    object-fit: cover;
+    height: 40px;
+    width: 40px;
+  }
+
+  & .wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  & .nameWrapper {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  & .name {
+    flex: 1;
+    text-align: left;
+  }
+
+  & .balance {
+    font-weight: 400;
+  }
+
+  & .checksum {
+    color: #6b7384;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+}

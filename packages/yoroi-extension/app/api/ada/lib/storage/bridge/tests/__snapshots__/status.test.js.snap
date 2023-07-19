@@ -32,7 +32,7 @@ exports[`Syncing with failed bip44 1`] = `
       \\"utxoOutputs\\": [
         {
           \\"TransactionId\\": 3,
-          \\"AddressId\\": 48,
+          \\"AddressId\\": 50,
           \\"OutputIndex\\": 0,
           \\"IsUnspent\\": true,
           \\"ErgoBoxId\\": null,
@@ -195,7 +195,7 @@ exports[`Syncing with failed bip44 1`] = `
       \\"utxoInputs\\": [
         {
           \\"TransactionId\\": 1,
-          \\"AddressId\\": 46,
+          \\"AddressId\\": 41,
           \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20\\",
           \\"IndexInParentTx\\": 0,
           \\"IndexInOwnTx\\": 0,
@@ -218,7 +218,7 @@ exports[`Syncing with failed bip44 1`] = `
         },
         {
           \\"TransactionId\\": 1,
-          \\"AddressId\\": 47,
+          \\"AddressId\\": 42,
           \\"OutputIndex\\": 1,
           \\"IsUnspent\\": true,
           \\"ErgoBoxId\\": null,
@@ -388,7 +388,7 @@ exports[`Syncing with failed bip44 1`] = `
       \\"utxoInputs\\": [
         {
           \\"TransactionId\\": 2,
-          \\"AddressId\\": 46,
+          \\"AddressId\\": 48,
           \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21\\",
           \\"IndexInParentTx\\": 0,
           \\"IndexInOwnTx\\": 0,
@@ -411,7 +411,7 @@ exports[`Syncing with failed bip44 1`] = `
         },
         {
           \\"TransactionId\\": 2,
-          \\"AddressId\\": 47,
+          \\"AddressId\\": 49,
           \\"OutputIndex\\": 1,
           \\"IsUnspent\\": true,
           \\"ErgoBoxId\\": null,
@@ -814,48 +814,60 @@ Array [
       },
       Object {
         "AddressId": 41,
-        "Digest": -1.3416871383074957e-161,
-        "Hash": "Ae2tdPwUPEYxD5EgazsN7DcLp2fFiak1RTco6CoDNioKVuodftS4oNeabwz",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 42,
-        "Digest": 2.414293239739638e-47,
-        "Hash": "Ae2tdPwUPEZFqcMbS757FyZrABDZUVtzEW4sPvzZj3UYBcn8BSWFBxmQK2n",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 43,
-        "Digest": 1.1036862858872953e+216,
-        "Hash": "Ae2tdPwUPEZGR3uPidVc5p1cSnV9KDzDxrrembeFhLYMgFAa4KHpTqmncFQ",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 44,
-        "Digest": -2.938948476649332e-97,
-        "Hash": "Ae2tdPwUPEZEvn7nMBBaBMCc773zeMCPsS93tDsFvyZw4quRbnq5bnP1i8F",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 45,
-        "Digest": 8.159203653530658e-92,
-        "Hash": "Ae2tdPwUPEZAzQ7FdZ8ksAjK7iVGzjMKUxWqkQLF52oGxWBNfyDRocqJwBT",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 46,
         "Digest": -1.2688708748746819e-61,
         "Hash": "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
         "Type": 0,
       },
       Object {
-        "AddressId": 47,
+        "AddressId": 42,
         "Digest": 3.0263387081779602e-151,
         "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
         "Type": 0,
       },
       Object {
+        "AddressId": 43,
+        "Digest": -1.3416871383074957e-161,
+        "Hash": "Ae2tdPwUPEYxD5EgazsN7DcLp2fFiak1RTco6CoDNioKVuodftS4oNeabwz",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 44,
+        "Digest": 2.414293239739638e-47,
+        "Hash": "Ae2tdPwUPEZFqcMbS757FyZrABDZUVtzEW4sPvzZj3UYBcn8BSWFBxmQK2n",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 45,
+        "Digest": 1.1036862858872953e+216,
+        "Hash": "Ae2tdPwUPEZGR3uPidVc5p1cSnV9KDzDxrrembeFhLYMgFAa4KHpTqmncFQ",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 46,
+        "Digest": -2.938948476649332e-97,
+        "Hash": "Ae2tdPwUPEZEvn7nMBBaBMCc773zeMCPsS93tDsFvyZw4quRbnq5bnP1i8F",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 47,
+        "Digest": 8.159203653530658e-92,
+        "Hash": "Ae2tdPwUPEZAzQ7FdZ8ksAjK7iVGzjMKUxWqkQLF52oGxWBNfyDRocqJwBT",
+        "Type": 0,
+      },
+      Object {
         "AddressId": 48,
+        "Digest": -1.2688708748746819e-61,
+        "Hash": "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 49,
+        "Digest": 3.0263387081779602e-151,
+        "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 50,
         "Digest": 3.0263387081779602e-151,
         "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
         "Type": 0,
@@ -917,22 +929,6 @@ Array [
         "IsDefault": true,
         "IsNFT": false,
         "Metadata": Object {
-          "assetName": "",
-          "longName": null,
-          "numberOfDecimals": 6,
-          "policyId": "",
-          "ticker": "ADA",
-          "type": "Cardano",
-        },
-        "NetworkId": 100,
-        "TokenId": 2,
-      },
-      Object {
-        "Digest": 6.262633522161549e-167,
-        "Identifier": "",
-        "IsDefault": true,
-        "IsNFT": false,
-        "Metadata": Object {
           "boxId": "",
           "description": null,
           "height": 0,
@@ -942,7 +938,7 @@ Array [
           "type": "Ergo",
         },
         "NetworkId": 200,
-        "TokenId": 3,
+        "TokenId": 2,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -958,7 +954,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 300,
-        "TokenId": 4,
+        "TokenId": 3,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -974,7 +970,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 400,
-        "TokenId": 5,
+        "TokenId": 4,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -990,6 +986,22 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 250,
+        "TokenId": 5,
+      },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 350,
         "TokenId": 6,
       },
     ],
@@ -1089,7 +1101,7 @@ Array [
   Object {
     "UtxoTransactionInput": Array [
       Object {
-        "AddressId": 46,
+        "AddressId": 41,
         "IndexInOwnTx": 0,
         "IndexInParentTx": 0,
         "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
@@ -1098,7 +1110,7 @@ Array [
         "UtxoTransactionInputId": 1,
       },
       Object {
-        "AddressId": 46,
+        "AddressId": 48,
         "IndexInOwnTx": 0,
         "IndexInParentTx": 0,
         "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
@@ -1132,7 +1144,7 @@ Array [
         "UtxoTransactionOutputId": 1,
       },
       Object {
-        "AddressId": 47,
+        "AddressId": 42,
         "ErgoBoxId": null,
         "ErgoCreationHeight": null,
         "ErgoRegisters": null,
@@ -1156,7 +1168,7 @@ Array [
         "UtxoTransactionOutputId": 3,
       },
       Object {
-        "AddressId": 47,
+        "AddressId": 49,
         "ErgoBoxId": null,
         "ErgoCreationHeight": null,
         "ErgoRegisters": null,
@@ -1168,7 +1180,7 @@ Array [
         "UtxoTransactionOutputId": 4,
       },
       Object {
-        "AddressId": 48,
+        "AddressId": 50,
         "ErgoBoxId": null,
         "ErgoCreationHeight": null,
         "ErgoRegisters": null,
@@ -1216,7 +1228,7 @@ exports[`Syncing with pending bip44 1`] = `
       \\"utxoOutputs\\": [
         {
           \\"TransactionId\\": 3,
-          \\"AddressId\\": 48,
+          \\"AddressId\\": 50,
           \\"OutputIndex\\": 0,
           \\"IsUnspent\\": true,
           \\"ErgoBoxId\\": null,
@@ -1379,7 +1391,7 @@ exports[`Syncing with pending bip44 1`] = `
       \\"utxoInputs\\": [
         {
           \\"TransactionId\\": 1,
-          \\"AddressId\\": 46,
+          \\"AddressId\\": 41,
           \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20\\",
           \\"IndexInParentTx\\": 0,
           \\"IndexInOwnTx\\": 0,
@@ -1402,7 +1414,7 @@ exports[`Syncing with pending bip44 1`] = `
         },
         {
           \\"TransactionId\\": 1,
-          \\"AddressId\\": 47,
+          \\"AddressId\\": 42,
           \\"OutputIndex\\": 1,
           \\"IsUnspent\\": true,
           \\"ErgoBoxId\\": null,
@@ -1572,7 +1584,7 @@ exports[`Syncing with pending bip44 1`] = `
       \\"utxoInputs\\": [
         {
           \\"TransactionId\\": 2,
-          \\"AddressId\\": 46,
+          \\"AddressId\\": 48,
           \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21\\",
           \\"IndexInParentTx\\": 0,
           \\"IndexInOwnTx\\": 0,
@@ -1595,7 +1607,7 @@ exports[`Syncing with pending bip44 1`] = `
         },
         {
           \\"TransactionId\\": 2,
-          \\"AddressId\\": 47,
+          \\"AddressId\\": 49,
           \\"OutputIndex\\": 1,
           \\"IsUnspent\\": true,
           \\"ErgoBoxId\\": null,
@@ -1998,48 +2010,60 @@ Array [
       },
       Object {
         "AddressId": 41,
-        "Digest": -1.3416871383074957e-161,
-        "Hash": "Ae2tdPwUPEYxD5EgazsN7DcLp2fFiak1RTco6CoDNioKVuodftS4oNeabwz",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 42,
-        "Digest": 2.414293239739638e-47,
-        "Hash": "Ae2tdPwUPEZFqcMbS757FyZrABDZUVtzEW4sPvzZj3UYBcn8BSWFBxmQK2n",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 43,
-        "Digest": 1.1036862858872953e+216,
-        "Hash": "Ae2tdPwUPEZGR3uPidVc5p1cSnV9KDzDxrrembeFhLYMgFAa4KHpTqmncFQ",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 44,
-        "Digest": -2.938948476649332e-97,
-        "Hash": "Ae2tdPwUPEZEvn7nMBBaBMCc773zeMCPsS93tDsFvyZw4quRbnq5bnP1i8F",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 45,
-        "Digest": 8.159203653530658e-92,
-        "Hash": "Ae2tdPwUPEZAzQ7FdZ8ksAjK7iVGzjMKUxWqkQLF52oGxWBNfyDRocqJwBT",
-        "Type": 0,
-      },
-      Object {
-        "AddressId": 46,
         "Digest": -1.2688708748746819e-61,
         "Hash": "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
         "Type": 0,
       },
       Object {
-        "AddressId": 47,
+        "AddressId": 42,
         "Digest": 3.0263387081779602e-151,
         "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
         "Type": 0,
       },
       Object {
+        "AddressId": 43,
+        "Digest": -1.3416871383074957e-161,
+        "Hash": "Ae2tdPwUPEYxD5EgazsN7DcLp2fFiak1RTco6CoDNioKVuodftS4oNeabwz",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 44,
+        "Digest": 2.414293239739638e-47,
+        "Hash": "Ae2tdPwUPEZFqcMbS757FyZrABDZUVtzEW4sPvzZj3UYBcn8BSWFBxmQK2n",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 45,
+        "Digest": 1.1036862858872953e+216,
+        "Hash": "Ae2tdPwUPEZGR3uPidVc5p1cSnV9KDzDxrrembeFhLYMgFAa4KHpTqmncFQ",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 46,
+        "Digest": -2.938948476649332e-97,
+        "Hash": "Ae2tdPwUPEZEvn7nMBBaBMCc773zeMCPsS93tDsFvyZw4quRbnq5bnP1i8F",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 47,
+        "Digest": 8.159203653530658e-92,
+        "Hash": "Ae2tdPwUPEZAzQ7FdZ8ksAjK7iVGzjMKUxWqkQLF52oGxWBNfyDRocqJwBT",
+        "Type": 0,
+      },
+      Object {
         "AddressId": 48,
+        "Digest": -1.2688708748746819e-61,
+        "Hash": "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 49,
+        "Digest": 3.0263387081779602e-151,
+        "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
+        "Type": 0,
+      },
+      Object {
+        "AddressId": 50,
         "Digest": 3.0263387081779602e-151,
         "Hash": "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
         "Type": 0,
@@ -2101,22 +2125,6 @@ Array [
         "IsDefault": true,
         "IsNFT": false,
         "Metadata": Object {
-          "assetName": "",
-          "longName": null,
-          "numberOfDecimals": 6,
-          "policyId": "",
-          "ticker": "ADA",
-          "type": "Cardano",
-        },
-        "NetworkId": 100,
-        "TokenId": 2,
-      },
-      Object {
-        "Digest": 6.262633522161549e-167,
-        "Identifier": "",
-        "IsDefault": true,
-        "IsNFT": false,
-        "Metadata": Object {
           "boxId": "",
           "description": null,
           "height": 0,
@@ -2126,7 +2134,7 @@ Array [
           "type": "Ergo",
         },
         "NetworkId": 200,
-        "TokenId": 3,
+        "TokenId": 2,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -2142,7 +2150,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 300,
-        "TokenId": 4,
+        "TokenId": 3,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -2158,7 +2166,7 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 400,
-        "TokenId": 5,
+        "TokenId": 4,
       },
       Object {
         "Digest": 6.262633522161549e-167,
@@ -2174,6 +2182,22 @@ Array [
           "type": "Cardano",
         },
         "NetworkId": 250,
+        "TokenId": 5,
+      },
+      Object {
+        "Digest": 6.262633522161549e-167,
+        "Identifier": "",
+        "IsDefault": true,
+        "IsNFT": false,
+        "Metadata": Object {
+          "assetName": "",
+          "longName": null,
+          "numberOfDecimals": 6,
+          "policyId": "",
+          "ticker": "TADA",
+          "type": "Cardano",
+        },
+        "NetworkId": 350,
         "TokenId": 6,
       },
     ],
@@ -2273,7 +2297,7 @@ Array [
   Object {
     "UtxoTransactionInput": Array [
       Object {
-        "AddressId": 46,
+        "AddressId": 41,
         "IndexInOwnTx": 0,
         "IndexInParentTx": 0,
         "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
@@ -2282,7 +2306,7 @@ Array [
         "UtxoTransactionInputId": 1,
       },
       Object {
-        "AddressId": 46,
+        "AddressId": 48,
         "IndexInOwnTx": 0,
         "IndexInParentTx": 0,
         "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
@@ -2316,7 +2340,7 @@ Array [
         "UtxoTransactionOutputId": 1,
       },
       Object {
-        "AddressId": 47,
+        "AddressId": 42,
         "ErgoBoxId": null,
         "ErgoCreationHeight": null,
         "ErgoRegisters": null,
@@ -2340,7 +2364,7 @@ Array [
         "UtxoTransactionOutputId": 3,
       },
       Object {
-        "AddressId": 47,
+        "AddressId": 49,
         "ErgoBoxId": null,
         "ErgoCreationHeight": null,
         "ErgoRegisters": null,
@@ -2352,7 +2376,7 @@ Array [
         "UtxoTransactionOutputId": 4,
       },
       Object {
-        "AddressId": 48,
+        "AddressId": 50,
         "ErgoBoxId": null,
         "ErgoCreationHeight": null,
         "ErgoRegisters": null,

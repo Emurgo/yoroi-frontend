@@ -20,9 +20,7 @@ import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
-import setupJormungandrStores from './jormungandr/index';
 import type { AdaStoresMap } from './ada/index';
-import type { JormungandrStoresMap } from './jormungandr/index';
 import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
@@ -33,7 +31,7 @@ import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
-import ConnectorStore from './DappConnectorStore'
+import ConnectorStore from './toplevel/DappConnectorStore'
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
   stateFetchStore: StateFetchStore,
@@ -90,7 +88,6 @@ export type StoresMap = {|
   connector: ConnectorStore,
   substores: {|
     ada: AdaStoresMap,
-    jormungandr: JormungandrStoresMap,
     ergo: ErgoStoresMap,
   |},
   // $FlowFixMe[value-as-type]
@@ -176,14 +173,12 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
-      jormungandr: setupJormungandrStores((stores: any), api, actions),
       ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
     initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
     initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
-    initializeSubstore<JormungandrStoresMap>(loadedStores.substores[ApiOptions.jormungandr]);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load('extension');

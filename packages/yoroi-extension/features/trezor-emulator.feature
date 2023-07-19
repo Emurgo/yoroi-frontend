@@ -12,7 +12,7 @@ Feature: Trezor wallet emulator
     Then I should see a plate PXCA-2349
 
   @Trezor-001
-  Scenario: Trezor (emulator). Send ADA.
+  Scenario: Trezor (emulator). Send ADA. (Trezor-001)
     Given I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -29,7 +29,7 @@ Feature: Trezor wallet emulator
     Then I should see the summary screen
 
   @Trezor-002
-  Scenario: Trezor (emulator). Verify address.
+  Scenario: Trezor (emulator). Verify address. (Trezor-002)
     When I go to the receive screen
     Given I should see the Receive screen
     And I click on the verify address button
@@ -38,7 +38,7 @@ Feature: Trezor wallet emulator
     And I verify the address on the trezor emulator
 
   @Trezor-003
-  Scenario: Trezor (emulator). Test Shelley Trezor delegation
+  Scenario: Trezor (emulator). Test Shelley Trezor delegation. (Trezor-003)
     When I go to the delegation by id screen
     And I fill the delegation id form:
       | stakePoolId                                              |
@@ -54,7 +54,7 @@ Feature: Trezor wallet emulator
     Then I should see the dashboard screen
 
   @Trezor-004
-  Scenario: Trezor (emulator). Withdraw rewards w/ deregistration.
+  Scenario: Trezor (emulator). Withdraw rewards w/ deregistration. (Trezor-004)
     When I go to the dashboard screen
     And I click on the withdraw button
     And I click on the checkbox
@@ -62,7 +62,7 @@ Feature: Trezor wallet emulator
     Then I see the deregistration for the transaction
     And I should see on the Yoroi withdrawal transfer summary screen:
       | fromAddress                                                 | reward | fees     |
-      | stake1u9jz8z7rnjtz4g5p26j953sjzdmsmzxcpzyk0p0e9sa2f5sjeqemq | 5      | 0.193793 |
+      | stake1u9jz8z7rnjtz4g5p26j953sjzdmsmzxcpzyk0p0e9sa2f5sjeqemq | 5      | 0.189041 |
     Given The expected transaction is "hKYAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8hsCGgACpGUDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAXpQuoGfhAzvgfp0H9ouqVNr4ZQPpQnFG9frwUkkyzA7dLIl1GmIuFbkJFMp3AakfKpXSZ9s+3dpaw9hYFkKgLglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQICDQmLn20i7qEzQSnFGhJv3Yp2qiAFF/6XxaqOeIvva6u/jxDYC/CFoA3UV4B6thf4QFJZ9owY9EsOhQuu14A319g=="
     When I confirm Yoroi transfer funds
     Then I switch to Trezor-connect screen and allow using
@@ -71,7 +71,7 @@ Feature: Trezor wallet emulator
     Then I should see the transactions screen
 
   @Trezor-005
-  Scenario: Trezor (emulator). Send Assets.
+  Scenario: Trezor (emulator). Send Assets. (Trezor-005)
     Given I go to the send transaction screen
     And I select the asset "nicoin" on the form
     And I fill the form:
@@ -89,7 +89,7 @@ Feature: Trezor wallet emulator
     Then I should see the summary screen
 
   @Trezor-006
-  Scenario: Trezor (emulator). User can transfer funds from a trezor wallet
+  Scenario: Trezor (emulator). User can transfer funds from a trezor wallet. (Trezor-006)
     Given I switched to the advanced level
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen

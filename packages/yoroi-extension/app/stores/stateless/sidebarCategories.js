@@ -50,6 +50,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
     request.selected == null &&
     matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) === false,
 });
+
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
   className: 'wallets',
   route: ROUTES.WALLETS.ROOT,
@@ -94,7 +95,7 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
 });
 
 
-export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
+export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
   className: 'dapp-connector',
   route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
   icon: dappConnectorIcon,
@@ -108,33 +109,50 @@ export const NOTICE_BOARD: SidebarCategory = registerCategory({
   icon: noticeBoardIcon,
   isVisible: _request => !environment.isProduction(),
 });
+
+type isVisibleFunc = ({|
+    hasAnyWallets: boolean,
+    selected: null | PublicDeriver<>,
+    currentRoute: string,
+    isRewardWallet: isRewardWalletFunc,
+  |}) => boolean;
+
+type isRewardWalletFunc = (PublicDeriver<>) => boolean;
+
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
   +icon: string,
   +label?: MessageDescriptor,
-  +isVisible: ({|
-    hasAnyWallets: boolean,
-    selected: null | PublicDeriver<>,
-    currentRoute: string,
-  |}) => boolean,
+  +isVisible: isVisibleFunc,
 |};
+
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
-  {
-    className: 'wallets',
-    route: ROUTES.MY_WALLETS,
-    icon: walletIcon,
-    label: globalMessages.walletLabel,
-    isVisible: _request => true,
-  },
+  // Open `/wallets` only if the user is on any other page other than `/wallets/add`
+  makeWalletCategory(
+    ROUTES.WALLETS.ROOT,
+    ({ currentRoute, hasAnyWallets }) => currentRoute !== ROUTES.WALLETS.ADD && hasAnyWallets,
+  ),
+  // Open `/wallets/transactions` if the user is on the `/wallet/add`
+  makeWalletCategory(
+    ROUTES.WALLETS.TRANSACTIONS,
+    ({ currentRoute, hasAnyWallets }) => currentRoute === ROUTES.WALLETS.ADD && hasAnyWallets,
+  ),
+  // If user didn't restored any wallets, it should redirect to the add wallet page.
+  makeWalletCategory(
+    ROUTES.WALLETS.ADD,
+    ({ hasAnyWallets }) => !hasAnyWallets,
+  ),
   {
     className: 'staking',
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected }) => (
-      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo())
+    isVisible: ({ selected, isRewardWallet }) => (
+      !!selected &&
+      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
+      isRewardWallet(selected)
     ),
   },
   {
@@ -153,11 +171,18 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'voting',
-    route: ROUTES.WALLETS.CATALYST_VOTING,
+    route: ROUTES.REVAMP.CATALYST_VOTING,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]
     isVisible: request => asGetStakingKey(request.selected) != null,
+  },
+  {
+    className: 'connected-websites',
+    route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: _request => true,
   },
   // {
   //   className: 'swap',
@@ -188,3 +213,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   //   isVisible: _request => true,
   // },
 ];
+
+function makeWalletCategory(route: string, isVisible: isVisibleFunc): SidebarCategoryRevamp {
+  return {
+    className: 'wallets',
+    route,
+    icon: walletIcon,
+    label: globalMessages.walletLabel,
+    isVisible,
+  }
+};

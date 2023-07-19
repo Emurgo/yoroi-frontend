@@ -9,7 +9,6 @@ Feature: Wallet creation
   Scenario: Wallet creation (IT-5)
     When I click the create button
     Then I select the currency cardano
-    Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -19,11 +18,27 @@ Feature: Wallet creation
     And I copy and enter the displayed mnemonic phrase
     Then I should see the opened wallet with name "Created Wallet"
 
+  @it-7
+  Scenario Outline: Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
+    When I click the create button
+    Then I select the currency cardano
+    And I enter the name "Created Wallet"
+    And I enter the created wallet password:
+      | password        | repeatedPassword  |
+      | <wrongPassword> | <wrongPassword>   |
+    Then I see the submit button is disabled
+    And I should see the invalid password error message:
+      | message                             |
+      | global.errors.invalidWalletPassword |
+
+    Examples:
+      | wrongPassword |           |
+      | Secre1        | too short |
+
   @it-9
   Scenario: Wallet access after browser restart (IT-9)
     When I click the create button
     Then I select the currency cardano
-    Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -35,11 +50,31 @@ Feature: Wallet creation
     When I restart the browser
     Then I should see the opened wallet with name "Created Wallet"
 
+  @it-16
+  Scenario Outline: Wallet can't be created if wallet name doesn't meet requirements (IT-16)
+    When I click the create button
+    Then I select the currency cardano
+    And I enter the name "Created Wallet"
+    And I enter the created wallet password:
+      | password     | repeatedPassword |
+      | asdfasdfasdf | asdfasdfasdf     |
+    And I clear the name "Created Wallet"
+    Then I see the submit button is disabled
+    And I should stay in the create wallet dialog
+    And I enter the name "<invalidWalletName>"
+    Then I see the submit button is disabled
+    And I should stay in the create wallet dialog
+    And I should see "Wallet name requires at least 1 and at most 40 letters." error message:
+      | message                             |
+      | global.errors.invalidWalletName     |
+    Examples:
+      | invalidWalletName                        |               |
+      | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|41 letters name|
+
   @it-18
   Scenario: Mnemonic words can be cleared by clicking "Clear button" on wallet creation screen (IT-18)
     When I click the create button
     Then I select the currency cardano
-    Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password     | repeatedPassword |
@@ -54,7 +89,6 @@ Feature: Wallet creation
   Scenario: Wallet can't be created without entering password (IT-24)
     When I click the create button
     Then I select the currency cardano
-    Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password     | repeatedPassword |
@@ -69,7 +103,6 @@ Feature: Wallet creation
    Scenario: Users will be presented with a security warning prior to seed creation (IT-27)
     When I click the create button
     Then I select the currency cardano
-    Then I select Create Wallet
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -78,57 +111,3 @@ Feature: Wallet creation
     Then I see the security warning prior:
     | message                             |
     | wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching   |
-
-  @it-16
-  Scenario Outline: Wallet can't be created if wallet name doesn't meet requirements (IT-16)
-    When I click the create button
-    Then I select the currency cardano
-    Then I select Create Wallet
-    And I enter the name "Created Wallet"
-    And I enter the created wallet password:
-    | password     | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf     |
-    And I clear the name "Created Wallet"
-    Then I see the submit button is disabled
-    And I should stay in the create wallet dialog
-    And I enter the name "<invalidWalletName>"
-    Then I see the submit button is disabled
-    And I should stay in the create wallet dialog
-    And I should see "Wallet name requires at least 1 and at most 40 letters." error message:
-    | message                             |
-    | global.errors.invalidWalletName     |
-    Examples:
-    | invalidWalletName                        |               |
-    | qwertyuiopasdfghjklzxcvbnmzxcvbnmlkjhgfds|41 letters name| 
-
-  @it-7
-  Scenario Outline: Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
-    When I click the create button
-    Then I select the currency cardano
-    Then I select Create Wallet
-    And I enter the name "Created Wallet"
-    And I enter the created wallet password:
-    | password        | repeatedPassword  |
-    | <wrongPassword> | <wrongPassword>   |
-    Then I see the submit button is disabled
-    And I should see the invalid password error message:
-    | message                             |
-    | global.errors.invalidWalletPassword |
-
-    Examples:
-    | wrongPassword |           |
-    | Secre1        | too short |
-
-  @it-131
-  Scenario: Wallet creation (IT-131)
-    When I click the create button
-    Then I select the currency ergo
-    Then I select Create Wallet
-    And I enter the name "Created Wallet"
-    And I enter the created wallet password:
-    | password   | repeatedPassword  |
-    | asdfasdfasdf | asdfasdfasdf        |
-    And I click the "Create personal wallet" button
-    And I accept the creation terms
-    And I copy and enter the displayed mnemonic phrase
-    Then I should see the opened wallet with name "Created Wallet"

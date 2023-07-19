@@ -3,11 +3,13 @@
 import React from 'react';
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
-import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
-import { ReactComponent as DoneIcon }  from '../../assets/images/forms/done.inline.svg';
-import { ReactComponent as EyeIcon }  from '../../assets/images/forms/password-eye-close.inline.svg';
-import { ReactComponent as CloseEyeIcon }  from '../../assets/images/forms/password-eye.inline.svg';
+import { ReactComponent as ErrorIcon } from '../../assets/images/forms/error.inline.svg';
+import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inline.svg';
+import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
+import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
+import { ReactComponent as ClosedEyeIconRevamp } from '../../assets/images/input/icon_24_eye_off.inline.svg';
+import { ReactComponent as OpenedEyeIconRevamp } from '../../assets/images/input/icon_24_eye_on.inline.svg';
 
 type Props = {|
   error?: boolean | string,
@@ -76,7 +78,8 @@ function TextField({
         theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
       }
       InputProps={{
-        ...(theme.name === 'classic' ? { notched: false } : {}),
+        ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
+        ...((theme.name === 'classic' ? { notched: false } : {}): any),
         endAdornment:
           type === 'password' ? (
             <InputAdornment
@@ -89,8 +92,12 @@ function TextField({
                 onClick={handleClickShowPassword}
                 onMouseDown={handleMouseDownPassword}
                 edge="end"
+                sx={{
+                  width: '40px',
+                  height: '40px',
+                }}
               >
-                {showPassword ? <EyeIcon /> : <CloseEyeIcon />}
+                {getEyeIcon(theme.name, showPassword)}
               </IconButton>
             </InputAdornment>
           ) : QRHandler ? (
@@ -99,11 +106,7 @@ function TextField({
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
-              <IconButton
-                aria-label="QR Code Scanner"
-                onClick={QRHandler}
-                edge="end"
-              >
+              <IconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
                 <QRLogo />
               </IconButton>
             </InputAdornment>
@@ -112,8 +115,7 @@ function TextField({
               {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
             </InputAdornment>
           ),
-          disableUnderline: revamp,
-          placeholder: placeholder != null ? placeholder : '',
+        placeholder: placeholder != null ? placeholder : '',
       }}
       {...props}
     />
@@ -135,5 +137,12 @@ TextField.defaultProps = {
   QRHandler: null,
   placeholder: undefined,
 };
+
+function getEyeIcon(theme: 'revamp' | 'classic' | 'modern', showPassword: boolean): Node {
+  if (theme === 'revamp' && !showPassword) return <ClosedEyeIconRevamp />;
+  if (theme === 'revamp' && showPassword) return <OpenedEyeIconRevamp />;
+
+  return showPassword ? <CloseEyeIcon /> : <EyeIcon />;
+}
 
 export default TextField;

@@ -306,7 +306,7 @@ export default class ConnectStore {
 
       if (
         (request.params.tx.auxiliaryData?.type ===
-          TxAuxiliaryDataType.CATALYST_REGISTRATION) &&
+          TxAuxiliaryDataType.CIP36_REGISTRATION) &&
         !version.compatibility.supportsCatalystRegistration
       ) {
         this._replyMessageWrap(
