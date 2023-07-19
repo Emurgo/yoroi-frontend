@@ -368,11 +368,10 @@ class VotingPageContent extends Component<Props> {
           hasAnyPending: false,
           balance: null,
         };
-      const txRequests = stores.transactions.getTxRequests(selected);
       return {
-        hasAnyPending: (txRequests.requests.pendingRequest.result ?? []).length > 0,
+        hasAnyPending: stores.transactions.hasAnyPending,
         // note: Catalyst balance depends on UTXO balance -- not on rewards
-        balance: txRequests.requests.getBalanceRequest.result,
+        balance: stores.transactions.balance,
       };
     })();
     return Object.freeze({

@@ -29,6 +29,10 @@ import type {
   MultiAssetMintMetadataResponse,
   GetUtxoDataRequest,
   GetUtxoDataResponse,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -237,6 +241,86 @@ export class RemoteFetcher implements IFetcher {
         throw new GetTxHistoryForAddressesApiError();
       });
   }
+
+  getRecentTransactionHashes
+  : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>
+    = (body) => {
+      const { network, addresses, before } = body;
+      const { BackendService } = network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getRecentTransactionHashes)} missing backend url`);
+      return axios(
+        `${BackendService}/api/v2.1/txs/summaries`,
+        {
+          method: 'post',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          data: { addresses, before },
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
+        }
+      ).then(response => response.data);
+    }
+
+  getTransactionsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>
+    = (body) => {
+      const { network, txHashes } = body;
+      const { BackendService } = network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getTransactionsByHashes)} missing backend url`);
+      return axios(
+        `${BackendService}/api/v2/txs/get`,
+        {
+          method: 'post',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          data: { txHashes },
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
+        }
+      ).then(response => {
+        return (
+          (Object.values(response.data): any): Array<RemoteTransaction>
+        ).map((resp: RemoteTransaction) => {
+          if (resp.type === 'shelley') {
+            // unfortunately the backend returns Shelley addresses as bech32
+            // this is a bad idea, and so we manually change them to raw payload
+            for (const input of resp.inputs) {
+              // replace non-existent w/ empty array to handle Allegra -> Mary transition
+              // $FlowExpectedError[cannot-write]
+              input.assets = input.assets ?? [];
+              try {
+                const payload = bech32.fromWords(bech32.decode(input.address, 1000).words);
+                // $FlowExpectedError[cannot-write]
+                input.address = Buffer.from(payload).toString('hex');
+              } catch (_e) { /* expected not to work for base58 addresses */ }
+            }
+            for (const output of resp.outputs) {
+              // replace non-existent w/ empty array to handle Allegra -> Mary transition
+              // $FlowExpectedError[cannot-write]
+              output.assets = output.assets ?? [];
+              try {
+                const payload = bech32.fromWords(bech32.decode(output.address, 1000).words);
+                // $FlowExpectedError[cannot-write]
+                output.address = Buffer.from(payload).toString('hex');
+              } catch (_e) { /* expected not to work for base58 addresses */ }
+            }
+          }
+          if (resp.height != null) {
+            return resp;
+          }
+          // $FlowExpectedError[prop-missing] remove if we rename the field in the backend-service
+          const height = resp.block_num;
+          // $FlowExpectedError[prop-missing] remove if we rename the field in the backend-service
+          delete resp.block_num;
+          return {
+            ...resp,
+            height,
+          };
+        });
+      });
+    }
 
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => {
     const { network, ...rest } = body;

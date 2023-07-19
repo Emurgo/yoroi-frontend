@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import { ErgoTxSignRequest } from '../../../app/api/ergo/lib/transactions/ErgoTxSignRequest';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver';

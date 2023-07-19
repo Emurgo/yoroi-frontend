@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import { WalletTypeOption } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { Cip1852Wallet } from '../../../app/api/ada/lib/storage/models/Cip1852Wallet/wrapper';

@@ -27,7 +27,7 @@ export async function discoverAllAddressesFrom(
   requestSize: number,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
-): Promise<Array<string>> {
+): Promise<Array<{| address: string, isUsed: boolean, index: number |}>> {
   let fetchedAddressesInfo: Array<AddressInfo> = [];
   let highestUsedIndex = initialHighestUsedIndex;
 
@@ -68,7 +68,6 @@ export async function discoverAllAddressesFrom(
   return fetchedAddressesInfo
     // bip-44 requires scanSize buffer
     .slice(0, (highestInBatch + scanSize) + 1) // +1 since range is exclusive
-    .map((addressInfo) => addressInfo.address);
 }
 
 /** Scan a set of addresses and find the largest index that is used */
