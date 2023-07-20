@@ -29,6 +29,7 @@ type ShowAddressRequestWrapper = {|
 
 export class LedgerConnect {
   locale: string;
+  tabId: ?number;
 
   constructor(params: {| locale: string |}) {
     this.locale = params.locale;
@@ -59,11 +60,14 @@ export class LedgerConnect {
   signTransaction: {|
     serial: ?string,
     params: SignTransactionRequest,
+    useOpenTab?: boolean,
   |} => Promise<SignTransactionResponse> = (request) => {
     return this._requestLedger(
       OPERATION_NAME.SIGN_TX,
       request.params,
       request.serial,
+      false,
+      request.useOpenTab === true,
     );
   }
 
@@ -78,12 +82,34 @@ export class LedgerConnect {
     );
   }
 
+  getVersion: {|
+    serial: ?string,
+    dontCloseTab?: boolean,
+  |} => Promise<GetVersionResponse> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.GET_LEDGER_VERSION,
+      undefined,
+      request.serial,
+      true,
+    );
+  }
+
   async _requestLedger(
     action: string,
     params: any,
     serial: ?string,
+    dontCloseTab?: boolean = false,
+    useOpenTab?: boolean = false,
   ): any {
-    const tabId = await this._createLedgerTab();
+    let tabId;
+    if (useOpenTab && this.tabId != null) {
+      tabId = this.tabId;
+    } else {
+      tabId = await this._createLedgerTab();
+      if (dontCloseTab) {
+        this.tabId = tabId;
+      }
+    }
 
     return new Promise((resolve, reject) => {
       chrome.tabs.sendMessage(
