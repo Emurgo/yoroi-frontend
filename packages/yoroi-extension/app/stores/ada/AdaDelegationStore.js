@@ -281,7 +281,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
               homepage: poolInfo.info.homepage,
             },
             history: poolInfo.history,
-            reputation: Object.freeze({}),
           },
         });
       }

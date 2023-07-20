@@ -152,10 +152,6 @@ const messages = defineMessages({
     id: 'api.errors.poolMissingApiError',
     defaultMessage: '!!!Pool could not be found. Please check the pool ID and ensure the pool was not deregistered.',
   },
-  getReputationError: {
-    id: 'api.errors.getReputationError',
-    defaultMessage: '!!!Error received from server while getting reputation.',
-  },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
@@ -501,15 +497,6 @@ export class PoolMissingApiError extends LocalizableError {
     super({
       id: messages.poolMissingApiError.id,
       defaultMessage: messages.poolMissingApiError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetReputationError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getReputationError.id,
-      defaultMessage: messages.getReputationError.defaultMessage || '',
     });
   }
 }

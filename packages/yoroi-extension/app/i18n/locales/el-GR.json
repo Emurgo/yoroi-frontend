@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Σφάλμα τη στιγμή λήψης υπολοίπου.",
   "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
-  "api.errors.getReputationError": "Error received from server while getting reputation.",
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "Παρελήφθη σφάλμα από τον διακομιστή κατά την διάρκεια των συναλλαγών.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Παρελήφθη σφάλμα από τον διακομιστή τη στιγμή λήψης των TxBodies.",
