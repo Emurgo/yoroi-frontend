@@ -297,6 +297,7 @@ export type CreateLedgerSignTxDataRequest = {|
   signRequest: HaskellShelleyTxSignRequest,
   network: $ReadOnly<NetworkRow>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  cip36: boolean,
 |};
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
@@ -961,6 +962,7 @@ export default class AdaApi {
         byronNetworkMagic: config.ByronNetworkId,
         networkId: Number.parseInt(config.ChainNetworkId, 10),
         addressingMap: request.addressingMap,
+        cip36: request.cip36,
       });
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
@@ -2382,6 +2384,8 @@ export default class AdaApi {
     const usedUtxos = signRequest.senderUtxos.map(utxo => (
       { txHash: utxo.tx_hash, index: utxo.tx_index }
     ));
+    const metadata = signRequest.unsignedTx.get_auxiliary_data();
+
     const transaction = CardanoShelleyTransaction.fromData({
       txid: txId,
       type: isIntraWallet ? 'self' : 'expend',
@@ -2397,8 +2401,8 @@ export default class AdaApi {
       block: null,
       certificates: [],
       ttl: new BigNumber(String(signRequest.unsignedTx.build().ttl())),
-      metadata: signRequest.metadata
-        ? Buffer.from(signRequest.metadata.to_bytes()).toString('hex')
+      metadata: metadata
+        ? Buffer.from(metadata.to_bytes()).toString('hex')
         : null,
       withdrawals: signRequest.withdrawals().map(withdrawal => ({
         address: withdrawal.address,

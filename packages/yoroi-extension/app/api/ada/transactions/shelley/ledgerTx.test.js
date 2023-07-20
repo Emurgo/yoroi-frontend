@@ -351,6 +351,7 @@ test('Create Ledger transaction', async () => {
       }
       return undefined;
     },
+    cip36: true,
   });
 
   expect(response).toStrictEqual(({
