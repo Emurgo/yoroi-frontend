@@ -12,7 +12,7 @@ const magenta = {
 };
 
 export const lightTheme = {
-  name: 'revamp',
+  name: 'revamp-light',
   palette: {
     mode: 'light',
     /* `main` is added since MUI required it but we don't use it at all */

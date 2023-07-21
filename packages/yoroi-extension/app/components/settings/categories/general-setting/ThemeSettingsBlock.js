@@ -147,7 +147,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
             />
           </RadioGroup>
         </Box>
-        {currentTheme === THEMES.YOROI_REVAMP && (environment.isNightly() || environment.isDev()) && (
+        {false && currentTheme === THEMES.YOROI_REVAMP && environment.isDev() && (
           <Box sx={{ mt: '20px' }}>
             <ThemeToggler />
           </Box>
