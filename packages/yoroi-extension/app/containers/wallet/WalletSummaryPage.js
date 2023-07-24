@@ -203,34 +203,27 @@ class WalletSummaryPage extends Component<AllProps> {
           />
         );
       } else {
-        walletTransactions = (
-          <WalletNoTransactionsComp
-            label={noTransactionsFoundLabel}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
+        walletTransactions = null;
       }
     }
 
     const notification = this._getThisPageActiveNotification();
 
-    let exportDialog;
+    let exportDialog = (
+      <Dialog
+        title={intl.formatMessage(globalMessages.processingLabel)}
+        closeOnOverlayClick={false}
+      >
+        <VerticalFlexContainer>
+          <LoadingSpinner />
+        </VerticalFlexContainer>
+      </Dialog>
+    );
 
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
 
-    if (!this.readyToExportHistory({ delegationRequests, publicDeriver })) {
-      exportDialog = (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
-          <VerticalFlexContainer>
-            <LoadingSpinner />
-          </VerticalFlexContainer>
-        </Dialog>
-      );
-    } else {
+    if (this.readyToExportHistory({ delegationRequests, publicDeriver })) {
       exportDialog = (
         <ExportTransactionDialog
           isActionProcessing={isExporting}
@@ -363,18 +356,7 @@ class WalletSummaryPage extends Component<AllProps> {
             />
           )}
         </NotificationMessage>
-        {!recentTransactionsRequest.wasExecuted || hasAny ? null : (
-          <WalletEmptyBanner
-            goToReceivePage={() => {
-              this.generated.actions.router.goToRoute.trigger({
-                route: ROUTES.WALLETS.RECEIVE.ROOT,
-              });
-            }}
-            onBuySellClick={() =>
-              this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-            }
-          />
-        )}
+
         <WalletSummaryRevamp
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
@@ -390,6 +372,22 @@ class WalletSummaryPage extends Component<AllProps> {
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
+          shouldShowEmptyBanner={recentTransactionsRequest.wasExecuted && !hasAny}
+          emptyBannerComponent={
+            <WalletEmptyBanner
+              goToReceivePage={() => {
+                this.generated.actions.router.goToRoute.trigger({
+                  route: ROUTES.WALLETS.RECEIVE.ROOT,
+                });
+              }}
+              goToSendPage={() => {
+                this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND });
+              }}
+              onBuySellClick={() =>
+                this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
+              }
+            />
+          }
         />
 
         {walletTransactions}

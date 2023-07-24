@@ -21,9 +21,9 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
+import { ReactComponent as AddMemoSvg } from '../../../assets/images/revamp/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
 import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
@@ -46,7 +46,11 @@ import CopyableAddress from '../../widgets/CopyableAddress';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
+import {
+  getTokenName,
+  getTokenIdentifierIfExists,
+  assetNameFromIdentifier,
+} from '../../../stores/stateless/tokenHelpers';
 import {
   parseMetadata,
   parseMetadataDetailed,
@@ -201,7 +205,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      numberOfDecimals,
+      numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -331,7 +335,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       return (
         <>
           {fiatDisplay}&nbsp;{currency}
-          <Typography>
+          <Typography variant="body1" color="grayscale.900">
             {beforeDecimalRewards}
             <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
@@ -341,12 +345,10 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     return (
-      <>
+      <Typography variant="body1" color="grayscale.900">
         {beforeDecimalRewards}
-        <Typography as="span" fontSize="inherit">
-          {afterDecimalRewards}
-        </Typography>
-      </>
+        {afterDecimalRewards} {this.getTicker(defaultEntry)}
+      </Typography>
     );
   };
 
@@ -421,12 +423,14 @@ export default class TransactionRevamp extends Component<Props, State> {
       const fingerprint = this.getFingerprint(entry);
       return (
         <div className={styles.fee}>
-          {this.renderAmountDisplay({
-            entry: {
-              ...entry,
-              amount: request.transform ? request.transform(entry.amount) : entry.amount,
-            },
-          })}{' '}
+          <Typography color="grayscale.600" variant="caption1">
+            {this.renderAmountDisplay({
+              entry: {
+                ...entry,
+                amount: request.transform ? request.transform(entry.amount) : entry.amount,
+              },
+            })}{' '}
+          </Typography>
           {fingerprint !== undefined ? (
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}
@@ -434,7 +438,9 @@ export default class TransactionRevamp extends Component<Props, State> {
               light
               linkType="token"
             >
-              <span className={styles.rowData}>{this.getTicker(entry)}</span>
+              <Typography variant="caption1" color="grayscale.600">
+                {this.getTicker(entry)}
+              </Typography>
             </ExplorableHashContainer>
           ) : (
             this.getTicker(entry)
@@ -445,9 +451,15 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     return (
       // eslint-disable-next-line react/no-array-index-key
-      <div
+      <Box
+        sx={{
+          display: 'grid',
+          gap: '15px',
+          gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
         key={divKey(request.address.value.getDefaultEntry().identifier)}
-        className={styles.addressItem}
       >
         <CopyableAddress
           hash={this.props.addressToDisplayString(request.address.address)}
@@ -464,13 +476,13 @@ export default class TransactionRevamp extends Component<Props, State> {
             light
             linkType="address"
           >
-            <span className={classnames([styles.rowData, styles.hash])}>
+            <Typography variant="caption1" color="grayscale.600">
               {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
-            </span>
+            </Typography>
           </ExplorableHashContainer>
         </CopyableAddress>
-        {this.generateAddressButton(request.address.address)}
-        <Typography component="span" variant="body2" color="grayscale.900">
+        <Box textAlign="center">{this.generateAddressButton(request.address.address)}</Box>
+        <Typography textAlign="center" component="span" variant="caption1" color="grayscale.600">
           {renderAmount(request.address.value.getDefaultEntry())}
         </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (
@@ -480,7 +492,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             {renderAmount(entry)}
           </React.Fragment>
         ))}
-      </div>
+      </Box>
     );
   };
 
@@ -494,7 +506,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
     const isValidTransaction = data instanceof CardanoShelleyTransaction ? data.isValid : true;
 
-    const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
+    const contentStyles = classnames(styles.content);
 
     const detailsStyles = classnames([
       styles.details,
@@ -510,7 +522,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       <Box className={styles.component}>
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
-          sx={{ padding: '20px 0', borderBottom: '1px solid', borderBottomColor: 'grayscale.200' }}
+          sx={{ padding: '20px 0', cursor: 'pointer' }}
           onClick={this.toggleDetails.bind(this)}
           role="presentation"
           aria-hidden
@@ -528,22 +540,17 @@ export default class TransactionRevamp extends Component<Props, State> {
                 <TypeIcon type={txType.icon} />
               </Box>
               <Box sx={columnTXStyles.transactionType}>
-                <Typography
-                  variant="body1"
-                  color={isPendingTransaction ? 'grayscale.400' : 'grayscale.900'}
-                >
+                <Typography variant="body1" color="grayscale.900">
                   {txType.msg}
                 </Typography>
-                <Typography
-                  variant="body3"
-                  color={isPendingTransaction ? 'grayscale.400' : 'grayscale.600'}
-                >
+                <Typography variant="caption1" color="grayscale.600">
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
               <Box sx={columnTXStyles.status} id="txStatus">
                 {state === TxStatusCodes.IN_BLOCK ? (
                   <Typography
+                    variant="body1"
                     sx={{
                       color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
                       textTransform: 'capitalize',
@@ -553,6 +560,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </Typography>
                 ) : (
                   <Typography
+                    variant="body1"
                     sx={{
                       color: isFailedTransaction
                         ? 'var(--yoroi-palette-error-100)'
@@ -597,8 +605,18 @@ export default class TransactionRevamp extends Component<Props, State> {
         </Box>
 
         {/* ==== Toggleable Transaction Details ==== */}
-        <Box className={contentStyles} sx={{ overflowX: 'overlay', background: 'grayscale.50' }}>
-          <div className={detailsStyles}>
+        <Box
+          className={contentStyles}
+          sx={{
+            overflowX: 'overlay',
+            bgcolor: 'common.white',
+            border: isExpanded ? '1px solid' : 'none',
+            borderColor: 'grayscale.200',
+            borderRadius: '8px',
+            mt: '8px',
+          }}
+        >
+          <Box className={detailsStyles}>
             {/* converting assets is not implemented but we may use it in the future for tokens */}
             {data.type === transactionTypes.EXCHANGE && (
               <div className={styles.conversion}>
@@ -610,16 +628,30 @@ export default class TransactionRevamp extends Component<Props, State> {
                 </div>
               </div>
             )}
-            <Box sx={{ overflowX: 'overlay', background: 'common.white' }}>
+            <Box sx={{ overflowX: 'overlay', bgcolor: 'common.white' }}>
               <div className={styles.addressContent}>
                 <div>
-                  <Box className={styles.addressHeader} sx={{ color: 'grayscale.900' }}>
-                    <h2>
-                      {intl.formatMessage(globalMessages.fromAddresses)}:
-                      <span className={styles.addressCount}>{data.addresses.from.length}</span>
-                    </h2>
-                    <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
+                  <Box
+                    sx={{
+                      px: '24px',
+                      display: 'grid',
+                      color: 'grayscale.max',
+                      gap: '15px',
+                      gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography variant="caption1">
+                      {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
+                      <span style={{ fontWeight: 500 }}>{data.addresses.from.length}</span>
+                    </Typography>
+                    <Typography variant="caption1" textAlign="center">
+                      {intl.formatMessage(messages.addressType)}
+                    </Typography>
+                    <Typography variant="caption1" textAlign="center">
+                      {intl.formatMessage(globalMessages.amountLabel)}
+                    </Typography>
                   </Box>
                   <Box className={styles.addressList} sx={{ color: 'grayscale.600' }}>
                     {data.addresses.from.map((address, addressIndex) => {
@@ -633,14 +665,28 @@ export default class TransactionRevamp extends Component<Props, State> {
                     })}
                   </Box>
                 </div>
-                <div>
-                  <Box className={styles.addressHeader} sx={{ color: 'grayscale.900' }}>
-                    <h2>
-                      {intl.formatMessage(globalMessages.toAddresses)}:
-                      <span className={styles.addressCount}>{data.addresses.to.length}</span>
-                    </h2>
-                    <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
+                <Box sx={{ borderLeft: '1px solid', borderColor: 'grayscale.200' }}>
+                  <Box
+                    sx={{
+                      px: '24px',
+                      display: 'grid',
+                      color: 'grayscale.max',
+                      gap: '15px',
+                      gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography variant="caption1">
+                      {intl.formatMessage(globalMessages.toAddresses)}:{' '}
+                      <span style={{ fontWeight: 500 }}>{data.addresses.to.length}</span>
+                    </Typography>
+                    <Typography variant="caption1" textAlign="center">
+                      {intl.formatMessage(messages.addressType)}
+                    </Typography>
+                    <Typography variant="caption1" textAlign="center">
+                      {intl.formatMessage(globalMessages.amountLabel)}
+                    </Typography>
                   </Box>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => {
@@ -652,82 +698,96 @@ export default class TransactionRevamp extends Component<Props, State> {
                       });
                     })}
                   </div>
-                </div>
+                </Box>
               </div>
               {this.getWithdrawals(data)}
               {this.getCertificate(data)}
 
-              {state === TxStatusCodes.IN_BLOCK && this.props.numberOfConfirmations != null && (
-                <div className={styles.row}>
-                  <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
-                  <span className={styles.rowData}>
-                    <span className={styles.assuranceLevel}>{status}</span>.{' '}
-                    <span className="confirmationCount">{this.props.numberOfConfirmations}</span>{' '}
-                    {intl.formatMessage(messages.confirmations)}.
-                  </span>
-                </div>
-              )}
+              <Box display="flex" p="24px">
+                <Box flexShrink={0}>
+                  {state === TxStatusCodes.IN_BLOCK && this.props.numberOfConfirmations != null && (
+                    <Box display="flex" gap="8px" mb="16px" flexDirection="column">
+                      <Typography variant="caption1" fontWeight={500}>
+                        {intl.formatMessage(messages.assuranceLevel)}
+                      </Typography>
+                      <Typography variant="caption1" color="grayscale.600">
+                        <span className={styles.assuranceLevel}>{status}</span>.{' '}
+                        <span className="confirmationCount">
+                          {this.props.numberOfConfirmations}
+                        </span>{' '}
+                        {intl.formatMessage(messages.confirmations)}.
+                      </Typography>
+                    </Box>
+                  )}
 
-              <h2>{intl.formatMessage(globalMessages.transactionId)}</h2>
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                hash={data.txid}
-                light
-                linkType="transaction"
-              >
-                <span className={classnames([styles.rowData, styles.hash, 'txid' /* for tests */])}>
-                  {data.txid}
-                </span>
-              </ExplorableHashContainer>
-
-              {this.getMetadata(data)}
-              {this.props.memo != null ? (
-                <div className={styles.row}>
-                  <h2>
-                    {intl.formatMessage(memoMessages.memoLabel)}
-
-                    <button
-                      type="button"
-                      onClick={onEditMemo.bind(this, data)}
-                      className={classnames(
-                        styles.editButton,
-                        'editMemoButton' // for tests
-                      )}
+                  <Box display="flex" gap="8px" mt="16px" flexDirection="column">
+                    <Typography variant="caption1" fontWeight={500}>
+                      {intl.formatMessage(globalMessages.transactionId)}
+                    </Typography>
+                    <ExplorableHashContainer
+                      selectedExplorer={this.props.selectedExplorer}
+                      hash={data.txid}
+                      light
+                      linkType="transaction"
                     >
-                      <div className={styles.editMemoIcon}>
-                        <EditSvg />
-                      </div>
-                    </button>
-                  </h2>
-                  <span
-                    className={classnames(
-                      styles.rowData,
-                      'memoContent' // for tests
-                    )}
-                  >
-                    {this.props.memo?.Content}
-                  </span>
-                </div>
-              ) : (
-                <div className={styles.row}>
-                  <div className={styles.memoActionItemBlock}>
-                    <button
-                      type="button"
-                      onClick={onAddMemo.bind(this, data)}
-                      className="addMemoButton" // for tests
-                    >
-                      <div>
-                        <span className={styles.addMemoIcon}>
-                          <AddMemoSvg />
-                        </span>
-                        <span>{intl.formatMessage(memoMessages.addMemo)}</span>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              )}
+                      <Typography
+                        variant="caption1"
+                        color="grayscale.600"
+                        className={classnames('txid' /* for tests */)}
+                      >
+                        {data.txid}
+                      </Typography>
+                    </ExplorableHashContainer>
+                  </Box>
+
+                  {this.getMetadata(data)}
+                </Box>
+                <Box display="flex" width="100%" alignItems="flex-end" justifyContent="flex-end">
+                  {this.props.memo != null ? (
+                    <div className={styles.row}>
+                      <h2>
+                        {intl.formatMessage(memoMessages.memoLabel)}
+
+                        <button
+                          type="button"
+                          onClick={onEditMemo.bind(this, data)}
+                          className={classnames(
+                            styles.editButton,
+                            'editMemoButton' // for tests
+                          )}
+                        >
+                          <div className={styles.editMemoIcon}>
+                            <EditSvg />
+                          </div>
+                        </button>
+                      </h2>
+                      <span
+                        className={classnames(
+                          styles.rowData,
+                          'memoContent' // for tests
+                        )}
+                      >
+                        {this.props.memo?.Content}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className={styles.row}>
+                      <Button
+                        variant="tertiary"
+                        color="primary"
+                        type="button"
+                        onClick={onAddMemo.bind(this, data)}
+                        className="addMemoButton" // for tests
+                        startIcon={<AddMemoSvg />}
+                      >
+                        {intl.formatMessage(memoMessages.addMemo)}
+                      </Button>
+                    </div>
+                  )}
+                </Box>
+              </Box>
             </Box>
-          </div>
+          </Box>
         </Box>
       </Box>
     );
@@ -744,13 +804,21 @@ export default class TransactionRevamp extends Component<Props, State> {
       );
     }
     return (
-      <button
+      <Box
         type="button"
-        className={classnames([styles.status, styles.typeAddress])}
+        sx={{
+          bgcolor: 'primary.100',
+          color: 'primary.600',
+          textTransform: 'capitalize',
+          cursor: 'pointer',
+          borderRadius: '20px',
+          px: '8px',
+          py: '4px',
+        }}
         onClick={addressInfo.goToRoute}
       >
-        {addressInfo.name}
-      </button>
+        <Typography variant="caption1">{addressInfo.name}</Typography>
+      </Box>
     );
   };
 
@@ -791,14 +859,27 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <div className={styles.addressContent}>
         <div>
-          <div className={styles.addressHeader}>
-            <h2>
-              {intl.formatMessage(globalMessages.withdrawalsLabel)}:
-              <span className={styles.addressCount}>{data.withdrawals.length}</span>
-            </h2>
-            <h2>{intl.formatMessage(messages.addressType)}</h2>
-            <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
-          </div>
+          <Box
+            sx={{
+              display: 'grid',
+              gap: '15px',
+              gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              px: '24px',
+            }}
+          >
+            <Typography variant="caption1">
+              {intl.formatMessage(globalMessages.withdrawalsLabel)}:{' '}
+              <span style={{ fontWeight: 500 }}>{data.withdrawals.length}</span>
+            </Typography>
+            <Typography variant="caption1" textAlign="center">
+              {intl.formatMessage(messages.addressType)}
+            </Typography>
+            <Typography variant="caption1" textAlign="center">
+              {intl.formatMessage(globalMessages.amountLabel)}
+            </Typography>
+          </Box>
           <div className={styles.addressList}>
             {data.withdrawals.map((address, addressIndex) => {
               return this.renderRow({
@@ -819,14 +900,16 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { intl } = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
-      <>
-        <h2>
+      <Box display="flex" flexDirection="column" gap="8px" px="24px" mt="24px">
+        <Typography variant="caption1" fontWeight={500}>
           {manyCerts
             ? intl.formatMessage(messages.certificatesLabel)
             : intl.formatMessage(messages.certificateLabel)}
-        </h2>
-        <span className={styles.rowData}>{node}</span>
-      </>
+        </Typography>
+        <Typography variant="caption1" color="grayscale.600">
+          {node}
+        </Typography>
+      </Box>
     );
 
     if (data instanceof CardanoShelleyTransaction) {
@@ -872,19 +955,17 @@ export default class TransactionRevamp extends Component<Props, State> {
           // do nothing for simple user
         }
         if (jsonData !== null) {
-          metadata = (<CodeBlock code={jsonData} />);
+          metadata = <CodeBlock code={jsonData} />;
         } else {
-          metadata = (<span>0x{data.metadata}</span>);
+          metadata = <span>0x{data.metadata}</span>;
         }
       } else {
-        metadata = (<CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 2)} </pre>} />);
+        metadata = <CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 2)} </pre>} />;
       }
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
-          <span className={styles.rowData}>
-            {metadata}
-          </span>
+          <span className={styles.rowData}>{metadata}</span>
         </div>
       );
     }

@@ -11,6 +11,7 @@ import { observer } from 'mobx-react';
 type Props = {|
   onBuySellClick: () => void,
   goToReceivePage: () => void,
+  goToSendPage: () => void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -28,16 +29,26 @@ const messages = defineMessages({
   },
 });
 
-function WalletEmptyBanner({ onBuySellClick, intl, goToReceivePage }: Props & Intl): Node {
+function WalletEmptyBanner({
+  onBuySellClick,
+  intl,
+  goToReceivePage,
+  goToSendPage,
+}: Props & Intl): Node {
   const actions = [
     {
       label: intl.formatMessage(globalMessages.buy),
-      variant: 'contained',
+      variant: 'primary',
       onClick: onBuySellClick,
     },
     {
+      label: intl.formatMessage(globalMessages.send),
+      variant: 'secondary',
+      onClick: goToSendPage,
+    },
+    {
       label: intl.formatMessage(globalMessages.receive),
-      variant: 'outlined',
+      variant: 'secondary',
       onClick: goToReceivePage,
     },
   ];
