@@ -11,7 +11,7 @@ function serverToPermission(server /*: string */)/*: string */ {
 }
 
 const Ports = {
-  DevBackendServe: 21000,
+  DevBackendServer: 21000,
   ErgoMockServer: 21001,
   ReactDevTools: 8097,
 };
@@ -19,6 +19,7 @@ const Ports = {
 const Servers = {
   // this allows connecting to multiple different backends for different currencies
   Primary: '*.yoroiwallet.com',
+  Testnet: '*.emurgornd.com',
 };
 
 module.exports = {

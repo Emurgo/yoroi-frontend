@@ -1,79 +1,99 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
-import { Button, IconButton, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { injectIntl, defineMessages } from 'react-intl';
-import { ReactComponent as CloseIcon }  from '../../assets/images/close.inline.svg';
-import { ReactComponent as CoverBg }  from '../../assets/images/transaction/wallet-empty-banner.inline.svg';
+import { ReactComponent as CoverBg } from '../../assets/images/transaction/wallet-empty-banner.inline.svg';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
 
 type Props = {|
-  isOpen: boolean,
-  onClose: void => void,
   onBuySellClick: () => void,
+  goToReceivePage: () => void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
 const messages = defineMessages({
-  walletEmpty: {
-    id: 'wallet.transaction.empty',
-    defaultMessage: '!!!Your wallet is empty',
+  welcomeMessage: {
+    id: 'wallet.transaction.welcomeMessage',
+    defaultMessage: '!!!Welcome to Yoroi',
   },
-  walletEmptySubtitle: {
-    id: 'wallet.transaction.emptySubtitle',
-    defaultMessage: '!!!Top up your wallet safely using our trusted partners',
+  welcomeMessageSubtitle: {
+    id: 'wallet.transaction.welcomeMessageSubtitle',
+    defaultMessage:
+      '!!!With new features and upgraded performance, transactions can be done faster and more securely than ever before.',
   },
 });
 
-function WalletEmptyBanner({ isOpen, onClose, onBuySellClick, intl }: Props & Intl): Node {
-  return isOpen ? (
-    <Box
-      sx={{
-        background: 'linear-gradient(45.48deg, #244ABF 0%, #4760FF 100%)',
-        minHeight: 198,
-        marginBottom: '40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingLeft: '40px',
-        borderRadius: '8px',
-        paddingRight: '110px',
-        overflowY: 'hidden',
-        position: 'relative',
-      }}
-    >
-      <Box sx={{ position: 'absolute', left: '50%', top: 0 }}>
-        <CoverBg />
-      </Box>
-      <Box>
-        <Typography variant="h3" color="var(--yoroi-palette-common-white)">
-          {intl.formatMessage(messages.walletEmpty)}
-        </Typography>
-        <Typography variant="body1" color="var(--yoroi-palette-common-white)">
-          {intl.formatMessage(messages.walletEmptySubtitle)}
-        </Typography>
-      </Box>
-      <Button variant="primary" sx={{ width: '230px' }} onClick={onBuySellClick}>
-        {intl.formatMessage(globalMessages.buyAda)}
-      </Button>
-      <IconButton
+function WalletEmptyBanner({ onBuySellClick, intl, goToReceivePage }: Props & Intl): Node {
+  const actions = [
+    {
+      label: intl.formatMessage(globalMessages.buy),
+      variant: 'contained',
+      onClick: onBuySellClick,
+    },
+    {
+      label: intl.formatMessage(globalMessages.receive),
+      variant: 'outlined',
+      onClick: goToReceivePage,
+    },
+  ];
+
+  return (
+    <Box>
+      <Box
         sx={{
-          position: 'absolute',
-          top: 32,
-          right: 24,
-          padding: '3px',
-          color: 'var(--yoroi-palette-common-white)',
+          background: theme => theme.palette.background.gradients.walletEmptyCard,
+          marginBottom: '40px',
+          borderRadius: '8px',
+          overflowY: 'hidden',
+          position: 'relative',
+          padding: '24px',
         }}
-        onClick={onClose}
       >
-        <CloseIcon />
-      </IconButton>
+        <Box sx={{ position: 'absolute', right: '10%', top: '-10%' }}>
+          <CoverBg />
+        </Box>
+        <Box>
+          <Typography variant="h3" color="common.black" fontWeight={500} mb="8px">
+            {intl.formatMessage(messages.welcomeMessage)}
+          </Typography>
+          <Typography variant="body1" color="common.black" maxWidth="500px" mb="48px">
+            {intl.formatMessage(messages.welcomeMessageSubtitle)}
+          </Typography>
+        </Box>
+        <Stack direction="row" gap="16px">
+          {actions.map(action => (
+            <Button
+              key={action.label}
+              variant={action.variant}
+              color="primary"
+              sx={{
+                width: '100px',
+                '&.MuiButton-sizeMedium': {
+                  height: '40px',
+                },
+              }}
+              onClick={action.onClick}
+            >
+              <Typography
+                variant="button2"
+                fontWeight={500}
+                sx={{
+                  lineHeight: '19px',
+                }}
+              >
+                {action.label}
+              </Typography>
+            </Button>
+          ))}
+        </Stack>
+      </Box>
     </Box>
-  ) : null;
+  );
 }
 
 export default (injectIntl(observer(WalletEmptyBanner)): ComponentType<Props>);

@@ -1,12 +1,12 @@
 // @flow
-import { action, computed, observable, runInAction, } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
-import type { GetBalanceFunc, } from '../../api/common/types';
+import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   BaseGetTransactionsRequest,
   ExportTransactionsFunc,
@@ -15,7 +15,7 @@ import type {
   GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
-import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
   asGetBalance,
@@ -28,7 +28,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { digestForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
-import { getApiForNetwork, } from '../../api/common/utils';
+import { getApiForNetwork } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -42,8 +42,8 @@ import {
   isErgo,
   networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { MultiToken, } from '../../api/common/lib/MultiToken';
-import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiToken';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { DefaultTokenEntry, TokenEntry } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -53,12 +53,10 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import {
-  persistSubmittedTransactions,
-  loadSubmittedTransactions
-} from '../../api/localStorage';
+import { persistSubmittedTransactions, loadSubmittedTransactions } from '../../api/localStorage';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import moment from 'moment';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -66,15 +64,15 @@ export type TxRequests = {|
   requests: {|
     pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
     /**
-    * Should ONLY be executed to cache query WITH search options
-    */
+     * Should ONLY be executed to cache query WITH search options
+     */
     recentRequest: CachedRequest<GetTransactionsFunc>,
     /**
-    * Should ONLY be executed to cache query WITHOUT search options.
-    * To reduce memory footprint, this request does not store the whole transaction
-    *  list, but instead only derived data from it.
-    *
-    */
+     * Should ONLY be executed to cache query WITHOUT search options.
+     * To reduce memory footprint, this request does not store the whole transaction
+     *  list, but instead only derived data from it.
+     *
+     */
     allRequest: CachedRequest<GetTransactionsDataFunc>,
     /**
      * in lovelaces
@@ -86,7 +84,6 @@ export type TxRequests = {|
     getAssetDepositRequest: CachedRequest<GetBalanceFunc>,
   |},
 |};
-
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
@@ -104,22 +101,23 @@ type SubmittedTransactionEntry = {|
 |};
 
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
-  const config = getCardanoHaskellBaseConfig(network)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const config = getCardanoHaskellBaseConfig(network).reduce(
+    (acc, next) => Object.assign(acc, next),
+    {}
+  );
   return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
 }
 
 function newMultiToken(
   defaultTokenInfo: DefaultTokenEntry,
-  values: Array<TokenEntry> = [],
+  values: Array<TokenEntry> = []
 ): MultiToken {
-  return new MultiToken(values, defaultTokenInfo)
+  return new MultiToken(values, defaultTokenInfo);
 }
 
 const TRANSACTION_LIST_COMPUTATION_BATCH_SIZE = 60;
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
-
   /** How many additional transactions to display when user wants to show more */
   SEARCH_LIMIT_INCREASE: number = 5;
 
@@ -127,7 +125,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable transactionsRequests: Array<TxRequests> = [];
 
   /** Track banners open status */
-  @observable showWalletEmptyBanner: boolean = true;
   @observable showDelegationBanner: boolean = true;
 
   @observable _searchOptionsForWallets: Array<{|
@@ -137,10 +134,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
-  getTransactionRowsToExportRequest: LocalizedRequest<(void => Promise<void>) => Promise<void>>
-    = new LocalizedRequest<(void => Promise<void>) => Promise<void>>(func => func());
-  exportTransactions: LocalizedRequest<ExportTransactionsFunc>
-    = new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
+  getTransactionRowsToExportRequest: LocalizedRequest<
+    ((void) => Promise<void>) => Promise<void>
+  > = new LocalizedRequest<((void) => Promise<void>) => Promise<void>>(func => func());
+  exportTransactions: LocalizedRequest<ExportTransactionsFunc> = new LocalizedRequest<ExportTransactionsFunc>(
+    this.api.export.exportTransactions
+  );
   @observable isExporting: boolean = false;
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
@@ -153,10 +152,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
-    actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
     actions.closeDelegationBanner.listen(this._closeDelegationBanner);
     this._loadSubmittedTransactions();
-    window.chrome.runtime.onMessage.addListener((message) => {
+    window.chrome.runtime.onMessage.addListener(message => {
       if (message === 'connector-tx-submitted') {
         runInAction(this._loadSubmittedTransactions);
       }
@@ -182,10 +180,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return result.unconfirmedAmount;
   }
 
-
-  @action _increaseSearchLimit: PublicDeriver<> => Promise<void> = async (
-    publicDeriver
-  ) => {
+  @action _increaseSearchLimit: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     if (this.searchOptions != null) {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
       await this.refreshLocal(publicDeriver);
@@ -193,13 +188,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action toggleIncludeTxIds: void => void = () => {
-    this.shouldIncludeTxIds = !this.shouldIncludeTxIds
-  }
+    this.shouldIncludeTxIds = !this.shouldIncludeTxIds;
+  };
 
   @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.recentTransactionsRequest)} no wallet selected`);
+      throw new Error(
+        `${nameof(TransactionsStore)}::${nameof(this.recentTransactionsRequest)} no wallet selected`
+      );
     }
     return this.getTxRequests(publicDeriver).requests.recentRequest;
   }
@@ -207,7 +204,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @computed get lastSyncInfo(): IGetLastSyncInfoResponse {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`);
+      throw new Error(
+        `${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`
+      );
     }
     const result = this.getTxRequests(publicDeriver).lastSyncInfo;
     return result;
@@ -217,16 +216,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @computed get searchOptions(): ?GetTransactionsRequestOptions {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;
-    const foundSearchOptions = find(
-      this._searchOptionsForWallets,
-      { publicDeriver }
-    );
+    const foundSearchOptions = find(this._searchOptionsForWallets, { publicDeriver });
     if (!foundSearchOptions) {
       throw new Error(`${nameof(this.searchOptions)} no option found`);
     }
     return foundSearchOptions.options;
   }
-
 
   /**
    * generate a hash of the transaction history
@@ -245,9 +240,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
-    return  [
+    return [
       ...this.getSubmittedTransactions(publicDeriver),
-      ...(result ? result.transactions : [])
+      ...(result ? result.transactions : []),
     ];
   }
 
@@ -274,10 +269,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   // This method ensures that at any time, there is only one refreshing process
   // for each wallet.
-  refreshTransactionData: {|
+  refreshTransactionData: ({|
     publicDeriver: PublicDeriver<>,
     localRequest: boolean,
-  |} => Promise<void> = async (request) => {
+  |}) => Promise<void> = async request => {
     const { publicDeriverId } = request.publicDeriver;
     if (this.ongoingRefreshing.has(publicDeriverId)) {
       return this.ongoingRefreshing.get(publicDeriverId);
@@ -293,25 +288,22 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         this.ongoingRefreshing.delete(publicDeriverId);
       });
     }
-  }
+  };
 
-  isWalletRefreshing:  PublicDeriver<> => boolean = (publicDeriver) => {
-    return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
-  }
+  isWalletRefreshing: (PublicDeriver<>) => boolean = publicDeriver => {
+    return this.ongoingRefreshing.has(publicDeriver.publicDeriverId);
+  };
 
-  isWalletLoading:  PublicDeriver<> => boolean = (publicDeriver) => {
+  isWalletLoading: (PublicDeriver<>) => boolean = publicDeriver => {
     return !this.getTxRequests(publicDeriver).requests.recentRequest.wasExecuted;
-  }
+  };
 
   /** Refresh transaction data for all wallets and update wallet balance */
-  @action _refreshTransactionData: {|
+  @action _refreshTransactionData: ({|
     publicDeriver: PublicDeriver<>,
     localRequest: boolean,
-  |} => Promise<void> = async (request) => {
-    const publicDeriver = asHasLevels<
-      ConceptualWallet,
-      IGetLastSyncInfo
-    >(request.publicDeriver);
+  |}) => Promise<void> = async request => {
+    const publicDeriver = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(request.publicDeriver);
     if (publicDeriver == null) {
       return;
     }
@@ -336,7 +328,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     // update last sync (note: changes even if no new transaction is found)
     {
       const lastUpdateDate = await this.api.common.getTxLastUpdatedDate({
-        getLastSyncInfo: publicDeriver.getLastSyncInfo
+        getLastSyncInfo: publicDeriver.getLastSyncInfo,
       });
       runInAction(() => {
         this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
@@ -372,7 +364,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     let submittedTransactionsChanged = false;
     runInAction(() => {
-      for (let i = 0; i < this._submittedTransactions.length;) {
+      for (let i = 0; i < this._submittedTransactions.length; ) {
         if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
           this._submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
@@ -386,13 +378,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  @action reactToTxHistoryUpdate: {|
+  @action reactToTxHistoryUpdate: ({|
     publicDeriver: PublicDeriver<>,
-  |} => Promise<void> = async (request) => {
-    const publicDeriver = asHasLevels<
-      ConceptualWallet,
-      IGetLastSyncInfo
-    >(request.publicDeriver);
+  |}) => Promise<void> = async request => {
+    const publicDeriver = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(request.publicDeriver);
     if (publicDeriver == null) {
       return;
     }
@@ -404,8 +393,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
     const isCardano = isCardanoHaskell(networkInfo);
-    const coinsPerUtxoWord = isCardano ?
-      getCoinsPerUtxoWord(networkInfo)
+    const coinsPerUtxoWord = isCardano
+      ? getCoinsPerUtxoWord(networkInfo)
       : RustModule.WalletV4.BigNum.zero();
 
     // <TODO:PLUTUS_SUPPORT>
@@ -416,9 +405,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     {
       const { pendingRequest } = requests;
       pendingRequest.invalidate({ immediately: false });
-      pendingRequest.execute(
-        { publicDeriver }
-      );
+      pendingRequest.execute({ publicDeriver });
       if (!pendingRequest.promise) throw new Error('should never happen');
       await pendingRequest.promise;
     }
@@ -444,35 +431,34 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             }
             const WalletV4 = RustModule.WalletV4;
             const utxos = await canGetUtxos.getAllUtxos();
-            const addressedUtxos = asAddressedUtxo(utxos)
-              .filter(u => u.assets.length > 0);
-            const deposits: Array<RustModule.WalletV4.BigNum> =
-              addressedUtxos.map((u: CardanoAddressedUtxo) => {
+            const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
+            const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(
+              (u: CardanoAddressedUtxo) => {
                 try {
                   return WalletV4.min_ada_required(
                     // $FlowFixMe[prop-missing]
                     cardanoValueFromRemoteFormat(u),
                     utxoHasDataHash,
-                    coinsPerUtxoWord,
+                    coinsPerUtxoWord
                   );
                 } catch (e) {
                   // eslint-disable-next-line no-console
-                  console.error(`Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`, e);
+                  console.error(
+                    `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
+                    e
+                  );
                   return WalletV4.BigNum.zero();
                 }
-              });
-            const sumDeposit = deposits.reduce(
-              (a, b) => a.checked_add(b),
-              WalletV4.BigNum.zero(),
+              }
             );
-            return newMultiToken(
-              defaultToken,
-              [{
+            const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), WalletV4.BigNum.zero());
+            return newMultiToken(defaultToken, [
+              {
                 identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
                 amount: new BigNumber(sumDeposit.to_str()),
                 networkId: networkInfo.NetworkId,
-              }],
-            );
+              },
+            ]);
           } catch (e) {
             // eslint-disable-next-line no-console
             console.error('Failed to request asset deposit recalc', e);
@@ -480,30 +466,24 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           return newMultiToken(defaultToken);
         },
       });
-      if (!getBalanceRequest.promise || !getAssetDepositRequest.promise) throw new Error('should never happen');
+      if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
+        throw new Error('should never happen');
       await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
     })();
 
     // refresh local history
     await this.refreshLocal(request.publicDeriver);
-  }
+  };
 
   @action refreshLocal: (
     PublicDeriver<> & IGetLastSyncInfo
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
-    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo
   ) => {
-    const limit = this.searchOptions
-      ? this.searchOptions.limit
-      : INITIAL_SEARCH_LIMIT;
-    const skip = this.searchOptions
-      ? this.searchOptions.skip
-      : SEARCH_SKIP;
+    const limit = this.searchOptions ? this.searchOptions.limit : INITIAL_SEARCH_LIMIT;
+    const skip = this.searchOptions ? this.searchOptions.skip : SEARCH_SKIP;
 
-    const withLevels = asHasLevels<
-      ConceptualWallet,
-      IGetLastSyncInfo
-    >(publicDeriver);
+    const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
     if (withLevels == null) {
       throw new Error(`${nameof(this.refreshLocal)} no levels`);
     }
@@ -518,21 +498,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     recentRequest.execute(requestParams); // note: different params/cache than allRequests
     if (!recentRequest.promise) throw new Error('should never happen');
     return recentRequest.promise;
-  }
+  };
 
   /** Add a new public deriver to track and refresh the data */
-  @action addObservedWallet: {|
+  @action addObservedWallet: ({|
     publicDeriver: PublicDeriver<>,
     lastSyncInfo: IGetLastSyncInfoResponse,
-  |} => void = (
-    request
-  ) => {
+  |}) => void = request => {
     const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
-    const foundRequest = find(
-      this.transactionsRequests,
-      { publicDeriver: request.publicDeriver }
-    );
+    const foundRequest = find(this.transactionsRequests, { publicDeriver: request.publicDeriver });
     if (foundRequest != null) {
       return;
     }
@@ -545,7 +520,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           this.stores.substores[apiType].transactions.refreshTransactions
         ),
         allRequest: new CachedRequest<GetTransactionsDataFunc>(
-          this.genComputeOnAllTransactions(apiType),
+          this.genComputeOnAllTransactions(apiType)
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
@@ -558,30 +533,28 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       publicDeriver: request.publicDeriver,
       options: {
         limit: INITIAL_SEARCH_LIMIT,
-        skip: SEARCH_SKIP
-      }
+        skip: SEARCH_SKIP,
+      },
     });
-  }
+  };
 
-  genComputeOnAllTransactions: string => GetTransactionsDataFunc = (apiType) => {
-    return async (request) => {
+  genComputeOnAllTransactions: string => GetTransactionsDataFunc = apiType => {
+    return async request => {
       const publicDeriver = request.publicDeriver;
 
       // Get current transactions for public deriver
       const txRequests = this.getTxRequests((publicDeriver: any));
 
-      const { assuranceMode } = this.stores.walletSettings
-            .getPublicDeriverSettingsCache((publicDeriver: any));
+      const { assuranceMode } = this.stores.walletSettings.getPublicDeriverSettingsCache(
+        (publicDeriver: any)
+      );
 
       let cursor = 0;
 
       const reducers = [
         new HashReducer(),
         new TotalAvailableReducer(),
-        new UnconfirmedAmountReducer(
-          txRequests.lastSyncInfo.Height,
-          assuranceMode,
-        ),
+        new UnconfirmedAmountReducer(txRequests.lastSyncInfo.Height, assuranceMode),
         new RemoteTransactionIdsReducer(),
         new TimestampsReducer(),
         new AssetIdsReducer(),
@@ -594,14 +567,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           limit: TRANSACTION_LIST_COMPUTATION_BATCH_SIZE,
         };
 
-        const batchResult =
-          await this.stores.substores[apiType].transactions.refreshTransactions(
-            {
-              ...batchRequest,
-              // only the first call should update from remote
-              isLocalRequest: request.isLocalRequest || i > 0,
-            }
-          );
+        const batchResult = await this.stores.substores[apiType].transactions.refreshTransactions({
+          ...batchRequest,
+          // only the first call should update from remote
+          isLocalRequest: request.isLocalRequest || i > 0,
+        });
         if (batchResult.transactions.length === 0) {
           break;
         }
@@ -621,34 +591,29 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         assetIds: [...reducers[5].result],
       };
     };
-  }
+  };
 
-  getTxRequests: (
-    PublicDeriver<>
-  ) => TxRequests = (
-    publicDeriver
-  ) => {
+  getTxRequests: (PublicDeriver<>) => TxRequests = publicDeriver => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest == null) {
-      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.getTxRequests)} no requests found`);
+      throw new Error(
+        `${nameof(TransactionsStore)}::${nameof(this.getTxRequests)} no requests found`
+      );
     }
     return foundRequest;
   };
 
-  @action _exportTransactionsToFile: {|
+  @action _exportTransactionsToFile: ({|
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
-  |} => Promise<void> = async (request) => {
+  |}) => Promise<void> = async request => {
     try {
       this._setExporting(true);
 
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const continuation = await this.exportTransactionsToFile({
-        publicDeriver: request.publicDeriver,
-        exportRequest: request.exportRequest,
-      });
+      const continuation = await this.exportTransactionsToFile(request);
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
@@ -656,10 +621,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         this._setExporting(false);
         this.actions.dialogs.closeActiveDialog.trigger();
         runInAction(() => {
-          this.shouldIncludeTxIds = false
-        })
+          this.shouldIncludeTxIds = false;
+        });
       }, EXPORT_START_DELAY);
-
     } catch (error) {
       let localizableError = error;
       if (!(error instanceof LocalizableError)) {
@@ -668,20 +632,24 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
       this._setExportError(localizableError);
       this._setExporting(false);
-      Logger.error(`${nameof(TransactionsStore)}::${nameof(this._exportTransactionsToFile)} ${stringifyError(error)}`);
+      Logger.error(
+        `${nameof(TransactionsStore)}::${nameof(this._exportTransactionsToFile)} ${stringifyError(
+          error
+        )}`
+      );
     } finally {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
     }
-  }
+  };
 
-  @action _setExporting: boolean => void = (isExporting)  => {
+  @action _setExporting: boolean => void = isExporting => {
     this.isExporting = isExporting;
-  }
+  };
 
-  @action _setExportError: ?LocalizableError => void = (error) => {
+  @action _setExportError: (?LocalizableError) => void = error => {
     this.exportError = error;
-  }
+  };
 
   @action _closeExportTransactionDialog: void => void = () => {
     if (!this.isExporting) {
@@ -689,19 +657,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       this._setExporting(false);
       this._setExportError(null);
     }
-  }
+  };
 
-  @action _closeWalletEmptyBanner: void => void = () => {
-    this.showWalletEmptyBanner = false
-  }
   @action _closeDelegationBanner: void => void = () => {
-    this.showDelegationBanner = false
-  }
+    this.showDelegationBanner = false;
+  };
 
-  exportTransactionsToFile: {|
+  exportTransactionsToFile: ({|
     publicDeriver: PublicDeriver<ConceptualWallet>,
     exportRequest: TransactionRowsToExportRequest,
-  |} => Promise<void => Promise<void>> = async (request) => {
+  |}) => Promise<(void) => Promise<void>> = async request => {
     const txStore = this.stores.transactions;
     let respTxRows = [];
 
@@ -715,7 +680,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (!withLevels) return;
       const rows = await this.api[apiType].getTransactionRowsToExport({
         publicDeriver: withLevels,
-        ...request.exportRequest,
         getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
       });
 
@@ -733,17 +697,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           const rewardRows = rewards.map(item => {
             const absSlot = absSlotFunc({
               epoch: item[0],
-              slot: 0
+              slot: 0,
             });
             const epochStartDate = realTimeFunc({
               absoluteSlotNum: absSlot,
-              timeSinceGenesisFunc: timeSinceGenFunc
+              timeSinceGenesisFunc: timeSinceGenFunc,
             });
 
             const defaultInfo = item[1].getDefaultEntry();
             const tokenInfo = this.stores.tokenInfoStore.tokenInfo
               .get(selectedNetwork.NetworkId.toString())
-              ?.get(defaultInfo.identifier)
+              ?.get(defaultInfo.identifier);
             const divider = new BigNumber(10).pow(tokenInfo?.Metadata.numberOfDecimals || 0);
             return {
               type: 'in',
@@ -751,7 +715,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
               fee: '0',
               date: epochStartDate,
               comment: `Staking Reward Epoch ${item[0]}`,
-              id: ''
+              id: '',
             };
           });
           respTxRows.push(...rewardRows);
@@ -761,18 +725,21 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       respTxRows.push(...rows);
     }).promise;
 
-    respTxRows = respTxRows.sort((a, b) => {
-      return b.date - a.date;
-    });
+    const { startDate, endDate } = request.exportRequest;
+    respTxRows = respTxRows
+      .filter(row => {
+        // 4th param `[]` means that the start and end date are included
+        return moment(row.date).isBetween(startDate, endDate, 'day', '[]');
+      })
+      .sort((a, b) => b.date - a.date);
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
     }
 
     const withPubKey = asGetPublicKey(request.publicDeriver);
-    const plate = withPubKey == null
-      ? null
-      : this.stores.wallets.getPublicKeyCache(withPubKey).plate.TextPart;
+    const plate =
+      withPubKey == null ? null : this.stores.wallets.getPublicKeyCache(withPubKey).plate.TextPart;
 
     return async () => {
       const defaultToken = request.publicDeriver.getParent().getDefaultToken();
@@ -784,24 +751,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       await this.stores.transactions.exportTransactions.execute({
         ticker: tokenName,
         rows: respTxRows,
-        nameSuffix: plate == null
-          ? tokenName
-          : `${tokenName}-${plate}`,
+        nameSuffix: plate == null ? tokenName : `${tokenName}-${plate}`,
         shouldIncludeTxIds: this.shouldIncludeTxIds,
       }).promise;
     };
-  }
+  };
 
   @action
   recordSubmittedTransaction: (
     PublicDeriver<>,
     WalletTransaction,
-    Array<{| txHash: string, index: number |}>,
-  ) => void = (
-    publicDeriver,
-    transaction,
-    usedUtxos,
-  ) => {
+    Array<{| txHash: string, index: number |}>
+  ) => void = (publicDeriver, transaction, usedUtxos) => {
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
       networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -809,40 +770,29 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       usedUtxos,
     });
     this._persistSubmittedTransactions();
-  }
+  };
 
-  getSubmittedTransactions: (
-    PublicDeriver<>,
-  ) => Array<WalletTransaction> = (
-    publicDeriver
-  ) => {
-    return this._submittedTransactions.filter(({ publicDeriverId }) =>
-      publicDeriverId === publicDeriver.publicDeriverId
-    ).map(tx => tx.transaction);
-  }
+  getSubmittedTransactions: (PublicDeriver<>) => Array<WalletTransaction> = publicDeriver => {
+    return this._submittedTransactions
+      .filter(({ publicDeriverId }) => publicDeriverId === publicDeriver.publicDeriverId)
+      .map(tx => tx.transaction);
+  };
 
   @action
-  clearSubmittedTransactions: (
-    PublicDeriver<>,
-  ) => void = (
-    publicDeriver
-  ) => {
-    for (let i = 0; i < this._submittedTransactions.length;) {
-      if (
-        this._submittedTransactions[i].publicDeriverId ===
-          publicDeriver.publicDeriverId
-      ) {
+  clearSubmittedTransactions: (PublicDeriver<>) => void = publicDeriver => {
+    for (let i = 0; i < this._submittedTransactions.length; ) {
+      if (this._submittedTransactions[i].publicDeriverId === publicDeriver.publicDeriverId) {
         this._submittedTransactions.splice(i, 1);
       } else {
         i++;
       }
     }
     this._persistSubmittedTransactions();
-  }
+  };
 
   _persistSubmittedTransactions: () => void = () => {
     persistSubmittedTransactions(this._submittedTransactions);
-  }
+  };
 
   _loadSubmittedTransactions: () => Promise<void> = async () => {
     try {
@@ -852,91 +802,90 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       }
       // token id set in submitted transactions, grouped by the network id
       const tokenIds: Map<number, Set<string>> = new Map();
-      const txs = data.map(({ publicDeriverId, transaction, networkId }) => {
-        if (transaction.block) {
-          throw new Error('submitted transaction should not have block data');
-        }
-        const txCtorData = {
-          txid: transaction.txid,
-          block: null,
-          type: transaction.type,
-          amount: MultiToken.from(transaction.amount),
-          fee: MultiToken.from(transaction.fee),
-          date: new Date(transaction.date),
-          addresses: {
-            from: transaction.addresses.from.map(({ address, value }) => ({
-              address,
-              value: MultiToken.from(value)
-            })),
-            to: transaction.addresses.to.map(({ address, value }) => ({
-              address,
-              value: MultiToken.from(value)
-            })),
-          },
-          state: transaction.state,
-          errorMsg: transaction.errorMsg,
-        };
-        let tx;
-
-        const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
-          ({ NetworkId }) => NetworkId === networkId
-        );
-        if (!network) {
-          return;
-        }
-
-        if (isCardanoHaskell(network)) {
-          runInAction(() => {
-            tx = new CardanoShelleyTransaction({
-                ...txCtorData,
-              certificates: transaction.certificates,
-              ttl: new BigNumber(transaction.ttl),
-              metadata: transaction.metadata,
-              withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+      const txs = data
+        .map(({ publicDeriverId, transaction, networkId }) => {
+          if (transaction.block) {
+            throw new Error('submitted transaction should not have block data');
+          }
+          const txCtorData = {
+            txid: transaction.txid,
+            block: null,
+            type: transaction.type,
+            amount: MultiToken.from(transaction.amount),
+            fee: MultiToken.from(transaction.fee),
+            date: new Date(transaction.date),
+            addresses: {
+              from: transaction.addresses.from.map(({ address, value }) => ({
                 address,
-                value: MultiToken.from(value)
+                value: MultiToken.from(value),
               })),
-              isValid: transaction.isValid,
+              to: transaction.addresses.to.map(({ address, value }) => ({
+                address,
+                value: MultiToken.from(value),
+              })),
+            },
+            state: transaction.state,
+            errorMsg: transaction.errorMsg,
+          };
+          let tx;
+
+          const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
+            ({ NetworkId }) => NetworkId === networkId
+          );
+          if (!network) {
+            return;
+          }
+
+          if (isCardanoHaskell(network)) {
+            runInAction(() => {
+              tx = new CardanoShelleyTransaction({
+                  ...txCtorData,
+                certificates: transaction.certificates,
+                ttl: new BigNumber(transaction.ttl),
+                metadata: transaction.metadata,
+                withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+                  address,
+                  value: MultiToken.from(value)
+                })),
+                isValid: transaction.isValid,
+              });
             });
-          });
-        } else if (isErgo(network)) {
-          runInAction(() => {
-            tx = new WalletTransaction(txCtorData);
-          });
-        } else {
-          return;
-        }
+          } else if (isErgo(network)) {
+            runInAction(() => {
+              tx = new WalletTransaction(txCtorData);
+            });
+          } else {
+            return;
+          }
 
-        let tokenIdSet = tokenIds.get(networkId);
-        if (!tokenIdSet) {
-          tokenIdSet = new Set();
-          tokenIds.set(networkId, tokenIdSet);
-        }
+          let tokenIdSet = tokenIds.get(networkId);
+          if (!tokenIdSet) {
+            tokenIdSet = new Set();
+            tokenIds.set(networkId, tokenIdSet);
+          }
 
-        // just to please flow
-        if (tx == null) {
-          return;
-        }
+          // just to please flow
+          if (tx == null) {
+            return;
+          }
 
-        tx.addresses.from.flatMap(
-          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-        ).forEach(tokenId => tokenIdSet?.add(tokenId));
-        tx.addresses.to.flatMap(
-          ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-        ).forEach(tokenId => tokenIdSet?.add(tokenId));
+          tx.addresses.from.flatMap(
+            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+          ).forEach(tokenId => tokenIdSet?.add(tokenId));
+          tx.addresses.to.flatMap(
+            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+          ).forEach(tokenId => tokenIdSet?.add(tokenId));
 
-        return {
-          publicDeriverId,
-          transaction: tx,
-          networkId,
-        };
-      }).filter(Boolean);
+          return {
+            publicDeriverId,
+            transaction: tx,
+            networkId,
+          };
+        })
+        .filter(Boolean);
 
       for (const [networkId, tokenIdSet] of tokenIds.entries()) {
-        await this.stores.tokenInfoStore.fetchMissingTokenInfo(
-          networkId,
-          [...tokenIdSet]
-        );
+        await this.stores.tokenInfoStore.fetchMissingTokenInfo(networkId, [...tokenIdSet]);
       }
 
       runInAction(() => {
@@ -946,7 +895,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       console.error(error);
     }
-  }
+  };
 }
 
 class HashReducer {
@@ -977,10 +926,7 @@ class UnconfirmedAmountReducer {
   lastSyncHeight: number;
   assuranceMode: AssuranceMode;
 
-  constructor(
-    lastSyncHeight: number,
-    assuranceMode: AssuranceMode,
-  ) {
+  constructor(lastSyncHeight: number, assuranceMode: AssuranceMode) {
     this.amount = {
       incoming: [],
       outgoing: [],

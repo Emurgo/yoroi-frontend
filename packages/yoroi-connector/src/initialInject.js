@@ -16,7 +16,7 @@
                 if (isSuccess) {
                     promise.resolve(event.data.auth);
                 } else {
-                    promise.reject(new Error('user reject'));
+                    promise.reject({ code: -3, info: 'User Rejected' });
                 }
             } else {
                 promise.resolve(isSuccess);

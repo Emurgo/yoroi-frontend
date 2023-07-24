@@ -1,27 +1,19 @@
 // @flow
-import { action, observable } from 'mobx';
-import BigNumber from 'bignumber.js';
-import type {
-  UserAnnotation,
-} from '../api/ada/transactions/types';
-import type {
-  CardanoShelleyTxIO,
-} from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
+import type { UserAnnotation } from '../api/ada/transactions/types';
+import type { CardanoShelleyTxIO } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
 import type {
   DbBlock,
   CertificatePart,
   NetworkRow,
 } from '../api/ada/lib/storage/database/primitives/tables';
-import WalletTransaction, { toAddr } from './WalletTransaction';
 import type { WalletTransactionCtorData } from './WalletTransaction';
+import type { DefaultTokenEntry } from '../api/common/lib/MultiToken';
+import { action, observable } from 'mobx';
+import BigNumber from 'bignumber.js';
+import WalletTransaction, { toAddr } from './WalletTransaction';
 import { TransactionType } from '../api/ada/lib/storage/database/primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../api/ada/lib/storage/database/primitives/enums';
-import {
-  MultiToken,
-} from '../api/common/lib/MultiToken';
-import type {
-  DefaultTokenEntry,
-} from '../api/common/lib/MultiToken';
+import { MultiToken } from '../api/common/lib/MultiToken';
 import { parseMetadata } from '../api/ada/lib/storage/bridge/metadataUtils';
 import { CatalystLabels } from '../api/ada/lib/cardanoCrypto/catalyst';
 import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
@@ -35,14 +27,13 @@ export type CardanoShelleyTransactionFeature =
   | 'PoolRegistration'
   | 'PoolRetirement'
   | 'GenesisKeyDelegation'
-  | 'MoveInstantaneousRewards'
-;
+  | 'MoveInstantaneousRewards';
 
 export type CardanoShelleyTransactionCtorData = {|
   ...WalletTransactionCtorData,
   certificates: Array<CertificatePart>,
   ttl: void | BigNumber,
-  metadata: null | string,
+  metadata: null | string | Object,
   withdrawals: Array<{|
     address: string,
     value: MultiToken,
@@ -51,14 +42,13 @@ export type CardanoShelleyTransactionCtorData = {|
 |};
 
 export default class CardanoShelleyTransaction extends WalletTransaction {
-
   @observable certificates: Array<CertificatePart>;
   @observable withdrawals: Array<{|
     address: string,
     value: MultiToken,
   |}>;
   @observable ttl: void | BigNumber;
-  @observable metadata: null | string;
+  @observable metadata: null | string | Object;
   @observable isValid: boolean;
 
   constructor(data: CardanoShelleyTransactionCtorData) {
@@ -85,15 +75,23 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     |},
     addressLookupMap: Map<number, string>,
     network: $ReadOnly<NetworkRow>,
-    defaultToken: DefaultTokenEntry
+    defaultToken: DefaultTokenEntry,
   |}): CardanoShelleyTransaction {
     const { addressLookupMap, defaultToken, tx } = request;
     if (tx.transaction.Type !== TransactionType.CardanoShelley) {
-      throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} tx type incorrect`);
+      throw new Error(
+        `${nameof(CardanoShelleyTransaction)}::${
+          this.constructor.fromAnnotatedTx
+        } tx type incorrect`
+      );
     }
     const { Extra } = tx.transaction;
     if (Extra == null) {
-      throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} missing extra data`);
+      throw new Error(
+        `${nameof(CardanoShelleyTransaction)}::${
+          this.constructor.fromAnnotatedTx
+        } missing extra data`
+      );
     }
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
@@ -102,22 +100,27 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       // note: we use the explicitly fee in the transaction
       // and not outputs - inputs since Shelley has implicit inputs like refunds or withdrawals
       fee: new MultiToken(
-        [{
-          identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-          amount: new BigNumber(Extra.Fee),
-          networkId: request.network.NetworkId,
-        }],
-        defaultToken,
+        [
+          {
+            identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+            amount: new BigNumber(Extra.Fee),
+            networkId: request.network.NetworkId,
+          },
+        ],
+        defaultToken
       ),
       ttl: Extra.Ttl != null ? new BigNumber(Extra.Ttl) : undefined,
       metadata: Extra.Metadata,
       amount: tx.amount.joinAddCopy(tx.fee),
-      date: tx.block != null
-        ? tx.block.BlockTime
-        : new Date(tx.transaction.LastUpdateTime),
+      date: tx.block != null ? tx.block.BlockTime : new Date(tx.transaction.LastUpdateTime),
       addresses: {
-        from: toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
-        to: toAddr({ rows: tx.utxoOutputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
+        from: toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken }),
+        to: toAddr({
+          rows: tx.utxoOutputs,
+          addressLookupMap,
+          tokens: tx.tokens,
+          defaultToken,
+        }).map(a => ({ ...a, isForeign: false })),
       },
       withdrawals: toAddr({
         rows: tx.accountingInputs,
@@ -177,8 +180,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
         features.push('GenesisKeyDelegation');
       }
       if (
-        cert.certificate.Kind ===
-          RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
+        cert.certificate.Kind === RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
       ) {
         features.push('MoveInstantaneousRewards');
       }

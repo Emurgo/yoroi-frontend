@@ -31,6 +31,7 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
+  TxSignErrorCodes,
 } from './connector/types';
 import {
   connectorCreateCardanoTx,
@@ -86,6 +87,8 @@ import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/tr
 import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
+import { hexToBytes } from '../../app/coreUtils';
+import { mergeWitnessSets } from './connector/utils';
 
 /*::
 declare var chrome;
@@ -519,6 +522,10 @@ const yoroiMessageHandler = async (
       );
     });
   }
+
+  /**
+   * Returns HEX of a serialised witness set
+   */
   async function signCardanoTx(
     tx: CardanoTx,
     password: string,
@@ -635,12 +642,19 @@ const yoroiMessageHandler = async (
       {
         let resp;
         try {
-          const signedTx = await signCardanoTx(
-            (request.tx: any),
-            password,
-            request.tabId
-          );
-          resp = { ok: signedTx };
+          let signedTxWitnessSetHex;
+          if (password) {
+            signedTxWitnessSetHex = await signCardanoTx(
+              (request.tx: any),
+              password,
+              request.tabId
+            );
+          } else if (request.witnessSetHex) {
+            signedTxWitnessSetHex = request.witnessSetHex;
+          } else {
+            throw new Error('missing password or witness from connector dialog');
+          }
+          resp = { ok: signedTxWitnessSetHex };
         } catch (error) {
           resp = { err: 'transaction signing failed' };
         }
@@ -649,15 +663,41 @@ const yoroiMessageHandler = async (
           return;
         }
         const { returnTx } = responseData.continuationData;
-        if (!returnTx && resp?.ok != null) {
-          const witnessSetResp = Buffer.from(
-            RustModule.WalletV4.Transaction.from_bytes(
-              Buffer.from(resp.ok, 'hex'),
-            ).witness_set().to_bytes()
-          ).toString('hex');
-          rpcResponse({ ok: witnessSetResp });
-        } else {
+        if (resp?.ok == null) {
           rpcResponse(resp);
+        } else {
+          const resultWitnessSetHex: string = resp.ok;
+          if (returnTx) {
+            const inputWitnessSetHex: string | null = RustModule.WasmScope(Scope => {
+              try {
+                const fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
+                return fullTx.witness_set().to_hex();
+              } catch {
+                // no input witness set
+                return null;
+              }
+            });
+            const isFullTx = inputWitnessSetHex != null;
+            const finalWitnessSetHex = inputWitnessSetHex == null
+                  ? resultWitnessSetHex
+                  : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
+            RustModule.WasmScope(Scope => {
+              let fullTx;
+              if (isFullTx) {
+                fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
+                fullTx.set_witness_set(hexToBytes(finalWitnessSetHex));
+              } else {
+                fullTx = Scope.WalletV4.FixedTransaction.new(
+                  hexToBytes(tx),
+                  hexToBytes(finalWitnessSetHex),
+                  true,
+                );
+              }
+              rpcResponse({ ok: fullTx.to_hex() });
+            });
+          } else {
+            rpcResponse({ ok: resultWitnessSetHex });
+          }
         }
       }
         break;
@@ -730,6 +770,10 @@ const yoroiMessageHandler = async (
     const connection = await getConnectedSite(request.tabId);
     const responseData = connection?.pendingSigns[String(request.uid)];
     if (connection && responseData) {
+      const code = responseData.request?.type === 'data'
+        ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
+        : TxSignErrorCodes.USER_DECLINED;
+
       sendToInjector(
         request.tabId,
         {
@@ -738,7 +782,7 @@ const yoroiMessageHandler = async (
           uid: request.uid,
           return: {
             err: {
-              code: 2,
+              code,
               info: 'User rejected'
             },
           },
@@ -754,6 +798,10 @@ const yoroiMessageHandler = async (
     const connection = await getConnectedSite(request.tabId);
     const responseData = connection?.pendingSigns[String(request.uid)];
     if (connection && responseData) {
+      const code = responseData.request?.type === 'data'
+        ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
+        : TxSignErrorCodes.PROOF_GENERATION;
+
       sendToInjector(
         request.tabId,
         {
@@ -762,7 +810,7 @@ const yoroiMessageHandler = async (
           uid: request.uid,
           return: {
             err: {
-              code: 3,
+              code,
               info: `utxo error: ${request.errorType} (${request.data})`
             },
           },
@@ -791,6 +839,7 @@ const yoroiMessageHandler = async (
             publicDeriverId: connection.status.publicDeriverId,
             sign: responseData.request,
             tabId: Number(tabId),
+            requesterUrl: connection.url,
           }: SigningMessage));
           return;
         }
@@ -1297,6 +1346,7 @@ async function handleInjectorMessage(message, sender) {
                 );
               } else {
                 rpcResponse({ err: 'not implemented' });
+
               }
             },
             db,
@@ -1317,10 +1367,10 @@ async function handleInjectorMessage(message, sender) {
             async (wallet) => {
               const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
                     'cardano';
+              await RustModule.load();
               const balance =
                     await connectorGetBalance(wallet, tokenId, connectionProtocol);
               if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
-                await RustModule.load();
                 const W4 = RustModule.WalletV4;
                 const value = W4.Value.new(
                   W4.BigNum.from_str(balance.default),
@@ -1507,13 +1557,17 @@ async function handleInjectorMessage(message, sender) {
             async (wallet) => {
               let id;
               if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+                const txBuffer = Buffer.from(message.params[0], 'hex');
                 const tx = RustModule.WalletV4.Transaction.from_bytes(
                   Buffer.from(message.params[0], 'hex'),
                 );
                 await connectorSendTxCardano(
                   wallet,
-                  tx.to_bytes(),
+                  txBuffer,
                   localStorageApi,
+                );
+                const tx = RustModule.WalletV4.Transaction.from_bytes(
+                  txBuffer
                 );
                 id = Buffer.from(
                   RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
@@ -1729,8 +1783,14 @@ async function handleInjectorMessage(message, sender) {
             requiredAmount = RustModule.WalletV4.Value.from_bytes(
               Buffer.from(requiredAmount, 'hex')
             ).coin().to_str();
-          } catch (e) {
-            throw new Error(`Failed to parse the required collateral amount: "${requiredAmount}"`);
+          } catch {
+            rpcResponse({
+              err: {
+                code: APIErrorCodes.API_INVALID_REQUEST,
+                info: 'failed to parse the required collateral amount',
+              },
+            });
+            return;
           }
         }
         await withDb(async (db, localStorageApi) => {
@@ -1785,7 +1845,12 @@ async function handleInjectorMessage(message, sender) {
                 );
               } catch (error) {
                 if (error instanceof NotEnoughMoneyToSendError) {
-                  rpcResponse({ error: 'not enough UTXOs' });
+                  rpcResponse({
+                    err: {
+                      code: APIErrorCodes.API_INTERNAL_ERROR,
+                      info: 'not enough UTXOs'
+                    }
+                  });
                   return;
                 }
                 throw error;
@@ -1794,9 +1859,9 @@ async function handleInjectorMessage(message, sender) {
               // pop-up the UI
               const connection = await getConnectedSite(tabId);
               if (connection == null) {
-                Logger.error(`ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-                return;
+                throw new Error(
+                  `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
+                );
               }
 
               await confirmSign(

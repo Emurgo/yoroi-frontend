@@ -98,6 +98,7 @@ const genBaseProps: {|
     stores: {
       profile: {
         shouldHideBalance: false,
+        isRevampTheme: false,
       },
       wallets: {
         publicDerivers: request.publicDerivers,
@@ -151,6 +152,9 @@ const genBaseProps: {|
           app: { currentRoute: ROUTES.MY_WALLETS },
           profile: {
             isSidebarExpanded: false,
+          },
+          delegation: {
+            getDelegationRequests: () => undefined,
           },
         },
         actions: {

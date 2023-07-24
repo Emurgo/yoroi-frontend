@@ -29,16 +29,19 @@ export const generateByronPlate = (
   const plate = legacyWalletChecksum(
     Buffer.from(accountPublic.as_bytes()).toString('hex')
   );
-  const generateAddressFunc = v2genAddressBatchFunc(
-    RustModule.WalletV2.Bip44ChainPublic.new(
-      RustModule.WalletV2.PublicKey.from_hex(
-        Buffer.from(chainKey.as_bytes()).toString('hex')
+
+  const addresses = RustModule.WasmScope(Scope => {
+    const generateAddressFunc = v2genAddressBatchFunc(
+      Scope.WalletV2.Bip44ChainPublic.new(
+        Scope.WalletV2.PublicKey.from_hex(
+          Buffer.from(chainKey.as_bytes()).toString('hex')
+        ),
+        Scope.WalletV2.DerivationScheme.v2()
       ),
-      RustModule.WalletV2.DerivationScheme.v2()
-    ),
-    byronNetworkMagic
-  );
-  const addresses = generateAddressFunc([...Array(count).keys()]);
+      byronNetworkMagic
+    );
+    return generateAddressFunc([...Array(count).keys()]);
+  });
   return { addresses, plate };
 };
 

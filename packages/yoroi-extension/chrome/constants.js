@@ -25,6 +25,7 @@ export function genCSP(request: {|
 
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/');
+  frameSrc.push('https://www.youtube.com/')
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');

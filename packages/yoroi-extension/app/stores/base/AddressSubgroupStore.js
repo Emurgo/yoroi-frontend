@@ -250,53 +250,7 @@ export class RewardAddressesSubgroup extends AddressTypeStore implements IAddres
     return this;
   }
 }
-export class GroupExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
-    super({
-      stores: data.stores,
-      actions: data.actions,
-      request: (request) => data.stores.addresses._createAddressIfNeeded({
-        publicDeriver: request.publicDeriver,
-        genAddresses: () => data.stores.addresses._wrapForChainAddresses({
-          ...request,
-          storeName: data.name,
-          type: CoreAddressTypes.JORMUNGANDR_GROUP,
-          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
-        }),
-      }),
-    });
-    return this;
-  }
-}
-export class GroupInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
-    super({
-      stores: data.stores,
-      actions: data.actions,
-      request: (request) => data.stores.addresses._wrapForChainAddresses({
-        ...request,
-        storeName: data.name,
-        type: CoreAddressTypes.JORMUNGANDR_GROUP,
-        chainsRequest: { chainId: ChainDerivations.INTERNAL },
-      }),
-    });
-    return this;
-  }
-}
-export class GroupMangledAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
-    super({
-      stores: data.stores,
-      actions: data.actions,
-      request: (request) => data.stores.addresses._wrapForAllAddresses({
-        ...request,
-        type: CoreAddressTypes.JORMUNGANDR_GROUP,
-        storeName: data.name,
-      }),
-    });
-    return this;
-  }
-}
+
 export class P2PKAllAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({

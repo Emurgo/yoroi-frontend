@@ -325,12 +325,12 @@ async function syncingSimpleTransaction(): Promise<void> {
                 height: 0,
               },
               NetworkId: 200,
-              TokenId: 3,
+              TokenId: 2,
             },
             TokenList: {
               Amount: '2100000',
               ListId: 1,
-              TokenId: 3,
+              TokenId: 2,
               TokenListItemId: 2,
             },
           }]
@@ -445,12 +445,12 @@ async function syncingSimpleTransaction(): Promise<void> {
                 height: 0,
               },
               NetworkId: 200,
-              TokenId: 3,
+              TokenId: 2,
             },
             TokenList: {
               Amount: '1100000',
               ListId: 4,
-              TokenId: 3,
+              TokenId: 2,
               TokenListItemId: 5,
             },
           }]
@@ -507,12 +507,12 @@ async function syncingSimpleTransaction(): Promise<void> {
                 height: 0,
               },
               NetworkId: 200,
-              TokenId: 3,
+              TokenId: 2,
             },
             TokenList: {
               Amount: '900000',
               ListId: 5,
-              TokenId: 3,
+              TokenId: 2,
               TokenListItemId: 6,
             },
           }]

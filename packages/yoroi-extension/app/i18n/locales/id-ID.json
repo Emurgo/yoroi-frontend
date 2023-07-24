@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Terjadi kesalahan saat mengambil informasi saldo.",
   "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
-  "api.errors.getReputationError": "Error received from server while getting reputation.",
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "Error dari server saat pengambilan transaksi.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Error dari server saat pengambilan TxBodies.",

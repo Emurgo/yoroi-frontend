@@ -15,9 +15,6 @@ import type {
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
-import type {
-  ReputationObject,
-} from '../../api/jormungandr/lib/state-fetch/types';
 import { getApiForNetwork } from '../../api/common/utils';
 import {
   PoolMissingApiError,
@@ -54,8 +51,6 @@ export type PoolMeta = {|
     +cert_ordinal: number,
     +payload: any, // TODO: how to store this since different networks have different cert types
   |}>,
-  // TODO: we need to get information about how much pledge and whether the pledge is met
-  +reputation: ReputationObject, // TODO: decide what to do. Replace with community standard?
 |};
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {

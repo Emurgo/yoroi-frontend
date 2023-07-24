@@ -33,6 +33,8 @@ import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
+import blake2b from 'blake2b';
+
 /**
  * based off what the cardano-wallet team found worked empirically
  * note: slots are 1 second in Shelley mainnet, so this is 2hrs
@@ -1145,12 +1147,14 @@ type UtxoOrAddressing = CardanoAddressedUtxo | {| ...Address, ...Addressing |};
 
 export function signTransaction(
   senderUtxos: Array<CardanoAddressedUtxo>,
-  unsignedTx: RustModule.WalletV4.TransactionBuilder | RustModule.WalletV4.TransactionBody,
+  unsignedTx:
+    RustModule.WalletV4.TransactionBuilder |
+    RustModule.WalletV4.TransactionBody |
+    Buffer,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
   metadata: ?RustModule.WalletV4.AuxiliaryData,
-  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet = null,
   otherRequiredSigners: Array<{| ...Address, ...Addressing |}> = [],
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
@@ -1188,10 +1192,26 @@ export function signTransaction(
     addIfUnique(otherSigner.address, otherSigner);
   }
 
-  const txBody = unsignedTx instanceof RustModule.WalletV4.TransactionBuilder
-    ? unsignedTx.build()
-    : unsignedTx;
-  const txHash = RustModule.WalletV4.hash_transaction(txBody);
+  let txBody;
+  let txHash;
+  if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
+    txBody = unsignedTx.build();
+    txHash = RustModule.WalletV4.hash_transaction(txBody);
+  } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBody) {
+    txBody = unsignedTx;
+    txHash = RustModule.WalletV4.hash_transaction(txBody);
+  } else if (unsignedTx instanceof Buffer) {
+    // note: we are calculating the tx hash from the raw tx body bytes, which
+    // probably won't match the serialized `txBody`. But this happens only for
+    // connector signing and only the witness will be returned so this is more
+    // likely to match what the client expects.
+    txBody = RustModule.WalletV4.TransactionBody.from_bytes(unsignedTx);
+    txHash = RustModule.WalletV4.TransactionHash.from_bytes(
+      blake2b(256 / 8).update(unsignedTx).digest('binary')
+    );
+  } else {
+    throw new Error('unexpected tx body type');
+  }
 
   const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
   const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
@@ -1218,7 +1238,7 @@ export function signTransaction(
     );
   }
 
-  witnessSet = witnessSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
+  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
 

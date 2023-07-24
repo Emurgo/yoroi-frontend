@@ -75,7 +75,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                   token.info.Metadata
                 ),
                 author: getAuthorFromTokenMetadata(policyId, fullName, token.info.Metadata),
-                // $FlowFixMe
+                // $FlowFixMe[prop-missing]
                 metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
               };
             });

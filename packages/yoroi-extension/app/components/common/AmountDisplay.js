@@ -1,4 +1,5 @@
 // @flow
+import { observer } from 'mobx-react';
 import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -20,6 +21,8 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
 |};
+
+@observer
 export default class AmountDisplay extends Component<Props> {
   static defaultProps: {| showAmount: boolean, showFiat: boolean |} = {
     showAmount: true,

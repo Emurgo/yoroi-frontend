@@ -4,13 +4,9 @@ import { WebDriver } from 'selenium-webdriver';
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { bytesToHex, getTtl, hexToBytes } from '../support/helpers/dapp-helpers';
 import { MultiAsset, TransactionBuilder } from '@emurgo/cardano-serialization-lib-nodejs';
+import type { DAppConnectorResponse } from '../support/helpers/dapp-helpers';
 
 class MockDAppWebpageError extends Error {}
-
-type AccessCallBack = {|
-  success: boolean,
-  errMsg?: string,
-|};
 
 type ReducedAsset = {|
   policyId: any | string,
@@ -171,32 +167,32 @@ export class MockDAppWebpage {
     throw new MockDAppWebpageError(changeAddresses.errMsg);
   }
 
-  async _getUTXOs(): Promise<Array<Utxo>> {
+  async _getUTXOs(amount?: string): Promise<Array<Utxo>> {
     this.logger.info(`MockDApp: Getting UTXOs`);
-    const walletUTXOsResponse = await this.driver.executeAsyncScript((...args) => {
+    const walletUTXOsResponse = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
-        .getUtxos()
+        .getUtxos(args[0])
         .then(utxosResponse => {
           // eslint-disable-next-line promise/always-return
           if (utxosResponse.length === 0) {
-            callback({ success: false, errMsg: 'NO UTXOS' });
+            callback({ success: false, error: 'NO UTXOS', retValue: null });
           } else {
-            callback({ success: true, retValue: utxosResponse });
+            callback({ success: true, retValue: utxosResponse, error: null });
           }
         })
-        .catch(error => {
-          callback({ success: false, errMsg: JSON.stringify(error) });
+        .catch(err => {
+          callback({ success: false, error: JSON.stringify(err), retValue: null });
         });
-    });
+    }, amount): DAppConnectorResponse);
     this.logger.info(
       `MockDApp: -> The walletUTXOsResponse: ${JSON.stringify(walletUTXOsResponse)}`
     );
     if (walletUTXOsResponse.success) {
       return this._mapCborUtxos(walletUTXOsResponse.retValue);
     }
-    this.logger.error(`MockDApp: -> The error is received: ${walletUTXOsResponse.errMsg}`);
-    throw new MockDAppWebpageError(walletUTXOsResponse.errMsg);
+    this.logger.error(`MockDApp: -> The error is received: ${walletUTXOsResponse.error}`);
+    throw new MockDAppWebpageError(walletUTXOsResponse.error);
   }
 
   async requestUsedAddresses() {
@@ -221,25 +217,25 @@ export class MockDAppWebpage {
     await this._requestAccess(true);
   }
 
-  async checkAccessRequest(): Promise<AccessCallBack> {
+  async checkAccessRequest(): Promise<DAppConnectorResponse> {
     this.logger.info(`MockDApp: Checking the access request`);
-    const accessResponse = await this.driver.executeAsyncScript((...args) => {
+    const accessResponse = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.accessRequestPromise
         .then(
           // eslint-disable-next-line promise/always-return
           api => {
             window.api = api;
-            callback({ success: true });
+            callback({ success: true, error: null, retValue: null });
           },
           error => {
-            callback({ success: false, errMsg: error.message });
+            callback({ success: false, error, retValue: null });
           }
         )
         .catch(error => {
-          callback({ success: false, errMsg: error.message });
+          callback({ success: false, error, retValue: null });
         });
-    });
+    }): DAppConnectorResponse);
     this.logger.info(`MockDApp: -> The access response: ${JSON.stringify(accessResponse)}`);
 
     await this.driver.executeScript(accResp => {
@@ -272,23 +268,23 @@ export class MockDAppWebpage {
   async isEnabled(): Promise<boolean> {
     await this.driver.sleep(100);
     this.logger.info(`MockDApp: Checking is a wallet enabled`);
-    const isEnabled = await this.driver.executeAsyncScript((...args) => {
+    const isEnabled = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.cardano.yoroi
         .isEnabled()
         .then(
           // eslint-disable-next-line promise/always-return
           onSuccess => {
-            callback({ success: true, retValue: onSuccess });
+            callback({ success: true, retValue: onSuccess, error: null });
           },
           onReject => {
-            callback({ success: false, errMsg: onReject.message });
+            callback({ success: false, error: onReject.message, retValue: null });
           }
         )
         .catch(error => {
-          callback({ success: false, errMsg: error.message });
+          callback({ success: false, error: error.message, retValue: null });
         });
-    });
+    }): DAppConnectorResponse);
     if (isEnabled.success) {
       this.logger.info(`MockDApp: -> The request cardano.yoroi.isEnabled() is successful`);
       this.logger.info(`MockDApp: -> The wallet is enabled: ${isEnabled.retValue}`);
@@ -299,7 +295,7 @@ export class MockDAppWebpage {
         isEnabled
       )}`
     );
-    throw new MockDAppWebpageError(isEnabled.errMsg);
+    throw new MockDAppWebpageError(isEnabled.error);
   }
 
   async getConnectionState(): Promise<boolean> {
@@ -323,18 +319,18 @@ export class MockDAppWebpage {
 
   async getBalance(): Promise<string> {
     this.logger.info(`MockDApp: Getting the balance`);
-    const balanceCborHex = await this.driver.executeAsyncScript((...args) => {
+    const balanceCborHex = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api
         .getBalance()
         // eslint-disable-next-line promise/always-return
         .then(balance => {
-          callback({ success: true, retValue: balance });
+          callback({ success: true, retValue: balance, error: null });
         })
-        .catch(error => {
-          callback({ success: false, errMsg: error.message });
+        .catch(err => {
+          callback({ success: false, error: err.message, retValue: null });
         });
-    });
+    }): DAppConnectorResponse);
     if (balanceCborHex.success) {
       const value = CardanoWasm.Value.from_bytes(Buffer.from(balanceCborHex.retValue, 'hex'));
       const valueStr = value.coin().to_str();
@@ -346,14 +342,14 @@ export class MockDAppWebpage {
         balanceCborHex
       )}`
     );
-    throw new MockDAppWebpageError(balanceCborHex.errMsg);
+    throw new MockDAppWebpageError(balanceCborHex.error);
   }
 
   async requestSigningTx(amount: string, toAddress: string) {
     this.logger.info(
       `MockDApp: Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
     );
-    const UTXOs = await this._getUTXOs();
+    const UTXOs = await this._getUTXOs(amount);
     const changeAddress = await this._getChangeAddress();
     const txBuilder = this._transactionBuilder();
     const utxo = UTXOs[0];
@@ -402,22 +398,24 @@ export class MockDAppWebpage {
     }, unsignedTransactionHex);
   }
 
-  async getSigningTxResult(): Promise<string | {| code: number, info: string |}> {
+  async getSigningTxResult(): Promise<DAppConnectorResponse> {
     this.logger.info(`MockDApp: Getting signing result`);
-    const signingResult = await this.driver.executeAsyncScript((...args) => {
+    const signingResult = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signTxPromise
         .then(
           // eslint-disable-next-line promise/always-return
           onSuccess => {
-            callback(onSuccess);
+            callback({ success: true, retValue: onSuccess, error: null });
           },
           onReject => {
-            callback(onReject);
+            callback({ success: false, retValue: null, error: onReject });
           }
         )
-        .catch(callback);
-    });
+        .catch(err => {
+          callback({ success: false, retValue: null, error: err });
+        });
+    }): DAppConnectorResponse);
     this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
     return signingResult;
   }
@@ -466,71 +464,92 @@ export class MockDAppWebpage {
     }
     this.logger.info(`MockDApp: -> Payload HEX: ${payloadHex}`);
 
-    this.driver.executeScript(
-      (addr, plHex) => {
-        window.signDataPromise = window.api.signData(addr, plHex);
-      },
-      address,
-      payloadHex
-    );
+    const scriptString = `window.signDataPromise = window.api.signData(${JSON.stringify(
+      address
+    )}, ${JSON.stringify(payloadHex)});`;
+
+    this.driver.executeScript(scriptString);
   }
 
-  async getSigningDataResult(): Promise<string> {
+  async getSigningDataResult(): Promise<DAppConnectorResponse> {
     this.logger.info(`MockDApp: Getting signing data result`);
-    const signingResult = await this.driver.executeAsyncScript((...args) => {
+    const signingResult = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signDataPromise
         .then(
-          // eslint-disable-next-line promise/always-return
           onSuccess => {
-            callback(onSuccess);
+            return callback({ success: true, retValue: onSuccess, error: null });
           },
           onReject => {
-            callback(onReject);
+            callback({ success: false, retValue: null, error: onReject });
           }
         )
-        .catch(callback);
-    });
+        .catch(err => {
+          callback({ success: false, retValue: null, error: err });
+        });
+    }): DAppConnectorResponse);
     this.logger.info(`MockDApp: -> Signing result: ${JSON.stringify(signingResult)}`);
     return signingResult;
   }
 
-  async getCollateralUtxos(amount: string): Promise<string> {
+  async getCollateral(amount: string): Promise<DAppConnectorResponse> {
     this.logger.info(`MockDApp: Getting Collateral Utxos`);
 
-    Buffer.from(
+    const convertedAmount = Buffer.from(
       CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
     ).toString('hex');
 
-    const collateralResponse = await this.driver.executeAsyncScript((...args) => {
+    const collateralResponse = (await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
 
       window.api
-        .getCollateralUtxos('1a004ac4a0')
-        // eslint-disable-next-line promise/always-return
+        .getCollateral(args[0])
         .then(utxosResponse => {
-          callback({ success: true, retValue: utxosResponse });
+          return callback({ success: true, retValue: utxosResponse, error: null });
         })
-        .catch(error => {
-          callback({ success: false, errMsg: error.message });
+        .catch(err => {
+          callback({ success: false, error: err, retValue: null });
         });
-    });
-    if (collateralResponse.success) {
+    }, convertedAmount): DAppConnectorResponse);
+    if (
+      collateralResponse.success &&
+      collateralResponse.retValue != null &&
+      collateralResponse.retValue.length !== 0
+    ) {
       const utxos = this._mapCborUtxos(collateralResponse.retValue);
-      return JSON.stringify(utxos, undefined, 2);
+      return { success: true, retValue: utxos, error: null };
     }
-    this.logger.error(`MockDApp: -> The error is received: ${collateralResponse.errMsg}`);
-    throw new MockDAppWebpageError(collateralResponse.errMsg);
+    this.logger.error(`MockDApp: -> Something went wrong: ${JSON.stringify(collateralResponse.error)}`);
+    return collateralResponse;
   }
 
   async addCollateral(amount: string) {
     this.logger.info(`MockDApp: Requesting collateral: data="${amount}"`);
-    const utxosHex = Buffer.from(
-      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount)).to_bytes()
-    ).toString('hex');
+    const scriptString = `window.collateralPromise = window.api.getCollateral(${amount});`;
+    await this.driver.executeScript(scriptString);
+  }
 
-    this.driver.executeScript(utxos => {
-      window.collateralPromise = window.api.getCollateralUtxos(utxos);
-    }, utxosHex);
+  async getCollateralResult(): Promise<DAppConnectorResponse> {
+    this.logger.info(`MockDApp: Getting collateral data result`);
+    const collateralResult = (await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.collateralPromise
+        .then(utxosResponse => {
+          return callback({ success: true, retValue: utxosResponse, error: null });
+        })
+        .catch(error => {
+          return callback({ success: false, error, retValue: null });
+        });
+    }): DAppConnectorResponse);
+    if (
+      collateralResult.success &&
+      collateralResult.retValue != null &&
+      collateralResult.retValue.length !== 0
+    ) {
+      const utxos = this._mapCborUtxos(collateralResult.retValue);
+      return { success: true, retValue: utxos, error: null };
+    }
+    this.logger.error(`MockDApp: -> Something went wrong: ${JSON.stringify(collateralResult)}`);
+    return collateralResult;
   }
 }

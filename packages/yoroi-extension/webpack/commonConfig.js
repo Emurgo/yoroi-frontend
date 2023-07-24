@@ -37,7 +37,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       template: path.join(__dirname, '../chrome/views/connector/main_window.html'),
       chunks: ['ergo'],
       alwaysWriteToDisk: true,
-      title: 'Yoroi dApp Connector',
+      title: 'Yoroi Dapp Connector',
     }),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/ledger.html`),

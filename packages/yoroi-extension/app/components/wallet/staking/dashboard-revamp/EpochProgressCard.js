@@ -41,7 +41,7 @@ type TitleProps = {|
 const Title = ({ label, value }: TitleProps): Node => {
   return (
     <Box>
-      <Typography fontWeight="500" color="var(--yoroi-palette-primary-300)">
+      <Typography fontWeight="500" color="primary.600">
         {label}: {value}
       </Typography>
     </Box>
@@ -77,7 +77,7 @@ const Graph = ({ value, days }): Node => {
         variant="determinate"
         value={value}
         sx={{
-          color: 'var(--yoroi-palette-primary-300)',
+          color: 'primary.600',
           animationDuration: '550ms',
           position: 'absolute',
           zIndex: 1,

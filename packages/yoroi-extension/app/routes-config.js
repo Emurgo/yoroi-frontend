@@ -36,6 +36,8 @@ export const ROUTES = {
   WALLETS: {
     ROOT: '/wallets',
     ADD: '/wallets/add',
+    CREATE_NEW_WALLET: '/wallets/new',
+    RESTORE_WALLET: '/wallets/restore',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',
     ASSETS: '/wallets/assets',
@@ -91,5 +93,12 @@ export const ROUTES = {
     YOROI_PALETTE: '/experimental/yoroi-palette',
     YOROI_COMPONENTS: '/experimental/components',
     THEMES: '/experimental/themes'
+  },
+  // Revamp specific routes:
+  REVAMP: {
+    // `transfer` the `wallet`
+    TRANSFER: '/wallets/transfer',
+    // `voting` is part of the sidebar
+    CATALYST_VOTING: '/voting',
   }
 };

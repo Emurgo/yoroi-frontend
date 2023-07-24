@@ -3,16 +3,26 @@
 import type { LocatorObject } from '../support/webdriver';
 
 export const addCollateralTitle: LocatorObject = {
-  locator: '//h5[contains(text(), "Add Collateral")]',
-  method: 'xpath',
+  locator: 'addCollateralTitle',
+  method: 'id',
 };
 
 export const transactionFeeTitle: LocatorObject = {
-  locator: '//p[contains(text(), "Transaction Fee")]',
-  method: 'xpath',
+  locator: 'addCollateralFeeTitle',
+  method: 'id',
 };
 
 export const totalAmountTitle: LocatorObject = {
-  locator: '//p[contains(text(), "Total Amount")]',
-  method: 'xpath',
+  locator: 'addCollateralAmountTitle',
+  method: 'id',
+};
+
+export const getCollateralTransactionFee = async (customWorld: Object): Promise<string> => {
+  const feeFieldElement = await customWorld.findElement(transactionFeeTitle);
+  return (await feeFieldElement.getText()).split(' ')[0];
+};
+
+export const getCollateralTransactionAmount = async (customWorld: Object): Promise<string> => {
+  const allAmountBlocks = await customWorld.findElement(totalAmountTitle);
+  return (await allAmountBlocks.getText()).split(' ')[0];
 };

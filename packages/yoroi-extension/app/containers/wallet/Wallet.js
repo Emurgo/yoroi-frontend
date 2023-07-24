@@ -30,8 +30,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
-import { THEMES } from '../../styles/utils';
-import type { Theme } from '../../styles/utils';
+import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -56,6 +55,18 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
+    const { wallets } = this.generated.stores;
+    const publicDeriver = wallets.selected;
+    const publicDerivers = wallets.publicDerivers;
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
+
+    if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
+      const lastSelectedWallet = wallets.getLastSelectedWallet();
+      this.generated.actions.wallets.setActiveWallet.trigger({
+        wallet: lastSelectedWallet ?? publicDerivers[0],
+      });
+    }
+
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
@@ -66,22 +77,19 @@ class Wallet extends Component<AllProps> {
   }
 
   checkRoute(): void | string {
-    let categories;
-    if (this.generated.stores.profile.currentTheme === THEMES.YOROI_REVAMP) {
-      categories = allCategories.filter(c => c.route !== ROUTES.WALLETS.DELEGATION_DASHBOARD);
-    } else {
-      categories = allCategories;
-    }
+    const isRevamp = this.generated.stores.profile.isRevampTheme;
+    const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
+
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
+    if (publicDeriver == null) return;
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-    const activeCategory = categories.find(
-      category => this.generated.stores.app.currentRoute.startsWith(category.route)
+    const activeCategory = categories.find(category =>
+      this.generated.stores.app.currentRoute.startsWith(category.route)
     );
 
     // if we're on a page that isn't applicable for the currently selected wallet
@@ -89,34 +97,17 @@ class Wallet extends Component<AllProps> {
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
     if (!activeCategory?.isVisible(visibilityContext)) {
-      const firstValidCategory = categories
-        .find(c => c.isVisible(visibilityContext));
+      const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
       return firstValidCategory.route;
     }
-    return undefined;
   }
 
   navigateToMyWallets: string => void = destination => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
-
-  renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
-    const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) throw new Error(`${nameof(this.renderOverlay)} no public deriver`);
-
-    if (this.generated.stores.wallets.firstSync === publicDeriver.getPublicDeriverId()) {
-      return (
-        <WalletSyncingOverlay
-          classicTheme={this.generated.stores.profile.currentTheme === THEMES.YOROI_CLASSIC}
-          onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
-        />
-      )
-    }
-    return null
-  }
 
   render(): Node {
     // abort rendering if the page isn't valid for this wallet
@@ -124,10 +115,10 @@ class Wallet extends Component<AllProps> {
       return null;
     }
     const { intl } = this.context;
-    const { wallets } = this.generated.stores;
-    const { actions } = this.generated;
+    const { actions, stores } = this.generated;
+    const selectedWallet = stores.wallets.selected;
 
-    if (!wallets.selected) {
+    if (!selectedWallet) {
       return (
         <TopBarLayout
           banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -141,11 +132,12 @@ class Wallet extends Component<AllProps> {
         </TopBarLayout>
       );
     }
-    const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
+    if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (
@@ -184,26 +176,31 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         <WalletWithNavigation
-          categories={
-            allCategories
-              .filter(c => c.isVisible(visibilityContext))
-              .map(category => ({
-                className: category.className,
-                icon: category.icon,
-                label: category.label,
-                isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
-                onClick: () => this.generated.actions.router.goToRoute.trigger({
+          categories={allCategories
+            .filter(c => c.isVisible(visibilityContext))
+            .map(category => ({
+              className: category.className,
+              icon: category.icon,
+              label: category.label,
+              isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
+              onClick: () =>
+                this.generated.actions.router.goToRoute.trigger({
                   route: category.route,
                 }),
             }))}
         >
           {this.props.children}
-          {this.renderOverlay()}
+          {isFirstSync && (
+            <WalletSyncingOverlay
+              classicTheme={this.generated.stores.profile.isClassicTheme}
+              onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
+            />
+          )}
         </WalletWithNavigation>
       </TopBarLayout>
     );
 
-    const walletRevamp = (
+    const walletRevamp = !isFirstSync ? (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
@@ -218,8 +215,11 @@ class Wallet extends Component<AllProps> {
         showAsCard
       >
         {warning}
-        {this.renderOverlay()}
         {this.props.children}
+      </TopBarLayout>
+    ) : (
+      <TopBarLayout sidebar={sidebarContainer}>
+        <WalletLoadingAnimation />
       </TopBarLayout>
     );
 
@@ -255,6 +255,13 @@ class Wallet extends Component<AllProps> {
           |}) => void,
         |},
       |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
@@ -263,7 +270,9 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
-        firstSync: ?number,
+        publicDerivers: Array<PublicDeriver<>>,
+        firstSyncWalletId: ?number,
+        getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       router: {| location: any |},
       transactions: {|
@@ -272,10 +281,11 @@ class Wallet extends Component<AllProps> {
         |},
       |},
       profile: {|
-        currentTheme: Theme,
+        isRevampTheme: boolean,
+        isClassicTheme: boolean,
       |},
-    |}
-    |} {
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -291,7 +301,9 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
-          firstSync: stores.wallets.firstSync
+          publicDerivers: stores.wallets.publicDerivers,
+          firstSyncWalletId: stores.wallets.firstSyncWalletId,
+          getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
@@ -301,9 +313,10 @@ class Wallet extends Component<AllProps> {
         },
         transactions: {
           getBalanceRequest: (() => {
-            if (stores.wallets.selected == null) return {
-              result: undefined,
-            };
+            if (stores.wallets.selected == null)
+              return {
+                result: undefined,
+              };
             const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
 
             return {
@@ -312,13 +325,17 @@ class Wallet extends Component<AllProps> {
           })(),
         },
         profile: {
-          currentTheme: stores.profile.currentTheme,
-        }
+          isRevampTheme: stores.profile.isRevampTheme,
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
       },
       actions: {
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
+        },
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
         },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),

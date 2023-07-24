@@ -3,6 +3,12 @@
 import BigNumber from 'bignumber.js';
 import type { TimeToAbsoluteSlotFunc, TimeToAbsoluteSlotRequest } from '../../../app/api/common/lib/storage/bridge/timeUtils';
 
+export type DAppConnectorResponse = {|
+  success: boolean,
+  retValue: any,
+  error: any,
+|};
+
 export function bytesToHex(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString('hex');
 }

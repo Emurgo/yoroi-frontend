@@ -1,0 +1,98 @@
+@import '../../../themes/mixins/loading-spinner';
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  flex-flow: row;
+  width: 100%;
+  gap: 16px;
+}
+
+.plateAndName {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 12px;
+  color: var(--yoroi-palette-gray-600);
+  font-size: 14px;
+  line-height: 19px;
+}
+
+.name {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--yoroi-palette-gray-900);
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+}
+
+.plate {
+  color: var(--yoroi-palette-gray-600);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.isLoading {
+  position: relative;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: 4px;
+}
+
+.toggleButton {
+  margin-left: 8px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.amount {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--yoroi-palette-gray-900);
+
+  .isLoading {
+    margin-left: 9px;
+    margin-bottom: 8px;
+    @include loading-spinner('../../../assets/images/spinner-dark.svg', 14);
+  }
+
+  .isSyncing {
+    @extend .isLoading;
+    margin-bottom: 4px;
+  }
+
+  & + & {
+    margin-left: 24px;
+  }
+}
+
+.amountAndHideIcon {
+  display: flex;
+  min-height: 38px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.amountLabel {
+  font-weight: 400;
+  display: block;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--yoroi-palette-gray-600);
+}

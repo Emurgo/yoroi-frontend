@@ -254,7 +254,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     if (result == null) {
       result = this.getWalletsNavigationRequest.execute().result;
     }
-    return result ?? { ergo: [], cardano: [], quickAccess: [] };
+    return result ?? { ergo: [], cardano: [] };
   }
   _getSortedWalletList: void => Promise<void> = async () => {
     await this.getWalletsNavigationRequest.execute();
