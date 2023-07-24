@@ -15,8 +15,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
-import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
-import WalletNoTransactionsRevamp from '../../components/wallet/transactions/WalletNoTransactionsRevamp';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
@@ -131,18 +129,13 @@ class WalletSummaryPage extends Component<AllProps> {
 
     if (searchOptions) {
       const { limit } = searchOptions;
-      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
 
       const mapWalletTransactionLayout = {
         CLASSIC: WalletTransactionsList,
         REVAMP: WalletTransactionsListRevamp,
       };
-      const mapWalletNoTransactionsLayout = {
-        CLASSIC: WalletNoTransactions,
-        REVAMP: WalletNoTransactionsRevamp,
-      };
+
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
-      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
 
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
         const {
