@@ -80,7 +80,11 @@ export default class ConnectStore {
       this.deviceCode = convertStringToDeviceCodeType(getKnownDeviceCode());
     });
 
-    chrome.runtime.sendMessage('ledger-ready');
+    const params = new URLSearchParams(document.location.search);
+    const mainTabId = Number(params.get('mainTabId'));
+    chrome.tabs.getCurrent(tab => {
+      chrome.tabs.sendMessage(mainTabId, { type: 'ledger-ready', tabId: tab.id });
+    });
   }
 
   @computed
