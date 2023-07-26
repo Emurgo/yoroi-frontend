@@ -1558,9 +1558,6 @@ async function handleInjectorMessage(message, sender) {
               let id;
               if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
                 const txBuffer = Buffer.from(message.params[0], 'hex');
-                const tx = RustModule.WalletV4.Transaction.from_bytes(
-                  Buffer.from(message.params[0], 'hex'),
-                );
                 await connectorSendTxCardano(
                   wallet,
                   txBuffer,
