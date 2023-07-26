@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.21.0",
+  "version": "4.22.100",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -116,7 +116,7 @@
     "cardano-wallet": "1.2.2",
     "chai": "4.3.0",
     "chai-as-promised": "7.1.1",
-    "chromedriver": "latest",
+    "chromedriver": "113.0.0",
     "config": "1.31.0",
     "config-webpack": "1.0.4",
     "crx": "5.0.1",

@@ -1,6 +1,6 @@
 # Build Yoroi Chrome extension
 
-Extension can be built for both Byron mainnet and Jormungandr testnet:
+Extension can be built for both Byron mainnet 
 
 ## Debug build
 

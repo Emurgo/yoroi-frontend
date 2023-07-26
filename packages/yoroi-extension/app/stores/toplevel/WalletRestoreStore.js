@@ -11,9 +11,7 @@ import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import { generateByronPlate, generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateErgoPlate } from '../../api/ergo/lib/crypto/plate';
-import { generateJormungandrPlate } from '../../api/jormungandr/lib/crypto/plate';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { v4Bip32PrivateToV3 } from '../../api/jormungandr/lib/crypto/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   generateWalletRootKey as generateAdaWalletRootKey,
@@ -23,7 +21,6 @@ import { generateWalletRootKey as generateErgoWalletRootKey } from '../../api/er
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
-  isJormungandr,
   isCardanoHaskell,
   isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -47,10 +44,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.accountId.shelley.label',
     defaultMessage: '!!!Shelley account checksum:',
   },
-  walletRestoreVerifyJormungandrAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.itn.label',
-    defaultMessage: '!!!ITN account checksum:',
-  },
   walletRestoreVerifyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.addressesLabel',
     defaultMessage: '!!!Your Wallet address[es]:',
@@ -62,10 +55,6 @@ const messages = defineMessages({
   walletRestoreVerifyShelleyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.shelley.addressesLabel',
     defaultMessage: '!!!Shelley Wallet address[es]:',
-  },
-  walletRestoreVerifyJormungandrAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.itn.addressesLabel',
-    defaultMessage: '!!!ITN Wallet address[es]:',
   },
 });
 
@@ -123,13 +112,8 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    if (isJormungandr(selectedNetwork)) {
-      runInAction(() => {
-        this.step = RestoreSteps.LEGACY_EXPLANATION;
-      });
-    } else {
-      await this.actions.walletRestore.startRestore.trigger();
-    }
+
+    await this.actions.walletRestore.startRestore.trigger();
   };
 
   @action
@@ -263,17 +247,12 @@ export function generatePlates(
     ) {
       return true;
     }
-    if (isJormungandr(network)) {
-      return true;
-    }
     return false;
   })();
 
   const shouldShowShelleyPlate = (() => {
-    return isCardanoHaskell(network) && !isJormungandr(network) && mode.type === 'cip1852';
+    return isCardanoHaskell(network) && mode.type === 'cip1852';
   })();
-
-  const shouldShowJormungandrPlate = false;
 
   if (shouldShowShelleyPlate) {
     const shelleyPlate = generateShelleyPlate(
@@ -302,34 +281,8 @@ export function generatePlates(
     );
     plates.push({
       ...byronPlate,
-      checksumTitle:
-        shouldShowJormungandrPlate == null
-          ? messages.walletRestoreVerifyAccountIdLabel
-          : messages.walletRestoreVerifyByronAccountIdLabel,
-      addressMessage:
-        shouldShowJormungandrPlate == null
-          ? messages.walletRestoreVerifyAddressesLabel
-          : messages.walletRestoreVerifyByronAddressesLabel,
-    });
-  }
-  if (shouldShowJormungandrPlate) {
-    const jormungandrPlate = generateJormungandrPlate(
-      v4Bip32PrivateToV3(getCardanoKey()),
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      // recall: ITN used the test discriminant
-      RustModule.WalletV3.AddressDiscrimination.Test
-    );
-    plates.push({
-      ...jormungandrPlate,
-      checksumTitle:
-        shouldShowByronPlate == null
-          ? messages.walletRestoreVerifyAccountIdLabel
-          : messages.walletRestoreVerifyJormungandrAccountIdLabel,
-      addressMessage:
-        shouldShowByronPlate == null
-          ? messages.walletRestoreVerifyAddressesLabel
-          : messages.walletRestoreVerifyJormungandrAddressesLabel,
+      checksumTitle: messages.walletRestoreVerifyAccountIdLabel,
+      addressMessage: messages.walletRestoreVerifyAddressesLabel,
     });
   }
 

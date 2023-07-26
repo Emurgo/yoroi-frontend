@@ -4,7 +4,6 @@ import type { GraphItems } from '../components/wallet/staking/dashboard/GraphWra
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
-  isJormungandr,
 } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
@@ -52,11 +51,6 @@ const generateRewardGraphData: ({|
     if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
       // TODO: -1 since cardano-db-sync doesn't expose this information for some reason
       return request.currentEpoch - 1;
-    }
-    if (isJormungandr(request.publicDeriver.getParent().getNetworkInfo())) {
-      // note: reward history includes the current epoch
-      // since it tells you the reward you got at slot 0 of the new epoch
-      return request.currentEpoch + 1;
     }
     throw new Error(`${nameof(generateRewardGraphData)} can't compute endEpoch for rewards`);
   })();

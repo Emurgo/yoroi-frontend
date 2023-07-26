@@ -32,7 +32,6 @@ import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/
 import { ReactComponent as ExpandArrow } from '../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Transaction.scss';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
 import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import { transactionTypes } from '../../../api/ada/transactions/types';
@@ -47,7 +46,7 @@ import CopyableAddress from '../../widgets/CopyableAddress';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
 import {
   parseMetadata,
   parseMetadataDetailed,
@@ -56,7 +55,6 @@ import CodeBlock from '../../widgets/CodeBlock';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import {
   assuranceLevelTranslations,
-  jormungandrCertificateKinds,
   shelleyCertificateKinds,
   stateTranslations,
   messages,
@@ -198,11 +196,12 @@ export default class TransactionRevamp extends Component<Props, State> {
       return <span>{hiddenAmount}</span>;
     }
     const tokenInfo = this.props.getTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
 
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
+      numberOfDecimals,
     );
 
     // we may need to explicitly add + for positive values
@@ -353,12 +352,14 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   getTicker: TokenEntry => string = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    return truncateToken(getTokenName(tokenInfo));
+    return tokenInfo != null
+      ? truncateToken(getTokenName(tokenInfo))
+      : assetNameFromIdentifier(tokenEntry.identifier);
   };
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    if (tokenInfo.Metadata.type === 'Cardano') {
+    if (tokenInfo?.Metadata.type === 'Cardano') {
       return getTokenIdentifierIfExists(tokenInfo);
     }
     return undefined;
@@ -768,28 +769,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     );
   };
 
-  jormungandrCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
-    const { intl } = this.context;
-    const kind = certificate.Kind;
-    return RustModule.WasmScope(Scope => {
-      switch (kind) {
-        case Scope.WalletV3.CertificateKind.PoolRegistration:
-          return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
-        case Scope.WalletV3.CertificateKind.PoolUpdate:
-          return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
-        case Scope.WalletV3.CertificateKind.PoolRetirement:
-          return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
-        case Scope.WalletV3.CertificateKind.StakeDelegation:
-          return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
-        case Scope.WalletV3.CertificateKind.OwnerStakeDelegation:
-          return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
-        default: {
-          throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
-        }
-      }
-    });
-  };
-
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
@@ -864,15 +843,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         <span className={styles.rowData}>{node}</span>
       </>
     );
-    if (data instanceof JormungandrTransaction) {
-      if (data.certificates.length === 0) {
-        return null;
-      }
-      return wrapCertificateText(
-        this.jormungandrCertificateToText(data.certificates[0].certificate),
-        data.certificates.length > 1
-      );
-    }
+
     if (data instanceof CardanoShelleyTransaction) {
       if (data.certificates.length === 0) {
         return null;
@@ -896,29 +867,38 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { intl } = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
-      let jsonData = null;
+      let metadata;
+      if (typeof data.metadata === 'string') {
+        let jsonData = null;
 
-      try {
-        jsonData = parseMetadata(data.metadata);
-      } catch (error) {
-        // try to parse schema using detailed conversion if advanced user
-        if (this.props.complexityLevel === ComplexityLevels.Advanced) {
-          try {
-            jsonData = parseMetadataDetailed(data.metadata);
-          } catch (errDetailed) {
-            // discard error
-            // can not parse metadata as json
-            // show the metadata hex as is
+        try {
+          jsonData = parseMetadata(data.metadata);
+        } catch (error) {
+          // try to parse schema using detailed conversion if advanced user
+          if (this.props.complexityLevel === ComplexityLevels.Advanced) {
+            try {
+              jsonData = parseMetadataDetailed(data.metadata);
+            } catch (errDetailed) {
+              // discard error
+              // can not parse metadata as json
+              // show the metadata hex as is
+            }
           }
+          // do nothing for simple user
         }
-        // do nothing for simple user
+        if (jsonData !== null) {
+          metadata = (<CodeBlock code={jsonData} />);
+        } else {
+          metadata = (<span>0x{data.metadata}</span>);
+        }
+      } else {
+        metadata = (<CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 2)} </pre>} />);
       }
-
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
           <span className={styles.rowData}>
-            {jsonData !== null ? <CodeBlock code={jsonData} /> : <span>0x{data.metadata}</span>}
+            {metadata}
           </span>
         </div>
       );

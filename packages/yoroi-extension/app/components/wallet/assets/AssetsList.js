@@ -37,6 +37,7 @@ const SORTING_COLUMNS = {
   name: string,
   id: string,
   amount: string,
+  amountForSorting?: BigNumber,
 |}
 type Props = {|
   +assetsList: Asset[],
@@ -136,6 +137,10 @@ export default class AssetsList extends Component<Props, State> {
     this.setState({ sortingDirection: newSortDirection })
 
     if (field === 'amount') {
+      const dedicatedField = 'amountForSorting';
+      if (a[dedicatedField] != null && b[dedicatedField] != null) {
+        return compareNumbers(a[dedicatedField], b[dedicatedField], newSortDirection)
+      }
       return compareNumbers(a[field], b[field], newSortDirection)
     }
     // Other fields

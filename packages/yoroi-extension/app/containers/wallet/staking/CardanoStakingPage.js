@@ -30,9 +30,7 @@ import { WalletTypeOption } from '../../../api/ada/lib/storage/models/Conceptual
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import SeizaFetcher from './SeizaFetcher';
-import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import type { Notification } from '../../../types/notificationType';
-import type { ReputationObject } from '../../../api/jormungandr/lib/state-fetch/types';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
@@ -314,11 +312,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
           )
         }
         undelegate={undefined}
-        reputationInfo={selectedPoolInfo.reputation}
-        openReputationDialog={() => this.generated.actions.dialogs.open.trigger({
-          dialog: PoolWarningDialog,
-          params: { reputation: selectedPoolInfo.reputation },
-        })}
       />
     );
   };
@@ -368,15 +361,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
-    }
-
-    if (this.generated.stores.uiDialogs.isOpen(PoolWarningDialog)) {
-      return (
-        <PoolWarningDialog
-          close={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
-          reputationInfo={this.generated.stores.uiDialogs.getParam<ReputationObject>('reputation')}
-        />
-      );
     }
 
     const networkInfo = selectedWallet.getParent().getNetworkInfo();

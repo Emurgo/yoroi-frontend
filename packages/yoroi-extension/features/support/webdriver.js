@@ -19,7 +19,7 @@ import {
 
 const fs = require('fs');
 
-const firefoxBin = process.env.FIREFOX_BIN
+const firefoxBin = process.env.FIREFOX_BIN != null
   ? process.env.FIREFOX_BIN
   : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 

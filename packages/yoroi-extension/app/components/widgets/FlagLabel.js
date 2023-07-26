@@ -18,7 +18,7 @@ export default class FlagLabel extends Component<Props> {
     return (
 
       <div className={styles.wrapper}>
-        <span className={styles.flag}><SvgElem /></span>
+        <span className={styles.flag}>{ typeof svg === 'string' ? svg : (<SvgElem />)}</span>
         <span>{label}</span>
       </div>
     );

@@ -1,6 +1,6 @@
 // @flow //
 
-// $FlowFixMe require.context comes from webpack
+// $FlowFixMe[prop-missing]
 const req = require.context('./locales', true, /\.json.*$/);
 const translations: { [locale: string]: { [key: string]: string } } = {};
 const SUPPORTED_LOCALS: Array<string> = [];

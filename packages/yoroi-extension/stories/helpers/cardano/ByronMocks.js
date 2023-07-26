@@ -71,7 +71,7 @@ function genByronSigningWallet(
       hardwareInfo,
       networkInfo: networks.CardanoMainnet,
       defaultToken: getDefaultEntryTokenInfo(
-        networks.JormungandrMainnet.NetworkId,
+        networks.CardanoMainnet.NetworkId,
         mockFromDefaults(defaultAssets)
       ),
     },
@@ -84,7 +84,7 @@ function genByronSigningWallet(
       RootKeyDerivationId: 0,
     },
     null,
-    null,
+    null
   );
   const clazz = HasUtxoChains(CardanoBip44PickReceive(
     DisplayCutoff(GetSigningKey(GetPublicKey(
