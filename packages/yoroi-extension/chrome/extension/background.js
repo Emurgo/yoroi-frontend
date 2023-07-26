@@ -162,6 +162,7 @@ type SignContinuationDataType = {|
 |} | {|
   type: 'cardano-tx',
   returnTx: boolean,
+  tx: string,
 |} | {|
   type: 'cardano-tx-input',
 |} | {|
@@ -662,7 +663,7 @@ const yoroiMessageHandler = async (
           rpcResponse({ err: 'unexpected error' });
           return;
         }
-        const { returnTx } = responseData.continuationData;
+        const { tx, returnTx } = responseData.continuationData;
         if (resp?.ok == null) {
           rpcResponse(resp);
         } else {
@@ -1245,6 +1246,7 @@ async function handleInjectorMessage(message, sender) {
           {
             type: 'cardano-tx',
             returnTx,
+            tx,
           },
           message.protocol,
           message.uid,
