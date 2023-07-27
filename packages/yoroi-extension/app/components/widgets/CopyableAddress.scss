@@ -8,15 +8,16 @@
     object-fit: contain;
     display: inline-flex;
     margin-right: 2px;
-    width: 32px;
-    height: 32px;
+    margin-left: 16px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     transition: background-color 0.3s;
     & > svg {
       display: block;
       margin: auto;
-      height: 20px;
-      width: 20px;
+      height: 24px;
+      width: 24px;
       path {
         fill: var(--yoroi-palette-gray-900);
       }

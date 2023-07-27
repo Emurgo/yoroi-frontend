@@ -4,9 +4,7 @@ import type { Node } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import type {
-  $npm$ReactIntl$IntlFormat,
-} from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -14,36 +12,36 @@ import type { AddressFilterKind } from '../../types/AddressFilterTypes';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
-import { routeForStore, allAddressSubgroups, } from '../../stores/stateless/addressStores';
+import { routeForStore, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
+import { Box } from '@mui/material';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +children?: Node
+  +children?: Node,
 |};
 
 @observer
 export default class Receive extends Component<Props> {
-
-  static defaultProps: {|children: void|} = {
+  static defaultProps: {| children: void |} = {
     children: undefined,
   };
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   componentDidMount() {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
-    const rootRoute = buildRoute(
-      ROUTES.WALLETS.RECEIVE.ROOT
-    );
+    const rootRoute = buildRoute(ROUTES.WALLETS.RECEIVE.ROOT);
 
-    const storesForWallet = allAddressSubgroups.filter(store => store.isRelated({
-      selected: publicDeriver,
-    }));
+    const storesForWallet = allAddressSubgroups.filter(store =>
+      store.isRelated({
+        selected: publicDeriver,
+      })
+    );
     if (this.generated.stores.app.currentRoute === rootRoute) {
       // if no store is specified, we just send the user to the first store in the list
       const firstRoute = routeForStore(storesForWallet[0].name);
@@ -57,7 +55,7 @@ export default class Receive extends Component<Props> {
       if (currentSelectedStore == null) {
         // just send user to the first store supported by this wallet
         this.generated.actions.router.redirect.trigger({
-          route: routeForStore(storesForWallet[0].name)
+          route: routeForStore(storesForWallet[0].name),
         });
       }
     }
@@ -70,9 +68,8 @@ export default class Receive extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
 
-
     const storesForWallet = allAddressSubgroups
-      .filter(store => store.isRelated({ selected: publicDeriver, }))
+      .filter(store => store.isRelated({ selected: publicDeriver }))
       .map(store => {
         const request = this.generated.stores.addresses.addressSubgroupMap.get(store.class);
         if (request == null) throw new Error('Should never happen');
@@ -86,16 +83,17 @@ export default class Receive extends Component<Props> {
         isActiveStore: this.generated.stores.app.currentRoute.startsWith(
           routeForStore(storeInfo.meta.name)
         ),
-        setAsActiveStore: () => this.generated.actions.router.goToRoute.trigger({
-          route: routeForStore(storeInfo.meta.name),
-        }),
+        setAsActiveStore: () =>
+          this.generated.actions.router.goToRoute.trigger({
+            route: routeForStore(storeInfo.meta.name),
+          }),
         name: storeInfo.meta.name,
         validFilters: storeInfo.meta.validFilters,
         wasExecuted: storeInfo.request.wasExecuted,
       }));
 
     return (
-      <FullscreenLayout bottomPadding={70}>
+      <Box display="flex" height="100%" width="100%">
         <ReceiveWithNavigation
           addressStores={storesForWallet}
           setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
@@ -103,7 +101,7 @@ export default class Receive extends Component<Props> {
         >
           {this.props.children}
         </ReceiveWithNavigation>
-      </FullscreenLayout>
+      </Box>
     );
   }
 
@@ -114,7 +112,7 @@ export default class Receive extends Component<Props> {
         addressFilter: AddressFilterKind,
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
-      wallets: {|selected: null | PublicDeriver<>|},
+      wallets: {| selected: null | PublicDeriver<> |},
     |},
     actions: {|
       addresses: {|
@@ -125,19 +123,19 @@ export default class Receive extends Component<Props> {
         redirect: {|
           trigger: (params: {|
             params?: ?any,
-            route: string
-          |}) => void
+            route: string,
+          |}) => void,
         |},
         goToRoute: {|
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
-          |}) => void
-        |}
-      |}
-    |}
-    |} {
+            route: string,
+          |}) => void,
+        |},
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -160,14 +158,14 @@ export default class Receive extends Component<Props> {
       },
       actions: {
         addresses: {
-          setFilter: { trigger: actions.addresses.setFilter.trigger, },
-          resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
+          setFilter: { trigger: actions.addresses.setFilter.trigger },
+          resetFilter: { trigger: actions.addresses.resetFilter.trigger },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
         },
-      }
+      },
     });
   }
 }

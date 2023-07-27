@@ -75,7 +75,7 @@ class StandardHeader extends Component<Props & InjectedLayoutProps> {
 
     const generateAddressForm = (
       <LoadingButton
-        variant={isRevampLayout ? 'contained' : 'primary'}
+        variant="primary"
         loading={isSubmitting}
         className="generateAddressButton"
         onClick={this.submit}

@@ -6,6 +6,7 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import ReceiveNavigation from '../navigation/ReceiveNavigation';
 import { Box } from '@mui/material';
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
+import ReceiveNavigationRevamp from '../navigation/ReceiveNavigationRevamp';
 
 export type Props = {|
   +children?: Node,
@@ -40,9 +41,7 @@ function ReceiveWithNavigation({
           activeFilter={activeFilter}
         />
       </Box>
-      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>
-        {children}
-      </Box>
+      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>{children}</Box>
     </Box>
   );
 
@@ -52,26 +51,19 @@ function ReceiveWithNavigation({
         display: 'flex',
         overflow: 'hidden',
         height: '100%',
-        backgroundColor: 'var(--yoroi-palette-common-white)',
+        bgcolor: 'common.white',
         borderRadius: '8px',
+        width: '100%',
       }}
     >
-      <Box
-        sx={{
-          flexShrink: 0,
-          height: '100%',
-          '& > div': { backgroundColor: 'var(--yoroi-palette-common-white)' },
-        }}
-      >
-        <ReceiveNavigation
+      <Box sx={{ flexShrink: 0, height: '100%' }}>
+        <ReceiveNavigationRevamp
           addressStores={addressStores}
           setFilter={setFilter}
           activeFilter={activeFilter}
         />
       </Box>
-      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>
-        {children}
-      </Box>
+      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>{children}</Box>
     </Box>
   );
   return renderLayoutComponent({ CLASSIC: classicReceiveNav, REVAMP: revampReceiveNav });

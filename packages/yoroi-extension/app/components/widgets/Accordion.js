@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
-import { ReactComponent as ArrowDownSVG }  from '../../assets/images/expand-arrow-grey.inline.svg';
+import { ReactComponent as ArrowDownSVG } from '../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Accordion.scss';
 
 type Props = {|
@@ -12,6 +12,8 @@ type Props = {|
   +children: Node,
   +activeHeader: boolean,
   +showSpinner: boolean,
+  +style?: Object,
+  +headerStyle?: Object,
 |};
 
 type State = {|
@@ -20,23 +22,22 @@ type State = {|
 
 @observer
 export default class Accordion extends Component<Props, State> {
-
   state: State = {
     isToggle: true,
   };
 
   toggleActive: void => void = () => {
     this.setState(prevState => ({ isToggle: !prevState.isToggle }));
-  }
+  };
 
   render(): Node {
-    const { header, children } = this.props;
+    const { header, children, style } = this.props;
     const { isToggle } = this.state;
 
     const activeButtonClasses = classnames([
       styles.accordionTitle,
       isToggle && styles.arrowUp,
-      this.props.activeHeader && styles.activeHead
+      this.props.activeHeader && styles.activeHead,
     ]);
 
     const toggleShowContent = classnames([
@@ -45,17 +46,21 @@ export default class Accordion extends Component<Props, State> {
     ]);
 
     return (
-      <div className={styles.accordionSection}>
-        <button className={activeButtonClasses} onClick={this.toggleActive.bind(this)} type="button">
+      <div style={style} className={styles.accordionSection}>
+        <button
+          className={activeButtonClasses}
+          onClick={this.toggleActive.bind(this)}
+          type="button"
+          style={this.props.headerStyle}
+        >
           {header}
-          <span className={styles.arrowDownIcon}><ArrowDownSVG /></span>
+          <span className={styles.arrowDownIcon}>
+            <ArrowDownSVG />
+          </span>
         </button>
         <div className={toggleShowContent}>
           {children}
-          {this.props.showSpinner
-            ? <div className={styles.spinner} />
-            : null
-          }
+          {this.props.showSpinner ? <div className={styles.spinner} /> : null}
         </div>
       </div>
     );
