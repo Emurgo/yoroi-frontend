@@ -44,7 +44,7 @@ export default class SidebarRevamp extends Component<Props> {
     const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
 
     return (
-      <Box className={styles.wrapper} sx={{ bgcolor: 'background.sidebar' }}>
+      <Box className={styles.wrapper}>
         {this.props.children}
         <div className={styles.header}>
           {onLogoClick ? (

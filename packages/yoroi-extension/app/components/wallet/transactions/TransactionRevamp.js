@@ -26,6 +26,7 @@ import { Box } from '@mui/system';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
+import { ReactComponent as StakeIcon } from '../../../assets/images/transaction/stake.inline.svg';
 import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
 import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
 import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
@@ -140,10 +141,10 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeRegistration') &&
             features.length === 2)
         ) {
-          return { icon: '', msg: intl.formatMessage(messages.stakeDelegated) };
+          return { icon: 'stake', msg: intl.formatMessage(messages.stakeDelegated) };
         }
         if (features.includes('StakeRegistration') && features.length === 1) {
-          return { icon: '', msg: intl.formatMessage(messages.stakeKeyRegistered) };
+          return { icon: 'stake', msg: intl.formatMessage(messages.stakeKeyRegistered) };
         }
       }
       return { icon: 'send', msg: intl.formatMessage(messages.intrawallet, { currency }) };
@@ -897,6 +898,7 @@ const icons = {
   receive: ReceiveIcon,
   reward: RewardIcon,
   error: ErrorIcon,
+  stake: StakeIcon
 };
 
 const TypeIcon = ({ type }) => {

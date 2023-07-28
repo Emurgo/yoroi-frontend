@@ -105,10 +105,10 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
           justifyContent: 'center',
           color: 'gray.900',
           border: '1px solid',
-          borderColor: 'gray.300',
+          borderColor: 'grayscale.300',
           borderRadius: 1,
           minWidth: '360px',
-          height: '56px',
+          height: '48px',
           ':hover': {
             borderColor: 'primary.600',
           },
@@ -120,10 +120,10 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.currency])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography className={styles.name} sx={{ color: 'grayscale.900' }}>
+                <Typography variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
                 </Typography>
-                <Typography className={styles.plateId} sx={{ color: 'grayscale.600' }}>
+                <Typography variant="caption1" sx={{ color: 'grayscale.600' }}>
                   {accountPlateId}
                 </Typography>
               </div>
@@ -149,8 +149,8 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             onClick={onUpdateHideBalance}
             sx={{
               bgcolor: 'primary.600',
-              width: '56px',
-              height: '54px',
+              width: '46px',
+              height: '46px',
               borderTopRightRadius: '6px',
               borderBottomRightRadius: '6px',
               borderTopLeftRadius: '0px',
