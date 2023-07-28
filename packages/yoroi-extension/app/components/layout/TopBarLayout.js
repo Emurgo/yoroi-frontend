@@ -70,7 +70,15 @@ function TopBarLayout({
           }}
         >
           {isRevampLayout && asModern !== true && !isModern ? (
-            <Box sx={{ bgcolor: bgcolor || 'common.white', height: '100%' }}>
+            <Box
+              sx={{
+                bgcolor: bgcolor || 'common.white',
+                height: '100%',
+                width: '100%',
+                maxWidth: '1872px',
+                mx: 'auto',
+              }}
+            >
               <Box
                 sx={{
                   height: '100%',
