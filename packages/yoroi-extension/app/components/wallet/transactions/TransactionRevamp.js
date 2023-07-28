@@ -196,7 +196,8 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   renderAmountDisplay: ({|
     entry: TokenEntry,
-  |}) => Node = request => {
+    getRawNumber: boolean,
+  |}) => Node | String = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
     }
@@ -213,6 +214,10 @@ export default class TransactionRevamp extends Component<Props, State> {
     const adjustedBefore = beforeDecimalRewards.startsWith('-')
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
+
+    if (request.getRawNumber) {
+      return adjustedBefore + afterDecimalRewards;
+    }
 
     return (
       <>
@@ -271,17 +276,24 @@ export default class TransactionRevamp extends Component<Props, State> {
       return (
         <>
           {fiatDisplay}&nbsp;{currency}
-          <Typography>
+          <Typography variant="body1" color="secondary.600">
             {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
         </>
       );
     }
 
+    const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
+    const isPositiveNumber = amount.charAt(0) === '+';
+
     return (
-      <>
+      <Typography
+        variant="body1"
+        fontWeight={500}
+        color={isPositiveNumber ? 'secondary.600' : 'grayscale.900'}
+      >
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
-      </>
+      </Typography>
     );
   };
 
@@ -781,7 +793,9 @@ export default class TransactionRevamp extends Component<Props, State> {
                         className="addMemoButton" // for tests
                         startIcon={<AddMemoSvg />}
                       >
-                        {intl.formatMessage(memoMessages.addMemo)}
+                        <Typography variant="button2" fontWeight={500}>
+                          {intl.formatMessage(memoMessages.addMemo)}
+                        </Typography>
                       </Button>
                     </div>
                   )}
@@ -979,7 +993,7 @@ const icons = {
   receive: ReceiveIcon,
   reward: RewardIcon,
   error: ErrorIcon,
-  stake: StakeIcon
+  stake: StakeIcon,
 };
 
 const TypeIcon = ({ type }) => {

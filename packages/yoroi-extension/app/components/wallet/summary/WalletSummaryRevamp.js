@@ -229,6 +229,8 @@ export default class WalletSummaryRevamp extends Component<Props> {
               padding: '12px 0',
               width: '100%',
               justifyContent: 'space-between',
+              borderBottom: '1px solid',
+              borderBottomColor: 'grayscale.200',
             }}
           >
             <Typography variant="body2" sx={{ ...columnTXStyles.transactionType, maxWidth: '35%' }}>
