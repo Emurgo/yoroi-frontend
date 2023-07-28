@@ -1,20 +1,19 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { AddressFilterKind } from '../../types/AddressFilterTypes';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { routeForStore, allAddressSubgroups } from '../../stores/stateless/addressStores';
-import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import { Box } from '@mui/material';
+import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 

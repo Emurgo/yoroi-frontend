@@ -1,18 +1,15 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { Notification } from '../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { truncateAddress } from '../../../utils/formatters';
-import { withLayout } from '../../../styles/context/layout';
 import { Box, Typography } from '@mui/material';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import classnames from 'classnames';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './StandardHeader.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
@@ -48,7 +45,7 @@ type Props = {|
 |};
 
 @observer
-class StandardHeaderRevamp extends Component<Props & InjectedLayoutProps> {
+export default class StandardHeaderRevamp extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -69,7 +66,6 @@ class StandardHeaderRevamp extends Component<Props & InjectedLayoutProps> {
       isWalletAddressUsed,
       onCopyAddressTooltip,
       notification,
-      isRevampLayout,
     } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
@@ -86,8 +82,6 @@ class StandardHeaderRevamp extends Component<Props & InjectedLayoutProps> {
         {intl.formatMessage(messages.generateNewAddressButtonLabel)}
       </LoadingButton>
     );
-
-    const copyableHashClass = classnames([styles.copyableHash]);
 
     const walletHeader = (
       <Box display="flex" alignItems="flex-end" mb="30px" pb="30px" gap="48px" position="relative">
@@ -168,5 +162,3 @@ class StandardHeaderRevamp extends Component<Props & InjectedLayoutProps> {
     return walletHeader;
   }
 }
-
-export default (withLayout(StandardHeaderRevamp): ComponentType<Props>);

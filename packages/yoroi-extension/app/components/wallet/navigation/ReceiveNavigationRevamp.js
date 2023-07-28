@@ -3,9 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import styles from './ReceiveNavigation.scss';
-import { Box } from '@mui/material';
-
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButtonRevamp from './ReceiveNavButtonRevamp';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -22,7 +19,7 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/info.i
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import { Tooltip, Typography } from '@mui/material';
+import {Box, Tooltip, Typography } from '@mui/material';
 
 type AddressStoreSubset = {
   +isActiveStore: boolean,
@@ -85,7 +82,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
     return (
       <Accordion
         style={{ paddingBottom: '24px' }}
-        showSpinner={stores.find(store => !store.wasExecuted) != null}
+        showSpinner={stores.find(str => !str.wasExecuted) != null}
         header={
           <ReceiveNavButtonRevamp
             label={intl.formatMessage(addressGroupName[store.name.group])}

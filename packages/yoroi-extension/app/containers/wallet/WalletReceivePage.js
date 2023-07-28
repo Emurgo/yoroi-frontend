@@ -1,10 +1,46 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
+import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Notification } from '../../types/notificationType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type {
+  AddressSubgroupMeta,
+  IAddressTypeUiSubset,
+  IAddressTypeStore,
+} from '../../stores/stateless/addressStores';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { InjectedLayoutProps } from '../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
-import BigNumber from 'bignumber.js';
 import { intlShape } from 'react-intl';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  addressGroupName,
+  addressSubgroupName,
+  AddressFilter,
+  AddressSubgroup,
+  AddressGroupTypes,
+} from '../../types/AddressFilterTypes';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import { validateAmount } from '../../utils/validations';
+import { Logger } from '../../utils/logging';
+import {
+  routeForStore,
+  allAddressSubgroups,
+  applyAddressFilter,
+} from '../../stores/stateless/addressStores';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { handleExternalLinkClick } from '../../utils/routing';
+import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../utils/formatters';
+import { withLayout } from '../../styles/context/layout';
+import BigNumber from 'bignumber.js';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
@@ -15,48 +51,13 @@ import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import Dialog from '../../components/widgets/Dialog';
 import globalMessages from '../../i18n/global-messages';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
-import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
-import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import {
-  addressGroupName,
-  addressSubgroupName,
-  AddressFilter,
-  AddressSubgroup,
-  AddressGroupTypes,
-} from '../../types/AddressFilterTypes';
-import LocalizableError from '../../i18n/LocalizableError';
-import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { Notification } from '../../types/notificationType';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { validateAmount } from '../../utils/validations';
-import { Logger } from '../../utils/logging';
-import type {
-  AddressSubgroupMeta,
-  IAddressTypeUiSubset,
-  IAddressTypeStore,
-} from '../../stores/stateless/addressStores';
-import {
-  routeForStore,
-  allAddressSubgroups,
-  applyAddressFilter,
-} from '../../stores/stateless/addressStores';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import { handleExternalLinkClick } from '../../utils/routing';
-import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
-import { withLayout } from '../../styles/context/layout';
 import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
+import LocalizableError from '../../i18n/LocalizableError';
+import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
@@ -66,8 +67,10 @@ type Props = {|
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
+type AllProps = {| ...Props, ...InjectedProps |};
 
-class WalletReceivePage extends Component<Props & InjectedProps> {
+@observer
+class WalletReceivePage extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   @observable notificationElementId: string = '';
@@ -609,4 +612,4 @@ class WalletReceivePage extends Component<Props & InjectedProps> {
   }
 }
 
-export default (withLayout(observer(WalletReceivePage)): ComponentType<Props>);
+export default (withLayout(WalletReceivePage): ComponentType<Props>);

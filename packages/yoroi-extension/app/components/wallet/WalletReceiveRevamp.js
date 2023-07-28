@@ -17,12 +17,8 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import { addressFilter, AddressFilter } from '../../types/AddressFilterTypes';
-import environment from '../../environment';
 import { truncateAddressShort, splitAmount, truncateToken } from '../../utils/formatters';
 import { ReactComponent as NoTransactionModernSvg } from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
-import { ReactComponent as AddLabelIcon } from '../../assets/images/add-label.inline.svg';
-import { ReactComponent as EditLabelIcon } from '../../assets/images/edit.inline.svg';
 import { hiddenAmount } from '../../utils/strings';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -138,7 +134,6 @@ export default class WalletReceiveRevamp extends Component<Props> {
   };
 
   getHierarchy: void => Node = () => {
-    const { intl } = this.context;
     const hierarchy = this.props.hierarchy.path.join(' > ');
 
     return (

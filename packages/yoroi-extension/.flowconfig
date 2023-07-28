@@ -30,7 +30,7 @@ deprecated-utility=error
 
 [options]
 types_first=true
-include_warnings=true
+include_warnings=false
 esproposal.decorators=ignore
 module.ignore_non_literal_requires=true
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/mappers/CSSModule.js.flow'
