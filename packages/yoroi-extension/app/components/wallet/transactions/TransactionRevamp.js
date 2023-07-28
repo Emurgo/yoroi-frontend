@@ -26,6 +26,7 @@ import { Box } from '@mui/system';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/revamp/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
+import { ReactComponent as StakeIcon } from '../../../assets/images/transaction/stake.inline.svg';
 import { ReactComponent as ReceiveIcon } from '../../../assets/images/transaction/receive.inline.svg';
 import { ReactComponent as RewardIcon } from '../../../assets/images/transaction/reward.inline.svg';
 import { ReactComponent as ErrorIcon } from '../../../assets/images/transaction/error.inline.svg';
@@ -144,10 +145,10 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeRegistration') &&
             features.length === 2)
         ) {
-          return { icon: '', msg: intl.formatMessage(messages.stakeDelegated) };
+          return { icon: 'stake', msg: intl.formatMessage(messages.stakeDelegated) };
         }
         if (features.includes('StakeRegistration') && features.length === 1) {
-          return { icon: '', msg: intl.formatMessage(messages.stakeKeyRegistered) };
+          return { icon: 'stake', msg: intl.formatMessage(messages.stakeKeyRegistered) };
         }
       }
       return { icon: 'send', msg: intl.formatMessage(messages.intrawallet, { currency }) };
@@ -195,7 +196,8 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   renderAmountDisplay: ({|
     entry: TokenEntry,
-  |}) => Node = request => {
+    getRawNumber: boolean,
+  |}) => Node | String = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
     }
@@ -212,6 +214,10 @@ export default class TransactionRevamp extends Component<Props, State> {
     const adjustedBefore = beforeDecimalRewards.startsWith('-')
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
+
+    if (request.getRawNumber) {
+      return adjustedBefore + afterDecimalRewards;
+    }
 
     return (
       <>
@@ -270,17 +276,24 @@ export default class TransactionRevamp extends Component<Props, State> {
       return (
         <>
           {fiatDisplay}&nbsp;{currency}
-          <Typography>
+          <Typography variant="body1" color="secondary.600">
             {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
         </>
       );
     }
 
+    const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
+    const isPositiveNumber = amount.charAt(0) === '+';
+
     return (
-      <>
+      <Typography
+        variant="body1"
+        fontWeight={500}
+        color={isPositiveNumber ? 'secondary.600' : 'grayscale.900'}
+      >
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
-      </>
+      </Typography>
     );
   };
 
@@ -780,7 +793,9 @@ export default class TransactionRevamp extends Component<Props, State> {
                         className="addMemoButton" // for tests
                         startIcon={<AddMemoSvg />}
                       >
-                        {intl.formatMessage(memoMessages.addMemo)}
+                        <Typography variant="button2" fontWeight={500}>
+                          {intl.formatMessage(memoMessages.addMemo)}
+                        </Typography>
                       </Button>
                     </div>
                   )}
@@ -978,6 +993,7 @@ const icons = {
   receive: ReceiveIcon,
   reward: RewardIcon,
   error: ErrorIcon,
+  stake: StakeIcon,
 };
 
 const TypeIcon = ({ type }) => {

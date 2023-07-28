@@ -85,7 +85,7 @@ export const commonRevampTheme: Object = {
     // DS name: body-2-regular
     body2: {
       fontSize: '0.875rem', // 14px
-      lineHeight: '24px',
+      lineHeight: '22px',
       fontWeight: 400,
       fontFamily,
     },

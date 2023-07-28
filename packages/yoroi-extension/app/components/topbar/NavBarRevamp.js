@@ -66,7 +66,7 @@ class NavBarRevamp extends Component<Props> {
                 {children}
                 {buyButton && <Box sx={{ marginLeft: '24px' }}>{buyButton}</Box>}
                 {walletDetails != null && (
-                  <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
+                  <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>
                     {walletDetails}
                   </Box>
                 )}
