@@ -712,6 +712,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 justifyContent="center"
                 gap="24px"
                 p="24px"
+                mx="-24px"
               >
                 {this.renderCurrentFooter(currentStep)}
               </Box>

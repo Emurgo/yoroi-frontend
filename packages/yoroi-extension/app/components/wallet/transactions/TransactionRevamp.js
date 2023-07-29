@@ -197,7 +197,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   renderAmountDisplay: ({|
     entry: TokenEntry,
     getRawNumber?: boolean,
-  |}) => Node | String = request => {
+  |}) => Node | string = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
     }
@@ -215,7 +215,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    if (request.getRawNumber) {
+    if (request.getRawNumber !== undefined) {
       return adjustedBefore + afterDecimalRewards;
     }
 
@@ -284,7 +284,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
-    const isPositiveNumber = String(amount).charAt(0) === '+';
+    const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
 
     return (
       <Typography
