@@ -1,5 +1,5 @@
 // @flow
-import { Component } from 'react';
+import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
@@ -170,7 +170,7 @@ type State = {|
 |};
 
 @observer
-export default class WalletSendForm extends Component<Props, State> {
+export default class WalletSendFormRevamp extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -180,6 +180,8 @@ export default class WalletSendForm extends Component<Props, State> {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
   };
+
+  bodyRef: any | null = null;
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
 
@@ -483,19 +485,6 @@ export default class WalletSendForm extends Component<Props, State> {
               }
               error={invalidMemo}
             />
-            <Button
-              variant="primary"
-              size="large"
-              onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
-              disabled={invalidMemo || !receiverField.isValid}
-              sx={{
-                display: 'block',
-                margin: '125px 0px 0px 0px',
-                width: '173px',
-              }}
-            >
-              {intl.formatMessage(globalMessages.nextButtonLabel)}
-            </Button>
           </div>
         );
       case SEND_FORM_STEP.AMOUNT:
@@ -616,7 +605,7 @@ export default class WalletSendForm extends Component<Props, State> {
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
               >
-                {intl.formatMessage(globalMessages.token)}
+                {intl.formatMessage(globalMessages.addToken)}
               </Button>
               <Button
                 variant="tertiary"
@@ -625,29 +614,9 @@ export default class WalletSendForm extends Component<Props, State> {
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
               >
-                {intl.formatMessage(globalMessages.nfts)}
+                {intl.formatMessage(globalMessages.addNft)}
               </Button>
             </div>
-
-            <Box sx={{ marginTop: '60px' }}>
-              <Button
-                variant="primary"
-                size="large"
-                onClick={() => {
-                  this.props.onSubmit();
-                  this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
-                }}
-                disabled={
-                  !this.props.fee ||
-                  this.props.hasAnyPending ||
-                  invalidMemo ||
-                  maxSendableAmount.isExecuting
-                }
-                sx={{ width: '173px' }}
-              >
-                {intl.formatMessage(globalMessages.nextButtonLabel)}
-              </Button>
-            </Box>
           </div>
         );
       case SEND_FORM_STEP.PREVIEW:
@@ -657,14 +626,91 @@ export default class WalletSendForm extends Component<Props, State> {
     }
   }
 
+  renderCurrentFooter(step: number): Node {
+    const { form } = this;
+    const { intl } = this.context;
+    const { invalidMemo } = this.state;
+    const { maxSendableAmount } = this.props;
+
+    const receiverField = form.$('receiver');
+
+    switch (step) {
+      case SEND_FORM_STEP.RECEIVER:
+        return (
+          <Button
+            key="receiver-next"
+            variant="primary"
+            size="medium"
+            sx={{ width: '128px' }}
+            onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
+            disabled={invalidMemo || !receiverField.isValid}
+          >
+            {intl.formatMessage(globalMessages.nextButtonLabel)}
+          </Button>
+        );
+      case SEND_FORM_STEP.AMOUNT:
+        return (
+          <>
+            <Button
+              key="amount-back"
+              variant="secondary"
+              size="medium"
+              onClick={() => this.onUpdateStep(SEND_FORM_STEP.RECEIVER)}
+              sx={{ width: '128px' }}
+            >
+              {intl.formatMessage(globalMessages.backButtonLabel)}
+            </Button>
+            <Button
+              key="amount-next"
+              variant="primary"
+              size="medium"
+              sx={{ width: '128px' }}
+              onClick={() => {
+                this.props.onSubmit();
+                this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
+              }}
+              disabled={
+                !this.props.fee ||
+                this.props.hasAnyPending ||
+                invalidMemo ||
+                maxSendableAmount.isExecuting
+              }
+            >
+              {intl.formatMessage(globalMessages.nextButtonLabel)}
+            </Button>
+          </>
+        );
+      default:
+        return null;
+    }
+  }
+
   render(): Node {
     const { currentStep } = this.state;
+    const { bodyRef } = this;
     return (
       <>
         <div className={styles.component}>
           <Box className={styles.wrapper} sx={{ bgcolor: 'common.white' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
-            <div className={styles.formBody}>{this.renderCurrentStep(currentStep)}</div>
+            <div ref={ref => (this.bodyRef = ref)} className={styles.formBody}>
+              {this.renderCurrentStep(currentStep)}
+            </div>
+            {currentStep !== SEND_FORM_STEP.PREVIEW && (
+              <Box
+                borderTop={
+                  bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'
+                }
+                borderColor="grayscale.200"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap="24px"
+                p="24px"
+              >
+                {this.renderCurrentFooter(currentStep)}
+              </Box>
+            )}
           </Box>
         </div>
       </>

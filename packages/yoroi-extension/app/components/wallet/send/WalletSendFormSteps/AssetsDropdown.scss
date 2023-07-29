@@ -1,5 +1,9 @@
 .component {
-  margin-top: 35px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 
   .header {
     width: 100%;

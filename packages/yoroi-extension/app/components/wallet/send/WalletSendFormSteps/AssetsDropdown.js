@@ -10,7 +10,7 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { NftImage } from '../../assets/NFTsList';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +tokens: FormattedTokenDisplay[],
@@ -18,7 +18,8 @@ type Props = {|
 |};
 
 type State = {|
-  +isOpen: boolean,
+  +isTokensOpen: boolean,
+  +isNftsOpen: boolean,
 |};
 
 export default class AssetsDropdown extends Component<Props, State> {
@@ -27,12 +28,18 @@ export default class AssetsDropdown extends Component<Props, State> {
   };
 
   state: State = {
-    isOpen: false,
+    isTokensOpen: false,
+    isNftsOpen: false,
   };
 
-  toggleDropdown(): void {
-    const { isOpen } = this.state;
-    this.setState({ isOpen: !isOpen });
+  toggleDropdown(type: string): void {
+    if (type === 'tokens') {
+      this.setState(prevState => ({ ...prevState, isTokensOpen: !prevState.isTokensOpen }));
+    }
+
+    if (type === 'nfts') {
+      this.setState(prevState => ({ ...prevState, isNftsOpen: !prevState.isNftsOpen }));
+    }
   }
 
   renderTokens(tokens: FormattedTokenDisplay[]): Node {
@@ -68,30 +75,54 @@ export default class AssetsDropdown extends Component<Props, State> {
 
   render(): Node {
     const { tokens, nfts } = this.props;
-    const { isOpen } = this.state;
+    const { isTokensOpen, isNftsOpen } = this.state;
     const { intl } = this.context;
     return (
       <div className={styles.component}>
-        <button type="button" onClick={() => this.toggleDropdown()} className={styles.header}>
-          <p className={styles.title}>Assets</p>
-          <div className={styles.headerRight}>
-            <p className={styles.count}>{tokens.length + nfts.length}</p>
-            {isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
-          </div>
-        </button>
-
-        {isOpen && (
-          <div className={styles.assetsList}>
-            {tokens.length > 0 && (
-              <div>
-                <h1 className={styles.sectionLabel}>{intl.formatMessage(globalMessages.tokens)}</h1>
-                <div>{this.renderTokens(tokens)}</div>
+        {tokens.length > 0 && (
+          <div>
+            <button
+              type="button"
+              onClick={() => this.toggleDropdown('tokens')}
+              className={styles.header}
+            >
+              <Typography fontWeight={500} variant="body1" color="grayscale.700">
+                {intl.formatMessage(globalMessages.tokens)} ({tokens.length})
+              </Typography>
+              <div className={styles.headerRight}>
+                {isTokensOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+              </div>
+            </button>
+            {isTokensOpen && (
+              <div className={styles.assetsList}>
+                <div>
+                  <div>{this.renderTokens(tokens)}</div>
+                </div>
               </div>
             )}
-            {nfts.length > 0 && (
-              <div>
-                <h1 className={styles.sectionLabel}>{intl.formatMessage(globalMessages.nfts)}</h1>
-                <div>{this.renderNfts(nfts)}</div>
+          </div>
+        )}
+
+        {nfts.length > 0 && (
+          <div>
+            <button
+              type="button"
+              onClick={() => this.toggleDropdown('nfts')}
+              className={styles.header}
+            >
+              <Typography fontWeight={500} variant="body1" color="grayscale.700">
+                {intl.formatMessage(globalMessages.nfts)} ({nfts.length})
+              </Typography>
+              <div className={styles.headerRight}>
+                {isNftsOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+              </div>
+            </button>
+
+            {isNftsOpen && (
+              <div className={styles.assetsList}>
+                <div>
+                  <div>{this.renderNfts(nfts)}</div>
+                </div>
               </div>
             )}
           </div>

@@ -1,19 +1,17 @@
 .component {
-    margin-bottom: 20px;
-    margin-right: 10px;
-    
     .token {
         cursor: pointer;
         width: 100%;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1.1fr 1fr 1fr;
         align-items: center;
-        padding: 4px 0px;
-        margin-bottom: 23px;
-        font-size: 16px;
-        letter-spacing: 0;
-        line-height: 24px;
-
+        justify-items: flex-start;
+        margin: 2px 0;
+        
+        & > div, & > p {
+            padding: 16px 24px;
+        }
+        
         .name {
             display: flex;
             align-items: center;
@@ -25,33 +23,26 @@
                 height: 32px;
                 margin-right: 16px;
             }
-
-            .label {
-                color: #3154CB;
-            }
-        }
-
-        .id {
-            color: #242838;
-            text-align: center;
         }
 
         .amount {
-            text-align: right;
-            color: #242838;
+            justify-self: flex-end;
         }
-
     }
     .amountWrapper {
         position: relative;
         width: 100%;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr 1fr;
         align-items: center;
-        justify-content: space-between;
-        border: 2px solid var(--yoroi-palette-gray-900);
         border-radius: 8px;
-        padding: 12px 16px;
         position: relative;
+        margin: 5px 0;
+        width: calc(100% - 6px);
+
+        & > div {
+            padding: 10px 24px;
+        }
 
         .error {
             position: absolute;
@@ -69,10 +60,6 @@
 
             .logo {
                 margin-right: 16px;
-            }
-
-            .label {
-                color: #242838;
             }
         }
 

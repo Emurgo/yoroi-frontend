@@ -1,9 +1,7 @@
 .component {
   width: 100%;
-  padding-top: 40px;
-  padding-right: 40px;
-  padding-bottom: 20px;
-  padding-left: 40px;
+  max-width: 506px;
+  margin: 0 auto;
 
   .staleTxWarning {
     margin-bottom: 20px;
@@ -26,7 +24,6 @@
   }
 
   .wrapper {
-    width: 65%;
     height: auto;
   }
 
@@ -84,8 +81,8 @@
   }
 
   .totalAmountWrapper {
-    margin-top: 17px;
-    margin-bottom: 40px;
+    margin-top: 24px;
+    margin-bottom: 8px;
     border-radius: 8px;
     padding: 24px;
     display: flex;

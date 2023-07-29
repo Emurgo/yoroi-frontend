@@ -32,6 +32,14 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
   },
+  addToken: {
+    id: 'global.labels.addToken',
+    defaultMessage: '!!!Add Token',
+  },
+  addNft: {
+    id: 'global.labels.addNft',
+    defaultMessage: '!!!Add NFT',
+  },
   nfts: {
     id: 'global.labels.nft',
     defaultMessage: '!!!NFTs',

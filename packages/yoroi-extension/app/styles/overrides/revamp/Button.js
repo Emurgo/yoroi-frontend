@@ -18,6 +18,10 @@ const RevampButtonCommonProps: Object = {
       '&.MuiButton-sizeMedium': { padding: '10px', height: '48px' },
       '&.MuiButton-sizeSmall': { padding: '7px', height: '32px' },
       '&:hover': { boxShadow: 'none' },
+      '& span.MuiButton-startIcon': {
+        marginLeft: '0px',
+        marginRight: '6px',
+      },
     },
   },
   defaultProps: { disableRipple: false },

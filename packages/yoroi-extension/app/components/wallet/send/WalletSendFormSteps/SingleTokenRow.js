@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react'
-import styles from './SingleTokenRow.scss'
+import type { Node } from 'react';
+import styles from './SingleTokenRow.scss';
 import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import {
   truncateAddressShort,
@@ -11,32 +11,31 @@ import {
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
-import { ReactComponent as CloseIcon} from '../../../../assets/images/forms/close-small.inline.svg';
-import type { FormattedTokenDisplay } from '../../../../utils/wallet'
+import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close-small.inline.svg';
+import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
-    +token: FormattedTokenDisplay,
-    +updateAmount: ($ReadOnly<TokenRow>, BigNumber | null) => void,
-    +onRemoveToken: $ReadOnly<TokenRow> => void,
-    +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
-    +onAddToken: $ReadOnly<TokenRow> => void,
-    +getTokenAmount: ($ReadOnly<TokenRow>) => ?BigNumber,
-    +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
+  +token: FormattedTokenDisplay,
+  +updateAmount: ($ReadOnly<TokenRow>, BigNumber | null) => void,
+  +onRemoveToken: ($ReadOnly<TokenRow>) => void,
+  +isTokenIncluded: ($ReadOnly<TokenRow>) => boolean,
+  +onAddToken: ($ReadOnly<TokenRow>) => void,
+  +getTokenAmount: ($ReadOnly<TokenRow>) => ?BigNumber,
+  +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
-
 
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
     defaultMessage: '!!!Not enough funds to make this transaction.',
   },
-})
+});
 export default class SingleTokenRow extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -45,11 +44,10 @@ export default class SingleTokenRow extends Component<Props> {
   }
 
   onAmountUpdate(value: string | null): void {
-    const formattedAmount = value !== null && value !== '' ? new BigNumber(
-      formattedAmountToNaturalUnits(
-        value,
-        this.getNumDecimals(),
-      )) : null;
+    const formattedAmount =
+      value !== null && value !== ''
+        ? new BigNumber(formattedAmountToNaturalUnits(value, this.getNumDecimals()))
+        : null;
     if (formattedAmount && formattedAmount.isNegative()) return;
     this.props.updateAmount(this.props.token.info, formattedAmount);
   }
@@ -67,37 +65,68 @@ export default class SingleTokenRow extends Component<Props> {
     return (
       <div className={styles.component}>
         {!this.props.isTokenIncluded(token.info) ? (
-          <button type='button' className={styles.token} onClick={() => this.props.onAddToken(token.info)}>
+          <button
+            type="button"
+            className={styles.token}
+            onClick={() => this.props.onAddToken(token.info)}
+          >
             <div className={styles.name}>
-              <div className={styles.logo}><NoAssetLogo /></div>
-              <p className={styles.label}>{token.label}</p>
+              <div className={styles.logo}>
+                <NoAssetLogo />
+              </div>
+              <Typography variant="body1" color="primary.600" className={styles.label}>
+                {token.label.startsWith('asset')
+                  ? truncateAddressShort(token.label, 14)
+                  : token.label}
+              </Typography>
             </div>
-            <p className={styles.id}>{truncateAddressShort(token.id, 14)}</p>
+            <Typography variant="body1" color="grayscale.900">
+              {truncateAddressShort(token.id, 14)}
+            </Typography>
             <p className={styles.amount}>{token.amount}</p>
           </button>
-        ): (
-          <div className={classnames([styles.amountWrapper, !isValid && styles.amountError])}>
+        ) : (
+          <Box
+            border="2px solid"
+            borderColor="grayscale.400"
+            className={classnames([styles.amountWrapper, !isValid && styles.amountError])}
+          >
             <div className={styles.amountTokenName}>
-              <div className={styles.logo}><NoAssetLogo /></div>
-              <p className={styles.label}>{token.label}</p>
+              <div className={styles.logo}>
+                <NoAssetLogo />
+              </div>
+              <Typography variant="body1" color="primary.600" className={styles.label}>
+                {token.label}
+              </Typography>
+            </div>
+            <div>
+              <Typography variant="body1" color="grayscale.900">
+                {truncateAddressShort(token.id, 14)}
+              </Typography>
             </div>
             <div className={styles.amountInput}>
               <AmountInputRevamp
-                value={!amount ? null
-                : formattedAmountToBigNumber(amount)}
+                value={!amount ? null : formattedAmountToBigNumber(amount)}
                 onChange={this.onAmountUpdate.bind(this)}
                 decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp
                 placeholder={token.amount}
               />
             </div>
-            <button type='button' onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}> <CloseIcon /> </button>
+            <button
+              type="button"
+              onClick={() => this.props.onRemoveToken(token.info)}
+              className={styles.close}
+            >
+              {' '}
+              <CloseIcon />{' '}
+            </button>
             <p className={styles.error}>
               {!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
             </p>
-          </div>
+          </Box>
         )}
       </div>
-    )
+    );
   }
 }
