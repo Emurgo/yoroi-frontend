@@ -28,7 +28,6 @@ import { Box, Button } from '@mui/material';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
-import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import WalletListDialog from '../components/topbar/WalletListDialog';
 import globalMessages from '../i18n/global-messages';
 

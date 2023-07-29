@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
@@ -693,7 +693,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         <div className={styles.component}>
           <Box className={styles.wrapper} sx={{ bgcolor: 'common.white' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
-            <div ref={ref => (this.bodyRef = ref)} className={styles.formBody}>
+            <div
+              ref={ref => {
+                this.bodyRef = ref;
+              }}
+              className={styles.formBody}
+            >
               {this.renderCurrentStep(currentStep)}
             </div>
             {currentStep !== SEND_FORM_STEP.PREVIEW && (

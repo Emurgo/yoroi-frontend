@@ -1,11 +1,8 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import styles from './SendFormHeader.scss';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import Stepper from '../../common/stepper/Stepper';
 import { Box } from '@mui/material';
@@ -43,7 +40,7 @@ export default class SendFormHeader extends Component<Props> {
           currentStep={String(currentStep)}
           steps={TABS}
           setCurrentStep={id => onUpdateStep(Number(id))}
-          sx={{ mt: "0 !important" }}
+          sx={{ mt: '0 !important' }}
         />
       </Box>
     );

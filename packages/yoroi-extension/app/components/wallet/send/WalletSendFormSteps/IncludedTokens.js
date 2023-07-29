@@ -23,7 +23,7 @@ export default class IncludedTokens extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  renderItem(items: FormattedNFTDisplay[] | FormattedTokenDisplay[], type: string): Node {
+  renderItem(items: FormattedNFTDisplay[] | FormattedTokenDisplay[]): Node {
     return items.map((item, i) => (
       <Box
         sx={{
@@ -43,7 +43,7 @@ export default class IncludedTokens extends Component<Props> {
             display: 'flex',
             alignItems: 'center',
             padding: '11px 16px',
-            width: '246px',
+            maxWidth: '246px',
           }}
         >
           {item.name && (
@@ -127,13 +127,13 @@ export default class IncludedTokens extends Component<Props> {
         {tokens.length > 0 && (
           <div>
             <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
-            <div>{this.renderItem(tokens, 'token')}</div>
+            <div>{this.renderItem(tokens)}</div>
           </div>
         )}
         {nfts.length > 0 && (
           <div>
             <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
-            <div>{this.renderItem(nfts, 'nft')}</div>
+            <div>{this.renderItem(nfts)}</div>
           </div>
         )}
       </div>

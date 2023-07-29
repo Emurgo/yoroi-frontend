@@ -48,7 +48,6 @@ import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Box } from '@mui/system';
-import { Button } from '@mui/material';
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 

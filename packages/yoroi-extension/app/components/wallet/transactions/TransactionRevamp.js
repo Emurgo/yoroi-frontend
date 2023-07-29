@@ -196,7 +196,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   renderAmountDisplay: ({|
     entry: TokenEntry,
-    getRawNumber: boolean,
+    getRawNumber?: boolean,
   |}) => Node | String = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
@@ -284,7 +284,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
-    const isPositiveNumber = amount.charAt(0) === '+';
+    const isPositiveNumber = String(amount).charAt(0) === '+';
 
     return (
       <Typography
