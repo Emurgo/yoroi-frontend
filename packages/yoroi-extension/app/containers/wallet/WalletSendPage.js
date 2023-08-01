@@ -196,6 +196,7 @@ class WalletSendPage extends Component<AllProps> {
             minAda={transactionBuilderStore.minAda}
             uriParams={this.generated.stores.loading.uriParams}
             resetUriParams={this.generated.stores.loading.resetUriParams}
+            memo={transactionBuilderStore.memo}
             showMemo={this.showMemo}
             onAddMemo={() =>
               this.showMemoDialog({
@@ -726,6 +727,7 @@ class WalletSendPage extends Component<AllProps> {
         txMismatch: boolean,
         isDefaultIncluded: boolean,
         selectedToken: void | $ReadOnly<TokenRow>,
+        memo: void | string,
         maxAssetsAllowed: number,
         plannedTxInfoMap: Array<{|
           token: $ReadOnly<TokenRow>,
@@ -830,6 +832,7 @@ class WalletSendPage extends Component<AllProps> {
             error: stores.transactionBuilderStore.createUnsignedTx.error,
           },
           selectedToken: stores.transactionBuilderStore.selectedToken,
+          memo: stores.transactionBuilderStore.memo,
           plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap,
           maxAssetsAllowed: stores.transactionBuilderStore.maxAssetsAllowed,
           calculateMinAda: stores.transactionBuilderStore.calculateMinAda,

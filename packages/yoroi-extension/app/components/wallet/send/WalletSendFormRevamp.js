@@ -131,6 +131,7 @@ type Props = {|
   +error: ?LocalizableError,
   +uriParams: ?UriParams,
   +resetUriParams: void => void,
+  +memo: void | string,
   +showMemo: boolean,
   +onAddMemo: void => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -176,7 +177,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   };
 
   state: State = {
-    showMemoWarning: false,
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
   };
@@ -411,7 +411,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   renderCurrentStep(step: number): Node {
     const { form } = this;
     const { intl } = this.context;
-    const { showMemoWarning, invalidMemo } = this.state;
+    const { invalidMemo } = this.state;
     const {
       shouldSendAll,
       isCalculatingFee,
@@ -419,6 +419,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       isDefaultIncluded,
       maxSendableAmount,
       spendableBalance,
+      memo,
     } = this.props;
 
     const amountField = form.$('amount');
@@ -473,18 +474,25 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 done={receiverField.isValid}
               />
             </div>
-            <MemoTextField
-              label={intl.formatMessage(memoMessages.addMemo)}
-              onChange={e => this.onUpdateMemo(e.target.value)}
-              onFocus={() => this.setState({ showMemoWarning: true })}
-              onBlur={() => this.setState({ showMemoWarning: false })}
-              helperText={
-                invalidMemo
-                  ? intl.formatMessage(messages.memoInvalidOptional, { maxMemo: MAX_MEMO_SIZE })
-                  : showMemoWarning && intl.formatMessage(memoMessages.memoWarning)
-              }
-              error={invalidMemo}
-            />
+            <Box sx={{ position: 'relative' }}>
+              <MemoTextField
+                label={intl.formatMessage(memoMessages.addMemo)}
+                onChange={e => this.onUpdateMemo(e.target.value)}
+                helperText={
+                  invalidMemo
+                    ? intl.formatMessage(messages.memoInvalidOptional, { maxMemo: MAX_MEMO_SIZE })
+                    : intl.formatMessage(memoMessages.memoWarning)
+                }
+                error={invalidMemo}
+              />
+              <Typography
+                variant="caption1"
+                color="grey.500"
+                sx={{ position: 'absolute', bottom: '12px', right: '0' }}
+              >
+                {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
+              </Typography>
+            </Box>
           </div>
         );
       case SEND_FORM_STEP.AMOUNT:

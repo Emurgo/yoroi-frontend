@@ -12,6 +12,13 @@ const RevampTextField = {
     variant: 'outlined',
     fullWidth: true,
   },
+  styleOverrides: {
+    root: {
+      '.MuiFormHelperText-root': {
+        fontSize: '0.75rem'
+      }
+    }
+  }
 };
 
 export { RevampTextField };
