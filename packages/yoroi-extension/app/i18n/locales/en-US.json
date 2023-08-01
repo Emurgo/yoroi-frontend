@@ -848,6 +848,8 @@
   "wallet.send.form.preview.nAssets": "{number} Assets",
   "wallet.send.form.receiver.hint": "Wallet Address",
   "wallet.send.form.receiver.label": "Receiver",
+  "wallet.send.form.revamp.receiver.label": "Enter address",
+  "wallet.send.form.confirmTx": "Confirm transaction",
   "wallet.send.form.revamp.transactionFee": "Transaction fee",
   "wallet.send.form.sendAll.allTokens": " + all tokens",
   "wallet.send.form.sendAll.customAmount": "Custom Amount",

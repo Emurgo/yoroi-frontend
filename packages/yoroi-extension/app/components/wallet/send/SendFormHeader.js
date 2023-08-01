@@ -14,19 +14,19 @@ type Props = {|
 
 const messages = defineMessages({
   receiver: {
-    id: 'wallet.send.form.receiver.label',
-    defaultMessage: '!!!Receiver',
+    id: 'wallet.send.form.revamp.receiver.label',
+    defaultMessage: '!!!Enter address',
   },
-  preview: {
-    id: 'wallet.send.form.preview.label',
-    defaultMessage: '!!!Preview',
+  confirmTx: {
+    id: 'wallet.send.form.confirmTx',
+    defaultMessage: '!!!Confirm transaction',
   },
 });
 
 const TABS = [
   { message: messages.receiver, stepId: '1' },
   { message: globalMessages.amount, stepId: '2' },
-  { message: messages.preview, stepId: '3' },
+  { message: messages.confirmTx, stepId: '3' },
 ];
 
 @observer
