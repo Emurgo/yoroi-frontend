@@ -37,13 +37,11 @@ function Stepper(props: Props & Intl): Node {
 
           if (isCurrentStep) stepColor = 'primary.600';
           else if (isPrevStep) stepColor = 'primary.300';
-
           if (isFutureStep) cursor = 'not-allowed';
 
           return (
             <Stack
-              sx={{ flexDirection: 'row' }}
-              className={styles.stackSteps}
+              sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
               key={stepId}
               onClick={() => {
                 if (isPrevStep) setCurrentStep(stepId);
@@ -51,13 +49,29 @@ function Stepper(props: Props & Intl): Node {
             >
               <Box
                 component="button"
-                className={styles.stackStep}
-                sx={{ borderColor: stepColor, cursor }}
+                sx={{
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: '8px',
+                  ...(!isPrevStep
+                    ? {
+                        borderWidth: '2.5px',
+                        borderStyle: 'solid',
+                      }
+                    : {}),
+                  borderRadius: '50%',
+                  transition: 'color 300ms ease',
+                  cursor,
+                  borderColor: stepColor,
+                }}
               >
                 {isPrevStep ? (
                   <StepMarkIcon />
                 ) : (
-                  <Typography variant="body2" fontWeight={500} color={stepColor}>
+                  <Typography variant="body2" fontWeight={500} color={stepColor} lineHeight="27px">
                     {idx + 1}
                   </Typography>
                 )}
