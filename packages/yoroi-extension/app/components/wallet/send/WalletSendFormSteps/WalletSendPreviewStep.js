@@ -474,14 +474,14 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             </div>
           ) : null}
 
-          <div className={styles.amountFeesWrapper}>
+          <Box>
             {amount.nonDefaultEntries().length > 0 && (
               <AssetsDropdown
                 tokens={getTokens(amount, this.props.getTokenInfo)}
                 nfts={getNFTs(amount, this.props.getTokenInfo)}
               />
             )}
-          </div>
+          </Box>
 
           {walletType === 'mnemonic' && (
             <TextField

@@ -11,6 +11,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { NftImage } from '../../assets/NFTsList';
 import { Box, Typography } from '@mui/material';
+import BigNumber from 'bignumber.js';
+import { splitAmount } from '../../../../utils/formatters';
 
 type Props = {|
   +tokens: FormattedTokenDisplay[],
@@ -43,15 +45,19 @@ export default class AssetsDropdown extends Component<Props, State> {
   }
 
   renderTokens(tokens: FormattedTokenDisplay[]): Node {
-    return tokens.map(token => (
-      <div className={styles.token}>
-        <div className={styles.label}>
-          <DefaultAssetIcon />
-          <p>{token.label}</p>
+    return tokens.map(token => {
+      const numberOfDecimals = token.info?.Metadata.numberOfDecimals || 0;
+      const displayAmount = splitAmount(new BigNumber(token.amount), numberOfDecimals).join('');
+      return (
+        <div className={styles.token}>
+          <div className={styles.label}>
+            <DefaultAssetIcon />
+            <p>{token.label}</p>
+          </div>
+          <p className={styles.amount}>{displayAmount}</p>
         </div>
-        <p className={styles.amount}>{token.amount}</p>
-      </div>
-    ));
+      );
+    });
   }
 
   renderNfts(nfts: FormattedNFTDisplay[]): Node {
