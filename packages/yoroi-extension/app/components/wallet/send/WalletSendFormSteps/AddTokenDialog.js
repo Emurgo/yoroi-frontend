@@ -26,7 +26,7 @@ import styles from './AddTokenDialog.scss';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/info.inline.svg';
+import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/fingerprint-info.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
 import SingleTokenRow from './SingleTokenRow';
@@ -390,7 +390,9 @@ export default class AddTokenDialog extends Component<Props, State> {
                   <Typography variant="body2" color="grayscale.600">
                     {intl.formatMessage(messages.identifier)}
                   </Typography>
-                  <InfoIcon />
+                  <Box sx={{ width: '20xp', height: '20px' }}>
+                    <InfoIcon />
+                  </Box>
                 </li>
                 <li className={styles.quantity}>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
@@ -402,7 +404,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                 </li>
               </Box>
               <Box
-                height="280px"
+                height="320px"
                 overflow="auto"
                 pr={currentTokensList.length > 4 ? '4px' : '24px'}
                 pl="24px"

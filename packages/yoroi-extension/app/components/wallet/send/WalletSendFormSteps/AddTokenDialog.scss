@@ -1,112 +1,109 @@
 .component {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .search {
+    border-radius: 8px;
+    background-color: #f0f3f5;
+    display: flex;
+    align-items: center;
+    padding: 0px 20px;
+    margin-bottom: 20px;
+
+    .searchInput {
+      width: 100%;
+      background-color: inherit;
+      border: none;
+      padding: 12px 0px;
+      margin-left: 12px;
+    }
+
+    .searchInput:focus {
+      outline: none;
+    }
+
+    .searchInput::placeholder {
+      color: #a7afc0;
+      font-family: Rubik;
+      font-size: 14px;
+      letter-spacing: 0;
+      line-height: 22px;
+    }
+  }
+
+  .minAda {
+    color: var(--yoroi-palette-gray-900);
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+    text-align: center;
+    margin-top: 24px;
+  }
+
+  .columns {
     width: 100%;
-    height: 100%;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+
+    li {
+      padding: 13px 24px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 4px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+
+    .quantity {
+      justify-content: flex-end;
+    }
+  }
+
+  .noAssetFound {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 24px;
+    margin-bottom: 43px;
+    height: 100%;
+    padding: 0 24px;
 
-    .search {
-        border-radius: 8px;
-        background-color: #F0F3F5;
-        display: flex;
-        align-items: center;
-        padding: 0px 20px;
-        margin-bottom: 20px;
-
-        .searchInput {
-            width: 100%;
-            background-color: inherit;
-            border: none;
-            padding: 12px 0px;
-            margin-left: 12px;
-        }
-
-        .searchInput:focus {
-            outline: none;
-        }
-
-        .searchInput::placeholder {
-            color: #A7AFC0;
-            font-family: Rubik;
-            font-size: 14px;
-            letter-spacing: 0;
-            line-height: 22px;
-        }
-
+    img {
+      display: inline-block;
+      width: 130px;
+      height: 100px;
+      margin-bottom: 24px;
     }
 
-    .minAda {
-        color: var(--yoroi-palette-gray-900);
-        font-size: 16px;
-        letter-spacing: 0;
-        line-height: 24px;
-        text-align: center;
-        margin-top: 24px;
+    .text {
+      color: #242838;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0;
+      line-height: 26px;
+      text-align: center;
+      margin-top: 16px;
     }
-
-    .columns {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1.1fr 1fr 1fr;
-        
-        li {
-            padding: 13px 24px;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 4px;
-
-            button {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-            }
-        }
-        
-        .quantity {
-            justify-content: flex-end;
-        }
-    }
-
-    .noAssetFound {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        margin-top: 24px;
-        margin-bottom: 43px;
-        height: 100%;
-        padding: 0 24px;
-
-        img {
-            display: inline-block;
-            width: 130px;
-            height: 100px;
-            margin-bottom: 24px;
-        }
-
-        .text {
-            color: #242838;
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: 0;
-            line-height: 26px;
-            text-align: center;
-            margin-top: 16px;
-        }
-
-    }
+  }
 }
 
 .dialog {
-    min-width: 670px !important;
-    padding: 0 !important;
+  min-width: 670px !important;
+  padding: 0 !important;
 
-    & > div {
-        padding-left: 0px !important;
-        max-height: unset;
-        padding-right: 0px !important;
-    }
+  & > div {
+    padding-left: 0px !important;
+    max-height: unset;
+    padding-right: 0px !important;
+  }
 }
-  
