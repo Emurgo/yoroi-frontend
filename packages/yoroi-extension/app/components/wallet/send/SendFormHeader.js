@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import Stepper from '../../common/stepper/Stepper';
-import { Box } from '@mui/material';
 
 type Props = {|
   step: number,
@@ -35,14 +34,12 @@ export default class SendFormHeader extends Component<Props> {
     const { step: currentStep, onUpdateStep } = this.props;
 
     return (
-      <Box>
-        <Stepper
-          currentStep={String(currentStep)}
-          steps={TABS}
-          setCurrentStep={id => onUpdateStep(Number(id))}
-          sx={{ mt: '0 !important' }}
-        />
-      </Box>
+      <Stepper
+        currentStep={String(currentStep)}
+        steps={TABS}
+        setCurrentStep={id => onUpdateStep(Number(id))}
+        sx={{ mt: '0 !important' }}
+      />
     );
   }
 }

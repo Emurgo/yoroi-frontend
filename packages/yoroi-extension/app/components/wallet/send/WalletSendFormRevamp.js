@@ -462,6 +462,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       networkId: this.props.defaultToken.NetworkId,
     });
 
+    const showFiat =
+      this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
+
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
@@ -499,16 +502,51 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         return (
           <div className={styles.amountStep}>
             {isCalculatingFee && (
-              <p className={styles.calculatingFee}>{intl.formatMessage(messages.calculatingFee)}</p>
+              <Typography
+                variant="caption1"
+                sx={{
+                  position: 'absolute',
+                  color: 'grey.600',
+                  left: '50%',
+                  top: '-14px',
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                {intl.formatMessage(messages.calculatingFee)}
+              </Typography>
             )}
 
-            {!isDefaultIncluded && <p className={styles.sendError}>{transactionFeeError}</p>}
-            <div
-              className={classnames([
-                styles.amountInput,
-                amountInputError && isDefaultIncluded && styles.amountInputError,
-                shouldSendAll && styles.disabled,
-              ])}
+            {!isDefaultIncluded && (
+              <Typography
+                variant="caption1"
+                sx={{
+                  position: 'absolute',
+                  color: 'magenta.500',
+                  left: '50%',
+                  top: '-14px',
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                {transactionFeeError}
+              </Typography>
+            )}
+            <Box
+              sx={{
+                position: 'relative',
+                padding: '16px 0px',
+                borderRadius: '8px',
+                ...(amountInputError && isDefaultIncluded
+                  ? {
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor: 'magenta.500',
+                    }
+                  : {
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: 'grey.400',
+                    }),
+              }}
             >
               <Typography
                 sx={{
@@ -523,7 +561,20 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               >
                 {intl.formatMessage(globalMessages.amountLabel)}
               </Typography>
-              <div className={styles.amountInputGrid}>
+              <Box
+                sx={{
+                  margin: '0px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '& input': {
+                    padding: '0px',
+                    '&:disabled': {
+                      cursor: 'not-allowed',
+                    },
+                  },
+                }}
+              >
                 <AmountInputRevamp
                   {...amountFieldProps}
                   value={
@@ -552,9 +603,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   amountFieldRevamp
                   placeholder="0.0"
                 />
-                <p className={styles.defaultCoin}>
+
+                <Typography variant="button2" color="grey.600" fontWeight={500} mr="12px">
                   {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
-                </p>
+                </Typography>
+
                 {!isErgo(this.props.selectedNetwork) && (
                   <Button
                     variant="tertiary"
@@ -587,15 +640,35 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     {intl.formatMessage(messages.max)}
                   </Button>
                 )}
-              </div>
-              {this.props.unitOfAccountSetting.enabled &&
-                this.props.unitOfAccountSetting.currency && (
-                  <div className={styles.fiat}>
-                    {this.renderUnitOfAccountAmount(amountFieldProps.value)}
-                  </div>
-                )}
-              {isDefaultIncluded && <p className={styles.amountError}>{amountInputError}</p>}
-            </div>
+              </Box>
+              {showFiat && (
+                <Box
+                  sx={{
+                    margin: '16px 16px 0px 16px',
+                    pt: '16px',
+                    color: 'grey.400',
+                    fontSize: '16px',
+                    letterSpacing: 0,
+                    borderTop: '1px solid var(--yoroi-comp-input-text-disabled)',
+                  }}
+                >
+                  {this.renderUnitOfAccountAmount(amountFieldProps.value)}
+                </Box>
+              )}
+              {isDefaultIncluded && (
+                <Typography
+                  sx={{
+                    position: 'absolute',
+                    bottom: '-25px',
+                    left: '17px',
+                    color: 'magenta.500',
+                    fontSize: '12px',
+                  }}
+                >
+                  {amountInputError}
+                </Typography>
+              )}
+            </Box>
 
             <IncludedTokens
               tokens={tokens}
@@ -699,16 +772,16 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return (
       <>
         <div className={styles.component}>
-          <Box className={styles.wrapper} sx={{ bgcolor: 'common.white' }}>
+          <Box className={styles.wrapper} sx={{ bgcolor: 'common.white', height: '100%' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
-            <div
+            <Box
               ref={ref => {
                 this.bodyRef = ref;
               }}
               className={styles.formBody}
             >
               {this.renderCurrentStep(currentStep)}
-            </div>
+            </Box>
             {currentStep !== SEND_FORM_STEP.PREVIEW && (
               <Box
                 borderTop={

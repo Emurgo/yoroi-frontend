@@ -26,64 +26,62 @@ function Stepper(props: Props & Intl): Node {
   if (currentStepIdx === -1) throw new Error(`Step to found. Should never happen`);
 
   return (
-    <Box>
-      <Stack sx={{ flexDirection: 'row', ...sx }} className={styles.stackContainer}>
-        {steps.map(({ stepId, message }, idx) => {
-          const isCurrentStep = currentStepIdx === idx;
-          const isPrevStep = idx < currentStepIdx;
-          const isFutureStep = idx > currentStepIdx;
-          let stepColor = 'grey.400';
-          let cursor = 'pointer';
+    <Stack sx={{ flexDirection: 'row', ...sx }} className={styles.stackContainer}>
+      {steps.map(({ stepId, message }, idx) => {
+        const isCurrentStep = currentStepIdx === idx;
+        const isPrevStep = idx < currentStepIdx;
+        const isFutureStep = idx > currentStepIdx;
+        let stepColor = 'grey.400';
+        let cursor = 'pointer';
 
-          if (isCurrentStep) stepColor = 'primary.600';
-          else if (isPrevStep) stepColor = 'primary.300';
-          if (isFutureStep) cursor = 'not-allowed';
+        if (isCurrentStep) stepColor = 'primary.600';
+        else if (isPrevStep) stepColor = 'primary.300';
+        if (isFutureStep) cursor = 'not-allowed';
 
-          return (
-            <Stack
-              sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-              key={stepId}
-              onClick={() => {
-                if (isPrevStep) setCurrentStep(stepId);
+        return (
+          <Stack
+            sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+            key={stepId}
+            onClick={() => {
+              if (isPrevStep) setCurrentStep(stepId);
+            }}
+          >
+            <Box
+              component="button"
+              sx={{
+                width: '24px',
+                height: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mr: '8px',
+                ...(!isPrevStep
+                  ? {
+                      borderWidth: '2.5px',
+                      borderStyle: 'solid',
+                    }
+                  : {}),
+                borderRadius: '50%',
+                transition: 'color 300ms ease',
+                cursor,
+                borderColor: stepColor,
               }}
             >
-              <Box
-                component="button"
-                sx={{
-                  width: '24px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: '8px',
-                  ...(!isPrevStep
-                    ? {
-                        borderWidth: '2.5px',
-                        borderStyle: 'solid',
-                      }
-                    : {}),
-                  borderRadius: '50%',
-                  transition: 'color 300ms ease',
-                  cursor,
-                  borderColor: stepColor,
-                }}
-              >
-                {isPrevStep ? (
-                  <StepMarkIcon />
-                ) : (
-                  <Typography variant="body2" fontWeight={500} color={stepColor} lineHeight="27px">
-                    {idx + 1}
-                  </Typography>
-                )}
-              </Box>
-              <Typography sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
-                {intl.formatMessage(message)}
-              </Typography>
-            </Stack>
-          );
-        })}
-      </Stack>
-    </Box>
+              {isPrevStep ? (
+                <StepMarkIcon />
+              ) : (
+                <Typography variant="body2" fontWeight={500} color={stepColor} lineHeight="27px">
+                  {idx + 1}
+                </Typography>
+              )}
+            </Box>
+            <Typography sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
+              {intl.formatMessage(message)}
+            </Typography>
+          </Stack>
+        );
+      })}
+    </Stack>
   );
 }
 
