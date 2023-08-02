@@ -70,6 +70,10 @@ type State = {|
 |};
 
 const messages = defineMessages({
+  receiverLabel: {
+    id: 'wallet.send.form.preview.receiverLabel',
+    defaultMessage: '!!!Receiver wallet address',
+  },
   nAssets: {
     id: 'wallet.send.form.preview.nAssets',
     defaultMessage: '!!!{number} Assets',
@@ -186,6 +190,18 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     if (coinPrice == null) return '-';
 
     return calculateAndFormatValue(shiftedAmount, coinPrice);
+  };
+
+  renderDefaultTokenAmount: TokenEntry => Node = entry => {
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    return (
+      <div className={styles.amount}>
+        {formatValue(entry)}
+        <span className={styles.currencySymbol}>
+          &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
+        </span>
+      </div>
+    );
   };
 
   renderTotalAmount: TokenEntry => Node = entry => {
@@ -392,7 +408,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
         <div>
           <Box mb="8px">
             <Typography variant="body1" color="grayscale.600">
-              {intl.formatMessage(globalMessages.receiverLabel)}
+              {intl.formatMessage(messages.receiverLabel)}
             </Typography>
           </Box>
           <Box>
@@ -438,6 +454,13 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               amount: this.props.transactionFee,
               render: this.renderSingleFee,
             })}
+          </div>
+        </div>
+
+        <div className={styles.amountWrapper}>
+          <div className={styles.amountLabel}>{this._amountLabel()}</div>
+          <div className={styles.amountValue}>
+            {this.renderDefaultTokenAmount(amount.getDefaultEntry())}
           </div>
         </div>
 

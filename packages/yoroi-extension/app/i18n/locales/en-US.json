@@ -848,6 +848,7 @@
   "wallet.send.form.preview.minAdaHelp": "Minimum ADA required to send these assets. {moreDetails}",
   "wallet.send.form.preview.moreDetails": "More details here",
   "wallet.send.form.preview.nAssets": "{number} Assets",
+  "wallet.send.form.preview.receiverLabel": "Receiver wallet address",
   "wallet.send.form.receiver.hint": "Wallet Address",
   "wallet.send.form.receiver.label": "Receiver",
   "wallet.send.form.revamp.receiver.label": "Enter address",
