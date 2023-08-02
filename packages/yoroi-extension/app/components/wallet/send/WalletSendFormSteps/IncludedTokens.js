@@ -60,9 +60,23 @@ export default class IncludedTokens extends Component<Props> {
                   mr="8px"
                   width={30}
                   height={30}
-                  sx={{ '& svg': { width: '100%', height: '100%' } }}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    '> img': {
+                      objectFit: 'cover',
+                      display: 'inline-block',
+                    },
+                  }}
                 >
-                  <NFTImage image={item.image ?? null} name={item.name} width={30} height={30} />
+                  <NFTImage
+                    image={item.image ?? null}
+                    name={item.name}
+                    width="30px"
+                    height="30px"
+                  />
                 </Box>
                 <Box width="80%">
                   <Typography
