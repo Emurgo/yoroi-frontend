@@ -7,6 +7,7 @@ import {
   truncateAddressShort,
   formattedAmountToNaturalUnits,
   formattedAmountToBigNumber,
+  splitAmount,
 } from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
@@ -57,10 +58,13 @@ export default class SingleTokenRow extends Component<Props> {
     const { token, isValidAmount } = this.props;
     const isValid = isValidAmount(token.info);
 
-    let amount = this.props.getTokenAmount(this.props.token.info);
+    const numberOfDecimals = this.getNumDecimals();
+    let amount = this.props.getTokenAmount(token.info);
     if (amount) {
-      amount = amount.shiftedBy(-this.getNumDecimals()).toString();
+      amount = amount.shiftedBy(-numberOfDecimals).toString();
     }
+
+    const displayAmount = splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
 
     return (
       <div className={styles.component}>
@@ -83,7 +87,7 @@ export default class SingleTokenRow extends Component<Props> {
             <Typography variant="body1" color="grayscale.900">
               {truncateAddressShort(token.id, 14)}
             </Typography>
-            <p className={styles.amount}>{token.amount}</p>
+            <p className={styles.amount}>{displayAmount}</p>
           </button>
         ) : (
           <Box
@@ -110,7 +114,7 @@ export default class SingleTokenRow extends Component<Props> {
                 onChange={this.onAmountUpdate.bind(this)}
                 decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp
-                placeholder={token.amount}
+                placeholder={displayAmount}
               />
             </div>
             <button

@@ -186,6 +186,8 @@
   "global.labels.stakingKeyHash": "Staking key hash",
   "global.labels.token": "token",
   "global.labels.upgrade": "Upgrade",
+  "global.labels.addToken": "Add Token",
+  "global.labels.addNft": "Add NFT",
   "global.language.chinese.simplified": "简体中文",
   "global.language.chinese.traditional": "繁體中文",
   "global.language.czech": "Czech",
