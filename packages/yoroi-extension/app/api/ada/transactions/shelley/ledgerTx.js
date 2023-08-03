@@ -49,6 +49,7 @@ export async function createLedgerSignTxPayload(request: {|
   byronNetworkMagic: number,
   networkId: number,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  cip36: boolean,
 |}): Promise<SignTransactionRequest> {
   const txBody = request.signRequest.unsignedTx.build();
 
@@ -94,32 +95,54 @@ export async function createLedgerSignTxPayload(request: {|
     const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } =
       request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
 
-    auxiliaryData = {
-      type: TxAuxiliaryDataType.CIP36_REGISTRATION,
-      params: {
-        format: CIP36VoteRegistrationFormat.CIP_36,
-        delegations: [
-          {
-            type: CIP36VoteDelegationType.KEY,
-            voteKeyHex: votingPublicKey.replace(/^0x/, ''),
-            weight: 1,
-          },
-        ],
-        stakingPath: stakingKeyPath,
-        paymentDestination: {
-          type: TxOutputDestinationType.DEVICE_OWNED,
-          params: {
-            type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+    if (request.cip36) {
+      auxiliaryData = {
+        type: TxAuxiliaryDataType.CIP36_REGISTRATION,
+        params: {
+          format: CIP36VoteRegistrationFormat.CIP_36,
+          delegations: [
+            {
+              type: CIP36VoteDelegationType.KEY,
+              voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+              weight: 1,
+            },
+          ],
+          stakingPath: stakingKeyPath,
+          paymentDestination: {
+            type: TxOutputDestinationType.DEVICE_OWNED,
             params: {
-              spendingPath: paymentKeyPath,
-              stakingPath: stakingKeyPath,
+              type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+              params: {
+                spendingPath: paymentKeyPath,
+                stakingPath: stakingKeyPath,
+              },
             },
           },
-        },
-        nonce,
-        votingPurpose: 0,
-      }
-    };
+          nonce,
+          votingPurpose: 0,
+        }
+      };
+    } else {
+      auxiliaryData = {
+        type: TxAuxiliaryDataType.CIP36_REGISTRATION,
+        params: {
+          format: CIP36VoteRegistrationFormat.CIP_15,
+          voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+          stakingPath: stakingKeyPath,
+          paymentDestination: {
+            type: TxOutputDestinationType.DEVICE_OWNED,
+            params: {
+              type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+              params: {
+                spendingPath: paymentKeyPath,
+                stakingPath: stakingKeyPath,
+              },
+            },
+          },
+          nonce,
+        }
+      };
+    }
   } else if (request.signRequest.metadata != null) {
     auxiliaryData = {
       type: TxAuxiliaryDataType.ARBITRARY_HASH,
