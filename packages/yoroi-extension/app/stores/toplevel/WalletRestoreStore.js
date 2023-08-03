@@ -9,7 +9,7 @@ import type {
 } from '../../actions/common/wallet-restore-actions';
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
-import { generateByronPlate, generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
+import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateErgoPlate } from '../../api/ergo/lib/crypto/plate';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -36,10 +36,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.accountId.label',
     defaultMessage: '!!!Your Wallet Account checksum:',
   },
-  walletRestoreVerifyByronAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.byron.label',
-    defaultMessage: '!!!Byron account checksum:',
-  },
   walletRestoreVerifyShelleyAccountIdLabel: {
     id: 'wallet.restore.dialog.verify.accountId.shelley.label',
     defaultMessage: '!!!Shelley account checksum:',
@@ -47,10 +43,6 @@ const messages = defineMessages({
   walletRestoreVerifyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.addressesLabel',
     defaultMessage: '!!!Your Wallet address[es]:',
-  },
-  walletRestoreVerifyByronAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.byron.addressesLabel',
-    defaultMessage: '!!!Byron Wallet address[es]:',
   },
   walletRestoreVerifyShelleyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.shelley.addressesLabel',
@@ -237,19 +229,6 @@ export function generatePlates(
       : generateAdaWalletRootKey(recoveryPhrase);
   };
 
-  const shouldShowByronPlate = (() => {
-    if (
-      // generically show byron checksum if length is 15
-      // since 15-word wallets were supported in Byron
-      (isCardanoHaskell(network) && (mode.length === 15 || mode.extra === 'paper')) ||
-      // only show HW byron checksums if using bip44
-      (mode.type === 'bip44' && (mode.extra === 'trezor' || mode.extra === 'ledger'))
-    ) {
-      return true;
-    }
-    return false;
-  })();
-
   const shouldShowShelleyPlate = (() => {
     return isCardanoHaskell(network) && mode.type === 'cip1852';
   })();
@@ -265,24 +244,6 @@ export function generatePlates(
       ...shelleyPlate,
       checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
       addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
-    });
-  }
-  if (shouldShowByronPlate) {
-    const byronPlate = generateByronPlate(
-      getCardanoKey(),
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      (() => {
-        if (network.BaseConfig[0].ByronNetworkId != null) {
-          return network.BaseConfig[0].ByronNetworkId;
-        }
-        throw new Error(`${nameof(generatePlates)} missing Byron network id`);
-      })()
-    );
-    plates.push({
-      ...byronPlate,
-      checksumTitle: messages.walletRestoreVerifyAccountIdLabel,
-      addressMessage: messages.walletRestoreVerifyAddressesLabel,
     });
   }
 
