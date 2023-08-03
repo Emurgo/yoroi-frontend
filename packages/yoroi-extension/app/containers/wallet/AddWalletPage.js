@@ -52,10 +52,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import {
-  networks,
-  isCardanoHaskell,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
