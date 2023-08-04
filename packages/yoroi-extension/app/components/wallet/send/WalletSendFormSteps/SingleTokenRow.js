@@ -64,7 +64,9 @@ export default class SingleTokenRow extends Component<Props> {
       amount = amount.shiftedBy(-numberOfDecimals).toString();
     }
 
-    const displayAmount = splitAmount(new BigNumber(token.amount), numberOfDecimals).join('');
+    const displayAmount = token.amount
+      ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
+      : '0';
 
     return (
       <div className={styles.component}>

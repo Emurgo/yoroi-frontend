@@ -177,12 +177,13 @@ class WalletSendPage extends Component<AllProps> {
         <>
           <WalletSendFormRevamp
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+            selectedWallet={publicDeriver}
             defaultToken={defaultToken}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             onSubmit={txBuilderActions.updateTentativeTx.trigger}
             totalInput={transactionBuilderStore.totalInput}
             hasAnyPending={hasAnyPending}
-            classicTheme={profile.isClassicTheme}
+            isClassicTheme={profile.isClassicTheme}
             updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
             updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
             updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
@@ -218,6 +219,16 @@ class WalletSendPage extends Component<AllProps> {
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
             maxSendableAmount={transactionBuilderStore.maxSendableAmount}
+            signRequest={transactionBuilderStore.tentativeTx}
+            staleTx={transactionBuilderStore.txMismatch}
+            openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
+            sendMoneyRequest={this.generated.stores.wallets.sendMoneyRequest}
+            sendMoney={this.generated.actions.wallets.sendMoney.trigger}
+            ledgerSendError={this.generated.stores.substores.ada.ledgerSend.error || null}
+            trezorSendError={this.generated.stores.substores.ada.trezorSend.error || null}
+            ledgerSend={this.generated.actions.ada.ledgerSend}
+            trezorSend={this.generated.actions.ada.trezorSend}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer}
           />
           {this.renderDialog()}
         </>
@@ -334,7 +345,7 @@ class WalletSendPage extends Component<AllProps> {
 
     const { transactionBuilderStore } = this.generated.stores;
     if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
+      throw new Error(`${nameof(this.renderTxPreviewStep)}::should never happen`);
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
@@ -669,6 +680,16 @@ class WalletSendPage extends Component<AllProps> {
           trigger: (params: void) => void,
         |},
       |},
+      wallets: {|
+        sendMoney: {|
+          trigger: (params: {|
+            password: string,
+            publicDeriver: PublicDeriver<>,
+            signRequest: ISignRequest<any>,
+            onSuccess?: void => void,
+          |}) => Promise<void>,
+        |},
+      |},
       dialogs: {|
         closeActiveDialog: {|
           trigger: (params: void) => void,
@@ -765,7 +786,20 @@ class WalletSendPage extends Component<AllProps> {
         getParam: <T>(number | string) => T,
         isOpen: any => boolean,
       |},
-      wallets: {| selected: null | PublicDeriver<> |},
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void,
+        |},
+      |},
+      ledgerSend: {|
+        error: ?LocalizableError,
+      |},
+      trezorSend: {|
+        error: ?LocalizableError,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -787,6 +821,11 @@ class WalletSendPage extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+            reset: stores.wallets.sendMoneyRequest.reset,
+            error: stores.wallets.sendMoneyRequest.error,
+          },
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -862,6 +901,11 @@ class WalletSendPage extends Component<AllProps> {
             trigger: actions.dialogs.push.trigger,
           },
           closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+        wallets: {
+          sendMoney: {
+            trigger: actions.wallets.sendMoney.trigger,
+          },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

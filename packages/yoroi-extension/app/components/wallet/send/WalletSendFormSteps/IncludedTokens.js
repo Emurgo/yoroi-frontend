@@ -40,7 +40,7 @@ export default class IncludedTokens extends Component<Props> {
             gap: '16px',
             position: 'relative',
           }}
-          key={`${item.name}-${item.label}`}
+          key={item.id}
         >
           <Box
             sx={{

@@ -507,7 +507,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             key="amount-back"
             variant="secondary"
             size="medium"
-            onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
+            onClick={() => this.props.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
             sx={{ width: '128px' }}
           >
             {intl.formatMessage(globalMessages.backButtonLabel)}

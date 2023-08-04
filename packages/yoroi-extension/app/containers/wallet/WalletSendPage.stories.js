@@ -15,9 +15,7 @@ import {
   mockLedgerMeta,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
-import {
-  walletLookup,
-} from '../../../stories/helpers/WalletCache';
+import { walletLookup } from '../../../stories/helpers/WalletCache';
 import {
   genShelleyCIP1852SigningWalletWithCache,
   genTentativeShelleyTx,
@@ -37,7 +35,11 @@ import { InvalidWitnessError } from '../../api/common/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import { defaultAssets, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { mockFromDefaults, getDefaultEntryTokenInfo, mockDefaultToken } from '../../stores/toplevel/TokenInfoStore';
+import {
+  mockFromDefaults,
+  getDefaultEntryTokenInfo,
+  mockDefaultToken,
+} from '../../stores/toplevel/TokenInfoStore';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
 
@@ -47,42 +49,37 @@ export default {
   decorators: [withScreenshot],
 };
 
-const getRoute = (id) => buildRoute(
-  ROUTES.WALLETS.SEND,
-  { id, }
-);
+const getRoute = id => buildRoute(ROUTES.WALLETS.SEND, { id });
 
-const genTokenInfoMap = (network) => {
-  const map = mockFromDefaults(defaultAssets)
+const genTokenInfoMap = network => {
+  const map = mockFromDefaults(defaultAssets);
 
   if (isErgo(network)) {
-    map.get(network.NetworkId.toString())
-      ?.set(
-        'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
-        {
-          Digest: 1234,
-          TokenId: 1234,
-          NetworkId: network.NetworkId,
-          Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
-          IsDefault: false,
-          IsNFT: false,
-          Metadata: {
-            type: 'Ergo',
-            height: 0,
-            boxId: 'dc18a160f90e139f4813759d86db87b7f80db228de8f6b8c493da954042881ef',
-            ticker: null,
-            longName: 'Cool Token',
-            numberOfDecimals: 3, // units per ERG
-            description: null,
-          }
-        }
-      );
+    map
+      .get(network.NetworkId.toString())
+      ?.set('f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4', {
+        Digest: 1234,
+        TokenId: 1234,
+        NetworkId: network.NetworkId,
+        Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
+        IsDefault: false,
+        IsNFT: false,
+        Metadata: {
+          type: 'Ergo',
+          height: 0,
+          boxId: 'dc18a160f90e139f4813759d86db87b7f80db228de8f6b8c493da954042881ef',
+          ticker: null,
+          longName: 'Cool Token',
+          numberOfDecimals: 3, // units per ERG
+          description: null,
+        },
+      });
   }
 
   return map;
-}
+};
 
-const genBaseProps: {|
+const genBaseProps: ({|
   wallet: PossibleCacheTypes,
   dialogInfo?: {|
     sendMoneyRequest: *,
@@ -92,7 +89,7 @@ const genBaseProps: {|
   initialShowMemoState?: boolean,
   hwSend?: *,
   balance: *,
-|} => * = (request) => ({
+|}) => * = request => ({
   initialShowMemoState: request.initialShowMemoState || false,
   stores: {
     explorers: {
@@ -104,15 +101,16 @@ const genBaseProps: {|
     },
     wallets: {
       selected: request.wallet.publicDeriver,
+      sendMoneyRequest: {
+        error: undefined,
+        isExecuting: false,
+        reset: () => {},
+      },
     },
     tokenInfoStore: {
-      tokenInfo: genTokenInfoMap(
-        request.wallet.publicDeriver.getParent().getNetworkInfo()
-      ),
-      getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
-        networkId,
-        mockFromDefaults(defaultAssets)
-      ),
+      tokenInfo: genTokenInfoMap(request.wallet.publicDeriver.getParent().getNetworkInfo()),
+      getDefaultTokenInfo: networkId =>
+        getDefaultEntryTokenInfo(networkId, mockFromDefaults(defaultAssets)),
     },
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => '5',
@@ -126,7 +124,7 @@ const genBaseProps: {|
     },
     uiDialogs: {
       getParam: () => (undefined: any),
-      isOpen: (clazz) => {
+      isOpen: clazz => {
         if (clazz === WalletSendConfirmationDialog) {
           return request.dialogInfo != null && request.hwSend == null;
         }
@@ -140,33 +138,30 @@ const genBaseProps: {|
       },
     },
     transactions: {
-      hasAnyPending: request.dialogInfo == null
-        ? boolean('hasAnyPending', false)
-        : false,
+      hasAnyPending: request.dialogInfo == null ? boolean('hasAnyPending', false) : false,
       getBalanceRequest: {
         result: request.balance,
       },
     },
-    transactionBuilderStore: request.dialogInfo == null
-      ? {
-        totalInput: undefined,
-        maxAssetsAllowed: 10,
-        fee: undefined,
-        shouldSendAll: boolean('shouldSendAll', false),
-        tentativeTx: null,
-        txMismatch: false,
-        createUnsignedTx: {
-          isExecuting: boolean('isExecuting', false),
-          error: undefined,
-        },
-        selectedToken: undefined,
-        plannedTxInfoMap: [],
-        calculateMinAda: () => '1',
-        isDefaultIncluded: false,
-        minAda: undefined,
-        maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
-      }
-      : request.dialogInfo.transactionBuilderStore,
+    transactionBuilderStore: {
+      totalInput: undefined,
+      maxAssetsAllowed: 10,
+      fee: undefined,
+      shouldSendAll: boolean('shouldSendAll', false),
+      tentativeTx: null,
+      txMismatch: false,
+      createUnsignedTx: {
+        isExecuting: boolean('isExecuting', false),
+        error: undefined,
+      },
+      selectedToken: undefined,
+      plannedTxInfoMap: [],
+      calculateMinAda: () => '1',
+      isDefaultIncluded: false,
+      minAda: undefined,
+      maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
+      memo: '',
+    },
     substores: {
       ada: {
         ledgerSend: request.hwSend || {
@@ -201,17 +196,17 @@ const genBaseProps: {|
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
       deselectToken: { trigger: action('deselectToken') },
-      calculateMaxAmount: { trigger: async (req) => action('calculateMaxAmount')(req) },
+      calculateMaxAmount: { trigger: async req => action('calculateMaxAmount')(req) },
     },
     ada: {
       ledgerSend: {
         init: { trigger: action('init') },
         cancel: { trigger: action('cancel') },
-        sendUsingLedgerWallet: { trigger: async (req) => action('sendUsingLedgerWallet')(req) },
+        sendUsingLedgerWallet: { trigger: async req => action('sendUsingLedgerWallet')(req) },
       },
       trezorSend: {
         cancel: { trigger: action('cancel') },
-        sendUsingTrezor: { trigger: async (req) => action('sendUsingTrezor')(req) },
+        sendUsingTrezor: { trigger: async req => action('sendUsingTrezor')(req) },
       },
     },
   },
@@ -228,14 +223,11 @@ const genBaseProps: {|
           getCurrentPrice: (_from, _to) => '5',
         },
         tokenInfoStore: {
-          tokenInfo: genTokenInfoMap(
-            request.wallet.publicDeriver.getParent().getNetworkInfo()
-          ),
+          tokenInfo: genTokenInfoMap(request.wallet.publicDeriver.getParent().getNetworkInfo()),
         },
         wallets: {
-          sendMoneyRequest: request.dialogInfo == null
-            ? (null: any)
-            : request.dialogInfo.sendMoneyRequest,
+          sendMoneyRequest:
+            request.dialogInfo == null ? (null: any) : request.dialogInfo.sendMoneyRequest,
           selected: request.wallet.publicDeriver,
         },
         ledgerSend: {
@@ -253,24 +245,24 @@ const genBaseProps: {|
         },
         wallets: {
           sendMoney: {
-            trigger: async (req) => action('sendMoney')(req),
+            trigger: async req => action('sendMoney')(req),
           },
         },
         ada: {
           ledgerSend: {
             sendUsingLedger: {
-              trigger: async (req) => action('sendUsingLedger')(req),
-            }
+              trigger: async req => action('sendUsingLedger')(req),
+            },
           },
           trezorSend: {
             sendUsingTrezor: {
-              trigger: async (req) => action('sendUsingTrezor')(req),
-            }
+              trigger: async req => action('sendUsingTrezor')(req),
+            },
           },
         },
       },
-    }
-  }
+    },
+  },
 });
 
 export const UserInput = (): Node => {
@@ -278,7 +270,7 @@ export const UserInput = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -286,12 +278,12 @@ export const UserInput = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         balance: new MultiToken([], defaultToken),
       })}
-    />)
+    />
   );
 };
 
@@ -300,7 +292,7 @@ export const MultiAsset = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -308,16 +300,21 @@ export const MultiAsset = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
-        balance: new MultiToken([{
-          identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
-          networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
-          amount: new BigNumber(1000),
-        }], defaultToken),
+        balance: new MultiToken(
+          [
+            {
+              identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
+              networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+              amount: new BigNumber(1000),
+            },
+          ],
+          defaultToken
+        ),
       })}
-    />)
+    />
   );
 };
 
@@ -326,7 +323,7 @@ export const MemoDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -334,13 +331,13 @@ export const MemoDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         noExternalStorage: true,
         balance: new MultiToken([], defaultToken),
       })}
-    />)
+    />
   );
 };
 
@@ -349,7 +346,7 @@ export const MemoExpanded = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -357,13 +354,13 @@ export const MemoExpanded = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         initialShowMemoState: true,
         balance: new MultiToken([], defaultToken),
       })}
-    />)
+    />
   );
 };
 
@@ -376,14 +373,10 @@ export const RegularConfirmationDialog = (): Node => {
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),
   });
-  const getErrorValue = () => select(
-    'errorCases',
-    errorCases,
-    errorCases.None
-  );
+  const getErrorValue = () => select('errorCases', errorCases, errorCases.None);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -391,7 +384,7 @@ export const RegularConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         balance: new MultiToken([], defaultToken),
@@ -418,10 +411,10 @@ export const RegularConfirmationDialog = (): Node => {
             isDefaultIncluded: false,
             minAda: undefined,
             maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
-          }
-        }
+          },
+        },
       })}
-    />)
+    />
   );
 };
 
@@ -429,21 +422,15 @@ export const MultiAssetConfirmationDialog = (): Node => {
   const wallet = genErgoSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeErgoTx(
-    wallet.publicDeriver
-  );
+  const { tentativeTx, inputAmount, fee } = genTentativeErgoTx(wallet.publicDeriver);
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),
   });
-  const getErrorValue = () => select(
-    'errorCases',
-    errorCases,
-    errorCases.None
-  );
+  const getErrorValue = () => select('errorCases', errorCases, errorCases.None);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -451,7 +438,7 @@ export const MultiAssetConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         balance: new MultiToken([], defaultToken),
@@ -478,29 +465,25 @@ export const MultiAssetConfirmationDialog = (): Node => {
             isDefaultIncluded: false,
             minAda: undefined,
             maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
-          }
-        }
+          },
+        },
       })}
-    />)
+    />
   );
 };
 
 export const LedgerConfirmationDialog = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
-    ...mockLedgerMeta
+    ...mockLedgerMeta,
   }));
   const lookup = walletLookup([wallet]);
 
   const { tentativeTx, inputAmount, fee } = genTentativeShelleyTx(wallet.publicDeriver);
-  const getErrorValue = () => select(
-    'errorCases',
-    ledgerErrorCases,
-    ledgerErrorCases.None
-  );
+  const getErrorValue = () => select('errorCases', ledgerErrorCases, ledgerErrorCases.None);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -514,9 +497,7 @@ export const LedgerConfirmationDialog = (): Node => {
         balance: new MultiToken([], defaultToken),
         hwSend: {
           isActionProcessing: boolean('isActionProcessing', false),
-          error: getErrorValue() === ledgerErrorCases.None
-            ? undefined
-            : getErrorValue(),
+          error: getErrorValue() === ledgerErrorCases.None ? undefined : getErrorValue(),
         },
         dialogInfo: {
           sendMoneyRequest: {
@@ -541,8 +522,8 @@ export const LedgerConfirmationDialog = (): Node => {
             isDefaultIncluded: false,
             minAda: undefined,
             maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
-          }
-        }
+          },
+        },
       })}
     />
   );
@@ -551,19 +532,15 @@ export const LedgerConfirmationDialog = (): Node => {
 export const TrezorConfirmationDialog = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
-    ...mockTrezorMeta
+    ...mockTrezorMeta,
   }));
   const lookup = walletLookup([wallet]);
 
   const { tentativeTx, inputAmount, fee } = genTentativeShelleyTx(wallet.publicDeriver);
-  const getErrorValue = () => select(
-    'errorCases',
-    trezorErrorCases,
-    trezorErrorCases.None
-  );
+  const getErrorValue = () => select('errorCases', trezorErrorCases, trezorErrorCases.None);
 
   const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -577,9 +554,7 @@ export const TrezorConfirmationDialog = (): Node => {
         balance: new MultiToken([], defaultToken),
         hwSend: {
           isActionProcessing: boolean('isActionProcessing', false),
-          error: getErrorValue() === trezorErrorCases.None
-            ? undefined
-            : getErrorValue(),
+          error: getErrorValue() === trezorErrorCases.None ? undefined : getErrorValue(),
         },
         dialogInfo: {
           sendMoneyRequest: {
@@ -604,8 +579,8 @@ export const TrezorConfirmationDialog = (): Node => {
             isDefaultIncluded: false,
             minAda: undefined,
             maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
-          }
-        }
+          },
+        },
       })}
     />
   );

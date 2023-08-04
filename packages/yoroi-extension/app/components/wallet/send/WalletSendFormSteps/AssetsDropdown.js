@@ -47,7 +47,10 @@ export default class AssetsDropdown extends Component<Props, State> {
   renderTokens(tokens: FormattedTokenDisplay[]): Node {
     return tokens.map(token => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals || 0;
-      const displayAmount = splitAmount(new BigNumber(token.amount), numberOfDecimals).join('');
+      const displayAmount = token.amount
+        ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
+        : '0';
+
       return (
         <div className={styles.token}>
           <div className={styles.label}>

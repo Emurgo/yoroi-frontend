@@ -27,6 +27,7 @@ import {
 import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   getTokenName,
   genFormatTokenAmount,
@@ -50,6 +51,11 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
+import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
+import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -116,10 +122,12 @@ const messages = defineMessages({
 
 type Props = {|
   +selectedNetwork: $ReadOnly<NetworkRow>,
+  +selectedWallet: PublicDeriver<>,
+  +selectedExplorer: SelectedExplorer,
   +hasAnyPending: boolean,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
-  +classicTheme: boolean,
+  +isClassicTheme: boolean,
   +updateReceiver: (void | string) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
@@ -162,10 +170,46 @@ type Props = {|
     result: ?BigNumber,
   |},
   +calculateMaxAmount: void => Promise<void>,
+  +signRequest: null | ISignRequest<any>,
+  +staleTx: boolean,
+  +openTransactionSuccessDialog: void => void,
+  +sendMoneyRequest: {|
+    error: ?LocalizableError,
+    isExecuting: boolean,
+    reset: () => void,
+  |},
+  +sendMoney: (params: {|
+    password: string,
+    publicDeriver: PublicDeriver<>,
+    signRequest: ISignRequest<any>,
+    onSuccess?: void => void,
+  |}) => Promise<void>,
+  +ledgerSendError: null | LocalizableError,
+  +trezorSendError: null | LocalizableError,
+  +ledgerSend: {|
+    cancel: {| trigger: (params: void) => void |},
+    init: {| trigger: (params: void) => void |},
+    sendUsingLedgerWallet: {|
+      trigger: (params: {|
+        params: SendUsingLedgerParams,
+        publicDeriver: PublicDeriver<>,
+        onSuccess?: void => void,
+      |}) => Promise<void>,
+    |},
+  |},
+  +trezorSend: {|
+    cancel: {| trigger: (params: void) => void |},
+    sendUsingTrezor: {|
+      trigger: (params: {|
+        params: SendUsingTrezorParams,
+        publicDeriver: PublicDeriver<>,
+        onSuccess?: void => void,
+      |}) => Promise<void>,
+    |},
+  |},
 |};
 
 type State = {|
-  showMemoWarning: boolean,
   invalidMemo: boolean,
   currentStep: number,
 |};
@@ -253,7 +297,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       fields: {
         receiver: {
           label: this.context.intl.formatMessage(messages.receiverLabel),
-          placeholder: this.props.classicTheme
+          placeholder: this.props.isClassicTheme
             ? this.context.intl.formatMessage(messages.receiverHint)
             : '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
@@ -286,7 +330,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         },
         amount: {
           label: this.context.intl.formatMessage(globalMessages.amountLabel),
-          placeholder: this.props.classicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
+          placeholder: this.props.isClassicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
             return this.props.uriParams
@@ -708,7 +752,29 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           </Box>
         );
       case SEND_FORM_STEP.PREVIEW:
-        return this.props.previewStep(this.onUpdateStep.bind(this));
+        return (
+          <WalletSendPreviewStepContainer
+            signRequest={this.props.signRequest}
+            staleTx={this.props.staleTx}
+            isDefaultIncluded={this.props.isDefaultIncluded}
+            unitOfAccountSetting={this.props.unitOfAccountSetting}
+            openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
+            minAda={this.props.minAda}
+            plannedTxInfoMap={this.props.plannedTxInfoMap}
+            onUpdateStep={this.onUpdateStep.bind(this)}
+            sendMoneyRequest={this.props.sendMoneyRequest}
+            sendMoney={this.props.sendMoney}
+            getTokenInfo={this.props.getTokenInfo}
+            getCurrentPrice={this.props.getCurrentPrice}
+            isClassicTheme={this.props.isClassicTheme}
+            ledgerSendError={this.props.ledgerSendError}
+            trezorSendError={this.props.ledgerSendError}
+            ledgerSend={this.props.ledgerSend}
+            trezorSend={this.props.trezorSend}
+            selectedExplorer={this.props.selectedExplorer}
+            selectedWallet={this.props.selectedWallet}
+          />
+        );
       default:
         throw Error(`${step} is not a valid step`);
     }
