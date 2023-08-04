@@ -2,8 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
-import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import WalletSendPreviewStep from './WalletSendPreviewStep';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -11,8 +9,6 @@ import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeri
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
-import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import {
