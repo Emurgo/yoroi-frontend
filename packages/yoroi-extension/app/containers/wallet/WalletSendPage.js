@@ -177,16 +177,17 @@ class WalletSendPage extends Component<AllProps> {
           <WalletSendFormRevamp
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
             selectedWallet={publicDeriver}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer}
+            selectedToken={transactionBuilderStore.selectedToken}
             defaultToken={defaultToken}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             onSubmit={txBuilderActions.updateTentativeTx.trigger}
             totalInput={transactionBuilderStore.totalInput}
             hasAnyPending={hasAnyPending}
             isClassicTheme={profile.isClassicTheme}
+            shouldSendAll={transactionBuilderStore.shouldSendAll}
             updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
             updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
-            shouldSendAll={transactionBuilderStore.shouldSendAll}
             updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
             fee={transactionBuilderStore.fee}
             isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
@@ -198,6 +199,7 @@ class WalletSendPage extends Component<AllProps> {
             resetUriParams={this.generated.stores.loading.resetUriParams}
             memo={transactionBuilderStore.memo}
             showMemo={this.showMemo}
+            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
             onAddMemo={() =>
               this.showMemoDialog({
                 dialog: MemoNoExternalStorageDialog,
@@ -207,26 +209,24 @@ class WalletSendPage extends Component<AllProps> {
             spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
             onAddToken={txBuilderActions.addToken.trigger}
             onRemoveTokens={txBuilderActions.removeTokens.trigger}
-            selectedToken={transactionBuilderStore.selectedToken}
-            openDialog={this.openDialog}
             plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
             isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
+            openDialog={this.openDialog}
             closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
             isOpen={uiDialogs.isOpen}
+            openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
             maxSendableAmount={transactionBuilderStore.maxSendableAmount}
             signRequest={transactionBuilderStore.tentativeTx}
             staleTx={transactionBuilderStore.txMismatch}
-            openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
             sendMoneyRequest={this.generated.stores.wallets.sendMoneyRequest}
             sendMoney={this.generated.actions.wallets.sendMoney.trigger}
             ledgerSendError={this.generated.stores.substores.ada.ledgerSend.error || null}
             trezorSendError={this.generated.stores.substores.ada.trezorSend.error || null}
             ledgerSend={this.generated.actions.ada.ledgerSend}
             trezorSend={this.generated.actions.ada.trezorSend}
-            selectedExplorer={this.generated.stores.explorers.selectedExplorer}
           />
           {this.renderDialog()}
         </>

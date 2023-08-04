@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { MuiThemes, THEMES } from '../utils';
 import { ThemeProvider } from '@mui/material/styles';
 import { getDesignTokens } from '../themes/revamp-theme';
-import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
+import { CssVarsProvider } from '@mui/joy/styles';
 
 export type Modes = 'light' | 'dark';
 
@@ -30,7 +30,7 @@ function ColorModeProvider({ children, currentTheme }: any): Node {
 
   return (
     <ColorModeContext.Provider value={colorMode}>
-      <CssVarsProvider theme={extendTheme({ cssVarPrefix: 'yoroi' })}>
+      <CssVarsProvider theme={theme}>
         <ThemeProvider theme={theme}>{children}</ThemeProvider>
       </CssVarsProvider>
     </ColorModeContext.Provider>
