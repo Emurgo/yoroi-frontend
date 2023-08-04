@@ -209,7 +209,6 @@ class WalletSendPage extends Component<AllProps> {
             onAddToken={txBuilderActions.addToken.trigger}
             onRemoveTokens={txBuilderActions.removeTokens.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
-            previewStep={this.renderTxPreviewStep}
             openDialog={this.openDialog}
             plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
             isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
@@ -334,32 +333,6 @@ class WalletSendPage extends Component<AllProps> {
         staleTx={transactionBuilderStore.txMismatch}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
         openTransactionSuccessDialog={this.openTransactionSuccessDialog}
-      />
-    );
-  };
-
-  renderTxPreviewStep: (onUpdateStep: (step: number) => void) => Node = onUpdateStep => {
-    const publicDeriver = this.generated.stores.wallets.selected;
-    if (!publicDeriver)
-      throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-
-    const { transactionBuilderStore } = this.generated.stores;
-    if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.renderTxPreviewStep)}::should never happen`);
-    }
-    const signRequest = transactionBuilderStore.tentativeTx;
-
-    return (
-      <WalletSendPreviewStepContainer
-        {...this.generated.WalletSendConfirmationDialogContainerProps}
-        signRequest={signRequest}
-        staleTx={transactionBuilderStore.txMismatch}
-        isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
-        unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-        openTransactionSuccessDialog={this.openTransactionSuccessDialog}
-        minAda={transactionBuilderStore.minAda}
-        plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
-        onUpdateStep={onUpdateStep}
       />
     );
   };
@@ -793,12 +766,6 @@ class WalletSendPage extends Component<AllProps> {
           isExecuting: boolean,
           reset: () => void,
         |},
-      |},
-      ledgerSend: {|
-        error: ?LocalizableError,
-      |},
-      trezorSend: {|
-        error: ?LocalizableError,
       |},
     |},
   |} {

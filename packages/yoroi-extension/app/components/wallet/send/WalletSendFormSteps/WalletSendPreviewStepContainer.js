@@ -77,7 +77,7 @@ type Props = {|
       |}) => Promise<void>,
     |},
   |},
-  selectedExplorer: SelectedExplorer,
+  selectedExplorer: Map<number, SelectedExplorer>,
   selectedWallet: PublicDeriver<>,
 |};
 
@@ -98,13 +98,12 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
     const { signRequest, openTransactionSuccessDialog } = this.props;
     const { ledgerSend, trezorSend, sendMoney, selectedWallet } = this.props;
 
-    if (selectedWallet == null) {
-      throw new Error(`unexpected missing active wallet`);
-    }
+    if (selectedWallet == null) throw new Error(`Unexpected missing active wallet`);
+    if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
     const walletType = this._getWalletType(selectedWallet);
     if (walletType === 'ledger') {
-      await ledgerSend.sendUsingLedger.trigger({
+      await ledgerSend.sendUsingLedgerWallet.trigger({
         params: { signRequest },
         publicDeriver: selectedWallet,
         onSuccess: openTransactionSuccessDialog,
@@ -142,6 +141,7 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
 
     if (selectedWallet == null)
       throw new Error(`Active wallet required for ${nameof(WalletSendPreviewStepContainer)}`);
+    if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
     const totalInput = signRequest.totalInput();
     const fee = signRequest.fee();

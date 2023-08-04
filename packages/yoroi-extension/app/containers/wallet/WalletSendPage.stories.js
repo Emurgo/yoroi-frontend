@@ -180,6 +180,7 @@ const genBaseProps: ({|
       push: { trigger: action('push') },
       closeActiveDialog: { trigger: action('closeActiveDialog') },
     },
+    wallets: { sendMoney: { trigger: async req => action('sendMoney')(req) } },
     router: {
       goToRoute: { trigger: action('goToRoute') },
     },

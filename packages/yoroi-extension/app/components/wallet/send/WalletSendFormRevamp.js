@@ -123,7 +123,7 @@ const messages = defineMessages({
 type Props = {|
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +selectedWallet: PublicDeriver<>,
-  +selectedExplorer: SelectedExplorer,
+  +selectedExplorer: Map<number, SelectedExplorer>,
   +hasAnyPending: boolean,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
@@ -151,7 +151,6 @@ type Props = {|
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
-  +previewStep: () => Node,
   +openDialog: any => void,
   +plannedTxInfoMap: Array<{|
     token: $ReadOnly<TokenRow>,
