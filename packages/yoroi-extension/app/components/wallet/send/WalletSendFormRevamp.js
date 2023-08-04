@@ -85,8 +85,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Calculating the fee, please wait.',
   },
   memoInvalidOptional: {
-    id: 'wallet.transaction.memo.optional.invalid',
-    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
+    id: 'wallet.revamp.transaction.memo.optional.invalid',
+    defaultMessage: '!!!Memo name is too long',
   },
   willSendAll: {
     id: 'wallet.send.form.willSendAll',
@@ -500,7 +500,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         );
       case SEND_FORM_STEP.AMOUNT:
         return (
-          <div className={styles.amountStep}>
+          <Box className={styles.amountStep}>
             {isCalculatingFee && (
               <Typography
                 variant="caption1"
@@ -670,14 +670,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               )}
             </Box>
 
-            <IncludedTokens
-              tokens={tokens}
-              nfts={nfts}
-              onRemoveTokens={this.props.onRemoveTokens}
-              shouldSendAll={shouldSendAll}
-            />
-
-            <div className={styles.addButtonsWrapper}>
+            <Box
+              sx={{
+                mt: '42px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+              }}
+            >
               <Button
                 variant="tertiary"
                 color="primary"
@@ -697,8 +697,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               >
                 {intl.formatMessage(globalMessages.addNft)}
               </Button>
-            </div>
-          </div>
+            </Box>
+
+            <IncludedTokens
+              tokens={tokens}
+              nfts={nfts}
+              onRemoveTokens={this.props.onRemoveTokens}
+              shouldSendAll={shouldSendAll}
+            />
+          </Box>
         );
       case SEND_FORM_STEP.PREVIEW:
         return this.props.previewStep();

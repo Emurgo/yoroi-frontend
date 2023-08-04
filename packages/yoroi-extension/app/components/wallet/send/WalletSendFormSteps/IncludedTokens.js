@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
-import styles from './IncludedTokens.scss';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
@@ -39,6 +38,7 @@ export default class IncludedTokens extends Component<Props> {
             alignItems: 'center',
             marginBottom: '12px',
             gap: '16px',
+            position: 'relative',
           }}
           key={`${item.name}-${item.label}`}
         >
@@ -47,11 +47,10 @@ export default class IncludedTokens extends Component<Props> {
               border: '2px solid',
               borderRadius: '8px',
               borderColor: 'grayscale.100',
-              width: '100%',
               display: 'flex',
               alignItems: 'center',
               padding: '11px 16px',
-              maxWidth: '246px',
+              width: '100%',
             }}
           >
             {item.name && (
@@ -125,7 +124,14 @@ export default class IncludedTokens extends Component<Props> {
             )}
           </Box>
 
-          <div>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              right: '-48px',
+            }}
+          >
             {!this.props.shouldSendAll && (
               <Box
                 sx={{ bgcolor: 'grayscale.50', width: '32px', height: '32px', borderRadius: '50%' }}
@@ -136,7 +142,7 @@ export default class IncludedTokens extends Component<Props> {
                 <RemoveIcon />
               </Box>
             )}
-          </div>
+          </Box>
         </Box>
       );
     });
@@ -146,20 +152,49 @@ export default class IncludedTokens extends Component<Props> {
     const { intl } = this.context;
     const { tokens, nfts } = this.props;
     return (
-      <div className={styles.component}>
+      <Box mt="24px">
         {tokens.length > 0 && (
-          <div>
-            <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
-            <div>{this.renderItems(tokens)}</div>
-          </div>
+          <Box mb={nfts.length > 0 ? '24px' : '0px'}>
+            <Typography
+              variant="caption1"
+              color="grey.900"
+              mb="8px"
+              sx={{ display: 'inline-block' }}
+            >
+              {intl.formatMessage(globalMessages.tokens)}
+            </Typography>
+            <Box>{this.renderItems(tokens)}</Box>
+          </Box>
         )}
+
         {nfts.length > 0 && (
-          <div>
-            <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
-            <div>{this.renderItems(nfts)}</div>
-          </div>
+          <Box>
+            <Typography
+              variant="caption1"
+              color="grey.900"
+              mb="8px"
+              sx={{ display: 'inline-block' }}
+            >
+              {intl.formatMessage(globalMessages.nfts)}
+            </Typography>
+            <Box>{this.renderItems(nfts)}</Box>
+          </Box>
         )}
-      </div>
+      </Box>
+      // <div className={styles.component}>
+      // {tokens.length > 0 && (
+      //   <div>
+      //     <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
+      //     <div>{this.renderItems(tokens)}</div>
+      //   </div>
+      // )}
+      // {nfts.length > 0 && (
+      //   <div>
+      //     <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
+      //     <div>{this.renderItems(nfts)}</div>
+      //   </div>
+      // )}
+      // </div>
     );
   }
 }
