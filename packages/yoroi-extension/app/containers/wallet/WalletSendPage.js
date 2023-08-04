@@ -327,7 +327,7 @@ class WalletSendPage extends Component<AllProps> {
     );
   };
 
-  renderTxPreviewStep: () => Node = () => {
+  renderTxPreviewStep: (onUpdateStep: (step: number) => void) => Node = onUpdateStep => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver)
       throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
@@ -348,6 +348,7 @@ class WalletSendPage extends Component<AllProps> {
         openTransactionSuccessDialog={this.openTransactionSuccessDialog}
         minAda={transactionBuilderStore.minAda}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+        onUpdateStep={onUpdateStep}
       />
     );
   };

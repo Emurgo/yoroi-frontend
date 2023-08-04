@@ -13,10 +13,11 @@ import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/u
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
 import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
-import type { TokenRow, } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken } from '../../../../api/common/lib/MultiToken';
 import {
-  isLedgerNanoWallet, isTrezorTWallet
+  isLedgerNanoWallet,
+  isTrezorTWallet,
 } from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { SendUsingLedgerParams } from '../../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../../actions/ada/trezor-send-actions';
@@ -38,7 +39,8 @@ type DialogProps = {|
     amount?: string,
     shouldSendAll?: boolean,
   |}>,
-  +minAda: ?MultiToken
+  +minAda: ?MultiToken,
+  +onUpdateStep: (step: number) => void,
 |};
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -48,18 +50,14 @@ type Props = {|
 
 @observer
 export default class WalletSendPreviewStepContainer extends Component<Props> {
-
   componentWillUnmount() {
     this.generated.stores.wallets.sendMoneyRequest.reset();
     this.generated.actions.ada.ledgerSend.cancel.trigger();
     this.generated.actions.ada.trezorSend.cancel.trigger();
   }
 
-  onSubmit: {| password: string |} => Promise<void> = async ({ password }) => {
-    const {
-      signRequest,
-      openTransactionSuccessDialog,
-    } = this.props;
+  onSubmit: ({| password: string |}) => Promise<void> = async ({ password }) => {
+    const { signRequest, openTransactionSuccessDialog } = this.props;
 
     const { ledgerSend, trezorSend } = this.generated.actions.ada;
     const { sendMoney } = this.generated.actions.wallets;
@@ -70,7 +68,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       throw new Error(`unexpected missing active wallet`);
     }
 
-    const walletType = this. _getWalletType(publicDeriver);
+    const walletType = this._getWalletType(publicDeriver);
     if (walletType === 'ledger') {
       await ledgerSend.sendUsingLedger.trigger({
         params: { signRequest },
@@ -82,8 +80,9 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         params: { signRequest },
         publicDeriver,
         onSuccess: openTransactionSuccessDialog,
-      })
-    } else { // walletType === 'mnemonic'
+      });
+    } else {
+      // walletType === 'mnemonic'
       await sendMoney.trigger({
         signRequest,
         password,
@@ -91,19 +90,17 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         onSuccess: openTransactionSuccessDialog,
       });
     }
-    trackSend()
-  }
+    trackSend();
+  };
 
   render(): Node {
-    const {
-      signRequest,
-      unitOfAccountSetting,
-    } = this.props;
+    const { signRequest, unitOfAccountSetting, onUpdateStep } = this.props;
     const { stores } = this.generated;
     const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
 
-    if (publicDeriver == null) throw new Error(`Active wallet required for ${nameof(WalletSendPreviewStepContainer)}`);
+    if (publicDeriver == null)
+      throw new Error(`Active wallet required for ${nameof(WalletSendPreviewStepContainer)}`);
 
     const { sendMoneyRequest } = stores.wallets;
 
@@ -112,19 +109,20 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     const size = signRequest.size?.();
     const fullSize = size ? size.full : 0;
     const maxOutput = size ? Math.max(...size.outputs) : 0;
-    const showSize = size != null && (
-      size.full > (MAX_TX_BYTES - 1000)
-      || maxOutput > (MAX_VALUE_BYTES - 1000)
-    );
+    const showSize =
+      size != null && (size.full > MAX_TX_BYTES - 1000 || maxOutput > MAX_VALUE_BYTES - 1000);
     const receivers = signRequest.receivers(false);
 
     return (
       <WalletSendPreviewStep
         staleTx={this.props.staleTx}
-        selectedExplorer={stores.explorers.selectedExplorer
-          .get(
+        selectedExplorer={
+          stores.explorers.selectedExplorer.get(
             publicDeriver.getParent().getNetworkInfo().NetworkId
-          ) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          ) ??
+          (() => {
+            throw new Error('No explorer for wallet network');
+          })()
         }
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
@@ -132,13 +130,17 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         receivers={receivers}
         totalAmount={totalInput}
         transactionFee={fee}
-        transactionSize={showSize ? `${fullSize}/${MAX_TX_BYTES} (Biggest output: ${maxOutput}/${MAX_VALUE_BYTES})` : null}
+        transactionSize={
+          showSize
+            ? `${fullSize}/${MAX_TX_BYTES} (Biggest output: ${maxOutput}/${MAX_VALUE_BYTES})`
+            : null
+        }
         onSubmit={this.onSubmit}
         isSubmitting={sendMoneyRequest.isExecuting}
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
-        addressToDisplayString={
-          addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+        addressToDisplayString={addr =>
+          addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
         }
         selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
         isDefaultIncluded={this.props.isDefaultIncluded}
@@ -147,6 +149,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         walletType={this._getWalletType(publicDeriver)}
         ledgerSendError={this.generated.stores.ledgerSend.error}
         trezorSendError={this.generated.stores.trezorSend.error}
+        onUpdateStep={onUpdateStep}
       />
     );
   }
@@ -172,13 +175,13 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
             publicDeriver: PublicDeriver<>,
             signRequest: ISignRequest<any>,
             onSuccess?: void => void,
-          |}) => Promise<void>
+          |}) => Promise<void>,
         |},
       |},
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
+          trigger: (params: void) => void,
+        |},
       |},
       ada: {|
         ledgerSend: {|
@@ -187,7 +190,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
               params: SendUsingLedgerParams,
               publicDeriver: PublicDeriver<>,
               onSuccess?: void => void,
-            |}) => Promise<void>
+            |}) => Promise<void>,
           |},
           cancel: {| trigger: (params: void) => void |},
         |},
@@ -197,7 +200,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
               params: SendUsingTrezorParams,
               publicDeriver: PublicDeriver<>,
               onSuccess?: void => void,
-            |}) => Promise<void>
+            |}) => Promise<void>,
           |},
           cancel: {| trigger: (params: void) => void |},
         |},
@@ -205,10 +208,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (
-          from: string,
-          to: string
-        ) => ?string,
+        getCurrentPrice: (from: string, to: string) => ?string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -223,17 +223,17 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         sendMoneyRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
-          reset: () => void
+          reset: () => void,
         |},
-        selected: null | PublicDeriver<>
+        selected: null | PublicDeriver<>,
       |},
       ledgerSend: {|
-        error: ?LocalizableError
+        error: ?LocalizableError,
       |},
       trezorSend: {|
-        error: ?LocalizableError
+        error: ?LocalizableError,
       |},
-    |}
+    |},
   |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;

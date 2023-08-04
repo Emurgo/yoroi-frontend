@@ -708,7 +708,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           </Box>
         );
       case SEND_FORM_STEP.PREVIEW:
-        return this.props.previewStep();
+        return this.props.previewStep(this.onUpdateStep.bind(this));
       default:
         throw Error(`${step} is not a valid step`);
     }
@@ -812,7 +812,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     );
   }
 
-  onUpdateStep(step: number) {
+  onUpdateStep(step: number): void {
     if (step > 3) throw new Error('Invalid Step number.');
     this.setState({ currentStep: step });
   }

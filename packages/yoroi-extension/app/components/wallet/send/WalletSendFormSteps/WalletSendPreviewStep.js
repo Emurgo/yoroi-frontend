@@ -18,7 +18,7 @@ import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import { truncateToken } from '../../../../utils/formatters';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
-import { Button, Link, Tooltip, Typography } from '@mui/material';
+import { Button, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -35,6 +35,7 @@ import WarningBox from '../../../widgets/WarningBox';
 import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import ErrorBlock from '../../../widgets/ErrorBlock';
+import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 
 type Props = {|
   +staleTx: boolean,
@@ -62,6 +63,7 @@ type Props = {|
   +walletType: 'trezor' | 'ledger' | 'mnemonic',
   +ledgerSendError: ?LocalizableError,
   +trezorSendError: ?LocalizableError,
+  +onUpdateStep: (step: number) => void,
 |};
 
 type State = {|
@@ -486,7 +488,6 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
           {walletType === 'mnemonic' && (
             <TextField
               type="password"
-              className={styles.walletPassword}
               {...walletPasswordField.bind()}
               disabled={isSubmitting}
               onChange={e => {
@@ -494,20 +495,34 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                 walletPasswordField.set('value', e.target.value);
               }}
               error={walletPasswordField.error || passwordError}
+              sx={{ mt: '24px' }}
             />
           )}
         </div>
 
         <div>{this.renderHWWalletInfo()}</div>
 
-        <Button
-          variant="primary"
-          onClick={this.submit.bind(this)}
-          disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
-          sx={{ width: '128px' }}
-        >
-          {isSubmitting ? <LoadingSpinner light /> : intl.formatMessage(this.getSendButtonText())}
-        </Button>
+        <Stack gap="24px" alignItems="center" justifyContent="center" direction="row" mt="24px">
+          <Button
+            key="amount-back"
+            variant="secondary"
+            size="medium"
+            onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
+            sx={{ width: '128px' }}
+          >
+            {intl.formatMessage(globalMessages.backButtonLabel)}
+          </Button>
+          <Button
+            key="amount-next"
+            variant="primary"
+            size="medium"
+            sx={{ width: '128px' }}
+            onClick={this.submit.bind(this)}
+            disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
+          >
+            {isSubmitting ? <LoadingSpinner light /> : intl.formatMessage(this.getSendButtonText())}
+          </Button>
+        </Stack>
       </div>
     );
   }
