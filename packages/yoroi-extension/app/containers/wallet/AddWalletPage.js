@@ -27,7 +27,6 @@ import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDia
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import type { GeneratedData as WalletRestoreDialogContainerData } from './dialogs/WalletRestoreDialogContainer';
 import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
-import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
 
 import WalletConnectHWOptionDialogContainer from './dialogs/WalletConnectHWOptionDialogContainer';
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
@@ -36,7 +35,6 @@ import type { GeneratedData as WalletTrezorConnectDialogContainerData } from './
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
 
-import WalletEraOptionDialogContainer from './dialogs/WalletEraOptionDialogContainer';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import WalletPaperDialogContainer from './dialogs/WalletPaperDialogContainer';
 import type { GeneratedData as WalletPaperDialogContainerData } from './dialogs/WalletPaperDialogContainer';
@@ -54,10 +52,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import {
-  networks,
-  isCardanoHaskell,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
@@ -183,19 +178,14 @@ class AddWalletPage extends Component<AllProps> {
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
           onRestore15={() => {
-            if (isCardanoHaskell(selectedNetwork)) {
-              return actions.dialogs.push.trigger({
-                dialog: WalletEraOptionDialogContainer,
-              });
-            }
             return actions.dialogs.push.trigger({
-              dialog: WalletRestoreDialog,
-              params: { restoreType: { type: 'bip44', extra: undefined, length: 15 } },
+              dialog: WalletRestoreDialogContainer,
+              params: { restoreType: { type: 'cip1852', extra: undefined, length: 15 } },
             });
           }}
           onRestore24={() => {
             actions.dialogs.push.trigger({
-              dialog: WalletRestoreDialog,
+              dialog: WalletRestoreDialogContainer,
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
             });
           }}
@@ -205,40 +195,13 @@ class AddWalletPage extends Component<AllProps> {
               ? undefined
               : () =>
                   actions.dialogs.push.trigger({
-                    dialog: WalletRestoreDialog,
+                    dialog: WalletRestoreDialogContainer,
                     params: { restoreType: { type: 'bip44', extra: 'paper', length: 21 } },
                   })
           }
         />
       );
-    } else if (uiDialogs.isOpen(WalletEraOptionDialogContainer)) {
-      if (selectedNetwork === undefined) {
-        throw new Error(`${nameof(AddWalletPage)} no API selected`);
-      }
-      const hardware = uiDialogs.getParam<'trezor' | 'ledger'>('hardware');
-      const onEra = (era: 'bip44' | 'cip1852') => {
-        if (hardware == null) {
-          return actions.dialogs.push.trigger({
-            dialog: WalletRestoreDialog,
-            params: { restoreType: { type: era, extra: undefined, length: 15 } },
-          });
-        }
-        if (hardware === 'ledger') {
-          openLedgerConnectDialog(era);
-        }
-        if (hardware === 'trezor') {
-          openTrezorConnectDialog(era);
-        }
-      };
-      activeDialog = (
-        <WalletEraOptionDialogContainer
-          onClose={this.onClose}
-          onByron={() => onEra('bip44')}
-          onShelley={() => onEra('cip1852')}
-          onBack={() => actions.dialogs.pop.trigger()}
-        />
-      );
-    } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
+    } else if (uiDialogs.isOpen(WalletRestoreDialogContainer)) {
       const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
       if (mode == null)
         throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
@@ -254,18 +217,8 @@ class AddWalletPage extends Component<AllProps> {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
           onClose={this.onClose}
-          onTrezor={() =>
-            actions.dialogs.push.trigger({
-              dialog: WalletEraOptionDialogContainer,
-              params: { hardware: 'trezor' },
-            })
-          }
-          onLedger={() =>
-            actions.dialogs.push.trigger({
-              dialog: WalletEraOptionDialogContainer,
-              params: { hardware: 'ledger' },
-            })
-          }
+          onTrezor={() => openTrezorConnectDialog('cip1852')}
+          onLedger={() => openLedgerConnectDialog('cip1852')}
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
