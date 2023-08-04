@@ -6,7 +6,7 @@
   var connectRequests = [];
 
   window.addEventListener("message", function(event) {
-    if (event.data.type == "connector_connected") {
+    if (event.data.type === "connector_connected") {
       if (event.data.err !== undefined) {
         connectRequests.forEach(promise => promise.reject(event.data.err));
       } else {
@@ -48,7 +48,7 @@
   var cardanoRpcResolver = new Map();
 
   window.addEventListener("message", function(event) {
-    if (event.data.type == "connector_rpc_response" && event.data.protocol === "cardano") {
+    if (event.data.type === "connector_rpc_response" && event.data.protocol === "cardano") {
       console.debug("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
       const rpcPromise = cardanoRpcResolver.get(event.data.uid);
       if (rpcPromise !== undefined) {

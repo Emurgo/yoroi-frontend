@@ -21,6 +21,10 @@ function markInjectionInDocument(container) {
 
 let resolveScriptedInject;
 
+// <TODO:IMPROVEMENT>
+// The function been changed to async, but it's still used to return a boolean flag
+// Ideally it needs to be updated to use proper reject
+// But all callers then need to update to use proper `then`, or `onSuccess` and `onFailure`
 async function injectIntoPage(code) {
   return new Promise((resolve, reject) => {
     try {
