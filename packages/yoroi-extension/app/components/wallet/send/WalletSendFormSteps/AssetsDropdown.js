@@ -69,6 +69,10 @@ export default class AssetsDropdown extends Component<Props, State> {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              '& img': {
+                borderRadius: '8px',
+                overflow: 'hidden',
+              },
             }}
           >
             <NftImage imageUrl={nft.image} name={nft.name} width="41px" height="44px" />

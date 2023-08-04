@@ -289,7 +289,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <Tooltip
               placement="top"
               title={
-                <Typography>
+                <Typography textAlign="center">
                   <FormattedMessage
                     {...messages.minAdaHelp}
                     values={{ moreDetails: moreDetailsLink }}
