@@ -1032,7 +1032,7 @@ export const memoMessages: * = defineMessages({
   },
   memoWarning: {
     id: 'wallet.send.form.memoWarning',
-    defaultMessage: '!!!Memos are stored localy only',
+    defaultMessage: '!!!(Optional) Memo is stored locally',
   },
 });
 export const connectorMessages: * = defineMessages({

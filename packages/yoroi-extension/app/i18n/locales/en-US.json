@@ -842,7 +842,7 @@
   "wallet.send.form.errors.invalidAmount": "Invalid amount. Please retype.",
   "wallet.send.form.errors.tooSmallUtxo": "{minUtxo} {ticker} is minimum.",
   "wallet.send.form.max": "MAX",
-  "wallet.send.form.memoWarning": "Memos are stored localy only",
+  "wallet.send.form.memoWarning": "(Optional) Memo is stored locally",
   "wallet.send.form.nAssets": "{number} assets",
   "wallet.send.form.preview.label": "Preview",
   "wallet.send.form.preview.minAdaHelp": "Minimum ADA required to send these assets. {moreDetails}",
