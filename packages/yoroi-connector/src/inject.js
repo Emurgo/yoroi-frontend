@@ -33,10 +33,10 @@ async function injectIntoPage(code) {
         container.removeChild(scriptTag);
         console.log(`[yoroi/${YOROI_TYPE}] dapp-connector is successfully injected into ${location.hostname}`);
         markInjectionInDocument(container);
-        return true;
+        resolve(true);
     } catch (e) {
         console.error(`[yoroi/${YOROI_TYPE}] injection failed!`, e);
-        reject(e);
+        resolve(false);
     }
   });
 }
@@ -193,7 +193,7 @@ async function handleConnectorRpcRequest(event) {
         listenToBackgroundServiceWorker();
     }
     try {
-        chrome.runtime.sendMessage(event.data);
+        await chrome.runtime.sendMessage(event.data);
     } catch (e) {
         console.error(`Could not send RPC to Yoroi: ${e}`);
         window.postMessage({
@@ -209,13 +209,13 @@ async function handleConnectorRpcRequest(event) {
     }
 }
 
-function connectorEventListener(event) {
+async function connectorEventListener(event) {
     const dataType = event.data.type;
     if (dataType === "connector_rpc_request") {
-        handleConnectorRpcRequest(event);
+        await handleConnectorRpcRequest(event);
     } else if (dataType === "connector_connect_request/ergo" || dataType === 'connector_connect_request/cardano') {
         const protocol = dataType.split('/')[1];
-        handleConnectorConnectRequest(event, protocol);
+        await handleConnectorConnectRequest(event, protocol);
     } else if (dataType === 'scripted_injected') {
         resolveScriptedInject();
     }
