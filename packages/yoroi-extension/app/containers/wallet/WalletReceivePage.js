@@ -13,7 +13,6 @@ import type {
 } from '../../stores/stateless/addressStores';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import type { InjectedLayoutProps } from '../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';

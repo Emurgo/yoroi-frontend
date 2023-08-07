@@ -137,7 +137,9 @@ export default class StandardHeaderRevamp extends Component<Props> {
           width="100%"
           borderRadius="16px"
           height="min-content"
-          sx={{ bgcolor: 'primary.100' }}
+          sx={{
+            background: theme => theme.palette.gradients['blue-green-bg'],
+          }}
         >
           <Box
             alignItems="flex-start"
@@ -153,7 +155,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
               },
             }}
           >
-            <QrCodeWrapper fgColor="#000" value={walletAddress} size={137} />
+            <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} />
           </Box>
         </Box>
       </Box>
