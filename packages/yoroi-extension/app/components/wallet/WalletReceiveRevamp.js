@@ -274,7 +274,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
     }
 
     return (
-      <Box pl="24px" className={styles.component}>
+      <Box className={styles.component} pl="24px">
         {this.getHierarchy()}
         {this.props.header}
         {walletReceiveContent}

@@ -129,33 +129,32 @@ export default class StandardHeaderRevamp extends Component<Props> {
           {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
         </Box>
 
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          py="18px"
-          width="100%"
-          borderRadius="16px"
-          height="min-content"
-          sx={{
-            background: theme => theme.palette.gradients['blue-green-bg'],
-          }}
-        >
+        <Box display="flex" justifyContent="center" alignItems="center" width="100%">
           <Box
-            alignItems="flex-start"
-            display="flex"
-            mx="auto"
+            py="16px"
+            px="130px"
+            borderRadius="16px"
+            height="min-content"
             sx={{
-              '& canvas': {
-                border: '16px solid',
-                borderRadius: '8px',
-                borderColor: 'common.white',
-                boxSizing: 'content-box',
-                bgcolor: 'common.white',
-              },
+              background: theme => theme.palette.gradients['blue-green-bg'],
             }}
           >
-            <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} />
+            <Box
+              alignItems="flex-start"
+              display="flex"
+              mx="auto"
+              sx={{
+                '& canvas': {
+                  border: '16px solid',
+                  borderRadius: '8px',
+                  borderColor: 'common.white',
+                  boxSizing: 'content-box',
+                  bgcolor: 'common.white',
+                },
+              }}
+            >
+              <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} />
+            </Box>
           </Box>
         </Box>
       </Box>
