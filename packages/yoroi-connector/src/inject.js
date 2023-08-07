@@ -37,7 +37,6 @@ async function injectIntoPage(code) {
         container.removeChild(scriptTag);
         console.log(`[yoroi/${YOROI_TYPE}] dapp-connector is successfully injected into ${location.hostname}`);
         markInjectionInDocument(container);
-        resolve(true);
     } catch (e) {
         console.error(`[yoroi/${YOROI_TYPE}] injection failed!`, e);
         resolve(false);
