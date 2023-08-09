@@ -26,6 +26,7 @@ import { ROUTES } from '../../../routes-config';
 import { useState, useEffect } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 import { urlResolveIpfs } from '../../../coreUtils';
+import classNames from 'classnames';
 
 type Props = {|
   list: Array<{| id: string, name: string, image: string | null |}>,
@@ -100,27 +101,14 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         </Typography>
         <Box display="flex" alignItems="center">
           <Stack direction="row" spacing={1} marginRight="30px">
-            {listColumnViews.map(Column => (
+            {listColumnViews.map(({ count, Icon, imageDims }) => (
               <Button
-                key={Column.count}
-                onClick={() => setColumns(Column)}
-                sx={{
-                  width: '40px',
-                  height: '40px',
-                  minHeight: '40px',
-                  minWidth: '40px',
-                  padding: '10px',
-                  backgroundColor:
-                    Column.count === columns.count ? 'var(--yoroi-palette-gray-200)' : 'none',
-                  '&:hover': {
-                    backgroundColor:
-                      Column.count !== columns.count
-                        ? 'var(--yoroi-palette-gray-50)'
-                        : 'var(--yoroi-palette-gray-200)',
-                  },
-                }}
+                key={count}
+                onClick={() => setColumns({ count, Icon, imageDims })}
+                className={classNames(count === columns.count && 'active')}
+                variant="segmented"
               >
-                <Column.Icon />
+                <Icon />
               </Button>
             ))}
           </Stack>
