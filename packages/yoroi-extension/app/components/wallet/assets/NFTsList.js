@@ -151,7 +151,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         </Stack>
       ) : (
         <ImageList
-          sx={{ width: '100%', paddingBottom: '30px', maxWidth: '1248px', mx: 'auto' }}
+          sx={{ width: '100%', paddingBottom: '30px', _maxWidth: '1248px', mx: 'auto' }}
           cols={columns.count}
           gap={24}
         >

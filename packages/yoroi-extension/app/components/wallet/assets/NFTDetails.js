@@ -124,7 +124,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -149,19 +149,22 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
       </Box>
       <Stack
         direction="row"
+        alignItems="start"
         sx={{
           margin: '0 auto',
           minHeight: '520px',
-          marginY: '21px',
+          mb: '21px',
           backgroundColor: 'var(--yoroi-palette-common-white)',
           borderRadius: '8px',
-          overflowX: 'auto',
+          height: '100%',
         }}
       >
         <ImageItem
           sx={{
             cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
             padding: below1400 ? '10px' : '24px',
+            paddingLeft: '0px',
+            paddingTop: '24px',
           }}
           onClick={() => nftInfo.image !== null && setOpen(true)}
         >
@@ -172,39 +175,44 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             height="510px"
           />
         </ImageItem>
-        <Box flex={1} sx={{ paddingTop: below1400 ? '10px' : '24px', paddingBottom: '22px' }}>
-          <Stack
-            justifyContent="space-between"
-            flexDirection="row"
-            sx={{
-              paddingBottom: '22px',
-              px: '24px',
-            }}
-          >
-            <TruncatedText
-              variant="h2"
-              sx={{ width: below1400 ? '200px' : '400px' }}
-              color="var(--yoroi-palette-gray-900)"
+        <Box flex={1} sx={{ paddingTop: '24px', paddingBottom: '22px' }}>
+          <Box>
+            <Stack
+              justifyContent="space-between"
+              flexDirection="row"
+              sx={{
+                paddingBottom: '22px',
+                px: '24px',
+                height: '100%',
+              }}
             >
-              {nftInfo.name}
-            </TruncatedText>
-
-            <Stack direction="row" spacing={1}>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
-                <IconButton
-                  aria-label="Previous"
-                  sx={{ transform: 'rotate(180deg)', width: '32px' }}
+              <Box>
+                <TruncatedText
+                  variant="h2"
+                  sx={{ width: below1400 ? '200px' : '400px' }}
+                  color="var(--yoroi-palette-gray-900)"
                 >
-                  <Chevron />
-                </IconButton>
-              </Link>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
-                <IconButton aria-label="Next" sx={{ width: '32px' }}>
-                  <Chevron />
-                </IconButton>
-              </Link>
+                  {nftInfo.name}
+                </TruncatedText>
+              </Box>
+
+              <Stack direction="row" spacing={1}>
+                <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
+                  <IconButton
+                    aria-label="Previous"
+                    sx={{ transform: 'rotate(180deg)', width: '32px' }}
+                  >
+                    <Chevron />
+                  </IconButton>
+                </Link>
+                <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
+                  <IconButton aria-label="Next" sx={{ width: '32px' }}>
+                    <Chevron />
+                  </IconButton>
+                </Link>
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
           <TabContext value={activeTab}>
             <Box>
               <TabList
@@ -299,9 +307,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 boxShadow: 'none',
                 bgcolor: 'transparent',
                 height: '100%',
-                maxHeight: '400px',
                 overflow: 'auto',
-                width: '600px',
               }}
               value={tabs[1].id}
             >
