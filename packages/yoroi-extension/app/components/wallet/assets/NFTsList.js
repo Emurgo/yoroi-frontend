@@ -150,7 +150,11 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <ImageList sx={{ width: '100%', paddingBottom: '30px' }} cols={columns.count} gap={24}>
+        <ImageList
+          sx={{ width: '100%', paddingBottom: '30px', maxWidth: '1248px', mx: 'auto' }}
+          cols={columns.count}
+          gap={24}
+        >
           {nftList.map(nft => {
             return (
               <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
