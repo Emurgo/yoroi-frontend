@@ -2,7 +2,16 @@
 import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
-import { Link as LinkMui, Typography, Stack, Tab, Modal, Button, IconButton } from '@mui/material';
+import {
+  Link as LinkMui,
+  Typography,
+  Stack,
+  Tab,
+  Modal,
+  Button,
+  IconButton,
+  Grid,
+} from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -147,35 +156,46 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           </Box>
         </Typography>
       </Box>
-      <Stack
-        direction="row"
-        alignItems="start"
+      <Grid
+        container
         sx={{
           margin: '0 auto',
           minHeight: '520px',
           mb: '21px',
-          backgroundColor: 'var(--yoroi-palette-common-white)',
+          backgroundColor: 'common.white',
           borderRadius: '8px',
           height: '100%',
         }}
       >
-        <ImageItem
+        <Grid item xs={4}>
+          <ImageItem
+            sx={{
+              cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
+              paddingTop: '24px',
+              display: 'block',
+              img: {
+                objectFit: 'unset',
+              },
+            }}
+            onClick={() => nftInfo.image !== null && setOpen(true)}
+          >
+            <NftImage
+              imageUrl={nftInfo.image}
+              name={nftInfo.name || '-'}
+              width="100%"
+              height="auto"
+            />
+          </ImageItem>
+        </Grid>
+
+        <Grid
+          item
+          xs={8}
           sx={{
-            cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
-            padding: below1400 ? '10px' : '24px',
-            paddingLeft: '0px',
             paddingTop: '24px',
+            paddingBottom: '22px',
           }}
-          onClick={() => nftInfo.image !== null && setOpen(true)}
         >
-          <NftImage
-            imageUrl={nftInfo.image}
-            name={nftInfo.name || '-'}
-            width="532px"
-            height="510px"
-          />
-        </ImageItem>
-        <Box flex={1} sx={{ paddingTop: '24px', paddingBottom: '22px' }}>
           <Box>
             <Stack
               justifyContent="space-between"
@@ -222,6 +242,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   marginX: '24px',
                   borderBottom: 1,
                   borderColor: 'divider',
+                  '.MuiTab-root': {
+                    paddingLeft: '0px',
+                  },
                 }}
                 onChange={(_, newValue) => setActiveTab(newValue)}
                 aria-label="NFTs tabs"
@@ -236,6 +259,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                       marginRight: id === tabs[0].id && '24px',
                       textTransform: 'none',
                       fontWeight: 500,
+                      paddingLeft: '0px',
+                      '.MuiTab-root': {
+                        paddingLeft: '0px',
+                      },
                     }}
                     label={intl.formatMessage(label)}
                     value={id}
@@ -331,8 +358,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               </Typography>
             </TabPanel>
           </TabContext>
-        </Box>
-      </Stack>
+        </Grid>
+      </Grid>
       <Modal
         onClose={onClose}
         open={open}

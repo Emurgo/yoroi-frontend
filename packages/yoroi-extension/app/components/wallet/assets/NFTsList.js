@@ -227,8 +227,9 @@ export function NftImage({
 
   if (loading) return <Skeleton variant="rectangular" animation="wave" sx={{ width, height }} />;
   return (
-    <img
-      style={{
+    <Box
+      component="img"
+      sx={{
         width,
         height,
         minWidth: width,
@@ -256,7 +257,6 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
         <Typography
           mt="16px"
           sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-          minHeight="48px"
           color="grayscale.900"
         >
           {name}
