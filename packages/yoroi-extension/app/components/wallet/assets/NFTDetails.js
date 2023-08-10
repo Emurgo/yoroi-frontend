@@ -133,7 +133,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box>
+    <Box sx={{ height: '101vh' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -158,6 +158,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
       </Box>
       <Grid
         container
+        columns={10}
         sx={{
           margin: '0 auto',
           minHeight: '520px',
@@ -171,7 +172,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           <ImageItem
             sx={{
               cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
-              paddingTop: '24px',
+              paddingY: '24px',
               display: 'block',
               img: {
                 objectFit: 'unset',
@@ -190,7 +191,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
         <Grid
           item
-          xs={8}
+          xs={6}
           sx={{
             paddingTop: '24px',
             paddingBottom: '22px',
