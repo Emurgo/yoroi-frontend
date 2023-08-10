@@ -152,7 +152,13 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         <Grid container columns={columns.count} spacing="24px">
           {nftList.map(nft => {
             return (
-              <Grid item xs={1}>
+              <Grid
+                item
+                xs={1}
+                sx={{
+                  aspectRatio: '1/1',
+                }}
+              >
                 <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
                   <NftCardImage ipfsUrl={nft.image} name={nft.name} />
                 </SLink>
