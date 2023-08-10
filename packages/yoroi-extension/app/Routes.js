@@ -38,6 +38,8 @@ const TermsOfUsePagePromise = () => import('./containers/profile/TermsOfUsePage'
 const TermsOfUsePage = React.lazy(TermsOfUsePagePromise);
 const UriPromptPagePromise = () => import('./containers/profile/UriPromptPage');
 const UriPromptPage = React.lazy(UriPromptPagePromise);
+const OptForAnalyticsPagePromise = () => import('./containers/profile/OptForAnalyticsPage');
+const OptForAnalyticsPage = React.lazy(OptForAnalyticsPagePromise);
 
 // SETTINGS
 const GeneralSettingsPagePromise = () =>
@@ -57,6 +59,9 @@ const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
 const SupportSettingsPagePromise = () =>
   import('./containers/settings/categories/SupportSettingsPage');
 const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
+const AnalyticsSettingsPagePromise = () =>
+  import('./containers/settings/categories/AnalyticsSettingsPage');
+const AnalyticsSettingsPage = React.lazy(AnalyticsSettingsPagePromise);
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
@@ -162,6 +167,8 @@ export const LazyLoadPromises: Array<() => any> = [
   ConnectedWebsitesPagePromise,
   YoroiPalettePagePromise,
   YoroiThemesPagePromise,
+  OptForAnalyticsPagePromise,
+  AnalyticsSettingsPagePromise,
 ];
 
 // populated by ConfigWebpackPlugin
@@ -200,6 +207,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.PROFILE.URI_PROMPT}
         component={props => <UriPromptPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
+        component={props => <OptForAnalyticsPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
@@ -396,6 +408,13 @@ const SettingsSubpages = (stores, actions) => (
       path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
       component={props => (
         <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />
+      )}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.ANALYTICS}
+      component={props => (
+        <AnalyticsSettingsPage {...props} stores={stores} actions={actions} />
       )}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />

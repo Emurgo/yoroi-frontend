@@ -31,6 +31,7 @@ export const ROUTES = {
     TERMS_OF_USE: '/profile/terms-of-use',
     COMPLEXITY_LEVEL: '/profile/complexity-level',
     URI_PROMPT: '/profile/uri-prompt',
+    OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
   SWITCH: '/switch',
   WALLETS: {
@@ -60,6 +61,7 @@ export const ROUTES = {
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
     LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
+    ANALYTICS: '/settings/analytics',
   },
   TRANSFER: {
     ROOT: '/transfer',
