@@ -2,7 +2,7 @@
 
 const RevampTabs = {
   styleOverrides: {
-    root: {
+    root: ({ theme }) => ({
       borderBottom: 'none',
       borderTopLeftRadius: 8,
       borderTopRightRadius: 8,
@@ -17,9 +17,9 @@ const RevampTabs = {
         textTransform: 'capitalize',
         ':hover': { color: 'primary.600' },
       },
-      '& .Mui-selected ': { fontWeight: 500, color: 'primary.600' },
-      '& .Mui-disabled': { color: 'grayscale.400' },
-    },
+      '& .Mui-selected ': { fontWeight: 500, color: theme.palette.primary[600] },
+      '& .Mui-disabled': { color: theme.palette.grayscale[400] },
+    }),
   },
   defaultProps: {
     indicatorColor: 'primary.main',
