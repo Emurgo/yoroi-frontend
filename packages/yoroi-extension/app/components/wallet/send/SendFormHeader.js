@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
 import Stepper from '../../common/stepper/Stepper';
 
 type Props = {|
@@ -20,11 +19,15 @@ const messages = defineMessages({
     id: 'wallet.send.form.confirmTx',
     defaultMessage: '!!!Confirm transaction',
   },
+  addAssets: {
+    id: 'wallet.send.form.addAssets',
+    defaultMessage: '!!!Add assets',
+  },
 });
 
 const TABS = [
   { message: messages.receiver, stepId: '1' },
-  { message: globalMessages.amount, stepId: '2' },
+  { message: messages.addAssets, stepId: '2' },
   { message: messages.confirmTx, stepId: '3' },
 ];
 

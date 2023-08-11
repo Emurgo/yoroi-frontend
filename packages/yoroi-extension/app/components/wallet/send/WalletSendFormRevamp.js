@@ -689,7 +689,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   sx={{
                     margin: '16px 16px 0px 16px',
                     pt: '16px',
-                    color: 'grey.400',
+                    color: 'grayscale.600',
                     fontSize: '16px',
                     letterSpacing: 0,
                     borderTop: '1px solid var(--yoroi-comp-input-text-disabled)',
