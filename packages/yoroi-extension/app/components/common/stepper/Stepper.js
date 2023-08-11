@@ -61,16 +61,22 @@ function Stepper(props: Props & Intl): Node {
                       borderStyle: 'solid',
                     }
                   : {}),
+                bgcolor: isCurrentStep ? 'primary.500' : 'unset',
                 borderRadius: '50%',
                 transition: 'color 300ms ease',
                 cursor,
-                borderColor: stepColor,
+                borderColor: isCurrentStep ? 'primary.500' : stepColor,
               }}
             >
               {isPrevStep ? (
                 <StepMarkIcon />
               ) : (
-                <Typography variant="body2" fontWeight={500} color={stepColor} lineHeight="27px">
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  color={isCurrentStep ? 'common.white' : stepColor}
+                  lineHeight="27px"
+                >
                   {idx + 1}
                 </Typography>
               )}

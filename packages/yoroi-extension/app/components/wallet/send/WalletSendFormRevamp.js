@@ -687,7 +687,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     if (!amountField.value) this.props.onRemoveTokens([defaultTokenInfo]);
                   }}
                   amountFieldRevamp
-                  placeholder="0.0"
+                  placeholder="0"
                 />
 
                 <Typography variant="button2" color="grey.600" fontWeight={500} mr="12px">
