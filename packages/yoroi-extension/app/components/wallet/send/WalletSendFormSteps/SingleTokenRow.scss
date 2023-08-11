@@ -1,103 +1,103 @@
 .component {
-    .token {
-        cursor: pointer;
+  .token {
+    cursor: pointer;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    align-items: center;
+    justify-items: flex-start;
+    margin: 2px 0;
+
+    & > div,
+    & > p {
+      padding: 16px 24px;
+    }
+
+    .name {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      .logo {
+        overflow: hidden;
+        width: 32px;
+        height: 32px;
+        margin-right: 16px;
+      }
+    }
+
+    .amount {
+      justify-self: flex-end;
+    }
+  }
+  .amountWrapper {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    align-items: center;
+    border-radius: 8px;
+    position: relative;
+    margin: 5px 0;
+    width: calc(100% - 6px);
+
+    & > div {
+      padding: 10px 24px;
+    }
+
+    .error {
+      position: absolute;
+      bottom: -16px;
+      right: 27px;
+      color: var(--yoroi-comp-input-error);
+      font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+      font-size: 0.75rem;
+    }
+
+    .amountTokenName {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      .logo {
+        margin-right: 16px;
+      }
+    }
+
+    .amountInput {
+      width: 100%;
+      margin: 0px 8px;
+      input {
+        text-align: right;
+        font-size: 16px;
+        line-height: 24px;
         width: 100%;
-        display: grid;
-        grid-template-columns: 1.1fr 1fr 1fr;
-        align-items: center;
-        justify-items: flex-start;
-        margin: 2px 0;
-        
-        & > div, & > p {
-            padding: 16px 24px;
-        }
-        
-        .name {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
+      }
 
-            .logo {
-                overflow: hidden;
-                width: 32px;
-                height: 32px;
-                margin-right: 16px;
-            }
-        }
-
-        .amount {
-            justify-self: flex-end;
-        }
-    }
-    .amountWrapper {
-        position: relative;
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1.1fr 1fr 1fr;
-        align-items: center;
-        border-radius: 8px;
-        position: relative;
-        margin: 5px 0;
-        width: calc(100% - 6px);
-
-        & > div {
-            padding: 10px 24px;
-        }
-
-        .error {
-            position: absolute;
-            bottom: -16px;
-            right: 27px;
-            color: var(--yoroi-comp-input-error);
-            font-family: "Roboto","Helvetica","Arial",sans-serif;
-            font-size: 0.75rem;
-        }
-
-        .amountTokenName {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-
-            .logo {
-                margin-right: 16px;
-            }
-        }
-
-        .amountInput {
-            width: 100%;
-            margin: 0px 8px;
-            input {
-                text-align: right; 
-                font-size: 16px;
-                line-height: 24px;
-                width: 100%;
-            }
-
-            input::placeholder {
-                font-size: 16px;
-                line-height: 24px;
-            }
-        }
-
-        .close {
-            position: absolute;
-            height: 32px;
-            width: 32px;
-            background-color: #F0F3F5;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            top: -12px;
-            right: -12px;
-        }
-
-        .close:hover {
-            background-color: lighten($color: #F0F3F5, $amount: 0.90);
-        }
+      input::placeholder {
+        font-size: 16px;
+        line-height: 24px;
+      }
     }
 
-    .amountError {
-        border: 2px solid var(--yoroi-palette-error-100);
+    .close {
+      position: absolute;
+      height: 32px;
+      width: 32px;
+      background-color: #f0f3f5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: -12px;
+      right: -12px;
     }
+
+    .close:hover {
+      background-color: lighten($color: #f0f3f5, $amount: 0.9);
+    }
+  }
+
+  .amountError {
+    border: 2px solid var(--yoroi-palette-error-100);
+  }
 }
