@@ -364,7 +364,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     if (walletType === 'trezor') {
       return messages.sendUsingTrezorT;
     }
-    return globalMessages.sendButtonLabel;
+    return globalMessages.confirmlette.mag;
   }
 
   renderError(): Node {

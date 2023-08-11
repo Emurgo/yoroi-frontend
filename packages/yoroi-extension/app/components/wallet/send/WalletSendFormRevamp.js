@@ -66,6 +66,18 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
+  receiverFieldLabelInactive: {
+    id: 'wallet.send.form.receiver.label.inactive',
+    defaultMessage: '!!!Enter wallet address',
+  },
+  receiverFieldLabelActive: {
+    id: 'wallet.send.form.receiver.label.active',
+    defaultMessage: '!!!Receiver address',
+  },
+  memoFieldLabelInactive: {
+    id: 'wallet.send.form.memo.label.inactive',
+    defaultMessage: '!!!Enter memo',
+  },
   dropdownAmountLabel: {
     id: 'wallet.send.form.sendAll.dropdownAmountLabel',
     defaultMessage: '!!!Send all {coinName}',
@@ -209,8 +221,10 @@ type Props = {|
 |};
 
 type State = {|
-  invalidMemo: boolean,
   currentStep: number,
+  invalidMemo: boolean,
+  isMemoFieldActive: boolean,
+  isReceiverFieldActive: boolean,
 |};
 
 @observer
@@ -222,6 +236,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
+    isReceiverFieldActive: false,
+    isMemoFieldActive: false,
   };
 
   bodyRef: any | null = null;
@@ -295,7 +311,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.receiverLabel),
+          label: this.context.intl.formatMessage(messages.receiverFieldLabelInactive),
           placeholder: this.props.isClassicTheme
             ? this.context.intl.formatMessage(messages.receiverHint)
             : '',
@@ -386,6 +402,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return info.Metadata.numberOfDecimals;
   }
 
+  setReceiverFieldStatus: boolean => void = isReceiverFieldActive => {
+    this.setState({ isReceiverFieldActive });
+  };
+
+  setMemoFieldStatus: boolean => void = isMemoFieldActive => {
+    this.setState({ isMemoFieldActive });
+  };
   getTokensAndNFTs: MultiToken => [
     FormattedTokenDisplay[],
     FormattedNFTDisplay[]
@@ -517,12 +540,21 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                done={receiverField.isValid}
+                onFocus={() => {
+                  this.setReceiverFieldStatus(true);
+                }}
+                onBlur={() => {
+                  if (!receiverField.value) this.setReceiverFieldStatus(false);
+                }}
+                label={
+                  this.state.isReceiverFieldActive
+                    ? intl.formatMessage(messages.receiverFieldLabelActive)
+                    : intl.formatMessage(messages.receiverFieldLabelInactive)
+                }
               />
             </div>
             <Box sx={{ position: 'relative' }}>
               <MemoTextField
-                label={intl.formatMessage(memoMessages.addMemo)}
                 onChange={e => this.onUpdateMemo(e.target.value)}
                 helperText={
                   invalidMemo
@@ -530,10 +562,21 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(memoMessages.memoWarning)
                 }
                 error={invalidMemo}
+                onFocus={() => {
+                  this.setMemoFieldStatus(true);
+                }}
+                onBlur={() => {
+                  if (!memo || memo.length === 0) this.setMemoFieldStatus(false);
+                }}
+                label={
+                  this.state.isMemoFieldActive
+                    ? intl.formatMessage(memoMessages.memoLabel)
+                    : intl.formatMessage(messages.memoFieldLabelInactive)
+                }
               />
               <Typography
                 variant="caption1"
-                color="grey.500"
+                color={invalidMemo ? 'magenta.500' : 'grey.500'}
                 sx={{ position: 'absolute', bottom: '12px', right: '0' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}

@@ -13,11 +13,14 @@ const RevampTextField = {
     fullWidth: true,
   },
   styleOverrides: {
-    root: {
+    root: ({ theme }) => ({
       '.MuiFormHelperText-root': {
         fontSize: '0.75rem',
+        '&.Mui-error': {
+          color: theme.palette.magenta[500],
+        },
       },
-    },
+    }),
   },
 };
 
