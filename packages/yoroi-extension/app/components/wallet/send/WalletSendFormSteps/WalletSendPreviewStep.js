@@ -36,7 +36,6 @@ import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
-import { Divider } from '../../../common/Divider';
 
 type Props = {|
   +staleTx: boolean,
@@ -406,107 +405,113 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
     return (
       <div className={styles.component}>
-        <Box width="506px">
-          {this.renderError()}
-          <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
-          <div>
-            <Box mb="8px">
-              <Typography variant="body1" color="grayscale.600">
-                {intl.formatMessage(messages.receiverLabel)}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: 'grayscale.900',
-                  overflowWrap: 'break-word',
-                }}
-              >
-                {this.props.addressToDisplayString(receivers[0])}
-              </Typography>
-            </Box>
-          </div>
-
-          <Box
-            className={styles.totalAmountWrapper}
-            sx={{ bgcolor: 'primary.600', color: 'grayscale.min' }}
-          >
-            <div className={styles.totalAmountLabel}>
-              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-            </div>
+        <Box
+          sx={{
+            width: '100%',
+            overflowY: 'scroll',
+          }}
+        >
+          <Box width="506px" mx="auto">
+            {this.renderError()}
+            <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
             <div>
-              <Box className={styles.totalAmountValue}>
-                {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+              <Box mb="8px">
+                <Typography variant="body1" color="grayscale.600">
+                  {intl.formatMessage(messages.receiverLabel)}
+                </Typography>
               </Box>
-              {amount.nonDefaultEntries().length > 0 && (
-                <div className={styles.assetsCount}>
-                  {intl.formatMessage(messages.nAssets, {
-                    number: amount.nonDefaultEntries().length,
-                  })}
-                </div>
-              )}
+              <Box>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'grayscale.900',
+                    overflowWrap: 'break-word',
+                  }}
+                >
+                  {this.props.addressToDisplayString(receivers[0])}
+                </Typography>
+              </Box>
             </div>
-          </Box>
 
-          <div className={styles.feesWrapper}>
-            <div className={styles.feesLabel}>
-              {intl.formatMessage(globalMessages.transactionFee)}
-            </div>
-            <div className={styles.feesValue}>
-              {this.renderBundle({
-                amount: this.props.transactionFee,
-                render: this.renderSingleFee,
-              })}
-            </div>
-          </div>
-
-          <div className={styles.amountWrapper}>
-            <div className={styles.amountLabel}>{this._amountLabel()}</div>
-            <div className={styles.amountValue}>
-              {this.renderDefaultTokenAmount(amount.getDefaultEntry())}
-            </div>
-          </div>
-
-          <div className={styles.wrapper}>
-            {this.props.transactionSize != null ? (
-              <div className={styles.addressToLabelWrapper}>
-                <Box className={styles.addressToLabel} sx={{ color: 'grayscale.600' }}>
-                  {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
-                </Box>
-                <span className={styles.txSize}>{this.props.transactionSize}</span>
+            <Box
+              className={styles.totalAmountWrapper}
+              sx={{ bgcolor: 'primary.600', color: 'grayscale.min' }}
+            >
+              <div className={styles.totalAmountLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
               </div>
-            ) : null}
+              <div>
+                <Box className={styles.totalAmountValue}>
+                  {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+                </Box>
+                {amount.nonDefaultEntries().length > 0 && (
+                  <div className={styles.assetsCount}>
+                    {intl.formatMessage(messages.nAssets, {
+                      number: amount.nonDefaultEntries().length,
+                    })}
+                  </div>
+                )}
+              </div>
+            </Box>
 
-            <Box>
-              {amount.nonDefaultEntries().length > 0 && (
-                <AssetsDropdown
-                  tokens={getTokens(amount, this.props.getTokenInfo)}
-                  nfts={getNFTs(amount, this.props.getTokenInfo)}
+            <div className={styles.feesWrapper}>
+              <div className={styles.feesLabel}>
+                {intl.formatMessage(globalMessages.transactionFee)}
+              </div>
+              <div className={styles.feesValue}>
+                {this.renderBundle({
+                  amount: this.props.transactionFee,
+                  render: this.renderSingleFee,
+                })}
+              </div>
+            </div>
+
+            <div className={styles.amountWrapper}>
+              <div className={styles.amountLabel}>{this._amountLabel()}</div>
+              <div className={styles.amountValue}>
+                {this.renderDefaultTokenAmount(amount.getDefaultEntry())}
+              </div>
+            </div>
+
+            <div className={styles.wrapper}>
+              {this.props.transactionSize != null ? (
+                <div className={styles.addressToLabelWrapper}>
+                  <Box className={styles.addressToLabel} sx={{ color: 'grayscale.600' }}>
+                    {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
+                  </Box>
+                  <span className={styles.txSize}>{this.props.transactionSize}</span>
+                </div>
+              ) : null}
+
+              <Box>
+                {amount.nonDefaultEntries().length > 0 && (
+                  <AssetsDropdown
+                    tokens={getTokens(amount, this.props.getTokenInfo)}
+                    nfts={getNFTs(amount, this.props.getTokenInfo)}
+                  />
+                )}
+              </Box>
+
+              {walletType === 'mnemonic' && (
+                <TextField
+                  type="password"
+                  {...walletPasswordField.bind()}
+                  disabled={isSubmitting}
+                  onChange={e => {
+                    this.setState({ passwordError: null });
+                    walletPasswordField.set('value', e.target.value);
+                  }}
+                  error={walletPasswordField.error || passwordError}
+                  sx={{ mt: '24px' }}
                 />
               )}
-            </Box>
+            </div>
 
-            {walletType === 'mnemonic' && (
-              <TextField
-                type="password"
-                {...walletPasswordField.bind()}
-                disabled={isSubmitting}
-                onChange={e => {
-                  this.setState({ passwordError: null });
-                  walletPasswordField.set('value', e.target.value);
-                }}
-                error={walletPasswordField.error || passwordError}
-                sx={{ mt: '24px' }}
-              />
-            )}
-          </div>
-
-          <div>{this.renderHWWalletInfo()}</div>
+            <div>{this.renderHWWalletInfo()}</div>
+          </Box>
         </Box>
 
         <Box mt="auto" width="100%">
-          <Divider />
           <Stack gap="24px" alignItems="center" justifyContent="center" direction="row" mt="24px">
             <Button
               key="amount-back"
