@@ -697,8 +697,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 {!isErgo(this.props.selectedNetwork) && (
                   <Button
                     variant="tertiary"
+                    size="small"
                     color="secondary"
-                    sx={{ width: '51px' }}
+                    sx={{
+                      '&.MuiButton-sizeSmall': {
+                        padding: '4px 8px',
+                      },
+                    }}
                     disabled={maxSendableAmount.isExecuting}
                     className={classnames([
                       styles.maxBtn,
