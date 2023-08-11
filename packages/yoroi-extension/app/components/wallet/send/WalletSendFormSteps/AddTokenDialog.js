@@ -81,11 +81,11 @@ const SORTING_COLUMNS = {
 export const messages: Object = defineMessages({
   nTokens: {
     id: 'wallet.send.form.dialog.nToken',
-    defaultMessage: '!!!Tokens ({number})',
+    defaultMessage: '!!!Token ({number})',
   },
   nameAndTicker: {
     id: 'wallet.assets.nameAndTicker',
-    defaultMessage: '!!!Name and ticker',
+    defaultMessage: '!!!Ticker and name',
   },
   quantity: {
     id: 'wallet.assets.quantity',
@@ -390,7 +390,7 @@ export default class AddTokenDialog extends Component<Props, State> {
                   <Typography variant="body2" color="grayscale.600">
                     {intl.formatMessage(messages.identifier)}
                   </Typography>
-                  <Box sx={{ width: '20xp', height: '20px' }}>
+                  <Box sx={{ '& > svg': { width: '24px', height: '24px' } }}>
                     <InfoIcon />
                   </Box>
                 </li>

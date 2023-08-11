@@ -128,7 +128,7 @@ const messages = defineMessages({
   },
   minimumRequiredADA: {
     id: 'wallet.send.form.amount.minimumRequiredADA',
-    defaultMessage: '!!!The minimum required is {number} ADA',
+    defaultMessage: '!!!Minimum required is {number} ADA',
   },
 });
 
