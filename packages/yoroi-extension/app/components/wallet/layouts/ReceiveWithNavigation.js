@@ -33,7 +33,7 @@ function ReceiveWithNavigation({
   const { renderLayoutComponent } = useLayout();
 
   const classicReceiveNav = (
-    <Box sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
+    <Box sx={{ display: 'flex', overflow: 'hidden', height: '100%', width: '100%' }}>
       <Box sx={{ flexShrink: 0, height: '100%' }}>
         <ReceiveNavigation
           addressStores={addressStores}
@@ -41,7 +41,16 @@ function ReceiveWithNavigation({
           activeFilter={activeFilter}
         />
       </Box>
-      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>{children}</Box>
+      <Box
+        sx={{
+          height: '100%',
+          minHeight: '200px',
+          overflow: 'auto',
+          flex: 1,
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 
