@@ -7,7 +7,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { truncateAddress } from '../../../utils/formatters';
 import { Box, Typography } from '@mui/material';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -73,7 +72,6 @@ export default class StandardHeaderRevamp extends Component<Props> {
     const generateAddressForm = (
       <LoadingButton
         variant="primary"
-        fullWidth
         loading={isSubmitting}
         className="generateAddressButton"
         onClick={this.submit}
@@ -84,77 +82,85 @@ export default class StandardHeaderRevamp extends Component<Props> {
     );
 
     const walletHeader = (
-      <Box display="flex" alignItems="flex-end" mb="30px" pb="30px" gap="48px" position="relative">
-        <Box maxWidth="500px" width="100%">
-          <Typography mb="24px" variant="body1" fontWeight={500}>
-            {intl.formatMessage(messages.walletAddressLabel)}
-          </Typography>
-          <Box mb="16px">
-            <CopyableAddress
-              darkVariant
-              sx={{
-                justifyContent: 'space-between',
-                border: '1px solid',
-                borderColor: 'grayscale.400',
-                bgcolor: 'grayscale.50',
-                p: '16px',
-                pr: '14px',
-              }}
-              hash={walletAddress}
-              elementId={mainAddressNotificationId}
-              onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
-              notification={notification}
-              placementTooltip="bottom-start"
-            >
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                hash={walletAddress}
-                light={isWalletAddressUsed}
-                linkType="address"
-              >
-                <RawHash light={isWalletAddressUsed}>
-                  <Typography variant="body1" color="grayscale.max">
-                    {truncateAddress(walletAddress)}
-                  </Typography>
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
-          </Box>
+      <Box>
+        <Typography mb="24px" variant="body1" fontWeight={500}>
+          {intl.formatMessage(messages.walletAddressLabel)}
+        </Typography>
 
-          <Typography mb="24px" variant="body2" lineHeight="22px" color="grayscale.600">
-            <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
-          </Typography>
-
-          {generateAddressForm}
-          {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
-        </Box>
-
-        <Box display="flex" justifyContent="center" alignItems="center" width="100%">
-          <Box
-            py="16px"
-            px="130px"
-            borderRadius="16px"
-            height="min-content"
-            sx={{
-              background: theme => theme.palette.gradients['blue-green-bg'],
-            }}
-          >
+        <Box
+          display="flex"
+          alignItems="start"
+          justifyContent="center"
+          mb="30px"
+          pb="30px"
+          gap="24px"
+          position="relative"
+        >
+          <Box display="flex" justifyContent="center" alignItems="center">
             <Box
-              alignItems="flex-start"
-              display="flex"
-              mx="auto"
+              p="16px"
+              borderRadius="16px"
+              height="min-content"
               sx={{
-                '& canvas': {
-                  border: '16px solid',
-                  borderRadius: '8px',
-                  borderColor: 'common.white',
-                  boxSizing: 'content-box',
-                  bgcolor: 'common.white',
-                },
+                background: theme => theme.palette.gradients['blue-green-bg'],
               }}
             >
-              <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} />
+              <Box
+                alignItems="flex-start"
+                display="flex"
+                mx="auto"
+                sx={{
+                  '& canvas': {
+                    border: '16px solid',
+                    borderRadius: '8px',
+                    borderColor: 'common.white',
+                    boxSizing: 'content-box',
+                    bgcolor: 'common.white',
+                  },
+                }}
+              >
+                <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} />
+              </Box>
             </Box>
+          </Box>
+          <Box width="100%">
+            <Box mb="8px">
+              <CopyableAddress
+                darkVariant
+                sx={{
+                  justifyContent: 'flex-start',
+                  alignItems: 'start',
+                  bgcolor: 'transparent',
+                  px: '0px',
+                  pt: '0px',
+                }}
+                hash={walletAddress}
+                elementId={mainAddressNotificationId}
+                onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
+                notification={notification}
+                placementTooltip="bottom-start"
+              >
+                <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={walletAddress}
+                  light={isWalletAddressUsed}
+                  linkType="address"
+                >
+                  <RawHash light={isWalletAddressUsed}>
+                    <Typography variant="body1" color="grayscale.max">
+                      {walletAddress}
+                    </Typography>
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyableAddress>
+            </Box>
+
+            <Typography mb="24px" variant="body2" lineHeight="22px" color="grayscale.600">
+              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
+            </Typography>
+
+            {generateAddressForm}
+            {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
           </Box>
         </Box>
       </Box>

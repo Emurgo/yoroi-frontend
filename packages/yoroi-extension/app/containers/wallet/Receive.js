@@ -92,7 +92,7 @@ export default class Receive extends Component<Props> {
       }));
 
     return (
-      <Box display="flex" maxWidth="1450px" mx="auto">
+      <Box display="flex" mx="auto">
         <ReceiveWithNavigation
           addressStores={storesForWallet}
           setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}

@@ -133,18 +133,6 @@ export default class WalletReceiveRevamp extends Component<Props> {
     return { header, body };
   };
 
-  getHierarchy: void => Node = () => {
-    const hierarchy = this.props.hierarchy.path.join(' > ');
-
-    return (
-      <Box mb="24px">
-        <Typography variant="h5" fontWeight={500}>
-          {hierarchy}
-        </Typography>
-      </Box>
-    );
-  };
-
   render(): Node {
     const {
       walletAddresses,
@@ -262,7 +250,6 @@ export default class WalletReceiveRevamp extends Component<Props> {
     if (walletAddresses === undefined || walletAddresses.length === 0) {
       return (
         <div className={styles.component}>
-          {this.getHierarchy()}
           {this.props.header}
           <div className={styles.notFound}>
             <NoTransactionModernSvg />
@@ -275,7 +262,6 @@ export default class WalletReceiveRevamp extends Component<Props> {
 
     return (
       <Box className={styles.component} pl="24px">
-        {this.getHierarchy()}
         {this.props.header}
         {walletReceiveContent}
       </Box>
