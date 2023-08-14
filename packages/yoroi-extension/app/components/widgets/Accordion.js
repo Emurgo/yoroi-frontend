@@ -6,6 +6,8 @@ import classnames from 'classnames';
 
 import { ReactComponent as ArrowDownSVG } from '../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Accordion.scss';
+import { withLayout } from '../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../styles/context/layout';
 
 type Props = {|
   +header: Node,
@@ -21,7 +23,7 @@ type State = {|
 |};
 
 @observer
-export default class Accordion extends Component<Props, State> {
+class Accordion extends Component<Props & InjectedLayoutProps, State> {
   state: State = {
     isToggle: true,
   };
@@ -31,12 +33,13 @@ export default class Accordion extends Component<Props, State> {
   };
 
   render(): Node {
-    const { header, children, style } = this.props;
+    const { header, children, style, isRevampLayout } = this.props;
     const { isToggle } = this.state;
 
     const activeButtonClasses = classnames([
       styles.accordionTitle,
-      isToggle && styles.arrowUp,
+      isToggle && styles.activeArrow,
+      isRevampLayout && styles.revamp,
       this.props.activeHeader && styles.activeHead,
     ]);
 
@@ -54,7 +57,7 @@ export default class Accordion extends Component<Props, State> {
           style={this.props.headerStyle}
         >
           {header}
-          <span className={styles.arrowDownIcon}>
+          <span className={styles.arrowIcon}>
             <ArrowDownSVG />
           </span>
         </button>
@@ -66,3 +69,5 @@ export default class Accordion extends Component<Props, State> {
     );
   }
 }
+
+export default (withLayout(Accordion): ComponentType<Props>);
