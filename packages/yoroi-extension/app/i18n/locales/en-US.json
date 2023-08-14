@@ -753,6 +753,7 @@
   "wallet.receive.page.noResultsFoundLabel": "No results found.",
   "wallet.receive.page.notFoundAnyAddresses": "No wallet addresses have been used yet.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
+  "wallet.revamp.receive.page.outputAmountUTXO": "Output Amount (UTXO)",
   "wallet.receive.page.rewardAddressLine1": "Your reward address holds your rewards and is used to validate any changes to your delegation preference",
   "wallet.receive.page.rewardAddressLine2": "You cannot send {ticker} to reward addresses, but we show it for personal auditing purposes",
   "wallet.receive.page.unmangeLabel": "Correct delegation preference",

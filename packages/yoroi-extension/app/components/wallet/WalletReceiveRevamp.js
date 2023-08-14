@@ -42,8 +42,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Generate URL',
   },
   outputAmountUTXO: {
-    id: 'wallet.receive.page.outputAmountUTXO',
-    defaultMessage: '!!!Balance (UTXO sum)',
+    id: 'wallet.revamp.receive.page.outputAmountUTXO',
+    defaultMessage: '!!!Output Amount (UTXO)',
   },
   noResultsFoundLabel: {
     id: 'wallet.receive.page.noResultsFoundLabel',
@@ -117,12 +117,12 @@ export default class WalletReceiveRevamp extends Component<Props> {
     const { intl } = this.context;
 
     const header = (
-      <Typography component="h2" variant="body2" color="grayscale.500">
+      <Typography component="h2" variant="body2" color="grayscale.500" textAlign="right">
         {intl.formatMessage(messages.outputAmountUTXO)}
       </Typography>
     );
     const body = address => (
-      <Typography variant="body1" color="grayscale.900">
+      <Typography variant="body1" color="grayscale.900" textAlign="right">
         {address.values != null ? (
           <span>{this.getAmount(address.values.getDefaultEntry())}</span>
         ) : (
@@ -158,11 +158,11 @@ export default class WalletReceiveRevamp extends Component<Props> {
           </Typography>
           {valueBlock.header}
           {onGeneratePaymentURI != null && (
-            <Typography color="grayscale.500" component="h2" variant="body2">
+            <Typography color="grayscale.500" component="h2" variant="body2" textAlign="right">
               {intl.formatMessage(messages.generateURLLabel)}
             </Typography>
           )}
-          <Typography color="grayscale.500" component="h2" variant="body2">
+          <Typography color="grayscale.500" component="h2" variant="body2" textAlign="right">
             {intl.formatMessage(messages.verifyAddressLabel)}
           </Typography>
         </Box>
@@ -179,7 +179,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
           return (
             <Box
               key={`gen-${address.address}`}
-              sx={{ p: '13px 24px !important', pl: '32px !important' }}
+              sx={{ p: '13px 24px !important' }}
               className={addressClasses}
             >
               {/* Address Id */}
@@ -209,11 +209,12 @@ export default class WalletReceiveRevamp extends Component<Props> {
               {valueBlock.body(address)}
               {/* Generate payment URL for Address action */}
               {onGeneratePaymentURI != null && (
-                <div
-                  className={classnames([
-                    styles.addressActionItemBlock,
-                    styles.generateURLActionBlock,
-                  ])}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                  }}
                 >
                   <button
                     type="button"
@@ -226,11 +227,15 @@ export default class WalletReceiveRevamp extends Component<Props> {
                       </span>
                     </div>
                   </button>
-                </div>
+                </Box>
               )}
               {/* Verify Address action */}
-              <div
-                className={classnames([styles.addressActionItemBlock, styles.verifyActionBlock])}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                }}
               >
                 <button type="button" onClick={onVerifyAddress.bind(this, address)}>
                   <div>
@@ -239,7 +244,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                     </span>
                   </div>
                 </button>
-              </div>
+              </Box>
               {/* Action block end */}
             </Box>
           );
