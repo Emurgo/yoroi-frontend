@@ -9,7 +9,7 @@ import {
   getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
+import { splitAmount, truncateToken } from '../../utils/formatters';
 import { computed } from 'mobx';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -56,6 +56,10 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
             .map(token => {
               const policyId = token.entry.identifier.split('.')[0];
               const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+
+              const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
+              const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
+              const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
               return {
                 policyId,
                 lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
@@ -63,7 +67,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 name,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                amount: genFormatTokenAmount(getTokenInfo)(token.entry),
+                amount: [beforeDecimal, afterDecimal].join(''),
                 description: getDescriptionFromTokenMetadata(policyId, name, token.info.Metadata),
               };
             });
