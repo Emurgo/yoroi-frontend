@@ -139,7 +139,9 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
           fontWeight={500}
           fontSize="18px"
         >
-          {intl.formatMessage(globalMessages.tokens)}: {list.length}
+          {intl.formatMessage(assetsMessage.assets, {
+            number: list.length,
+          })}
         </Typography>
         <SearchInput
           disableUnderline
@@ -280,7 +282,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
       }
       secondColumn={
         <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-          <CopyToClipboardText text={id}>{truncateAddressShort(id)}</CopyToClipboardText>
+          <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
+            <CopyToClipboardText text={id}>{id}</CopyToClipboardText>
+          </Box>
         </Typography>
       }
       thirdColumn={<Typography fontWeight="500">{amount}</Typography>}
