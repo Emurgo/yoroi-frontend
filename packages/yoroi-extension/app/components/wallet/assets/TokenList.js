@@ -27,6 +27,7 @@ import {
   ListItemText,
   Stack,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { Link } from 'react-router-dom';
@@ -271,6 +272,7 @@ type TokenItemRowProps = {|
   isTotalAmount?: boolean,
 |};
 function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowProps): Node {
+  const below1200px = useMediaQuery('(max-width: 1200px)');
   return (
     <ListItemLayout
       firstColumn={
@@ -298,7 +300,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
       secondColumn={
         <Typography variant="body1" color="grayscale.900">
           <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
-            <CopyToClipboardText text={id}>{id}</CopyToClipboardText>
+            <CopyToClipboardText text={id}>
+              {below1200px ? truncateAddressShort(id) : id}
+            </CopyToClipboardText>
           </Box>
         </Typography>
       }
