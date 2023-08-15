@@ -165,7 +165,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
             <ListItemLayout
               firstColumn={
                 <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
+                  <Typography variant="body2" color="grayscale.600" mr="4px">
                     {intl.formatMessage(assetsMessage.nameAndTicker)}
                   </Typography>
                   {displayColumnLogo(SORTING_COLUMNS.NAME)}
@@ -173,15 +173,30 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
               }
               secondColumn={
                 <Stack direction="row" alignItems="center" spacing="4px">
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
+                  <Typography variant="body2" color="grayscale.600">
                     {intl.formatMessage(globalMessages.fingerprint)}
                   </Typography>
-                  <Info />
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      '> svg': {
+                        width: '32px',
+                        height: '32px',
+                        '> path': {
+                          fill: 'grayscale.600',
+                        },
+                      },
+                    }}
+                  >
+                    <Info />
+                  </Box>
                 </Stack>
               }
               thirdColumn={
                 <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
+                  <Typography variant="body2" color="grayscale.600" mr="4px">
                     {intl.formatMessage(assetsMessage.quantity)}
                   </Typography>
                   {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
@@ -260,9 +275,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
     <ListItemLayout
       firstColumn={
         <Box display="flex" alignItems="center">
-          <Avatar variant="round" sx={{ background: 'white', marginRight: '16px' }}>
+          <Box sx={{ mr: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {avatar}
-          </Avatar>
+          </Box>
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
@@ -281,7 +296,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
         </Box>
       }
       secondColumn={
-        <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="body1" color="grayscale.900">
           <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
             <CopyToClipboardText text={id}>{id}</CopyToClipboardText>
           </Box>
