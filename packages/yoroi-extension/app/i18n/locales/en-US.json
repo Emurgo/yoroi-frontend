@@ -477,6 +477,7 @@
   "wallet.address.category.single": "Addresses containing only a spending key and no staking key",
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.assets.assets": "Assets ({number})",
+  "wallet.assets.details.back": "Back to assets",
   "wallet.assets.created": "Created",
   "wallet.assets.details": "Details",
   "wallet.assets.detailsOn": "Details on",

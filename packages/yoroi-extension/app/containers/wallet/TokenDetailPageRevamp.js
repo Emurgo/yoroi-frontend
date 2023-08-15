@@ -64,17 +64,13 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
                 name,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
                 amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-                description: getDescriptionFromTokenMetadata(
-                  policyId,
-                  name,
-                  token.info.Metadata
-                )
-              }
+                description: getDescriptionFromTokenMetadata(policyId, name, token.info.Metadata),
+              };
             });
 
     const { tokenId } = this.props.match.params;
     const tokenInfo = assetsList.find(token => token.id === tokenId);
-    const tokensCount = assetsList.length + 1 // +1 for the default assets
+    const tokensCount = assetsList.length + 1; // +1 for the default assets
     return (
       <Box
         borderRadius="8px"

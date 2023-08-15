@@ -5,6 +5,7 @@ import { Avatar, Link as LinkMui, Grid, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { defineMessages, injectIntl } from 'react-intl';
 import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as ArrowLeft } from '../../../assets/images/assets-page/back-arrow.inline.svg';
 import { ReactComponent as LinkSvg } from '../../../assets/images/link.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -30,7 +31,6 @@ type Props = {|
     amount: string,
     description: string | null,
   |},
-  tokensCount: number,
   network: $ReadOnly<NetworkRow>,
 |};
 
@@ -67,6 +67,10 @@ export const tokenMessages: Object = defineMessages({
     id: 'wallet.nftGallary.details.description',
     defaultMessage: '!!!Description',
   },
+  back: {
+    id: 'wallet.assets.details.back',
+    defaultMessage: '!!!Back to assets',
+  },
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
@@ -79,34 +83,40 @@ export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network =
   return 'https://testnet.cardanoscan.io/token';
 };
 
-function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): Node {
+function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
   if (tokenInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
 
   return (
     <Box>
-      <Box
-        borderBottom="1px solid var(--yoroi-palette-gray-200)"
-        paddingBottom="16px"
-        backgroundColor="var(--yoroi-palette-common-white)"
-      >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-600)">
-          {/* eslint-disable-next-line react/no-unescaped-entities */}
-          <Typography
-            as={Link}
-            replace
-            to={ROUTES.ASSETS.ROOT}
-            variant="h5"
-            color="var(--yoroi-palette-common-black)"
-            fontWeight={500}
-            fontSize="18px"
-            sx={{ textDecoration: 'none' }}
+      <Box backgroundColor="common.white">
+        <Typography
+          as={Link}
+          replace
+          to={ROUTES.ASSETS.ROOT}
+          variant="h5"
+          color="grayscale.900"
+          fontWeight={500}
+          fontSize="18px"
+          sx={{
+            textDecoration: 'none',
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            lineHeight: '27px',
+            textTransform: 'uppercase',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mb: '1px',
+            }}
           >
-            {intl.formatMessage(globalMessages.tokens)}: {tokensCount}
-          </Typography>
-          <Typography as="span" variant="h5" color="var(--yoroi-palette-common-black)" ml="4px">
-            / {tokenInfo.name}
-          </Typography>
+            <ArrowLeft />
+          </Box>
+          {intl.formatMessage(tokenMessages.back)}
         </Typography>
       </Box>
       <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
