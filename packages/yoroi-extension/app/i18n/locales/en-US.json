@@ -489,6 +489,7 @@
   "wallet.assets.policyId": "Policy ID",
   "wallet.assets.quantity": "Quantity",
   "wallet.assets.search": "Search",
+  "wallet.revamp.assets.search": "Search by asset name or ID",
   "wallet.assets.ticker": "Ticker",
   "wallet.assets.tokens": "Tokens",
   "wallet.backup.dialog.legacy.checkConfirm": "Do you want to check if your wallet needs to be upgraded?",
