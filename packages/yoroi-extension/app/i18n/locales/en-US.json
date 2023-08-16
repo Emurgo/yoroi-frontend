@@ -380,6 +380,7 @@
   "settings.unitOfAccount.currency.krw": "South Korean won",
   "settings.unitOfAccount.currency.usd": "US dollar",
   "settings.unitOfAccount.label": "Currency",
+  "settings.unitOfAccount.revamp.label": "Select currency",
   "settings.unitOfAccount.lastUpdated": "<strong>Last updated:</strong> {lastUpdated}",
   "settings.unitOfAccount.note": "<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.",
   "settings.unitOfAccount.title": "Fiat pairing",

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
@@ -15,6 +15,7 @@ import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout, InjectedLayoutProps } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -34,6 +35,10 @@ const messages = defineMessages({
     id: 'settings.unitOfAccount.label',
     defaultMessage: '!!!Currency',
   },
+  revampInputLabel: {
+    id: 'settings.unitOfAccount.revamp.label',
+    defaultMessage: '!!!Select currency',
+  },
 });
 
 type Props = {|
@@ -51,25 +56,27 @@ type Props = {|
 |};
 
 @observer
-export default class UnitOfAccountSettings extends Component<Props> {
-  static defaultProps: {|error: void|} = {
-    error: undefined
+class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
+  static defaultProps: {| error: void |} = {
+    error: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
-        label: this.context.intl.formatMessage(messages.label),
-      }
-    }
+        label: this.context.intl.formatMessage(
+          this.props.isRevampLayout ? messages.revampInputLabel : messages.label
+        ),
+      },
+    },
   });
 
   render(): Node {
-    const { currencies, error, currentValue, lastUpdatedTimestamp } = this.props;
+    const { currencies, error, currentValue, lastUpdatedTimestamp, isRevampLayout } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
@@ -106,57 +113,64 @@ export default class UnitOfAccountSettings extends Component<Props> {
       );
     };
 
-    const lastUpdated = lastUpdatedTimestamp != null
-      ? new Date(lastUpdatedTimestamp).toLocaleString()
-      : '-';
+    const lastUpdated =
+      lastUpdatedTimestamp != null ? new Date(lastUpdatedTimestamp).toLocaleString() : '-';
 
-    const dialog = this.props.isSubmitting
-      ? (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
-          <VerticalFlexContainer>
-            <LoadingSpinner />
-          </VerticalFlexContainer>
-        </Dialog>
-      )
-      : null;
+    const dialog = this.props.isSubmitting ? (
+      <Dialog
+        title={intl.formatMessage(globalMessages.processingLabel)}
+        closeOnOverlayClick={false}
+      >
+        <VerticalFlexContainer>
+          <LoadingSpinner />
+        </VerticalFlexContainer>
+      </Dialog>
+    ) : null;
 
     return (
       <div className={componentClassNames}>
         {dialog}
-        <h2 className={styles.title}>
-          {intl.formatMessage(messages.unitOfAccountTitle)}
-        </h2>
+        <h2 className={styles.title}>{intl.formatMessage(messages.unitOfAccountTitle)}</h2>
 
-        <p><FormattedHTMLMessage {...messages.note} /></p>
+        <p>
+          <FormattedHTMLMessage {...messages.note} />
+        </p>
 
-        <p><FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} /></p>
+        <p>
+          <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
+        </p>
 
-        <Select
-          formControlProps={{ sx: { marginTop: '40px' } }}
-          {...coinPriceCurrencyId.bind()}
-          onChange={this.props.onSelect}
-          value={currentValue}
-          menuProps={{
-            sx: {
-              '& .MuiMenu-paper': {
-                maxHeight: '280px',
-              },
-            },
+        <Box
+          sx={{
+            width: isRevampLayout ? '506px' : '100%',
           }}
-          renderValue={value => (
-            <Typography variant="body2" fontWeight="300">
-              {/* $FlowFixMe[prop-missing] */}
-              {value} - {currencies.filter(item => item.value === value)[0].name}
-            </Typography>
-          )}
         >
-          {currencies.map(option => optionRenderer(option))}
-        </Select>
-        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          <Select
+            formControlProps={{ sx: { marginTop: '40px' } }}
+            {...coinPriceCurrencyId.bind()}
+            onChange={this.props.onSelect}
+            value={currentValue}
+            menuProps={{
+              sx: {
+                '& .MuiMenu-paper': {
+                  maxHeight: '280px',
+                },
+              },
+            }}
+            renderValue={value => (
+              <Typography variant="body2" fontWeight="300">
+                {/* $FlowFixMe[prop-missing] */}
+                {value} - {currencies.filter(item => item.value === value)[0].name}
+              </Typography>
+            )}
+          >
+            {currencies.map(option => optionRenderer(option))}
+          </Select>
+          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+        </Box>
       </div>
     );
   }
 }
+
+export default (withLayout(UnitOfAccountSettings): ComponentType<Props>);

@@ -20,7 +20,7 @@ import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { trackSetUnitOfAccount, trackSetLocale } from '../../../api/analytics';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 
 const currencyLabels = defineMessages({
@@ -112,7 +112,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
       : 'ADA';
 
     return (
-      <>
+      <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
         {profileStore.isRevampTheme && (
           <Typography variant="h5" fontWeight={500} mb="24px">
             {intl.formatMessage(settingsMenuMessages.general)}
@@ -153,7 +153,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           onExternalLinkClick={handleExternalLinkClick}
         />
         <AboutYoroiSettingsBlock wallet={this.generated.stores.wallets.selected} />
-      </>
+      </Box>
     );
   }
 
