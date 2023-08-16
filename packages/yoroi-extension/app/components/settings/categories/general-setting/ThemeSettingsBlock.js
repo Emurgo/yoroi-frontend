@@ -90,6 +90,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
   render(): Node {
     const { currentTheme, onSubmit, onExternalLinkClick } = this.props;
     const { intl } = this.context;
+    const isRevampLayout = currentTheme === THEMES.YOROI_REVAMP;
 
     const blogLink = (
       <Typography
@@ -108,12 +109,19 @@ export default class ThemeSettingsBlock extends Component<Props> {
     );
 
     return (
-      <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingY: '24px' }}>
+      <Box
+        sx={{
+          borderTop: !isRevampLayout && '1px solid var(--yoroi-palette-gray-200)',
+          pb: '20px',
+          mt: isRevampLayout ? '10px' : '0px',
+          py: !isRevampLayout && '24px',
+        }}
+      >
         <Typography
-          color="var(--yoroi-palette-gray-900)"
-          fontSize="18px"
-          fontWeight="500"
-          marginBottom="10px"
+          variant={isRevampLayout ? 'body1' : 'h5'}
+          fontWeight={500}
+          mb={isRevampLayout ? '16px' : '12px'}
+          color="grayscale.900"
         >
           {intl.formatMessage(messages.version)}
         </Typography>

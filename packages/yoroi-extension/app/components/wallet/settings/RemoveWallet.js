@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import styles from './RemoveWallet.scss';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

@@ -1,10 +1,6 @@
 @import '../../../../themes/mixins/error-message';
 
 .component {
-  border-top: 1px solid var(--yoroi-palette-gray-200);
-  padding-top: 30px;
-  margin-bottom: 20px;
-
   .title {
     color: var(--yoroi-support-settings-text);
     font-weight: 500;

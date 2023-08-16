@@ -128,17 +128,33 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
     ) : null;
 
     return (
-      <div className={componentClassNames}>
+      <Box
+        sx={{
+          b: '20px',
+          mt: isRevampLayout ? '13px' : '0px',
+          pt: !isRevampLayout && '30px',
+          borderTop: !isRevampLayout && '1px solid',
+          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+        }}
+        className={componentClassNames}
+      >
         {dialog}
-        <h2 className={styles.title}>{intl.formatMessage(messages.unitOfAccountTitle)}</h2>
+        <Typography
+          component="h2"
+          variant={isRevampLayout ? 'body1' : 'h5'}
+          fontWeight={500}
+          mb={isRevampLayout ? '16px' : '12px'}
+        >
+          {intl.formatMessage(messages.unitOfAccountTitle)}
+        </Typography>
 
-        <p>
+        <Typography>
           <FormattedHTMLMessage {...messages.note} />
-        </p>
+        </Typography>
 
-        <p>
+        <Typography>
           <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
-        </p>
+        </Typography>
 
         <Box
           sx={{
@@ -146,7 +162,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
           }}
         >
           <Select
-            formControlProps={{ sx: { marginTop: '40px' } }}
+            formControlProps={{ sx: { marginTop: isRevampLayout ? '16px' : '40px' } }}
             {...coinPriceCurrencyId.bind()}
             onChange={this.props.onSelect}
             value={currentValue}
@@ -168,7 +184,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
           </Select>
           {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
         </Box>
-      </div>
+      </Box>
     );
   }
 }

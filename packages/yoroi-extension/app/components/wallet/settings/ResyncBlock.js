@@ -42,8 +42,7 @@ class ResyncBlock extends Component<Props & InjectedProps> {
           pb: '20px',
           mt: isRevampLayout ? '40px' : '32px',
           pt: !isRevampLayout && '30px',
-          borderTop: !isRevampLayout && '1px solid',
-          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+          borderTop: !isRevampLayout && '1px solid var(--yoroi-palette-gray-200)',
         }}
       >
         <Typography
