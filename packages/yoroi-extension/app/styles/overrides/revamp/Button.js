@@ -17,6 +17,7 @@ const RevampButtonCommonProps: Object = {
       '&.MuiButton-sizeLarge': { height: '56px' },
       '&.MuiButton-sizeMedium': { padding: '10px', height: '48px' },
       '&.MuiButton-sizeSmall': { padding: '7px', height: '32px' },
+      '&.MuiButton-sizeFlat': { padding: '13px 24px', hight: 'unset' },
       '&:hover': { boxShadow: 'none' },
     },
   },

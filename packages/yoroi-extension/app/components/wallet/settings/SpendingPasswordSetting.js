@@ -77,16 +77,7 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
           {intl.formatMessage(messages.passwordDescription)}
         </Typography>
 
-        <Button
-          onClick={this.props.openDialog}
-          sx={{
-            '&.MuiButton-sizeMedium': {
-              p: '13px 24px',
-            },
-          }}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={this.props.openDialog} size="flat" variant="contained" color="primary">
           {intl.formatMessage(messages.changePassword)}
         </Button>
       </Box>

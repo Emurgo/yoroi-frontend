@@ -37,7 +37,7 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
           pb: '24px',
           pt: !isRevampLayout && '24px',
           borderTop: !isRevampLayout && '1px solid',
-          borderColor: !isRevampLayout && 'grayscale.200',
+          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
         }}
       >
         <Typography variant={isRevampLayout ? 'body1' : 'h5'} fontWeight={500} mb="12px">
