@@ -894,6 +894,7 @@
   "wallet.settings.general.language": "Language",
   "wallet.settings.blockchain.explorer.title": "Explorer settings",
   "wallet.settings.general.revamp.languageSelectLabel": "Select your language",
+  "wallet.settings.wallet.basics": "Basics",
   "wallet.staking.FAQPage": "FAQ page",
   "wallet.staking.availableTotalRewards": "Available Total Rewards",
   "wallet.staking.availableTotalRewardsHelper": "If the Reward amount is different than expected, see possible reasons of that on our {faqLink}.",
