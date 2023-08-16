@@ -9,7 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
 
-const messages = defineMessages({
+export const settingsMenuMessages = defineMessages({
   general: {
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',
@@ -44,12 +44,12 @@ export default class SettingsMenu extends Component<Props> {
 
     const settingOptions: Array<Object> = [
       {
-        label: intl.formatMessage(messages.general),
+        label: intl.formatMessage(settingsMenuMessages.general),
         route: ROUTES.SETTINGS.GENERAL,
         className: 'general',
       },
       {
-        label: intl.formatMessage(messages.blockchain),
+        label: intl.formatMessage(settingsMenuMessages.blockchain),
         route: ROUTES.SETTINGS.BLOCKCHAIN,
         className: 'blockchain',
       },
@@ -59,7 +59,7 @@ export default class SettingsMenu extends Component<Props> {
         className: 'wallet',
       },
       !environmnent.isProduction() && {
-        label: intl.formatMessage(messages.externalStorage),
+        label: intl.formatMessage(settingsMenuMessages.externalStorage),
         route: ROUTES.SETTINGS.EXTERNAL_STORAGE,
         className: 'externalStorage',
       },
@@ -74,7 +74,7 @@ export default class SettingsMenu extends Component<Props> {
         className: 'support',
       },
       {
-        label: intl.formatMessage(messages.levelOfComplexity),
+        label: intl.formatMessage(settingsMenuMessages.levelOfComplexity),
         route: ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY,
         className: 'levelOfComplexity',
       },
