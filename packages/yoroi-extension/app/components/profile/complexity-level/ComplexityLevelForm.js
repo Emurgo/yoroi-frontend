@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ComplexityLevelForm.scss';
 import classnames from 'classnames';
@@ -12,7 +12,8 @@ import { LoadingButton } from '@mui/lab';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { withLayout } from '../../../styles/context/layout';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
 
 const messages = defineMessages({
   subtitle: {
@@ -41,6 +42,10 @@ const messages = defineMessages({
   labelSelectedLevel: {
     id: 'profile.complexityLevel.selected.label',
     defaultMessage: '!!!Your current level of Complexity is',
+  },
+  selectedLevelLabel: {
+    id: 'profile.complexityLevel.selected.labelWithLevel',
+    defaultMessage: '!!!Your current level of Complexity is : <strong>{level}</strong>',
   },
   labelChoose: {
     id: 'global.label.choose',
@@ -85,19 +90,119 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
     ];
 
     return (
-      <>
-        <div className={styles.component}>
-          <div className={styles.description}>{intl.formatMessage(messages.subtitle)}</div>
-          <div className={styles.selected}>
-            {complexityLevel && (
-              <>
-                {intl.formatMessage(messages.labelSelectedLevel)} :{' '}
-                <Box component="span" className="currentLevel">
-                  {complexityLevel}
+      <Box className={styles.component}>
+        {isRevampLayout && (
+          <Typography
+            textAlign="center"
+            color="grayscale.900"
+            mb="16px"
+            variant="h3"
+            fontWeight={500}
+          >
+            {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
+          </Typography>
+        )}
+
+        <Typography
+          textAlign="center"
+          variant="body1"
+          color={isRevampLayout ? 'grayscale.800' : 'var(--yoroi-palette-gray-600)'}
+        >
+          {intl.formatMessage(messages.subtitle)}
+        </Typography>
+
+        {complexityLevel && (
+          <Typography
+            variant="body1"
+            my="1rem"
+            mx="auto"
+            sx={{
+              textAlign: 'center',
+              '& strong': {
+                color: isRevampLayout ? 'primary.500' : 'var(--yoroi-comp-button-secondary-text)',
+                fontWeight: 500,
+                textTransform: 'uppercase',
+              },
+            }}
+          >
+            <FormattedHTMLMessage
+              {...messages.selectedLevelLabel}
+              values={{
+                level: intl.formatMessage(
+                  complexityLevel === ComplexityLevels.Advanced
+                    ? messages.titleAdvancedLevel
+                    : messages.titleSimpleLevel
+                ),
+              }}
+            />
+          </Typography>
+        )}
+
+        {isRevampLayout ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '24px',
+              mt: '32px',
+            }}
+          >
+            {levels.map(level => {
+              const isSelected = level.key === complexityLevel;
+
+              return (
+                <Box
+                  key={level.key}
+                  sx={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    textAlign: 'center',
+                    p: '16px',
+                    background: theme =>
+                      isSelected
+                        ? theme.palette.gradients.green
+                        : theme.palette.gradients['blue-green-bg'],
+                    borderRadius: '8px',
+                    alignSelf: 'stretch',
+                    cursor: isSelected ? 'not-allowed' : 'pointer',
+                    position: 'relative',
+                    zIndex: 1,
+                    '&::before': {
+                      position: 'absolute',
+                      content: '""',
+                      top: '0px',
+                      right: '0px',
+                      left: '0px',
+                      bottom: '0px',
+                      background: theme => theme.palette.gradients.green,
+                      borderRadius: '8px',
+                      zIndex: -1,
+                      opacity: 0,
+                      transition: 'opacity 300ms linear',
+                    },
+                    '&:hover::before': {
+                      opacity: 1,
+                    },
+                  }}
+                  onClick={() => this.props.onSubmit(level.key)}
+                >
+                  <Box sx={{ mb: '16px' }}>{level.image}</Box>
+                  <Box mb="10px">
+                    <Typography mb="4px" variant="h3" fontWeight={500}>
+                      {level.name}
+                    </Typography>
+                    <Typography variant="body2">{level.description}</Typography>
+                  </Box>
                 </Box>
-              </>
-            )}
-          </div>
+              );
+            })}
+          </Box>
+        ) : (
           <div className={styles.cardsWrapper}>
             {levels.map(level => (
               <div className={styles.card} key={level.key}>
@@ -121,8 +226,8 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
               </div>
             ))}
           </div>
-        </div>
-      </>
+        )}
+      </Box>
     );
   }
 }

@@ -255,6 +255,7 @@
   "profile.complexityLevel.advanced": "Advanced",
   "profile.complexityLevel.advanced.description": "I have some understanding of blockchain and how cryptography is used to power both the blockchain itself and the wallet software. I am okay with seeing options and functionality that critically depend on my understanding of these concepts.",
   "profile.complexityLevel.selected.label": "Your current level of Complexity is",
+  "profile.complexityLevel.selected.labelWithLevel": "Your current level of Complexity is : <strong>{level}</strong>",
   "profile.complexityLevel.simple": "Simple",
   "profile.complexityLevel.simple.description": "Simplest experience possible. No previous knowledge of blockchain required. Highly friendly to on-board beginners, and for users who prefer simplicity.",
   "profile.complexityLevel.subtitle": "We understand blockchain can be difficult, which is why we try and keep the interface as simple as possible for you",
