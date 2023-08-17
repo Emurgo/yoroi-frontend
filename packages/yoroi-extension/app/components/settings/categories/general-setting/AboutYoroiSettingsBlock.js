@@ -23,7 +23,8 @@ import { handleExternalLinkClick } from '../../../../utils/routing';
 import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
-import { withLayout, InjectedLayoutProps } from '../../../../styles/context/layout';
+import { withLayout } from '../../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   aboutYoroiLabel: {

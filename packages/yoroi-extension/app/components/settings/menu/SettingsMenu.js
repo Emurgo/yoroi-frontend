@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import environmnent from '../../../environment';
@@ -8,9 +8,10 @@ import { ROUTES } from '../../../routes-config';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
-import { withLayout, InjectedLayoutProps } from '../../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 
-export const settingsMenuMessages = defineMessages({
+export const settingsMenuMessages: Object = defineMessages({
   general: {
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',

@@ -8,7 +8,8 @@ import InlineEditingInput from '../../widgets/forms/InlineEditingInput';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletNameSetting.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout, InjectedLayoutProps } from '../../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({

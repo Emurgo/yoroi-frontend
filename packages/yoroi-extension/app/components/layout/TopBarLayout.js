@@ -58,20 +58,17 @@ function TopBarLayout({
             },
             boxShadow: !isRevampLayout && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
             borderRadius: !isRevampLayout && showAsCard === true && '8px',
-            ...(showInContainer === true && {
-              bgcolor: 'common.white',
-              width: '100%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              flex: '0 1 auto',
-              height: '100%',
-            }),
-            ...(isRevampLayout &&
-              asModern !== true &&
-              !isModern && {
-                overflow: 'auto',
-              }),
+            ...(isRevampLayout && asModern !== true && !isModern
+              ? { overflow: 'auto' }
+              : showInContainer === true && {
+                  bgcolor: 'common.white',
+                  width: '100%',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: '0 1 auto',
+                  height: '100%',
+                }),
           }}
         >
           {isRevampLayout && asModern !== true && !isModern ? (

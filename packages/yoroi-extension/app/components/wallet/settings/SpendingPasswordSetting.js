@@ -8,7 +8,8 @@ import ReadOnlyInput from '../../widgets/forms/ReadOnlyInput';
 import globalMessages from '../../../i18n/global-messages';
 // import styles from './SpendingPasswordSetting.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout, InjectedLayoutProps } from '../../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Box, Button, Typography } from '@mui/material';
 
 const messages = defineMessages({

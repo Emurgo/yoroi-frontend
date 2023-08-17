@@ -14,7 +14,8 @@ import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout, InjectedLayoutProps } from '../../../../styles/context/layout';
+import { withLayout } from '../../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
 type Props = {|
   +languages: Array<LanguageType>,
