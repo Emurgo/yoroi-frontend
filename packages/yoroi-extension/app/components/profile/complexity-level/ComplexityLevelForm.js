@@ -162,11 +162,14 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                     alignItems: 'center',
                     justifyContent: 'flex-start',
                     textAlign: 'center',
-                    p: '16px',
+                    p: '1px',
+                    border: 'solid 1px transparent',
                     background: theme =>
                       isSelected
                         ? theme.palette.gradients.green
-                        : theme.palette.gradients['blue-green-bg'],
+                        : 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)',
+                    backgroundClip: 'content-box, border-box',
+                    backgroundOrigin: 'border-box',
                     borderRadius: '8px',
                     alignSelf: 'stretch',
                     cursor: isSelected ? 'not-allowed' : 'pointer',
@@ -179,7 +182,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                       right: '0px',
                       left: '0px',
                       bottom: '0px',
-                      background: theme => theme.palette.gradients.green,
+                      background: theme => theme.palette.gradients['blue-green-bg'],
                       borderRadius: '8px',
                       zIndex: -1,
                       opacity: 0,
@@ -191,12 +194,14 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                   }}
                   onClick={() => this.props.onSubmit(level.key)}
                 >
-                  <Box sx={{ mb: '16px' }}>{level.image}</Box>
-                  <Box mb="10px">
-                    <Typography mb="4px" variant="h3" fontWeight={500}>
-                      {level.name}
-                    </Typography>
-                    <Typography variant="body2">{level.description}</Typography>
+                  <Box sx={{ p: '15px' }}>
+                    <Box sx={{ mb: '16px' }}>{level.image}</Box>
+                    <Box mb="10px">
+                      <Typography mb="4px" variant="h3" fontWeight={500}>
+                        {level.name}
+                      </Typography>
+                      <Typography variant="body2">{level.description}</Typography>
+                    </Box>
                   </Box>
                 </Box>
               );
