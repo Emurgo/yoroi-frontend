@@ -897,6 +897,10 @@ const globalMessages: * = defineMessages({
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
   },
+  termsOfService: {
+    id: 'settings.menu.termsOfService.link.label',
+    defaultMessage: '!!!Terms of Service Agreement',
+  },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
     defaultMessage: '!!!From addresses',

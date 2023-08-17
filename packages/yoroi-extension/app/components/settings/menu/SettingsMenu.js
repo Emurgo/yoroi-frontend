@@ -8,6 +8,7 @@ import { ROUTES } from '../../../routes-config';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
+import { withLayout, InjectedLayoutProps } from '../../../styles/context/layout';
 
 export const settingsMenuMessages = defineMessages({
   general: {
@@ -33,14 +34,14 @@ type Props = {|
   +onItemClick: string => void,
 |};
 @observer
-export default class SettingsMenu extends Component<Props> {
+class SettingsMenu extends Component<Props & InjectedLayoutProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem } = this.props;
+    const { onItemClick, isActiveItem, isRevampLayout } = this.props;
 
     const settingOptions: Array<Object> = [
       {
@@ -64,7 +65,9 @@ export default class SettingsMenu extends Component<Props> {
         className: 'externalStorage',
       },
       {
-        label: intl.formatMessage(globalMessages.termsOfUse),
+        label: intl.formatMessage(
+          isRevampLayout ? globalMessages.termsOfService : globalMessages.termsOfUse
+        ),
         route: ROUTES.SETTINGS.TERMS_OF_USE,
         className: 'termsOfUse',
       },
@@ -85,3 +88,5 @@ export default class SettingsMenu extends Component<Props> {
     );
   }
 }
+
+export default (withLayout(SettingsMenu): ComponentType<Props>);

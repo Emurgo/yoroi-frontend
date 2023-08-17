@@ -7,7 +7,8 @@
     overflow: auto;
   }
 
-  h1, h2 {
+  h1,
+  h2 {
     font-weight: 500;
     font-size: 17px;
     margin-bottom: 11px;
@@ -27,13 +28,13 @@
     margin-left: 20px;
   }
 
-  p, li {
+  p,
+  li {
     font-weight: 400;
     font-size: 14px;
     letter-spacing: 0.5px;
     line-height: 1.38;
     margin-bottom: 11px;
-
   }
 }
 
@@ -41,24 +42,46 @@
   color: var(--yoroi-terms-of-use-text-color);
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
   .terms {
-    h1, h2 {
+    h1,
+    h2 {
       font-size: 16px;
     }
-    
+
     h1 {
       margin-top: 26px;
     }
-    
+
     h2 {
       margin-top: 46px;
     }
-    
-    p, li {
+
+    p,
+    li {
       color: var(--yoroi-terms-of-use-text-color);
       font-size: 13px;
       line-height: 1.54;
+    }
+  }
+}
+
+:global(.YoroiRevamp) .terms {
+  &:not(.fixedHight) {
+    padding-bottom: 20px;
+
+    h2 {
+      color: var(--yoroi-terms-of-use-text-color);
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0px;
+      margin-bottom: 16px;
+      color: #000;
+      font-size: 18px;
+      font-weight: 500;
     }
   }
 }
