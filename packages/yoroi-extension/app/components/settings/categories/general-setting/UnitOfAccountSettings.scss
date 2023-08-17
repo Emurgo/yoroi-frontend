@@ -1,26 +1,14 @@
 @import '../../../../themes/mixins/error-message';
 
 .component {
-  .title {
-    color: var(--yoroi-support-settings-text);
-    font-weight: 500;
-    font-size: 18px;
-    line-height: 22px;
-    margin-bottom: 12px;
-  }
-  a,
-  p {
+  .text {
     color: var(--yoroi-support-settings-text);
     font-weight: 400;
     font-size: 14px;
     line-height: 22px;
   }
 
-  a {
-    color: var(--yoroi-support-settings-text);
-  }
-
-  p {
+  .text {
     margin-bottom: 2px;
   }
 

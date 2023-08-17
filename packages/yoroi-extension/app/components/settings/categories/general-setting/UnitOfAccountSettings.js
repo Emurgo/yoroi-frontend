@@ -27,6 +27,11 @@ const messages = defineMessages({
     defaultMessage:
       '!!!<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.',
   },
+  noteRevamp: {
+    id: 'settings.revamp.unitOfAccount.note',
+    defaultMessage:
+      '!!!Please note, that the coin price is approximate and may not match the price of any given trading platform. Any transactions based on this price approximates are done at your own risk',
+  },
   lastUpdated: {
     id: 'settings.unitOfAccount.lastUpdated',
     defaultMessage: '!!!<strong>Last updated:</strong> {lastUpdated}',
@@ -148,21 +153,28 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </Typography>
 
-        <Typography>
-          <FormattedHTMLMessage {...messages.note} />
-        </Typography>
+        {!isRevampLayout && (
+          <>
+            <Typography className="text">
+              <FormattedHTMLMessage {...messages.note} />
+            </Typography>
 
-        <Typography>
-          <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
-        </Typography>
+            <Typography className="text">
+              <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
+            </Typography>
+          </>
+        )}
 
         <Box
           sx={{
             width: isRevampLayout ? '506px' : '100%',
+            marginTop: isRevampLayout ? '0px' : '40px',
           }}
         >
           <Select
-            formControlProps={{ sx: { marginTop: isRevampLayout ? '16px' : '40px' } }}
+            formControlProps={{ error: !!error }}
+            helperText={error && intl.formatMessage(error, error.values)}
+            error={!!error}
             {...coinPriceCurrencyId.bind()}
             onChange={this.props.onSelect}
             value={currentValue}
@@ -174,7 +186,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               },
             }}
             renderValue={value => (
-              <Typography variant="body2" fontWeight="300">
+              <Typography variant={isRevampLayout ? 'body1' : 'body2'} fontWeight="300">
                 {/* $FlowFixMe[prop-missing] */}
                 {value} - {currencies.filter(item => item.value === value)[0].name}
               </Typography>
@@ -182,7 +194,25 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
           >
             {currencies.map(option => optionRenderer(option))}
           </Select>
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+
+          {isRevampLayout && (
+            <>
+              <Typography variant="caption1" display="inline-block" color="grayscale.700">
+                <FormattedHTMLMessage {...messages.noteRevamp} />
+              </Typography>
+              <Typography
+                variant="body1"
+                fontWeight={500}
+                sx={{
+                  '& span': { fontWeight: 400 },
+                }}
+                mt="6px"
+                mb="35px"
+              >
+                <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
+              </Typography>
+            </>
+          )}
         </Box>
       </Box>
     );
