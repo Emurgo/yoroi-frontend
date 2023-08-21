@@ -3,11 +3,13 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import TrezorConnect from 'trezor-connect';
-import type { DeviceEvent } from 'trezor-connect/lib/types/trezor/device';
-import type { UiEvent } from 'trezor-connect/lib/types/events';
-import type { CardanoPublicKey } from 'trezor-connect/lib/types/networks/cardano';
-import type { Success, Unsuccessful, } from 'trezor-connect/lib/types/params';
+import TrezorConnect from 'trezor-connect-flow';
+import type {
+  DeviceEvent,
+  UiEvent,
+  CardanoPublicKey,
+  Success, Unsuccessful,
+} from 'trezor-connect-flow';
 
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';

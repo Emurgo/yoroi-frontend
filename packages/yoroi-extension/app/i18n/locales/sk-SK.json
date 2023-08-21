@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Chyba pri získavaní zostatku.",
   "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
-  "api.errors.getReputationError": "Error received from server while getting reputation.",
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "Pri získavaní transakcií server vrátil chybu.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Pri získavaní TxBodies server vrátil chybu.",

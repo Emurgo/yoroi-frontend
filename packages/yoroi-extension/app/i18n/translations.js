@@ -1,4 +1,20 @@
 // @flow
+import en from 'react-intl/locale-data/en';
+import ko from 'react-intl/locale-data/ko';
+import ja from 'react-intl/locale-data/ja';
+import zh from 'react-intl/locale-data/zh';
+import ru from 'react-intl/locale-data/ru';
+import de from 'react-intl/locale-data/de';
+import fr from 'react-intl/locale-data/fr';
+import nl from 'react-intl/locale-data/nl';
+import pt from 'react-intl/locale-data/pt';
+import id from 'react-intl/locale-data/id';
+import es from 'react-intl/locale-data/es';
+import it from 'react-intl/locale-data/it';
+import tr from 'react-intl/locale-data/tr';
+import cs from 'react-intl/locale-data/cs';
+import sk from 'react-intl/locale-data/sk';
+import vi from 'react-intl/locale-data/vi';
 import globalMessages from './global-messages';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { ReactComponent as EnglishFlag }  from '../assets/images/flags/english.inline.svg';
@@ -16,9 +32,28 @@ import { ReactComponent as IndonesianFlag }  from '../assets/images/flags/indone
 import { ReactComponent as TurkishFlag }  from '../assets/images/flags/turkish.inline.svg';
 import { ReactComponent as CzechFlag }  from '../assets/images/flags/czech.inline.svg';
 import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inline.svg';
+import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
+
+export const locales: any = Object.freeze([
+  ...en,
+  ...ko,
+  ...ja,
+  ...zh,
+  ...ru,
+  ...de,
+  ...fr,
+  ...nl,
+  ...pt,
+  ...id,
+  ...es,
+  ...it,
+  ...tr,
+  ...cs,
+  ...sk,
+  ...vi,
+]);
 
 // This is essentially bulk require
-
 // $FlowExpectedError[prop-missing] require.context comes from webpack
 const req = require.context('./locales', true, /\.json.*$/, 'lazy');
 export const translations: {|
@@ -116,5 +151,10 @@ export const LANGUAGES: Array<LanguageType> = [
     value: 'sk-SK',
     label: globalMessages.languageSlovak,
     svg: SlovakFlag
+  },
+  {
+    value: 'vi-VN',
+    label: globalMessages.languageVietnamese,
+    svg: VietnameseFlag
   }
 ];

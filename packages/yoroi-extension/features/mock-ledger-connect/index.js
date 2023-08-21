@@ -75,6 +75,8 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsAlonzo: false,
             supportsBabbage: false,
             supportsReqSignersInOrdinaryTx: false,
+            supportsCIP36: false,
+            supportsCIP36Vote: false,
           },
         },
       };

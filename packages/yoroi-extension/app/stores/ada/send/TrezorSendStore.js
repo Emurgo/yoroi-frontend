@@ -183,7 +183,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         const {
           votingPublicKey,
           stakingKey: stakingKeyHex,
-          rewardAddress,
+          paymentAddress,
           nonce,
         } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
 
@@ -191,17 +191,17 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         if (
           !auxDataSupplement
           || auxDataSupplement.type !== 1
-          || auxDataSupplement.catalystSignature == null
+          || auxDataSupplement.governanceSignature == null
         ) {
           // noinspection ExceptionCaughtLocallyJS
           throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} unexpected Trezor sign transaction response`);
         }
-        const { catalystSignature } = auxDataSupplement;
+        const catalystSignature = auxDataSupplement.governanceSignature;
 
         metadata = generateRegistrationMetadata(
           votingPublicKey,
           stakingKeyHex,
-          rewardAddress,
+          paymentAddress,
           nonce,
           (_hashedMetadata) => {
             return catalystSignature;

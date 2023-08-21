@@ -204,7 +204,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
         {loadingSpinner}
         {!isLoadingTransactions && hasMoreToLoad && (
           <Button
-            variant="primary"
+            variant="contained"
             disabled={isLoadingTransactions}
             onClick={onLoadMore}
             sx={{ margin: '30px auto', width: '400px', display: 'block' }}

@@ -57,6 +57,7 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
+import { bytesToHex } from '../../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -104,9 +105,9 @@ export class RemoteFetcher implements IFetcher {
       });
     return result.map(utxo => {
       if (utxo.receiver.startsWith('addr')) {
-        const fixedAddr = Buffer.from(
-          RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-        ).toString('hex');
+        const fixedAddr = RustModule.WasmScope(Module => bytesToHex(
+          Module.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
+        ));
         return {
           ...utxo,
           receiver: fixedAddr,

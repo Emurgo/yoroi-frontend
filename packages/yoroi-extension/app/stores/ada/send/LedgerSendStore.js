@@ -45,7 +45,10 @@ import type {
 import { genAddressingLookup } from '../../stateless/addressStores';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
-import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
+import {
+  generateRegistrationMetadata,
+  generateCip15RegistrationMetadata,
+} from '../../../api/ada/lib/cardanoCrypto/catalyst';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
@@ -207,18 +210,29 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         locale: this.stores.profile.currentLocale,
       });
 
+      let cip36: boolean = false;
+      if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
+        const getVersionResponse = await ledgerConnect.getVersion({
+          serial: request.expectedSerial,
+          dontCloseTab: true,
+        });
+        cip36 = getVersionResponse.compatibility.supportsCIP36Vote === true;
+      }
+
       const network = request.publicDeriver.getParent().getNetworkInfo();
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
         network,
         addressingMap: request.addressingMap,
+        cip36,
       });
 
       const ledgerSignTxResp: LedgerSignTxResponse =
         await ledgerConnect.signTransaction({
           serial: request.expectedSerial,
           params: ledgerSignTxPayload,
+          useOpenTab: true,
         });
 
       // There is no need of ledgerConnect after this line.
@@ -233,29 +247,41 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         const {
           votingPublicKey,
           stakingKey,
-          rewardAddress,
+          paymentAddress,
           nonce,
         } = request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
 
         if (
           !ledgerSignTxResp.auxiliaryDataSupplement ||
             (ledgerSignTxResp.auxiliaryDataSupplement.type !==
-              TxAuxiliaryDataSupplementType.CATALYST_REGISTRATION)
+              TxAuxiliaryDataSupplementType.CIP36_REGISTRATION)
         ) {
           throw new Error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} unexpected Ledger sign transaction response`);
         }
-        const { catalystRegistrationSignatureHex } =
+        const { cip36VoteRegistrationSignatureHex } =
           ledgerSignTxResp.auxiliaryDataSupplement;
 
-        metadata = generateRegistrationMetadata(
-          votingPublicKey,
-          stakingKey,
-          rewardAddress,
-          nonce,
-          (_hashedMetadata) => {
-            return catalystRegistrationSignatureHex;
-          },
-        );
+        if (cip36) {
+          metadata = generateRegistrationMetadata(
+            votingPublicKey,
+            stakingKey,
+            paymentAddress,
+            nonce,
+            (_hashedMetadata) => {
+              return cip36VoteRegistrationSignatureHex;
+            },
+          );
+        } else {
+          metadata = generateCip15RegistrationMetadata(
+            votingPublicKey,
+            stakingKey,
+            paymentAddress,
+            nonce,
+            (_hashedMetadata) => {
+              return cip36VoteRegistrationSignatureHex;
+            },
+          );
+        }
         // We can verify that
         //  Buffer.from(
         //    blake2b(256 / 8).update(metadata.to_bytes()).digest('binary')

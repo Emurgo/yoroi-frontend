@@ -2,8 +2,8 @@
   "network": {
     "name": "storybook"
   },
-  "seiza": {
-    "simpleTemplate": "https://testnet.seiza-website.emurgo.io/staking-simple/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$"
+  "poolExplorer": {
+    "simpleTemplate": "https://adapools.yoroiwallet.com/?source=$$BROWSER$$"
   },
   "app": {
     "walletRefreshInterval": 20000,

@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Errore durante l'ottenimento del saldo.",
   "api.errors.getBestBlockApiError": "Errore ricevuto dal server durante l'ottenimento del blocco migliore.",
   "api.errors.getPoolInfoApiError": "Errore ricevuto dal server durante il recupero delle informazioni sulla pool.",
-  "api.errors.getReputationError": "Errore ricevuto dal server durante l'acquisizione della reputazione.",
   "api.errors.getRewardHistoryApiError": "Errore ricevuto dal server durante l'ottenimento della cronologia delle ricompense.",
   "api.errors.getTxHistoryForAddressesApiError": "Errore ricevuto dal server durante il recupero delle transazioni.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Errore ricevuto dal server durante l'acquisizione TxBodies.",

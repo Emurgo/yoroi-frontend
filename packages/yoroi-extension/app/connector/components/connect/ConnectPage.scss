@@ -3,27 +3,31 @@
   flex-direction: column;
   height: calc(100vh - 52px);
   overflow: auto;
+  background-color: #fff;
   &.isNightly {
     height: calc(100vh - 138px);
   }
 }
+
 .connectWrapper {
-  padding-top: 47px;
-  padding-bottom: 78px;
+  padding-top: 32px;
+  padding-bottom: 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
+
   & .image {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border: 1px solid #a7afc0;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f8f8f8;
+    background-color: #fff;
+
     img {
-      width: 20px;
+      width: 44px;
     }
   }
   & .title {
@@ -34,18 +38,9 @@
   }
 }
 
-.titleWallet {
-  display: flex;
-  margin-left: 20px;
-
-  & * + * {
-    padding-left: 10px;
-  }
-}
-
 .toggleButton {
   cursor: pointer;
-} 
+}
 
 .noWallets {
   display: flex;
@@ -80,16 +75,42 @@
   }
 }
 
+.walletsContainer {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.titleWallet {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  font-weight: 500;
+
+  & * + * {
+    padding-left: 10px;
+  }
+}
+
 .list {
   & .listItem {
+    border: 1px solid #fff;
+    border-radius: 8px;
+
     & > div {
       width: 100%;
     }
+
     label {
       width: 100%;
       color: var(--yoroi-palette-gray-900);
     }
+
+    &:hover {
+      border-color: #c4cad7;
+    }
   }
+
   overflow: auto;
 }
 

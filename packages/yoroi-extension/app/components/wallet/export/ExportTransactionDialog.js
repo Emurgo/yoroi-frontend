@@ -11,9 +11,9 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import DateRange from './DateRange'
+import DateRange from './DateRange';
 import { Box } from '@mui/system';
-import { Moment } from 'moment'
+import { Moment } from 'moment';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -22,12 +22,13 @@ const messages = defineMessages({
   },
   infoText1: {
     id: 'wallet.transaction.export.dialog.infoText1',
-    defaultMessage: '!!!The entire transaction history within your wallet will be exported to a file',
+    defaultMessage:
+      '!!!The entire transaction history within your wallet will be exported to a file',
   },
   includeTxIds: {
     id: 'wallet.transaction.export.dialog.includeTxIds',
-    defaultMessage: '!!!Include Transaction IDs'
-  }
+    defaultMessage: '!!!Include Transaction IDs',
+  },
 });
 
 type Props = {|
@@ -42,27 +43,23 @@ type Props = {|
 type State = {|
   startDate: typeof Moment | null,
   endDate: typeof Moment | null,
-|}
+|};
 
 @observer
 export default class ExportTransactionDialog extends Component<Props, State> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   state: State = {
     startDate: null,
     endDate: null,
-  }
+  };
 
   componentWillUnmount() {
-    const {
-      toggleIncludeTxIds,
-      shouldIncludeTxIds
-    } = this.props;
+    const { toggleIncludeTxIds, shouldIncludeTxIds } = this.props;
     // Reset `includeTxIds` state
-    if (shouldIncludeTxIds) toggleIncludeTxIds()
+    if (shouldIncludeTxIds) toggleIncludeTxIds();
   }
 
   render(): Node {
@@ -73,7 +70,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       submit,
       cancel,
       toggleIncludeTxIds,
-      shouldIncludeTxIds
+      shouldIncludeTxIds,
     } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (
@@ -89,23 +86,27 @@ export default class ExportTransactionDialog extends Component<Props, State> {
         }}
       >
         <span>{intl.formatMessage(messages.infoText1)}</span>
-      </Box>);
+      </Box>
+    );
 
-    const dialogActions = [{
-      label: intl.formatMessage(globalMessages.exportButtonLabel),
-      primary: true,
-      isSubmitting: isActionProcessing || false,
-      disabled: (
-        !startDate || !endDate ||
-        startDate.isAfter(endDate) ||
-        !startDate.isValid() || !endDate.isValid()
-      ),
-      onClick: () => submit({ startDate, endDate }),
-    }];
+    const dialogActions = [
+      {
+        label: intl.formatMessage(globalMessages.exportButtonLabel),
+        primary: true,
+        isSubmitting: isActionProcessing || false,
+        disabled:
+          !startDate ||
+          !endDate ||
+          startDate.isAfter(endDate) ||
+          !startDate.isValid() ||
+          !endDate.isValid(),
+        onClick: () => submit({ startDate, endDate }),
+      },
+    ];
 
     return (
       <Dialog
-        className='ExportTransactionDialog'
+        className="ExportTransactionDialog"
         title={intl.formatMessage(messages.dialogTitle)}
         actions={dialogActions}
         closeOnOverlayClick={false}
@@ -115,12 +116,12 @@ export default class ExportTransactionDialog extends Component<Props, State> {
         {infoBlock}
         <DateRange
           date={{ startDate, endDate }}
-          setStartDate={(date) => {
-            this.setState({ startDate: date })}
-          }
-          setEndDate={(date) => {
-            this.setState({ endDate: date })}
-          }
+          setStartDate={date => {
+            this.setState({ startDate: date });
+          }}
+          setEndDate={date => {
+            this.setState({ endDate: date });
+          }}
         />
         <CheckboxLabel
           label={intl.formatMessage(messages.includeTxIds)}
@@ -128,6 +129,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
           checked={shouldIncludeTxIds}
         />
         {error && <ErrorBlock error={error} />}
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

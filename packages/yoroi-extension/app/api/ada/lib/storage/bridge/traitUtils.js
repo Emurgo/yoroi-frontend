@@ -57,6 +57,7 @@ export async function rawGetAllAddressesForDisplay(
   request: {|
     publicDeriver: IPublicDeriver<>,
     type: CoreAddressT,
+    ignoreCutoff: boolean,
    |},
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
@@ -91,7 +92,7 @@ export async function rawGetAllAddressesForDisplay(
 
   // when public deriver level = chain we still have a display cutoff
   const hasCutoff = asDisplayCutoff(request.publicDeriver);
-  if (hasCutoff != null) {
+  if (hasCutoff != null && !request.ignoreCutoff) {
     const cutoff = await hasCutoff.rawGetCutoff(
       tx,
       {
@@ -128,8 +129,9 @@ export type FullAddressPayload =
 
 export async function getAllAddressesForDisplay(
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-    type: CoreAddressT,
+    +publicDeriver: IPublicDeriver<ConceptualWallet>,
+    +type: CoreAddressT,
+    +ignoreCutoff?: ?boolean,
   |},
 ): Promise<Array<FullAddressPayload>> {
   const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
@@ -161,9 +163,90 @@ export async function getAllAddressesForDisplay(
       {
         publicDeriver: request.publicDeriver,
         type: request.type,
+        ignoreCutoff: request.ignoreCutoff === true,
       },
       derivationTables,
     )
+  );
+}
+
+type AddressWithDerivationPath = {|
+  +address: string,
+  +path: Array<number>,
+|};
+
+export async function getAllAddressesWithPaths(
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+): Promise<{|
+  utxoAddresses: Array<$ReadOnly<AddressWithDerivationPath>>,
+  accountingAddresses: Array<$ReadOnly<AddressWithDerivationPath>>,
+|}> {
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+  if (!withLevels) {
+    throw new Error(`${nameof(getAllAddressesWithPaths)} publicDerviver traits missing`);
+  }
+  const derivationTables = withLevels.getParent().getDerivationTables();
+  const deps = Object.freeze({
+    GetPathWithSpecific,
+    GetAddress,
+    GetDerivationSpecific,
+  });
+  const depTables = Object.keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
+
+  return await raii(
+    publicDeriver.getDb(),
+    [
+      ...depTables,
+      ...mapToTables(publicDeriver.getDb(), derivationTables),
+    ],
+    async dbTx => {
+      const utxoAddresses = [];
+      const accountingAddresses = [];
+      const withUtxos = asGetAllUtxos(publicDeriver);
+      if (withUtxos != null) {
+        const addrResponse = await withUtxos.rawGetAllUtxoAddresses(
+          dbTx,
+          {
+            GetPathWithSpecific: deps.GetPathWithSpecific,
+            GetAddress: deps.GetAddress,
+            GetDerivationSpecific: deps.GetDerivationSpecific,
+          },
+          undefined,
+          derivationTables,
+        );
+        for (const family of addrResponse) {
+          for (const addr of family.addrs) {
+            utxoAddresses.push({ address: addr.Hash, path: family.addressing.path });
+          }
+        }
+      }
+      const withAccounting = asGetAllAccounting(publicDeriver);
+      if (withAccounting != null) {
+        const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
+          dbTx,
+          {
+            GetPathWithSpecific: deps.GetPathWithSpecific,
+            GetAddress: deps.GetAddress,
+            GetDerivationSpecific: deps.GetDerivationSpecific,
+          },
+          undefined,
+          derivationTables,
+        );
+        for (const family of addrResponse) {
+          for (const addr of family.addrs) {
+            accountingAddresses.push({ address: addr.Hash, path: family.addressing.path });
+          }
+        }
+      }
+
+      return {
+        utxoAddresses,
+        accountingAddresses,
+      };
+
+    },
   );
 }
 

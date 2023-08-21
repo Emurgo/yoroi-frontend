@@ -10,7 +10,6 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
-import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof EpochProgressContainer.prototype.generated;
 
@@ -77,7 +76,7 @@ export default class EpochProgressContainer extends Component<Props> {
           s: this._leftPadDate(timeLeftInEpoch.getUTCSeconds()),
         }}
         showTooltip={this.props.showTooltip}
-        useEndOfEpoch={!isJormungandr(this.props.publicDeriver.getParent().getNetworkInfo())}
+        useEndOfEpoch
       />
     );
   }
@@ -112,12 +111,6 @@ export default class EpochProgressContainer extends Component<Props> {
         return {
           getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
           getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
-        };
-      }
-      if (api === ApiOptions.jormungandr) {
-        return {
-          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
-          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
         };
       }
       throw new Error(`${nameof(EpochProgressContainer)} api not supported`);

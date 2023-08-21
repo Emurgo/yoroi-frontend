@@ -4,12 +4,11 @@ import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { Node } from 'react';
 import {
-  genFormatTokenAmount,
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
+import { splitAmount, truncateToken } from '../../utils/formatters';
 import { computed } from 'mobx';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -40,11 +39,21 @@ export default class TokensPageRevamp extends Component<InjectedOrGenerated<Gene
           info: getTokenInfo(entry),
         }))
         .filter(item => item.info.IsNFT === false)
-        .map(token => ({
-          name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-          id: getTokenIdentifierIfExists(token.info) ?? '-',
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-        }));
+        .map(token => {
+          const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
+          const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
+          const [beforeDecimal, afterDecimal] = splitAmount(
+            shiftedAmount,
+            numberOfDecimals
+          );
+
+          return {
+            name: truncateToken(getTokenStrictName(token.info) ?? '-'),
+            id: getTokenIdentifierIfExists(token.info) ?? '-',
+            amount: [beforeDecimal, afterDecimal].join(''),
+            amountForSorting: shiftedAmount,
+          }
+        });
     })();
 
     const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);

@@ -18,6 +18,7 @@ import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { createAuthEntry } from '../api';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -44,8 +45,7 @@ export default class ConnectContainer extends Component<
       checksum: null,
     },
   };
-  onUnload: (SyntheticEvent<>) => void = ev => {
-    ev.preventDefault();
+  onUnload: () => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     chrome.runtime.sendMessage({
       type: 'connect_response',
@@ -57,6 +57,7 @@ export default class ConnectContainer extends Component<
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
+    window.addEventListener('beforeunload', this.onUnload);
     window.addEventListener('unload', this.onUnload);
   }
 
@@ -112,7 +113,9 @@ export default class ConnectContainer extends Component<
       }: ConnectResponseData)
     );
 
-    connector.closeWindow.trigger();
+    // if we close the window immediately, the previous message may not be able to
+    // to reach the service worker
+    setTimeout(() => { connector.closeWindow.trigger(); }, 100);
   };
 
   onSelectWallet: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (
@@ -168,6 +171,9 @@ export default class ConnectContainer extends Component<
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const protocol = this.generated.stores.connector.protocol;
     const network = protocol === 'ergo' ? 'ERG' : 'Cardano';
+    const isSelectWalletHardware =
+      this.state.selectedWallet.deriver?.getParent().getWalletType() !==
+      WalletTypeOption.WEB_WALLET;
 
     return (
       <ConnectPage
@@ -187,6 +193,7 @@ export default class ConnectContainer extends Component<
         unitOfAccount={this.generated.stores.profile.unitOfAccount}
         getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         onUpdateHideBalance={this.updateHideBalance}
+        isSelectWalletHardware={isSelectWalletHardware}
       />
     );
   }

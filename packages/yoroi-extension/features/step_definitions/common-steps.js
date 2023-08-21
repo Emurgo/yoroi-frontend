@@ -9,6 +9,7 @@ import {
   AfterAll,
   setDefinitionFunctionWrapper,
   setDefaultTimeout,
+  When,
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
 import * as ErgoServer from '../mock-chain/mockErgoServer';
@@ -49,16 +50,12 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  pickUpCurrencyDialogErgo,
   walletRestoreOptionDialog,
   restoreNormalWallet,
-  walletRestoreDialog,
   restoreWalletButton,
   saveButton,
   byronEraButton,
   createWalletButton,
-  createOptionDialog,
-  createNormalWalletButton,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import {
@@ -84,11 +81,13 @@ import {
   walletRecoveryPhraseDisplayDialog
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
-import { walletNameText, walletPlate } from '../pages/walletPage';
+import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
+import { walletNameText, walletPlate, walletSyncingOverlayComponent } from '../pages/walletPage';
 import {
   continueButton,
   getTosCheckbox,
   languageSelectionForm,
+  loadingSpinnerComponent,
   termsOfUseComponent,
   walletAddComponent,
 } from '../pages/basicSetupPage';
@@ -106,13 +105,14 @@ import {
   uriPromptForm,
 } from '../pages/uriPromptPage';
 import { yoroiModern } from '../pages/mainWindowPage';
-import { extensionTabName, WindowManager } from '../support/windowManager';
+import { backgroungTabName, extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 
 const simpleNodeLogger = require('simple-node-logger');
 
 const { promisify } = require('util');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 /** We need to keep track of our progress in testing to give unique names to screenshots */
 const testProgress = {
@@ -123,6 +123,12 @@ const testProgress = {
 
 BeforeAll(() => {
   setDefaultTimeout(halfMinute);
+  const chromeDataDir = `${testRunsDataDir}_chrome`;
+  const firefoxDataDir = `${testRunsDataDir}_chrome`;
+  const chromeMockServerDataDir = `${testRunsDataDir}_cardanoMockServerLogs`;
+  rimraf.sync(chromeDataDir);
+  rimraf.sync(firefoxDataDir);
+  rimraf.sync(chromeMockServerDataDir);
 
   CardanoServer.getMockServer({});
   ErgoServer.getMockServer({});
@@ -237,15 +243,38 @@ After(async function (scenario) {
     if (this.getBrowser() !== 'firefox') {
       await getLogs(this.driver, 'failedStep', logging.Type.BROWSER);
       await getLogs(this.driver, 'failedStep', logging.Type.DRIVER);
+      // getting logs from background
+      await this.windowManager.openNewTab(backgroungTabName, this.getBackgroundUrl());
+      await this.windowManager.switchTo(backgroungTabName);
+      await getLogs(this.driver, 'background', logging.Type.BROWSER);
+      await this.windowManager.switchTo(extensionTabName);
     }
   }
   await this.windowManager.switchTo(extensionTabName);
+  await getIndexedDBTablesInfo(this, 'second_test_done');
   await this.driver.quit();
   await helpers.sleep(halfSecond);
 });
 
-export async function getPlates(customWorld: any): Promise<any> {
+export async function getIndexedDBTablesInfo(customWorld: any, postfix: string = '') {
+  const dir = await createDirInTestRunsData(customWorld.driver, 'IndexedDBTables');
+  const tables = [
+    'UtxoAtSafePointTable',
+    'UtxoDiffToBestBlock',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput'
+  ];
+
+  for (const table of tables) {
+    const filePath = `${dir}/${table}_${postfix}.json`;
+    const dbResponse = await customWorld.getInfoFromIndexedDB(table);
+    await writeFile(filePath, JSON.stringify(dbResponse));
+  }
+};
+
+export async function getPlates(customWorld: any): Promise<Array<any>> {
   // check plate in confirmation dialog
+  await customWorld.waitForElement(restoringDialogPlate);
   let plateElements = await customWorld.findElements(restoringDialogPlate);
 
   // this makes this function also work for wallets that already exist
@@ -331,7 +360,7 @@ async function getLogs(driver, name, loggingType) {
 
   const dir = await createDirInTestRunsData(driver, `${log}Logs`);
   const consoleLogPath = `${dir}/${testProgress.step}_${testProgress.lineNum}-${name}-${log}-log.json`;
-  const logEntries = await driver.manage().logs().get(loggingType);
+  const logEntries = await driver.manage().logs().get(loggingType, logging.Level.ALL);
   const jsonLogs = logEntries.map(l => l.toJSON());
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
@@ -368,18 +397,25 @@ async function restoreWallet (
   await inputMnemonicForWallet(customWorld, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Mnemonic phrase is entered`);
   await customWorld.waitForElement(verifyRestoredInfoDialog);
-  await checkWalletPlate(customWorld, walletName, restoreInfo);
+  await checkWalletPlate(customWorld, walletName, restoreInfo, walletEra);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet plate is checked`);
+  await customWorld.waitForElementNotPresent(walletSyncingOverlayComponent);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet is fully synchronized`);
 }
 
 async function checkWalletPlate(
   customWorld: any,
   walletName: string,
-  restoreInfo: RestorationInput
+  restoreInfo: RestorationInput,
+  walletEra?: string
 ): Promise<void> {
   const plateElements = await getPlates(customWorld);
   const plateText = await plateElements[0].getText();
-  expect(plateText).to.be.equal(restoreInfo.plate);
+  if (walletEra === 'shelley'){
+    expect(plateText).to.be.equal(restoreInfo.plate);
+  } else if (walletEra === 'byron') {
+    expect(plateText).to.be.equal(restoreInfo.plateByron);
+  }
 
   await customWorld.click(confirmButton);
   await customWorld.waitUntilText(walletNameText, truncateLongName(walletName));
@@ -396,25 +432,6 @@ export async function checkErrorByTranslationId(
 Then(/^I pause the test to debug$/, async function () {
   this.webDriverLogger.info(`Step: I pause the test to debug`);
   await this.waitForElement({ locator: '.element_that_does_not_exist', method: 'css' });
-});
-
-Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
-  this.webDriverLogger.info(`Step: There is an Ergo wallet stored named ${walletName}`);
-  const restoreInfo = testWallets[walletName];
-  expect(restoreInfo).to.not.equal(undefined);
-
-  await this.click(restoreWalletButton);
-
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(pickUpCurrencyDialogErgo);
-
-  await this.waitForElement(walletRestoreOptionDialog);
-
-  await this.click(restoreNormalWallet);
-  await this.waitForElement(walletRestoreDialog);
-
-  await inputMnemonicForWallet(this, restoreInfo);
-  await checkWalletPlate(this, walletName, restoreInfo);
 });
 
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName: WalletNames) {
@@ -437,9 +454,6 @@ Given(/^I create a new Shelley wallet with the name ([^"]*)$/, async function (w
 
   await this.waitForElement(pickUpCurrencyDialog);
   await this.click(getCurrencyButton('cardano'));
-
-  await this.waitForElement(createOptionDialog);
-  await this.click(createNormalWalletButton);
 
   await this.waitForElement(walletInfoDialog);
   await this.input(walletNameInput, walletName);
@@ -521,6 +535,10 @@ Given(/^I have opened the extension$/, async function () {
   if (browserName === 'firefox') {
     await this.driver.manage().window().maximize();
   }
+  // this string is for local debug only. It sets the same resolution as on Github virtual display
+  if (process.env.LIKE_GITHUB_DISPLAY != null && process.env.LIKE_GITHUB_DISPLAY === '1') {
+    this.driver.manage().window().setRect({ x: 0, y: 0, width: 989, height: 1113 });
+  }
 });
 
 Given(/^I refresh the page$/, async function () {
@@ -564,6 +582,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(oneSecond + halfSecond);
+  await this.waitForElementNotPresent(loadingSpinnerComponent);
   await this.waitForElement(yoroiModern);
 });
 
@@ -596,6 +615,7 @@ Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
 
 Given(/^I connected Trezor emulator device$/, async function () {
   // select connecting a HW wallet
+  this.webDriverLogger.info(`Step: I connected Trezor device`);
   await this.click(connectHwButton);
   // pick up currency
   await this.waitForElement(pickUpCurrencyDialog);
@@ -617,6 +637,10 @@ Given(/^I connected Trezor emulator device$/, async function () {
   const name = await this.getValue(walletNameInput);
   expect(name).to.be.equal('Emulator');
   await this.click(saveButton);
+  this.webDriverLogger.info(`Step: Wallet is connected and saved`);
+  await this.waitForElement(walletSyncingOverlayComponent);
+  await this.waitForElementNotPresent(walletSyncingOverlayComponent);
+  this.webDriverLogger.info(`Step: Wallet is fully synchronized`);
 });
 
 async function restoreWalletsFromStorage(client) {
@@ -775,6 +799,12 @@ Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   const walletButtonInRow = await getWalletButtonByPlate(this, restoreInfo.plate);
   await walletButtonInRow.click();
+  await this.waitForElement(walletSummaryBox);
+});
+
+When(/^I go to General Settings$/, async function () {
+  await goToSettings(this);
+  await selectSubmenuSettings(this, 'general');
 });
 
 Then(/^Debug. Take screenshot$/, async function () {

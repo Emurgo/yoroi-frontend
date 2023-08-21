@@ -5,24 +5,9 @@ import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
 import type { RouterHistory } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
-import { translations } from './i18n/translations';
+import { locales, translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
 import { changeToplevelTheme, MuiThemes } from './styles/utils';
@@ -39,23 +24,7 @@ import Support from './components/widgets/Support';
 import { trackNavigation } from './api/analytics';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...nl,
-  ...pt,
-  ...id,
-  ...es,
-  ...it,
-  ...tr,
-  ...cs,
-  ...sk,
-]);
+addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,
@@ -68,14 +37,14 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
-  @observable mergedMessages: null | {| [key: string]: string, |} = null;
+  @observable mergedMessages: null | {| [key: string]: string |} = null;
 
   componentDidMount: () => void = () => {
     autorun(async () => {
       const locale = this.props.stores.profile.currentLocale;
       const _mergedMessages = {
-        ...await translations['en-US'],
-        ...await translations[locale]
+        ...(await translations['en-US']),
+        ...(await translations[locale]),
       };
       runInAction(() => {
         this.mergedMessages = _mergedMessages;
@@ -84,7 +53,7 @@ class App extends Component<Props, State> {
     this.props.history.listen(({ pathname }) => {
       trackNavigation(pathname);
     });
-  }
+  };
 
   state: State = {
     crashed: false,
