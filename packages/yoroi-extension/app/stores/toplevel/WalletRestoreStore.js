@@ -9,7 +9,7 @@ import type {
 } from '../../actions/common/wallet-restore-actions';
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
-import { generateByronPlate, generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
+import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateErgoPlate } from '../../api/ergo/lib/crypto/plate';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
