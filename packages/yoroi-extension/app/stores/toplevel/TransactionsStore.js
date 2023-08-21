@@ -796,7 +796,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _loadSubmittedTransactions: () => Promise<void> = async () => {
     try {
-      const data = loadSubmittedTransactions();
+      const data = await loadSubmittedTransactions();
       if (!data) {
         return;
       }
@@ -837,19 +837,23 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           }
 
           if (isCardanoHaskell(network)) {
-            tx = new CardanoShelleyTransaction({
-              ...txCtorData,
-              certificates: transaction.certificates,
-              ttl: new BigNumber(transaction.ttl),
-              metadata: transaction.metadata,
-              withdrawals: transaction.withdrawals.map(({ address, value }) => ({
-                address,
-                value: MultiToken.from(value),
-              })),
-              isValid: transaction.isValid,
+            runInAction(() => {
+              tx = new CardanoShelleyTransaction({
+                  ...txCtorData,
+                certificates: transaction.certificates,
+                ttl: new BigNumber(transaction.ttl),
+                metadata: transaction.metadata,
+                withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+                  address,
+                  value: MultiToken.from(value)
+                })),
+                isValid: transaction.isValid,
+              });
             });
           } else if (isErgo(network)) {
-            tx = new WalletTransaction(txCtorData);
+            runInAction(() => {
+              tx = new WalletTransaction(txCtorData);
+            });
           } else {
             return;
           }
@@ -860,12 +864,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             tokenIds.set(networkId, tokenIdSet);
           }
 
-          tx.addresses.from
-            .flatMap(({ value }) => value.values.map(tokenEntry => tokenEntry.identifier))
-            .forEach(tokenId => tokenIdSet?.add(tokenId));
-          tx.addresses.to
-            .flatMap(({ value }) => value.values.map(tokenEntry => tokenEntry.identifier))
-            .forEach(tokenId => tokenIdSet?.add(tokenId));
+          // just to please flow
+          if (tx == null) {
+            return;
+          }
+
+          tx.addresses.from.flatMap(
+            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+          ).forEach(tokenId => tokenIdSet?.add(tokenId));
+          tx.addresses.to.flatMap(
+            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+          ).forEach(tokenId => tokenIdSet?.add(tokenId));
 
           return {
             publicDeriverId,

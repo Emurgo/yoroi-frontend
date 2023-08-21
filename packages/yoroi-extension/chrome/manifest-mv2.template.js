@@ -49,9 +49,9 @@ export default ({
     // the name shown in chrome://extensions
     // we also reuse this to choose the filename on disk
     name: titleOverride === true ? defaultTitle : 'Yoroi',
-    manifest_version: 3,
+    manifest_version: 2,
     description,
-    action: {
+    browser_action: {
       default_title: defaultTitle,
       default_icon: icons,
     },
@@ -62,15 +62,12 @@ export default ({
     },
     icons,
     background: {
-      service_worker: 'js/background-service-worker.js',
+      page: 'background.html',
     },
     permissions: [
       'storage',
-      // so that the background service could access `chrome.system.display.width`
-      'system.display',
-    ],
-    host_permissions: [
       '*://connect.trezor.io/*',
+      'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*'
     ],
     content_scripts: [
       {
@@ -78,9 +75,7 @@ export default ({
         js: ['js/trezor-content-script.js'],
       },
     ],
-    content_security_policy: {
-      extension_pages: contentSecurityPolicy
-    },
+    content_security_policy: contentSecurityPolicy,
     protocol_handlers: !enableProtocolHandlers
       ? []
       : [
@@ -108,11 +103,10 @@ export default ({
         all_frames: true,
       }
     );
-    base.web_accessible_resources.push(
-      {
-        resources: injectedScripts.map(script => `js/${script}`),
-        matches: ['<all_urls>'],
-      }
+    base.web_accessible_resources.splice(
+      0,
+      0,
+      ...injectedScripts.map(script => `js/${script}`)
     );
   }
 
@@ -142,10 +136,10 @@ export function overrideForNightly(manifest: any): any {
   manifest.browser_specific_settings.gecko.id = '{6abdeba8-579b-11ea-8e2d-0242ac130003}';
 
   manifest.name = nightlyTitle;
-  manifest.action.default_title = nightlyTitle;
+  manifest.browser_action.default_title = nightlyTitle;
 
   manifest.icons = nightlyIcons;
-  manifest.action.default_icon = nightlyIcons;
+  manifest.browser_action.default_icon = nightlyIcons;
 
   return manifest;
 }
