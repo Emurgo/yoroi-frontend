@@ -751,13 +751,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
     const startBlockHash = blockHashes[startSlot];
     const endBlockHash = blockHashes[endSlot];
-    if (!startBlockHash) {
-      throw new Error('missing start block hash');
+    if (startBlockHash != null && endBlockHash == null) {
+      throw new Error(
+        '[tx-export] Unexpected state: start block hash exists, but end block hash doesnt. Context: '
+        + JSON.stringify({ startDate, endDate, startSlot, endSlot, startBlockHash, endBlockHash, })
+      );
     }
-    if (!endBlockHash) {
-      throw new Error('missing end block hash');
-    }
-    const txs = await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash);
+    const rangeAvailable = endBlockHash != null;
+    const txs = rangeAvailable ?
+      await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash)
+      : [];
 
     respTxRows.push(...txs);
 
@@ -792,7 +795,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _getTxsFromRemote: (
     publicDeriver: PublicDeriver<>,
-    startBlockHash: string,
+    startBlockHash: ?string,
     endBlockHash: string,
   ) => Promise<Array<TransactionExportRow>> = async (
     publicDeriver,
@@ -805,7 +808,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const network = publicDeriver.getParent().getNetworkInfo()
     const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses({
-      after: { block: startBlockHash },
+      ...(startBlockHash != null ? {
+        after: { block: startBlockHash },
+      } : {}),
       untilBlock: endBlockHash,
       network,
       addresses: toRequestAddresses(addresses),
