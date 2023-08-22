@@ -80,32 +80,36 @@ function WalletDelegationBanner({
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
   return isOpen ? (
-    <WrapperBanner>
+    <WrapperBanner
+      sx={{
+        background: theme => theme.palette.background.gradients.walletEmptyCard,
+      }}
+    >
       <Box>
-        <Typography variant="h3" color="var(--yoroi-palette-common-white)" marginBottom="3px">
+        <Typography variant="h3" fontWeight={500} color="comon.black" marginBottom="4px">
           {intl.formatMessage(emptyDashboardMessages.title, { ticker })}
         </Typography>
-        <Typography variant="body1" color="var(--yoroi-palette-common-white)">
+        <Typography variant="body1" color="common.black">
           {intl.formatMessage(messages.delegateNow)}
         </Typography>
         <Stack
           spacing="8px"
           sx={{
-            marginTop: '33px',
+            marginTop: '24px',
             span: {
               marginLeft: '8px',
             },
           }}
         >
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: 'flex', mb: '16px' }}>
             <AvatarWrapper>
-              {avatar != null ? (
+              {avatar ? (
                 <AvatarImg src={avatar} alt={name} />
               ) : (
                 <AvatarImg src={avatarGenerated} alt={name} />
               )}
             </AvatarWrapper>
-            <Typography color="var(--yoroi-palette-common-white)" variant="body1">
+            <Typography color="common.black" variant="body1" fontWeight={500}>
               {name}
             </Typography>
           </Box>
@@ -127,37 +131,35 @@ function WalletDelegationBanner({
             <Label variant="body1" mr="8px">
               {intl.formatMessage(messages.socialMedia)}
             </Label>
-            <SocialMediaStakePool
-              color="#8A99D1"
-              socialLinks={socialLinks}
-              websiteUrl={websiteUrl}
-            />
           </Box>
+          <SocialMediaStakePool
+            color="common.black"
+            socialLinks={socialLinks}
+            websiteUrl={websiteUrl}
+          />
+          <Stack direction="row" spacing="24px" mt="24px">
+            <Link
+              as={Button}
+              variant="secondary"
+              sx={{ textDecoration: 'none' }}
+              size="small"
+              href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {intl.formatMessage(globalMessages.learnMore)}
+            </Link>
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => onDelegateClick(id)}
+              disabled={isWalletWithNoFunds}
+            >
+              {intl.formatMessage(globalMessages.delegateLabel)}
+            </Button>
+          </Stack>
         </Stack>
       </Box>
-      <Stack direction="row" spacing="24px">
-        <Link
-          as={Button}
-          variant="outlined"
-          color="secondary"
-          sx={{ width: '220px', textDecoration: 'none' }}
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          {intl.formatMessage(globalMessages.learnMore)}
-        </Link>
-        {!isWalletWithNoFunds && (
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ width: '220px' }}
-            onClick={() => onDelegateClick(id)}
-          >
-            {intl.formatMessage(globalMessages.delegateLabel)}
-          </Button>
-        )}
-      </Stack>
       <CloseBtn onClick={onClose}>
         <CloseIcon />
       </CloseBtn>
@@ -169,16 +171,12 @@ export default (injectIntl(observer(WalletDelegationBanner)): ComponentType<Prop
 
 const WrapperBanner = styled(Box)({
   position: 'relative',
-  background: 'linear-gradient(45.48deg, #244ABF 0%, #4760FF 100%)',
-  minHeight: 269,
   marginBottom: '40px',
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'start',
   justifyContent: 'space-between',
-  padding: '32px',
-  paddingLeft: '40px',
+  padding: '24px',
   borderRadius: '8px',
-  paddingRight: '110px',
   overflowY: 'hidden',
 });
 
