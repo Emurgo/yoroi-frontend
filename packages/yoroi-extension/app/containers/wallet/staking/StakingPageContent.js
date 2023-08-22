@@ -48,7 +48,6 @@ import { generateGraphData } from '../../../utils/graph';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
-import { ROUTES } from '../../../routes-config';
 
 export type GeneratedData = typeof StakingPageContent.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -241,7 +240,7 @@ class StakingPageContent extends Component<AllProps> {
     // socialLinks: {
     //   fb: '',
     //   tw: '',
-    // },
+    //  },
     // };
 
     return <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undefined} />;
@@ -345,14 +344,6 @@ class StakingPageContent extends Component<AllProps> {
             onBuySellClick={() =>
               this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
             }
-            goToReceivePage={() => {
-              this.generated.actions.router.goToRoute.trigger({
-                route: ROUTES.WALLETS.RECEIVE.ROOT,
-              });
-            }}
-            goToSendPage={() => {
-              this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND });
-            }}
           />
         ) : null}
         {hasNeverDelegated ? null : (
