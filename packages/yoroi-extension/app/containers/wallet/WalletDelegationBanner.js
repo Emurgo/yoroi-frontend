@@ -1,10 +1,10 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
-import { Button, IconButton, Typography, Link } from '@mui/material';
+import { Button, Typography, Link } from '@mui/material';
 
 import { injectIntl, defineMessages } from 'react-intl';
-import { ReactComponent as CloseIcon } from '../../assets/images/close.inline.svg';
+import { ReactComponent as StakingIllustration } from '../../assets/images/dashboard/staking-illustration.inline.svg';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -17,7 +17,6 @@ import type { PoolData } from './staking/SeizaFetcher';
 
 type Props = {|
   +isOpen: boolean,
-  +onClose: void => void,
   +isWalletWithNoFunds: boolean,
   +poolInfo: PoolData | void,
   +onDelegateClick: string => Promise<void>,
@@ -73,7 +72,6 @@ const messages = defineMessages({
 
 function WalletDelegationBanner({
   isOpen,
-  onClose,
   isWalletWithNoFunds,
   onDelegateClick,
   intl,
@@ -122,6 +120,9 @@ function WalletDelegationBanner({
         background: theme => theme.palette.background.gradients.walletEmptyCard,
       }}
     >
+      <Box sx={{ position: 'absolute', bottom: '-4px', right: '20px' }}>
+        <StakingIllustration height="300px" />
+      </Box>
       <Box>
         <Typography variant="h3" fontWeight={500} color="comon.black" marginBottom="4px">
           {intl.formatMessage(emptyDashboardMessages.title, { ticker })}
@@ -197,9 +198,6 @@ function WalletDelegationBanner({
           </Button>
         </Box>
       </Box>
-      <CloseBtn onClick={onClose}>
-        <CloseIcon />
-      </CloseBtn>
     </WrapperBanner>
   ) : null;
 }
@@ -215,14 +213,6 @@ const WrapperBanner = styled(Box)({
   padding: '24px',
   borderRadius: '8px',
   overflowY: 'hidden',
-});
-
-const CloseBtn = styled(IconButton)({
-  position: 'absolute',
-  top: 32,
-  right: 24,
-  padding: '3px',
-  color: 'var(--yoroi-palette-common-white)',
 });
 
 const AvatarWrapper = styled(Box)({

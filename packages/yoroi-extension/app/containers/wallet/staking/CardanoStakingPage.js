@@ -131,7 +131,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
           {hasNeverDelegated ? (
             <WalletDelegationBanner
               isOpen={this.generated.stores.transactions.showDelegationBanner}
-              onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
               onDelegateClick={async poolId => {
                 await this._updatePool(poolId);
                 await this._next();
