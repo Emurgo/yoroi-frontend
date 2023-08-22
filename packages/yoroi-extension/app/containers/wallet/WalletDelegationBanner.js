@@ -1,7 +1,7 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
-import { Stack, Button, IconButton, Typography, Link } from '@mui/material';
+import { Button, IconButton, Typography, Link } from '@mui/material';
 
 import { injectIntl, defineMessages } from 'react-intl';
 import { ReactComponent as CloseIcon } from '../../assets/images/close.inline.svg';
@@ -11,10 +11,7 @@ import { observer } from 'mobx-react';
 import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard/StakingDashboard';
 import { toSvg } from 'jdenticon';
 
-import {
-  HelperTooltip,
-  SocialMediaStakePool,
-} from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
+import { SocialMediaStakePool } from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
@@ -34,6 +31,22 @@ const messages = defineMessages({
   noDelegated: {
     id: 'wallet.transaction.empty',
     defaultMessage: '!!!Your wallet is empty',
+  },
+  poolSize: {
+    id: 'wallet.staking.banner.poolSizeLabel',
+    defaultMessage: '!!!Pool size',
+  },
+  poolShare: {
+    id: 'wallet.staking.banner.poolShareLabel',
+    defaultMessage: '!!!Share',
+  },
+  poolCosts: {
+    id: 'wallet.staking.banner.poolCostsLabel',
+    defaultMessage: '!!!Costs',
+  },
+  blocksLabel: {
+    id: 'wallet.staking.banner.poolBlocksLabel',
+    defaultMessage: '!!!Blocks',
   },
   delegateNow: {
     id: 'wallet.staking.banner.delegateNow',
@@ -74,10 +87,34 @@ function WalletDelegationBanner({
       </Box>
     );
   }
-  const { id, name, avatar, websiteUrl, roa: estimatedRoa30d, socialLinks } = poolInfo || {};
+  const { id, name, avatar, websiteUrl, roa: estimatedRoa30d, socialLinks, poolSize, share } =
+    poolInfo || {};
 
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+
+  const poolInfoFields = [
+    {
+      label: globalMessages.roa30d,
+      value: estimatedRoa30d,
+    },
+    {
+      label: messages.poolSize,
+      value: poolSize,
+    },
+    {
+      label: messages.poolShare,
+      value: share,
+    },
+    {
+      label: messages.poolCosts,
+      value: '__c',
+    },
+    {
+      label: messages.blocksLabel,
+      value: '__b',
+    },
+  ];
 
   return isOpen ? (
     <WrapperBanner
@@ -92,73 +129,73 @@ function WalletDelegationBanner({
         <Typography variant="body1" color="common.black">
           {intl.formatMessage(messages.delegateNow)}
         </Typography>
-        <Stack
-          spacing="8px"
+        <Box sx={{ display: 'flex', mb: '16px', mt: '24px' }}>
+          <AvatarWrapper>
+            {avatar ? (
+              <AvatarImg src={avatar} alt={name} />
+            ) : (
+              <AvatarImg src={avatarGenerated} alt={name} />
+            )}
+          </AvatarWrapper>
+          <Typography color="common.black" variant="body1" fontWeight={500}>
+            {name}
+          </Typography>
+        </Box>
+        <Box
           sx={{
-            marginTop: '24px',
-            span: {
-              marginLeft: '8px',
-            },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: '20px',
           }}
         >
-          <Box sx={{ display: 'flex', mb: '16px' }}>
-            <AvatarWrapper>
-              {avatar ? (
-                <AvatarImg src={avatar} alt={name} />
-              ) : (
-                <AvatarImg src={avatarGenerated} alt={name} />
-              )}
-            </AvatarWrapper>
-            <Typography color="common.black" variant="body1" fontWeight={500}>
-              {name}
-            </Typography>
-          </Box>
-          <Label variant="body1">
-            {intl.formatMessage(globalMessages.roa30d)}
-            <Typography as="span" color="var(--yoroi-palette-common-white)" marginRight="10px">
-              {estimatedRoa30d}
-            </Typography>
-            <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
-          </Label>
-          <Label variant="body1">
-            {intl.formatMessage(messages.firstReward)}
-            <Typography as="span" color="var(--yoroi-palette-common-white)" marginRight="10px">
-              {intl.formatMessage(messages.firstRewardDetails)}
-            </Typography>
-            <HelperTooltip message={intl.formatMessage(messages.firstRewardHelperMessage)} />
-          </Label>
-          <Box display="flex">
-            <Label variant="body1" mr="8px">
-              {intl.formatMessage(messages.socialMedia)}
-            </Label>
-          </Box>
+          {poolInfoFields.map(({ label: message, value }) => {
+            const label = intl.formatMessage(message);
+            return (
+              <Box
+                sx={{
+                  minWidth: '85px',
+                }}
+                key={label}
+              >
+                <Typography variant="body1" fontWeight={500} color="common.black">
+                  {label}
+                </Typography>
+                <Typography variant="body1" color="common.black">
+                  {value ? value.trim() : '-'}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
+        <Box mt="16px">
           <SocialMediaStakePool
             color="common.black"
             socialLinks={socialLinks}
             websiteUrl={websiteUrl}
           />
-          <Stack direction="row" spacing="24px" mt="24px">
-            <Link
-              as={Button}
-              variant="secondary"
-              sx={{ textDecoration: 'none' }}
-              size="small"
-              href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              {intl.formatMessage(globalMessages.learnMore)}
-            </Link>
-            <Button
-              variant="primary"
-              size="small"
-              onClick={() => onDelegateClick(id)}
-              disabled={isWalletWithNoFunds}
-            >
-              {intl.formatMessage(globalMessages.delegateLabel)}
-            </Button>
-          </Stack>
-        </Stack>
+        </Box>
+        <Box sx={{ marginTop: '24px', display: 'flex', flexDirection: 'row', gap: '24px' }}>
+          <Link
+            as={Button}
+            variant="secondary"
+            sx={{ textDecoration: 'none' }}
+            size="small"
+            href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            {intl.formatMessage(globalMessages.learnMore)}
+          </Link>
+          <Button
+            variant="primary"
+            size="small"
+            onClick={() => onDelegateClick(id)}
+            disabled={isWalletWithNoFunds}
+          >
+            {intl.formatMessage(globalMessages.delegateLabel)}
+          </Button>
+        </Box>
       </Box>
       <CloseBtn onClick={onClose}>
         <CloseIcon />
@@ -202,11 +239,4 @@ const AvatarImg = styled('img')({
   width: '100%',
   background: 'white',
   objectFit: 'scale-down',
-});
-
-const Label = styled(Typography)({
-  display: 'flex',
-  alignItems: 'center',
-  color: 'var(--yoroi-palette-common-white)',
-  opacity: 0.5,
 });
