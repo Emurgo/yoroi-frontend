@@ -60,6 +60,7 @@ import moment from 'moment';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
+import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -819,15 +820,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       await getAllAddressesForWallet(publicDeriver)
     );
     const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-    const network = publicDeriver.getParent().getNetworkInfo()
-    const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses({
-      ...(startBlockHash != null ? {
-        after: { block: startBlockHash },
-      } : {}),
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const txsRequest: HistoryRequest = {
+      after: undefined,
       untilBlock: endBlockHash,
       network,
       addresses: toRequestAddresses(addresses),
-    });
+    };
+    if (startBlockHash != null) {
+      txsRequest.after = { block: startBlockHash };
+    }
+    const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses(txsRequest);
 
     const ownAddresses = new Set([
       ...addresses.utxoAddresses.map(a => a.Hash),
