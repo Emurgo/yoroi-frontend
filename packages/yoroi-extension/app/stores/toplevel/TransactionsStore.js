@@ -735,7 +735,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       );
 
       return [
-        Math.max(relativeSlot.epoch, 1),
+        Math.max(relativeSlot.epoch, 0),
         Math.max(relativeSlot.slot, 0)
       ];
     }
