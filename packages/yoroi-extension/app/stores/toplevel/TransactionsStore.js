@@ -10,8 +10,8 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   BaseGetTransactionsRequest,
   ExportTransactionsFunc,
-  GetTransactionsFunc,
   GetTransactionsDataFunc,
+  GetTransactionsFunc,
   GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
@@ -42,8 +42,8 @@ import {
   isErgo,
   networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { DefaultTokenEntry, TokenEntry } from '../../api/common/lib/MultiToken';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -52,10 +52,10 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
-import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import { persistSubmittedTransactions, loadSubmittedTransactions } from '../../api/localStorage';
-import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
+import { loadSubmittedTransactions, persistSubmittedTransactions } from '../../api/localStorage';
+import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import moment from 'moment';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
@@ -727,7 +727,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const toRelativeSlotNumber = await timeUtils.genToRelativeSlotNumber(config);
 
     const dateFormat = 'YYYY-MM-DD';
-    const dateToSlot = (date: string) => {
+    const dateToSlot = (date: string): [number, number] => {
       const relativeSlot = toRelativeSlotNumber(
         timeToSlot({
           time: new Date(`${date}T23:59:59`), // Get the slot at the last second in the day
@@ -740,27 +740,40 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       ];
     }
 
-    const startSlot = dateToSlot(startDate.subtract(1, 'day').format(dateFormat));
-    const endSlot = dateToSlot(endDate.format(dateFormat));
-
-    const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
-    const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-    const { blockHashes } =  await fetcher.getLatestBlockBySlot({
-      network: selectedNetwork,
-      slots: [startSlot, endSlot]
-    });
-    const startBlockHash = blockHashes[startSlot];
-    const endBlockHash = blockHashes[endSlot];
-    if (startBlockHash != null && endBlockHash == null) {
-      throw new Error(
-        '[tx-export] Unexpected state: start block hash exists, but end block hash doesnt. Context: '
-        + JSON.stringify({ startDate, endDate, startSlot, endSlot, startBlockHash, endBlockHash, })
-      );
+    const slotsToTxs = async (
+      startSlot: [number, number],
+      endSlot: [number, number],
+    ): Promise<Array<TransactionExportRow>> => {
+      if (String(startSlot) === String(endSlot)) {
+        return [];
+      }
+      const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
+      const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      const { blockHashes } =  await fetcher.getLatestBlockBySlot({
+        network: selectedNetwork,
+        slots: [startSlot, endSlot]
+      });
+      const startBlockHash = blockHashes[startSlot];
+      const endBlockHash = blockHashes[endSlot];
+      if (endBlockHash == null) {
+        if (startBlockHash != null) {
+          throw new Error(
+            '[tx-export] Unexpected state: start block hash exists, but end block hash doesnt. Context: '
+            + JSON.stringify({
+              startDate, endDate, startSlot, endSlot, startBlockHash, endBlockHash,
+            })
+          );
+        }
+        // No range available
+        return [];
+      }
+      return await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash);
     }
-    const rangeAvailable = endBlockHash != null;
-    const txs = rangeAvailable ?
-      await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash)
-      : [];
+
+    const txs = await slotsToTxs(
+      dateToSlot(startDate.subtract(1, 'day').format(dateFormat)),
+      dateToSlot(endDate.format(dateFormat)),
+    );
 
     respTxRows.push(...txs);
 
