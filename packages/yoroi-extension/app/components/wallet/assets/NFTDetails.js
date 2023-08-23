@@ -141,7 +141,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           to={ROUTES.NFTS.ROOT}
           variant="h5"
           sx={{
-            color: 'var(--yoroi-palette-gray-900)',
+            color: 'grayscale.900',
             textDecoration: 'none',
             marginTop: '5px',
             textTransform: 'capitalize',
@@ -210,8 +210,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               <Box>
                 <TruncatedText
                   variant="h2"
+                  fontWeight={500}
                   sx={{ width: below1400 ? '200px' : '400px' }}
-                  color="var(--yoroi-palette-gray-900)"
+                  color="common.black"
                 >
                   {nftInfo.name}
                 </TruncatedText>
@@ -338,14 +339,16 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               {nftInfo.metadata && (
                 <Button
                   onClick={onCopyMetadata}
-                  variant="text"
                   color="inherit"
-                  sx={{ ml: '-8px', mb: '24px' }}
-                  startIcon={isCopied ? <IconCopied /> : <IconCopy />}
+                  sx={{
+                    ml: '-8px',
+                    mb: '24px',
+                    fontSize: '14px',
+                    color: 'grayscale.900',
+                  }}
+                  endIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >
-                  <Typography variant="button2" fontWeight="500">
-                    {intl.formatMessage(messages.copyMetadata)}
-                  </Typography>
+                  {intl.formatMessage(messages.copyMetadata)}
                 </Button>
               )}
               <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
