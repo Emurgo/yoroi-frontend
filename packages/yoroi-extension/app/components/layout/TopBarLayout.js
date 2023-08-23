@@ -142,6 +142,11 @@ function TopBarLayout({
               flexDirection: 'column',
               maxHeight: 'calc(100vh - 110px)',
             }),
+            ...(isRevampLayout &&
+              asModern !== true &&
+              !isModern && {
+                backgroundColor: 'common.white',
+              }),
           }}
         >
           {content}
@@ -188,6 +193,11 @@ function TopBarLayout({
               showInContainer === true && isRevampLayout
                 ? 'common.white'
                 : 'var(--yoroi-palette-gray-50)',
+            ...(isRevampLayout &&
+              asModern !== true &&
+              !isModern && {
+                backgroundColor: 'common.white',
+              }),
           }}
         >
           {banner}

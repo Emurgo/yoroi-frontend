@@ -44,11 +44,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           return {
             name,
             id: getTokenIdentifierIfExists(token.info) ?? '-',
-            image: getImageFromTokenMetadata(
-              policyId,
-              fullName,
-              token.info.Metadata,
-            ),
+            image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
           };
         });
     })();
