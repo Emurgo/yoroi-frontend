@@ -438,10 +438,12 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
   };
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <TruncatedText sx={{ width: '90%' }}>{children}</TruncatedText>
+    <Stack direction="row" alignItems="center">
+      <TruncatedText>{children}</TruncatedText>
 
-      <IconButton onClick={onCopy}>{isCopied ? <IconCopied /> : <IconCopy />}</IconButton>
+      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
+        {isCopied ? <IconCopied /> : <IconCopy />}
+      </IconButton>
     </Stack>
   );
 }
