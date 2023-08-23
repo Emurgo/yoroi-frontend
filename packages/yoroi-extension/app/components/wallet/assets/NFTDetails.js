@@ -244,7 +244,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   borderBottom: 1,
                   borderColor: 'divider',
                   '.MuiTab-root': {
-                    paddingLeft: '0px',
+                    paddingX: '0px',
+                    mr: '24px',
                   },
                 }}
                 onChange={(_, newValue) => setActiveTab(newValue)}
@@ -255,18 +256,13 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     key={id}
                     sx={{
                       minWidth: 'unset',
-                      paddingX: '0px',
                       width: 'content',
-                      marginRight: id === tabs[0].id && '24px',
                       textTransform: 'none',
                       fontWeight: 500,
-                      paddingLeft: '0px',
-                      '.MuiTab-root': {
-                        paddingLeft: '0px',
-                      },
                     }}
                     label={intl.formatMessage(label)}
                     value={id}
+                    disableRipple
                   />
                 ))}
               </TabList>
