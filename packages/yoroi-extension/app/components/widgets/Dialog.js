@@ -137,7 +137,7 @@ const ModalContainer = styled(Box)(({ theme }) => ({
   minWidth: 'var(--yoroi-comp-dialog-min-width-md)',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '24px',
-  paddingBottom: theme.name === 'classic' ? '30px' : '40px',
+  paddingBottom: theme.name === 'classic' ? '30px' : '24px',
   maxWidth: theme.name === 'classic' ? '785px' : '560px',
   backgroundColor: 'var(--yoroi-comp-dialog-background)',
   color: 'var(--yoroi-comp-dialog-text)',
@@ -156,16 +156,16 @@ const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
   maxHeight: '60vh',
-  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
-  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
+  paddingRight: theme.name === 'classic' ? '30px' : '24px',
 }));
 const ModalFooter = styled(Box)(({ theme }) => ({
   display: 'flex',
-  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
-  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
+  paddingRight: theme.name === 'classic' ? '30px' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '34px',
   '& button': {
-    width: ' 50%',
+    width: '50%',
     '&:only-child': {
       margin: 'auto',
       width: '100%',
