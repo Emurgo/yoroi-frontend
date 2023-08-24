@@ -1,12 +1,10 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
-import { Avatar, Link as LinkMui, Grid, Typography } from '@mui/material';
+import { Link as LinkMui, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { defineMessages, injectIntl } from 'react-intl';
-import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { ReactComponent as ArrowLeft } from '../../../assets/images/assets-page/back-arrow.inline.svg';
-import { ReactComponent as LinkSvg } from '../../../assets/images/link.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
