@@ -133,7 +133,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ height: '101vh' }}>
+    <Box sx={{ overflowY: 'scroll', height: '100%', p: '24px' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}

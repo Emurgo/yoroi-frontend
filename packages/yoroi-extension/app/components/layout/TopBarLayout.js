@@ -17,6 +17,7 @@ type Props = {|
   +showInContainer?: boolean,
   +showAsCard?: boolean,
   +asModern?: boolean,
+  +withPadding?: boolean, // default: true
   +bgcolor?: string,
 |};
 
@@ -35,6 +36,7 @@ function TopBarLayout({
   currentTheme,
   isRevampLayout,
   asModern,
+  withPadding,
   bgcolor,
 }: Props & InjectedProps) {
   const isModern = currentTheme === THEMES.YOROI_MODERN;
@@ -90,7 +92,8 @@ function TopBarLayout({
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    padding: '24px',
+                    padding:
+                      typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
                     backgroundColor: bgcolor || 'common.white',
                   }}
                 >
@@ -215,5 +218,6 @@ TopBarLayout.defaultProps = {
   showInContainer: false,
   showAsCard: false,
   asModern: false,
+  withPadding: true,
   bgcolor: undefined,
 };
