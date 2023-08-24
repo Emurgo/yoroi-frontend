@@ -686,8 +686,10 @@ export async function connectorSignTx(
   };
 }
 
-function getScriptRequiredSigningKeys(
+export function getScriptRequiredSigningKeys(
   witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
+  // eslint-disable-next-line no-shadow
+  RustModule: typeof RustModule,
 ): Set<string> {
   const set = new Set<string>();
   const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
@@ -730,17 +732,17 @@ export async function connectorSignCardanoTx(
     __connectorSignCardanoTx(publicDeriver, password, tx, Module));
 }
 
-async function __connectorSignCardanoTx(
-  publicDeriver: PublicDeriver<>,
-  password: string,
+export function resolveTxOrTxBody(
   tx: CardanoTx,
   // eslint-disable-next-line no-shadow
   RustModule: typeof RustModule,
-): Promise<string> {
-
-  // eslint-disable-next-line no-unused-vars
-  const { tx: txHex, partialSign } = tx;
-
+): {
+  txBody: RustModule.WalletV4.TransactionBody,
+  witnessSet: RustModule.WalletV4.TransactionWitnessSet,
+  auxiliaryData: ?RustModule.WalletV4.AuxiliaryData,
+  rawTxBody: Buffer,
+} {
+  const { tx: txHex } = tx;
   let txBody: RustModule.WalletV4.TransactionBody;
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
   let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
@@ -761,6 +763,19 @@ async function __connectorSignCardanoTx(
       throw originalErr;
     }
   }
+  return { txBody, witnessSet, auxiliaryData, rawTxBody }
+}
+
+async function __connectorSignCardanoTx(
+  publicDeriver: PublicDeriver<>,
+  password: string,
+  tx: CardanoTx,
+  // eslint-disable-next-line no-shadow
+  RustModule: typeof RustModule,
+): Promise<string> {
+
+  const { txBody, witnessSet, auxiliaryData, rawTxBody } =
+    resolveTxOrTxBody(tx, RustModule);
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -773,7 +788,7 @@ async function __connectorSignCardanoTx(
   }
 
   const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
-  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet);
+  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet, RustModule);
   const totalAdditionalRequiredSignKeys = new Set<string>([
     ...requiredTxSignKeys,
     ...requiredScriptSignKeys,
