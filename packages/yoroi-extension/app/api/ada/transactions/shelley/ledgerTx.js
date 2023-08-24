@@ -644,7 +644,7 @@ export function toLedgerSignRequest(
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
   rawTxBody: Buffer,
-  additionalRequiredSigners: [string] = [],
+  additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
   const parsedCbor = cbor.decode(rawTxBody);
 
@@ -831,7 +831,7 @@ export function toLedgerSignRequest(
     );
   }
 
-  function getRequiredSignerHashHexes(): [string] {
+  function getRequiredSignerHashHexes(): Array<string> {
     const set = new Set<string>();
     const requiredSigners = txBody.required_signers();
     if (requiredSigners) {
@@ -845,7 +845,7 @@ export function toLedgerSignRequest(
   const additionalWitnessPaths = [];
   const formattedRequiredSigners = [];
   RustModule.WasmScope(Module => {
-    function hashHexToOwnAddressPath(hashHex: string): ?AddressMap {
+    function hashHexToOwnAddressPath(hashHex: string): ?Array<number> {
       const hash = Module.WalletV4.Ed25519KeyHash.from_hex(hashHex);
       const enterpriseAddress = Module.WalletV4.EnterpriseAddress.new(
         networkId,

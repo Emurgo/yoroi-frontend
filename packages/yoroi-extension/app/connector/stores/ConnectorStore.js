@@ -417,8 +417,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             : [...(getScriptRequiredSigningKeys(witnessSet, Module))];
         });
 
-
-        const witnessSetHex = (await this.hwSignTx(wallet.publicDeriver, rawTxBody, additionalRequiredSigners))
+        const witnessSetHex =
+          (await this.hwSignTx(
+            wallet.publicDeriver,
+            rawTxBody,
+            additionalRequiredSigners,
+          ))
           .witness_set()
           .to_hex();
 
@@ -1054,7 +1058,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   async hwSignTx(
     publicDeriver: PublicDeriver<>,
     rawTxBody: Buffer,
-    additionalRequiredSigners: [string] = [],
+    additionalRequiredSigners: Array<string> = [],
   ): Promise<RustModule.WalletV4.Transaction> {
     if (isLedgerNanoWallet(publicDeriver.getParent())) {
       return this.ledgerSignTx(publicDeriver, rawTxBody, additionalRequiredSigners);
@@ -1152,7 +1156,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   async ledgerSignTx(
     publicDeriver: PublicDeriver<>,
     rawTxBody: Buffer,
-    additionalRequiredSigners: [string] = [],
+    additionalRequiredSigners: Array<string> = [],
   ): Promise<RustModule.WalletV4.Transaction> {
     const config = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo()).reduce(
       (acc, next) => Object.assign(acc, next),

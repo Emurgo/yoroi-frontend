@@ -736,12 +736,12 @@ export function resolveTxOrTxBody(
   tx: CardanoTx,
   // eslint-disable-next-line no-shadow
   RustModule: typeof RustModule,
-): {
+): {|
   txBody: RustModule.WalletV4.TransactionBody,
-  witnessSet: RustModule.WalletV4.TransactionWitnessSet,
-  auxiliaryData: ?RustModule.WalletV4.AuxiliaryData,
   rawTxBody: Buffer,
-} {
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
+  auxiliaryData: ?RustModule.WalletV4.AuxiliaryData,
+|} {
   const { tx: txHex } = tx;
   let txBody: RustModule.WalletV4.TransactionBody;
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
