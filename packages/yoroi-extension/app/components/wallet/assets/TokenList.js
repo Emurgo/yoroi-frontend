@@ -4,7 +4,7 @@ import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as DefaultAssetLogo } from '../../../assets/images/assets-page/default-asset-logo.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../assets/images/assets-page/arrows-list.inline.svg';
@@ -234,7 +234,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
             {assetsList.map(token => (
               <TokenItemRow
                 key={token.id}
-                avatar={<NoAssetLogo />}
+                avatar={<DefaultAssetLogo />}
                 name={token.name}
                 id={token.id}
                 amount={shouldHideBalance ? hiddenAmount : token.amount}
