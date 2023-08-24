@@ -21,6 +21,7 @@ import type {
   MultiAssetMintMetadataRequest,
   MultiAssetMintMetadataResponse,
   GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
+  GetLatestBlockBySlotFunc,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -141,6 +142,11 @@ export class BatchedFetcher implements IFetcher {
 
   getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = (body) => (
     batchGetUtxoData(this.baseFetcher.getUtxoData)(body)
+  )
+
+  getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
+    // Todo: Implement batching as the max slots per request is 50
+    this.baseFetcher.getLatestBlockBySlot(body)
   )
 }
 

@@ -14,6 +14,7 @@ import type {
   TokenInfoRequest, TokenInfoResponse,
   MultiAssetMintMetadataRequest, MultiAssetMintMetadataResponse,
   GetUtxoDataRequest, GetUtxoDataResponse,
+  GetLatestBlockBySlotReq, GetLatestBlockBySlotRes,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -35,4 +36,5 @@ export interface IFetcher {
   getMultiAssetMintMetadata(body: MultiAssetMintMetadataRequest)
     : Promise<MultiAssetMintMetadataResponse>;
   getUtxoData(body: GetUtxoDataRequest): Promise<GetUtxoDataResponse>;
+  getLatestBlockBySlot(body: GetLatestBlockBySlotReq): Promise<GetLatestBlockBySlotRes>;
 }

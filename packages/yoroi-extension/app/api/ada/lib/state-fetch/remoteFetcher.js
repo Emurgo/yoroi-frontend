@@ -29,6 +29,7 @@ import type {
   MultiAssetMintMetadataResponse,
   GetUtxoDataRequest,
   GetUtxoDataResponse,
+  GetLatestBlockBySlotFunc,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -487,6 +488,30 @@ export class RemoteFetcher implements IFetcher {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUtxoData)} error: ` + stringifyError(error));
         throw new GetUtxoDataError();
       });
+  }
 
+  getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2.1/lastBlockBySlot`,
+      {
+        method: 'post',
+        data: {
+          slots: body.slots,
+        },
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        return {
+          blockHashes: {},
+        }
+      });
   }
 }
