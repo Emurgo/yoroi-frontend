@@ -138,13 +138,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
 
   return (
     <Stack sx={{ minHeight: '500px' }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        borderBottom="1px solid var(--yoroi-palette-gray-200)"
-        paddingBottom="16px"
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" paddingBottom="8px">
         <Typography
           variant="h5"
           color="var(--yoroi-palette-common-black)"
@@ -189,47 +183,49 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
       ) : (
         <>
           <List>
-            <ListItemLayout
-              firstColumn={
-                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
-                  <Typography variant="body2" color="grayscale.600" mr="4px">
-                    {intl.formatMessage(assetsMessage.nameAndTicker)}
-                  </Typography>
-                  {displayColumnLogo(SORTING_COLUMNS.NAME)}
-                </ButtonBase>
-              }
-              secondColumn={
-                <Stack direction="row" alignItems="center" spacing="4px">
-                  <Typography variant="body2" color="grayscale.600">
-                    {intl.formatMessage(globalMessages.fingerprint)}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      '> svg': {
-                        width: '32px',
-                        height: '32px',
-                        '> path': {
-                          fill: 'grayscale.600',
+            <Box sx={{ borderBottom: '1px solid', borderColor: 'grayscale.200', mt: '-8px' }}>
+              <ListItemLayout
+                firstColumn={
+                  <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
+                    <Typography variant="body2" color="grayscale.600" mr="4px">
+                      {intl.formatMessage(assetsMessage.nameAndTicker)}
+                    </Typography>
+                    {displayColumnLogo(SORTING_COLUMNS.NAME)}
+                  </ButtonBase>
+                }
+                secondColumn={
+                  <Stack direction="row" alignItems="center" spacing="4px">
+                    <Typography variant="body2" color="grayscale.600">
+                      {intl.formatMessage(globalMessages.fingerprint)}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '> svg': {
+                          width: '32px',
+                          height: '32px',
+                          '> path': {
+                            fill: 'grayscale.600',
+                          },
                         },
-                      },
-                    }}
-                  >
-                    <Info />
-                  </Box>
-                </Stack>
-              }
-              thirdColumn={
-                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                  <Typography variant="body2" color="grayscale.600" mr="4px">
-                    {intl.formatMessage(assetsMessage.quantity)}
-                  </Typography>
-                  {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                </ButtonBase>
-              }
-            />
+                      }}
+                    >
+                      <Info />
+                    </Box>
+                  </Stack>
+                }
+                thirdColumn={
+                  <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                    <Typography variant="body2" color="grayscale.600" mr="4px">
+                      {intl.formatMessage(assetsMessage.quantity)}
+                    </Typography>
+                    {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                  </ButtonBase>
+                }
+              />
+            </Box>
 
             {assetsList.map(token => (
               <TokenItemRow
