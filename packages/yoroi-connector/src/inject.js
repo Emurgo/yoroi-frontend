@@ -164,18 +164,17 @@ class CardanoAuth {
 class CardanoAPI {
   
     constructor(auth, rpc) {
-      const self = this;
       function rpcWrapper(func, params) {
-        return rpc(func, params, self._returnType[0]);
+        return rpc(func, params, CardanoAPI._returnType[0]);
       }
-      this._auth = new CardanoAuth(auth, rpcWrapper);
-      this._cardano_rpc_call = rpcWrapper;
-      this._disconnection = [false];
-      this._returnType = ["cbor"];
+      CardanoAPI._auth = new CardanoAuth(auth, rpcWrapper);
+      CardanoAPI._cardano_rpc_call = rpcWrapper;
+      CardanoAPI._disconnection = [false];
+      CardanoAPI._returnType = ["cbor"];
       window.addEventListener('yoroi_wallet_disconnected', function() {
-          if (!self._disconnection[0]) {
-              self._disconnection[0] = true;
-              self._disconnection.slice(1).forEach(f => f());
+          if (!CardanoAPI._disconnection[0]) {
+              CardanoAPI._disconnection[0] = true;
+              CardanoAPI._disconnection.slice(1).forEach(f => f());
           }
       });
     }
@@ -186,60 +185,60 @@ class CardanoAPI {
         if (returnType !== 'cbor' && returnType !== 'json') {
           throw new Error('Possible return type values are: "cbor" or "json"');
         }
-        this._returnType[0] = returnType;
+        CardanoAPI._returnType[0] = returnType;
       },
       
       auth: () => {
-        return this._auth;
+        return CardanoAPI._auth;
       },
       
       createTx: (req) => {
-        return this._cardano_rpc_call("create_tx/cardano", [req]);
+        return CardanoAPI._cardano_rpc_call("create_tx/cardano", [req]);
       },
 
       listNFTs: () => {
-        return this._cardano_rpc_call("list_nfts/cardano", []);
+        return CardanoAPI._cardano_rpc_call("list_nfts/cardano", []);
       },
       
       onDisconnect: (callback) => {
-        if (this._disconnection[0]) {
+        if (CardanoAPI._disconnection[0]) {
           throw new Error('Cardano API instance is already disconnected!');
         }
-        this._disconnection.push(callback);
+        CardanoAPI._disconnection.push(callback);
       },
       
     }) 
     
     getNetworkId() {
-      return this._cardano_rpc_call("get_network_id", []);
+      return CardanoAPI._cardano_rpc_call("get_network_id", []);
     }
     
     getBalance(token_id = '*') {
-      return this._cardano_rpc_call("get_balance", [token_id]);
+      return CardanoAPI._cardano_rpc_call("get_balance", [token_id]);
     }
     
     getUsedAddresses(paginate = undefined) {
-      return this._cardano_rpc_call("get_used_addresses", [paginate]);
+      return CardanoAPI._cardano_rpc_call("get_used_addresses", [paginate]);
     }
     
     getUnusedAddresses() {
-      return this._cardano_rpc_call("get_unused_addresses", []);
+      return CardanoAPI._cardano_rpc_call("get_unused_addresses", []);
     }
     
     getRewardAddresses() {
-      return this._cardano_rpc_call("get_reward_addresses/cardano", []);
+      return CardanoAPI._cardano_rpc_call("get_reward_addresses/cardano", []);
     }
     
     getChangeAddress() {
-      return this._cardano_rpc_call("get_change_address", []);
+      return CardanoAPI._cardano_rpc_call("get_change_address", []);
     }
     
     getUtxos(amount = undefined, paginate = undefined) {
-      return this._cardano_rpc_call("get_utxos/cardano", [amount, paginate]);
+      return CardanoAPI._cardano_rpc_call("get_utxos/cardano", [amount, paginate]);
     }
     
     submitTx(tx) {
-      return this._cardano_rpc_call('submit_tx', [tx]);
+      return CardanoAPI._cardano_rpc_call('submit_tx', [tx]);
     }
     
     signTx(param, _partialSign = false) {
@@ -256,20 +255,20 @@ class CardanoAPI {
       } else if (typeof param !== 'string') {
         throw new Error('.signTx argument is expected to be an object or a string!')
       }
-      return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign, returnTx }]);
+      return CardanoAPI._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign, returnTx }]);
     }
     
     signData(address, payload) {
-      return this._cardano_rpc_call("sign_data", [address, payload]);
+      return CardanoAPI._cardano_rpc_call("sign_data", [address, payload]);
     }
 
     // DEPRECATED
     getCollateralUtxos(requiredAmount) {
-      return this._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
+      return CardanoAPI._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
     }
 
     getCollateral(requiredAmount) {
-      return this._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
+      return CardanoAPI._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
     }
 }
 `
