@@ -10,8 +10,8 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   BaseGetTransactionsRequest,
   ExportTransactionsFunc,
-  GetTransactionsFunc,
   GetTransactionsDataFunc,
+  GetTransactionsFunc,
   GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
@@ -42,8 +42,8 @@ import {
   isErgo,
   networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { DefaultTokenEntry, TokenEntry } from '../../api/common/lib/MultiToken';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -52,11 +52,15 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
-import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import { persistSubmittedTransactions, loadSubmittedTransactions } from '../../api/localStorage';
-import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
+import { loadSubmittedTransactions, persistSubmittedTransactions } from '../../api/localStorage';
+import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import moment from 'moment';
+import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
+import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
+import type { TransactionExportRow } from '../../api/export';
+import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -670,19 +674,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const txStore = this.stores.transactions;
     let respTxRows = [];
 
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
     const delegationStore = this.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(request.publicDeriver);
 
     await txStore.getTransactionRowsToExportRequest.execute(async () => {
       const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
-      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-      if (!withLevels) return;
-      const rows = await this.api[apiType].getTransactionRowsToExport({
-        publicDeriver: withLevels,
-        getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
-      });
-
       /**
        * NOTE: The rewards export currently supports only Haskell Shelley
        */
@@ -721,17 +717,71 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           respTxRows.push(...rewardRows);
         }
       }
-
-      respTxRows.push(...rows);
     }).promise;
 
     const { startDate, endDate } = request.exportRequest;
-    respTxRows = respTxRows
-      .filter(row => {
-        // 4th param `[]` means that the start and end date are included
-        return moment(row.date).isBetween(startDate, endDate, 'day', '[]');
-      })
-      .sort((a, b) => b.date - a.date);
+
+    const config = getCardanoHaskellBaseConfig(
+      request.publicDeriver.getParent().getNetworkInfo()
+    )
+    const timeToSlot = await timeUtils.genTimeToSlot(config);
+    const toRelativeSlotNumber = await timeUtils.genToRelativeSlotNumber(config);
+
+    const dateFormat = 'YYYY-MM-DD';
+    const dateToSlot = (date: string): [number, number] => {
+      const relativeSlot = toRelativeSlotNumber(
+        timeToSlot({
+          time: new Date(`${date}T23:59:59`), // Get the slot at the last second in the day
+        }).slot
+      );
+
+      return [
+        Math.max(relativeSlot.epoch, 0),
+        Math.max(relativeSlot.slot, 0)
+      ];
+    }
+
+    const slotsToTxs = async (
+      startSlot: [number, number],
+      endSlot: [number, number],
+    ): Promise<Array<TransactionExportRow>> => {
+      if (String(startSlot) === String(endSlot)) {
+        return [];
+      }
+      const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
+      const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      const { blockHashes } =  await fetcher.getLatestBlockBySlot({
+        network: selectedNetwork,
+        slots: [startSlot, endSlot]
+      });
+      const startBlockHash = blockHashes[startSlot];
+      const endBlockHash = blockHashes[endSlot];
+      if (endBlockHash == null) {
+        if (startBlockHash != null) {
+          throw new Error(
+            '[tx-export] Unexpected state: start block hash exists, but end block hash doesnt. Context: '
+            + JSON.stringify({
+              startDate, endDate, startSlot, endSlot, startBlockHash, endBlockHash,
+            })
+          );
+        }
+        // No range available
+        return [];
+      }
+      return await this._getTxsFromRemote(request.publicDeriver, startBlockHash, endBlockHash);
+    }
+
+    const txs = await slotsToTxs(
+      dateToSlot(startDate.subtract(1, 'day').format(dateFormat)),
+      dateToSlot(endDate.format(dateFormat)),
+    );
+
+    respTxRows.push(...txs);
+
+    respTxRows = respTxRows.filter(row => {
+      // 4th param `[]` means that the start and end date are included
+      return moment(row.date).isBetween(startDate, endDate, 'day', '[]')
+    }).sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
@@ -756,6 +806,82 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       }).promise;
     };
   };
+
+  _getTxsFromRemote: (
+    publicDeriver: PublicDeriver<>,
+    startBlockHash: ?string,
+    endBlockHash: string,
+  ) => Promise<Array<TransactionExportRow>> = async (
+    publicDeriver,
+    startBlockHash,
+    endBlockHash
+  ) => {
+    const addresses =  (
+      await getAllAddressesForWallet(publicDeriver)
+    );
+    const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const txsRequest: HistoryRequest = {
+      after: undefined,
+      untilBlock: endBlockHash,
+      network,
+      addresses: toRequestAddresses(addresses),
+    };
+    if (startBlockHash != null) {
+      txsRequest.after = { block: startBlockHash };
+    }
+    const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses(txsRequest);
+
+    const ownAddresses = new Set([
+      ...addresses.utxoAddresses.map(a => a.Hash),
+      ...addresses.accountingAddresses.map(a => a.Hash),
+    ]);
+
+    const result = [];
+    txsFromNetwork.forEach(remoteTx => {
+      let ownAmountChange = new BigNumber('0');
+      let txFee = new BigNumber('0');
+      for (const input of remoteTx.inputs) {
+        txFee = txFee.plus(input.amount);
+        if (ownAddresses.has(input.address)) {
+          ownAmountChange = ownAmountChange.minus(input.amount);
+        }
+      }
+      for (const output of remoteTx.outputs) {
+        txFee = txFee.minus(output.amount);
+        if (ownAddresses.has(output.address)) {
+          ownAmountChange = ownAmountChange.plus(output.amount);
+        }
+      }
+
+      // invariant: reported amount + fee = own amount change
+      let type;
+      let fee;
+      let amount;
+      if (ownAmountChange.isPositive()) {
+        type = 'in';
+        fee = new BigNumber('0');
+        amount = ownAmountChange;
+      } else {
+        type = 'out';
+        fee = txFee;
+        amount = ownAmountChange.absoluteValue().minus(txFee);
+      }
+
+      if (remoteTx.time != null) {
+        const time: string = remoteTx.time;
+        result.push({
+          type,
+          amount: amount.shiftedBy(-6).toString(),
+          fee: fee.shiftedBy(-6).toString(),
+          date: new Date(time),
+          comment: '',
+          id: remoteTx.hash,
+        });
+      }
+    });
+    return result;
+  }
 
   @action
   recordSubmittedTransaction: (
@@ -796,7 +922,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _loadSubmittedTransactions: () => Promise<void> = async () => {
     try {
-      const data = loadSubmittedTransactions();
+      const data = await loadSubmittedTransactions();
       if (!data) {
         return;
       }
@@ -837,19 +963,23 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           }
 
           if (isCardanoHaskell(network)) {
-            tx = new CardanoShelleyTransaction({
-              ...txCtorData,
-              certificates: transaction.certificates,
-              ttl: new BigNumber(transaction.ttl),
-              metadata: transaction.metadata,
-              withdrawals: transaction.withdrawals.map(({ address, value }) => ({
-                address,
-                value: MultiToken.from(value),
-              })),
-              isValid: transaction.isValid,
+            runInAction(() => {
+              tx = new CardanoShelleyTransaction({
+                  ...txCtorData,
+                certificates: transaction.certificates,
+                ttl: new BigNumber(transaction.ttl),
+                metadata: transaction.metadata,
+                withdrawals: transaction.withdrawals.map(({ address, value }) => ({
+                  address,
+                  value: MultiToken.from(value)
+                })),
+                isValid: transaction.isValid,
+              });
             });
           } else if (isErgo(network)) {
-            tx = new WalletTransaction(txCtorData);
+            runInAction(() => {
+              tx = new WalletTransaction(txCtorData);
+            });
           } else {
             return;
           }
@@ -860,12 +990,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             tokenIds.set(networkId, tokenIdSet);
           }
 
-          tx.addresses.from
-            .flatMap(({ value }) => value.values.map(tokenEntry => tokenEntry.identifier))
-            .forEach(tokenId => tokenIdSet?.add(tokenId));
-          tx.addresses.to
-            .flatMap(({ value }) => value.values.map(tokenEntry => tokenEntry.identifier))
-            .forEach(tokenId => tokenIdSet?.add(tokenId));
+          // just to please flow
+          if (tx == null) {
+            return;
+          }
+
+          tx.addresses.from.flatMap(
+            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+          ).forEach(tokenId => tokenIdSet?.add(tokenId));
+          tx.addresses.to.flatMap(
+            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
+          ).forEach(tokenId => tokenIdSet?.add(tokenId));
 
           return {
             publicDeriverId,

@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Bakiye alınırken hata oluştu.",
   "api.errors.getBestBlockApiError": "En iyi blok alınırken sunucudan hata alındı.",
   "api.errors.getPoolInfoApiError": "Havuz bilgisi alınırken sunucudan hata alındı.",
-  "api.errors.getReputationError": "İtibar alınırken sunucudan hata alındı.",
   "api.errors.getRewardHistoryApiError": "Ödül geçmişi alınırken sunucudan hata alındı.",
   "api.errors.getTxHistoryForAddressesApiError": "İşlemler alınırken sunucudan hata alındı.",
   "api.errors.getTxsBodiesForUTXOsApiError": "TxBodies alınırken sunucudan hata alındı.",

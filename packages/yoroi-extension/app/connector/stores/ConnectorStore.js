@@ -168,6 +168,7 @@ export function getUtxosAndAddresses(
         if (window.chrome.runtime.lastError) {
           // eslint-disable-next-line prefer-promise-reject-errors
           reject('Could not establish connection: get_utxos/cardano ');
+          return;
         }
 
         resolve(response);
@@ -185,6 +186,7 @@ export function getConnectedSites(): Promise<ConnectedSites> {
           if (window.chrome.runtime.lastError) {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: get_connected_sites ');
+            return;
           }
 
           resolve(response);
@@ -274,7 +276,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     super.setup();
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(async password => {
+    this.actions.connector.confirmSignInTx.listen(async (password) => {
       await this._confirmSignInTx(password);
     });
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
@@ -474,7 +476,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       tabId: signingMessage.tabId,
     };
     window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
   };
 
   // ========== wallets info ========== //
@@ -615,7 +616,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('Missgin utxos for signing tx');
     }
 
-    const submittedTxs = loadSubmittedTransactions() || [];
+    const submittedTxs = await loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(response.utxos),
       connectedWallet.publicDeriver,
@@ -724,7 +725,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       });
       for (let i = 0; i < foreignUtxos.length; i++) {
         const foreignUtxo = foreignUtxos[i];
-        if (foreignUtxo == null) {
+        if (foreignUtxo == null || typeof foreignUtxo !== 'object') {
           window.chrome.runtime.sendMessage({
             type: 'sign_error',
             errorType: 'missing_utxo',
@@ -811,7 +812,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
     const addressedUtxos = asAddressedUtxo(toJS(utxos));
     this.addressedUtxos = addressedUtxos;
-    const submittedTxs = loadSubmittedTransactions() || [];
+    const submittedTxs = await loadSubmittedTransactions() || [];
 
     const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
       connectedWallet.publicDeriver,

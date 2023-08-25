@@ -18,6 +18,5 @@ module.exports = {
     './jestSetup',
   ],
   // ignore manifest.test.js file, because it isn't a test
-  testPathIgnorePatterns: ['manifest.test.js'],
-  modulePathIgnorePatterns: ['jormungandr'],
+  testPathIgnorePatterns: ['manifest.test.js', 'manifest-mv2.test.js'],
 };
