@@ -46,7 +46,7 @@ export type HistoryRequest = {|
   addresses: Array<string>,
   after?: {|
     block: string,
-    tx: string,
+    tx?: string,
   |},
   untilBlock: string,
 |};
@@ -420,6 +420,23 @@ export type UtxoData = {|
 export type GetUtxoDataResponse = Array<UtxoData | null>;
 
 export type GetUtxoDataFunc = (body: GetUtxoDataRequest) => Promise<GetUtxoDataResponse>;
+
+// getLastBlockBySlot
+
+type EpochNo = number;
+type SlotNo = number;
+type RelativeSlot = [EpochNo, SlotNo];
+export type GetLatestBlockBySlotReq = {|
+  ...BackendNetworkInfo,
+  slots: Array<RelativeSlot>,
+|};
+export type GetLatestBlockBySlotRes = {|
+  blockHashes: {|
+    [key: RelativeSlot]: string | null,
+  |}
+|}
+export type GetLatestBlockBySlotFunc =
+  (body: GetLatestBlockBySlotReq) => Promise<GetLatestBlockBySlotRes>
 
 export type GetRecentTransactionHashesRequest = {|
   ...BackendNetworkInfo,

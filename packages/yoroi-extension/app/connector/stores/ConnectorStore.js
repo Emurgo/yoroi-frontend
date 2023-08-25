@@ -725,7 +725,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       });
       for (let i = 0; i < foreignUtxos.length; i++) {
         const foreignUtxo = foreignUtxos[i];
-        if (foreignUtxo == null) {
+        if (foreignUtxo == null || typeof foreignUtxo !== 'object') {
           window.chrome.runtime.sendMessage({
             type: 'sign_error',
             errorType: 'missing_utxo',
