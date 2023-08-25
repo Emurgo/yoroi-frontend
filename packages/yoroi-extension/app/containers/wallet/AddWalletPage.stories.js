@@ -1,4 +1,4 @@
-//fixme: broken flow
+// @flow
 
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
@@ -530,7 +530,8 @@ const restoreWalletProps: ({|
       duplicatedWallet: null,
     },
     transactions: {
-      getTxRequests: request.lookup.getTransactions,
+      // getTxRequests: request.lookup.getTransactions,
+      getBalance: request.lookup.getBalance,
     },
     yoroiTransfer: {
       status: request.yoroiTransferStep || TransferStatus.UNINITIALIZED,

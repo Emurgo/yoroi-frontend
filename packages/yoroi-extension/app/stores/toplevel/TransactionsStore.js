@@ -49,9 +49,6 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import { transactionTypes } from '../../api/ada/transactions/types';
-import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
-import { assuranceLevels } from '../../config/transactionAssuranceConfig';
 import {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
