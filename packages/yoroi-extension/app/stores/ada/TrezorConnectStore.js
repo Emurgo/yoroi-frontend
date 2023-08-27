@@ -53,7 +53,6 @@ import type {
 } from '../../actions/common/wallet-restore-actions';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { trackWalletCreation } from '../../api/analytics';
 
 type TrezorConnectionResponse = {|
   trezorResp: Success<CardanoPublicKey> | Unsuccessful,
@@ -336,7 +335,6 @@ export default class TrezorConnectStore
     await this._saveHW(
       walletName,
     );
-    trackWalletCreation('hardware');
   };
 
   /** creates new wallet and loads it */

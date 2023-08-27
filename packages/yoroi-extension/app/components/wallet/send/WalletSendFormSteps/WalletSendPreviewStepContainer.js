@@ -20,7 +20,6 @@ import {
 } from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { SendUsingLedgerParams } from '../../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../../actions/ada/trezor-send-actions';
-import { trackSend } from '../../../../api/analytics';
 
 export type GeneratedData = typeof WalletSendPreviewStepContainer.prototype.generated;
 
@@ -91,7 +90,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         onSuccess: openTransactionSuccessDialog,
       });
     }
-    trackSend()
   }
 
   render(): Node {
