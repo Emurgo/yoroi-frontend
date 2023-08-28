@@ -193,17 +193,20 @@ export default class WalletSummaryRevamp extends Component<Props> {
           >
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
-          {numberOfTransactions !== 0 && (
+          {numberOfTransactions !== 0 && !isLoadingTransactions && (
             <Button
               variant="tertiary"
               color="primary"
-              sx={{ textTransform: 'uppercase', margin: '2px' }}
+              sx={{
+                textTransform: 'uppercase',
+                margin: '2px',
+                lineHeight: '21px',
+              }}
               onClick={openExportTxToFileDialog}
               onKeyPress={openExportTxToFileDialog}
-              disabled={isLoadingTransactions}
               startIcon={<ExportTxToFileSvg />}
             >
-              {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
+              {intl.formatMessage(globalMessages.exportButtonLabel)}
             </Button>
           )}
         </Box>
