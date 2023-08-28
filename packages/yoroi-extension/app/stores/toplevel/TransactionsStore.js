@@ -154,10 +154,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   isErgoWalletSelected: () => boolean = () => {
     const { selected } = this.stores.wallets;
-    if (!selected) {
-      throw new Error('no wallet selected');
-    }
-    return isErgo(selected.getParent().getNetworkInfo());
+    return selected != null && isErgo(selected.getParent().getNetworkInfo());
   }
 
   /** Calculate information about transactions that are still realistically reversible */
