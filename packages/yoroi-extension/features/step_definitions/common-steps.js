@@ -32,7 +32,7 @@ import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
 import stableStringify from 'json-stable-stringify';
-import type { RestorationInput, WalletNames } from '../mock-chain/TestWallets';
+import type { WalletNames } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
 import type { LocatorObject } from '../support/webdriver';
@@ -385,20 +385,19 @@ async function restoreWallet(
   // wallet info dialog
   await inputWalletInfo(customWorld, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet info is entered`);
-  await checkWalletPlate(customWorld, walletName, restoreInfo);
+  await checkWalletPlate(customWorld, restoreInfo.plate);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet plate is checked`);
   await customWorld.click(nextButton);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet is fully synchronized`);
 }
 
-async function checkWalletPlate(
+export async function checkWalletPlate(
   customWorld: any,
-  walletName: string,
-  restoreInfo: RestorationInput,
+  expectedWalletPlate: string,
 ): Promise<void> {
   const plateElement = await customWorld.findElement(restoringDialogPlate);
   const plateText = await plateElement.getText();
-  expect(plateText).to.be.equal(restoreInfo.plate);
+  expect(plateText).to.be.equal(expectedWalletPlate);
 }
 
 export async function checkErrorByTranslationId(
