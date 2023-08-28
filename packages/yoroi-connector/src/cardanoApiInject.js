@@ -61,26 +61,26 @@
         if (returnType !== 'cbor' && returnType !== 'json') {
           throw new Error('Possible return type values are: "cbor" or "json"');
         }
-        this._returnType[0] = returnType;
+        CardanoAPI._returnType[0] = returnType;
       },
       
       auth: () => {
-        return this._auth;
+        return CardanoAPI._auth;
       },
       
       createTx: (req) => {
-        return this._cardano_rpc_call("create_tx/cardano", [req]);
+        return CardanoAPI._cardano_rpc_call("create_tx/cardano", [req]);
       },
 
       listNFTs: () => {
-        return this._cardano_rpc_call("list_nfts/cardano", []);
+        return CardanoAPI._cardano_rpc_call("list_nfts/cardano", []);
       },
       
       onDisconnect: (callback) => {
-        if (this._disconnection[0]) {
+        if (CardanoAPI._disconnection[0]) {
           throw new Error('Cardano API instance is already disconnected!');
         }
-        this._disconnection.push(callback);
+        CardanoAPI._disconnection.push(callback);
       },
       
     }) 
