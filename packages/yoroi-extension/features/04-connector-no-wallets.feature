@@ -4,7 +4,7 @@ Feature: dApp connector no wallets
     Given I have opened the mock dApp
 
   @dApp-1010
-  Scenario: dApp, no wallets, connecting wallet (DAPP-1010)
+  Scenario: (DAPP-1010) dApp, no wallets, connecting wallet
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I should see "No Cardano wallets is found" message
