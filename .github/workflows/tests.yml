@@ -115,12 +115,6 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: npm run test:build
 
-      - name: Create the report's folder
-        working-directory: ./packages/yoroi-extension
-        run: |
-          mkdir reports
-          touch ./reports/cucumberReports.json
-
       - name: Run dapp connector tests
         working-directory: ./packages/yoroi-extension
         env:
@@ -244,12 +238,6 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: npm run test:build
 
-      - name: Create the report's folder
-        working-directory: ./packages/yoroi-extension
-        run: |
-          mkdir reports
-          touch ./reports/cucumberReports.json
-
       - name: Run tests
         working-directory: ./packages/yoroi-extension
         run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:run:e2e:trezor:${{ matrix.browser }}
@@ -336,12 +324,6 @@ jobs:
       - name: Build the test mainnet version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build:mainnet
-
-      - name: Create the report's folder
-        working-directory: ./packages/yoroi-extension
-        run: |
-          mkdir reports
-          touch ./reports/cucumberReports.json
 
       - name: Run smoke tests
         working-directory: ./packages/yoroi-extension
@@ -433,12 +415,6 @@ jobs:
       - name: Build the test version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build
-
-      - name: Create the report's folder
-        working-directory: ./packages/yoroi-extension
-        run: |
-          mkdir reports
-          touch ./reports/cucumberReports.json
 
       - name: Run tests
         working-directory: ./packages/yoroi-extension

@@ -5,38 +5,38 @@ import type { LocatorObject } from '../support/webdriver';
 export const seedPhrasePlaceholder = 'Tap each word in the correct order to verify your recovery phrase';
 export const connectHwButton: LocatorObject = { locator: '.WalletAdd_btnConnectHW', method: 'css' };
 export const createWalletButton: LocatorObject = {
-  locator: '.WalletAdd_btnCreateWallet',
-  method: 'css',
+  locator: 'createWalletButton',
+  method: 'id',
 };
 export const restoreWalletButton: LocatorObject = {
-  locator: '.WalletAdd_btnRestoreWallet',
-  method: 'css',
+  locator: 'restoreWalletButton',
+  method: 'id',
 };
 // Currency options dialog
 export const pickUpCurrencyDialog: LocatorObject = {
-  locator: '.PickCurrencyOptionDialog',
-  method: 'css',
+  locator: 'connectHardwareWalletButton',
+  method: 'id',
 };
 export const pickUpCurrencyDialogCardano: LocatorObject = {
   locator: '.PickCurrencyOptionDialog_cardano',
   method: 'css',
 };
-export const walletRestoreOptionDialog: LocatorObject = {
-  locator: '.WalletRestoreOptionDialog',
-  method: 'css',
+export const selectWalletTypeStepBox: LocatorObject = {
+  locator: 'selectWalletTypeStepBox',
+  method: 'id',
 };
 export const restoreNormalWallet: LocatorObject = {
-  locator: '.WalletRestoreOptionDialog_restoreNormalWallet',
-  method: 'css',
+  locator: 'fifteenWordsButton',
+  method: 'id',
 };
 export const restore24WordWallet: LocatorObject = {
-  locator: '.WalletRestoreOptionDialog_normal24WordWallet',
-  method: 'css',
+  locator: 'twentyfourWordsButton',
+  method: 'id',
 };
-export const walletRestoreDialog: LocatorObject = {
-  locator: '.WalletRestoreDialog',
-  method: 'css',
-};
+export const infoDialog: LocatorObject = {
+  locator: 'walletRestorationInfoDialog',
+  method: 'id',
+}
 export const getCurrencyButton = (currency: string): LocatorObject => {
   return { locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' };
 };

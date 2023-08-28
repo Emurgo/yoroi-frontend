@@ -5,12 +5,12 @@ Feature: dApp connector errors checking
     Given I have opened the extension
     And I have completed the basic setup
     Then I should see the Create wallet screen
-    Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
+    Given There is a Shelley wallet stored named shelley-simple-15
     Then I open the mock dApp tab
 
   @dApp-1006
-  Scenario: dApp, authorised wallet, connecting wallet, wrong password -> correct password (DAPP-1006)
+  Scenario: (DAPP-1006) dApp, authorised wallet, connecting wallet, wrong password -> correct password
     When I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -21,7 +21,7 @@ Feature: dApp connector errors checking
     And The access request should succeed
 
   @dApp-1007
-  Scenario: dApp, authorised wallet, connecting wallet, back to wallets and close pop-up (DAPP-1007)
+  Scenario: (DAPP-1007) dApp, authorised wallet, connecting wallet, back to wallets and close pop-up
     When I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -33,7 +33,7 @@ Feature: dApp connector errors checking
     And The user reject is received
 
   @dApp-1008
-  Scenario: dApp, authorised wallet, signing transaction, close pop-up (DAPP-1008)
+  Scenario: (DAPP-1008) dApp, authorised wallet, signing transaction, close pop-up
     When I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -50,7 +50,7 @@ Feature: dApp connector errors checking
     And The user reject for signing is received
 
   @dApp-1009
-  Scenario: dApp, authorised wallet, disconnect wallet (DAPP-1009)
+  Scenario: (DAPP-1009) dApp, authorised wallet, disconnect wallet
     When I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -61,7 +61,7 @@ Feature: dApp connector errors checking
     And I receive the wallet disconnection message
 
   @dApp-1014
-  Scenario: dApp, authorised wallet, signing transaction, cancel signing (DAPP-1014)
+  Scenario: (DAPP-1014) dApp, authorised wallet, signing transaction, cancel signing
     When I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -78,7 +78,7 @@ Feature: dApp connector errors checking
     And The user reject for signing is received
 
   @dApp-1017
-  Scenario: dApp, authorized wallet, unused address, signing data, cancel signing (DAPP-1017)
+  Scenario: (DAPP-1017) dApp, authorized wallet, unused address, signing data, cancel signing
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -95,7 +95,7 @@ Feature: dApp connector errors checking
     And The user reject for signing data is received
 
   @dApp-1018
-  Scenario: dApp, authorized wallet, used address, signing data, cancel signing (DAPP-1018)
+  Scenario: (DAPP-1018) dApp, authorized wallet, used address, signing data, cancel signing
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance

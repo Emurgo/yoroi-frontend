@@ -5,12 +5,12 @@ Feature: dApp connector data signing
     Given I have opened the extension
     And I have completed the basic setup
     Then I should see the Create wallet screen
-    Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
+    Given There is a Shelley wallet stored named shelley-simple-15
     Then I open the mock dApp tab
 
   @dApp-1019
-  Scenario: dApp, anonymous wallet, unused address, sign Cardano data (DAPP-1019)
+  Scenario: (DAPP-1019) dApp, anonymous wallet, unused address, sign Cardano data
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -29,7 +29,7 @@ Feature: dApp connector data signing
     Then The popup window should be closed
 
   @dApp-1020
-  Scenario: dApp, anonymous wallet, used address, sign Cardano data (DAPP-1020)
+  Scenario: (DAPP-1020) dApp, anonymous wallet, used address, sign Cardano data
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -48,7 +48,7 @@ Feature: dApp connector data signing
     Then The popup window should be closed
 
   @dApp-1021
-  Scenario: dApp, authorised wallet, unused address, sign Cardano data (DAPP-1021)
+  Scenario: (DAPP-1021) dApp, authorised wallet, unused address, sign Cardano data
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
@@ -68,7 +68,7 @@ Feature: dApp connector data signing
     Then The popup window should be closed
 
   @dApp-1022
-  Scenario: dApp, authorised wallet, used address, sign Cardano data (DAPP-1022)
+  Scenario: (DAPP-1022) dApp, authorised wallet, used address, sign Cardano data
     And I request access to Yoroi
     Then I should see the connector popup for connection
     And I select the only wallet named shelley-simple-15 with 5.5 balance
