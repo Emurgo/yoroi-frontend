@@ -15,7 +15,7 @@ import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
@@ -223,29 +223,34 @@ export default class WalletSummaryRevamp extends Component<Props> {
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
-          <Box
+          <Grid
+            container
             sx={{
-              display: 'flex',
-              padding: '12px 0',
               width: '100%',
-              justifyContent: 'space-between',
+              padding: '12px 0',
               borderBottom: '1px solid',
               borderBottomColor: 'grayscale.200',
             }}
           >
-            <Typography variant="body2" sx={{ ...columnTXStyles.transactionType, maxWidth: '35%' }}>
-              {intl.formatMessage({ id: 'wallet.summary.page.type' })}
-            </Typography>
-            <Typography variant="body2" sx={columnTXStyles.status}>
-              {intl.formatMessage({ id: 'wallet.summary.page.status' })}
-            </Typography>
-            <Typography variant="body2" sx={columnTXStyles.fee}>
-              {intl.formatMessage(globalMessages.feeLabel)}
-            </Typography>
-            <Typography variant="body2" sx={{ ...columnTXStyles.amount, maxWidth: '30%' }}>
-              {intl.formatMessage(globalMessages.amountLabel)}
-            </Typography>
-          </Box>
+            <Grid item xs={4}>
+              <Typography variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.type' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'left' }}>
+              <Typography variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.status' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+            </Grid>
+            <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
+              <Typography variant="body2">
+                {intl.formatMessage(globalMessages.amountLabel)}
+              </Typography>
+            </Grid>
+          </Grid>
         )}
       </Box>
     );

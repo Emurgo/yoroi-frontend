@@ -52,6 +52,7 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
+import { Box } from '@mui/material';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -340,7 +341,7 @@ class WalletSummaryPage extends Component<AllProps> {
     );
 
     const walletSummaryPageRevamp = (
-      <VerticalFlexContainer>
+      <Box>
         <NotificationMessage icon={successIcon} show={!!notification}>
           {!!notification && (
             <FormattedHTMLMessage
@@ -458,7 +459,7 @@ class WalletSummaryPage extends Component<AllProps> {
             }}
           />
         ) : null}
-      </VerticalFlexContainer>
+      </Box>
     );
 
     return this.props.renderLayoutComponent({

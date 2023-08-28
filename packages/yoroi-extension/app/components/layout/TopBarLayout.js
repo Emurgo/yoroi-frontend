@@ -67,6 +67,11 @@ function TopBarLayout({
               flex: '0 1 auto',
               height: '100%',
             }),
+            ...(isRevampLayout &&
+              asModern !== true &&
+              !isModern && {
+                overflow: 'auto',
+              }),
           }}
         >
           {isRevampLayout && asModern !== true && !isModern ? (
@@ -93,7 +98,6 @@ function TopBarLayout({
                     padding: '24px',
                     pb: 0,
                     bgcolor: bgcolor || 'common.white',
-                    overflow: 'auto',
                   }}
                 >
                   {children}
