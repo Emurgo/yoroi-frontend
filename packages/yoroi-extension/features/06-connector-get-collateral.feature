@@ -5,12 +5,12 @@ Feature: dApp connector get collateral
     Given I have opened the extension
     And I have completed the basic setup
     Then I should see the Create wallet screen
+    Then Revamp. I switch to revamp version
     
     
   @dApp-1023
   Scenario: dApp, anonymous wallet, get collateral (DAPP-1023)
     Given There is a Shelley wallet stored named shelley-collateral
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
@@ -24,7 +24,6 @@ Feature: dApp connector get collateral
   @dApp-1024
   Scenario: dApp, authorized wallet, get collateral (DAPP-1024)
     Given There is a Shelley wallet stored named shelley-collateral
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request access to Yoroi
     Then I should see the connector popup for connection
@@ -39,7 +38,6 @@ Feature: dApp connector get collateral
   @dApp-1025
   Scenario: dApp, anonymous wallet, get collateral, connector popup (DAPP-1025)
     Given There is a Shelley wallet stored named shelley-simple-15
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
@@ -61,7 +59,6 @@ Feature: dApp connector get collateral
   @dApp-1026
   Scenario: dApp, authorized wallet, get collateral, connector popup (DAPP-1026)
     Given There is a Shelley wallet stored named shelley-simple-15
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request access to Yoroi
     Then I should see the connector popup for connection
@@ -84,7 +81,6 @@ Feature: dApp connector get collateral
   @dApp-1027
   Scenario: dApp, anonymous wallet, get collateral from empty wallet (DAPP-1027)
     Given There is a Shelley wallet stored named empty-wallet
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
@@ -100,7 +96,6 @@ Feature: dApp connector get collateral
   @dApp-1028
   Scenario: dApp, authorized wallet, get collateral from empty wallet (DAPP-1028)
     Given There is a Shelley wallet stored named empty-wallet
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request access to Yoroi
     Then I should see the connector popup for connection
@@ -117,7 +112,6 @@ Feature: dApp connector get collateral
   @dApp-1029
   Scenario: dApp, anonymous wallet, get collateral, more than 5 ADA (DAPP-1029)
     Given There is a Shelley wallet stored named shelley-simple-15
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
@@ -133,7 +127,6 @@ Feature: dApp connector get collateral
   @dApp-1030
   Scenario: dApp, authorized wallet, get collateral, more than 5 ADA (DAPP-1030)
     Given There is a Shelley wallet stored named shelley-simple-15
-    Then Revamp. I switch to revamp version
     Then I open the mock dApp tab
     And I request access to Yoroi
     Then I should see the connector popup for connection

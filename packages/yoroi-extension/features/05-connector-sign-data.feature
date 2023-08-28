@@ -5,8 +5,8 @@ Feature: dApp connector data signing
     Given I have opened the extension
     And I have completed the basic setup
     Then I should see the Create wallet screen
-    Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
+    Given There is a Shelley wallet stored named shelley-simple-15
     Then I open the mock dApp tab
 
   @dApp-1019
