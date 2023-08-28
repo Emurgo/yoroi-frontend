@@ -76,6 +76,12 @@ export default class StandardHeaderRevamp extends Component<Props> {
         className="generateAddressButton"
         onClick={this.submit}
         disabled={this.props.isFilterActive}
+        sx={{
+          '&.MuiButton-sizeMedium': {
+            padding: '9px 16px',
+            height: 'unset',
+          },
+        }}
       >
         {intl.formatMessage(messages.generateNewAddressButtonLabel)}
       </LoadingButton>

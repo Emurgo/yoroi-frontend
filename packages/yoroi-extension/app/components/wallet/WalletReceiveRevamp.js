@@ -153,16 +153,16 @@ export default class WalletReceiveRevamp extends Component<Props> {
           borderBottomColor="grayscale.200"
           className={styles.generatedAddressesGrid}
         >
-          <Typography color="grayscale.500" component="h2" variant="body2">
+          <Typography color="grayscale.600" component="h2" variant="body2">
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
           </Typography>
           {valueBlock.header}
           {onGeneratePaymentURI != null && (
-            <Typography color="grayscale.500" component="h2" variant="body2" textAlign="right">
+            <Typography color="grayscale.600" component="h2" variant="body2" textAlign="right">
               {intl.formatMessage(messages.generateURLLabel)}
             </Typography>
           )}
-          <Typography color="grayscale.500" component="h2" variant="body2" textAlign="right">
+          <Typography color="grayscale.600" component="h2" variant="body2" textAlign="right">
             {intl.formatMessage(messages.verifyAddressLabel)}
           </Typography>
         </Box>
