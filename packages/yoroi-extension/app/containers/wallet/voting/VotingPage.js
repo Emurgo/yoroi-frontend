@@ -82,7 +82,6 @@ class VotingPage extends Component<AllProps> {
     }
 
     const { stores, actions } = this.props;
-
     return Object.freeze({
       VotingPageContentProps: ({
         actions,

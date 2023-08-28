@@ -237,7 +237,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
       await this.stores.transactions.refreshTransactionData({
         publicDeriver,
-        localRequest: false,
+        isLocalRequest: false,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
       await updateSyncedWallets(publicDeriver);
@@ -259,7 +259,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     try {
       await this.stores.transactions.refreshTransactionData({
         publicDeriver,
-        localRequest: true,
+        isLocalRequest: true,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {

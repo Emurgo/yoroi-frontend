@@ -207,7 +207,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       toJS(this.plannedTxInfoMap),
       this.stores.wallets.selected,
       // update if tx history changes
-      this.stores.transactions.hash,
+      this.stores.transactions.recent,
       this.receiver,
     ],
     async () => {
@@ -375,7 +375,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         metadata: this.metadata,
       }));
     } else if (isErgo(network)) {
-      const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
+      const lastSync = this.stores.transactions.getLastSyncInfo(publicDeriver);
       const txFee = new BigNumber(
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee

@@ -437,3 +437,37 @@ export type GetLatestBlockBySlotRes = {|
 |}
 export type GetLatestBlockBySlotFunc =
   (body: GetLatestBlockBySlotReq) => Promise<GetLatestBlockBySlotRes>
+
+export type GetRecentTransactionHashesRequest = {|
+  ...BackendNetworkInfo,
+  addresses: Array<string>,
+  before: {|
+    blockHash: string,
+    txHash?: ?string,
+  |},
+|};
+
+export type GetRecentTransactionHashesResponse = {|
+  [address: string]: Array<{|
+    txHash: string,
+    blockHash: string,
+    txBlockIndex: number,
+    epoch: number,
+    slot: number,
+  |}>
+|};
+
+export type GetRecentTransactionHashesFunc = (
+  body: GetRecentTransactionHashesRequest
+) => Promise<GetRecentTransactionHashesResponse>;
+
+export type GetTransactionsByHashesRequest = {|
+  ...BackendNetworkInfo,
+  txHashes: Array<string>,
+|};
+
+export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
+
+export type GetTransactionsByHashesFunc = (
+  body: GetTransactionsByHashesRequest
+) => Promise<GetTransactionsByHashesResponse>;

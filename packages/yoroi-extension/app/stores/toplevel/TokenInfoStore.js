@@ -1,6 +1,6 @@
 // @flow
 
-import { observable, runInAction, action } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 
 import type {
@@ -24,7 +24,6 @@ import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
 import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
@@ -71,32 +70,7 @@ export default class TokenInfoStore<
   setup(): void {
     super.setup();
     this.tokenInfo = new Map();
-    // the connector doesn't have this action
-    if (this.actions.wallets?.setActiveWallet) {
-      this.actions.wallets.setActiveWallet.listen(
-        ({ wallet }) => { this.fetchMissingTokenInfoForWallet(wallet) }
-      );
-    }
   }
-
-  @action fetchMissingTokenInfoForWallet: (
-    wallet: PublicDeriver<>,
-  ) => Promise<void> = async (wallet) => {
-    // the Ergo connector doesn't have this store, but it this function won't be invoked
-    if (!this.stores.transactions) {
-      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.fetchMissingTokenInfo)} missing transactions store`);
-    }
-
-    const { requests } = this.stores.transactions.getTxRequests(wallet);
-
-    await requests.allRequest;
-
-    const  tokenIds = Array.from(requests.allRequest.result?.assetIds ?? []);
-
-    const networkId = wallet.getParent().networkInfo.NetworkId;
-
-    await this.fetchMissingTokenInfo(networkId, tokenIds);
-  };
 
   fetchMissingTokenInfo: (number, Array<string>) => Promise<void> = async (
     networkId,

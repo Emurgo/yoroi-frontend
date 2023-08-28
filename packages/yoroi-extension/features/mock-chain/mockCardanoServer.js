@@ -525,6 +525,16 @@ export function getMockServer(settings: {
       }
     });
 
+    server.post('/api/v2/txs/get', async (req, res) => {
+      const resp = await mockImporter.getTransactionsByHashes(req.body);
+      res.send(resp);
+    });
+
+    server.post('/api/v2.1/txs/summaries', async (req, res) => {
+      const resp = await mockImporter.getRecentTransactionHashes(req.body);
+      res.send(resp);
+    });
+
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServer, () => {
