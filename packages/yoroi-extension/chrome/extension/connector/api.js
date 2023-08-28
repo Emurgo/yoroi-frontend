@@ -47,7 +47,10 @@ import {
   TxStatusCodes,
 } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
-import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
+import {
+  getAllAddressesForDisplay,
+  getAddressRowsForWallet,
+} from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 import LocalStorageApi, {
@@ -360,31 +363,25 @@ function ergoAddressToBase58(a: FullAddressPayload): string {
     .to_base58()
 }
 
-async function getAllFullAddresses(
+async function getAllFullAddressesForErgo(
   wallet: IPublicDeriver<>,
   usedFilter: boolean,
 ): Promise<FullAddressPayloadWithBase58[]> {
-  const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
-  const addressTypes = isCardano ? [
-    CoreAddressTypes.CARDANO_BASE,
-  ] : [
+  const addressTypes = [
     CoreAddressTypes.ERGO_P2PK,
     CoreAddressTypes.ERGO_P2SH,
     CoreAddressTypes.ERGO_P2S
   ]
   const promises = addressTypes
-    .map(type => getAllAddressesForDisplay({
-      publicDeriver: wallet,
-      type,
-      ignoreCutoff: true,
-    }));
+    .map(type => getAllAddressesForDisplay({ publicDeriver: wallet, type }));
+
   await RustModule.load();
   const addresses: FullAddressPayload[] =
-    (await Promise.all(promises)).flat();
+        (await Promise.all(promises)).flat();
   return addresses
     .filter(a => a.isUsed === usedFilter)
     .map(a => {
-      const base58 = isCardano ? a.address : ergoAddressToBase58(a);
+      const base58 = ergoAddressToBase58(a);
       return {
         fullAddress: a,
         base58,
@@ -412,8 +409,10 @@ async function getCardanoRewardAddresses(
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
-  return getAllFullAddresses(wallet, usedFilter)
-    .then(arr => arr.map(a => a.base58));
+  const addresses = await getAddressRowsForWallet({ publicDeriver: wallet });
+  return addresses
+    .filter(a => a.IsUsed === usedFilter && a.Type === CoreAddressTypes.CARDANO_BASE)
+    .map(a => a.Hash);
 }
 
 async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
@@ -608,7 +607,7 @@ export async function connectorSignTx(
   // SIGNING INPUTS //
 
   const p2sExtractor = createP2sAddressTreeExtractor(
-    () => getAllFullAddresses(publicDeriver, true),
+    () => getAllFullAddressesForErgo(publicDeriver, true),
   );
 
   const signingKey = await wallet.getSigningKey()
@@ -686,8 +685,10 @@ export async function connectorSignTx(
   };
 }
 
-function getScriptRequiredSigningKeys(
+export function getScriptRequiredSigningKeys(
   witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
+  // eslint-disable-next-line no-shadow
+  RustModule: typeof RustModule,
 ): Set<string> {
   const set = new Set<string>();
   const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
@@ -730,17 +731,17 @@ export async function connectorSignCardanoTx(
     __connectorSignCardanoTx(publicDeriver, password, tx, Module));
 }
 
-async function __connectorSignCardanoTx(
-  publicDeriver: PublicDeriver<>,
-  password: string,
+export function resolveTxOrTxBody(
   tx: CardanoTx,
   // eslint-disable-next-line no-shadow
   RustModule: typeof RustModule,
-): Promise<string> {
-
-  // eslint-disable-next-line no-unused-vars
-  const { tx: txHex, partialSign } = tx;
-
+): {|
+  txBody: RustModule.WalletV4.TransactionBody,
+  rawTxBody: Buffer,
+  witnessSet: ?RustModule.WalletV4.TransactionWitnessSet,
+  auxiliaryData: ?RustModule.WalletV4.AuxiliaryData,
+|} {
+  const { tx: txHex } = tx;
   let txBody: RustModule.WalletV4.TransactionBody;
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
   let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
@@ -761,6 +762,19 @@ async function __connectorSignCardanoTx(
       throw originalErr;
     }
   }
+  return { txBody, witnessSet, auxiliaryData, rawTxBody }
+}
+
+async function __connectorSignCardanoTx(
+  publicDeriver: PublicDeriver<>,
+  password: string,
+  tx: CardanoTx,
+  // eslint-disable-next-line no-shadow
+  RustModule: typeof RustModule,
+): Promise<string> {
+
+  const { txBody, witnessSet, auxiliaryData, rawTxBody } =
+    resolveTxOrTxBody(tx, RustModule);
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -773,7 +787,7 @@ async function __connectorSignCardanoTx(
   }
 
   const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
-  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet);
+  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet, RustModule);
   const totalAdditionalRequiredSignKeys = new Set<string>([
     ...requiredTxSignKeys,
     ...requiredScriptSignKeys,

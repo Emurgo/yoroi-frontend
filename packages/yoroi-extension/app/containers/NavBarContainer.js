@@ -20,8 +20,10 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
 import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
-import type { TxRequests } from '../stores/toplevel/TransactionsStore';
-import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  IGetPublic,
+  IGetLastSyncInfoResponse,
+} from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
@@ -69,8 +71,8 @@ export default class NavBarContainer extends Component<Props> {
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     const walletComponents = wallets.map(wallet => {
-      const txRequests = this.generated.stores.transactions.getTxRequests(wallet);
-      const balance = txRequests.requests.getBalanceRequest.result || null;
+      const balance = this.generated.stores.transactions.balance;
+      const lastSyncInfo = this.generated.stores.transactions.lastSyncInfo;
 
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
@@ -89,9 +91,7 @@ export default class NavBarContainer extends Component<Props> {
           plateComponent={<NavPlate plate={plate} wallet={settingsCache} />}
           onSelect={() => this.switchToNewWallet(wallet)}
           isCurrentWallet={wallet === this.generated.stores.wallets.selected}
-          syncTime={
-            txRequests.lastSyncInfo.Time ? moment(txRequests.lastSyncInfo.Time).fromNow() : null
-          }
+          syncTime={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={
             <NavWalletDetails
               walletAmount={balance}
@@ -128,8 +128,7 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-        const balance = txRequests.requests.getBalanceRequest.result || null;
+        const balance = this.generated.stores.transactions.balance;
 
         return (
           <NavWalletDetails
@@ -246,7 +245,8 @@ export default class NavBarContainer extends Component<Props> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        balance: MultiToken | null,
+        lastSyncInfo: IGetLastSyncInfoResponse,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
@@ -293,7 +293,8 @@ export default class NavBarContainer extends Component<Props> {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
+          lastSyncInfo: stores.transactions.lastSyncInfo,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,

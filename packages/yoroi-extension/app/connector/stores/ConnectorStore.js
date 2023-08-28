@@ -7,6 +7,8 @@ import type {
   ConnectRetrieveData,
   FailedSignData,
   GetConnectedSitesData,
+  GetConnectionProtocolData,
+  GetUtxosRequest,
   Protocol,
   PublicDeriverCache,
   RemoveWalletFromWhitelistData,
@@ -14,40 +16,30 @@ import type {
   Tx,
   TxSignWindowRetrieveData,
   WhitelistEntry,
-  GetUtxosRequest,
-  GetConnectionProtocolData,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import type {
-  CardanoConnectorSignRequest,
-  SignSubmissionErrorType,
-  TxDataInput,
-  TxDataOutput,
-} from '../types';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType, TxDataInput, TxDataOutput, } from '../types';
+import { LoadingWalletStates } from '../types';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import type {
-  GetUtxoDataResponse,
-  RemoteUnspentOutput,
-  UtxoData,
-} from '../../api/ada/lib/state-fetch/types';
+import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData, } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed, toJS } from 'mobx';
+import { action, computed, observable, runInAction, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
-import { LoadingWalletStates } from '../types';
 import { getWallets } from '../../api/common/index';
 import {
+  getCardanoHaskellBaseConfig,
   getErgoBaseConfig,
   isCardanoHaskell,
   isErgo,
-  getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   asGetBalance,
@@ -63,36 +55,30 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/connector/utils';
 import { Logger } from '../../utils/logging';
+import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  asAddressedUtxo,
-  multiTokenFromCardanoValue,
-  multiTokenFromRemote,
-} from '../../api/ada/transactions/utils';
-import {
-  connectorGetUsedAddresses,
-  connectorGetUnusedAddresses,
-  connectorGetChangeAddress,
-  connectorSendTxCardano,
   connectorGenerateReorgTx,
+  connectorGetChangeAddress,
+  connectorGetUnusedAddresses,
+  connectorGetUsedAddresses,
   connectorRecordSubmittedCardanoTransaction,
+  connectorSendTxCardano,
+  getScriptRequiredSigningKeys,
+  resolveTxOrTxBody,
 } from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { loadSubmittedTransactions } from '../../api/localStorage';
 import { signTransaction as shelleySignTransaction } from '../../api/ada/transactions/shelley/transactions';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { getAllAddressesWithPaths } from '../../api/ada/lib/storage/bridge/traitUtils';
 import {
-  toLedgerSignRequest,
   buildConnectorSignedTransaction as buildSignedLedgerTransaction,
+  toLedgerSignRequest,
 } from '../../api/ada/transactions/shelley/ledgerTx';
 import {
-  toTrezorSignRequest,
   buildConnectorSignedTransaction as buildSignedTrezorTransaction,
+  toTrezorSignRequest,
 } from '../../api/ada/transactions/shelley/trezorTx';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import blake2b from 'blake2b';
@@ -100,10 +86,10 @@ import type LocalizableError from '../../i18n/LocalizableError';
 import { convertToLocalizableError as convertToLocalizableLedgerError } from '../../domain/LedgerLocalizedError';
 import { convertToLocalizableError as convertToLocalizableTrezorError } from '../../domain/TrezorLocalizedError';
 import {
-  transactionHashMismatchError,
-  unsupportedTransactionError,
   ledgerSignDataUnsupportedError,
+  transactionHashMismatchError,
   trezorSignDataUnsupportedError,
+  unsupportedTransactionError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 
@@ -425,7 +411,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           throw new Error('unexpected nullish transaction');
         }
 
-        const witnessSetHex = (await this.hwSignTx(wallet.publicDeriver, rawTxBody))
+        const additionalRequiredSigners = RustModule.WasmScope(Module => {
+          const { witnessSet } = resolveTxOrTxBody((tx: any), Module);
+          return witnessSet == null ? []
+            : [...(getScriptRequiredSigningKeys(witnessSet, Module))];
+        });
+
+        const witnessSetHex =
+          (await this.hwSignTx(
+            wallet.publicDeriver,
+            rawTxBody,
+            additionalRequiredSigners,
+          ))
           .witness_set()
           .to_hex();
 
@@ -1060,10 +1057,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async hwSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer
+    rawTxBody: Buffer,
+    additionalRequiredSigners: Array<string> = [],
   ): Promise<RustModule.WalletV4.Transaction> {
     if (isLedgerNanoWallet(publicDeriver.getParent())) {
-      return this.ledgerSignTx(publicDeriver, rawTxBody);
+      return this.ledgerSignTx(publicDeriver, rawTxBody, additionalRequiredSigners);
     }
     if (isTrezorTWallet(publicDeriver.getParent())) {
       return this.trezorSignTx(publicDeriver, rawTxBody);
@@ -1157,7 +1155,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async ledgerSignTx(
     publicDeriver: PublicDeriver<>,
-    rawTxBody: Buffer
+    rawTxBody: Buffer,
+    additionalRequiredSigners: Array<string> = [],
   ): Promise<RustModule.WalletV4.Transaction> {
     const config = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo()).reduce(
       (acc, next) => Object.assign(acc, next),
@@ -1190,6 +1189,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         ownStakeAddressMap,
         addressedUtxos,
         rawTxBody,
+        additionalRequiredSigners,
       );
     } catch {
       runInAction(() => {
