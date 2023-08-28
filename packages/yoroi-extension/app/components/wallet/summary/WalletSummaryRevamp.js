@@ -207,7 +207,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             </Button>
           )}
         </Box>
-        <Box sx={{ padding: hasPendingAmount ? '16px 30px' : 0 }}>
+        <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
           <Typography variant="body1">
             {this.renderPendingAmount(
               pendingAmount.incoming,
