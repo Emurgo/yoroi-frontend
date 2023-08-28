@@ -87,7 +87,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     () => [
       this.stores.wallets.selected,
       // update if tx history changes
-      this.stores.transactions.hash,
+      this.stores.transactions.recent,
     ],
     () => {
       if (this.createVotingRegTx.wasExecuted) {

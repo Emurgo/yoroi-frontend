@@ -13,7 +13,9 @@ import type {
   SignedRequestInternal,
   RemoteTransactionInput,
   TokenInfoFunc,
-  MultiAssetMintMetadataFunc
+  MultiAssetMintMetadataFunc,
+  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -91,7 +93,12 @@ export function genCheckAddressesInUse(
   return async (
     body: FilterUsedRequest,
   ): Promise<FilterUsedResponse> => {
-    const addresses = body.addresses.map(addr => fixAddresses(addr, network));
+    const mapToOriginal = {}
+    const addresses = body.addresses.map(addr => {
+      const fixed = fixAddresses(addr, network);
+      mapToOriginal[fixed] = addr;
+      return fixed;
+    });
     const addressSet = new Set(addresses);
     const usedSet = new Set();
 
@@ -101,7 +108,22 @@ export function genCheckAddressesInUse(
       }
       const oursInTx = ourAddressesInTx(tx, addressSet);
       for (const found of oursInTx) {
-        usedSet.add(found);
+        let origAddr;
+        if (addressSet.has(found)) {
+          origAddr = mapToOriginal[found];
+        } else {
+          const enterpriseWasm = toEnterprise(found);
+          if (enterpriseWasm != null) {
+            const enterprise = Buffer.from(enterpriseWasm.to_address().to_bytes()).toString('hex');
+            if (addressSet.has(enterprise)) {
+              origAddr = mapToOriginal[enterprise];
+            }
+          }
+        }
+        if (!origAddr) {
+          throw new Error('unexpected: missing address in addressSet');
+        }
+        usedSet.add(origAddr);
       }
     }
 
@@ -957,4 +979,51 @@ export class MockUtxoApi implements UtxoApiContract {
       },
     };
   }
+}
+
+export function genGetTransactionsByHashes(
+  transactions: Array<RemoteTransaction>
+): GetTransactionsByHashesFunc {
+  return async (
+    body: GetTransactionsByHashesRequest
+  ): Promise<GetTransactionsByHashesResponse> => {
+    const txByHash = {};
+    for (const tx of transactions) {
+      txByHash[tx.hash] = tx;
+    }
+    return body.txHashes.map(hash => txByHash[hash]);
+  };
+}
+
+export function genGetRecentTransactionHashes(
+  transactions: Array<RemoteTransaction>
+): GetRecentTransactionHashesFunc {
+  return async (
+    body: GetRecentTransactionHashesRequest
+  ): Promise<GetRecentTransactionHashesResponse> => {
+    const fixedAddresses = body.addresses.map(a => {
+      return fixAddresses(a, networks.CardanoMainnet);
+    });
+
+    // ignore the "before" parameter because in tests we don't expect pagination
+    const ownAddresses = new Set(fixedAddresses);
+    const result = {};
+    for (const tx of transactions) {
+      for (const addr of ourAddressesInTx(tx, ownAddresses)) {
+        if (!result[addr]) {
+          result[addr] = [];
+        }
+        // note strictly we should return the mapping from input addresses to tx
+        // (`addr` !== input address), but the client only cares about the tx data
+        result[addr].push({
+          txHash: tx.hash,
+          blockHash: tx.block_hash,
+          txBlockIndex: tx.tx_ordinal,
+          epoch: tx.epoch,
+          slot: tx.slot,
+        });
+      }
+    }
+    return result;
+  };
 }

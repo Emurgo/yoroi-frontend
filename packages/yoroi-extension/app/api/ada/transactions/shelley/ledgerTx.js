@@ -49,6 +49,7 @@ export async function createLedgerSignTxPayload(request: {|
   byronNetworkMagic: number,
   networkId: number,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  cip36: boolean,
 |}): Promise<SignTransactionRequest> {
   const txBody = request.signRequest.unsignedTx.build();
 
@@ -94,32 +95,54 @@ export async function createLedgerSignTxPayload(request: {|
     const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } =
       request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
 
-    auxiliaryData = {
-      type: TxAuxiliaryDataType.CIP36_REGISTRATION,
-      params: {
-        format: CIP36VoteRegistrationFormat.CIP_36,
-        delegations: [
-          {
-            type: CIP36VoteDelegationType.KEY,
-            voteKeyHex: votingPublicKey.replace(/^0x/, ''),
-            weight: 1,
-          },
-        ],
-        stakingPath: stakingKeyPath,
-        paymentDestination: {
-          type: TxOutputDestinationType.DEVICE_OWNED,
-          params: {
-            type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+    if (request.cip36) {
+      auxiliaryData = {
+        type: TxAuxiliaryDataType.CIP36_REGISTRATION,
+        params: {
+          format: CIP36VoteRegistrationFormat.CIP_36,
+          delegations: [
+            {
+              type: CIP36VoteDelegationType.KEY,
+              voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+              weight: 1,
+            },
+          ],
+          stakingPath: stakingKeyPath,
+          paymentDestination: {
+            type: TxOutputDestinationType.DEVICE_OWNED,
             params: {
-              spendingPath: paymentKeyPath,
-              stakingPath: stakingKeyPath,
+              type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+              params: {
+                spendingPath: paymentKeyPath,
+                stakingPath: stakingKeyPath,
+              },
             },
           },
-        },
-        nonce,
-        votingPurpose: 0,
-      }
-    };
+          nonce,
+          votingPurpose: 0,
+        }
+      };
+    } else {
+      auxiliaryData = {
+        type: TxAuxiliaryDataType.CIP36_REGISTRATION,
+        params: {
+          format: CIP36VoteRegistrationFormat.CIP_15,
+          voteKeyHex: votingPublicKey.replace(/^0x/, ''),
+          stakingPath: stakingKeyPath,
+          paymentDestination: {
+            type: TxOutputDestinationType.DEVICE_OWNED,
+            params: {
+              type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+              params: {
+                spendingPath: paymentKeyPath,
+                stakingPath: stakingKeyPath,
+              },
+            },
+          },
+          nonce,
+        }
+      };
+    }
   } else if (request.signRequest.metadata != null) {
     auxiliaryData = {
       type: TxAuxiliaryDataType.ARBITRARY_HASH,
@@ -621,6 +644,7 @@ export function toLedgerSignRequest(
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
   rawTxBody: Buffer,
+  additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
   const parsedCbor = cbor.decode(rawTxBody);
 
@@ -807,23 +831,37 @@ export function toLedgerSignRequest(
     );
   }
 
+  function getRequiredSignerHashHexes(): Array<string> {
+    const set = new Set<string>();
+    const requiredSigners = txBody.required_signers();
+    if (requiredSigners) {
+      for (let i = 0; i < requiredSigners.len(); i++) {
+        set.add(requiredSigners.get(i).to_hex());
+      }
+    }
+    return [...set];
+  }
+
   const additionalWitnessPaths = [];
   const formattedRequiredSigners = [];
-  const requiredSigners = txBody.required_signers();
-  if (requiredSigners) {
-    for (let i = 0; i < requiredSigners.len(); i++) {
-      const hash = requiredSigners.get(i);
-      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
+  RustModule.WasmScope(Module => {
+    function hashHexToOwnAddressPath(hashHex: string): ?Array<number> {
+      const hash = Module.WalletV4.Ed25519KeyHash.from_hex(hashHex);
+      const enterpriseAddress = Module.WalletV4.EnterpriseAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        Module.WalletV4.StakeCredential.from_keyhash(hash),
       ).to_address().to_hex();
-      const stakeAddress = RustModule.WalletV4.RewardAddress.new(
+      const stakeAddress = Module.WalletV4.RewardAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        Module.WalletV4.StakeCredential.from_keyhash(hash),
       ).to_address().to_hex();
-      const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
+      return ownUtxoAddressMap[enterpriseAddress] ||
         ownStakeAddressMap[stakeAddress];
-      if (ownAddressPath) {
+    }
+    const requiredSignerHashHexes = getRequiredSignerHashHexes();
+    for (const hashHex of requiredSignerHashHexes) {
+      const ownAddressPath = hashHexToOwnAddressPath(hashHex);
+      if (ownAddressPath != null) {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.PATH,
           path: ownAddressPath,
@@ -832,11 +870,17 @@ export function toLedgerSignRequest(
       } else {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.HASH,
-          hashHex: hash.to_hex(),
+          hashHex,
         });
       }
     }
-  }
+    for (const additionalHashHex of (additionalRequiredSigners || [])) {
+      const ownAddressPath = hashHexToOwnAddressPath(additionalHashHex);
+      if (ownAddressPath != null) {
+        additionalWitnessPaths.push(ownAddressPath);
+      }
+    }
+  });
 
   function addressingMap(addr: string): void | {| +path: Array<number> |} {
     const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
@@ -927,7 +971,7 @@ export function toLedgerSignRequest(
         })) ?? null,
       scriptDataHashHex: txBody.script_data_hash()?.to_hex() ??  null,
       collateralInputs: formattedCollateral,
-      requiredSigners: requiredSigners ? formattedRequiredSigners : null,
+      requiredSigners: formattedRequiredSigners.length > 0 ? formattedRequiredSigners : null,
       includeNetworkId: txBody.network_id() != null,
       collateralOutput: formattedCollateralReturn,
       totalCollateral: txBody.total_collateral()?.to_str() ?? null,
