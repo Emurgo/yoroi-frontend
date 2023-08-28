@@ -8,8 +8,6 @@
     object-fit: contain;
     display: inline-flex;
     margin-right: 2px;
-    width: 32px;
-    height: 32px;
     border-radius: 50%;
     transition: background-color 0.3s;
     & > svg {
@@ -33,4 +31,16 @@
   align-items: center;
   padding: 8px 20px;
   border-radius: 8px;
+}
+
+:global(.YoroiRevamp) {
+  .copyIconBig {
+    width: 32px;
+    height: 32px;
+    margin-left: 8px;
+    & > svg {
+      height: 24px;
+      width: 24px;
+    }
+  }
 }
