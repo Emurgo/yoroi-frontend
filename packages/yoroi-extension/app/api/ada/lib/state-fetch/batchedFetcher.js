@@ -22,6 +22,8 @@ import type {
   MultiAssetMintMetadataResponse,
   GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
   GetLatestBlockBySlotFunc,
+  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -85,6 +87,22 @@ export class BatchedFetcher implements IFetcher {
       this.baseFetcher.getTransactionsHistoryForAddresses
     )(body)
   )
+
+  getRecentTransactionHashes
+  : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>
+    = (body) => (
+      batchGetRecentTransactionHashes(
+        this.baseFetcher.getRecentTransactionHashes
+      )(body)
+    );
+
+  getTransactionsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>
+    = (body) => (
+      batchGetTransactionsByHashes(
+        this.baseFetcher.getTransactionsByHashes
+      )(body)
+    );
 
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
     batchGetRewardHistory(
@@ -324,6 +342,30 @@ export function batchGetTransactionsHistoryForAddresses(
       if (error instanceof LocalizableError) throw error;
       throw new GetTxHistoryForAddressesApiError();
     }
+  };
+}
+
+function batchGetRecentTransactionHashes(
+  getRecentTransactionHashes: GetRecentTransactionHashesFunc,
+): GetRecentTransactionHashesFunc {
+  return getRecentTransactionHashes;
+}
+
+function batchGetTransactionsByHashes(
+  getTransactionsByHashes: GetTransactionsByHashesFunc,
+): GetTransactionsByHashesFunc {
+  return async function(
+    body: GetTransactionsByHashesRequest
+  ): Promise<GetTransactionsByHashesResponse> {
+    let txs = [];
+    for (const txHashes of chunk(body.txHashes, 100)) {
+      const batchResult = await getTransactionsByHashes({
+        txHashes,
+        network: body.network,
+      });
+      txs = [ ...txs, ...batchResult ];
+    }
+    return txs;
   };
 }
 

@@ -137,7 +137,7 @@ async function scanChain(request: {|
    */
 
   return addresses
-    .map((address, i) => {
+    .map(({ address, isUsed }, i) => {
       return {
         index: i + request.lastUsedIndex + 1,
         insert: async insertRequest => {
@@ -149,6 +149,8 @@ async function scanChain(request: {|
             Number.parseInt(config.ChainNetworkId, 10),
           );
         },
+        isUsed,
+        address,
       };
     });
 }
