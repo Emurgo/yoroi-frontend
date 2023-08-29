@@ -21,6 +21,8 @@ type Props = {|
 |};
 
 type InjectedProps = {| isRevampLayout: boolean, currentTheme: string |};
+
+type AllProps = {| ...Props, ...InjectedProps |};
 /** Adds a top bar above the wrapped node */
 function TopBarLayout({
   banner,
@@ -36,7 +38,7 @@ function TopBarLayout({
   isRevampLayout,
   asModern,
   bgcolor,
-}: Props & InjectedProps) {
+}: AllProps) {
   const isModern = currentTheme === THEMES.YOROI_MODERN;
 
   const getContentUnderBanner: void => Node = () => {
@@ -67,11 +69,7 @@ function TopBarLayout({
               flex: '0 1 auto',
               height: '100%',
             }),
-            ...(isRevampLayout &&
-              asModern !== true &&
-              !isModern && {
-                overflow: 'auto',
-              }),
+            overflow: isRevampLayout && asModern !== true && !isModern ? 'auto' : '',
           }}
         >
           {isRevampLayout && asModern !== true && !isModern ? (
@@ -142,11 +140,7 @@ function TopBarLayout({
               flexDirection: 'column',
               maxHeight: 'calc(100vh - 110px)',
             }),
-            ...(isRevampLayout &&
-              asModern !== true &&
-              !isModern && {
-                backgroundColor: 'common.white',
-              }),
+            backgroundColor: isRevampLayout && asModern !== true && !isModern ? 'common.white' : '',
           }}
         >
           {content}
@@ -193,11 +187,8 @@ function TopBarLayout({
               showInContainer === true && isRevampLayout
                 ? 'common.white'
                 : 'var(--yoroi-palette-gray-50)',
-            ...(isRevampLayout &&
-              asModern !== true &&
-              !isModern && {
-                backgroundColor: 'common.white',
-              }),
+
+            backgroundColor: isRevampLayout && asModern !== true && !isModern ? 'common.white' : '',
           }}
         >
           {banner}

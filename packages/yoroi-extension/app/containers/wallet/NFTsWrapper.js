@@ -69,7 +69,6 @@ export default class NFTsWrapper extends Component<Props> {
             title={<NavBarTitle title={intl.formatMessage(messages.NFTGallery)} />}
           />
         }
-        isRevampLayout
       >
         {this.props.children}
       </TopBarLayout>
