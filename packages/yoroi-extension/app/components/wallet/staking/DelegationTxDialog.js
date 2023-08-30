@@ -32,11 +32,24 @@ import WarningBox from '../../widgets/WarningBox';
 import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { toSvg } from 'jdenticon';
 
 const messages = defineMessages({
   delegationTips: {
     id: 'wallet.delegation.transaction.delegationTips',
     defaultMessage: '!!!Delegation tips',
+  },
+  firstTip: {
+    id: 'wallet.delegation.transaction.delegationTips.firstTip',
+    defaultMessage: '!!!You can delegate to only one stake pool at a time',
+  },
+  secondTip: {
+    id: 'wallet.delegation.transaction.delegationTips.secondTip',
+    defaultMessage: '!!!Easily switch to a different stake pool',
+  },
+  thirdTip: {
+    id: 'wallet.delegation.transaction.delegationTips.thirdTip',
+    defaultMessage: '!!!Cancel your delegation at any time',
   },
   explanationLine1: {
     id: 'wallet.delegation.transaction.explanationLine1',
@@ -57,6 +70,18 @@ const messages = defineMessages({
   approximateLabel: {
     id: 'wallet.delegation.transaction.approximationLabel',
     defaultMessage: '!!!Current approximation of rewards that you will receive per epoch:',
+  },
+  stakePoolChecksumAndName: {
+    id: 'wallet.delegation.transaction.stakePoolChecksumAndNameLabel',
+    defaultMessage: '!!!Stake pool checksum and name',
+  },
+  depositLabel: {
+    id: 'wallet.delegation.transaction.depositLabel',
+    defaultMessage: '!!!Deposit',
+  },
+  amountToDelegate: {
+    id: 'wallet.delegation.transaction.amountToDelegate',
+    defaultMessage: '!!!Amount to delegate',
   },
 });
 
@@ -134,24 +159,6 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
       this.props.isSubmitting ? styles.submitButtonSpinning : null,
     ]);
 
-    const actions = [
-      {
-        label: intl.formatMessage(globalMessages.backButtonLabel),
-        disabled: this.props.isSubmitting,
-        onClick: this.props.isSubmitting
-          ? () => {} // noop
-          : this.props.onCancel,
-      },
-      {
-        label: intl.formatMessage(globalMessages.delegateLabel),
-        onClick: this.submit.bind(this),
-        primary: true,
-        className: confirmButtonClasses,
-        isSubmitting: this.props.isSubmitting,
-        disabled: this.props.isSubmitting,
-      },
-    ];
-
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
     const decimalPlaces = this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry())
@@ -159,65 +166,42 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
     const delegatingValue = new BigNumber(
       this.props.amountToDelegate.getDefaultEntry().amount
     ).shiftedBy(-decimalPlaces);
-    return (
+
+    const classicLayout = (
       <Dialog
         title={intl.formatMessage(
           isRevampLayout
             ? globalMessages.delegateLabel
             : globalMessages.walletSendConfirmationDialogTitle
         )}
-        actions={actions}
+        actions={[
+          {
+            label: intl.formatMessage(globalMessages.backButtonLabel),
+            disabled: this.props.isSubmitting,
+            onClick: this.props.isSubmitting
+              ? () => {} // noop
+              : this.props.onCancel,
+          },
+          {
+            label: intl.formatMessage(globalMessages.delegateLabel),
+            onClick: this.submit.bind(this),
+            primary: true,
+            className: confirmButtonClasses,
+            isSubmitting: this.props.isSubmitting,
+            disabled: this.props.isSubmitting,
+          },
+        ]}
         closeOnOverlayClick={false}
         onClose={!this.props.isSubmitting ? this.props.onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
       >
         {this.props.staleTx && staleTxWarning}
-        {isRevampLayout ? (
-          <Box
-            sx={{
-              background: theme => theme.palette.gradients['blue-green-banner'],
-              mb: '24px',
-              p: '12px 16px 8px 16px',
-              borderRadius: '8px',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '8px' }}>
-              <InfoIcon />
-              <Typography variant="body1" fontWeight={500} color="grayscale.900">
-                {intl.formatMessage(messages.delegationTips)}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                listStyle: 'outside',
-                pl: '27px',
-              }}
-              component="ul"
-            >
-              {[
-                messages.explanationLine1,
-                messages.explanationLine2,
-                messages.explanationLine3,
-              ].map(msg => {
-                const message = intl.formatMessage(msg);
-                return (
-                  <Box component="li" key={message}>
-                    <Typography variant="body1" color="grayscale.900">
-                      {message}
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </Box>
-          </Box>
-        ) : (
-          <ul className={styles.explanation}>
-            <li className={styles.line}>{intl.formatMessage(messages.explanationLine1)}</li>
-            <li className={styles.line}>{intl.formatMessage(messages.explanationLine2)}</li>
-            <li className={styles.line}>{intl.formatMessage(messages.explanationLine3)}</li>
-          </ul>
-        )}
+        <ul className={styles.explanation}>
+          <li className={styles.line}>{intl.formatMessage(messages.explanationLine1)}</li>
+          <li className={styles.line}>{intl.formatMessage(messages.explanationLine2)}</li>
+          <li className={styles.line}>{intl.formatMessage(messages.explanationLine3)}</li>
+        </ul>
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.stakePoolName)}</p>
           <p className={styles.content}>
@@ -273,6 +257,155 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         ) : null}
       </Dialog>
     );
+
+    const avatarSource = toSvg(this.props.poolHas, 36, { padding: 0 });
+    const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+    const tokenTicker = getTokenName(
+      this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry())
+    );
+
+    const revampLayout = (
+      <Dialog
+        title={intl.formatMessage(
+          isRevampLayout
+            ? globalMessages.delegateLabel
+            : globalMessages.walletSendConfirmationDialogTitle
+        )}
+        actions={[
+          {
+            label: intl.formatMessage(globalMessages.delegateLabel),
+            onClick: this.submit.bind(this),
+            primary: true,
+            className: confirmButtonClasses,
+            isSubmitting: this.props.isSubmitting,
+            disabled: this.props.isSubmitting,
+          },
+        ]}
+        closeOnOverlayClick={false}
+        onClose={!this.props.isSubmitting ? this.props.onCancel : null}
+        className={styles.dialog}
+        closeButton={<DialogCloseButton />}
+      >
+        {this.props.staleTx && staleTxWarning}
+        <Box
+          sx={{
+            background: theme => theme.palette.gradients['blue-green-banner'],
+            mb: '24px',
+            p: '12px 16px 8px 16px',
+            borderRadius: '8px',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '8px' }}>
+            <InfoIcon />
+            <Typography variant="body1" fontWeight={500} color="grayscale.900">
+              {intl.formatMessage(messages.delegationTips)}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              listStyle: 'outside',
+              pl: '27px',
+            }}
+            component="ul"
+          >
+            {[messages.firstTip, messages.secondTip, messages.thirdTip].map(msg => {
+              const message = intl.formatMessage(msg);
+              return (
+                <Box component="li" key={message}>
+                  <Typography variant="body1" color="grayscale.900">
+                    {message}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+        <Box mb="16px">
+          <Typography variant="body1" color="grayscale.600" mb="4px">
+            {intl.formatMessage(messages.stakePoolChecksumAndName)}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Box>
+              <Box
+                sx={{ width: '24px', height: '24px', borderRadius: '50%', display: 'inline-block' }}
+                component="img"
+                src={avatarGenerated}
+              />
+            </Box>
+            <Typography variant="body1" color="grayscale.900">
+              {this.props.poolName ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
+            </Typography>
+          </Box>
+        </Box>
+        <Box
+          mb="24px"
+          sx={{
+            '& span': {
+              color: 'grayscale.900',
+            },
+          }}
+        >
+          <Typography variant="body1" color="grayscale.600" mb="4px">
+            {intl.formatMessage(globalMessages.stakePoolHash)}
+          </Typography>
+          <ExplorableHashContainer
+            selectedExplorer={this.props.selectedExplorer}
+            hash={this.props.poolHash}
+            light
+            linkType="pool"
+            placementTooltip="top-start"
+          >
+            <RawHash light>{this.props.poolHash}</RawHash>
+          </ExplorableHashContainer>
+        </Box>
+
+        <Box
+          sx={{
+            py: '24px',
+            borderTop: '1px solid',
+            borderColor: 'grayscale.200',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}
+        >
+          <Box>
+            <Typography color="grayscale.600" variant="body1">
+              {intl.formatMessage(messages.depositLabel)}
+            </Typography>
+            <Typography color="grayscale.900">-2 {tokenTicker}</Typography>
+          </Box>
+          <Box>
+            <Typography color="grayscale.600" variant="body1">
+              {intl.formatMessage(globalMessages.feeLabel)}
+            </Typography>
+            <Typography color="grayscale.900">
+              {formatValue(this.props.transactionFee.getDefaultEntry())} {tokenTicker}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography color="grayscale.600" variant="body1">
+              {intl.formatMessage(messages.amountToDelegate)}
+            </Typography>
+            <Typography color="grayscale.900">
+              {delegatingValue.toString()} {tokenTicker}
+            </Typography>
+          </Box>
+        </Box>
+
+        {spendingPasswordForm}
+        {this.props.error ? (
+          <p className={styles.error}>
+            {intl.formatMessage(this.props.error, this.props.error.values)}
+          </p>
+        ) : null}
+      </Dialog>
+    );
+
+    return this.props.renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
   }
 }
 

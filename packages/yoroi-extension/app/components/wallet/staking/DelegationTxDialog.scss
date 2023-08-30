@@ -86,3 +86,15 @@
     }
   }
 }
+
+:global(.YoroiRevamp) {
+  .dialog {
+    h1 {
+      margin-bottom: 25px;
+    }
+
+    & > div:nth-child(3) {
+      margin-top: 14px;
+    }
+  }
+}

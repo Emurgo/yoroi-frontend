@@ -410,6 +410,10 @@ const globalMessages: * = defineMessages({
     id: 'global.label.assets',
     defaultMessage: '!!!assets',
   },
+  success: {
+    id: 'global.label.success',
+    defaultMessage: '!!!Success',
+  },
   step1: {
     id: 'transfer.form.instructions.step1.text',
     defaultMessage:
