@@ -64,6 +64,7 @@
   "connector.connect.info": "Your connection preferences will be saved to your Yoroi dApp list.",
   "connector.connect.noWalletsFound": "Ooops, no {network} wallets found.",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
+  "connector.connected-dapps.title": "Connected DApps ({numDapps})",
   "connector.connected-dapps.cardanoLabel": "Cardano, ADA",
   "connector.connected-dapps.dappsLabel": "Dapps",
   "connector.connected-dapps.ergoLabel": "Ergo, ERG",
