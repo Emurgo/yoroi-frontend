@@ -23,9 +23,13 @@ import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 import { urlResolveIpfs } from '../../../coreUtils';
+import { debounce, } from 'lodash';
+import { ampli } from '../../../../ampli/index';
+
+const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
 type Props = {|
   list: Array<{| id: string, name: string, image: string | null |}>,
@@ -60,8 +64,26 @@ const listColumnViews = [
 
 function NfTsList({ list, intl }: Props & Intl): Node {
   const [columns, setColumns] = useState(listColumnViews[0]);
+  const setColumnsAndTrack = function (column) {
+    setColumns(column);
+    ampli.nftGalleryGridViewSelected({
+      nft_grid_view: column.count === 4 ? '4_rows' : '6_rows',
+    });
+  };
+
   const [nftList, setNftList] = useState([...list]);
   const [keyword, setKeyword] = useState('');
+  const trackSearch = useCallback(debounce(
+    (nftCount: number, nftSearchTerm: string) => {
+      if (nftSearchTerm !== '' ) {
+        ampli.nftGallerySearchActivated({
+          nft_count: nftCount,
+          nft_search_term: nftSearchTerm,
+        })
+      }
+    },
+    SEARCH_ACTIVATE_DEBOUNCE_WAIT,
+  ), []);
 
   useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
@@ -70,6 +92,9 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       return [a.name, a.id].some(val => val.match(regExp));
     });
     setNftList(filteredAssetsList);
+    if (keyword !== '') {
+      trackSearch(filteredAssetsList.length, keyword)
+    }
   }, [keyword, list]);
 
   return (
@@ -101,7 +126,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
             {listColumnViews.map(Column => (
               <Button
                 key={Column.count}
-                onClick={() => setColumns(Column)}
+                onClick={() => setColumnsAndTrack(Column)}
                 sx={{
                   width: '40px',
                   height: '40px',
@@ -163,7 +188,11 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         <ImageList sx={{ width: '100%', padding: '0px 24px 30px' }} cols={columns.count} gap={24}>
           {nftList.map(nft => {
             return (
-              <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}>
+              <SLink
+                key={nft.id}
+                to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
+                onClick={() => { ampli.nftGalleryDetailsPageViewed(); }}
+              >
                 <NftCardImage
                   ipfsUrl={nft.image}
                   name={nft.name}

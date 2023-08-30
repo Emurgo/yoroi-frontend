@@ -17,11 +17,21 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import NfTsList from '../../components/wallet/assets/NFTsList';
 import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
+import { once } from 'lodash';
+import { ampli } from '../../../ampli/index';
 
 export type GeneratedData = typeof NFTsPageRevamp.prototype.generated;
 
 @observer
 export default class NFTsPageRevamp extends Component<InjectedOrGenerated<GeneratedData>> {
+  trackPageViewed: (number) => void = once((nftCount) => {
+    setTimeout(() => {
+      ampli.nftGalleryPageViewed({
+        nft_count: nftCount,
+      });
+    }, 0);
+  });
+
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
@@ -52,6 +62,8 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           };
         });
     })();
+
+    this.trackPageViewed(nftsList.length);
 
     return <NfTsList list={nftsList} />;
   }

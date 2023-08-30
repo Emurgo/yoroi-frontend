@@ -23,6 +23,7 @@ import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
 import { urlResolveIpfs } from '../../../coreUtils';
+import { ampli } from '../../../../ampli/index';
 
 type Props = {|
   nftInfo: void | {
@@ -92,6 +93,12 @@ const tabs = [
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
+  const setActiveTabAndTrack = function (tabId: string) {
+    setActiveTab(tabId);
+    ampli.nftGalleryDetailsTab({
+      nft_tab: tabId === 'overview' ? 'Overview' : 'Metadata',
+    });
+  };
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
   const below1400 = useMediaQuery('(max-width:1400px)');
@@ -109,6 +116,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
     }
   };
   const onClose = () => setOpen(false);
+  const setOpenAndTrack = () => {
+    setOpen(true);
+    ampli.nftGalleryDetailsImageViewed();
+  };
   function displayAddr(addr: string): string {
     if (below1250 === true) {
       return truncateAddressShort(addr);
@@ -163,7 +174,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
             padding: below1400 ? '10px' : '24px',
           }}
-          onClick={() => nftInfo.image !== null && setOpen(true)}
+          onClick={() => nftInfo.image !== null && setOpenAndTrack()}
         >
           <NftImage
             imageUrl={nftInfo.image}
@@ -190,7 +201,16 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             </TruncatedText>
 
             <Stack direction="row" spacing={1}>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
+              <Link
+                to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
+                onClick={
+                  () => {
+                    ampli.nftGalleryDetailsNavigation({
+                      nft_navigation: 'Previous',
+                    });
+                  }
+                }
+              >
                 <IconButton
                   aria-label="Previous"
                   sx={{ transform: 'rotate(180deg)', width: '32px' }}
@@ -198,7 +218,16 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   <Chevron />
                 </IconButton>
               </Link>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
+              <Link
+                to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
+                onClick={
+                  () => {
+                    ampli.nftGalleryDetailsNavigation({
+                      nft_navigation: 'Next',
+                    });
+                  }
+                }
+              >
                 <IconButton aria-label="Next" sx={{ width: '32px' }}>
                   <Chevron />
                 </IconButton>
@@ -215,7 +244,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   borderBottom: 1,
                   borderColor: 'divider',
                 }}
-                onChange={(_, newValue) => setActiveTab(newValue)}
+                onChange={(_, newValue) => setActiveTabAndTrack(newValue)}
                 aria-label="NFTs tabs"
               >
                 {tabs.map(({ label, id }) => (
