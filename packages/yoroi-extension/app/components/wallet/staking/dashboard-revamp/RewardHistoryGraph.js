@@ -192,7 +192,12 @@ function RewardHistoryGraph({
       sx={{ height: '278px', display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-        <Button color="secondary" size="medium" onClick={onOpenRewardList}>
+        <Button
+          color="primary"
+          size="medium"
+          onClick={onOpenRewardList}
+          sx={{ lineHeight: '21px' }}
+        >
           {title}
         </Button>
       </Box>

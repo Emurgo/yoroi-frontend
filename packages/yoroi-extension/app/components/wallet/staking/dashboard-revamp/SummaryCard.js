@@ -31,6 +31,7 @@ type Props = {|
   +graphData: GraphData,
   +epochLength: ?number,
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -123,19 +124,21 @@ function SummaryCard({
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <WrapperIcon bgcolor="#EEF1FA">
-            <StakingIcon />
-          </WrapperIcon>
+          <StakingIcon />
           <InfoDetails>
-            <Typography variant="body2" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
+            <Typography
+              variant="caption1"
+              color="grayscale.600"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography variant="h1" color="grayscale.900">
+            <Typography variant="h2" color="common.black" fontWeight={500}>
               {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="grayscale.900">
+            <Typography variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </InfoDetails>
@@ -144,15 +147,20 @@ function SummaryCard({
             </OverviewButton> */}
         </InfoRow>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <WrapperIcon bgcolor="#F3FAFF">
-            <TotalDelegatedIcon />
-          </WrapperIcon>
+          <TotalDelegatedIcon />
           <InfoDetails>
-            <Typography variant="body1" color="grayscale.600" marginBottom="4px">
+            <Typography
+              variant="caption1"
+              color="grayscale.600"
+              marginBottom="4px"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.totalDelegated)}
             </Typography>
+          </InfoDetails>
+          <InfoDetails>
             {totalDelegated ? (
-              <Typography variant="h1" fontWeight="400" color="grayscale.900">
+              <Typography variant="h2" fontWeight="500" color="common.black">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
@@ -160,7 +168,7 @@ function SummaryCard({
                 <LoadingSpinner small />
               </div>
             )}
-            <Typography variant="body1" color="grayscale.900">
+            <Typography variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalDelegated)}
             </Typography>
           </InfoDetails>
@@ -194,15 +202,7 @@ const InfoRow = styled(Box)({
     borderLeftWidth: '1px',
   },
 });
-const WrapperIcon = styled(Box)({
-  borderRadius: '50px',
-  width: '40px',
-  height: '40px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginRight: '24px',
-});
+
 const InfoDetails = styled(Box)({});
 
 // todo: remove?
