@@ -13,10 +13,9 @@ import { ReactComponent as DeleteIcon } from '../../../assets/images/revamp/dele
 import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { intlShape, defineMessages } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { constructPlate } from '../../topbar/NavPlate';
 import styles from './WalletRow.scss';
-import WalletType from '../../widgets/WalletType';
-import NavPlate, { constructPlate } from '../../topbar/NavPlate';
 
 const messages = defineMessages({
   active: {
