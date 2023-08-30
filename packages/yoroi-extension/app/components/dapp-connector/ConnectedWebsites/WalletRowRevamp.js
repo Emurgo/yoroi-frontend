@@ -27,7 +27,6 @@ const messages = defineMessages({
 type Props = {|
   +url: ?string,
   +protocol: ?string,
-  +isActiveSite: boolean,
   +shouldHideBalance: boolean,
   +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -96,7 +95,6 @@ export default class WalletRowRevamp extends Component<Props, State> {
 
   render(): Node {
     const {
-      isActiveSite,
       url,
       protocol,
       plate,
@@ -160,7 +158,6 @@ export default class WalletRowRevamp extends Component<Props, State> {
           >
             {url}
           </Typography>
-          {isActiveSite && <p className={styles.status}>{intl.formatMessage(messages.active)}</p>}
         </Box>
         {showDeleteIcon && (
           <Box position="absolute" right="16px" top="16px">

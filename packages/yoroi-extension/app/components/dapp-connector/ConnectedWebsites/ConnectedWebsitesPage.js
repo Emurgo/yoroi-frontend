@@ -120,7 +120,6 @@ class ConnectedWebsitesPage extends Component<AllProps> {
             url={url}
             protocol={protocol}
             websiteIcon={image}
-            isActiveSite={this.props.activeSites.includes(url)}
             onRemoveWallet={this.props.onRemoveWallet}
             balance={balance}
             plate={plate}
