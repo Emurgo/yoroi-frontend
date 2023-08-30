@@ -148,7 +148,7 @@ class VotingPageContent extends Component<Props> {
       );
     }
 
-    if (false && !environment.isTest()) {
+    if (!environment.isTest()) {
       if (!catalystRoundInfo || (!catalystRoundInfo.currentFund && !catalystRoundInfo.nextFund)) {
         return (
           <RegistrationOver
@@ -239,7 +239,7 @@ class VotingPageContent extends Component<Props> {
     }
 
     // disable the minimum on E2E tests
-    if (false && !environment.isTest() && balance.getDefaultEntry().amount.lt(CATALYST_MIN_AMOUNT)) {
+    if (!environment.isTest() && balance.getDefaultEntry().amount.lt(CATALYST_MIN_AMOUNT)) {
       const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
       const tokenInfo = getTokenInfo({
         identifier: selected.getParent().getDefaultToken().defaultIdentifier,
