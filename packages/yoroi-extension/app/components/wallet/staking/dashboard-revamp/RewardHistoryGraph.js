@@ -2,7 +2,7 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, Stack, Typography } from '@mui/material';
-import { defineMessages, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { getAvatarFromPoolId } from '../utils';
@@ -148,40 +148,13 @@ const AccordionSummary = styled((props /* AccordionSummaryProps */) => (
 type RewardHistoryGraphProps = {|
   graphData: GraphData,
   onOpenRewardList: () => void,
-  epochLength: ?number,
 |};
-
-const messages = defineMessages({
-  epochAxisLabel: {
-    id: 'wallet.dashboard.graph.epochAxisLabel',
-    defaultMessage: '!!!Epoch ({epochLength} days)',
-  },
-  singleEpochAxisLabel: {
-    id: 'wallet.dashboard.graph.singleEpochAxisLabel',
-    defaultMessage: '!!!Epoch (1 day)',
-  },
-  dayToggleLabel: {
-    id: 'wallet.dashboard.graph.dayToggleLabel',
-    defaultMessage: '!!!Day (UTC)',
-  },
-});
 
 function RewardHistoryGraph({
   graphData,
   onOpenRewardList,
-  epochLength,
   intl,
 }: RewardHistoryGraphProps & Intl): Node {
-  function _getEpochLengthLabel(): string {
-    if (epochLength == null) {
-      return intl.formatMessage(globalMessages.epochLabel);
-    }
-
-    return epochLength === 1
-      ? intl.formatMessage(messages.singleEpochAxisLabel)
-      : intl.formatMessage(messages.epochAxisLabel, { epochLength });
-  }
-
   const { rewardsGraphData } = graphData;
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = intl.formatMessage(globalMessages.rewardHistory);
@@ -189,9 +162,19 @@ function RewardHistoryGraph({
     <Box
       p="24px"
       pt="4px"
-      sx={{ height: '278px', display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}
+      sx={{ display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
+      >
+        <Typography variant="body1" fontWeight={500}>
+          {title}
+        </Typography>
         <Button
           color="primary"
           size="medium"
@@ -214,15 +197,17 @@ function RewardHistoryGraph({
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       ) : (
-        <RewardGraphClean
-          epochTitle={intl.formatMessage(globalMessages.epochLabel)}
-          stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
-          xAxisLabel={_getEpochLengthLabel()}
-          yAxisLabel={intl.formatMessage(globalMessages.rewardHistory)}
-          primaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
-          data={rewardList}
-          hideYAxis={rewardsGraphData.hideYAxis}
-        />
+        <Box ml="-50px">
+          <RewardGraphClean
+            epochTitle={intl.formatMessage(globalMessages.epochLabel)}
+            stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
+            xAxisLabel={intl.formatMessage(globalMessages.epochs)}
+            yAxisLabel={intl.formatMessage(globalMessages.rewardValue)}
+            primaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
+            data={rewardList}
+            hideYAxis={rewardsGraphData.hideYAxis}
+          />
+        </Box>
       )}
     </Box>
   );

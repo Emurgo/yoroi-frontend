@@ -171,7 +171,6 @@ class StakingPageContent extends Component<AllProps> {
               )
             : new MultiToken([], defaultToken);
         })()}
-        epochLength={this.getEpochLengthInDays(request.publicDeriver)}
         graphData={generateGraphData({
           delegationRequests: request.delegationRequests,
           publicDeriver: request.publicDeriver,
@@ -622,7 +621,6 @@ const WrapperCards = styled(Box)({
   gap: '40px',
   justifyContent: 'space-between',
   marginBottom: '40px',
-  height: '556px',
 });
 
 const RightCardsWrapper = styled(Box)({

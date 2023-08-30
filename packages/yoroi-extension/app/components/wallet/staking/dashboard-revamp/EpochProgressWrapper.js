@@ -38,7 +38,7 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
           borderColor: 'grayscale.200',
         }}
       >
-        <Typography variant="h5" color="grayscale.900">
+        <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.epochProgress)}
         </Typography>
       </Box>

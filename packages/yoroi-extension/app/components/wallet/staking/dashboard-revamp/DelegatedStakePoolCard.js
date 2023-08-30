@@ -33,7 +33,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           borderBottomColor: 'grayscale.200',
         }}
       >
-        <Typography variant="h5" color="grayscale.900">
+        <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
       </Box>
@@ -59,30 +59,42 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="grayscale.500">
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography as="span" color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {roa} %
             </Typography>
           </Box>
         ) : null}
         {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="grayscale.500">
-              Pool Size
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
-            <Typography as="span" color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {poolSize}
             </Typography>
           </Box>
         )}
         {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="grayscale.500">
-              Share
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {intl.formatMessage(globalMessages.poolShare)}
             </Typography>
-            <Typography as="span" color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {share} %
             </Typography>
           </Box>

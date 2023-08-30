@@ -29,7 +29,6 @@ type Props = {|
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
-  +epochLength: ?number,
 |};
 
 type Intl = {|
@@ -39,7 +38,7 @@ type Intl = {|
 const messages = defineMessages({
   summary: {
     id: 'wallet.staking.summary',
-    defaultMessage: '!!!Summary',
+    defaultMessage: '!!!Rewards Summary',
   },
   dialogSummaryDescription: {
     id: 'wallet.staking.dialogSummaryDescription',
@@ -57,7 +56,6 @@ function SummaryCard({
   onOpenRewardList,
   unitOfAccount,
   graphData,
-  epochLength,
   intl,
 }: Props & Intl): Node {
   const formatTokenEntry: TokenEntry => Node = tokenEntry => {
@@ -118,7 +116,7 @@ function SummaryCard({
           borderColor: 'grayscale.200',
         }}
       >
-        <Typography variant="h5" color="grayscale.900">
+        <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
       </Box>
@@ -174,11 +172,7 @@ function SummaryCard({
           </InfoDetails>
         </InfoRow>
       </Box>
-      <RewardHistoryGraph
-        onOpenRewardList={onOpenRewardList}
-        graphData={graphData}
-        epochLength={epochLength}
-      />
+      <RewardHistoryGraph onOpenRewardList={onOpenRewardList} graphData={graphData} />
     </Card>
   );
 }
