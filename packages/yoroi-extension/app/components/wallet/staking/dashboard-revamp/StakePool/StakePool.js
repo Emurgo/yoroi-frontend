@@ -7,7 +7,9 @@ import { ReactComponent as TelegramIconRevamp } from '../../../../../assets/imag
 import { ReactComponent as FbIcon } from '../../../../../assets/images/social/revamp/facebook.inline.svg';
 import { ReactComponent as FbIconRevamp } from '../../../../../assets/images/social/revamp/facebook-24x24.inline.svg';
 import { ReactComponent as YoutubeIcon } from '../../../../../assets/images/social/revamp/youtube.inline.svg';
+import { ReactComponent as YoutubeIconRevamp } from '../../../../../assets/images/social/revamp/youtube-24x24.inline.svg';
 import { ReactComponent as TwitchIcon } from '../../../../../assets/images/social/revamp/twitch.inline.svg';
+import { ReactComponent as TwitchIconRevamp } from '../../../../../assets/images/social/revamp/twitch-24x24.inline.svg';
 import { ReactComponent as DiscordIcon } from '../../../../../assets/images/social/revamp/discord.inline.svg';
 import { ReactComponent as DiscordIconRevamp } from '../../../../../assets/images/social/revamp/discord-24x24.inline.svg';
 import { ReactComponent as GithubIcon } from '../../../../../assets/images/social/revamp/github.inline.svg';
@@ -18,6 +20,7 @@ import { List, StyledLink } from './StakePool.styles';
 import { Tooltip, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { ReactComponent as QuestionMarkIcon } from '../../../../../assets/images/question-mark.inline.svg';
+import { ReactComponent as InfoIconRevamp } from '../../../../../assets/images/info-icon-revamp.inline.svg';
 import type { SocialLinks } from '../../../../../containers/wallet/staking/SeizaFetcher';
 import { withLayout } from '../../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../../styles/context/layout';
@@ -26,7 +29,16 @@ import type { InjectedLayoutProps } from '../../../../../styles/context/layout';
 type Props = {| socialLinks?: SocialLinks, websiteUrl?: string, +color: string |};
 
 const SocialExternalLink = ({ href, children }: {| href: string, children: Node |}): Node => (
-  <StyledLink href={href} target="_blank" rel="noreferrer noopener">
+  <StyledLink
+    href={href}
+    target="_blank"
+    rel="noreferrer noopener"
+    sx={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
     {children}
   </StyledLink>
 );
@@ -64,12 +76,12 @@ const StakingPoolSocialMedia = ({
       ) : null}
       {youtube != null ? (
         <SocialExternalLink href={`https://youtube.com/${youtube}`}>
-          <YoutubeIcon />
+          {isRevampLayout ? <YoutubeIconRevamp /> : <YoutubeIcon />}
         </SocialExternalLink>
       ) : null}
       {twitch != null ? (
         <SocialExternalLink href={`https://twitch.com/${twitch}`}>
-          <TwitchIcon />
+          {isRevampLayout ? <TwitchIconRevamp /> : <TwitchIcon />}
         </SocialExternalLink>
       ) : null}
       {discord != null ? (
@@ -96,12 +108,15 @@ export const SocialMediaStakePool = (withLayout(StakingPoolSocialMedia): Compone
 type HelperTooltipProps = {|
   +message: string | Node,
 |};
-export const HelperTooltip = ({ message }: HelperTooltipProps): Node => {
+const HelperTooltipComp = ({
+  message,
+  isRevampLayout,
+}: HelperTooltipProps & InjectedLayoutProps): Node => {
   return (
     <Tooltip title={<Typography variant="body2">{message}</Typography>} arrow placement="right">
-      <Box display="inline-flex">
-        <QuestionMarkIcon />
-      </Box>
+      <Box display="inline-flex">{isRevampLayout ? <InfoIconRevamp /> : <QuestionMarkIcon />}</Box>
     </Tooltip>
   );
 };
+
+export const HelperTooltip = (withLayout(HelperTooltipComp): ComponentType<HelperTooltipProps>);

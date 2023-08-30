@@ -11,7 +11,10 @@ import { observer } from 'mobx-react';
 import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard/StakingDashboard';
 import { toSvg } from 'jdenticon';
 
-import { SocialMediaStakePool } from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
+import {
+  SocialMediaStakePool,
+  HelperTooltip,
+} from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
@@ -58,11 +61,11 @@ const messages = defineMessages({
   },
   firstReward: {
     id: 'wallet.staking.banner.firstReward',
-    defaultMessage: '!!!First reward',
+    defaultMessage: '!!!First reward in',
   },
   firstRewardDetails: {
     id: 'wallet.staking.banner.firstRewardDetails',
-    defaultMessage: '!!!in 3-4 epochs',
+    defaultMessage: '!!!3-4 epochs',
   },
   socialMedia: {
     id: 'wallet.staking.banner.socialMedia',
@@ -85,34 +88,10 @@ function WalletDelegationBanner({
       </Box>
     );
   }
-  const { id, name, avatar, websiteUrl, roa: estimatedRoa30d, socialLinks, poolSize, share } =
-    poolInfo || {};
+  const { id, name, avatar, websiteUrl, roa: estimatedRoa30d, socialLinks } = poolInfo || {};
 
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-
-  const poolInfoFields = [
-    {
-      label: globalMessages.roa30d,
-      value: estimatedRoa30d,
-    },
-    {
-      label: messages.poolSize,
-      value: poolSize,
-    },
-    {
-      label: messages.poolShare,
-      value: share,
-    },
-    {
-      label: messages.poolCosts,
-      value: '__c',
-    },
-    {
-      label: messages.blocksLabel,
-      value: '__b',
-    },
-  ];
 
   return isOpen ? (
     <WrapperBanner
@@ -147,34 +126,41 @@ function WalletDelegationBanner({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: '20px',
+            gap: '16px',
           }}
         >
-          {poolInfoFields.map(({ label: message, value }) => {
-            const label = intl.formatMessage(message);
-            return (
-              <Box
-                sx={{
-                  minWidth: '85px',
-                }}
-                key={label}
-              >
-                <Typography variant="body1" fontWeight={500} color="common.black">
-                  {label}
-                </Typography>
-                <Typography variant="body1" color="common.black">
-                  {value ? value.trim() : '-'}
-                </Typography>
-              </Box>
-            );
-          })}
-        </Box>
-        <Box mt="16px">
-          <SocialMediaStakePool
-            color="common.black"
-            socialLinks={socialLinks}
-            websiteUrl={websiteUrl}
-          />
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Typography variant="body1" fontWeight={500} color="common.black">
+                {intl.formatMessage(globalMessages.roa30d)}
+              </Typography>
+              <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
+            </Box>
+            <Typography variant="body1" color="common.black">
+              {estimatedRoa30d}
+            </Typography>
+          </Box>
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Typography variant="body1" fontWeight={500} color="common.black">
+                {intl.formatMessage(messages.firstReward)}
+              </Typography>
+              <HelperTooltip message={intl.formatMessage(messages.firstRewardHelperMessage)} />
+            </Box>
+            <Typography variant="body1" color="common.black">
+              {intl.formatMessage(messages.firstRewardDetails)}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="body1" fontWeight={500} color="common.black">
+              {intl.formatMessage(messages.socialMedia)}
+            </Typography>
+            <SocialMediaStakePool
+              color="common.black"
+              socialLinks={socialLinks}
+              websiteUrl={websiteUrl}
+            />
+          </Box>
         </Box>
         <Box sx={{ marginTop: '24px', display: 'flex', flexDirection: 'row', gap: '24px' }}>
           <Link
