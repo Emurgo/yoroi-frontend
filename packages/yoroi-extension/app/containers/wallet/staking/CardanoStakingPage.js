@@ -40,6 +40,7 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -144,6 +145,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
                   )
                 )
               )}
+              isTestnet={isTestnet(publicDeriver.getParent().getNetworkInfo())}
             />
           ) : null}
           <Box sx={{ iframe: { minHeight: '60vh' } }}>

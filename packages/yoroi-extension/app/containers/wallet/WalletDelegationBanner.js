@@ -21,6 +21,7 @@ import type { PoolData } from './staking/SeizaFetcher';
 type Props = {|
   +isOpen: boolean,
   +isWalletWithNoFunds: boolean,
+  +isTestnet: boolean,
   +poolInfo: PoolData | void,
   +onDelegateClick: string => Promise<void>,
   +ticker: string,
@@ -76,6 +77,7 @@ const messages = defineMessages({
 function WalletDelegationBanner({
   isOpen,
   isWalletWithNoFunds,
+  isTestnet,
   onDelegateClick,
   intl,
   ticker,
@@ -177,7 +179,14 @@ function WalletDelegationBanner({
           <Button
             variant="primary"
             size="small"
-            onClick={() => onDelegateClick(id)}
+            // onClick={() => onDelegateClick(id)}
+            onClick={() =>
+              onDelegateClick(
+                isTestnet
+                  ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' // Testnet pool: https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
+                  : id
+              )
+            }
             disabled={isWalletWithNoFunds}
           >
             {intl.formatMessage(globalMessages.delegateLabel)}
