@@ -71,7 +71,7 @@ function CreateWalletPage(props: Props & Intl): Node {
   return (
     <InfoDialog open={open} onClose={onClose}>
       {content.map(({ id, title, tips }) => (
-        <Box key={id} mb={id === 1 ? '16px' : '0px'}>
+        <Box key={id} mb={id === 1 ? '16px' : '0px'} id="walletRestorationInfoDialog">
           <Typography textAlign="center" variant="body1" fontWeight="500" mb="8px">
             {intl.formatMessage(title)}
           </Typography>

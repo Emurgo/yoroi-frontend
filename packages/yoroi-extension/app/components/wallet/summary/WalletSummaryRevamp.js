@@ -5,11 +5,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './WalletSummary.scss';
+import BigNumber from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './WalletSummary.scss';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -17,7 +18,6 @@ import { hiddenAmount } from '../../../utils/strings';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { Button, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import BigNumber from 'bignumber.js';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -31,7 +31,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
@@ -160,12 +159,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
   }
 
   render(): Node {
-    const {
-      pendingAmount,
-      numberOfTransactions,
-      isLoadingTransactions,
-      openExportTxToFileDialog,
-    } = this.props;
+    const { pendingAmount, isLoadingTransactions, openExportTxToFileDialog } = this.props;
     const { intl } = this.context;
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
@@ -188,15 +182,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 fontSize="18px"
                 sx={{ fontWeight: 500, color: 'common.black' }}
               >
-                {intl.formatMessage({ id: 'wallet.summary.page.transactionsLabel' })}:{' '}
-                <Typography
-                  variant="h2"
-                  as="span"
-                  fontSize="18px"
-                  sx={{ fontWeight: 500, color: 'common.black' }}
-                >
-                  {numberOfTransactions}
-                </Typography>
+                {intl.formatMessage({ id: 'wallet.summary.page.transactionsLabel' })}
               </Typography>
               <Button
                 variant="secondary"

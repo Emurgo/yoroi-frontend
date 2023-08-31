@@ -5,7 +5,6 @@ import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
 import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
-import type { TxRequests } from '../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
@@ -88,8 +87,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           ? null
           : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
-      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-      const balance = txRequests.requests.getBalanceRequest.result || null;
+      const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
@@ -153,16 +151,14 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const wallets = this.generated.stores.wallets.publicDerivers;
     let balance;
     if (publicDeriver) {
-      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-      balance = txRequests.requests.getBalanceRequest.result;
+      balance = this.generated.stores.transactions.getBalance(publicDeriver);
     }
 
     const ergoWallets = [];
     const cardanoWallets = [];
 
     wallets.forEach(wallet => {
-      const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
-      const walletBalance = walletTxRequests.requests.getBalanceRequest.result || null;
+      const walletBalance = this.generated.stores.transactions.getBalance(wallet);
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
@@ -334,7 +330,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
@@ -387,7 +383,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
