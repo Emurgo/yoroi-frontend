@@ -176,17 +176,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get lastSyncInfo(): IGetLastSyncInfoResponse {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.lastSyncInfo;
-    }
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) {
+    const { selected } = this.stores.wallets;
+    if (selected == null) {
       throw new Error(
         `${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`
       );
     }
-    const result = this.getTxHistoryState(publicDeriver).lastSyncInfo;
-    return result;
+    if (isErgo(selected.getParent().getNetworkInfo())) {
+      return this.ergoTransactionsStore.lastSyncInfo;
+    }
+    return this.getTxHistoryState(selected).lastSyncInfo;
   }
 
   @computed get recent(): Array<WalletTransaction> {
