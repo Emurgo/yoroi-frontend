@@ -91,7 +91,7 @@ export default class NavBarContainer extends Component<Props> {
           plateComponent={<NavPlate plate={plate} wallet={settingsCache} />}
           onSelect={() => this.switchToNewWallet(wallet)}
           isCurrentWallet={wallet === this.generated.stores.wallets.selected}
-          syncTime={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}
+          syncTime={lastSyncInfo?.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={
             <NavWalletDetails
               walletAmount={balance}
@@ -246,7 +246,7 @@ export default class NavBarContainer extends Component<Props> {
       |},
       transactions: {|
         balance: MultiToken | null,
-        lastSyncInfo: IGetLastSyncInfoResponse,
+        lastSyncInfo: ?IGetLastSyncInfoResponse,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
@@ -268,6 +268,7 @@ export default class NavBarContainer extends Component<Props> {
       throw new Error(`${nameof(NavBarContainer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
+    const { selected } = stores.wallets;
     return Object.freeze({
       stores: {
         app: {
@@ -277,7 +278,7 @@ export default class NavBarContainer extends Component<Props> {
           getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
         wallets: {
-          selected: stores.wallets.selected,
+          selected,
           publicDerivers: stores.wallets.publicDerivers,
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
@@ -294,7 +295,7 @@ export default class NavBarContainer extends Component<Props> {
         },
         transactions: {
           balance: stores.transactions.balance,
-          lastSyncInfo: stores.transactions.lastSyncInfo,
+          lastSyncInfo: selected == null ? null : stores.transactions.lastSyncInfo,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
