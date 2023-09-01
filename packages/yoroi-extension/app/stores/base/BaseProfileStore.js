@@ -201,7 +201,7 @@ export default class BaseProfileStore
             type: 'enrichment',
             setup: () => Promise.resolve(),
             execute: async (event) => {
-              console.info('[metrics-react-native]', event.event_type, event.event_properties)
+              console.info('[metrics]', event.event_type, event.event_properties)
               return Promise.resolve(event)
             },
           });
