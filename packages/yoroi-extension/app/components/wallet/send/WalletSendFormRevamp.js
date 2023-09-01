@@ -50,6 +50,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -180,6 +181,7 @@ export default class WalletSendForm extends Component<Props, State> {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
   };
+  maxStep: number = SEND_FORM_STEP.RECEIVER;
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
 
@@ -605,7 +607,13 @@ export default class WalletSendForm extends Component<Props, State> {
             <IncludedTokens
               tokens={tokens}
               nfts={nfts}
-              onRemoveTokens={this.props.onRemoveTokens}
+              onRemoveTokens={(tokens) => {
+                const assetCount = totalAmount.nonDefaultEntries().length - 1;
+                this.props.onRemoveTokens(tokens);
+                ampli.sendSelectAssetUpdated({
+                  asset_count: assetCount,
+                });
+              }}
               shouldSendAll={shouldSendAll}
             />
 
@@ -677,6 +685,20 @@ export default class WalletSendForm extends Component<Props, State> {
   onUpdateStep(step: number) {
     if (step > 3) throw new Error('Invalid Step number.');
     this.setState({ currentStep: step });
+    if (step > this.maxStep) {
+      this.maxStep = step;
+      if (step === SEND_FORM_STEP.AMOUNT) {
+        ampli.sendSelectAssetPageViewed();
+      } else if (step === SEND_FORM_STEP.PREVIEW) {
+        const { totalInput } = this.props;
+        if (totalInput == null) {
+          throw new Error('expect totalInput');
+        }
+        ampli.sendSelectAssetSelected({
+          asset_count: totalInput.nonDefaultEntries().length,
+        });
+      }
+    }
   }
 
   onUpdateMemo(memo: string) {

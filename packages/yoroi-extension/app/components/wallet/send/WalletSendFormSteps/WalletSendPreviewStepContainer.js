@@ -20,6 +20,7 @@ import {
 } from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { SendUsingLedgerParams } from '../../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../../actions/ada/trezor-send-actions';
+import { ampli } from '../../../../../ampli/index';
 
 export type GeneratedData = typeof WalletSendPreviewStepContainer.prototype.generated;
 
@@ -68,6 +69,10 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     if (publicDeriver == null) {
       throw new Error(`unexpected missing active wallet`);
     }
+
+    ampli.sendSummarySubmitted({
+      asset_count: signRequest.totalInput().nonDefaultEntries().length,
+    });
 
     const walletType = this. _getWalletType(publicDeriver);
     if (walletType === 'ledger') {

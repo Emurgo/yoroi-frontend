@@ -48,6 +48,7 @@ import { withLayout } from '../../styles/context/layout';
 import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
+import { ampli } from '../../../ampli/index';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -104,6 +105,7 @@ class WalletSendPage extends Component<AllProps> {
     runInAction(() => {
       this.showMemo = this.generated.initialShowMemoState;
     });
+    ampli.sendInitiated();
   }
 
   @action

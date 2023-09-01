@@ -26,6 +26,7 @@ import NFTImage from './NFTImage';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import { Box } from '@mui/system';
+import { ampli } from '../../../../../ampli/index';
 
 type Props = {|
   +onClose: void => void,
@@ -148,7 +149,23 @@ export default class AddNFTDialog extends Component<Props, State> {
   onAddAll: void => void = () => {
     const amount = new BigNumber('1');
     const toRemove = [];
+    let changed = false;
+    const tokens = this.props.plannedTxInfoMap
+      .filter(({ token }) => !token.IsDefault)
+      .map(({ token }) => ({ tokenId: token.tokenId }));
     for (const { token, included } of this.state.selectedTokens) {
+      const tokenIndex = tokens.findIndex(({ tokenId }) => tokenId === token.TokenId);
+      if (tokenIndex !== -1) {
+        if (!included) {
+          tokens.splice(tokenIndex, 1);
+          changed = true;
+        }
+      } else {
+        if (included) {
+          tokens.push({ tokenId: token.TokenId });
+          changed = true;
+        }
+      }
       if (!included) {
         toRemove.push(token);
         continue;
@@ -161,6 +178,11 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
+    if (changed) {
+      ampli.sendSelectAssetUpdated({
+        asset_count: tokens.length,
+      });
+    }
   };
 
   render(): Node {
