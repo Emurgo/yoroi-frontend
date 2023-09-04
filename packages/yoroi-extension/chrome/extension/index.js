@@ -15,6 +15,8 @@ import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 import { Logger } from '../../app/utils/logging';
 import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
+import { ampli } from '../../ampli/index';
+import { ROUTES } from '../../app/routes-config';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -64,6 +66,18 @@ const initializeYoroi: void => Promise<void> = async () => {
     <App stores={stores} actions={actions} history={history} />,
     root
   );
+
+  history.listen(({ pathname }) => {
+    if (pathname === ROUTES.ASSETS.ROOT) {
+      ampli.assetsPageViewed();
+    } else if (pathname === ROUTES.REVAMP.TRANSFER) {
+      ampli.claimAdaPageViewed();
+    } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
+      ampli.createWalletLanguagePageViewed();
+    } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
+      ampli.connectorPageViewed();
+    }
+  });
 };
 
 addCloseListener(TabIdKeys.Primary);
