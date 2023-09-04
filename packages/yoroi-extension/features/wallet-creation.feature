@@ -4,19 +4,21 @@ Feature: Wallet creation
     Given I have opened the extension
     And I have completed the basic setup
     And There is no wallet stored
+    Then I should see the Create wallet screen
+    Then Revamp. I switch to revamp version
 
   @it-5
   Scenario: Wallet creation (IT-5)
     When I click the create button
-    Then I select the currency cardano
-    And I enter the name "Created Wallet"
-    And I enter the created wallet password:
-    | password   | repeatedPassword  |
-    | asdfasdfasdf | asdfasdfasdf        |
-    And I click the "Create personal wallet" button
-    And I accept the creation terms
-    And I copy and enter the displayed mnemonic phrase
+    Then I see Create Wallet warning step and continue
+    Then I see Recovery Phrase step and remember it
+    And I enter the recovery phrase
+    Then I enter wallet details:
+    | walletName | password | repeatedPassword |
+    | Created Wallet | asdfasdfasdf | asdfasdfasdf |
+    And I click the "Create" button
     Then I should see the opened wallet with name "Created Wallet"
+    Then Debug. Take screenshot
 
   @it-7
   Scenario Outline: Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
