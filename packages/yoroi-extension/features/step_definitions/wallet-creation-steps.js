@@ -10,7 +10,6 @@ import {
   createWalletButton,
   createWalletNameError,
   createWalletPasswordError,
-  createWalletPasswordHelperText,
   createWalletPasswordInput,
   createWalletRepeatPasswordInput,
   recoveryPhraseButton,
@@ -25,6 +24,7 @@ import { addAdditionalWalletButton } from '../pages/walletPage';
 import {
   addWalletDetailsBox,
   createWalletWarning,
+  createWalletPasswordHelperText,
   enterFullRecoveryPhrase,
   getFullRecoveryPhrase,
   getRecoveryPhraseWord,
@@ -121,18 +121,16 @@ When(/^I click the "Create" button$/, async function () {
 });
 
 Then(/^I should see the invalid password error message:$/, async function (data) {
+  this.webDriverLogger.info(`Step: I should see the invalid password error message`);
   const error = data.hashes()[0];
+  await this.waitForElement(createWalletPasswordHelperText);
   await checkErrorByTranslationId(this, createWalletPasswordHelperText, error);
 });
 
-Then(/^I see the submit button is disabled$/, async function () {
-  const dialogElement = await this.driver.findElement(
-    By.xpath('//div[contains(@class, "Dialog")]')
-  );
-  const disabledButton = await dialogElement.findElement(
-    By.xpath('.//button[contains(@class, "primary")]')
-  );
-  const buttonState = await disabledButton.isEnabled();
+Then(/^I see the Create button is disabled$/, async function () {
+  this.webDriverLogger.info(`Step: I see the Create button is disabled`);
+  const createButton = await this.findElement(nextButton);
+  const buttonState = await createButton.isEnabled();
   expect(buttonState).to.be.false;
 });
 
