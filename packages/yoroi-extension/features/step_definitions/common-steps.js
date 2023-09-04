@@ -61,9 +61,6 @@ import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-s
 import {
   restoreWalletInputPhraseDialog,
   inputMnemonicForWallet,
-  walletPasswordInput,
-  repeatPasswordInput,
-  restoringDialogPlate,
   validPhraseText,
   nextButton,
   inputWalletInfo,
@@ -110,6 +107,11 @@ import { yoroiModern } from '../pages/mainWindowPage';
 import { backgroungTabName, extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 import { infoDialogContinueButton } from '../pages/commonDialogPage';
+import {
+  newWalletDialogPlate,
+  repeatPasswordInput,
+  walletPasswordInput,
+} from '../pages/walletDetailsPage';
 
 const simpleNodeLogger = require('simple-node-logger');
 
@@ -285,8 +287,6 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     return fn;
   }
   return async function (...args) {
-    const ret = await fn.apply(this, args);
-
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
@@ -302,6 +302,8 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     }
 
     testProgress.step += 1;
+
+    const ret = await fn.apply(this, args);
     return ret;
   };
 });
@@ -393,9 +395,9 @@ async function restoreWallet(
 
 export async function checkWalletPlate(
   customWorld: any,
-  expectedWalletPlate: string,
+  expectedWalletPlate: string
 ): Promise<void> {
-  const plateElement = await customWorld.findElement(restoringDialogPlate);
+  const plateElement = await customWorld.findElement(newWalletDialogPlate);
   const plateText = await plateElement.getText();
   expect(plateText).to.be.equal(expectedWalletPlate);
 }
@@ -793,8 +795,11 @@ Then(/^Debug. Take screenshot$/, async function () {
   const currentTime = getLogDate();
   await takeScreenshot(this.driver, `debug_${currentTime}`);
   await takePageSnapshot(this.driver, `debug_${currentTime}`);
-  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
-  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+  const browserName = await this.getBrowser();
+  if (browserName !== 'firefox') {
+    await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+    await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
+  }
 });
 
 Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
