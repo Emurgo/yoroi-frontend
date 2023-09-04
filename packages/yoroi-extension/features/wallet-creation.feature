@@ -23,12 +23,13 @@ Feature: Wallet creation
   @it-7
   Scenario Outline: Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
     When I click the create button
-    Then I select the currency cardano
-    And I enter the name "Created Wallet"
-    And I enter the created wallet password:
-      | password        | repeatedPassword  |
-      | <wrongPassword> | <wrongPassword>   |
-    Then I see the submit button is disabled
+    Then I see Create Wallet warning step and continue
+    Then I see Recovery Phrase step and remember it
+    And I enter the recovery phrase
+    Then I enter wallet details:
+    | walletName | password | repeatedPassword |
+    | Created Wallet | <wrongPassword> | <wrongPassword> |
+    Then I see the Create button is disabled
     And I should see the invalid password error message:
       | message                             |
       | global.errors.invalidWalletPassword |
