@@ -83,10 +83,6 @@ export const createPersonalWalletButton: LocatorObject = {
   locator: '.WalletCreateDialog .primary',
   method: 'css',
 };
-export const createWalletPasswordHelperText: LocatorObject = {
-  locator: '//p[starts-with(@id, "walletPassword") and contains(@id, "-helper-text")]',
-  method: 'xpath',
-};
 export const walletRecoveryPhraseMnemonicComponent: LocatorObject = {
   locator: '.WalletRecoveryPhraseMnemonic_component',
   method: 'css',

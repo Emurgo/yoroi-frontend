@@ -55,6 +55,10 @@ export const enterFullRecoveryPhrase = async (
 };
 export const isValidPhraseMessage: LocatorObject = { locator: 'isValidPhraseMessage', method: 'id' };
 export const addWalletDetailsBox: LocatorObject = { locator: 'addWalletDetailsStepComponent', method: 'id' };
+export const createWalletPasswordHelperText: LocatorObject = {
+  locator: 'walletPasswordInput-helper-text',
+  method: 'id',
+};
 
 // !!! OLD LOCATORS !!!
 export const walletInfoDialog: LocatorObject = { locator: '.WalletCreateDialog', method: 'css' };
