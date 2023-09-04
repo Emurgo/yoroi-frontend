@@ -71,10 +71,6 @@ const messages = defineMessages({
     id: 'wallet.delegation.transaction.approximationLabel',
     defaultMessage: '!!!Current approximation of rewards that you will receive per epoch:',
   },
-  stakePoolChecksumAndName: {
-    id: 'wallet.delegation.transaction.stakePoolChecksumAndNameLabel',
-    defaultMessage: '!!!Stake pool checksum and name',
-  },
   epochRewardLabel: {
     id: 'wallet.delegation.transaction.epochRewardLabel',
     defaultMessage: '!!!Approx epoch reward',
@@ -267,7 +263,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
       </Dialog>
     );
 
-    const avatarSource = toSvg(this.props.poolHas, 36, { padding: 0 });
+    const avatarSource = toSvg(this.props.poolHash, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
     const tokenTicker = getTokenName(
       this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry())
@@ -331,7 +327,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         </Box>
         <Box mb="16px">
           <Typography variant="body1" color="grayscale.600" mb="4px">
-            {intl.formatMessage(messages.stakePoolChecksumAndName)}
+            {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
           </Typography>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <Box>

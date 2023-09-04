@@ -657,6 +657,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.stakepool',
     defaultMessage: '!!!Stakepool Name',
   },
+  stakePoolChecksumAndName: {
+    id: 'global.labels.stakePoolChecksumAndName',
+    defaultMessage: '!!!Stake pool checksum and name',
+  },
   rewardsLabel: {
     id: 'global.labels.rewardsLabel',
     defaultMessage: '!!!Rewards',

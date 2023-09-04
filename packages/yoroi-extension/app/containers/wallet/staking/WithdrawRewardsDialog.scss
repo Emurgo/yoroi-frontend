@@ -1,0 +1,12 @@
+.dialog {
+  min-width: 650px;
+  max-width: unset;
+
+  & > h1 {
+    margin-bottom: 25px !important;
+  }
+
+  & > div {
+    padding: 0px 25px !important;
+  }
+}

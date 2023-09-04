@@ -13,6 +13,7 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
+import type { GeneratedData as WithdrawRewardsDialogData } from './WithdrawRewardsDialog';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import type {
   CurrentTimeRequests,
@@ -48,6 +49,7 @@ import { generateGraphData } from '../../../utils/graph';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
+import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 
 export type GeneratedData = typeof StakingPageContent.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -153,6 +155,13 @@ class StakingPageContent extends Component<AllProps> {
             dialog: OverviewModal,
           })
         }
+        withdrawRewards={
+          this._isRegistered(request.publicDeriver) === true
+            ? () => {
+                this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+              }
+            : undefined
+        }
         unitOfAccount={this.toUnitOfAccount}
         getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={stores.profile.shouldHideBalance}
@@ -242,7 +251,7 @@ class StakingPageContent extends Component<AllProps> {
     //  },
     // };
 
-    return <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undefined} />;
+    return <DelegatedStakePoolCard delegatedPool={delegatedPool} />;
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
@@ -414,6 +423,15 @@ class StakingPageContent extends Component<AllProps> {
             }}
           />
         ) : null}
+        <WithdrawRewardsDialog
+          {...this.generated.WithdrawRewardsDialogProps}
+          onClose={() => {
+            this.generated.actions.ada.delegationTransaction.reset.trigger({
+              justTransaction: false,
+            });
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+          }}
+        />
         {uiDialogs.isOpen(RewardHistoryDialog) ? (
           <RewardHistoryDialog
             onClose={this.onClose}
@@ -435,6 +453,7 @@ class StakingPageContent extends Component<AllProps> {
     DeregisterDialogContainerProps: InjectedOrGenerated<DeregisterDialogContainerData>,
     UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
     WithdrawalTxDialogContainerProps: InjectedOrGenerated<WithdrawalTxDialogContainerData>,
+    WithdrawRewardsDialogProps: InjectedOrGenerated<WithdrawRewardsDialogData>,
     actions: {|
       ada: {|
         delegationTransaction: {|
@@ -611,6 +630,10 @@ class StakingPageContent extends Component<AllProps> {
         stores,
         actions,
       }: InjectedOrGenerated<DeregisterDialogContainerData>),
+      WithdrawRewardsDialogProps: ({
+        stores,
+        actions,
+      }: InjectedOrGenerated<WithdrawRewardsDialogData>),
     });
   }
 }

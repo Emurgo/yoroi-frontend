@@ -52,6 +52,7 @@ function SummaryCard({
   totalDelegated,
   getTokenInfo,
   onOverviewClick: _onOverviewClick, // todo: remove?
+  withdrawRewards,
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
@@ -114,11 +115,26 @@ function SummaryCard({
           padding: '15px 24px',
           borderBottom: '1px solid',
           borderColor: 'grayscale.200',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
+        <Button
+          variant="primary"
+          sx={{
+            '&.MuiButton-sizeMedium': {
+              height: 'unset',
+              p: '9px 20px',
+            },
+          }}
+          onClick={withdrawRewards}
+        >
+          {intl.formatMessage(globalMessages.withdrawLabel)}
+        </Button>
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
