@@ -14,11 +14,17 @@ import globalMessages from '../../../i18n/global-messages';
 import { toSvg } from 'jdenticon';
 import styles from './WithdrawRewardsDialog.scss';
 import { CopyAddress } from '../../../components/wallet/assets/NFTDetails';
+import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
+import { truncateAddress } from '../../../utils/formatters';
 
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.withdrawRewards.transaction.title',
     defaultMessage: '!!!Withdraw reward',
+  },
+  withdrawalAddress: {
+    id: 'wallet.withdrawRewards.transaction.address',
+    defaultMessage: '!!!Withdrawal address',
   },
 });
 
@@ -66,10 +72,8 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (currentPools.length === 0) return null;
 
     const currentPool = currentPools[0][currentPage];
-    const meta = this.generated.stores.delegation.getLocalPoolInfo(
-      publicDeriver.getParent().getNetworkInfo(),
-      String(currentPool)
-    );
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const meta = this.generated.stores.delegation.getLocalPoolInfo(network, String(currentPool));
     if (meta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -77,6 +81,24 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
     const avatarSource = toSvg(currentPool, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+
+    const {
+      createWithdrawalTx,
+      shouldDeregister,
+    } = this.generated.stores.substores.ada.delegationTransaction;
+
+    if (this.generated.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(WithdrawRewardsDialog)} no selected network`);
+    }
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      this.generated.stores.profile.selectedNetwork.NetworkId
+    );
+
+    const tentativeTx = createWithdrawalTx.result;
+
+    if (!tentativeTx) return 'no tx...';
+    const receivers = tentativeTx.receivers(true);
+    const receiverAddress = addressToDisplayString(receivers[0], network);
 
     return (
       <Dialog
@@ -124,6 +146,14 @@ export default class WithdrawRewardsDialog extends Component<Props> {
               <CopyAddress text={currentPool}>{currentPool}</CopyAddress>
             </Typography>
           </Box>
+          <Box>
+            <Typography variant="body1" color="grayscale.600">
+              {intl.formatMessage(messages.withdrawalAddress)}
+            </Typography>
+            <Typography variant="body1" color="grayscale.900">
+              <CopyAddress text={receiverAddress}>{truncateAddress(receiverAddress)}</CopyAddress>
+            </Typography>
+          </Box>
         </Box>
       </Dialog>
     );
@@ -131,6 +161,22 @@ export default class WithdrawRewardsDialog extends Component<Props> {
 
   @computed get generated(): {|
     stores: {|
+      tokenInfoStore: {|
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
+      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
+      substores: {|
+        ada: {|
+          delegationTransaction: {|
+            createWithdrawalTx: {|
+              reset: void => void,
+              error: ?LocalizableError,
+              result: ?ISignRequest<any>,
+            |},
+            shouldDeregister: boolean,
+          |},
+        |},
+      |},
       wallets: {| selected: null | PublicDeriver<> |},
       delegation: {|
         selectedPage: number,
@@ -149,6 +195,24 @@ export default class WithdrawRewardsDialog extends Component<Props> {
 
     return Object.freeze({
       stores: {
+        profile: {
+          selectedNetwork: stores.profile.selectedNetwork,
+        },
+        tokenInfoStore: {
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+        },
+        substores: {
+          ada: {
+            delegationTransaction: {
+              createWithdrawalTx: {
+                error: stores.substores.ada.delegationTransaction.createWithdrawalTx.error,
+                result: stores.substores.ada.delegationTransaction.createWithdrawalTx.result,
+                reset: stores.substores.ada.delegationTransaction.createWithdrawalTx.reset,
+              },
+              shouldDeregister: stores.substores.ada.delegationTransaction.shouldDeregister,
+            },
+          },
+        },
         wallets: {
           selected: stores.wallets.selected,
         },

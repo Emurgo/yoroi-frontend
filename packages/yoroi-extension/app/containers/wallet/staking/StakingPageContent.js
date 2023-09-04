@@ -401,7 +401,8 @@ class StakingPageContent extends Component<AllProps> {
               const { delegationTransaction } = this.generated.actions.ada;
               delegationTransaction.createWithdrawalTxForWallet.trigger({ publicDeriver });
               this.generated.actions.dialogs.open.trigger({
-                dialog: WithdrawalTxDialogContainer,
+                // dialog: WithdrawalTxDialogContainer,
+                dialog: WithdrawRewardsDialog,
               });
             }}
           />
@@ -423,15 +424,17 @@ class StakingPageContent extends Component<AllProps> {
             }}
           />
         ) : null}
-        <WithdrawRewardsDialog
-          {...this.generated.WithdrawRewardsDialogProps}
-          onClose={() => {
-            this.generated.actions.ada.delegationTransaction.reset.trigger({
-              justTransaction: false,
-            });
-            this.generated.actions.dialogs.closeActiveDialog.trigger();
-          }}
-        />
+        {uiDialogs.isOpen(WithdrawRewardsDialog) ? (
+          <WithdrawRewardsDialog
+            {...this.generated.WithdrawRewardsDialogProps}
+            onClose={() => {
+              this.generated.actions.ada.delegationTransaction.reset.trigger({
+                justTransaction: false,
+              });
+              this.generated.actions.dialogs.closeActiveDialog.trigger();
+            }}
+          />
+        ) : null}
         {uiDialogs.isOpen(RewardHistoryDialog) ? (
           <RewardHistoryDialog
             onClose={this.onClose}
