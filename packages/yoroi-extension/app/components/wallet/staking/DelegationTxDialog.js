@@ -29,7 +29,7 @@ import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/to
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-revamp.inline.svg';
 
 import WarningBox from '../../widgets/WarningBox';
-import { Box, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { toSvg } from 'jdenticon';
@@ -75,13 +75,22 @@ const messages = defineMessages({
     id: 'wallet.delegation.transaction.stakePoolChecksumAndNameLabel',
     defaultMessage: '!!!Stake pool checksum and name',
   },
-  depositLabel: {
-    id: 'wallet.delegation.transaction.depositLabel',
-    defaultMessage: '!!!Deposit',
+  epochRewardLabel: {
+    id: 'wallet.delegation.transaction.epochRewardLabel',
+    defaultMessage: '!!!Approx epoch reward',
+  },
+  epochRewardTip: {
+    id: 'wallet.delegation.transaction.epochRewardTip',
+    defaultMessage: '!!!Current approximation of rewards that you will receive per epoch',
   },
   amountToDelegate: {
     id: 'wallet.delegation.transaction.amountToDelegate',
     defaultMessage: '!!!Amount to delegate',
+  },
+  amountToDelegateTip: {
+    id: 'wallet.delegation.transaction.amountToDelegateTip',
+    defaultMessage:
+      '!!!Amount to delegate equals to your wallet balance at the moment of delegation',
   },
 });
 
@@ -337,26 +346,21 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             </Typography>
           </Box>
         </Box>
-        <Box
-          mb="24px"
-          sx={{
-            '& span': {
-              color: 'grayscale.900',
-            },
-          }}
-        >
+        <Box mb="24px">
           <Typography variant="body1" color="grayscale.600" mb="4px">
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            hash={this.props.poolHash}
-            light
-            linkType="pool"
-            placementTooltip="top-start"
-          >
-            <RawHash light>{this.props.poolHash}</RawHash>
-          </ExplorableHashContainer>
+          <Box>
+            <ExplorableHashContainer
+              selectedExplorer={this.props.selectedExplorer}
+              hash={this.props.poolHash}
+              light
+              linkType="pool"
+              placementTooltip="top-start"
+            >
+              <RawHash light>{this.props.poolHash}</RawHash>
+            </ExplorableHashContainer>
+          </Box>
         </Box>
 
         <Box
@@ -370,25 +374,58 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           }}
         >
           <Box>
-            <Typography color="grayscale.600" variant="body1">
-              {intl.formatMessage(messages.depositLabel)}
+            <Box display="flex" gap="6px" alignItems="center">
+              <Typography color="grayscale.600" variant="body1">
+                {intl.formatMessage(messages.amountToDelegate)}
+              </Typography>
+              <Tooltip
+                title={
+                  <Typography variant="body2">
+                    {intl.formatMessage(messages.amountToDelegateTip)}
+                  </Typography>
+                }
+                placement="top"
+              >
+                <Box component="span" sx={{ cursor: 'pointer' }}>
+                  <InfoIcon />
+                </Box>
+              </Tooltip>
+            </Box>
+            <Typography color="grayscale.900">
+              {delegatingValue.toString()} {tokenTicker}
             </Typography>
-            <Typography color="grayscale.900">-2 {tokenTicker}</Typography>
+          </Box>
+          <Box>
+            <Box display="flex" gap="6px" alignItems="center">
+              <Typography color="grayscale.600" variant="body1">
+                {intl.formatMessage(messages.epochRewardLabel)}
+              </Typography>
+              <Tooltip
+                title={
+                  <Typography variant="body2">
+                    {intl.formatMessage(messages.epochRewardTip)}
+                  </Typography>
+                }
+              >
+                <Box component="span" sx={{ cursor: 'pointer' }}>
+                  <InfoIcon />
+                </Box>
+              </Tooltip>
+            </Box>
+            <Typography color="grayscale.900">
+              {this.props.approximateReward.amount
+                .shiftedBy(-this.props.approximateReward.token.Metadata.numberOfDecimals)
+                .toFormat(this.props.approximateReward.token.Metadata.numberOfDecimals)}
+              &nbsp;
+              {tokenTicker}
+            </Typography>
           </Box>
           <Box>
             <Typography color="grayscale.600" variant="body1">
               {intl.formatMessage(globalMessages.feeLabel)}
             </Typography>
             <Typography color="grayscale.900">
-              {formatValue(this.props.transactionFee.getDefaultEntry())} {tokenTicker}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography color="grayscale.600" variant="body1">
-              {intl.formatMessage(messages.amountToDelegate)}
-            </Typography>
-            <Typography color="grayscale.900">
-              {delegatingValue.toString()} {tokenTicker}
+              -{formatValue(this.props.transactionFee.getDefaultEntry())} {tokenTicker}
             </Typography>
           </Box>
         </Box>
