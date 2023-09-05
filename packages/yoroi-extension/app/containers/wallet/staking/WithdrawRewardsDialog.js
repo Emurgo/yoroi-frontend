@@ -9,7 +9,7 @@ import { Box, Typography } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import { action, computed, observable } from 'mobx';
-import { isUsingStaticRendering, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import { toSvg } from 'jdenticon';
 import styles from './WithdrawRewardsDialog.scss';
@@ -33,6 +33,7 @@ import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPas
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import LegacyTransferLayout from '../../../components/transfer/LegacyTransferLayout';
+import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -100,9 +101,6 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           publicDeriver: selected,
         });
       }
-      // if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
-      //   this.props.onSubmit.trigger();
-      // }
     } else {
       this.spendingPasswordForm.submit({
         onSuccess: async form => {
@@ -112,9 +110,6 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             password: walletPassword,
             publicDeriver: selected,
           });
-          // if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
-          //   this.props.onSubmit.trigger();
-          // }
         },
         onError: () => {},
       });
@@ -178,10 +173,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const avatarSource = toSvg(currentPool, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const {
-      createWithdrawalTx,
-      shouldDeregister,
-    } = this.generated.stores.substores.ada.delegationTransaction;
+    const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
 
     if (this.generated.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawRewardsDialog)} no selected network`);
@@ -194,8 +186,16 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
     );
 
-    const tentativeTx = createWithdrawalTx.result;
+    if (createWithdrawalTx.error != null)
+      return (
+        <YoroiTransferErrorPage
+          error={createWithdrawalTx.error}
+          onCancel={this.props.onClose}
+          classicTheme={false}
+        />
+      );
 
+    const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
       return (
         <Dialog
