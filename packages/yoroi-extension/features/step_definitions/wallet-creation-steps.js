@@ -8,10 +8,7 @@ import { checkErrorByTranslationId } from './common-steps';
 import {
   clearButton,
   createWalletButton,
-  createWalletNameError,
   createWalletPasswordError,
-  createWalletPasswordInput,
-  createWalletRepeatPasswordInput,
   recoveryPhraseButton,
   recoveryPhraseConfirmButton,
   securityWarning,
@@ -23,6 +20,7 @@ import { dialogTitle, infoDialog, infoDialogContinueButton } from '../pages/comm
 import { addAdditionalWalletButton } from '../pages/walletPage';
 import {
   addWalletDetailsBox,
+  createWalletNameError,
   createWalletWarning,
   createWalletPasswordHelperText,
   enterFullRecoveryPhrase,
@@ -33,6 +31,7 @@ import {
   recoveryPhraseBox,
   toggleRecoveryPhraseBlurButton,
   verifyRecoveryPhraseBox,
+  createWalletRepeatPasswordHelperText,
 } from '../pages/createWalletPage';
 import {
   walletNameInput,
@@ -107,12 +106,12 @@ When(/^I enter wallet details:$/, async function (table) {
 
 When(/^I enter the created wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input(createWalletPasswordInput, fields.password);
-  await this.input(createWalletRepeatPasswordInput, fields.repeatedPassword);
+  await this.input(walletPasswordInput, fields.password);
+  await this.input(repeatPasswordInput, fields.repeatedPassword);
 });
 
 When(/^I clear the created wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm(createWalletPasswordInput, password.length);
+  await this.clearInputUpdatingForm(walletPasswordInput, password.length);
 });
 
 When(/^I click the "Create" button$/, async function () {
@@ -125,6 +124,13 @@ Then(/^I should see the invalid password error message:$/, async function (data)
   const error = data.hashes()[0];
   await this.waitForElement(createWalletPasswordHelperText);
   await checkErrorByTranslationId(this, createWalletPasswordHelperText, error);
+});
+
+Then(/^I should see the invalid repeat password error message:$/, async function (data) {
+  this.webDriverLogger.info(`Step: I should see the invalid repeat password error message`);
+  const error = data.hashes()[0];
+  await this.waitForElement(createWalletRepeatPasswordHelperText);
+  await checkErrorByTranslationId(this, createWalletRepeatPasswordHelperText, error);
 });
 
 Then(/^I see the Create button is disabled$/, async function () {
@@ -192,13 +198,11 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
   await this.waitUntilText(dialogTitle, createMessage.toUpperCase(), 2000);
 });
 
-Then(
-  /^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/,
-  async function (data) {
-    const error = data.hashes()[0];
-    await checkErrorByTranslationId(this, createWalletNameError, error);
-  }
-);
+Then(/^I should see the invalid wallet name error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  await this.waitForElement(createWalletNameError);
+  await checkErrorByTranslationId(this, createWalletNameError, error);
+});
 
 Then(/^I should see "Invalid Password" error message:$/, async function (data) {
   const error = data.hashes()[0];
