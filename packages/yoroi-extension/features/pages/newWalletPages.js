@@ -2,7 +2,8 @@
 
 import type { LocatorObject } from '../support/webdriver';
 
-export const seedPhrasePlaceholder = 'Tap each word in the correct order to verify your recovery phrase';
+export const seedPhrasePlaceholder =
+  'Tap each word in the correct order to verify your recovery phrase';
 export const connectHwButton: LocatorObject = { locator: '.WalletAdd_btnConnectHW', method: 'css' };
 export const createWalletButton: LocatorObject = {
   locator: 'createWalletButton',
@@ -36,7 +37,7 @@ export const restore24WordWallet: LocatorObject = {
 export const infoDialog: LocatorObject = {
   locator: 'walletRestorationInfoDialog',
   method: 'id',
-}
+};
 export const getCurrencyButton = (currency: string): LocatorObject => {
   return { locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' };
 };
@@ -87,10 +88,6 @@ export const walletRecoveryPhraseMnemonicComponent: LocatorObject = {
   locator: '.WalletRecoveryPhraseMnemonic_component',
   method: 'css',
 };
-export const createWalletNameError: LocatorObject = {
-  locator: '.walletName .MuiFormHelperText-root',
-  method: 'css',
-};
 export const createWalletPasswordError: LocatorObject = {
   locator: '.FormFieldOverridesClassic_error',
   method: 'css',
@@ -116,7 +113,7 @@ export const clearButton: LocatorObject = {
 export const getRecoveryPhraseWord = (indexNumber: number): LocatorObject => {
   return {
     locator: `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${indexNumber}]`,
-    method: 'xpath'
+    method: 'xpath',
   };
 };
 
