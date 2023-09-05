@@ -1,6 +1,7 @@
 .dialog {
   min-width: 650px;
   max-width: unset;
+  padding-bottom: 24px;
 
   & > h1 {
     margin-bottom: 25px !important;
@@ -8,5 +9,9 @@
 
   & > div {
     padding: 0px 25px !important;
+  }
+
+  & > div:nth-child(3) {
+    margin-top: 7px !important;
   }
 }
