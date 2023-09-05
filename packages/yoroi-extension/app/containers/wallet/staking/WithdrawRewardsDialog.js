@@ -9,7 +9,7 @@ import { Box, Typography } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import { action, computed, observable } from 'mobx';
-import { observer } from 'mobx-react';
+import { isUsingStaticRendering, observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import { toSvg } from 'jdenticon';
 import styles from './WithdrawRewardsDialog.scss';
@@ -30,6 +30,9 @@ import {
 } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
+import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
+import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import LegacyTransferLayout from '../../../components/transfer/LegacyTransferLayout';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -76,12 +79,11 @@ export default class WithdrawRewardsDialog extends Component<Props> {
   submit: void => Promise<void> = async () => {
     const selected = this.generated.stores.wallets.selected;
     if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
+    const signRequest = this.generated.stores.substores.ada.delegationTransaction.createWithdrawalTx
+      .result;
+    if (signRequest == null) return;
 
     if (this.spendingPasswordForm == null) {
-      if (this.props.transactionRequest.result == null) return;
-      const signRequest = this.generated.stores.substores.ada.delegationTransaction
-        .createWithdrawalTx.result;
-
       if (isTrezorTWallet(selected.getParent())) {
         await this.generated.actions.ada.trezorSend.sendUsingTrezor.trigger({
           params: {
@@ -105,10 +107,8 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       this.spendingPasswordForm.submit({
         onSuccess: async form => {
           const { walletPassword } = form.values();
-
-          if (this.props.transactionRequest.result == null) return;
           await this.generated.actions.wallets.sendMoney.trigger({
-            signRequest: this.props.transactionRequest.result,
+            signRequest,
             password: walletPassword,
             publicDeriver: selected,
           });
@@ -196,7 +196,19 @@ export default class WithdrawRewardsDialog extends Component<Props> {
 
     const tentativeTx = createWithdrawalTx.result;
 
-    if (!tentativeTx) return 'Loading...';
+    if (!tentativeTx)
+      return (
+        <Dialog
+          title={intl.formatMessage(globalMessages.processingLabel)}
+          closeOnOverlayClick={false}
+        >
+          <LegacyTransferLayout>
+            <VerticallyCenteredLayout>
+              <LoadingSpinner />
+            </VerticallyCenteredLayout>
+          </LegacyTransferLayout>
+        </Dialog>
+      );
     const receivers = tentativeTx.receivers(true);
     const receiverAddress = addressToDisplayString(receivers[0], network);
     const withdrawals = tentativeTx.withdrawals();
@@ -210,13 +222,14 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const finalRewards = this.getTotalBalance(recoveredBalance, txFee, deregistrations);
 
     const withSigning = asGetSigningKey(publicDeriver);
-
+    const isSubmitting = this.generated.stores.wallets.sendMoneyRequest.isExecuting;
+    const error = this.generated.stores.wallets.sendMoneyRequest.error;
     const spendingPasswordForm =
       withSigning == null ? undefined : (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
           classicTheme={false}
-          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+          isSubmitting={isSubmitting}
         />
       );
 
@@ -226,9 +239,12 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         actions={[
           {
             label: intl.formatMessage(globalMessages.withdrawLabel),
-            onClick: () => {},
+            onClick: this.submit,
             primary: true,
-            disabled: true,
+            disabled:
+              isSubmitting ||
+              !this.spendingPasswordForm ||
+              !this.spendingPasswordForm.values().walletPassword,
           },
         ]}
         closeOnOverlayClick={false}
@@ -319,6 +335,11 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           </Box>
 
           <Box mt="24px">{spendingPasswordForm}</Box>
+          <Box mt="-27px" pl="8px">
+            <Typography variant="caption1" color="magenta.500">
+              {error && intl.formatMessage(error, error.values)}
+            </Typography>
+          </Box>
         </Box>
       </Dialog>
     );
