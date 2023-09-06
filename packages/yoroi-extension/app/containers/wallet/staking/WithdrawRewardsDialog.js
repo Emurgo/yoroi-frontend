@@ -233,6 +233,12 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         />
       );
 
+    const shouldDisable = withSigning
+      ? isSubmitting
+      : isSubmitting ||
+        !this.spendingPasswordForm ||
+        !this.spendingPasswordForm.values().walletPassword;
+
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
@@ -241,10 +247,8 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             label: intl.formatMessage(globalMessages.withdrawLabel),
             onClick: this.submit,
             primary: true,
-            disabled:
-              isSubmitting ||
-              !this.spendingPasswordForm ||
-              !this.spendingPasswordForm.values().walletPassword,
+            disabled: shouldDisable,
+            isSubmitting,
           },
         ]}
         closeOnOverlayClick={false}
