@@ -19,7 +19,7 @@ type Props = {|
   +children: ?Node,
   +websiteName: string,
   +url: string,
-  +light: boolean,
+  +light?: boolean,
   +primary?: boolean,
   +placementTooltip?: string,
   +onExternalLinkClick: MouseEvent => void,
@@ -32,12 +32,13 @@ export default class ExplorableHash extends Component<Props> {
   |} = {
     placementTooltip: 'bottom',
     primary: false,
+    light: undefined,
   };
 
   render(): Node {
     const { websiteName, onExternalLinkClick } = this.props;
-
     const addressClass = classnames([this.props.light ? styles.lightColor : styles.darkColor]);
+
     return (
       <Tooltip
         className={styles.component}

@@ -350,11 +350,11 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}
               hash={this.props.poolHash}
-              light
+              primary
               linkType="pool"
               placementTooltip="top"
             >
-              <RawHash light>{this.props.poolHash}</RawHash>
+              <RawHash primary>{this.props.poolHash}</RawHash>
             </ExplorableHashContainer>
           </Box>
         </Box>
@@ -428,9 +428,18 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
 
         {spendingPasswordForm}
         {this.props.error ? (
-          <p className={styles.error}>
-            {intl.formatMessage(this.props.error, this.props.error.values)}
-          </p>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: '13px',
+            }}
+          >
+            <Typography variant="caption1" color="magenta.500" textAlign="center">
+              {intl.formatMessage(this.props.error, this.props.error.values)}
+            </Typography>
+          </Box>
         ) : null}
       </Dialog>
     );

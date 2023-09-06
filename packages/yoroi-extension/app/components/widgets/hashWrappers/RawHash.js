@@ -9,7 +9,7 @@ import { Box } from '@mui/material';
 
 type Props = {|
   +children: ?Node,
-  +light: boolean,
+  +light?: boolean,
   +primary?: boolean,
   +className?: string,
 |};
@@ -19,14 +19,14 @@ export default class RawHash extends Component<Props> {
   static defaultProps: {| className: void |} = {
     className: undefined,
     primary: false,
+    light: undefined,
   };
 
   render(): Node {
-    const addressClasses = classnames([
-      styles.hash,
-      this.props.light ? styles.lightColor : styles.darkColor,
-      this.props.className,
-    ]);
+    const addressClasses = classnames([styles.hash, this.props.className], {
+      [styles.lightColor]: this.props.light === true,
+      [styles.darkColor]: this.props.light === false,
+    });
     return this.props.primary ? (
       <Box
         component="span"

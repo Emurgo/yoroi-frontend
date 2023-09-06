@@ -15,7 +15,7 @@ type Props = {|
   +children: ?Node,
   +selectedExplorer: SelectedExplorer,
   +hash: string,
-  +light: boolean,
+  +light?: boolean,
   +primary?: boolean,
   +linkType: LinkType,
   +placementTooltip?: string,
@@ -26,6 +26,7 @@ export default class ExplorableHashContainer extends Component<Props> {
   static defaultProps: {| placementTooltip: string |} = {
     placementTooltip: 'bottom',
     primary: false,
+    light: undefined,
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {

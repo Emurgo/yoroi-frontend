@@ -374,11 +374,20 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           <Box mt="24px" mx="5px">
             {spendingPasswordForm}
           </Box>
-          <Box mt="-27px" pl="8px" mx="5px">
-            <Typography variant="caption1" color="magenta.500">
-              {error && intl.formatMessage(error, error.values)}
-            </Typography>
-          </Box>
+          {error ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: '2px',
+              }}
+            >
+              <Typography variant="caption1" color="magenta.500">
+                {intl.formatMessage(error, error.values)}
+              </Typography>
+            </Box>
+          ) : null}
         </Box>
       </Dialog>
     );
