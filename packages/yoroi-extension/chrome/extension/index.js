@@ -76,6 +76,8 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.createWalletLanguagePageViewed();
     } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
       ampli.connectorPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ADD) {
+      ampli.createWalletSelectMethodPageViewed();
     }
   });
 };
