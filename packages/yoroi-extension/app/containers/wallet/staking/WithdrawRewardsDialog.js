@@ -34,6 +34,8 @@ import VerticallyCenteredLayout from '../../../components/layout/VerticallyCente
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import LegacyTransferLayout from '../../../components/transfer/LegacyTransferLayout';
 import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
+import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
+import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -239,6 +241,11 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         !this.spendingPasswordForm ||
         !this.spendingPasswordForm.values().walletPassword;
 
+    const selectedExplorer = this.generated.stores.explorers.selectedExplorer.get(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+    if (!selectedExplorer) throw new Error('No explorer for wallet network');
+
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
@@ -257,7 +264,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         className={styles.dialog}
       >
         <Box>
-          <Box mb="16px">
+          <Box mb="16px" px="5px">
             <Typography variant="body1" color="grayscale.600">
               {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
             </Typography>
@@ -287,19 +294,44 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Box>
           </Box>
           <Box>
-            <Typography variant="body1" color="grayscale.600">
+            <Typography variant="body1" color="grayscale.600" px="4px">
               {intl.formatMessage(globalMessages.stakePoolHash)}
             </Typography>
-            <Typography variant="body1" color="grayscale.900">
-              <CopyAddress text={currentPool}>{currentPool}</CopyAddress>
+            <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
+              <CopyAddress text={currentPool}>
+                <ExplorableHashContainer
+                  selectedExplorer={selectedExplorer}
+                  hash={currentPool}
+                  light
+                  primary
+                  linkType="pool"
+                  placementTooltip="top"
+                >
+                  <RawHash light primary>
+                    {currentPool}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyAddress>
             </Typography>
           </Box>
           <Box>
-            <Typography variant="body1" color="grayscale.600">
+            <Typography variant="body1" color="grayscale.600" px="5px">
               {intl.formatMessage(messages.withdrawalAddress)}
             </Typography>
-            <Typography variant="body1" color="grayscale.900">
-              <CopyAddress text={receiverAddress}>{truncateAddress(receiverAddress)}</CopyAddress>
+            <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
+              <CopyAddress>
+                <ExplorableHashContainer
+                  selectedExplorer={selectedExplorer}
+                  hash={receiverAddress}
+                  light
+                  primary
+                  linkType="address"
+                >
+                  <RawHash light primary>
+                    {truncateAddress(receiverAddress)}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyAddress>
             </Typography>
           </Box>
 
@@ -309,6 +341,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             justifyContent="space-between"
             pt="24px"
             mt="28px"
+            mx="5px"
             borderTop="1px solid"
             borderColor="grayscale.200"
           >
@@ -338,8 +371,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Box>
           </Box>
 
-          <Box mt="24px">{spendingPasswordForm}</Box>
-          <Box mt="-27px" pl="8px">
+          <Box mt="24px" mx="5px">
+            {spendingPasswordForm}
+          </Box>
+          <Box mt="-27px" pl="8px" mx="5px">
             <Typography variant="caption1" color="magenta.500">
               {error && intl.formatMessage(error, error.values)}
             </Typography>
@@ -385,6 +420,9 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       |},
     |},
     stores: {|
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       tokenInfoStore: {|
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
         tokenInfo: TokenInfoMap,
@@ -452,6 +490,9 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         },
       },
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           selectedNetwork: stores.profile.selectedNetwork,
         },

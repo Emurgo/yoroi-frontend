@@ -352,7 +352,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
               hash={this.props.poolHash}
               light
               linkType="pool"
-              placementTooltip="top-start"
+              placementTooltip="top"
             >
               <RawHash light>{this.props.poolHash}</RawHash>
             </ExplorableHashContainer>

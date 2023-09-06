@@ -10,12 +10,14 @@
   }
 
   & > div {
-    padding: 0px 25px !important;
+    padding: 0px 20px !important;
     overflow: unset;
     max-height: unset;
   }
 
   & > div:nth-child(3) {
     margin-top: 27px !important;
+    padding-left: 25px !important;
+    padding-right: 25px !important;
   }
 }

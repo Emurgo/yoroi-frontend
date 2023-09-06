@@ -6,9 +6,7 @@ import { handleExternalLinkClick } from '../../utils/routing';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type {
-  LinkType
-} from '../../api/ada/lib/storage/database/explorers/tables';
+import type { LinkType } from '../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 
 import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash';
@@ -18,17 +16,19 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +hash: string,
   +light: boolean,
+  +primary?: boolean,
   +linkType: LinkType,
   +placementTooltip?: string,
 |};
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
-  static defaultProps: {|placementTooltip: string|} = {
+  static defaultProps: {| placementTooltip: string |} = {
     placementTooltip: 'bottom',
+    primary: false,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -40,13 +40,15 @@ export default class ExplorableHashContainer extends Component<Props> {
       return this.props.children ?? null;
     }
 
-    const displayName = explorerInfo.name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer);
+    const displayName =
+      explorerInfo.name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer);
 
     return (
       <ExplorableHash
         websiteName={displayName}
         url={explorerInfo.baseUrl + this.props.hash}
         light={this.props.light}
+        primary={this.props.primary}
         onExternalLinkClick={handleExternalLinkClick}
         placementTooltip={this.props.placementTooltip}
       >
@@ -54,5 +56,4 @@ export default class ExplorableHashContainer extends Component<Props> {
       </ExplorableHash>
     );
   }
-
 }
