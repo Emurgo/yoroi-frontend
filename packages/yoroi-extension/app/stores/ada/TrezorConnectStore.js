@@ -246,7 +246,7 @@ export default class TrezorConnectStore
   _validateHWResponse: TrezorConnectionResponse => boolean = (
     resp,
   ) => {
-    const { trezorResp, trezorEventDevice } = resp;
+    const { trezorResp } = resp;
 
     if (trezorResp && !trezorResp.success) {
       switch (trezorResp.payload.error) {
