@@ -59,7 +59,7 @@
     "storybook:screenshots": "rimraf ./__screenshots__/ && storycap http://localhost:6006",
     "storybook:publish": "npm run storybook:build && netlify deploy --dir=storybook-static --prod",
     "metrics:pull": "ampli pull extension",
-    "metrics:status": "ampli status"
+    "metrics:status": "babel-node scripts/checkMetrics.js"
   },
   "repository": {
     "type": "git",
