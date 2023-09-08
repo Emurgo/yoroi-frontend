@@ -132,6 +132,7 @@ function SummaryCard({
             },
           }}
           onClick={withdrawRewards}
+          disabled={totalRewards.getDefaultEntry().amount.isZero()}
         >
           {intl.formatMessage(globalMessages.withdrawLabel)}
         </Button>

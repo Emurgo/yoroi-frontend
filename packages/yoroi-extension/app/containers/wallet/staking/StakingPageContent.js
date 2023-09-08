@@ -136,6 +136,11 @@ class StakingPageContent extends Component<AllProps> {
     publicDeriver: PublicDeriver<>,
     errorIfPresent: void | {| error: LocalizableError |},
   |}) => Node = request => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
+    }
+
     const { actions, stores } = this.generated;
 
     const showRewardAmount =
@@ -158,7 +163,13 @@ class StakingPageContent extends Component<AllProps> {
         withdrawRewards={
           this._isRegistered(request.publicDeriver) === true
             ? () => {
-                this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+                // this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+                this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+                const { delegationTransaction } = this.generated.actions.ada;
+                delegationTransaction.createWithdrawalTxForWallet.trigger({ publicDeriver });
+                this.generated.actions.dialogs.open.trigger({
+                  dialog: WithdrawRewardsDialog,
+                });
               }
             : undefined
         }
@@ -464,6 +475,9 @@ class StakingPageContent extends Component<AllProps> {
           createWithdrawalTxForWallet: {|
             trigger: (params: {| publicDeriver: PublicDeriver<> |}) => Promise<void>,
           |},
+          setShouldDeregister: {|
+            trigger: boolean => void,
+          |},
         |},
       |},
       dialogs: {|
@@ -603,6 +617,9 @@ class StakingPageContent extends Component<AllProps> {
             },
             createWithdrawalTxForWallet: {
               trigger: actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger,
+            },
+            setShouldDeregister: {
+              trigger: actions.ada.delegationTransaction.setShouldDeregister.trigger,
             },
           },
         },

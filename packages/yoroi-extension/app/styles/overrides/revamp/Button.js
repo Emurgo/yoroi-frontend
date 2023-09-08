@@ -95,6 +95,8 @@ function getContainedStyles(variant: 'primary' | 'secondary' | 'magenta', theme:
     '&.Mui-disabled': {
       color: theme.palette.common.white,
       backgroundColor: theme.palette[variant][300],
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette.common.white,
@@ -131,6 +133,8 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', theme: Object): Obj
       border: '2px solid',
       borderColor: theme.palette[variant][200],
       color: theme.palette[variant][200],
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette[variant][600],
@@ -164,6 +168,8 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', theme: Object): Obj
       border: '2px solid',
       borderColor: theme.palette[variant][200],
       color: theme.palette[variant][200],
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette[variant][600],
