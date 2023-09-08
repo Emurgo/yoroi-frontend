@@ -1,6 +1,5 @@
 .dialog {
-  min-width: 650px;
-  max-width: unset;
+  max-width: 650px;
   max-height: unset;
   height: unset;
   padding-bottom: 24px;
@@ -11,8 +10,6 @@
 
   & > div {
     padding: 0px 20px !important;
-    overflow: unset;
-    max-height: unset;
   }
 
   & > div:nth-child(3) {

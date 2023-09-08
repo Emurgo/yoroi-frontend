@@ -1027,6 +1027,7 @@
   "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "You do NOT need to undelegate before switching stake pools",
   "wallet.undelegation.transaction.explanationLine2": "It will take 2 epochs after the end of the current epoch for undelegation to take effect",
+  "wallet.undelegation.transaction.warning": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.",
   "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
   "wallet.unsupported.title": "This wallet type is incompatible.",
   "wallet.voting.dialog.completeLabel": "Complete",

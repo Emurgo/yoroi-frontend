@@ -36,6 +36,7 @@ import LegacyTransferLayout from '../../../components/transfer/LegacyTransferLay
 import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
+import Warning from '../../../components/common/Warning';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -49,6 +50,11 @@ const messages = defineMessages({
   finalRewards: {
     id: 'wallet.withdrawRewards.transaction.finalRewardsLabel',
     defaultMessage: '!!!Final Rewards',
+  },
+  deregistrationWarning: {
+    id: 'wallet.undelegation.transaction.warning',
+    defaultMessage:
+      '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
   },
 });
 
@@ -175,7 +181,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const avatarSource = toSvg(currentPool, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
+    const {
+      createWithdrawalTx,
+      shouldDeregister,
+    } = this.generated.stores.substores.ada.delegationTransaction;
 
     if (this.generated.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawRewardsDialog)} no selected network`);
@@ -251,6 +260,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         title={intl.formatMessage(messages.dialogTitle)}
         actions={[
           {
+            label: intl.formatMessage(globalMessages.cancel),
+            onClick: this.props.onClose,
+          },
+          {
             label: intl.formatMessage(globalMessages.withdrawLabel),
             onClick: this.submit,
             primary: true,
@@ -264,6 +277,15 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         className={styles.dialog}
       >
         <Box>
+          {shouldDeregister && (
+            <Box mb="24px">
+              <Warning>
+                <Typography variant="body1">
+                  {intl.formatMessage(messages.deregistrationWarning)}
+                </Typography>
+              </Warning>
+            </Box>
+          )}
           <Box mb="16px" px="5px">
             <Typography variant="body1" color="grayscale.600">
               {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}

@@ -28,7 +28,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
     <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
-          padding: '20px 9px 20px 24px',
+          padding: '16px 9px 16px 24px',
           borderBottom: '1px solid',
           borderBottomColor: 'grayscale.200',
           display: 'flex',
