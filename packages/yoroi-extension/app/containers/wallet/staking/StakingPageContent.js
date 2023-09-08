@@ -131,6 +131,20 @@ class StakingPageContent extends Component<AllProps> {
     return epochLengthInDays;
   };
 
+  createWithdrawalTx: (shouldDeregister: boolean) => void = shouldDeregister => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
+    }
+
+    this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(shouldDeregister);
+    const { delegationTransaction } = this.generated.actions.ada;
+    delegationTransaction.createWithdrawalTxForWallet.trigger({ publicDeriver });
+    this.generated.actions.dialogs.open.trigger({
+      dialog: WithdrawRewardsDialog,
+    });
+  };
+
   getUserSummary: ({|
     delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
@@ -162,15 +176,7 @@ class StakingPageContent extends Component<AllProps> {
         }
         withdrawRewards={
           this._isRegistered(request.publicDeriver) === true
-            ? () => {
-                // this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
-                this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
-                const { delegationTransaction } = this.generated.actions.ada;
-                delegationTransaction.createWithdrawalTxForWallet.trigger({ publicDeriver });
-                this.generated.actions.dialogs.open.trigger({
-                  dialog: WithdrawRewardsDialog,
-                });
-              }
+            ? () => this.createWithdrawalTx(false) // shouldDeregister=false
             : undefined
         }
         unitOfAccount={this.toUnitOfAccount}
@@ -262,7 +268,12 @@ class StakingPageContent extends Component<AllProps> {
     //  },
     // };
 
-    return <DelegatedStakePoolCard delegatedPool={delegatedPool} />;
+    return (
+      <DelegatedStakePoolCard
+        delegatedPool={delegatedPool}
+        undelegate={() => this.createWithdrawalTx(true)} // shouldDeregister=true
+      />
+    );
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
@@ -661,7 +672,7 @@ export default (withLayout(StakingPageContent): ComponentType<Props>);
 
 const WrapperCards = styled(Box)({
   display: 'flex',
-  gap: '40px',
+  gap: '24px',
   justifyContent: 'space-between',
   marginBottom: '40px',
 });
@@ -671,5 +682,5 @@ const RightCardsWrapper = styled(Box)({
   flex: '1 1 48.5%',
   maxWidth: '48.5%',
   flexDirection: 'column',
-  gap: '40px',
+  gap: '24px',
 });

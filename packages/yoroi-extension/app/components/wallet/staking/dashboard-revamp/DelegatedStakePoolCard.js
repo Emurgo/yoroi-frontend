@@ -28,14 +28,31 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
     <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
-          padding: '15px 24px',
+          padding: '20px 9px 20px 24px',
           borderBottom: '1px solid',
           borderBottomColor: 'grayscale.200',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
+        <UndelegateButton
+          variant="text"
+          onClick={undelegate}
+          disabled={!undelegate}
+          sx={{
+            lineHeight: '21px',
+            '&.MuiButton-sizeMedium': {
+              height: 'unset',
+              p: '9px 15px',
+            },
+          }}
+        >
+          {intl.formatMessage(globalMessages.undelegateLabel)}
+        </UndelegateButton>
       </Box>
       <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
@@ -100,13 +117,6 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           </Box>
         )}
       </Wrapper>
-      {undelegate && (
-        <Wrapper>
-          <UndelegateButton sx={{ minWidth: '50%' }} variant="secondary" onClick={undelegate}>
-            {intl.formatMessage(globalMessages.undelegateLabel)}
-          </UndelegateButton>
-        </Wrapper>
-      )}
     </Card>
   );
 }
