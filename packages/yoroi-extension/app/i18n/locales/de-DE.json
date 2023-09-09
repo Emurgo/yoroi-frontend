@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Fehler beim Abrufen des Kontostandes.",
   "api.errors.getBestBlockApiError": "Fehler vom Server beim Abrufen des besten Blocks.",
   "api.errors.getPoolInfoApiError": "Fehler vom Server beim Abrufen der Pool-Informationen.",
-  "api.errors.getReputationError": "Fehler vom Server beim Abrufen der Reputation.",
   "api.errors.getRewardHistoryApiError": "Fehler vom Server beim Abrufen der Ertragshistorie.",
   "api.errors.getTxHistoryForAddressesApiError": "Fehler vom Server beim Abrufen der Transaktionen.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Fehler vom Server beim Abrufen der TxBodies.",

@@ -15,7 +15,6 @@ import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
@@ -39,7 +38,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
     // Guard against potential null values
     if (!publicDeriver)
       throw new Error(`Active wallet requiTokenDetails)}d for ${nameof(TokenDetailsPageRevamp)}.`);
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const spendableBalance = this.generated.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
     const network = publicDeriver.getParent().getNetworkInfo();
 
@@ -93,12 +92,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
         tokenInfo: TokenInfoMap,
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-        getTxRequests: (PublicDeriver<>) => TxRequests,
-      |},
+      transactions: {| balance: MultiToken | null |},
       wallets: {| selected: null | PublicDeriver<> |},
     |},
   |} {
@@ -119,18 +113,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance
         },
       },
     });

@@ -14,7 +14,6 @@ import {
 } from '../support/helpers/transfer-helpers';
 import { checkErrorByTranslationId } from './common-steps';
 import { daedalusMasterKeyButton, twelveWordOption } from '../pages/walletClaimTransferPage';
-import { proceedRecoveryButton } from '../pages/restoreWalletPage';
 import { errorMessage, errorPageTitle } from '../pages/errorPage';
 import { amountField, feeField, totalAmountField } from '../pages/confirmTransactionPage';
 import { walletAddComponent } from '../pages/basicSetupPage';
@@ -61,9 +60,9 @@ When(/^I click on the transfer funds from Daedalus master key button$/, async fu
 });
 
 When(/^I proceed with the recovery$/, async function () {
-  await this.waitForElement(proceedRecoveryButton);
-  await this.waitEnable(proceedRecoveryButton);
-  await this.click(proceedRecoveryButton);
+  await this.waitForElement(nextButton);
+  await this.waitEnable(nextButton);
+  await this.click(nextButton);
 });
 
 When(/^I click next button on the Daedalus transfer page$/, async function () {

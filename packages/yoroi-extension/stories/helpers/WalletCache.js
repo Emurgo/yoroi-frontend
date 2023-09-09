@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/WalletSettingsStore';
 import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
@@ -10,7 +10,6 @@ import BaseCardanoTimeStore from '../../app/stores/base/BaseCardanoTimeStore';
 import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
 import type { ByronCacheValue } from './cardano/ByronMocks';
 import type { ShelleyCip1852CacheValue } from './cardano/ShelleyCip1852Mocks';
-import type { JormungandrCacheValue } from './jormungandr/JormungandrMocks';
 import type { ErgoCacheValue } from './ergo/ErgoMocks';
 
 export type CardanoCacheValue = {|
@@ -37,7 +36,6 @@ export type CardanoCacheValue = {|
 export type PossibleCacheTypes =
   ByronCacheValue |
   ShelleyCip1852CacheValue |
-  JormungandrCacheValue |
   ErgoCacheValue;
 
 export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|

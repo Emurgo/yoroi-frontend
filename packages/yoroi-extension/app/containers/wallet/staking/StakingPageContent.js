@@ -4,7 +4,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import type { ConfigType } from '../../../../config/config-types';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { DelegationRequests, PoolMeta } from '../../../stores/toplevel/DelegationStore';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
@@ -13,7 +12,6 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
-import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import type {
   CurrentTimeRequests,
@@ -42,13 +40,9 @@ import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import {
-  isCardanoHaskell,
-  isJormungandr,
-} from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import EpochProgressContainer from './EpochProgressContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
-import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import { generateGraphData } from '../../../utils/graph';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
@@ -249,20 +243,7 @@ class StakingPageContent extends Component<AllProps> {
     // },
     // };
 
-    // don't support undelegation for ratio stake since it's a less intuitive UX
-    const undelegate =
-      currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
-        ? async () => {
-            this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-            const delegationTransaction = this.generated.actions.jormungandr.delegationTransaction;
-            await delegationTransaction.createTransaction.trigger({
-              publicDeriver,
-              poolRequest: undefined,
-            });
-          }
-        : undefined;
-
-    return <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />;
+    return <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undefined} />;
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
@@ -284,9 +265,8 @@ class StakingPageContent extends Component<AllProps> {
       const epochTime = toRealTime({
         absoluteSlotNum: toAbsoluteSlot({
           epoch,
-          // in Jormungandr, rewards were distributed at the start of the epoch
-          // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
-          slot: isJormungandr(publicDeriver.getParent().getNetworkInfo()) ? 0 : getEpochLength(),
+          // Rewards are calculated at the start of the epoch but distributed at the end
+          slot: getEpochLength(),
         }),
         timeSinceGenesisFunc: timeSinceGenesis,
       });
@@ -343,8 +323,7 @@ class StakingPageContent extends Component<AllProps> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
-    const txRequests = stores.transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result;
+    const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
@@ -470,16 +449,6 @@ class StakingPageContent extends Component<AllProps> {
           |},
         |},
       |},
-      jormungandr: {|
-        delegationTransaction: {|
-          createTransaction: {|
-            trigger: (params: {|
-              poolRequest: PoolRequest,
-              publicDeriver: PublicDeriver<>,
-            |}) => Promise<void>,
-          |},
-        |},
-      |},
       dialogs: {|
         open: {|
           trigger: (params: {|
@@ -536,7 +505,7 @@ class StakingPageContent extends Component<AllProps> {
       wallets: {| selected: null | PublicDeriver<> |},
       transactions: {|
         showDelegationBanner: boolean,
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken,
       |},
       time: {|
         getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
@@ -564,12 +533,7 @@ class StakingPageContent extends Component<AllProps> {
           getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
         };
       }
-      if (api === ApiOptions.jormungandr) {
-        return {
-          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
-          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
-        };
-      }
+
       return {
         getTimeCalcRequests: (undefined: any),
         getCurrentTimeRequests: () => {
@@ -597,7 +561,7 @@ class StakingPageContent extends Component<AllProps> {
         },
         transactions: {
           showDelegationBanner: stores.transactions.showDelegationBanner,
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -622,13 +586,6 @@ class StakingPageContent extends Component<AllProps> {
             },
             createWithdrawalTxForWallet: {
               trigger: actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger,
-            },
-          },
-        },
-        jormungandr: {
-          delegationTransaction: {
-            createTransaction: {
-              trigger: actions.jormungandr.delegationTransaction.createTransaction.trigger,
             },
           },
         },

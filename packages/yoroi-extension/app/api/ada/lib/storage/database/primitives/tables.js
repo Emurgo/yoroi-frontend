@@ -7,7 +7,7 @@ import type {
   CertificateRelationType,
   CoreAddressT,
 } from './enums';
-import type { AddressDiscriminationType, CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
+import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
@@ -55,35 +55,6 @@ export type CardanoHaskellBaseConfig = [
   $ReadOnly<CardanoHaskellShelleyBaseConfig>
 ];
 
-export type JormungandrFeeConfig = {|
-  constant: string,
-  coefficient: string,
-  certificate: string,
-  per_certificate_fees?: {|
-    certificate_pool_registration?: string,
-    certificate_stake_delegation?: string,
-    certificate_owner_stake_delegation?: string,
-  |},
-|};
-export type JormungandrGenesisBaseConfig = {|
-  ...CommonBaseConfig,
-  /*
-  * Legacy byron addresses contained a network id inside of its attributes
-  * This network id was a 32-bit number, but the bech32 ID is smaller
-  * Therefore, the Byron network ID is only used to generate legacy addresses
-  */
-  +ByronNetworkId: number,
-  +Discriminant: AddressDiscriminationType,
-  +GenesisDate: string, // start of the network
-  +SlotsPerEpoch: number,
-  +SlotDuration: number,
-
-  // based on https://staking.cardano.org/en/calculator/ (ITN version -- link no longer exists)
-  +PerEpochPercentageReward: number,
-  +LinearFee: JormungandrFeeConfig,
-|};
-export type JormungandrBaseConfig = [$ReadOnly<JormungandrGenesisBaseConfig>];
-
 export type ErgoGenesisBaseConfig = {|
   ...CommonBaseConfig,
   MinimumBoxValue: string,
@@ -96,9 +67,7 @@ export type CardanoHaskellConfig = $ReadOnly<InexactSubset<{|
   ...$ElementType<CardanoHaskellBaseConfig, 0>,
   ...$ElementType<CardanoHaskellBaseConfig, 1>,
 |}>>;
-export type JormungandrConfig = $ReadOnly<InexactSubset<{|
-  ...$ElementType<JormungandrBaseConfig, 0>,
-|}>>;
+
 export type ErgoConfig = $ReadOnly<InexactSubset<{|
   ...$ElementType<ErgoBaseConfig, 0>,
 |}>>;
@@ -122,10 +91,7 @@ export type NetworkInsert = {|
    * Only updates to fields specified here.
    * For these updates, you need to query a full node for current parameters
    */
-  BaseConfig:
-    CardanoHaskellBaseConfig |
-    JormungandrBaseConfig |
-    ErgoBaseConfig,
+  BaseConfig: CardanoHaskellBaseConfig | ErgoBaseConfig,
   /**
    * Some currencies have totally different implementations that use the same coin type
    * To differentiate these, we need some identifier of the fork
@@ -178,6 +144,7 @@ export type AddressInsert = {|
   Digest: number,
   Type: CoreAddressT,
   Hash: string,
+  IsUsed: boolean,
 |};
 export type AddressRow = {|
   AddressId: number,
@@ -193,6 +160,7 @@ export const AddressSchema: {|
     Digest: 'Digest',
     Type: 'Type',
     Hash: 'Hash',
+    IsUsed: 'IsUsed',
   }
 };
 
@@ -292,7 +260,6 @@ export type DbBlock = {|
 export const TransactionType = Object.freeze({
   CardanoByron: 0,
   CardanoShelley: 1,
-  Jormungandr: 1_00,
   Ergo: 2_00,
 });
 
@@ -327,11 +294,7 @@ export type CardanoShelleyTransactionInsert = {|
   |},
   ...TransactionInsertBase,
 |};
-export type JormungandrTransactionInsert = {|
-  Type: $PropertyType<typeof TransactionType, 'Jormungandr'>,
-  Extra: null,
-  ...TransactionInsertBase,
-|};
+
 export type ErgoTransactionInsert = {|
   Type: $PropertyType<typeof TransactionType, 'Ergo'>,
   Extra: null,
@@ -341,12 +304,13 @@ export type ErgoTransactionInsert = {|
 export type TransactionInsert =
   CardanoByronTransactionInsert |
   CardanoShelleyTransactionInsert |
-  JormungandrTransactionInsert |
   ErgoTransactionInsert;
+
 export type TransactionRow = {|
   TransactionId: number,
   ...TransactionInsert,
 |};
+
 export const TransactionSchema: {|
   +name: 'Transaction',
   properties: $ObjMapi<TransactionRow, ToSchemaProp>,
@@ -652,6 +616,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(AddressSchema.properties.Digest, Type.NUMBER)
     .addColumn(AddressSchema.properties.Type, Type.NUMBER)
     .addColumn(AddressSchema.properties.Hash, Type.STRING)
+    .addColumn(AddressSchema.properties.IsUsed, Type.BOOLEAN)
     .addPrimaryKey(
       ([AddressSchema.properties.AddressId]: Array<string>),
       true,

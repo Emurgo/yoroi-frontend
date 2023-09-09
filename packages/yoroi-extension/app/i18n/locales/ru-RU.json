@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "Ошибка при получении баланса.",
   "api.errors.getBestBlockApiError": "Получена ошибка от сервера при получении лучшего блока.",
   "api.errors.getPoolInfoApiError": "Получена ошибка от сервера при получении информации о пуле.",
-  "api.errors.getReputationError": "Получена ошибка от сервера при получении репутации.",
   "api.errors.getRewardHistoryApiError": "Получена ошибка от сервера при получении истории вознаграждений.",
   "api.errors.getTxHistoryForAddressesApiError": "Получена ошибка от сервера при получении транзакций.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Получена ошибка от сервера при получении TxBodies.",

@@ -1,5 +1,5 @@
-// @flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -36,13 +36,11 @@ import {
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import WalletTransaction from '../../domain/WalletTransaction';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
-import JormungandrTransaction from '../../domain/JormungandrTransaction';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import { TxStatusCodes, CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { createDebugWalletDialog } from './dialogs/DebugWalletDialogContainer';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -366,27 +364,6 @@ export const Transaction = (): Node => {
     Medium: assuranceModes.NORMAL.low,
     High: assuranceModes.NORMAL.medium,
   };
-  const certificateCases = {
-    None: -1,
-    ...RustModule.WalletV3.CertificateKind
-  };
-  const certificateSelect = select(
-    'certificate',
-    certificateCases,
-    certificateCases.None
-  );
-  const certificates = certificateSelect === certificateCases.None
-    ? []
-    : [{
-      relatedAddresses: [],
-      certificate: {
-        CertificateId: 0,
-        TransactionId: 0,
-        Kind: certificateSelect,
-        Ordinal: 0,
-        Payload: ''
-      },
-    }];
 
   const baseTxProps = {
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
@@ -462,13 +439,8 @@ export const Transaction = (): Node => {
     state,
     errorMsg: null,
   };
-  const walletTransaction = certificates.length === 0
-    ? new CardanoByronTransaction(baseTxProps)
-    : new JormungandrTransaction({
-      ...baseTxProps,
-      certificates,
-    });
-  const transactions = [walletTransaction];
+  const walletTransaction = new CardanoByronTransaction(baseTxProps);
+  const transactions = [new CardanoByronTransaction(baseTxProps)];
 
   const numConfirmations = state === TxStatusCodes.IN_BLOCK
     ? select(

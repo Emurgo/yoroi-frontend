@@ -86,7 +86,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   }
 
   return (
-    <Stack alignItems="center" justifyContent="center" className={styles.component}>
+    <Stack alignItems="center" justifyContent="center" className={styles.component} id='enterRecoveryPhraseStepComponent'>
       <Stack
         direction="column"
         alignItems="left"
@@ -127,7 +127,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         duplicatedWalletData={duplicatedWalletData}
         open={isActiveDialog}
         onClose={handleClose}
-        // $FlowFixMe incompatible-call
+        // $FlowFixMe[incompatible-call]
         onNext={() => openDuplicatedWallet(duplicatedWallet)}
       />
     </Stack>

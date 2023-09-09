@@ -20,7 +20,6 @@
   "api.errors.getBalanceError": "残高の取得中にエラーが発生しました。",
   "api.errors.getBestBlockApiError": "ベストブロックを獲得プロセス中にサーバーからエラーを受信しました。",
   "api.errors.getPoolInfoApiError": "プール情報の取得中にサーバーからエラーを受信しました。",
-  "api.errors.getReputationError": "評判の取得中にサーバーからエラーを受信しました。",
   "api.errors.getRewardHistoryApiError": "報酬履歴の取得中にサーバーからエラーを受信しました。",
   "api.errors.getTxHistoryForAddressesApiError": "トランザクション取得中にサーバーからエラーを受信しました。",
   "api.errors.getTxsBodiesForUTXOsApiError": "TxBodiesの取得中にサーバーからエラーを受信しました。",

@@ -4,7 +4,7 @@ Feature: dApp connector no wallets
     Given I have opened the mock dApp
 
   @dApp-1010
-  Scenario: dApp, no wallets, connecting wallet (DAPP-1010)
+  Scenario: (DAPP-1010) dApp, no wallets, connecting wallet
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
     And I should see "No Cardano wallets is found" message
@@ -12,8 +12,8 @@ Feature: dApp connector no wallets
     Then The pop-up is closed and the extension tab is opened
     And I have completed the basic setup
     Then I should see the Create wallet screen
-    Given There is a Shelley wallet stored named shelley-simple-15
     Then Revamp. I switch to revamp version
+    Given There is a Shelley wallet stored named shelley-simple-15
     Given I switch back to the mock dApp
     And I request anonymous access to Yoroi
     Then I should see the connector popup for connection
