@@ -300,7 +300,7 @@ export async function connectorGetUtxosCardano(
   return Promise.resolve(selectedUtxo);
 }
 
-const MAX_COLLATERAL = new BigNumber('5000000');
+export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 
