@@ -54,6 +54,7 @@ import {
   connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
+  MAX_COLLATERAL,
 } from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -1783,7 +1784,7 @@ async function handleInjectorMessage(message, sender) {
       try {
         checkParamCount(1);
         await RustModule.load();
-        let requiredAmount: string = message.params[0];
+        let requiredAmount: string = message.params[0] || String(MAX_COLLATERAL);
         if (!/^\d+$/.test(requiredAmount)) {
           try {
             requiredAmount = RustModule.WalletV4.Value.from_bytes(
