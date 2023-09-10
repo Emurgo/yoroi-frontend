@@ -97,8 +97,6 @@ import {
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
-
-axios.defaults.adapter = fetchAdapter;
 import {
   UTxOSet,
   Value as LibValue,
@@ -110,6 +108,8 @@ import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
 import {
   NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
 } from'@emurgo/yoroi-eutxo-txs/dist/errors';
+
+axios.defaults.adapter = fetchAdapter;
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -241,16 +241,18 @@ export async function connectorGetUtxosErgo(
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
+// $FlowFixMe
 function stringToLibValue(s: string): LibValue {
   if (/^\d+$/.test(s)) {
     // The string is an int number
     return new LibValue(
-      new Amount(valueStr),
+      new Amount(s),
       NativeAssets.from([]),
     );
   }
   try {
     return RustModule.WasmScope(Module => {
+      // $FlowFixMe
       function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): NativeAssets {
         const mappedAssets = [];
         if (masset != null) {
