@@ -241,13 +241,49 @@ export async function connectorGetUtxosErgo(
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
-function _stringToWasmValue(s: string): RustModule.WalletV4.Value {
+function stringToLibValue(s: string): LibValue {
   if (/^\d+$/.test(s)) {
     // The string is an int number
-    return RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(s));
+    return new LibValue(
+      new Amount(valueStr),
+      NativeAssets.from([]),
+    );
   }
   try {
-    return RustModule.WalletV4.Value.from_bytes(hexToBytes(s));
+    return RustModule.WasmScope(Module => {
+      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): NativeAssets {
+        const mappedAssets = [];
+        if (masset != null) {
+          const policies = masset.keys();
+          for (let i = 0; i < policies.len(); i++) {
+            const policy = policies.get(i);
+            const assets = masset.get(policy);
+            if (assets != null) {
+              const names = assets.keys();
+              for (let j = 0; j < names.len(); j++) {
+                const name = names.get(j);
+                const amount = assets.get(name);
+                if (amount != null) {
+                  mappedAssets.push({
+                    asset: {
+                      policy: policy.to_bytes(),
+                      name: name.to_bytes(),
+                    },
+                    amount: new Amount(amount.to_str()),
+                  })
+                }
+              }
+            }
+          }
+        }
+        return NativeAssets.from(mappedAssets);
+      }
+      const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
+      return new LibValue(
+        new Amount(value.coin().to_str()),
+        multiAssetToLibAssets(value.multiasset()),
+      )
+    });
   } catch (e) {
     throw ConnectorError.invalidRequest(
       `Invalid required value string "${s}". Expected an int number or a hex of serialized Value instance. Cause: ${String(e)}`,
@@ -294,10 +330,7 @@ export async function connectorGetUtxosCardano(
       formattedUtxos.map(toLibUTxO)
     )
   );
-  const value = new LibValue(
-    new Amount(valueStr),
-    NativeAssets.from([])
-  );
+  const value = stringToLibValue(valueStr);
   let selectedUtxos;
   try {
     selectedUtxos = (await coinSelectionClassificationStrategy(
