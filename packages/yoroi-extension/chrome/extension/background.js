@@ -1454,7 +1454,6 @@ async function handleInjectorMessage(message, sender) {
                     valueExpected,
                     paginate,
                     coinsPerUtxoWord,
-                    network.NetworkId,
                   ),
                   isCBOR,
                 );
