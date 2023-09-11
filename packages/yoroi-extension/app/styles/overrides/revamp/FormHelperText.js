@@ -2,16 +2,17 @@
 
 const RevampFormHelperText = {
   styleOverrides: {
-    root: {
-      color: 'grayscale.600',
+    root: ({ theme }) => ({
+      color: theme.palette.grayscale[600],
       marginTop: 0,
       marginLeft: '14px',
       fontWeight: 400,
       position: 'absolute',
       bottom: '-2px',
-      '&.Mui-disabled': { color: 'grayscale.200' },
-      '&.Mui-error': { color: 'magenta.500' },
-    },
+      fontSize: '0.75rem',
+      '&.Mui-disabled': { color: theme.palette.grayscale[200] },
+      '&.Mui-error': { color: theme.palette.magenta[500] },
+    }),
   },
   defaultProps: { variant: 'outlined' },
 };
