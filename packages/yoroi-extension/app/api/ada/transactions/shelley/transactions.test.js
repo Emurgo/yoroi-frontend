@@ -27,7 +27,8 @@ import {
 } from '../../../../config/numbersConfig';
 import { defaultAssets, networks, } from '../../lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../../common/lib/MultiToken';
-import { identifierToCardanoAsset } from '../utils';
+import { identifierSplit, identifierToCardanoAsset, iterateWasm, iterateWasmKeyValue } from '../utils';
+import { bytesToHex } from '../../../../coreUtils';
 
 const network = networks.CardanoMainnet;
 const defaultIdentifier = defaultAssets.filter(
@@ -452,19 +453,31 @@ describe('Create unsigned TX from UTXO', () => {
       expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1666');
     }
 
-    const assetInfo = identifierToCardanoAsset(testAssetId);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
-      ?.get(assetInfo.policyId)
-      ?.get(assetInfo.name)
-      ?.to_str()
-    ).toEqual('1234');
+    function assertMultiAsset(masset: any, policy: string, name: string, amount: string): void {
+      const massetArray = iterateWasmKeyValue(masset);
+      expect(massetArray.length).toEqual(1);
+      expect(massetArray[0][0].to_hex()).toEqual(policy);
+      const assetsArray = iterateWasmKeyValue(massetArray[0][1]);
+      expect(assetsArray.length).toEqual(1);
+      expect(bytesToHex(assetsArray[0][0].name())).toEqual(name);
+      expect(assetsArray[0][1].to_str()).toEqual(amount);
+    }
+
+    const assetSplit = identifierSplit(testAssetId);
+    assertMultiAsset(
+      unsignedTxResponse.txBuilder.get_explicit_input().multiasset(),
+      assetSplit.policyId,
+      assetSplit.name,
+      '1234',
+    );
 
     const tx = unsignedTxResponse.txBuilder.build();
-    expect(tx.outputs().get(4).amount().multiasset()
-      ?.get(assetInfo.policyId)
-      ?.get(assetInfo.name)
-      ?.to_str()
-    ).toEqual('234'); // expected change
+    assertMultiAsset(
+      tx.outputs().get(4).amount().multiasset(),
+      assetSplit.policyId,
+      assetSplit.name,
+      '234',
+    );
   });
 
   it('Should fail when not enough ADA to avoid burning tokens', async () => {
