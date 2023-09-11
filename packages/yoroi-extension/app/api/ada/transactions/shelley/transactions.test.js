@@ -27,7 +27,7 @@ import {
 } from '../../../../config/numbersConfig';
 import { defaultAssets, networks, } from '../../lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../../common/lib/MultiToken';
-import { identifierSplit, identifierToCardanoAsset, iterateWasm, iterateWasmKeyValue } from '../utils';
+import { identifierSplit, iterateWasmKeyValue } from '../utils';
 import { bytesToHex } from '../../../../coreUtils';
 
 const network = networks.CardanoMainnet;
