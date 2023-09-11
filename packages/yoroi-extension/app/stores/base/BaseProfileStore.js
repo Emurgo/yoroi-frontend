@@ -89,6 +89,14 @@ export default class BaseProfileStore
     (string) => Promise<void>
   >(this.api.localStorage.setUserTheme);
 
+  @observable getUserRevampMigrationStatusRequest: Request<
+    (void) => Promise<boolean>
+  > = new Request<(void) => Promise<boolean>>(this.api.localStorage.getUserRevampMigrationStatus);
+
+  @observable setUserRevampMigrationStatusRequest: Request<
+    (boolean) => Promise<void>
+  > = new Request<(boolean) => Promise<void>>(this.api.localStorage.setUserRevampMigrationStatus);
+
   @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
     (void) => Promise<?string>
   >(this.api.localStorage.getCustomUserTheme);
@@ -266,6 +274,12 @@ export default class BaseProfileStore
       result = this.getThemeRequest.execute().result;
     }
     if (this.isCurrentThemeSet && result != null) {
+      if (!this.didUserMigratedToRevampTheme) {
+        this.setUserRevampMigrationStatusRequest.execute(true);
+        this._updateTheme({ theme: THEMES.YOROI_REVAMP })
+        return THEMES.YOROI_REVAMP;
+      }
+
       // verify content is an actual theme
       if (Object.values(THEMES).find(theme => theme === result)) {
         // $FlowExpectedError[incompatible-return]: can safely cast
@@ -273,7 +287,7 @@ export default class BaseProfileStore
       }
     }
 
-    return THEMES.YOROI_MODERN;
+    return THEMES.YOROI_REVAMP;
   }
 
   @computed get isRevampTheme(): boolean {
@@ -304,6 +318,16 @@ export default class BaseProfileStore
 
   @computed get isCurrentThemeSet(): boolean {
     return this.getThemeRequest.result !== null && this.getThemeRequest.result !== undefined;
+  }
+
+  @computed get didUserMigratedToRevampTheme(): boolean {
+    let { result } = this.getUserRevampMigrationStatusRequest;
+
+    if (result == null) {
+      result = this.getUserRevampMigrationStatusRequest.execute().result
+    }
+
+    return result === 'true';
   }
 
   @computed get hasLoadedCurrentTheme(): boolean {

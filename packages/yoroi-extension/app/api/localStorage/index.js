@@ -24,6 +24,7 @@ const storageKeys = {
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   THEME: networkForLocalStorage + '-THEME',
+  REVAMP_MIGRATION_STATUS: 'REVAMP_MIGRATION_STATUS',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
@@ -118,6 +119,14 @@ export default class LocalStorageApi {
   setUserTheme: string => Promise<void> = (theme) => setLocalItem(storageKeys.THEME, theme);
 
   unsetUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.THEME);
+
+  // ========== Theme Migration ========== //
+
+  getUserRevampMigrationStatus: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.REVAMP_MIGRATION_STATUS);
+
+  setUserRevampMigrationStatus: boolean => Promise<boolean> = (status) =>
+    setLocalItem(storageKeys.REVAMP_MIGRATION_STATUS, status.toString());
 
   // ========== Select Wallet ========== //
 
