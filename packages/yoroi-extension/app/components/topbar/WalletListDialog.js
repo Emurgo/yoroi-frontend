@@ -299,8 +299,7 @@ export default class WalletListDialog extends Component<Props, State> {
               this.isCurrentWallet(this.state.selectedWallet, 'global')
             }
             fullWidth
-            variant="contained"
-            color="primary"
+            variant="primary"
           >
             {intl.formatMessage(messages.applyWallet)}
           </Button>
