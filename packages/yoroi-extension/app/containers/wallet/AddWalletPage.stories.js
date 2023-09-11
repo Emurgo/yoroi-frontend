@@ -35,7 +35,6 @@ import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import WalletEraOptionDialogContainer from './dialogs/WalletEraOptionDialogContainer';
 import { getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
@@ -44,8 +43,7 @@ import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
 import {
   defaultAssets,
-  networks,
-  isJormungandr,
+  networks
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
@@ -532,7 +530,8 @@ const restoreWalletProps: ({|
       duplicatedWallet: null,
     },
     transactions: {
-      getTxRequests: request.lookup.getTransactions,
+      // getTxRequests: request.lookup.getTransactions,
+      getBalance: request.lookup.getBalance,
     },
     yoroiTransfer: {
       status: request.yoroiTransferStep || TransferStatus.UNINITIALIZED,
@@ -643,19 +642,6 @@ export const ErgoRestoreOptions = (): Node => {
   );
 };
 
-export const CardanoEraSelect = (): Node => {
-  return (
-    <AddWalletPage
-      generated={defaultProps(
-        Object.freeze({
-          selectedNetwork: networks.CardanoMainnet,
-          openDialog: WalletEraOptionDialogContainer,
-        })
-      )}
-    />
-  );
-};
-
 export const RestoreWalletStart = (): Node => {
   const modeOptions: {| [key: string]: RestoreModeType |} = {
     SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
@@ -746,7 +732,7 @@ export const RestoreVerify = (): Node => {
               selectedNetwork,
               step: RestoreSteps.VERIFY_MNEMONIC,
               restoreRequest: {
-                isExecuting: !isJormungandr(selectedNetwork) && boolean('isExecuting', false),
+                isExecuting: boolean('isExecuting', false),
                 error: undefined,
                 reset: action('reset'),
               },

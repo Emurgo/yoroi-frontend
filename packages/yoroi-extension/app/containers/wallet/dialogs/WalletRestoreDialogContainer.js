@@ -31,7 +31,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
 import type { Notification } from '../../../types/notificationType';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
@@ -40,7 +39,6 @@ import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
 import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import NavPlate from '../../../components/topbar/NavPlate';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { ROUTES } from '../../../routes-config';
@@ -180,14 +178,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           parent
         );
         const withPubKey = asGetPublicKey(publicDeriver);
-        const plate =
-          withPubKey == null
-            ? null
-            : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-        const txRequests: TxRequests = this.generated.stores.transactions.getTxRequests(
-          publicDeriver
-        );
-        const balance = txRequests.requests.getBalanceRequest.result ?? null;
+        const plate = withPubKey == null
+          ? null
+          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+        const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
         return (
           <WalletAlreadyExistDialog
@@ -249,7 +243,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
               }
             }}
             notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
-            isSubmitting={!isJormungandr(this.getSelectedNetwork()) && isSubmitting}
+            isSubmitting={isSubmitting}
             error={error}
           />
         );
@@ -437,7 +431,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         shouldHideBalance: boolean,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -500,7 +494,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,

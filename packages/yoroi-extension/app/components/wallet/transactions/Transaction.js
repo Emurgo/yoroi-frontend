@@ -23,7 +23,6 @@ import styles from './Transaction.scss';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
 import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import { transactionTypes } from '../../../api/ada/transactions/types';
@@ -135,33 +134,7 @@ export const messages: Object = defineMessages({
   },
 });
 
-export const jormungandrCertificateKinds: Object = defineMessages({
-  PoolRegistration: {
-    id: 'wallet.transaction.certificate.PoolRegistration',
-    defaultMessage: '!!!Pool registration',
-  },
-  PoolUpdate: {
-    id: 'wallet.transaction.certificate.PoolUpdate',
-    defaultMessage: '!!!Pool update',
-  },
-  PoolRetirement: {
-    id: 'wallet.transaction.certificate.PoolRetirement',
-    defaultMessage: '!!!Pool retirement',
-  },
-  StakeDelegation: {
-    id: 'wallet.transaction.certificate.StakeDelegation',
-    defaultMessage: '!!!Stake delegation',
-  },
-  OwnerStakeDelegation: {
-    id: 'wallet.transaction.certificate.OwnerStakeDelegation',
-    defaultMessage: '!!!Owner stake delegation',
-  },
-});
-
 export const shelleyCertificateKinds: Object = {
-  PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
-  PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
-  StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
   StakeDeregistration: globalMessages.StakeDeregistration,
   ...defineMessages({
     StakeRegistration: {
@@ -175,6 +148,18 @@ export const shelleyCertificateKinds: Object = {
     MoveInstantaneousRewardsCert: {
       id: 'wallet.transaction.certificate.MoveInstantaneousRewardsCert',
       defaultMessage: '!!!Manually-initiated reward payout',
+    },
+    PoolRegistration: {
+      id: 'wallet.transaction.certificate.PoolRegistration',
+      defaultMessage: '!!!Pool registration',
+    },
+    PoolRetirement: {
+      id: 'wallet.transaction.certificate.PoolRetirement',
+      defaultMessage: '!!!Pool retirement',
+    },
+    StakeDelegation: {
+      id: 'wallet.transaction.certificate.StakeDelegation',
+      defaultMessage: '!!!Stake delegation',
     },
   }),
 };
@@ -861,28 +846,6 @@ export default class Transaction extends Component<Props, State> {
     );
   };
 
-  jormungandrCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
-    const { intl } = this.context;
-    const kind = certificate.Kind;
-    return RustModule.WasmScope(Scope => {
-      switch (kind) {
-        case Scope.WalletV3.CertificateKind.PoolRegistration:
-          return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
-        case Scope.WalletV3.CertificateKind.PoolUpdate:
-          return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
-        case Scope.WalletV3.CertificateKind.PoolRetirement:
-          return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
-        case Scope.WalletV3.CertificateKind.StakeDelegation:
-          return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
-        case Scope.WalletV3.CertificateKind.OwnerStakeDelegation:
-          return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
-        default: {
-          throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
-        }
-      }
-    });
-  };
-
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
@@ -957,15 +920,7 @@ export default class Transaction extends Component<Props, State> {
         <span className={styles.rowData}>{node}</span>
       </>
     );
-    if (data instanceof JormungandrTransaction) {
-      if (data.certificates.length === 0) {
-        return null;
-      }
-      return wrapCertificateText(
-        this.jormungandrCertificateToText(data.certificates[0].certificate),
-        data.certificates.length > 1
-      );
-    }
+
     if (data instanceof CardanoShelleyTransaction) {
       if (data.certificates.length === 0) {
         return null;

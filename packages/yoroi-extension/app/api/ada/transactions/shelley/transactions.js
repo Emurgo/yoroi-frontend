@@ -1044,9 +1044,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
     txBuilder.set_collateral(collateralBuilder);
     // script data hash
     txBuilder.calc_script_data_hash(
-      protocolParams.networkId > 0 ?
-        RustModule.WalletV4.TxBuilderConstants.plutus_vasil_cost_models()
-        : RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
+      RustModule.WalletV4.TxBuilderConstants.plutus_default_cost_models(),
     );
   }
 

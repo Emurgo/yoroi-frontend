@@ -54,9 +54,6 @@ import {
   unwrapStakingKey as unwrapCardanoStakingKey,
 } from '../../bridge/utils';
 import {
-  unwrapStakingKey as unwrapJormungandrStakingKey,
-} from '../../../../../jormungandr/lib/storage/bridge/utils';
-import {
   normalizeToPubDeriverLevel,
   rawChangePassword,
   decryptKey,
@@ -114,7 +111,6 @@ import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
 import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
 import { scanBip44Chain, scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
-import { scanJormungandrCip1852Account } from '../../../../../jormungandr/lib/restoration/scan';
 import { scanShelleyCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
@@ -133,7 +129,6 @@ import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
 import {
   isCardanoHaskell,
-  isJormungandr,
 } from '../../database/prepackaged/networks';
 import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
 import {
@@ -288,10 +283,25 @@ const GetAllUtxosMixin = (
           } else {
             amount = utxo.assets[i-1].amount;
           }
-          const token = tokenMap.get(tokenId);
-          if (!token) {
-            throw new Error(`missing token ID in UTXO: ${tokenId}`);
-          }
+          const token = tokenMap.get(tokenId) || {
+            // Note this is dummy placeholder value and only the `Identifier` value
+            // matters. The only scenario this is needed is when during `updateUtxos`,
+            // new UTXOs with unseen tokens are added and before it requests the token
+            // info.
+            TokenId: -1,
+            NetworkId: networkId,
+            IsDefault: false,
+            Digest: 0,
+            Identifier: tokenId,
+            Metadata: {
+              type: 'Cardano',
+              policyId: tokenId.split('.')[0],
+              assetName: tokenId.split('.')[1],
+              numberOfDecimals: 0,
+              ticker: null,
+              longName: null
+            },
+          };
           return { Token: token, TokenList: { Amount: amount.toString() } };
         });
         return {
@@ -616,7 +626,6 @@ const GetAllAccountingMixin = (
     const allAccounts = await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables);
     const stakingKeyAccount = allAccounts[0];
     const stakingAddr = stakingKeyAccount.addrs.find(addr => (
-      addr.Type === CoreAddressTypes.JORMUNGANDR_ACCOUNT ||
       addr.Type === CoreAddressTypes.CARDANO_REWARD
     ));
     if (stakingAddr == null) {
@@ -1182,84 +1191,6 @@ export const ErgoBip44PickReceive: * = Mixin<
   ErgoBip44PickReceiveMixinDependencies,
   IPickReceive
 >(ErgoBip44PickReceiveMixin);
-
-// ==================================
-//   Cip1852JormungandrPickReceive
-// ==================================
-
-type Cip1852JormungandrPickReceiveMixinDependencies = IPublicDeriver<> & IGetStakingKey;
-const Cip1852JormungandrPickReceiveMixin = (
-  superclass: Class<Cip1852JormungandrPickReceiveMixinDependencies>,
-) => (class Cip1852JormungandrPickReceive extends superclass implements IPickReceive {
-  rawPickReceive: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IPickReceiveRequest,
-    Map<number, string>,
-  ) => Promise<IPickReceiveResponse> = async (
-    tx,
-    deps,
-    body,
-    derivationTables,
-  ) => {
-    const stakingAddressDbRow = await this.rawGetStakingKey(
-      tx,
-      deps,
-      undefined,
-      derivationTables
-    );
-
-    const stakingKey = Buffer.from(unwrapJormungandrStakingKey(stakingAddressDbRow.addr.Hash).as_bytes()).toString('hex');
-    const ourGroupAddress = body.addrs
-      .filter(addr => (addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP))
-      .filter(addr => addr.Hash.includes(stakingKey));
-    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852JormungandrPickReceive)}::${nameof(this.rawPickReceive)} no group address found`);
-    return {
-      addr: ourGroupAddress[0],
-      row: body.row,
-      addressing: body.addressing,
-    };
-  }
-
-  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
-    body,
-  ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
-    const deps = Object.freeze({
-      GetPathWithSpecific,
-      GetAddress,
-      GetDerivationSpecific,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii<IPickReceiveResponse>(
-      super.getDb(),
-      [
-        ...depTables,
-        ...mapToTables(super.getDb(), derivationTables),
-      ],
-      async tx => this.rawPickReceive(
-        tx,
-        deps,
-        body,
-        derivationTables,
-      )
-    );
-  }
-});
-export const Cip1852JormungandrPickReceive: * = Mixin<
-  Cip1852JormungandrPickReceiveMixinDependencies,
-  IPickReceive
->(Cip1852JormungandrPickReceiveMixin);
 
 // =======================
 //   Cip1852PickReceive
@@ -1870,78 +1801,6 @@ export function asScanLegacyCardanoAccountUtxoInstance<
   obj: T
 ): void | (IScanAccountUtxo & ScanLegacyCardanoAccountUtxoDependencies & T) {
   if (obj instanceof ScanLegacyCardanoAccountUtxoInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
-// ==============================
-//   ScanJormungandrAccountUtxo
-// ==============================
-
-type ScanJormungandrAccountUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
-const ScanJormungandrAccountUtxoMixin = (
-  superclass: Class<ScanJormungandrAccountUtxoDependencies>,
-) => (class ScanJormungandrAccountUtxo extends superclass implements IScanAccountUtxo {
-  rawScanAccount: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IScanAccountRequest,
-    Map<number, string>,
-  ) => Promise<IScanAccountResponse> = async (
-    tx,
-    deps,
-    body,
-    derivationTables,
-  ): Promise<IScanAccountResponse> => {
-    const stakingAddressDbRow = await this.rawGetStakingKey(
-      tx,
-      deps,
-      undefined,
-      derivationTables
-    );
-
-    const address = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(stakingAddressDbRow.addr.Hash, 'hex')
-    );
-    const stakingAddress = address.to_account_address();
-    if (stakingAddress == null) {
-      throw new StaleStateError(`${nameof(ScanJormungandrAccountUtxo)}::${nameof(this.rawScanAccount)} Could non-account hash in staking key derivation`);
-    }
-    return await scanJormungandrCip1852Account({
-      accountPublicKey: body.accountPublicKey,
-      lastUsedInternal: body.lastUsedInternal,
-      lastUsedExternal: body.lastUsedExternal,
-      network: this.getParent().getNetworkInfo(),
-      checkAddressesInUse: body.checkAddressesInUse,
-      addByHash: rawGenAddByHash(
-        new Set([
-          ...body.internalAddresses,
-          ...body.externalAddresses,
-        ])
-      ),
-      stakingKey: stakingAddress.get_account_key(),
-    });
-  }
-});
-
-const ScanJormungandrAccountUtxo: * = Mixin<
-  ScanJormungandrAccountUtxoDependencies,
-  IScanAccountUtxo,
->(ScanJormungandrAccountUtxoMixin);
-const ScanJormungandrAccountUtxoInstance = (
-  (ScanJormungandrAccountUtxo: any): ReturnType<typeof ScanJormungandrAccountUtxoMixin>
-);
-export function asScanJormungandrAccountUtxoInstance<
-  T: IPublicDeriver<any>
->(
-  obj: T
-): void | (IScanAccountUtxo & ScanJormungandrAccountUtxoDependencies & T) {
-  if (obj instanceof ScanJormungandrAccountUtxoInstance) {
     return obj;
   }
   return undefined;
@@ -2909,9 +2768,7 @@ export async function addTraitsForCip1852Child(
   // recall: adding addresses to public deriver in cip1852 is same as bip44
   currClass = AddBip44FromPublic(currClass);
 
-  if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-    currClass = PickReceive(Cip1852JormungandrPickReceive(currClass));
-  } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+  if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
     currClass = PickReceive(Cip1852PickReceive(currClass));
   } else {
     throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to pick receive address`);
@@ -2926,9 +2783,7 @@ export async function addTraitsForCip1852Child(
     currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-        currClass = ScanJormungandrAccountUtxo(currClass);
-      } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+      if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
         currClass = ScanShelleyAccountUtxo(currClass);
       } else {
         throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to scan for network`);

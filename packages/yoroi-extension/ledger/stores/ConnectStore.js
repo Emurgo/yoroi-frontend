@@ -64,7 +64,7 @@ export default class ConnectStore {
   @observable response: void | MessageType;
   @observable expectedSerial: ?string;
   @observable extension: ?string;
-  userInteractableRequest: RequestType;
+  userInteractableRequest: ?RequestType;
   sendResponseFunc: ?(any) => void;
 
   constructor(transportId: TransportIdType) {
@@ -80,7 +80,11 @@ export default class ConnectStore {
       this.deviceCode = convertStringToDeviceCodeType(getKnownDeviceCode());
     });
 
-    chrome.runtime.sendMessage('ledger-ready');
+    const params = new URLSearchParams(document.location.search);
+    const mainTabId = Number(params.get('mainTabId'));
+    chrome.tabs.getCurrent(tab => {
+      chrome.tabs.sendMessage(mainTabId, { type: 'ledger-ready', tabId: tab.id });
+    });
   }
 
   @computed
@@ -192,6 +196,9 @@ export default class ConnectStore {
       this.setProgressState(PROGRESS_STATE.DEVICE_TYPE_SELECTED);
     });
 
+    if (!this.userInteractableRequest) {
+      return;
+    }
     const actn = this.userInteractableRequest.action;
     const { params } = this.userInteractableRequest;
 
@@ -387,7 +394,7 @@ export default class ConnectStore {
       const adaApp = new AdaApp(transport);
       const resp: GetVersionResponse = await adaApp.getVersion();
 
-      this._replyMessageWrap(actn, true, resp);
+      this._replyMessageWrap(actn, true, resp, true);
     } catch (err) {
       this._replyError(actn, err);
     } finally {
@@ -512,13 +519,18 @@ export default class ConnectStore {
    * @param {*} success success status boolean
    * @param {*} payload payload object
    */
-  _replyMessageWrap: (string, boolean, any) => void = (actn, success, payload) => {
-    this._replyMessage({
-      success,
-      payload,
-      action: actn,
-      extension: this.extension,
-    });
+  _replyMessageWrap: (string, boolean, any, ?boolean) => void = (
+    actn, success, payload, dontClose,
+  ) => {
+    this._replyMessage(
+      {
+        success,
+        payload,
+        action: actn,
+        extension: this.extension,
+      },
+      dontClose,
+    );
   }
 
   /**
@@ -538,12 +550,19 @@ export default class ConnectStore {
    * Reply message to Content Script  [ Website ==> Content Script ]
    * @param {*} msg MessageType object as reply
    */
-  _replyMessage: (MessageType) => void = (msg) => {
-    if (ENV.isDevelopment) {
-      this.setResponse(msg);
-      this.setProgressState(PROGRESS_STATE.DEVICE_RESPONSE);
+  _replyMessage: (MessageType, ?boolean) => void = (msg, dontClose) => {
+    if (dontClose) {
+      runInAction(() => {
+        this.userInteractableRequest = null;
+        this.setProgressState(PROGRESS_STATE.DEVICE_TYPE_SELECTED);
+      });
     } else {
-      window.close();
+      if (ENV.isDevelopment) {
+        this.setResponse(msg);
+        this.setProgressState(PROGRESS_STATE.DEVICE_RESPONSE);
+      } else {
+        window.close();
+      }
     }
     msg.action = `${msg.action}-reply`;
     if (this.sendResponseFunc != null) {

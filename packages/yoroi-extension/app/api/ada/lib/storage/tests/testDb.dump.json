@@ -1,6 +1,6 @@
 {
   "name": "yoroi-schema",
-  "version": 17,
+  "version": 18,
   "tables": {
     "Network": [
       {
@@ -37,37 +37,6 @@
         ],
         "CoinType": 2147485463,
         "Fork": 0
-      },
-      {
-        "NetworkId": 100,
-        "NetworkName": "Jormungandr Mainnet",
-        "Backend": {
-          "BackendService": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
-          "WebSocket": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443"
-        },
-        "BaseConfig": [
-          {
-            "StartAt": 0,
-            "Discriminant": 0,
-            "ChainNetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
-            "ByronNetworkId": 764824073,
-            "GenesisDate": "1576264417000",
-            "SlotsPerEpoch": 43200,
-            "SlotDuration": 2,
-            "PerEpochPercentageReward": 19666,
-            "LinearFee": {
-              "constant": "200000",
-              "coefficient": "100000",
-              "certificate": "400000",
-              "per_certificate_fees": {
-                "certificate_pool_registration": "500000000",
-                "certificate_stake_delegation": "400000"
-              }
-            }
-          }
-        ],
-        "CoinType": 2147485463,
-        "Fork": 1
       },
       {
         "NetworkId": 200,

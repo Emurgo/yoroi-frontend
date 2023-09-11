@@ -29,6 +29,7 @@ type ShowAddressRequestWrapper = {|
 
 export class LedgerConnect {
   locale: string;
+  tabId: ?number;
 
   constructor(params: {| locale: string |}) {
     this.locale = params.locale;
@@ -59,11 +60,14 @@ export class LedgerConnect {
   signTransaction: {|
     serial: ?string,
     params: SignTransactionRequest,
+    useOpenTab?: boolean,
   |} => Promise<SignTransactionResponse> = (request) => {
     return this._requestLedger(
       OPERATION_NAME.SIGN_TX,
       request.params,
       request.serial,
+      false,
+      request.useOpenTab === true,
     );
   }
 
@@ -78,12 +82,34 @@ export class LedgerConnect {
     );
   }
 
+  getVersion: {|
+    serial: ?string,
+    dontCloseTab?: boolean,
+  |} => Promise<GetVersionResponse> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.GET_LEDGER_VERSION,
+      undefined,
+      request.serial,
+      true,
+    );
+  }
+
   async _requestLedger(
     action: string,
     params: any,
     serial: ?string,
+    dontCloseTab?: boolean,
+    useOpenTab?: boolean,
   ): any {
-    const tabId = await this._createLedgerTab();
+    let tabId;
+    if (useOpenTab && this.tabId != null) {
+      tabId = this.tabId;
+    } else {
+      tabId = await this._createLedgerTab();
+      if (dontCloseTab) {
+        this.tabId = tabId;
+      }
+    }
 
     return new Promise((resolve, reject) => {
       chrome.tabs.sendMessage(
@@ -113,14 +139,16 @@ export class LedgerConnect {
 
   _createLedgerTab(): Promise<number> {
     return new Promise(resolve => {
-      const readyListener = (message, sender) => {
-        if (message === 'ledger-ready') {
+      const readyListener = message => {
+        if (message.type === 'ledger-ready') {
           chrome.runtime.onMessage.removeListener(readyListener);
-          resolve(sender.tab.id);
+          resolve(message.tabId);
         }
       };
       chrome.runtime.onMessage.addListener(readyListener);
-      chrome.tabs.create({ url: `ledger.html?locale=${this.locale}` });
+      chrome.tabs.getCurrent(tab => {
+        chrome.tabs.create({ url: `ledger.html?locale=${this.locale}&mainTabId=${tab.id}` });
+      })
     });
   }
 
