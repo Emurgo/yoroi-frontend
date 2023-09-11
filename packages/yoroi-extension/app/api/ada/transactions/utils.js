@@ -423,9 +423,10 @@ export function asAddressedUtxo(
   });
 }
 
-export function iterateWasm<T>(iterable: ?{ get: number => T }, len: ?number): [T] {
+export function iterateWasm<T>(iterable: ?{| get: number => T |}, len: ?number): T[] {
   const res = [];
   if (iterable != null) {
+    // $FlowFixMe
     const l = len ?? iterable.len();
     for (let i = 0; i < l; i++) {
       res.push(iterable.get(i));
@@ -434,9 +435,10 @@ export function iterateWasm<T>(iterable: ?{ get: number => T }, len: ?number): [
   return res;
 }
 
-export function iterateWasmKeyValue<K, V>(iterable: ?{ get: K => V }, keys: ?K[]): [[K, V]] {
+export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K[]): [K, V][] {
   const res = [];
   if (iterable != null) {
+    // $FlowFixMe
     const k = keys ?? iterateWasm(iterable.keys());
     for (const key of k) {
       res.push([key, iterable.get(key)]);
