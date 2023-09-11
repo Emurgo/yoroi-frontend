@@ -12,7 +12,7 @@ Feature: Wallet creation
   Scenario: (IT-5) Wallet creation
     Then I see Create Wallet warning step and continue
     Then I see Recovery Phrase step and remember it
-    And I enter the recovery phrase
+    And I repeat the recovery phrase
     Then I enter wallet details:
     | walletName | password | repeatedPassword |
     | Created Wallet | asdfasdfasdf | asdfasdfasdf |
@@ -23,7 +23,7 @@ Feature: Wallet creation
   Scenario Outline: (IT-7) Wallet can't be created if its password doesn't meet complexity requirements
     Then I see Create Wallet warning step and continue
     Then I see Recovery Phrase step and remember it
-    And I enter the recovery phrase
+    And I repeat the recovery phrase
     Then I enter wallet details:
     | walletName | password | repeatedPassword |
     | Created Wallet | <wrongPassword> | <wrongPassword> |
@@ -40,7 +40,7 @@ Feature: Wallet creation
   Scenario: (IT-9) Wallet access after browser restart
     Then I see Create Wallet warning step and continue
     Then I see Recovery Phrase step and remember it
-    And I enter the recovery phrase
+    And I repeat the recovery phrase
     Then I enter wallet details:
     | walletName | password | repeatedPassword |
     | Created Wallet | asdfasdfasdf | asdfasdfasdf |
@@ -53,7 +53,7 @@ Feature: Wallet creation
   Scenario Outline: (IT-16) Wallet can't be created if wallet name doesn't meet requirements
     Then I see Create Wallet warning step and continue
     Then I see Recovery Phrase step and remember it
-    And I enter the recovery phrase
+    And I repeat the recovery phrase
     Then I enter wallet details:
     | walletName | password | repeatedPassword |
     | Created Wallet | asdfasdfasdf | asdfasdfasdf |
@@ -73,7 +73,7 @@ Feature: Wallet creation
   Scenario: (IT-24) Wallet can't be created without entering password
     Then I see Create Wallet warning step and continue
     Then I see Recovery Phrase step and remember it
-    And I enter the recovery phrase
+    And I repeat the recovery phrase
     Then I enter wallet details:
     | walletName | password | repeatedPassword |
     | Created Wallet | asdfasdfasdf | asdfasdfasdf |

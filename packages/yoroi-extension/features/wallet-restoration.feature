@@ -4,15 +4,17 @@ Feature: Restore Wallet
     Given I have opened the extension
     And I have completed the basic setup
     And There is no wallet stored
+    Then I should see the Create wallet screen
+    Then Revamp. I switch to revamp version
+    And I click the "Restore Wallet" button
 
-  @it-6
+  @it-6 @restore-wallet
   Scenario: Restoring an empty wallet (IT-6)
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
+    Then I select 15-word wallet
     And I enter the recovery phrase:
     | recoveryPhrase                                                                             |
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
+    And I enter the name "Restored Wallet"
     And I enter the restored wallet password:
     | password   | repeatedPassword |
     | asdfasdfasdf | asdfasdfasdf       |
@@ -26,7 +28,7 @@ Feature: Restore Wallet
     | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
     | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
-  @it-11
+  @it-11 @restore-wallet
   Scenario: Fail to completely restore a wallet with addresses generated not following gap from BIP44 protocol (IT-11)
     When I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -46,7 +48,7 @@ Feature: Restore Wallet
       | address                                                     |
       | Ae2tdPwUPEZLzYQaqFk1U9VWBeY9AfQ2hKBWZjxtfwWVE46sy6u5ZZAeFu1 |
 
-  @it-13
+  @it-13 @restore-wallet
   Scenario: Mnemonic words can be cleared by pressing "x" sign for each word on wallet restoration screen (IT-13)
     When I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -56,7 +58,7 @@ Feature: Restore Wallet
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
     Then I delete recovery phrase by clicking "x" signs
 
-  @it-26
+  @it-26 @restore-wallet
   Scenario: Wallet can't be restored without entering password (IT-26)
     And I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -71,7 +73,7 @@ Feature: Restore Wallet
     Then I see the submit button is disabled
     And I should stay in the restore wallet dialog
 
-  @it-70
+  @it-70 @restore-wallet
   Scenario Outline: Wallet restoration Recovery Phrase test (IT-70)
     And I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -91,7 +93,7 @@ Feature: Restore Wallet
       | recoveryPhrase                                                                                           |                    |
       | atom remind style monster lunch result upgrade fashion eight limit glance frequent eternal borrow accuse | invalid word order |
 
-  @it-71
+  @it-71 @restore-wallet
   Scenario Outline: Ensure user can not add more than 15 words to the Yoroi Wallet Recovery Phrase (IT-71)
     And I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -104,7 +106,7 @@ Feature: Restore Wallet
       | recoveryPhrase                                                                                                  |                    |
       | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase    |
 
-  @it-73
+  @it-73 @restore-wallet
   Scenario Outline: Wallet restoration Recovery Phrase with less than 15 words (IT-73)
     And I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -120,7 +122,7 @@ Feature: Restore Wallet
       | recoveryPhrase                                                                                   |                    |
       | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow | 14-words phrase    |
   
-  @it-86
+  @it-86 @restore-wallet
   Scenario: Successfully restoring a simple wallet (IT-86)
     When I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -142,7 +144,7 @@ Feature: Restore Wallet
     | Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB |
     | Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261 |
 
-  @it-87
+  @it-87 @restore-wallet
   Scenario: Ensure that wallet addresses are restored correctly (IT-87)
     When I click the restore button for cardano
     Then I select Byron-era 15-word wallet
@@ -168,7 +170,7 @@ Feature: Restore Wallet
     | Ae2tdPwUPEZBdh5hX9QMWCeiihXf3onFAgx6KzKBtm7nj4wwyN8eoroTWqF |
     | Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd |
 
-  @it-95
+  @it-95 @restore-wallet
   Scenario: Create & delete (1 wallet) (IT-95)
     # copy the DB
     Given I capture DB state snapshot
@@ -200,7 +202,7 @@ Feature: Restore Wallet
     Then I compare to DB state snapshot
     And I should see the Create wallet screen
 
-  @it-117
+  @it-117 @restore-wallet
   Scenario: Switch wallets (IT-117)
     # wallet 1
     Given There is a Byron wallet stored named many-tx-wallet
@@ -213,7 +215,7 @@ Feature: Restore Wallet
     Then I switch to "many-tx-wallet" from the dropdown
     Then I should see the opened wallet with name "many-tx-wallet"
 
-  @it-132
+  @it-132 @restore-wallet
   Scenario: Restoring a shelley 15-word wallet (IT-132)
     When I click the restore button for cardano
     Then I select Shelley-era 15-word wallet
@@ -237,7 +239,7 @@ Feature: Restore Wallet
     | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
     | addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn |
 
-  @it-133
+  @it-133 @restore-wallet
   Scenario: Restoring a shelley 24-word wallet (IT-133)
     When I click the restore button for cardano
     Then I select Shelley-era 24-word wallet
