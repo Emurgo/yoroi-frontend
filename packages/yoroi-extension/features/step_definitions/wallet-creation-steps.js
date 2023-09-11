@@ -71,7 +71,7 @@ When(/^I see Recovery Phrase step and remember it$/, async function () {
   await this.click(nextButton);
 });
 
-When(/^I enter the recovery phrase$/, async function () {
+When(/^I repeat the recovery phrase$/, async function () {
   this.webDriverLogger.info(`Step: I enter the recovery phrase`);
   // step 3
   await this.waitForElement(verifyRecoveryPhraseBox);

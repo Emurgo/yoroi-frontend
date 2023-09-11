@@ -11,28 +11,29 @@ import {
   confirmButton,
   errorInvalidRecoveryPhrase,
   restoreWalletInputPhraseDialog,
+  validPhraseText,
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
 import {
   recoveryPhraseDeleteIcon,
   recoveryPhraseError,
-  restoreDialogButton,
   restoreNormalWallet,
-  shelleyEraButton,
   walletAlreadyExistsComponent,
+  restoreWalletButton,
 } from '../pages/newWalletPages';
 import { dialogTitle } from '../pages/commonDialogPage';
 import { repeatPasswordInput, walletPasswordInput } from '../pages/walletDetailsPage';
 
-Then(/^I select Shelley-era 15-word wallet$/, async function () {
+Then(/^I select 15-word wallet$/, async function () {
+  await this.waitForElement(restoreNormalWallet);
   await this.click(restoreNormalWallet);
-  await this.click(shelleyEraButton);
-  await this.waitForElement(restoreWalletInputPhraseDialog);
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
   const fields = table.hashes()[0];
+  await this.waitForElement(restoreWalletInputPhraseDialog);
   await enterRecoveryPhrase(this, fields.recoveryPhrase);
+  await this.waitForElement(validPhraseText);
 });
 
 When(/^I can't enter more then 15 words from the recovery phrase:$/, async function (table) {
@@ -75,7 +76,7 @@ When(/^I clear the restored wallet password ([^"]*)$/, async function (password)
 });
 
 When(/^I click the "Restore Wallet" button$/, async function () {
-  await this.click(restoreDialogButton);
+  await this.click(restoreWalletButton);
 });
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
