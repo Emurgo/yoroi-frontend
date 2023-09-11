@@ -1446,16 +1446,21 @@ async function handleInjectorMessage(message, sender) {
               ).reduce((acc, next) => Object.assign(acc, next), {});
               const coinsPerUtxoWord =
                     RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
-              const utxos = await transformCardanoUtxos(
-                await connectorGetUtxosCardano(
-                  wallet,
-                  valueExpected,
-                  paginate,
-                  coinsPerUtxoWord,
-                  network.NetworkId,
-                ),
-                isCBOR,
-              );
+              let utxos;
+              try {
+                utxos = await transformCardanoUtxos(
+                  await connectorGetUtxosCardano(
+                    wallet,
+                    valueExpected,
+                    paginate,
+                    coinsPerUtxoWord,
+                  ),
+                  isCBOR,
+                );
+              } catch (e) {
+                rpcResponse({ err: e.message });
+                return;
+              }
               rpcResponse({ ok: utxos });
             },
             db,

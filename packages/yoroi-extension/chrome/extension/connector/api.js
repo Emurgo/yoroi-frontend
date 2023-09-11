@@ -34,7 +34,11 @@ import JSONBigInt from 'json-bigint';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
 import { extractP2sKeysFromErgoBox, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
-import { SendTransactionApiError } from '../../../app/api/common/errors';
+import {
+  SendTransactionApiError,
+  CannotSendBelowMinimumValueError,
+  NotEnoughMoneyToSendError,
+} from '../../../app/api/common/errors';
 
 import axios from 'axios';
 import keyBy from 'lodash/keyBy';
@@ -43,7 +47,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import {
   CoreAddressTypes,
-  PRIMARY_ASSET_CONSTANTS,
   TxStatusCodes,
 } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -64,7 +67,10 @@ import {
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
-import { signTransaction as shelleySignTransaction } from '../../../app/api/ada/transactions/shelley/transactions';
+import {
+  signTransaction as shelleySignTransaction,
+  toLibUTxO,
+} from '../../../app/api/ada/transactions/shelley/transactions';
 import {
   getCardanoHaskellBaseConfig,
   getErgoBaseConfig,
@@ -80,7 +86,6 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
-import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelley/coinSelection';
 import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
@@ -92,6 +97,17 @@ import {
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
+import {
+  UTxOSet,
+  Value as LibValue,
+  Amount,
+  NativeAssets,
+} from '@emurgo/yoroi-eutxo-txs/dist/classes';
+import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
+import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
+import {
+  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
+} from'@emurgo/yoroi-eutxo-txs/dist/errors';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -225,13 +241,51 @@ export async function connectorGetUtxosErgo(
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
-function stringToWasmValue(s: string): RustModule.WalletV4.Value {
+// $FlowFixMe
+function stringToLibValue(s: string): LibValue {
   if (/^\d+$/.test(s)) {
     // The string is an int number
-    return RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(s));
+    return new LibValue(
+      new Amount(s),
+      NativeAssets.from([]),
+    );
   }
   try {
-    return RustModule.WalletV4.Value.from_bytes(hexToBytes(s));
+    return RustModule.WasmScope(Module => {
+      // $FlowFixMe
+      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): NativeAssets {
+        const mappedAssets = [];
+        if (masset != null) {
+          const policies = masset.keys();
+          for (let i = 0; i < policies.len(); i++) {
+            const policy = policies.get(i);
+            const assets = masset.get(policy);
+            if (assets != null) {
+              const names = assets.keys();
+              for (let j = 0; j < names.len(); j++) {
+                const name = names.get(j);
+                const amount = assets.get(name);
+                if (amount != null) {
+                  mappedAssets.push({
+                    asset: {
+                      policy: policy.to_bytes(),
+                      name: name.to_bytes(),
+                    },
+                    amount: new Amount(amount.to_str()),
+                  })
+                }
+              }
+            }
+          }
+        }
+        return NativeAssets.from(mappedAssets);
+      }
+      const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
+      return new LibValue(
+        new Amount(value.coin().to_str()),
+        multiAssetToLibAssets(value.multiasset()),
+      )
+    });
   } catch (e) {
     throw ConnectorError.invalidRequest(
       `Invalid required value string "${s}". Expected an int number or a hex of serialized Value instance. Cause: ${String(e)}`,
@@ -244,7 +298,6 @@ export async function connectorGetUtxosCardano(
   valueExpected: ?Value,
   paginate: ?Paginate,
   coinsPerUtxoWord: RustModule.WalletV4.BigNum,
-  networkId: number,
 ): Promise<Array<RemoteUnspentOutput>> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
@@ -271,21 +324,45 @@ export async function connectorGetUtxosCardano(
   if (valueStr.length === 0) {
     return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
-  const value = multiTokenFromCardanoValue(
-    stringToWasmValue(valueStr),
-    {
-      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      defaultNetworkId: networkId,
-    },
+
+  setRuntime(RustModule.CrossCsl.init());
+
+  const utxoSet = new UTxOSet(
+    await Promise.all(
+      formattedUtxos.map(toLibUTxO)
+    )
   );
-  const { selectedUtxo } = coinSelectionForValues(
-    formattedUtxos,
-    [value],
-    false,
-    coinsPerUtxoWord,
-    networkId,
-  );
-  return Promise.resolve(selectedUtxo);
+  const value = stringToLibValue(valueStr);
+  let selectedUtxos;
+  try {
+    selectedUtxos = (await coinSelectionClassificationStrategy(
+      utxoSet,
+      [value],
+      coinsPerUtxoWord.to_str(),
+    )).selectedUtxos;
+  } catch (error) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
+      throw new NotEnoughMoneyToSendError();
+    }
+    if (String(error).includes('less than the minimum UTXO value')) {
+      throw new CannotSendBelowMinimumValueError();
+    }
+    throw error;
+  }
+
+  return selectedUtxos.asArray().map(utxo => ({
+    utxo_id: `${utxo.tx}${utxo.index}`,
+    tx_hash: utxo.tx,
+    tx_index: utxo.index,
+    receiver: utxo.address.hex,
+    amount: utxo.value.amount.toString(),
+    assets: utxo.value.assets.asArray().map(([nativeAsset, amount]) => ({
+      amount: amount.toString(),
+      assetId: nativeAsset.getHash(),
+      policyId: nativeAsset.policy.asHex(),
+      name: nativeAsset.name.asHex()
+    }))
+  }));
 }
 
 export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
