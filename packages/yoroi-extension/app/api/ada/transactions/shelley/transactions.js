@@ -984,7 +984,8 @@ export function signTransaction(
   unsignedTx:
     RustModule.WalletV4.TransactionBuilder |
     RustModule.WalletV4.TransactionBody |
-    Buffer,
+    Buffer |
+    Uint8Array,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
@@ -1034,7 +1035,7 @@ export function signTransaction(
   } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBody) {
     txBody = unsignedTx;
     txHash = RustModule.WalletV4.hash_transaction(txBody);
-  } else if (unsignedTx instanceof Buffer) {
+  } else if (unsignedTx instanceof Buffer || unsignedTx instanceof Uint8Array) {
     // note: we are calculating the tx hash from the raw tx body bytes, which
     // probably won't match the serialized `txBody`. But this happens only for
     // connector signing and only the witness will be returned so this is more
