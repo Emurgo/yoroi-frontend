@@ -50,6 +50,7 @@ import type {
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
+import { ShelleyCertificateTypes } from './types';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
   if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
@@ -653,6 +654,7 @@ export function genGetAccountState(
 
     const addressSet = new Set(body.addresses);
     // 2) calculate the withdrawal for each address
+    const delegations = {};
     for (const tx of blockchain) {
       if (tx.type !== 'shelley') continue;
       for (const withdrawal of tx.withdrawals) {
@@ -663,6 +665,11 @@ export function genGetAccountState(
           };
 
           currVal.withdrawals = currVal.withdrawals.plus(withdrawal.amount);
+        }
+      }
+      for (const cert of tx.certificates) {
+        if (cert.kind === ShelleyCertificateTypes.StakeDelegation) {
+          delegations[cert.rewardAddress] = cert.poolKeyHash;
         }
       }
     }
@@ -680,6 +687,7 @@ export function genGetAccountState(
         remainingAmount: stateForAddr.rewards.minus(stateForAddr.withdrawals).toString(),
         rewards: stateForAddr.rewards.toString(),
         withdrawals: stateForAddr.withdrawals.toString(),
+        delegation: delegations[address] ?? null,
       };
     }
     return result;

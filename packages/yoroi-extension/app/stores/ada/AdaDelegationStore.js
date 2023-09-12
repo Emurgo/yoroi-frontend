@@ -148,6 +148,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
               defaultToken
             ),
             stakingAddress: stakingKeyResp.addr.Hash,
+            delegation: stateForStakingKey?.delegation ?? null,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
 
