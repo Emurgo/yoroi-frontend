@@ -93,16 +93,27 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
             wallets.publicDerivers.length !== 0 ? wallets.publicDerivers[0] : null;
           if (firstWallet == null) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-          } else if (wallets.publicDerivers.length === 1) {
-            // if user only has 1 wallet, just go to it directly as a shortcut
+            return;
+          }
+          const isRevamp = this.stores.profile.isRevampTheme;
+          if (isRevamp) {
+            const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.ROOT,
-              publicDeriver: firstWallet,
+              publicDeriver: lastSelectedWallet ?? firstWallet,
             });
           } else {
-            this.actions.router.goToRoute.trigger({
-              route: ROUTES.MY_WALLETS,
-            });
+            if (wallets.publicDerivers.length === 1) {
+              // if user only has 1 wallet, just go to it directly as a shortcut
+              this.actions.router.goToRoute.trigger({
+                route: ROUTES.WALLETS.ROOT,
+                publicDeriver: firstWallet,
+              });
+            } else {
+              this.actions.router.goToRoute.trigger({
+                route: ROUTES.MY_WALLETS,
+              });
+            }
           }
         }
         if (this.stores.loading.shouldRedirect) {
