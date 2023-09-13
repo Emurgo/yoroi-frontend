@@ -228,6 +228,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                   '&:hover': { border: 0 },
                   '&.Mui-disabled': { border: 0 },
                 }}
+                id="clearAllButton"
               >
                 {intl.formatMessage(messages.clearAll)}
               </Button>

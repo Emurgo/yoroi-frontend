@@ -243,7 +243,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
           <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
         </Box>
-        <Typography variant="h3" fontWeight={500}>
+        <Typography variant="h3" fontWeight={500} id="restoreTitle">
           {intl.formatMessage(messages.title)}
         </Typography>
       </Box>
