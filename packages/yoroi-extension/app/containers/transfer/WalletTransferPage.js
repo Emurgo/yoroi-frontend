@@ -12,12 +12,11 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import YoroiTransferPage from './YoroiTransferPage';
 import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
-import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { truncateToken } from '../../utils/formatters';
+import config from '../../config';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -40,19 +39,17 @@ export default class WalletTransferPage extends Component<Props> {
     return (<YoroiTransferPage {...props} />);
   }
 
-  render(): Node {
-    const { actions, stores } = this.generated;
-    const { uiDialogs } = stores;
+  startTransferYoroiPaperFunds: void => void = () => {
+    this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
+      source: {
+        type: 'bip44',
+        extra: 'paper',
+        length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+      },
+    });
+  }
 
-    let activeDialog = null;
-    if (uiDialogs.isOpen(ByronEraOptionDialogContainer)) {
-      activeDialog = (
-        <ByronEraOptionDialogContainer
-          onCancel={this.onClose}
-          {...this.generated.ByronEraOptionDialogContainerProps}
-        />
-      );
-    }
+  render(): Node {
 
     const icarusTransfer = this.generated.YoroiTransferPageProps != null
       ? this.getIcarusTransferDialog(this.generated.YoroiTransferPageProps)
@@ -67,19 +64,16 @@ export default class WalletTransferPage extends Component<Props> {
     return (
       <>
         <TransferTypeSelect
-          onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
+          onByron={this.startTransferYoroiPaperFunds}
           ticker={truncateToken(getTokenName(defaultTokenInfo))}
         />
-        {activeDialog}
         {icarusTransfer}
-        {daedalusTransfer}
       </>
     );
   }
 
 
   @computed get generated(): {|
-    ByronEraOptionDialogContainerProps: InjectedOrGenerated<ByronEraOptionDialogContainerData>,
     YoroiTransferPageProps: ?InjectedOrGenerated<YoroiTransferPageData>,
     actions: {|
       yoroiTransfer: {|
@@ -141,9 +135,6 @@ export default class WalletTransferPage extends Component<Props> {
           },
         },
       },
-      ByronEraOptionDialogContainerProps: (
-        { actions, stores }: InjectedOrGenerated<ByronEraOptionDialogContainerData>
-      ),
       YoroiTransferPageProps: (
         { actions, stores }: (?InjectedOrGenerated<YoroiTransferPageData>)
       ),
