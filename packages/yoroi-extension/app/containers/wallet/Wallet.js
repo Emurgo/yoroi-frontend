@@ -31,6 +31,7 @@ import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
+import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -216,6 +217,7 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         {this.props.children}
+        {this.getDialogs()}
       </TopBarLayout>
     ) : (
       <TopBarLayout sidebar={sidebarContainer}>
@@ -232,6 +234,12 @@ class Wallet extends Component<AllProps> {
       return undefined;
     }
     return warnings[warnings.length - 1]();
+  };
+
+  getDialogs: void => Node = () => {
+    const isOpen = this.generated.stores.uiDialogs.isOpen;
+    if (isOpen(RevampAnnouncementDialog) || true) return <RevampAnnouncementDialog />;
+    return null;
   };
 
   @computed get generated(): {|
@@ -284,6 +292,9 @@ class Wallet extends Component<AllProps> {
         isRevampTheme: boolean,
         isClassicTheme: boolean,
       |},
+      uiDialogs: {|
+        isOpen: any => boolean,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -327,6 +338,9 @@ class Wallet extends Component<AllProps> {
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
           isClassicTheme: stores.profile.isClassicTheme,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
         },
       },
       actions: {
