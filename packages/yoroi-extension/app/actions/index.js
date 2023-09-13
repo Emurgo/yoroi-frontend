@@ -12,7 +12,6 @@ import AddressesActions from './common/addresses-actions';
 import TimeActions from './common/time-actions';
 import TransactionsActions from './common/transactions-actions';
 import WalletRestoreActions from './common/wallet-restore-actions';
-import DaedalusTransferActions from './common/daedalus-transfer-actions';
 import YoroiTransferActions from './common/yoroi-transfer-actions';
 import TxBuilderActions from './common/tx-builder-actions';
 import ExplorerActions from './common/explorer-actions';
@@ -33,7 +32,6 @@ export type ActionsMap = {|
   profile: ProfileActions,
   dialogs: DialogsActions,
   notifications: NotificationsActions,
-  daedalusTransfer: DaedalusTransferActions,
   yoroiTransfer: YoroiTransferActions,
   memos: MemosActions,
   loading: LoadingActions,
@@ -59,7 +57,6 @@ const actionsMap: ActionsMap = Object.freeze({
   profile: new ProfileActions(),
   dialogs: new DialogsActions(),
   notifications: new NotificationsActions(),
-  daedalusTransfer: new DaedalusTransferActions(),
   yoroiTransfer: new YoroiTransferActions(),
   memos: new MemosActions(),
   loading: new LoadingActions(),
