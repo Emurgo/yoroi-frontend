@@ -25,14 +25,6 @@ const messages = defineMessages({
     id: 'wallet.add.page.subtitle.label',
     defaultMessage: '!!!Yoroi light wallet for Cardano',
   },
-  transferFundsTitle: {
-    id: 'wallet.add.page.daedalusTransfer.title',
-    defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
-  },
-  transferFundsTooltip: {
-    id: 'wallet.add.page.daedalusTransfer.tooltip',
-    defaultMessage: '!!!You can transfer funds from a Daedalus wallet<br/>to Yoroi, but first you will need to create<br/>a Yoroi wallet to store those funds.',
-  },
 });
 
 type Props = {|
@@ -40,7 +32,6 @@ type Props = {|
   +onRestore: void => void,
   +onHardwareConnect: void => void,
   +onSettings: void => void,
-  +onDaedalusTransfer: void => void,
 |};
 
 @observer
@@ -90,26 +81,6 @@ export default class WalletAdd extends Component<Props> {
                 onRestore={this.props.onRestore}
                 onHardwareConnect={this.props.onHardwareConnect}
               />
-              {/* Transfer funds from a Daedalus wallet to Yoroi */}
-              <button
-                type="button"
-                onClick={onDaedalusTransfer}
-                className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
-              >
-                <span className={styles.heroCardsItemLinkIcon}>
-                  <DaedalusIcon width="45" height="40" />
-                </span>
-                <div className={styles.heroCardsItemTitle}>
-                  {intl.formatMessage(messages.transferFundsTitle)}
-                  <div className={styles.tooltip}>
-                    <CustomTooltip
-                      toolTip={
-                        <div><FormattedHTMLMessage {...messages.transferFundsTooltip} /></div>
-                      }
-                    />
-                  </div>
-                </div>
-              </button>
             </div>
           </div>
         </div>

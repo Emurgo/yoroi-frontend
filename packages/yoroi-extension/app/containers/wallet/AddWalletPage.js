@@ -281,7 +281,6 @@ class AddWalletPage extends Component<AllProps> {
             onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
             onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
             onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
           />
           {activeDialog}
         </TopBarLayout>
@@ -314,12 +313,6 @@ class AddWalletPage extends Component<AllProps> {
   _goToSettingsRoot: () => void = () => {
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.SETTINGS.ROOT,
-    });
-  };
-
-  _goToDaedalusTransferRoot: () => void = () => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: ROUTES.TRANSFER.DAEDALUS,
     });
   };
 

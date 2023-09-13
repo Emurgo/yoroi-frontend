@@ -11,12 +11,9 @@ import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSele
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import YoroiTransferPage from './YoroiTransferPage';
 import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
-import DaedalusTransferPage from './DaedalusTransferPage';
-import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
-import type { GeneratedData as ShelleyEraOptionDialogContainerData } from './options/ShelleyEraOptionDialogContainer';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
@@ -43,10 +40,6 @@ export default class WalletTransferPage extends Component<Props> {
     return (<YoroiTransferPage {...props} />);
   }
 
-  getDaedalusTransferDialog: InjectedOrGenerated<DaedalusTransferPageData> => Node = (props) => {
-    return (<DaedalusTransferPage {...props} />);
-  }
-
   render(): Node {
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
@@ -65,10 +58,6 @@ export default class WalletTransferPage extends Component<Props> {
       ? this.getIcarusTransferDialog(this.generated.YoroiTransferPageProps)
       : null;
 
-    const daedalusTransfer = this.generated.DaedalusTransferPageProps != null
-      ? this.getDaedalusTransferDialog(this.generated.DaedalusTransferPageProps)
-      : null;
-
     const defaultToken = this.props.publicDeriver.getParent().getDefaultToken();
     const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
@@ -79,7 +68,6 @@ export default class WalletTransferPage extends Component<Props> {
       <>
         <TransferTypeSelect
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
-          onShelley={null}
           ticker={truncateToken(getTokenName(defaultTokenInfo))}
         />
         {activeDialog}
@@ -92,8 +80,6 @@ export default class WalletTransferPage extends Component<Props> {
 
   @computed get generated(): {|
     ByronEraOptionDialogContainerProps: InjectedOrGenerated<ByronEraOptionDialogContainerData>,
-    ShelleyEraOptionDialogContainerProps: InjectedOrGenerated<ShelleyEraOptionDialogContainerData>,
-    DaedalusTransferPageProps: ?InjectedOrGenerated<DaedalusTransferPageData>,
     YoroiTransferPageProps: ?InjectedOrGenerated<YoroiTransferPageData>,
     actions: {|
       yoroiTransfer: {|
@@ -158,14 +144,8 @@ export default class WalletTransferPage extends Component<Props> {
       ByronEraOptionDialogContainerProps: (
         { actions, stores }: InjectedOrGenerated<ByronEraOptionDialogContainerData>
       ),
-      ShelleyEraOptionDialogContainerProps: (
-        { actions, stores }: InjectedOrGenerated<ShelleyEraOptionDialogContainerData>
-      ),
       YoroiTransferPageProps: (
         { actions, stores }: (?InjectedOrGenerated<YoroiTransferPageData>)
-      ),
-      DaedalusTransferPageProps: (
-        { actions, stores }: (?InjectedOrGenerated<DaedalusTransferPageData>)
       ),
     });
   }

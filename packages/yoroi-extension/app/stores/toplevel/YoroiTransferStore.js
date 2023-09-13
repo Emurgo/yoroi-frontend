@@ -111,10 +111,6 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
       this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
       return;
     }
-    if (payload.source.extra === 'ledger' || payload.source.extra === 'trezor') {
-      this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
-      return;
-    }
     if (payload.source.extra === 'privateKey') {
       const { derivationLevel } = payload.source;
       if (derivationLevel === 0) {

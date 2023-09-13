@@ -19,7 +19,6 @@ const messages = defineMessages({
 
 type Props = {|
   +onByron: void => void,
-  +onShelley: void => void,
 |};
 
 @observer

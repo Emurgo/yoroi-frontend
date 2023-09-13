@@ -7,7 +7,6 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
-import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../stores/toplevel/TransactionsStore';
@@ -29,7 +28,7 @@ export const mockTransferProps: {
   selected: null | PublicDeriver<>,
   dialog?: any,
   YoroiTransferPageProps?: YoroiTransferPageData,
-  DaedalusTransferPageProps?: DaedalusTransferPageData,
+  DaedalusTransferPageProps?: void,
   publicDerivers: Array<PublicDeriver<>>,
   shelleyRewardDisclaimer?: void,
   getConceptualWalletSettingsCache:
@@ -239,9 +238,7 @@ export const mockTransferProps: {
         YoroiTransferPageProps: request.YoroiTransferPageProps
           ? { generated: request.YoroiTransferPageProps }
           : null,
-        DaedalusTransferPageProps: request.DaedalusTransferPageProps
-          ? { generated: request.DaedalusTransferPageProps }
-          : null,
+        DaedalusTransferPageProps: null,
       },
     },
     BannerContainerProps: {

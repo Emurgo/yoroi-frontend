@@ -537,10 +537,6 @@ const globalMessages: * = defineMessages({
     id: 'transfer.instructions.attention.title.label',
     defaultMessage: '!!!Attention',
   },
-  transferTitleText: {
-    id: 'daedalusTransfer.instructions.attention.title',
-    defaultMessage: '!!!Transfer all funds from',
-  },
   invalidMemo: {
     id: 'wallet.transaction.memo.invalid',
     defaultMessage: '!!!Memo must be at least 1 and at most {maxMemo} characters.',
@@ -791,10 +787,6 @@ const globalMessages: * = defineMessages({
   hardwareWalletLabel: {
     id: 'yoroiTransfer.start.instructions.hardware',
     defaultMessage: '!!!Hardware wallet',
-  },
-  daedalusWalletLabel: {
-    id: 'daedalusTransfer.instructions.attention.button.label',
-    defaultMessage: '!!!Daedalus Wallet',
   },
   yoroiPaperLabel: {
     id: 'yoroiTransfer.start.instructions.yoroiPaper',

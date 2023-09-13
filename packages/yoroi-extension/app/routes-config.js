@@ -63,7 +63,6 @@ export const ROUTES = {
   },
   TRANSFER: {
     ROOT: '/transfer',
-    DAEDALUS: '/transfer/daedalus',
     YOROI: '/transfer/yoroi',
   },
   SEND_FROM_URI: {
