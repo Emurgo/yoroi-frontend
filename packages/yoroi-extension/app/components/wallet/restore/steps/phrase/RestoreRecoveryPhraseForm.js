@@ -235,7 +235,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
             </Fade>
 
             <Fade in={!isValidPhrase && allWordsEntered}>
-              <Typography variant="body2" color="#FF1351">
+              <Typography variant="body2" color="#FF1351" id="mnemonicErrorText">
                 {mnemonicError}
               </Typography>
             </Fade>
