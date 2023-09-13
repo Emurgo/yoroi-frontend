@@ -2,7 +2,7 @@
 
 import type { LocatorObject } from '../support/webdriver';
 import type { RestorationInput } from '../mock-chain/TestWallets';
-import { Key } from 'selenium-webdriver';
+import { Key, WebElement } from 'selenium-webdriver';
 import { walletNameInput, walletPasswordInput, repeatPasswordInput } from './walletDetailsPage';
 
 export const getWords = (word: string): LocatorObject => {
@@ -31,10 +31,17 @@ export const inputWalletInfo = async (customWorld: any, restoreInfo: Restoration
   await customWorld.input(repeatPasswordInput, restoreInfo.password);
 };
 
+export const restorePageTitle: LocatorObject = { locator: 'restoreTitle', method: 'id' };
+
 export const restoreWalletInputPhraseDialog: LocatorObject = {
   locator: 'enterRecoveryPhraseStepComponent',
   method: 'id',
 };
+
+export const validPhraseText: LocatorObject = { locator: 'validPhraseMessage', method: 'id' };
+
+export const clearAllButton: LocatorObject = { locator: 'clearAllButton', method: 'id' };
+
 export const errorInvalidRecoveryPhrase: LocatorObject = {
   locator: '//p[contains(@class, "-error") and contains(@id, "recoveryPhrase")]',
   method: 'xpath',
@@ -47,7 +54,13 @@ export const getRecoveryPhraseInput = (inputIndex: number): LocatorObject => {
   };
 };
 
-export const validPhraseText: LocatorObject = { locator: 'validPhraseMessage', method: 'id' };
+export const getAllRecoverPhraseInputs = async (customWorld: any): Promise<WebElement[]> => {
+  const abstractInputLocator = {
+    locator: '//input[contains(@id, "downshift-") and contains(@id, "-input")]',
+    method: 'xpath',
+  };
+  return await customWorld.findElements(abstractInputLocator);
+};
 
 export const nextButton: LocatorObject = {
   locator: 'primaryButton',
