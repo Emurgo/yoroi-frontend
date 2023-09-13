@@ -20,6 +20,8 @@ import ThemeSettingsBlock from '../../../components/settings/categories/general-
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import LocalizableError from '../../../i18n/LocalizableError';
+import { Box, Button } from '@mui/material';
+import SwapInput from '../../../components/swap/SwapInput';
 
 type GeneratedData = typeof SwapPage.prototype.generated;
 
@@ -30,26 +32,31 @@ export default class SwapPage extends Component<InjectedOrGenerated<GeneratedDat
   };
 
   render(): Node {
-    return <>Swap form here</>;
+    return (
+      <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Box>Market</Box>
+            <Box>Limit</Box>
+          </Box>
+          <Box>Refresh</Box>
+        </Box>
+        <SwapInput label="Swap from" />
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box>Switch</Box>
+          <Box>
+            <Button variant="tertiary" color="primary">
+              Clear
+            </Button>
+          </Box>
+        </Box>
+        <SwapInput label="Swap to" />
+      </Box>
+    );
   }
 
   @computed get generated(): {|
     actions: {|
-      profile: {|
-        updateLocale: {|
-          trigger: (params: {|
-            locale: string,
-          |}) => Promise<void>,
-        |},
-        updateTheme: {|
-          trigger: (params: {|
-            theme: string,
-          |}) => Promise<void>,
-        |},
-        updateUnitOfAccount: {|
-          trigger: (params: UnitOfAccountSettingType) => Promise<void>,
-        |},
-      |},
       router: {|
         goToRoute: {|
           trigger: (params: {|
@@ -59,43 +66,12 @@ export default class SwapPage extends Component<InjectedOrGenerated<GeneratedDat
           |}) => void,
         |},
       |},
-      wallets: {|
-        setActiveWallet: {|
-          trigger: (params: {|
-            wallet: PublicDeriver<>,
-          |}) => void,
-        |},
-      |},
     |},
     stores: {|
-      app: {| currentRoute: string |},
-      profile: {|
-        LANGUAGE_OPTIONS: Array<LanguageType>,
-        currentLocale: string,
-        currentTheme: Theme,
-        setProfileLocaleRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-        |},
-        UNIT_OF_ACCOUNT_OPTIONS: Array<{|
-          svg: string,
-          symbol: string,
-        |}>,
-        setUnitOfAccountRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-        |},
-        unitOfAccount: UnitOfAccountSettingType,
-      |},
       wallets: {|
         selected: null | PublicDeriver<>,
         publicDerivers: Array<PublicDeriver<>>,
         getLastSelectedWallet: void => ?PublicDeriver<>,
-      |},
-      coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?string,
-        lastUpdateTimestamp: null | number,
-        refreshCurrentUnit: {| isExecuting: boolean |},
       |},
     |},
   |} {
@@ -109,46 +85,13 @@ export default class SwapPage extends Component<InjectedOrGenerated<GeneratedDat
     const profileStore = stores.profile;
     return Object.freeze({
       stores: {
-        app: {
-          currentRoute: stores.app.currentRoute,
-        },
-        profile: {
-          setProfileLocaleRequest: {
-            isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
-            error: profileStore.setProfileLocaleRequest.error,
-          },
-          LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
-          currentLocale: profileStore.currentLocale,
-          currentTheme: profileStore.currentTheme,
-          UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
-          unitOfAccount: profileStore.unitOfAccount,
-          setUnitOfAccountRequest: {
-            error: profileStore.setUnitOfAccountRequest.error,
-            isExecuting: profileStore.setUnitOfAccountRequest.isExecuting,
-          },
-        },
         wallets: {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
           getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
         },
-        coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-          lastUpdateTimestamp: stores.coinPriceStore.lastUpdateTimestamp,
-          refreshCurrentUnit: {
-            isExecuting: stores.coinPriceStore.refreshCurrentUnit.isExecuting,
-          },
-        },
       },
       actions: {
-        wallets: {
-          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
-        },
-        profile: {
-          updateLocale: { trigger: actions.profile.updateLocale.trigger },
-          updateTheme: { trigger: actions.profile.updateTheme.trigger },
-          updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
-        },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
