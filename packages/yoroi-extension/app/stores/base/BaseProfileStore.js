@@ -15,23 +15,16 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
-import {
-  trackSetLocale,
-  trackUpdateTheme
-} from '../../api/analytics';
+import { trackSetLocale, trackUpdateTheme } from '../../api/analytics';
 
 interface CoinPriceStore {
-  refreshCurrentUnit: Request<void => Promise<void>>
+  refreshCurrentUnit: Request<(void) => Promise<void>>;
 }
 
-export default class BaseProfileStore
-  <
-    TStores: { +coinPriceStore: CoinPriceStore, ... },
-    TActions: { +profile: BaseProfileActions, ... }
-  >
-  extends Store<TStores, TActions>
-{
-
+export default class BaseProfileStore<
+  TStores: { +coinPriceStore: CoinPriceStore, ... },
+  TActions: { +profile: BaseProfileActions, ... }
+> extends Store<TStores, TActions> {
   LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()
@@ -97,6 +90,18 @@ export default class BaseProfileStore
     (boolean) => Promise<void>
   > = new Request<(boolean) => Promise<void>>(this.api.localStorage.setUserRevampMigrationStatus);
 
+  @observable getUserRevampAnnouncementStatusRequest: Request<
+    (void) => Promise<boolean>
+  > = new Request<(void) => Promise<boolean>>(
+    this.api.localStorage.getUserRevampAnnouncementStatus
+  );
+
+  @observable setUserRevampAnnouncementStatusRequest: Request<
+    (boolean) => Promise<void>
+  > = new Request<(boolean) => Promise<void>>(
+    this.api.localStorage.setUserRevampAnnouncementStatus
+  );
+
   @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
     (void) => Promise<?string>
   >(this.api.localStorage.getCustomUserTheme);
@@ -153,7 +158,6 @@ export default class BaseProfileStore
     (void) => Promise<UnitOfAccountSettingType>
   > = new Request(this.api.localStorage.getUnitOfAccount);
 
-
   setup(): void {
     super.setup();
     this.actions.profile.updateLocale.listen(this._updateLocale);
@@ -166,12 +170,11 @@ export default class BaseProfileStore
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
     this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
-    this.registerReactions([
-      this._setBigNumberFormat,
-      this._updateMomentJsLocaleAfterLocaleChange,
-    ]);
+    this.actions.profile.markRevampAsAnnounced.listen(this._markRevampAsAnnounced);
+    this.registerReactions([this._setBigNumberFormat, this._updateMomentJsLocaleAfterLocaleChange]);
     this._getSelectComplexityLevel(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
+    this.isRevampAnnounced;
   }
 
   teardown(): void {
@@ -216,6 +219,22 @@ export default class BaseProfileStore
     );
   }
 
+  @computed get isRevampAnnounced(): boolean {
+    let { result } = this.getUserRevampAnnouncementStatusRequest;
+
+    if (result == null) {
+      result = this.getUserRevampAnnouncementStatusRequest.execute().result;
+    }
+
+    return result === 'true';
+  }
+
+  @action
+  _markRevampAsAnnounced: void => Promise<void> = async () => {
+    await this.setUserRevampAnnouncementStatusRequest.execute(true);
+    await this.getUserRevampAnnouncementStatusRequest.execute();
+  };
+
   @action
   _updateTentativeLocale: ({| locale: string |}) => void = request => {
     this.inMemoryLanguage = request.locale;
@@ -233,9 +252,8 @@ export default class BaseProfileStore
 
   _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
-    const locale = this.inMemoryLanguage != null ?
-          this.inMemoryLanguage :
-          BaseProfileStore.getDefaultLocale();
+    const locale =
+      this.inMemoryLanguage != null ? this.inMemoryLanguage : BaseProfileStore.getDefaultLocale();
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
     runInAction(() => {
@@ -276,7 +294,7 @@ export default class BaseProfileStore
     if (this.isCurrentThemeSet && result != null) {
       if (!this.didUserMigratedToRevampTheme) {
         this.setUserRevampMigrationStatusRequest.execute(true);
-        this._updateTheme({ theme: THEMES.YOROI_REVAMP })
+        this._updateTheme({ theme: THEMES.YOROI_REVAMP });
         return THEMES.YOROI_REVAMP;
       }
 
@@ -291,7 +309,7 @@ export default class BaseProfileStore
   }
 
   @computed get isRevampTheme(): boolean {
-    return this.currentTheme === THEMES.YOROI_REVAMP
+    return this.currentTheme === THEMES.YOROI_REVAMP;
   }
 
   @computed get isModernTheme(): boolean {
@@ -324,7 +342,7 @@ export default class BaseProfileStore
     let { result } = this.getUserRevampMigrationStatusRequest;
 
     if (result == null) {
-      result = this.getUserRevampMigrationStatusRequest.execute().result
+      result = this.getUserRevampMigrationStatusRequest.execute().result;
     }
 
     return result === 'true';
@@ -336,7 +354,7 @@ export default class BaseProfileStore
 
   _updateTheme: ({| theme: string |}) => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
-    document.documentElement?.removeAttribute('style') // remove css prop
+    document.documentElement?.removeAttribute('style'); // remove css prop
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
@@ -344,14 +362,12 @@ export default class BaseProfileStore
     trackUpdateTheme(theme);
   };
 
-
-
   _exportTheme: void => Promise<void> = async () => {
     const { getCSSCustomPropObject } = require(`../../styles/utils`);
     const cssCustomPropObject = getCSSCustomPropObject();
     await this.unsetCustomThemeRequest.execute();
     await this.setCustomThemeRequest.execute({
-      cssCustomPropObject
+      cssCustomPropObject,
     });
     await this.getCustomThemeRequest.execute(); // eagerly cache
   };
@@ -384,7 +400,6 @@ export default class BaseProfileStore
   _getTermsOfUseAcceptance: void => void = () => {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
-
 
   // ========== Complexity Level Choice ========== //
 
@@ -474,7 +489,7 @@ export default class BaseProfileStore
       throw new Error('failed to load unit of account setting');
     }
     return this.getUnitOfAccountRequest.result;
-  }
+  };
 
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await this.setUnitOfAccountRequest.execute(currency);

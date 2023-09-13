@@ -75,6 +75,9 @@ class Wallet extends Component<AllProps> {
         route: newRoute,
       });
     }
+
+    if (!this.generated.stores.profile.isRevampAnnounced)
+      this.generated.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
   }
 
   checkRoute(): void | string {
@@ -238,7 +241,15 @@ class Wallet extends Component<AllProps> {
 
   getDialogs: void => Node = () => {
     const isOpen = this.generated.stores.uiDialogs.isOpen;
-    if (isOpen(RevampAnnouncementDialog) || true) return <RevampAnnouncementDialog />;
+    if (isOpen(RevampAnnouncementDialog))
+      return (
+        <RevampAnnouncementDialog
+          onClose={() => {
+            this.generated.actions.profile.markRevampAsAnnounced.trigger();
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+          }}
+        />
+      );
     return null;
   };
 
@@ -248,6 +259,22 @@ class Wallet extends Component<AllProps> {
     NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
+      profile: {|
+        markRevampAsAnnounced: {|
+          tigger: (params: void) => void,
+        |},
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void,
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any,
+          |}) => void,
+        |},
+      |},
       router: {|
         goToRoute: {|
           trigger: (params: {|
@@ -291,6 +318,7 @@ class Wallet extends Component<AllProps> {
       profile: {|
         isRevampTheme: boolean,
         isClassicTheme: boolean,
+        isRevampAnnounced: boolean,
       |},
       uiDialogs: {|
         isOpen: any => boolean,
@@ -338,18 +366,28 @@ class Wallet extends Component<AllProps> {
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
           isClassicTheme: stores.profile.isClassicTheme,
+          isRevampAnnounced: stores.profile.isRevampAnnounced,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
         },
       },
       actions: {
+        profile: {
+          markRevampAsAnnounced: { trigger: actions.profile.markRevampAsAnnounced.trigger },
+        },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
         },
         wallets: {
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger },
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
         },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
