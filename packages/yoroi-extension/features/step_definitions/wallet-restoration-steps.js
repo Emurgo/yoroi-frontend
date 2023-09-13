@@ -1,28 +1,49 @@
 // @flow
 
 import { When, Then } from 'cucumber';
-import { By, error } from 'selenium-webdriver';
+import { Key, error } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
 import { checkErrorByTranslationId, checkWalletPlate } from './common-steps';
 import {
   cleanRecoverInput,
-  enterRecoveryPhrase,
+  clearAllButton,
   confirmButton,
+  enterRecoveryPhrase,
   errorInvalidRecoveryPhrase,
+  getAllRecoverPhraseInputs,
+  getRecoveryPhraseInput,
+  nextButton,
+  restorePageTitle,
   restoreWalletInputPhraseDialog,
   validPhraseText,
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
 import {
-  recoveryPhraseDeleteIcon,
   recoveryPhraseError,
   restoreNormalWallet,
   walletAlreadyExistsComponent,
   restoreWalletButton,
 } from '../pages/newWalletPages';
-import { dialogTitle } from '../pages/commonDialogPage';
-import { repeatPasswordInput, walletPasswordInput } from '../pages/walletDetailsPage';
+import { infoDialog, infoDialogContinueButton } from '../pages/commonDialogPage';
+import {
+  repeatPasswordInput,
+  walletPasswordInput,
+  walletNameInput,
+} from '../pages/walletDetailsPage';
+
+const getTextFromAllInputs = async customWorld => {
+  const resultArray = [];
+  const allInputs = await getAllRecoverPhraseInputs(customWorld);
+  for (const inputElement of allInputs) {
+    const inputText = await inputElement.getText();
+    if (inputText) {
+      resultArray.push(inputText);
+    }
+  }
+
+  return resultArray;
+};
 
 Then(/^I select 15-word wallet$/, async function () {
   await this.waitForElement(restoreNormalWallet);
@@ -30,10 +51,19 @@ Then(/^I select 15-word wallet$/, async function () {
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
+  this.webDriverLogger.info(`Step: I enter the recovery phrase`);
   const fields = table.hashes()[0];
   await this.waitForElement(restoreWalletInputPhraseDialog);
   await enterRecoveryPhrase(this, fields.recoveryPhrase);
   await this.waitForElement(validPhraseText);
+  await this.click(nextButton);
+});
+
+When(/^I enter the recovery phrase, not clicking next:$/, async function (table) {
+  this.webDriverLogger.info(`Step: I enter the recovery phrase`);
+  const fields = table.hashes()[0];
+  await this.waitForElement(restoreWalletInputPhraseDialog);
+  await enterRecoveryPhrase(this, fields.recoveryPhrase);
 });
 
 When(/^I can't enter more then 15 words from the recovery phrase:$/, async function (table) {
@@ -58,13 +88,31 @@ When(/^I enter the master key:$/, async function (table) {
 });
 
 When(/^I clear the recovery phrase$/, async function () {
+  this.webDriverLogger.info(`Step: I clear the recovery phrase`);
   await this.clearInputUpdatingForm(cleanRecoverInput, 15);
 });
 
-When(/^I enter the restored wallet password:$/, async function (table) {
+When(/^I enter the restored wallet details:$/, async function (table) {
+  this.webDriverLogger.info(`Step: I enter the restored wallet details`);
+  // info modal window
+  await this.waitForElement(infoDialog);
+  await this.click(infoDialogContinueButton);
+  // entering a wallet info
   const fields = table.hashes()[0];
+  await this.input(walletNameInput, fields.walletName);
   await this.input(walletPasswordInput, fields.password);
-  await this.input(repeatPasswordInput, fields.repeatedPassword);
+  await this.input(repeatPasswordInput, fields.repeatPassword);
+});
+
+Then(/^I click the "Restore" button$/, async function () {
+  this.webDriverLogger.info(`Step: I click the "Restore" button`);
+  await this.click(nextButton);
+});
+
+Then(/^I see the "Restore" button is disabled$/, async function () {
+  await this.waitForElement(nextButton);
+  const pointerValue = await this.getCssValue(nextButton, 'pointer-events');
+  expect(pointerValue).to.be.equal('none');
 });
 
 Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
@@ -90,21 +138,30 @@ Then(/^I should see a plate ([^"]*)$/, async function (plate) {
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {
   const restoreMessage = await i18n.formatMessage(this.driver, {
-    id: 'wallet.restore.dialog.title.label',
+    id: 'wallet.add.page.revamp.restoreWallet',
   });
-  await this.waitUntilText(dialogTitle, restoreMessage.toUpperCase(), 2000);
+  await this.waitUntilText(restorePageTitle, restoreMessage, 2000);
 });
 
-Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
-  const webElements = await this.driver.findElements(By.xpath(`//span[contains(text(), '×')]`));
-  for (let i = 0; i < webElements.length; i++) {
-    await this.click(recoveryPhraseDeleteIcon);
-  }
-  const expectedElements = await this.driver.findElements(
-    By.xpath(`//span[contains(text(), '×')]`)
-  );
+Then(/^I delete recovery phrase by clicking "Clear all"$/, async function () {
+  // click Clear all button
+  await this.waitForElement(clearAllButton);
+  await this.click(clearAllButton);
+  // check that all recovery inputs are empty
+  const resultArray = await getTextFromAllInputs(this);
+  expect(resultArray.length).to.be.equal(0);
+});
 
-  expect(expectedElements.length).to.be.equal(0);
+Then(/^I delete recovery phrase$/, async function () {
+  // click on every recovery phrase and send the DELETE button
+  for (let index = 0; index < 15; index++) {
+    const recoveryInput = getRecoveryPhraseInput(index);
+    await this.click(recoveryInput);
+    await this.input(recoveryInput, Key.DELETE);
+  }
+  // check that all recovery inputs are empty
+  const resultArray = await getTextFromAllInputs(this);
+  expect(resultArray.length).to.be.equal(0);
 });
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
