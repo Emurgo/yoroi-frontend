@@ -86,82 +86,41 @@ Feature: Restore Wallet
       | recoveryPhrase                                                                                           |                    |
       | atom remind style monster lunch result upgrade fashion eight limit glance frequent eternal borrow accuse | invalid word order |
 
-  @it-71 @restore-wallet
-  Scenario Outline: Ensure user can not add more than 15 words to the Yoroi Wallet Recovery Phrase (IT-71)
-    And I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I can't enter more then 15 words from the recovery phrase:
-      | recoveryPhrase   |
-      | <recoveryPhrase> |
-    Then I don't see last word of <recoveryPhrase> in recovery phrase field
-    Examples:
-      | recoveryPhrase                                                                                                  |                 |
-      | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster galaxy | 16-words phrase |
-
   @it-73 @restore-wallet
   Scenario Outline: Wallet restoration Recovery Phrase with less than 15 words (IT-73)
-    And I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
+    Then I select 15-word wallet
+    And I enter the recovery phrase, not clicking next:
       | recoveryPhrase   |
       | <recoveryPhrase> |
-    Then I should see an "1 words left" error message:
-      | message                                               |
-      | wallet.restore.dialog.form.errors.shortRecoveryPhrase |
+    Then I see the "Next" button is disabled
+    And I should stay in the restore wallet dialog
 
     Examples:
       | recoveryPhrase                                                                                   |                 |
       | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow | 14-words phrase |
 
-  @it-86 @restore-wallet
-  Scenario: Successfully restoring a simple wallet (IT-86)
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
-      | recoveryPhrase                                                                                   |
-      | shoe rose battle fine shoulder address kite coffee jaguar proof practice area party sphere train |
-    And I enter the restored wallet password:
-      | password     | repeatedPassword |
-      | asdfasdfasdf | asdfasdfasdf     |
-    And I click the "Restore Wallet" button
-    Then I should see a plate SETH-7545
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet"
-    Given There are 2 generated addresses
-    And I go to the receive screen
-    And I should see the addresses exactly list them
-      | address                                                     |
-      | Ae2tdPwUPEZ7sn3AQhUFGHXiWuG5aU3XnMi2SNKeh94S9Pp17igo1RwzodB |
-      | Ae2tdPwUPEZ73Nh3ALXKwtt9Wmb8bQHa9owoXtkvGEWK3AX6kXNHBK1D261 |
-
   @it-87 @restore-wallet
   Scenario: Ensure that wallet addresses are restored correctly (IT-87)
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
+    Then I select 15-word wallet
     And I enter the recovery phrase:
       | recoveryPhrase                                                                                        |
       | offer liberty horror emerge twice behind tag agree october dismiss vehicle obtain anchor endorse town |
-    And I enter the restored wallet password:
-      | password     | repeatedPassword |
-      | asdfasdfasdf | asdfasdfasdf     |
-    And I click the "Restore Wallet" button
-    Then I should see a plate DADJ-4614
-    Then I click the next button
+    And I enter the restored wallet details:
+      | walletName      | password     | repeatPassword |
+      | Restored Wallet | asdfasdfasdf | asdfasdfasdf   |
+    Then I should see a plate EKOZ-2975
+    Then I click the "Restore" button
     Then I should see the opened wallet with name "Restored Wallet"
     Given There are 6 generated addresses
     And I go to the receive screen
     And I should see the addresses exactly list them
       | address                                                     |
-      | Ae2tdPwUPEYz5p78UtoKpzeQV8DMEHf8nM9TNJGu1xwF9ez26Zx26wupZ2v |
-      | Ae2tdPwUPEZ7RZHyqo5P7LMcFny5PLpJJax9Xma8QqdTV5PeYeGwivdwGNq |
-      | Ae2tdPwUPEZ5jDsa81F9tjv9QunxzBLsrV8XNjYdt5CdNtuAUKgroxTxZdP |
-      | Ae2tdPwUPEYy4sHipF5wCMmFhsz9asT5HdEarYcguJimUnVebcTKnfViLak |
-      | Ae2tdPwUPEZBdh5hX9QMWCeiihXf3onFAgx6KzKBtm7nj4wwyN8eoroTWqF |
-      | Ae2tdPwUPEYzErSRwThtfVfBbhM87NCXDwkGHRqSYJcRVP4GS8Lgx3AxAXd |
+      | addr1qxj8k49qfq2kyrmmd4txql2qydnedpktp4t50333f05sa9xgwspvglncuydd5s5ljdzhlzdjtmqwcwls3pcmlcxmhlnq230arf |
+      | addr1qxs4zjle0wpwf9cencjmkqqkehmvnyann7n9hnxvvll7cdkgwspvglncuydd5s5ljdzhlzdjtmqwcwls3pcmlcxmhlnqwww7j6 |
+      | addr1qylzfcwny5a9nczjkpl3rpg6g4zcsztkkfxzq5utj5dxuy7gwspvglncuydd5s5ljdzhlzdjtmqwcwls3pcmlcxmhlnq4j7dha |
+      | addr1qyvxdd2nzhqpuglmmkdkle7wz5mstl9jcwvs6cdasucvv0xgwspvglncuydd5s5ljdzhlzdjtmqwcwls3pcmlcxmhlnqmlrnmx |
+      | addr1qxyr8tm03gzdwmfp37uyk6ay4xvlz0a6xkaafcam48xmvnxgwspvglncuydd5s5ljdzhlzdjtmqwcwls3pcmlcxmhlnq9wdpye |
+      | addr1q8see75c59fjn4gcshvr0jm0mfsyw904djp2fpc8efte97wgwspvglncuydd5s5ljdzhlzdjtmqwcwls3pcmlcxmhlnqf6ldxq |
 
   @it-95 @restore-wallet
   Scenario: Create & delete (1 wallet) (IT-95)
