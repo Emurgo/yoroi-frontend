@@ -10,9 +10,9 @@ import {
   clearAllButton,
   confirmButton,
   enterRecoveryPhrase,
-  errorInvalidRecoveryPhrase,
   getAllRecoverPhraseInputs,
   getRecoveryPhraseInput,
+  mnemonicErrorText,
   nextButton,
   restorePageTitle,
   restoreWalletInputPhraseDialog,
@@ -109,10 +109,18 @@ Then(/^I click the "Restore" button$/, async function () {
   await this.click(nextButton);
 });
 
-Then(/^I see the "Restore" button is disabled$/, async function () {
-  await this.waitForElement(nextButton);
-  const pointerValue = await this.getCssValue(nextButton, 'pointer-events');
+const nextButtonIsDisabled = async (customWorld: any) => {
+  await customWorld.waitForElement(nextButton);
+  const pointerValue = await customWorld.getCssValue(nextButton, 'pointer-events');
   expect(pointerValue).to.be.equal('none');
+}
+
+Then(/^I see the "Restore" button is disabled$/, async function () {
+  await nextButtonIsDisabled(this);
+});
+
+Then(/^I see the "Next" button is disabled$/, async function () {
+  await nextButtonIsDisabled(this);
 });
 
 Then(/^I repeat the wallet password "([^"]*)"$/, async function (password) {
@@ -129,7 +137,9 @@ When(/^I click the "Restore Wallet" button$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message$/, async function () {
   await this.driver.sleep(500);
-  expect(await this.isDisplayed(errorInvalidRecoveryPhrase)).to.be.true;
+  const errorObject = { message: 'wallet.restore.thirdStep.incorrectRecoveryPhrase' };
+  expect(await this.isDisplayed(mnemonicErrorText)).to.be.true;
+  await checkErrorByTranslationId(this, mnemonicErrorText, errorObject);
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
@@ -162,11 +172,6 @@ Then(/^I delete recovery phrase$/, async function () {
   // check that all recovery inputs are empty
   const resultArray = await getTextFromAllInputs(this);
   expect(resultArray.length).to.be.equal(0);
-});
-
-Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
-  const expectedError = data.hashes()[0];
-  await checkErrorByTranslationId(this, recoveryPhraseError, expectedError);
 });
 
 Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async function (table) {
