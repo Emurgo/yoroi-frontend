@@ -48,6 +48,7 @@ export async function getDelegatedBalance(
     utxoPart,
     accountPart: request.rewardBalance,
     delegation: request.delegation,
+    allRewards: request.allRewards,
   };
 }
 

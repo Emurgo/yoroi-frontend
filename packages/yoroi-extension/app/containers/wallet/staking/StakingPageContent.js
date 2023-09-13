@@ -76,10 +76,24 @@ class StakingPageContent extends Component<AllProps> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const delegation = this.generated.stores.substores.ada.delegation;
-    const adaDelegationRequests = delegation.getDelegationRequests(publicDeriver);
-    if (adaDelegationRequests == null) return undefined;
-    return adaDelegationRequests.getRegistrationHistory.result?.current;
+    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
+      publicDeriver
+    );
+    if (delegationRequests == null) return undefined;
+    if (
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
+    ) {
+      return undefined;
+    }
+    if (delegationRequests.getDelegatedBalance.result.delegation || (
+      delegationRequests.getDelegatedBalance.result.allRewards != null &&
+      delegationRequests.getDelegatedBalance.result.allRewards !== '0'
+    )) {
+      return true;
+    }
+    return false;
   };
 
   async componentDidMount() {
@@ -333,9 +347,6 @@ class StakingPageContent extends Component<AllProps> {
       delegationRequests.getDelegatedBalance.wasExecuted &&
       errorIfPresent == null;
 
-    const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
-    const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
-
     return (
       <Box>
         {isWalletWithNoFunds ? (
@@ -350,7 +361,7 @@ class StakingPageContent extends Component<AllProps> {
             }}
           />
         ) : null}
-        {hasNeverDelegated ? null : (
+        {!this._isRegistered(publicDeriver) ? null : (
           <WrapperCards>
             {this.getUserSummary({ delegationRequests, publicDeriver, errorIfPresent })}
             <RightCardsWrapper>

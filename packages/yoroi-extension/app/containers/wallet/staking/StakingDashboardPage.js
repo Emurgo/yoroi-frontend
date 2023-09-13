@@ -136,7 +136,7 @@ export default class StakingDashboardPage extends Component<Props> {
           getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
-        delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
+        hideGraph={!this._isRegistered(publicDeriver)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(getTokenName(
           this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
@@ -430,17 +430,18 @@ export default class StakingDashboardPage extends Component<Props> {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
     if (
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting ||
-      delegationRequests.getCurrentDelegation.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
     ) {
       return { pools: null };
     }
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
+    if (delegationRequests.getDelegatedBalance.result.delegation == null) {
       return { pools: [] };
     }
-    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-
+    const currentPools = [
+      [delegationRequests.getDelegatedBalance.result.delegation, 1]
+    ];
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
@@ -677,12 +678,24 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.
-      delegation.getDelegationRequests(
+    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
       publicDeriver
     );
-    if (adaDelegationRequests == null) return undefined;
-    return adaDelegationRequests.getRegistrationHistory.result?.current;
+    if (delegationRequests == null) return undefined;
+    if (
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
+    ) {
+      return undefined;
+    }
+    if (delegationRequests.getDelegatedBalance.result.delegation || (
+      delegationRequests.getDelegatedBalance.result.allRewards != null &&
+      delegationRequests.getDelegatedBalance.result.allRewards !== '0'
+    )) {
+      return true;
+    }
+    return false;
   };
 
   @computed get generated(): {|
