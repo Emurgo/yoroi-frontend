@@ -16,7 +16,6 @@ import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';
 import { ComplexityLevels } from '../../types/complexityLevelType';
-import { DisclaimerStatus } from './options/ShelleyEraOptionDialogContainer';
 import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
 import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -32,7 +31,7 @@ export const mockTransferProps: {
   YoroiTransferPageProps?: YoroiTransferPageData,
   DaedalusTransferPageProps?: DaedalusTransferPageData,
   publicDerivers: Array<PublicDeriver<>>,
-  shelleyRewardDisclaimer?: void | $Values<typeof DisclaimerStatus>,
+  shelleyRewardDisclaimer?: void,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
   getPublicKeyCache:

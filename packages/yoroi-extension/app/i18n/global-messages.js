@@ -608,10 +608,6 @@ const globalMessages: * = defineMessages({
     defaultMessage:
       '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
   },
-  restoreShelleyEraWalletDescription: {
-    id: 'wallet.add.optionDialog.walletEra.standard.description',
-    defaultMessage: '!!!Standard modern wallets support delegation to stake pools.',
-  },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
     defaultMessage:

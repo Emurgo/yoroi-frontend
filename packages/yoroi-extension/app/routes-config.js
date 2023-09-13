@@ -96,8 +96,6 @@ export const ROUTES = {
   },
   // Revamp specific routes:
   REVAMP: {
-    // `transfer` the `wallet`
-    TRANSFER: '/wallets/transfer',
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
   }

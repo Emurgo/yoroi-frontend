@@ -15,7 +15,6 @@ import DaedalusTransferPage from './DaedalusTransferPage';
 import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
-import ShelleyEraOptionDialogContainer from './options/ShelleyEraOptionDialogContainer';
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ShelleyEraOptionDialogContainerData } from './options/ShelleyEraOptionDialogContainer';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
@@ -61,14 +60,6 @@ export default class WalletTransferPage extends Component<Props> {
         />
       );
     }
-    if (uiDialogs.isOpen(ShelleyEraOptionDialogContainer)) {
-      activeDialog = (
-        <ShelleyEraOptionDialogContainer
-          onCancel={this.onClose}
-          {...this.generated.ShelleyEraOptionDialogContainerProps}
-        />
-      );
-    }
 
     const icarusTransfer = this.generated.YoroiTransferPageProps != null
       ? this.getIcarusTransferDialog(this.generated.YoroiTransferPageProps)
@@ -88,9 +79,7 @@ export default class WalletTransferPage extends Component<Props> {
       <>
         <TransferTypeSelect
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
-          onShelley={
-            () => actions.dialogs.open.trigger({ dialog: ShelleyEraOptionDialogContainer })
-          }
+          onShelley={null}
           ticker={truncateToken(getTokenName(defaultTokenInfo))}
         />
         {activeDialog}

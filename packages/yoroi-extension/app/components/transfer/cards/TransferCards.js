@@ -15,10 +15,6 @@ const messages = defineMessages({
     id: 'wallet.transfer.cards.byron',
     defaultMessage: '!!!Byron-era wallet',
   },
-  shelleyEraWallet: {
-    id: 'wallet.transfer.cards.shelley',
-    defaultMessage: '!!!Shelley-era wallet',
-  },
 });
 
 type Props = {|
@@ -64,36 +60,6 @@ export default class TransferCards extends Component<Props> {
             </div>
             <div className={styles.heroCardsItemDate}>
               2017-2020
-            </div>
-          </div>
-        </button>
-        {/* shelley-itn wallet */}
-        <button
-          type="button"
-          className="TransferCards_shelleyEra"
-          onClick={this.props.onShelley}
-        >
-          <div
-            className={classnames([
-              styles.heroCardsItem,
-              styles.heroCardsItemBg,
-              styles.bgShelleyMainnet,
-            ])}
-          >
-            <div className={styles.heroCardsItemTitle}>
-              {intl.formatMessage(messages.shelleyEraWallet)}
-              <div className={styles.tooltip}>
-                <CustomTooltip
-                  toolTip={
-                    <div className={styles.tooltipSize}>
-                      {intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
-                    </div>
-                  }
-                />
-              </div>
-            </div>
-            <div className={styles.heroCardsItemDate}>
-              2020
             </div>
           </div>
         </button>
