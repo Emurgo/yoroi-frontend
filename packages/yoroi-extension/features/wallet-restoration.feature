@@ -14,63 +14,62 @@ Feature: Restore Wallet
     And I enter the recovery phrase:
     | recoveryPhrase                                                                             |
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
-    And I enter the name "Restored Wallet"
-    And I enter the restored wallet password:
-    | password   | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate EAJD-7036
-    Then I click the next button
+    And I enter the restored wallet details:
+    | walletName | password | repeatPassword |
+    | Restored Wallet | asdfasdfasdf | asdfasdfasdf |
+    Then I should see a plate ZDDC-9858
+    Then I click the "Restore" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
-    | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
-    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
+    | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
+    | addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn |
 
   @it-11 @restore-wallet
   Scenario: Fail to completely restore a wallet with addresses generated not following gap from BIP44 protocol (IT-11)
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
+    Then I select 15-word wallet
     And I enter the recovery phrase:
       | recoveryPhrase                                                                                 |
       | grace saddle snake vocal amateur coin inside ginger leopard place liar patrol usual joy around |
-    And I enter the restored wallet password:
-      | password   | repeatedPassword |
-      | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate HNHT-5379
-    Then I click the next button
+    And I enter the restored wallet details:
+      | walletName | password | repeatPassword |
+      | Restored Wallet | asdfasdfasdf | asdfasdfasdf |
+    Then I should see a plate PNHH-3365
+    And I click the "Restore" button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen
     And I should see the addresses exactly list them
       | address                                                     |
-      | Ae2tdPwUPEZLzYQaqFk1U9VWBeY9AfQ2hKBWZjxtfwWVE46sy6u5ZZAeFu1 |
+      | addr1qymqlsf2aent7ddr4l8zh34rl3qgk79gav8rr8c7r72vwdrjlv3qxt89y5f3yya3mnw0zx67whft2n73ulm2wtha2r9q20asqp |
+
+  @it-10 @restore-wallet
+  Scenario: (IT-10) Mnemonic words can be cleared by pressing "Clear all"
+    Then I select 15-word wallet
+    And I enter the recovery phrase, not clicking next:
+    | recoveryPhrase                                                                             |
+    | eight country switch draw meat scout mystery blade tip drift useless good keep usage usage |
+    Then I delete recovery phrase by clicking "Clear all"
 
   @it-13 @restore-wallet
-  Scenario: Mnemonic words can be cleared by pressing "x" sign for each word on wallet restoration screen (IT-13)
-    When I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
+  Scenario: (IT-13) Mnemonic words can be cleared by deleting each word on wallet restoration screen
+    Then I select 15-word wallet
+    And I enter the recovery phrase, not clicking next:
     | recoveryPhrase                                                                             |
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
-    Then I delete recovery phrase by clicking "x" signs
+    Then I delete recovery phrase
 
   @it-26 @restore-wallet
   Scenario: Wallet can't be restored without entering password (IT-26)
-    And I click the restore button for cardano
-    Then I select Byron-era 15-word wallet
-    And I enter the name "Restored Wallet"
+    Then I select 15-word wallet
     And I enter the recovery phrase:
       | recoveryPhrase                                                                                           |
       | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
-    And I enter the restored wallet password:
-      | password   | repeatedPassword |
-      | asdfasdfasdf | asdfasdfasdf       |
+    And I enter the restored wallet details:
+      | walletName | password | repeatPassword |
+      | Restored Wallet | asdfasdfasdf | asdfasdfasdf |
     And I clear the restored wallet password asdfasdfasdf
-    Then I see the submit button is disabled
+    Then I see the "Restore" button is disabled
     And I should stay in the restore wallet dialog
 
   @it-70 @restore-wallet
