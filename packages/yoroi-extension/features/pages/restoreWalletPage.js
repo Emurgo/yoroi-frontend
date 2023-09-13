@@ -38,6 +38,8 @@ export const restoreWalletInputPhraseDialog: LocatorObject = {
   method: 'id',
 };
 
+export const mnemonicErrorText: LocatorObject = { locator: 'mnemonicErrorText', method: 'id' };
+
 export const validPhraseText: LocatorObject = { locator: 'validPhraseMessage', method: 'id' };
 
 export const clearAllButton: LocatorObject = { locator: 'clearAllButton', method: 'id' };
