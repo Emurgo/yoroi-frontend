@@ -189,16 +189,6 @@ class AddWalletPage extends Component<AllProps> {
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
             });
           }}
-          onPaperRestore={
-            // <TODO:PENDING_REMOVAL>
-            getApiForNetwork(selectedNetwork) !== ApiOptions.ada 
-              ? undefined
-              : () =>
-                  actions.dialogs.push.trigger({
-                    dialog: WalletRestoreDialogContainer,
-                    params: { restoreType: { type: 'bip44', extra: 'paper', length: 21 } },
-                  })
-          }
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialogContainer)) {

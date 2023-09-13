@@ -33,8 +33,6 @@ type Props = {|
   +onCancel: void => void,
   +onRestore15: void => void,
   +onRestore24: void | (void => void),
-  // <TODO:PENDING_REMOVAL>
-  +onPaperRestore: void | (void => void),
 |};
 
 @observer
@@ -49,8 +47,6 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
       onCancel,
       onRestore15,
       onRestore24,
-      // <TODO:PENDING_REMOVAL>
-      // onPaperRestore,
     } = this.props;
 
     return (
@@ -81,18 +77,6 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
                 onSubmit={onRestore24}
               />
             )}
-
-            {/* <TODO:PENDING_REMOVAL>*/}
-
-            {/*{onPaperRestore != null && (*/}
-            {/*  <OptionBlock*/}
-            {/*    parentName="WalletRestoreOptionDialog"*/}
-            {/*    type="restorePaperWallet"*/}
-            {/*    title={intl.formatMessage(globalMessages.paperWalletLabel)}*/}
-            {/*    learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}*/}
-            {/*    onSubmit={onPaperRestore}*/}
-            {/*  />*/}
-            {/*)}*/}
           </ul>
         </div>
       </Dialog>

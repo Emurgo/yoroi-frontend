@@ -9,7 +9,6 @@ import {
 import {
   genShelleyCip1852DummyWithCache,
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import { ROUTES } from '../../routes-config';
 import Transfer from './Transfer';
 import { mockTransferProps } from './Transfer.mock';
@@ -39,20 +38,6 @@ export const MainPage = (): Node => {
     {...mockTransferProps({
       currentRoute: ROUTES.TRANSFER.YOROI,
       selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
-      ...lookup,
-    })}
-  />);
-};
-
-
-export const ByronDialog = (): Node => {
-  const wallet = genShelleyCip1852DummyWithCache();
-  const lookup = walletLookup([wallet]);
-  return (<Transfer
-    {...mockTransferProps({
-      currentRoute: ROUTES.TRANSFER.YOROI,
-      dialog: ByronEraOptionDialogContainer,
-      selected: wallet.publicDeriver,
       ...lookup,
     })}
   />);
