@@ -264,7 +264,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             onClick: this.props.onClose,
           },
           {
-            label: intl.formatMessage(globalMessages.withdrawLabel),
+            label: intl.formatMessage(globalMessages.confirm),
             onClick: this.submit,
             primary: true,
             disabled: shouldDisable,

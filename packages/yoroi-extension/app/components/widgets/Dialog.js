@@ -187,11 +187,11 @@ function getBtnVariant(
   if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
 
   if (isRevampLayout && primary) {
-    return { variant: 'contained', color: 'primary' };
+    return { variant: 'primary', color: 'primary' };
   }
 
   if (isRevampLayout && !primary) {
-    return { variant: 'outlined', color: 'primary' };
+    return { variant: 'secondary', color: 'primary' };
   }
 
   if (danger === true) return { variant: 'danger' };
