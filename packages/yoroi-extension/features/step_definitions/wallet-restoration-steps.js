@@ -10,7 +10,7 @@ import {
   clearAllButton,
   confirmButton,
   enterRecoveryPhrase,
-  getAllRecoverPhraseInputs,
+  getAllRecoveryPhraseInputs,
   getRecoveryPhraseInput,
   mnemonicErrorText,
   nextButton,
@@ -24,6 +24,7 @@ import {
   restoreNormalWallet,
   walletAlreadyExistsComponent,
   restoreWalletButton,
+  restore24WordWallet,
 } from '../pages/newWalletPages';
 import { infoDialog, infoDialogContinueButton } from '../pages/commonDialogPage';
 import {
@@ -34,7 +35,7 @@ import {
 
 const getTextFromAllInputs = async customWorld => {
   const resultArray = [];
-  const allInputs = await getAllRecoverPhraseInputs(customWorld);
+  const allInputs = await getAllRecoveryPhraseInputs(customWorld);
   for (const inputElement of allInputs) {
     const inputText = await inputElement.getText();
     if (inputText) {
@@ -48,6 +49,11 @@ const getTextFromAllInputs = async customWorld => {
 Then(/^I select 15-word wallet$/, async function () {
   await this.waitForElement(restoreNormalWallet);
   await this.click(restoreNormalWallet);
+});
+
+Then(/^I select 24-word wallet$/, async function () {
+  await this.waitForElement(restore24WordWallet);
+  await this.click(restore24WordWallet);
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
@@ -95,8 +101,10 @@ When(/^I clear the recovery phrase$/, async function () {
 When(/^I enter the restored wallet details:$/, async function (table) {
   this.webDriverLogger.info(`Step: I enter the restored wallet details`);
   // info modal window
-  await this.waitForElement(infoDialog);
-  await this.click(infoDialogContinueButton);
+  if (await this.checkIfExists(infoDialog)) {
+    await this.waitForElement(infoDialog);
+    await this.click(infoDialogContinueButton);
+  }
   // entering a wallet info
   const fields = table.hashes()[0];
   await this.input(walletNameInput, fields.walletName);
@@ -113,7 +121,7 @@ const nextButtonIsDisabled = async (customWorld: any) => {
   await customWorld.waitForElement(nextButton);
   const pointerValue = await customWorld.getCssValue(nextButton, 'pointer-events');
   expect(pointerValue).to.be.equal('none');
-}
+};
 
 Then(/^I see the "Restore" button is disabled$/, async function () {
   await nextButtonIsDisabled(this);
