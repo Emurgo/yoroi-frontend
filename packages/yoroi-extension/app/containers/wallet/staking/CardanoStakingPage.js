@@ -359,6 +359,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const { intl } = this.context;
     const { delegationTransaction } = this.generated.stores.substores.ada;
     const delegationTx = delegationTransaction.createDelegationTx.result;
+    const uiDialogs = this.generated.stores.uiDialogs;
 
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
@@ -466,7 +467,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         />
       );
     }
-    if (delegationTx != null && !showSignDialog) {
+    if (uiDialogs.isOpen(DelegationSuccessDialog)) {
       return (
         <DelegationSuccessDialog
           onClose={this.generated.actions.ada.delegationTransaction.complete.trigger}

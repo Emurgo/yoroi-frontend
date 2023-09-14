@@ -33,6 +33,7 @@ import { Box, Tooltip, Typography } from '@mui/material';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { toSvg } from 'jdenticon';
+import { CopyAddress } from '../assets/NFTDetails';
 
 const messages = defineMessages({
   delegationTips: {
@@ -333,19 +334,29 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
         </Box>
         <Box mb="24px">
-          <Typography variant="body1" color="grayscale.600" mb="4px">
+          <Typography variant="body1" color="grayscale.600">
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
           <Box>
-            <ExplorableHashContainer
-              selectedExplorer={this.props.selectedExplorer}
-              hash={this.props.poolHash}
-              primary
-              linkType="pool"
-              placementTooltip="top"
+            <Typography
+              variant="body1"
+              sx={{ '& > div > p': { p: '2px 3px' }, px: '2px', ml: '-3px', mt: '-2px' }}
             >
-              <RawHash primary>{this.props.poolHash}</RawHash>
-            </ExplorableHashContainer>
+              <CopyAddress text={this.props.poolHash}>
+                <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={this.props.poolHash}
+                  light
+                  primary
+                  linkType="pool"
+                  placementTooltip="top"
+                >
+                  <RawHash light primary>
+                    {this.props.poolHash}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyAddress>
+            </Typography>
           </Box>
         </Box>
 

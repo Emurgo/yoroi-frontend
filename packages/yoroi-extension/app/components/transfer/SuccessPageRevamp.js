@@ -43,7 +43,7 @@ export class SuccessPageRevamp extends Component<Props> {
         actions={actions}
         closeOnOverlayClick={false}
         onClose={closeInfo ? closeInfo.onClose : undefined}
-        closeButton={closeInfo ? <DialogCloseButton /> : undefined}
+        closeButton={closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} /> : undefined}
       >
         <Box>
           <Box
