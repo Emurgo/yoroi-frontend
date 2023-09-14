@@ -11,9 +11,9 @@ export const getWords = (word: string): LocatorObject => {
 
 export const enterRecoveryPhrase = async (customWorld: any, phrase: string) => {
   const recoveryPhrase = phrase.split(' ');
+  const allInputs = await getAllRecoveryPhraseInputs(customWorld);
   for (let i = 0; i < recoveryPhrase.length; i++) {
-    const recoveryPhraseInputField = getRecoveryPhraseInput(i);
-    const recoveryPhraseElement = await customWorld.findElement(recoveryPhraseInputField);
+    const recoveryPhraseElement = (await allInputs)[i];
     await recoveryPhraseElement.sendKeys(recoveryPhrase[i], Key.RETURN);
   }
 };
@@ -56,7 +56,7 @@ export const getRecoveryPhraseInput = (inputIndex: number): LocatorObject => {
   };
 };
 
-export const getAllRecoverPhraseInputs = async (customWorld: any): Promise<WebElement[]> => {
+export const getAllRecoveryPhraseInputs = async (customWorld: any): Promise<WebElement[]> => {
   const abstractInputLocator = {
     locator: '//input[contains(@id, "downshift-") and contains(@id, "-input")]',
     method: 'xpath',
