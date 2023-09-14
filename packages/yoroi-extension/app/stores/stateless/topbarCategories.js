@@ -62,6 +62,7 @@ export type TopbarCategory = {|
     selected: PublicDeriver<>,
     walletHasAssets: boolean,
   |}) => boolean | {| disabledReason: MessageDescriptor |},
+  isHiddenButAllowed?: boolean,
 |};
 
 export const allCategories: Array<TopbarCategory> = [];
@@ -138,6 +139,7 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
         || networkId === networks.CardanoPreviewTestnet.NetworkId
       );
   },
+  isHiddenButAllowed: true,
 });
 
 /** Revamp Wallet categoriess */
