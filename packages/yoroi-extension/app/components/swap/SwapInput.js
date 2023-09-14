@@ -13,6 +13,7 @@ export default function SwapInput({
   const { amount, ticker } = asset;
   const [error, setError] = useState('');
   const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {
     if (e.target.value === '') {
@@ -33,13 +34,16 @@ export default function SwapInput({
     setInputValue(e.target.value);
   };
 
+  const isFocusedColor = isFocused ? 'black' : 'gray.400';
+
   return (
     <Box>
       <Box
         component="fieldset"
         sx={{
-          border: '1px solid',
-          borderColor: error ? '#FF1351' : 'gray.400',
+          borderStyle: 'solid',
+          borderWidth: isFocused || error ? '2px' : '1px',
+          borderColor: error ? '#FF1351' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
           display: 'grid',
@@ -71,14 +75,17 @@ export default function SwapInput({
             appearance: 'none',
             border: '0',
             outline: 'none',
+            '::placeholder': { color: '#6b7384' },
           }}
           component="input"
           type="text"
           variant="body1"
-          color="#6B7384"
+          color="#000"
           placeholder="0"
           onChange={handleChange}
           value={inputValue}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">

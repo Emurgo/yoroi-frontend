@@ -38,11 +38,12 @@ export default function PriceInput({ label, assets = [], readonly, isLoading }) 
           appearance: 'none',
           border: '0',
           outline: 'none',
+          '::placeholder': { color: '#6b7384' },
         }}
         component="input"
         type="text"
         variant="body1"
-        color="#6B7384"
+        color="#000"
         placeholder="0"
         bgcolor={readonly ? 'gray.50' : 'common.white'}
         readOnly={readonly}
