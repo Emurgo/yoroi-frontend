@@ -140,11 +140,15 @@
 
     // DEPRECATED
     getCollateralUtxos(requiredAmount) {
-      return CardanoAPI._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
+      const amount = typeof requiredAmount === 'object' ? requiredAmount.amount : requiredAmount;
+      const strAmount = amount == null || amount === '' ? null : String(amount);
+      return CardanoAPI._cardano_rpc_call("get_collateral_utxos", [strAmount]);
     }
 
     getCollateral(requiredAmount) {
-      return CardanoAPI._cardano_rpc_call("get_collateral_utxos", [requiredAmount]);
+      const amount = typeof requiredAmount === 'object' ? requiredAmount.amount : requiredAmount;
+      const strAmount = amount == null || amount === '' ? null : String(amount);
+      return CardanoAPI._cardano_rpc_call("get_collateral_utxos", [strAmount]);
     }
   }
   window.CardanoAPI = CardanoAPI;
