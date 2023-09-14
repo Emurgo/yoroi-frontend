@@ -25,8 +25,8 @@ class SubMenu extends Component<AllProps> {
     const { onItemClick, isActiveItem, options } = this.props;
 
     return (
-      <div className={styles.componentWrapper}>
-        <div className={this.props.isRevampLayout ? styles.componentRevamp : styles.component}>
+      <div className={styles.componentWrapper} id="subMenu">
+        <div className={this.props.isRevampLayout ? styles.componentRevamp : styles.component} id="settingsMenuLayout">
           {options.filter(Boolean).map(({ label, route, className }) => (
             <SubMenuItem
               key={label}

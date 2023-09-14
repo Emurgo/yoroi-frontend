@@ -65,7 +65,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
       .getConceptualWalletSettingsCache(parent);
 
     return (
-      <>
+      <div id="walletSettingsPage">
         {this.getDialog(selectedWallet)}
         <WalletNameSetting
           error={renameModelRequest.error}
@@ -122,7 +122,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
             dialog: RemoveWalletDialogContainer,
           })}
         />
-      </>
+      </div>
     );
   }
 

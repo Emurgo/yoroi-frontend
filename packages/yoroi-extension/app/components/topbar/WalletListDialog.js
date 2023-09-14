@@ -288,7 +288,7 @@ export default class WalletListDialog extends Component<Props, State> {
             borderTop: '1px solid var(--yoroi-palette-gray-100)',
           }}
         >
-          <Button onClick={onAddWallet} size="large" variant="outlined" color="primary" fullWidth>
+          <Button onClick={onAddWallet} size="large" variant="outlined" color="primary" fullWidth id="addWalletButton">
             {intl.formatMessage(messages.addWallet)}
           </Button>
           <Button
@@ -301,6 +301,7 @@ export default class WalletListDialog extends Component<Props, State> {
             fullWidth
             variant="contained"
             color="primary"
+            id="applyWalletButton"
           >
             {intl.formatMessage(messages.applyWallet)}
           </Button>

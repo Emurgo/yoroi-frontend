@@ -19,7 +19,7 @@ class NavBarTitle extends Component<Props & InjectedProps> {
     const { renderLayoutComponent, title } = this.props;
 
     const navbarTitleClassic = <div className={styles.title}>{title}</div>;
-    const navbarTitleRevamp = <div className={styles.titleRevamp}>{title}</div>;
+    const navbarTitleRevamp = <div className={styles.titleRevamp} id="navBarTitle">{title}</div>;
 
     return renderLayoutComponent({
       CLASSIC: navbarTitleClassic,
