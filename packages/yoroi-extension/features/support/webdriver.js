@@ -299,7 +299,6 @@ function CustomWorld(cmdInput: WorldInput) {
     await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
   };
 
-
   this.click = async (locator: LocatorObject, numberOfClicks: number = 1) => {
     this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
     for (let index = 0; index < numberOfClicks; index++) {
