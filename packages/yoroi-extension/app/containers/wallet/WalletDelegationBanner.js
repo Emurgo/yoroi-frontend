@@ -136,7 +136,10 @@ function WalletDelegationBanner({
               <Typography variant="body1" fontWeight={500} color="common.black">
                 {intl.formatMessage(globalMessages.roa30d)}
               </Typography>
-              <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
+              <HelperTooltip
+                message={intl.formatMessage(globalMessages.roaHelperMessage)}
+                placement="top"
+              />
             </Box>
             <Typography variant="body1" color="common.black">
               {estimatedRoa30d}
@@ -147,7 +150,10 @@ function WalletDelegationBanner({
               <Typography variant="body1" fontWeight={500} color="common.black">
                 {intl.formatMessage(messages.firstReward)}
               </Typography>
-              <HelperTooltip message={intl.formatMessage(messages.firstRewardHelperMessage)} />
+              <HelperTooltip
+                message={intl.formatMessage(messages.firstRewardHelperMessage)}
+                placement="top"
+              />
             </Box>
             <Typography variant="body1" color="common.black">
               {intl.formatMessage(messages.firstRewardDetails)}

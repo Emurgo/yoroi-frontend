@@ -94,13 +94,6 @@ function DialogFn(props: Props & InjectedProps): Node {
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
                   key={i}
-                  // variant={
-                  //   action.danger === true
-                  //     ? 'danger'
-                  //     : action.primary === true
-                  //     ? 'primary'
-                  //     : 'secondary'
-                  // }
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
                   loading={action.isSubmitting}
@@ -187,11 +180,11 @@ function getBtnVariant(
   if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
 
   if (isRevampLayout && primary) {
-    return { variant: 'primary', color: 'primary' };
+    return { variant: 'primary' };
   }
 
   if (isRevampLayout && !primary) {
-    return { variant: 'secondary', color: 'primary' };
+    return { variant: 'secondary' };
   }
 
   if (danger === true) return { variant: 'danger' };

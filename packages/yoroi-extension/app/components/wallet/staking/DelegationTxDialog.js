@@ -39,18 +39,6 @@ const messages = defineMessages({
     id: 'wallet.delegation.transaction.delegationTips',
     defaultMessage: '!!!Delegation tips',
   },
-  firstTip: {
-    id: 'wallet.delegation.transaction.delegationTips.firstTip',
-    defaultMessage: '!!!You can delegate to only one stake pool at a time',
-  },
-  secondTip: {
-    id: 'wallet.delegation.transaction.delegationTips.secondTip',
-    defaultMessage: '!!!Easily switch to a different stake pool',
-  },
-  thirdTip: {
-    id: 'wallet.delegation.transaction.delegationTips.thirdTip',
-    defaultMessage: '!!!Cancel your delegation at any time',
-  },
   explanationLine1: {
     id: 'wallet.delegation.transaction.explanationLine1',
     defaultMessage: '!!!You can only delegate to one stake pool at a time',
@@ -313,16 +301,18 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             }}
             component="ul"
           >
-            {[messages.firstTip, messages.secondTip, messages.thirdTip].map(msg => {
-              const message = intl.formatMessage(msg);
-              return (
-                <Box component="li" key={message}>
-                  <Typography variant="body1" color="grayscale.900">
-                    {message}
-                  </Typography>
-                </Box>
-              );
-            })}
+            {[messages.explanationLine1, messages.explanationLine2, messages.explanationLine3].map(
+              msg => {
+                const message = intl.formatMessage(msg);
+                return (
+                  <Box component="li" key={message}>
+                    <Typography variant="body1" color="grayscale.900">
+                      {message}
+                    </Typography>
+                  </Box>
+                );
+              }
+            )}
           </Box>
         </Box>
         <Box mb="16px">

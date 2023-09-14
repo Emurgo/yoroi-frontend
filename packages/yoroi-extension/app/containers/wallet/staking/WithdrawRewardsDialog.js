@@ -47,14 +47,18 @@ const messages = defineMessages({
     id: 'wallet.withdrawRewards.transaction.address',
     defaultMessage: '!!!Withdrawal address',
   },
-  finalRewards: {
-    id: 'wallet.withdrawRewards.transaction.finalRewardsLabel',
-    defaultMessage: '!!!Final Rewards',
+  accumulatedRewards: {
+    id: 'wallet.withdrawRewards.transaction.accumulatedRewards',
+    defaultMessage: '!!!Accumulated Rewards',
   },
   deregistrationWarning: {
     id: 'wallet.undelegation.transaction.warning',
     defaultMessage:
       '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
+  },
+  undelegateAnyway: {
+    id: 'wallet.undelegation.transaction.button.label',
+    defaultMessage: '!!!Undelegate anyway',
   },
 });
 
@@ -244,12 +248,6 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         />
       );
 
-    const shouldDisable = withSigning
-      ? isSubmitting
-      : isSubmitting ||
-        !this.spendingPasswordForm ||
-        !this.spendingPasswordForm.values().walletPassword;
-
     const selectedExplorer = this.generated.stores.explorers.selectedExplorer.get(
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
@@ -264,10 +262,11 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             onClick: this.props.onClose,
           },
           {
-            label: intl.formatMessage(globalMessages.confirm),
+            label: intl.formatMessage(
+              shouldDeregister ? messages.undelegateAnyway : globalMessages.confirm
+            ),
             onClick: this.submit,
             primary: true,
-            disabled: shouldDisable,
             isSubmitting,
           },
         ]}
@@ -369,7 +368,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           >
             <Box minWidth="180px">
               <Typography variant="body1" color="grayscale.600" mb="4px">
-                {intl.formatMessage(globalMessages.rewardsLabel)}
+                {intl.formatMessage(messages.accumulatedRewards)}
               </Typography>
               <Typography variant="body1" color="grayscale.900">
                 {formatValue(recoveredBalance.getDefaultEntry())} {ticker}
@@ -385,7 +384,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Box>
             <Box minWidth="180px">
               <Typography variant="body1" color="grayscale.600" mb="4px">
-                {intl.formatMessage(messages.finalRewards)}
+                {intl.formatMessage(globalMessages.finalBalanceLabel)}
               </Typography>
               <Typography variant="body1" color="grayscale.900">
                 {formatValue(finalRewards.getDefaultEntry())} {ticker}

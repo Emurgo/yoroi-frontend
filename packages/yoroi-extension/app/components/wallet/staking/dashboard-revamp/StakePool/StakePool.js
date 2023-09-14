@@ -107,16 +107,26 @@ export const SocialMediaStakePool = (withLayout(StakingPoolSocialMedia): Compone
 
 type HelperTooltipProps = {|
   +message: string | Node,
+  +placement?: string,
 |};
 const HelperTooltipComp = ({
   message,
   isRevampLayout,
+  placement,
 }: HelperTooltipProps & InjectedLayoutProps): Node => {
   return (
-    <Tooltip title={<Typography variant="body2">{message}</Typography>} arrow placement="right">
+    <Tooltip
+      title={<Typography variant="body2">{message}</Typography>}
+      arrow
+      placement={placement || 'right'}
+    >
       <Box display="inline-flex">{isRevampLayout ? <InfoIconRevamp /> : <QuestionMarkIcon />}</Box>
     </Tooltip>
   );
+};
+
+HelperTooltipComp.defaultProps = {
+  placement: 'right',
 };
 
 export const HelperTooltip = (withLayout(HelperTooltipComp): ComponentType<HelperTooltipProps>);
