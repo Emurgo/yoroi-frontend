@@ -12,10 +12,12 @@ export default function SwapInput({
 }) {
   const { amount, ticker } = asset;
   const [error, setError] = useState('');
+  const [inputValue, setInputValue] = useState('');
 
   const handleChange = e => {
     if (e.target.value === '') {
       setError('');
+      setInputValue('');
       return;
     }
 
@@ -27,6 +29,8 @@ export default function SwapInput({
     } else if (Number.isNaN(val)) {
       setError('Invalid amount');
     }
+
+    setInputValue(e.target.value);
   };
 
   return (
@@ -74,6 +78,7 @@ export default function SwapInput({
           color="#6B7384"
           placeholder="0"
           onChange={handleChange}
+          value={inputValue}
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
@@ -93,6 +98,7 @@ export default function SwapInput({
               variant="caption"
               fontWeight={500}
               sx={{ p: '4px 8px', bgcolor: '#F0F3F5', borderRadius: '8px' }}
+              onClick={() => setInputValue(amount)}
             >
               MAX
             </Typography>
