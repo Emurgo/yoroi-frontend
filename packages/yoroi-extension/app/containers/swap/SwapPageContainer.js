@@ -68,6 +68,7 @@ class SwapPageContainer extends Component<AllProps> {
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
+        bgcolor="var(--yoroi-palette-common-white)"
         navbar={
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}

@@ -1,6 +1,7 @@
 import { Box, Input, Typography } from '@mui/material';
 import { ReactComponent as ChevronIcon } from '../../assets/images/revamp/chevron-icon.inline.svg';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/info-icon.inline.svg';
+import { ReactComponent as PoolImage } from './pool.inline.svg';
 import { useState } from 'react';
 
 export default function SwapPool({ assets, isLoading }) {
@@ -30,7 +31,9 @@ export default function SwapPool({ assets, isLoading }) {
         }}
         onClick={handleShowFullInfo}
       >
-        <Box>Img</Box>
+        <Box>
+          <PoolImage />
+        </Box>
         <Typography variant="body1" fontWeight={500} color="#4B6DDE">
           Minswap (Auto)
         </Typography>
