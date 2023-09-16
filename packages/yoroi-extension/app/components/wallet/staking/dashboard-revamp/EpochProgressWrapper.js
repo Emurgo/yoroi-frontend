@@ -1,19 +1,20 @@
 // @flow
 import type { ComponentType, Node } from 'react';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Box, styled } from '@mui/system';
 import { Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { injectIntl } from 'react-intl';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
 import { EpochProgressCard } from './EpochProgressCard';
+import globalMessages from '../../../../i18n/global-messages';
 import moment from 'moment';
 
 type Props = {|
   epochProgress: {|
     currentEpoch: number,
-    startEpochDate: string,
-    endEpochDate: string,
+    startEpochDate: string | Date,
+    endEpochDate: string | Date,
+    endEpochDateTime: Date,
     percentage: number,
   |},
 |};
@@ -23,6 +24,8 @@ type Intl = {|
 |};
 
 function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
+  const days = moment(epochProgress.endEpochDateTime).diff(moment(), 'days');
+
   return (
     <Card>
       <Box
@@ -38,7 +41,7 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
       <Box sx={{ padding: '24px' }}>
         <EpochProgressCard
           percentage={epochProgress.percentage}
-          days={moment(epochProgress.endEpochDate).diff(moment(), 'days')}
+          days={days}
           currentEpoch={epochProgress.currentEpoch}
           startEpochDate={epochProgress.startEpochDate}
           endEpochDate={epochProgress.endEpochDate}
