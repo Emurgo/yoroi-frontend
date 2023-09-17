@@ -86,28 +86,3 @@
     }
   }
 }
-
-:global(.YoroiRevamp) {
-  .dialog {
-    max-width: 650px;
-    padding-top: 25px;
-    padding-bottom: 24px;
-
-    h1 {
-      margin-bottom: 25px !important;
-      line-height: 22px;
-    }
-
-    & > div {
-      padding: 0px 24px !important;
-    }
-
-    & > div:nth-child(3) {
-      margin-top: 14px;
-    }
-
-    & > button {
-      right: 15px;
-    }
-  }
-}

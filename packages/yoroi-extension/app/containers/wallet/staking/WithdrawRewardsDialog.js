@@ -4,7 +4,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import Dialog from '../../../components/widgets/Dialog';
 import { Box, Typography } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
@@ -12,7 +11,6 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import { toSvg } from 'jdenticon';
-import styles from './WithdrawRewardsDialog.scss';
 import { CopyAddress } from '../../../components/wallet/assets/NFTDetails';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { truncateAddress } from '../../../utils/formatters';
@@ -37,6 +35,7 @@ import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
+import DialogRevamp from '../../../components/widgets/DialogRevamp';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -213,16 +212,18 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
       return (
-        <Dialog
+        <DialogRevamp
           title={intl.formatMessage(globalMessages.processingLabel)}
           closeOnOverlayClick={false}
         >
-          <LegacyTransferLayout>
-            <VerticallyCenteredLayout>
-              <LoadingSpinner />
-            </VerticallyCenteredLayout>
-          </LegacyTransferLayout>
-        </Dialog>
+          <Box width="350px">
+            <LegacyTransferLayout>
+              <VerticallyCenteredLayout>
+                <LoadingSpinner />
+              </VerticallyCenteredLayout>
+            </LegacyTransferLayout>
+          </Box>
+        </DialogRevamp>
       );
     const receivers = tentativeTx.receivers(true);
     const receiverAddress = addressToDisplayString(receivers[0], network);
@@ -254,7 +255,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (!selectedExplorer) throw new Error('No explorer for wallet network');
 
     return (
-      <Dialog
+      <DialogRevamp
         title={intl.formatMessage(messages.dialogTitle)}
         actions={[
           {
@@ -273,9 +274,8 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={this.props.onClose}
         closeButton={<DialogCloseButton />}
-        className={styles.dialog}
       >
-        <Box>
+        <Box maxWidth="600px">
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
@@ -410,7 +410,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Box>
           ) : null}
         </Box>
-      </Dialog>
+      </DialogRevamp>
     );
   }
 
