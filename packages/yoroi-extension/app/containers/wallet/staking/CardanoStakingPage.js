@@ -448,12 +448,13 @@ class CardanoStakingPage extends Component<AllProps, State> {
             selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
           }
           onCancel={this.cancel}
-          onSubmit={({ password }) =>
-            this.generated.actions.ada.delegationTransaction.signTransaction.trigger({
+          onSubmit={async ({ password }) => {
+            await this.generated.actions.ada.delegationTransaction.signTransaction.trigger({
               password,
               publicDeriver: selectedWallet,
-            })
-          }
+              dialog: DelegationSuccessDialog,
+            });
+          }}
           classicTheme={this.generated.stores.profile.isClassicTheme}
           error={this.generated.stores.wallets.sendMoneyRequest.error}
           selectedExplorer={

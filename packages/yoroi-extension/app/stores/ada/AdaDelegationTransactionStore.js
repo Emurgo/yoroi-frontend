@@ -208,8 +208,9 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
 
   @action
   _signTransaction: ({|
-    password?: string,
     publicDeriver: PublicDeriver<>,
+    password?: string,
+    dialog?: any,
   |}) => Promise<void> = async request => {
     const result = this.createDelegationTx.result;
     if (result == null) {
@@ -253,6 +254,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
     }
+    if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
     trackDelegation();
   };
 

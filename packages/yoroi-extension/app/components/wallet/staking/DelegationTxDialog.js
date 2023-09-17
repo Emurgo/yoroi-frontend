@@ -270,7 +270,6 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             label: intl.formatMessage(globalMessages.delegateLabel),
             onClick: this.submit.bind(this),
             primary: true,
-            className: confirmButtonClasses,
             isSubmitting: this.props.isSubmitting,
             disabled: this.props.isSubmitting,
           },
