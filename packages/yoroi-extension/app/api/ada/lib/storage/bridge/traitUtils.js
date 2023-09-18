@@ -10,6 +10,7 @@ import {
   asGetAllAccounting,
   asHasLevels,
 } from '../models/PublicDeriver/traits';
+import { PublicDeriver } from '../models/PublicDeriver/index';
 import type {
   IPublicDeriver,
   Address, AddressType, Value, Addressing, UsedStatus,
@@ -247,6 +248,80 @@ export async function getAllAddressesWithPaths(
 
     },
   );
+}
+
+export async function getAllAddressesForWallet(
+  publicDeriver: PublicDeriver<>,
+): Promise<{|
+  utxoAddresses: Array<$ReadOnly<AddressRow>>,
+  accountingAddresses: Array<$ReadOnly<AddressRow>>,
+|}> {
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+  if (!withLevels) {
+    throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
+  }
+  const derivationTables = withLevels.getParent().getDerivationTables();
+  const deps = Object.freeze({
+    GetPathWithSpecific,
+    GetAddress,
+    GetDerivationSpecific,
+  });
+  const depTables = Object.keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
+
+  return await raii(
+    publicDeriver.getDb(),
+    [
+      ...depTables,
+      ...mapToTables(publicDeriver.getDb(), derivationTables),
+    ],
+    dbTx => rawGetAddressRowsForWallet(
+      dbTx,
+      deps,
+      { publicDeriver },
+      derivationTables,
+    ),
+  );
+}
+
+export async function getAddressRowsForWallet(
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
+  |},
+): Promise<Array<$ReadOnly<AddressRow>>> {
+  const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+  const derivationTables = withLevels == null
+    ? new Map()
+    : withLevels.getParent().getDerivationTables();
+  const deps = Object.freeze({
+    GetAddress,
+    GetPathWithSpecific,
+    GetDerivationSpecific,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
+  const result = await raii<PromisslessReturnType<typeof rawGetAddressRowsForWallet>>(
+    request.publicDeriver.getDb(),
+    [
+      ...depTables,
+      ...mapToTables(
+        request.publicDeriver.getDb(),
+        derivationTables
+      ),
+    ],
+    async tx => await rawGetAddressRowsForWallet(
+      tx,
+      deps,
+      {
+        publicDeriver: request.publicDeriver,
+      },
+      derivationTables,
+    )
+  );
+  return [...result.utxoAddresses, ...result.accountingAddresses];
 }
 
 export async function rawGetAddressRowsForWallet(

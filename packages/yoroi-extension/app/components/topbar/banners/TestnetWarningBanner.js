@@ -63,9 +63,9 @@ export default class TestnetWarningBanner extends Component<Props> {
         <div className={styles.ergoWarning}>
           <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
           <div className={styles.text}>
-            NOTE: Due to the planned gradual termination of the Ergo wallets support in Yoroi extension,
+            NOTE: Due to the planned termination of the Ergo wallets support in Yoroi extension,
             <br />
-            Starting with the next version any Ergo wallets in the list will be visible, but not operational!
+            Starting with the next version any Ergo wallets will be removed and no longer accessible!
             <br />
             Please make sure to migrate your Ergo funds and wallets to another application.
           </div>

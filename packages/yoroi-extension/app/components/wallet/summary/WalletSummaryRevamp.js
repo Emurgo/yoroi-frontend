@@ -5,11 +5,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './WalletSummary.scss';
+import BigNumber from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './WalletSummary.scss';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -32,7 +33,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,

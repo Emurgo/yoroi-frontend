@@ -59,6 +59,16 @@ export function identifierToCardanoAsset(
     name: RustModule.WalletV4.AssetName.new(Buffer.from(parts[1], 'hex')),
   };
 }
+export function identifierSplit(
+  identifier: string,
+): {| policyId: string, name: string |} {
+  // recall: 'a.'.split() gives ['a', ''] as desired
+  const parts = identifier.split('.');
+  return {
+    policyId: parts[0],
+    name: parts[1],
+  };
+}
 
 export function parseTokenList(
   assets: void | RustModule.WalletV4.MultiAsset,
@@ -411,4 +421,28 @@ export function asAddressedUtxo(
       assets,
     };
   });
+}
+
+export function iterateWasm<T>(iterable: ?{| get: number => T |}, len: ?number): T[] {
+  const res = [];
+  if (iterable != null) {
+    // $FlowFixMe
+    const l = len ?? iterable.len();
+    for (let i = 0; i < l; i++) {
+      res.push(iterable.get(i));
+    }
+  }
+  return res;
+}
+
+export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K[]): [K, V][] {
+  const res = [];
+  if (iterable != null) {
+    // $FlowFixMe
+    const k = keys ?? iterateWasm(iterable.keys());
+    for (const key of k) {
+      res.push([key, iterable.get(key)]);
+    }
+  }
+  return res;
 }

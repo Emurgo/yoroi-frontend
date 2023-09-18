@@ -1,5 +1,5 @@
-// @flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import { withScreenshot } from 'storycap';
