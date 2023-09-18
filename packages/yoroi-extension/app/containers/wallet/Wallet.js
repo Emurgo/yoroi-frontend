@@ -84,7 +84,10 @@ class Wallet extends Component<AllProps> {
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
-    if (!activeCategory?.isVisible(visibilityContext)) {
+    if (
+      !activeCategory?.isVisible(visibilityContext)
+      && activeCategory?.isHiddenButAllowed !== true
+    ) {
       const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
