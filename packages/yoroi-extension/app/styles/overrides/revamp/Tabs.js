@@ -2,6 +2,7 @@
 
 const RevampTabs = {
   styleOverrides: {
+    // $FlowFixMe
     root: ({ theme }) => ({
       borderBottom: 'none',
       borderTopLeftRadius: 8,

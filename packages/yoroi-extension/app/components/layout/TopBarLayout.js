@@ -105,6 +105,23 @@ function TopBarLayout({
       </>
     );
     if (showInContainer === true) {
+      const boxProperties = {
+        height: '100%',
+        minHeight: '200px',
+        backgroundColor: 'grey.50',
+        maxWidth: '1295px',
+        paddingLeft: '40px',
+        paddingRight: '40px',
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: 'calc(100vh - 110px)',
+      };
+      if (isRevampLayout && asModern !== true && !isModern) {
+        boxProperties.backgroundColor = 'common.white';
+      }
       return isRevampLayout && asModern !== true && !isModern ? (
         <Box
           sx={{
@@ -121,27 +138,7 @@ function TopBarLayout({
         </Box>
       ) : (
         <Box
-          sx={{
-            height: '100%',
-            minHeight: '200px',
-            backgroundColor: 'grey.50',
-            ...(showInContainer === true && {
-              maxWidth: '1295px',
-              paddingLeft: '40px',
-              paddingRight: '40px',
-              width: '100%',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              maxHeight: 'calc(100vh - 110px)',
-            }),
-            ...(isRevampLayout &&
-              asModern !== true &&
-              !isModern && {
-                backgroundColor: 'common.white',
-              }),
-          }}
+          sx={boxProperties}
         >
           {content}
         </Box>
