@@ -125,9 +125,6 @@ class WalletSummaryPage extends Component<AllProps> {
     );
 
     if (recent.length > 0) {
-      const { limit } = searchOptions;
-      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
-
       const mapWalletTransactionLayout = {
         CLASSIC: WalletTransactionsList,
         REVAMP: WalletTransactionsListRevamp,
