@@ -5,7 +5,11 @@ import type {
   lf$Transaction,
 } from 'lovefield';
 
-import { AddDerivation, GetOrAddDerivation, } from '../../../primitives/api/write';
+import {
+  AddDerivation,
+  GetOrAddDerivation,
+  ModifyAddress,
+} from '../../../primitives/api/write';
 import type {
   AddDerivationRequest,
   DerivationQueryResult,
@@ -73,6 +77,9 @@ export class AddDerivationTree {
         Array.from(derivationTables.values()),
         tableName,
       );
+      if (tree.children[i].isUsed) {
+        await ModifyAddress.markAsUsed(db, tx, [child.KeyDerivation.KeyDerivationId]);
+      }
       // recursively call down to the next level
       const children = tree.children[i].children == null
         ? undefined
