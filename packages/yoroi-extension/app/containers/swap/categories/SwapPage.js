@@ -28,9 +28,28 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
 import SwapPool from '../../../components/swap/SwapPool';
+import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 
 export default function SwapPage(): Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
+  const [openedDialog, setOpenedDialog] = useState('');
+  const [fromAsset, setFromAsset] = useState({ amount: '', walletAmount: 212, ticker: 'TADA' });
+  const [toAsset, setToAsset] = useState({ amount: '', walletAmount: 0, ticker: '' });
+
+  const handleOpenedDialog = type => setOpenedDialog(type);
+  const handleSwitchSelectedAssets = () => {
+    setFromAsset(toAsset);
+    setToAsset(fromAsset);
+  };
+  const handleSelectedAsset = (asset, type) => {
+    const func = type === 'from' ? setFromAsset : setToAsset;
+    func(asset);
+  };
+
+  const handleAmountChange = (amount, type) => {
+    const func = type === 'from' ? setFromAsset : setToAsset;
+    func(p => ({ ...p, amount }));
+  };
 
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
@@ -64,16 +83,19 @@ export default function SwapPage(): Node {
 
       {/* From Field */}
       <SwapInput
+        key={fromAsset.ticker}
         label="Swap from"
-        image={<AdaTokenImage />}
-        asset={{ amount: 212, ticker: 'TADA' }}
+        image={fromAsset.ticker.includes('ADA') ? <AdaTokenImage /> : null}
+        asset={fromAsset}
+        handleAmountChange={amount => handleAmountChange(amount, 'from')}
+        onAssetSelect={() => handleOpenedDialog('from')}
         showMax
         isFrom
       />
 
       {/* Clear and switch */}
       <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Box sx={{ cursor: 'pointer' }}>
+        <Box sx={{ cursor: 'pointer' }} onClick={handleSwitchSelectedAssets}>
           <SwitchIcon />
         </Box>
         <Box>
@@ -84,7 +106,14 @@ export default function SwapPage(): Node {
       </Box>
 
       {/* To Field */}
-      <SwapInput label="Swap to" asset={{ amount: 0, ticker: '' }} />
+      <SwapInput
+        key={toAsset.ticker}
+        label="Swap to"
+        image={toAsset.ticker.includes('ADA') ? <AdaTokenImage /> : null}
+        asset={toAsset}
+        onAssetSelect={() => handleOpenedDialog('to')}
+        handleAmountChange={amount => handleAmountChange(amount, 'to')}
+      />
 
       {/* Price between assets */}
       <Box mt="16px">
@@ -131,6 +160,25 @@ export default function SwapPage(): Node {
           ]}
         />
       </Box>
+
+      {/* Dialogs */}
+      {(openedDialog === 'from' || openedDialog === 'to') && (
+        <SelectAssetDialog
+          assets={[
+            { name: 'TADA', ticker: 'TADA', walletAmount: 212, address: 'TADA' },
+            {
+              name: 'Anzens USD',
+              ticker: 'USDA',
+              walletAmount: 10,
+              amount: 0,
+              address: 'addr1asdl4bl0f328dsckmx23443mllsdkfj32e4',
+            },
+          ]}
+          type={openedDialog}
+          onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
+          onClose={() => handleOpenedDialog('')}
+        />
+      )}
     </Box>
   );
 }

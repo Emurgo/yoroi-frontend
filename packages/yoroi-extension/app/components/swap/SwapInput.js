@@ -4,16 +4,18 @@ import { ReactComponent as ChevronIcon } from '../../assets/images/revamp/chevro
 import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
 
 export default function SwapInput({
-  label,
   isFrom = false,
   showMax = false,
   asset = {},
   image = null,
+  label,
   isLoading,
+  onAssetSelect,
+  handleAmountChange,
 }) {
-  const { amount, ticker } = asset;
+  const { amount, walletAmount, ticker } = asset;
   const [error, setError] = useState('');
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(amount);
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {
@@ -24,12 +26,14 @@ export default function SwapInput({
     }
 
     const val = Number(e.target.value);
-    const checkAmount = isFrom ? amount : Infinity;
+    const checkAmount = isFrom ? walletAmount : Infinity;
 
     if (val !== 0 && val > checkAmount) {
       setError('Not enough balance');
     } else if (Number.isNaN(val)) {
       setError('Invalid amount');
+    } else {
+      handleAmountChange(val);
     }
 
     setInputValue(e.target.value);
@@ -89,7 +93,7 @@ export default function SwapInput({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <Box sx={{ justifySelf: 'end', cursor: 'pointer' }}>
+        <Box sx={{ justifySelf: 'end', cursor: 'pointer' }} onClick={onAssetSelect}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
             <Box>{image || <DefaultTokenImage />}</Box>
             <Box width="max-content">{ticker || 'Select asset'}</Box>
@@ -105,7 +109,10 @@ export default function SwapInput({
               variant="caption"
               fontWeight={500}
               sx={{ p: '4px 8px', bgcolor: '#F0F3F5', borderRadius: '8px' }}
-              onClick={() => setInputValue(amount)}
+              onClick={() => {
+                setInputValue(walletAmount);
+                handleAmountChange(walletAmount);
+              }}
             >
               MAX
             </Typography>
@@ -115,7 +122,7 @@ export default function SwapInput({
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography variant="caption" color="#6B7384">
-            Current balance: {amount} {ticker}
+            Current balance: {walletAmount} {ticker}
           </Typography>
         </Box>
       </Box>
